@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -22,14 +22,16 @@ import com.liferay.portalweb.portal.util.RuntimeVariables;
  */
 public class InternationalizationJapaneseTest extends BaseTestCase {
 	public void testInternationalizationJapanese() throws Exception {
+		selenium.open("/web/guest/home/");
+		loadRequiredJavaScriptModules();
+
 		for (int second = 0;; second++) {
-			if (second >= 60) {
+			if (second >= 90) {
 				fail("timeout");
 			}
 
 			try {
-				if (selenium.isElementPresent(
-							"//img[@alt='\u65e5\u672c\u8a9e (\u65e5\u672c)']")) {
+				if (selenium.isVisible("link=Language Test Page")) {
 					break;
 				}
 			}
@@ -39,26 +41,62 @@ public class InternationalizationJapaneseTest extends BaseTestCase {
 			Thread.sleep(1000);
 		}
 
-		selenium.saveScreenShotAndSource();
-		selenium.click(RuntimeVariables.replace(
-				"//img[@alt='\u65e5\u672c\u8a9e (\u65e5\u672c)']"));
+		selenium.clickAt("link=Language Test Page",
+			RuntimeVariables.replace("Language Test Page"));
 		selenium.waitForPageToLoad("30000");
-		selenium.saveScreenShotAndSource();
-		Thread.sleep(5000);
-		selenium.clickAt("//nav/ul/li[2]/a/span", RuntimeVariables.replace(""));
-		selenium.typeKeys("//input",
+		loadRequiredJavaScriptModules();
+		selenium.clickAt("//img[@alt='\u65e5\u672c\u8a9e (\u65e5\u672c) - Beta']",
+			RuntimeVariables.replace("\u65e5\u672c\u8a9e (\u65e5\u672c) - Beta"));
+		selenium.waitForPageToLoad("30000");
+		loadRequiredJavaScriptModules();
+		selenium.clickAt("//nav/ul/li[2]/a/span",
+			RuntimeVariables.replace("Edit Page Name"));
+
+		for (int second = 0;; second++) {
+			if (second >= 90) {
+				fail("timeout");
+			}
+
+			try {
+				if (selenium.isVisible("//input[@type='text']")) {
+					break;
+				}
+			}
+			catch (Exception e) {
+			}
+
+			Thread.sleep(1000);
+		}
+
+		selenium.type("//input[@type='text']",
 			RuntimeVariables.replace(
 				"\u8a00\u8a9e\u30c6\u30b9\u30c8\u30da\u30fc\u30b8"));
-		selenium.saveScreenShotAndSource();
-		selenium.type("//input",
-			RuntimeVariables.replace(
-				"\u8a00\u8a9e\u30c6\u30b9\u30c8\u30da\u30fc\u30b8"));
-		selenium.saveScreenShotAndSource();
-		selenium.clickAt("save", RuntimeVariables.replace(""));
-		Thread.sleep(5000);
+		selenium.clickAt("//button[@id='save']",
+			RuntimeVariables.replace("Save"));
+
+		for (int second = 0;; second++) {
+			if (second >= 90) {
+				fail("timeout");
+			}
+
+			try {
+				if (selenium.isVisible(
+							"link=\u8a00\u8a9e\u30c6\u30b9\u30c8\u30da\u30fc\u30b8")) {
+					break;
+				}
+			}
+			catch (Exception e) {
+			}
+
+			Thread.sleep(1000);
+		}
+
+		assertTrue(selenium.isVisible(
+				"link=\u8a00\u8a9e\u30c6\u30b9\u30c8\u30da\u30fc\u30b8"));
 		selenium.clickAt("//img[@alt='English (United States)']",
-			RuntimeVariables.replace(""));
+			RuntimeVariables.replace("English (United States)"));
 		selenium.waitForPageToLoad("30000");
-		selenium.saveScreenShotAndSource();
+		loadRequiredJavaScriptModules();
+		assertTrue(selenium.isVisible("link=Language Test Page"));
 	}
 }

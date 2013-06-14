@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -31,6 +31,17 @@ public class AssetTagFinderUtil {
 		java.lang.String[] tagProperties)
 		throws com.liferay.portal.kernel.exception.SystemException {
 		return getFinder().countByG_N_P(groupId, name, tagProperties);
+	}
+
+	public static int filterCountByG_N(long groupId, java.lang.String name)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getFinder().filterCountByG_N(groupId, name);
+	}
+
+	public static int filterCountByG_C_N(long groupId, long classNameId,
+		java.lang.String name)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getFinder().filterCountByG_C_N(groupId, classNameId, name);
 	}
 
 	public static int filterCountByG_N_P(long groupId, java.lang.String name,
@@ -97,6 +108,15 @@ public class AssetTagFinderUtil {
 		throws com.liferay.portal.kernel.exception.SystemException {
 		return getFinder()
 				   .findByG_N_P(groupId, name, tagProperties, start, end, obc);
+	}
+
+	public static java.util.List<com.liferay.portlet.asset.model.AssetTag> findByG_N_S_E(
+		long groupId, java.lang.String name, int startPeriod, int endPeriod,
+		int periodLength)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getFinder()
+				   .findByG_N_S_E(groupId, name, startPeriod, endPeriod,
+			periodLength);
 	}
 
 	public static AssetTagFinder getFinder() {

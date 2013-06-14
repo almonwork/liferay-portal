@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -15,7 +15,6 @@
 package com.liferay.portlet.asset.service;
 
 import com.liferay.portal.kernel.bean.PortalBeanLocatorUtil;
-import com.liferay.portal.kernel.util.MethodCache;
 import com.liferay.portal.kernel.util.ReferenceRegistry;
 
 /**
@@ -66,25 +65,32 @@ public class AssetLinkLocalServiceUtil {
 	* Deletes the asset link with the primary key from the database. Also notifies the appropriate model listeners.
 	*
 	* @param linkId the primary key of the asset link
+	* @return the asset link that was removed
 	* @throws PortalException if a asset link with the primary key could not be found
 	* @throws SystemException if a system exception occurred
 	*/
-	public static void deleteAssetLink(long linkId)
+	public static com.liferay.portlet.asset.model.AssetLink deleteAssetLink(
+		long linkId)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException {
-		getService().deleteAssetLink(linkId);
+		return getService().deleteAssetLink(linkId);
 	}
 
 	/**
 	* Deletes the asset link from the database. Also notifies the appropriate model listeners.
 	*
 	* @param assetLink the asset link
+	* @return the asset link that was removed
 	* @throws SystemException if a system exception occurred
 	*/
-	public static void deleteAssetLink(
+	public static com.liferay.portlet.asset.model.AssetLink deleteAssetLink(
 		com.liferay.portlet.asset.model.AssetLink assetLink)
 		throws com.liferay.portal.kernel.exception.SystemException {
-		getService().deleteAssetLink(assetLink);
+		return getService().deleteAssetLink(assetLink);
+	}
+
+	public static com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery() {
+		return getService().dynamicQuery();
 	}
 
 	/**
@@ -156,6 +162,11 @@ public class AssetLinkLocalServiceUtil {
 		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery)
 		throws com.liferay.portal.kernel.exception.SystemException {
 		return getService().dynamicQueryCount(dynamicQuery);
+	}
+
+	public static com.liferay.portlet.asset.model.AssetLink fetchAssetLink(
+		long linkId) throws com.liferay.portal.kernel.exception.SystemException {
+		return getService().fetchAssetLink(linkId);
 	}
 
 	/**
@@ -254,6 +265,24 @@ public class AssetLinkLocalServiceUtil {
 		getService().setBeanIdentifier(beanIdentifier);
 	}
 
+	/**
+	* Adds a new asset link.
+	*
+	* @param userId the primary key of the link's creator
+	* @param entryId1 the primary key of the first asset entry
+	* @param entryId2 the primary key of the second asset entry
+	* @param type the link type. Acceptable values include {@link
+	com.liferay.portlet.asset.model.AssetLinkConstants#TYPE_RELATED}
+	which is a bidirectional relationship and {@link
+	com.liferay.portlet.asset.model.AssetLinkConstants#TYPE_CHILD}
+	which is a unidirectional relationship. For more information see
+	{@link com.liferay.portlet.asset.model.AssetLinkConstants}
+	* @param weight the weight of the relationship, allowing precedence
+	ordering of links
+	* @return the asset link
+	* @throws PortalException if the user could not be found
+	* @throws SystemException if a system exception occurred
+	*/
 	public static com.liferay.portlet.asset.model.AssetLink addLink(
 		long userId, long entryId1, long entryId2, int type, int weight)
 		throws com.liferay.portal.kernel.exception.PortalException,
@@ -261,58 +290,171 @@ public class AssetLinkLocalServiceUtil {
 		return getService().addLink(userId, entryId1, entryId2, type, weight);
 	}
 
+	/**
+	* Deletes the asset link.
+	*
+	* @param link the asset link
+	* @throws SystemException if a system exception occurred
+	*/
 	public static void deleteLink(
 		com.liferay.portlet.asset.model.AssetLink link)
 		throws com.liferay.portal.kernel.exception.SystemException {
 		getService().deleteLink(link);
 	}
 
+	/**
+	* Deletes the asset link.
+	*
+	* @param linkId the primary key of the asset link
+	* @throws PortalException if the asset link could not be found
+	* @throws SystemException if a system exception occurred
+	*/
 	public static void deleteLink(long linkId)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException {
 		getService().deleteLink(linkId);
 	}
 
+	/**
+	* Deletes all links associated with the asset entry.
+	*
+	* @param entryId the primary key of the asset entry
+	* @throws SystemException if a system exception occurred
+	*/
 	public static void deleteLinks(long entryId)
 		throws com.liferay.portal.kernel.exception.SystemException {
 		getService().deleteLinks(entryId);
 	}
 
+	/**
+	* Delete all links that associate the two asset entries.
+	*
+	* @param entryId1 the primary key of the first asset entry
+	* @param entryId2 the primary key of the second asset entry
+	* @throws SystemException if a system exception occurred
+	*/
 	public static void deleteLinks(long entryId1, long entryId2)
 		throws com.liferay.portal.kernel.exception.SystemException {
 		getService().deleteLinks(entryId1, entryId2);
 	}
 
+	/**
+	* Returns all the asset links whose first entry ID is the given entry ID.
+	*
+	* @param entryId the primary key of the asset entry
+	* @return the asset links whose first entry ID is the given entry ID
+	* @throws SystemException if a system exception occurred
+	*/
 	public static java.util.List<com.liferay.portlet.asset.model.AssetLink> getDirectLinks(
 		long entryId)
 		throws com.liferay.portal.kernel.exception.SystemException {
 		return getService().getDirectLinks(entryId);
 	}
 
+	/**
+	* Returns all the asset links of the given link type whose first entry ID
+	* is the given entry ID.
+	*
+	* @param entryId the primary key of the asset entry
+	* @param typeId the link type. Acceptable values include {@link
+	com.liferay.portlet.asset.model.AssetLinkConstants#TYPE_RELATED}
+	which is a bidirectional relationship and {@link
+	com.liferay.portlet.asset.model.AssetLinkConstants#TYPE_CHILD}
+	which is a unidirectional relationship. For more information see
+	{@link com.liferay.portlet.asset.model.AssetLinkConstants}
+	* @return the asset links of the given link type whose first entry ID is
+	the given entry ID
+	* @throws SystemException if a system exception occurred
+	*/
 	public static java.util.List<com.liferay.portlet.asset.model.AssetLink> getDirectLinks(
 		long entryId, int typeId)
 		throws com.liferay.portal.kernel.exception.SystemException {
 		return getService().getDirectLinks(entryId, typeId);
 	}
 
+	/**
+	* Returns all the asset links whose first or second entry ID is the given
+	* entry ID.
+	*
+	* @param entryId the primary key of the asset entry
+	* @return the asset links whose first or second entry ID is the given entry
+	ID
+	* @throws SystemException if a system exception occurred
+	*/
 	public static java.util.List<com.liferay.portlet.asset.model.AssetLink> getLinks(
 		long entryId)
 		throws com.liferay.portal.kernel.exception.SystemException {
 		return getService().getLinks(entryId);
 	}
 
+	/**
+	* Returns all the asset links of the given link type whose first or second
+	* entry ID is the given entry ID.
+	*
+	* @param entryId the primary key of the asset entry
+	* @param typeId the link type. Acceptable values include {@link
+	com.liferay.portlet.asset.model.AssetLinkConstants#TYPE_RELATED}
+	which is a bidirectional relationship and {@link
+	com.liferay.portlet.asset.model.AssetLinkConstants#TYPE_CHILD}
+	which is a unidirectional relationship. For more information see
+	{@link com.liferay.portlet.asset.model.AssetLinkConstants}
+	* @return the asset links of the given link type whose first or second
+	entry ID is the given entry ID
+	* @throws SystemException if a system exception occurred
+	*/
 	public static java.util.List<com.liferay.portlet.asset.model.AssetLink> getLinks(
 		long entryId, int typeId)
 		throws com.liferay.portal.kernel.exception.SystemException {
 		return getService().getLinks(entryId, typeId);
 	}
 
+	/**
+	* Returns all the asset links of the given link type whose second entry ID
+	* is the given entry ID.
+	*
+	* @param entryId the primary key of the asset entry
+	* @param typeId the link type. Acceptable values include {@link
+	com.liferay.portlet.asset.model.AssetLinkConstants#TYPE_RELATED}
+	which is a bidirectional relationship and {@link
+	com.liferay.portlet.asset.model.AssetLinkConstants#TYPE_CHILD}
+	which is a unidirectional relationship. For more information see
+	{@link com.liferay.portlet.asset.model.AssetLinkConstants}
+	* @return the asset links of the given link type whose second entry ID is
+	the given entry ID
+	* @throws SystemException if a system exception occurred
+	*/
 	public static java.util.List<com.liferay.portlet.asset.model.AssetLink> getReverseLinks(
 		long entryId, int typeId)
 		throws com.liferay.portal.kernel.exception.SystemException {
 		return getService().getReverseLinks(entryId, typeId);
 	}
 
+	/**
+	* Updates all links of the asset entry, replacing them with links
+	* associating the asset entry with the asset entries of the given link
+	* entry IDs.
+	*
+	* <p>
+	* If no link exists with a given link entry ID, a new link is created
+	* associating the current asset entry with the asset entry of that link
+	* entry ID. An existing link is deleted if either of its entry IDs is not
+	* contained in the given link entry IDs.
+	* </p>
+	*
+	* @param userId the primary key of the user updating the links
+	* @param entryId the primary key of the asset entry to be managed
+	* @param linkEntryIds the primary keys of the asset entries to be linked
+	with the asset entry to be managed
+	* @param typeId the type of the asset links to be created. Acceptable
+	values include {@link
+	com.liferay.portlet.asset.model.AssetLinkConstants#TYPE_RELATED}
+	which is a bidirectional relationship and {@link
+	com.liferay.portlet.asset.model.AssetLinkConstants#TYPE_CHILD}
+	which is a unidirectional relationship. For more information see
+	{@link com.liferay.portlet.asset.model.AssetLinkConstants}
+	* @throws PortalException if the user could not be found
+	* @throws SystemException if a system exception occurred
+	*/
 	public static void updateLinks(long userId, long entryId,
 		long[] linkEntryIds, int typeId)
 		throws com.liferay.portal.kernel.exception.PortalException,
@@ -326,20 +468,15 @@ public class AssetLinkLocalServiceUtil {
 
 			ReferenceRegistry.registerReference(AssetLinkLocalServiceUtil.class,
 				"_service");
-			MethodCache.remove(AssetLinkLocalService.class);
 		}
 
 		return _service;
 	}
 
+	/**
+	 * @deprecated
+	 */
 	public void setService(AssetLinkLocalService service) {
-		MethodCache.remove(AssetLinkLocalService.class);
-
-		_service = service;
-
-		ReferenceRegistry.registerReference(AssetLinkLocalServiceUtil.class,
-			"_service");
-		MethodCache.remove(AssetLinkLocalService.class);
 	}
 
 	private static AssetLinkLocalService _service;

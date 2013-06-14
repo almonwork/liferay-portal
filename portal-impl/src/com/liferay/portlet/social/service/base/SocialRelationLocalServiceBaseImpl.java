@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -21,44 +21,39 @@ import com.liferay.portal.kernel.bean.IdentifiableBean;
 import com.liferay.portal.kernel.dao.jdbc.SqlUpdate;
 import com.liferay.portal.kernel.dao.jdbc.SqlUpdateFactoryUtil;
 import com.liferay.portal.kernel.dao.orm.DynamicQuery;
+import com.liferay.portal.kernel.dao.orm.DynamicQueryFactoryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
-import com.liferay.portal.kernel.search.Indexer;
-import com.liferay.portal.kernel.search.IndexerRegistryUtil;
-import com.liferay.portal.kernel.search.SearchException;
+import com.liferay.portal.kernel.search.Indexable;
+import com.liferay.portal.kernel.search.IndexableType;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.model.PersistedModel;
+import com.liferay.portal.service.BaseLocalServiceImpl;
 import com.liferay.portal.service.PersistedModelLocalServiceRegistry;
 import com.liferay.portal.service.ResourceLocalService;
-import com.liferay.portal.service.ResourceService;
 import com.liferay.portal.service.UserLocalService;
 import com.liferay.portal.service.UserService;
-import com.liferay.portal.service.persistence.ResourceFinder;
-import com.liferay.portal.service.persistence.ResourcePersistence;
 import com.liferay.portal.service.persistence.UserFinder;
 import com.liferay.portal.service.persistence.UserPersistence;
 
 import com.liferay.portlet.social.model.SocialRelation;
+import com.liferay.portlet.social.service.SocialActivityAchievementLocalService;
+import com.liferay.portlet.social.service.SocialActivityCounterLocalService;
 import com.liferay.portlet.social.service.SocialActivityInterpreterLocalService;
+import com.liferay.portlet.social.service.SocialActivityLimitLocalService;
 import com.liferay.portlet.social.service.SocialActivityLocalService;
-import com.liferay.portlet.social.service.SocialEquityGroupSettingLocalService;
-import com.liferay.portlet.social.service.SocialEquityHistoryLocalService;
-import com.liferay.portlet.social.service.SocialEquityLogLocalService;
-import com.liferay.portlet.social.service.SocialEquitySettingLocalService;
-import com.liferay.portlet.social.service.SocialEquityUserLocalService;
+import com.liferay.portlet.social.service.SocialActivitySettingLocalService;
+import com.liferay.portlet.social.service.SocialActivitySettingService;
 import com.liferay.portlet.social.service.SocialRelationLocalService;
 import com.liferay.portlet.social.service.SocialRequestInterpreterLocalService;
 import com.liferay.portlet.social.service.SocialRequestLocalService;
+import com.liferay.portlet.social.service.persistence.SocialActivityAchievementPersistence;
+import com.liferay.portlet.social.service.persistence.SocialActivityCounterFinder;
+import com.liferay.portlet.social.service.persistence.SocialActivityCounterPersistence;
 import com.liferay.portlet.social.service.persistence.SocialActivityFinder;
+import com.liferay.portlet.social.service.persistence.SocialActivityLimitPersistence;
 import com.liferay.portlet.social.service.persistence.SocialActivityPersistence;
-import com.liferay.portlet.social.service.persistence.SocialEquityAssetEntryPersistence;
-import com.liferay.portlet.social.service.persistence.SocialEquityGroupSettingPersistence;
-import com.liferay.portlet.social.service.persistence.SocialEquityHistoryPersistence;
-import com.liferay.portlet.social.service.persistence.SocialEquityLogPersistence;
-import com.liferay.portlet.social.service.persistence.SocialEquitySettingPersistence;
-import com.liferay.portlet.social.service.persistence.SocialEquityUserPersistence;
+import com.liferay.portlet.social.service.persistence.SocialActivitySettingPersistence;
 import com.liferay.portlet.social.service.persistence.SocialRelationPersistence;
 import com.liferay.portlet.social.service.persistence.SocialRequestPersistence;
 
@@ -81,7 +76,8 @@ import javax.sql.DataSource;
  * @generated
  */
 public abstract class SocialRelationLocalServiceBaseImpl
-	implements SocialRelationLocalService, IdentifiableBean {
+	extends BaseLocalServiceImpl implements SocialRelationLocalService,
+		IdentifiableBean {
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
@@ -95,26 +91,12 @@ public abstract class SocialRelationLocalServiceBaseImpl
 	 * @return the social relation that was added
 	 * @throws SystemException if a system exception occurred
 	 */
+	@Indexable(type = IndexableType.REINDEX)
 	public SocialRelation addSocialRelation(SocialRelation socialRelation)
 		throws SystemException {
 		socialRelation.setNew(true);
 
-		socialRelation = socialRelationPersistence.update(socialRelation, false);
-
-		Indexer indexer = IndexerRegistryUtil.getIndexer(getModelClassName());
-
-		if (indexer != null) {
-			try {
-				indexer.reindex(socialRelation);
-			}
-			catch (SearchException se) {
-				if (_log.isWarnEnabled()) {
-					_log.warn(se, se);
-				}
-			}
-		}
-
-		return socialRelation;
+		return socialRelationPersistence.update(socialRelation, false);
 	}
 
 	/**
@@ -131,49 +113,34 @@ public abstract class SocialRelationLocalServiceBaseImpl
 	 * Deletes the social relation with the primary key from the database. Also notifies the appropriate model listeners.
 	 *
 	 * @param relationId the primary key of the social relation
+	 * @return the social relation that was removed
 	 * @throws PortalException if a social relation with the primary key could not be found
 	 * @throws SystemException if a system exception occurred
 	 */
-	public void deleteSocialRelation(long relationId)
+	@Indexable(type = IndexableType.DELETE)
+	public SocialRelation deleteSocialRelation(long relationId)
 		throws PortalException, SystemException {
-		SocialRelation socialRelation = socialRelationPersistence.remove(relationId);
-
-		Indexer indexer = IndexerRegistryUtil.getIndexer(getModelClassName());
-
-		if (indexer != null) {
-			try {
-				indexer.delete(socialRelation);
-			}
-			catch (SearchException se) {
-				if (_log.isWarnEnabled()) {
-					_log.warn(se, se);
-				}
-			}
-		}
+		return socialRelationPersistence.remove(relationId);
 	}
 
 	/**
 	 * Deletes the social relation from the database. Also notifies the appropriate model listeners.
 	 *
 	 * @param socialRelation the social relation
+	 * @return the social relation that was removed
 	 * @throws SystemException if a system exception occurred
 	 */
-	public void deleteSocialRelation(SocialRelation socialRelation)
+	@Indexable(type = IndexableType.DELETE)
+	public SocialRelation deleteSocialRelation(SocialRelation socialRelation)
 		throws SystemException {
-		socialRelationPersistence.remove(socialRelation);
+		return socialRelationPersistence.remove(socialRelation);
+	}
 
-		Indexer indexer = IndexerRegistryUtil.getIndexer(getModelClassName());
+	public DynamicQuery dynamicQuery() {
+		Class<?> clazz = getClass();
 
-		if (indexer != null) {
-			try {
-				indexer.delete(socialRelation);
-			}
-			catch (SearchException se) {
-				if (_log.isWarnEnabled()) {
-					_log.warn(se, se);
-				}
-			}
-		}
+		return DynamicQueryFactoryUtil.forClass(SocialRelation.class,
+			clazz.getClassLoader());
 	}
 
 	/**
@@ -242,6 +209,11 @@ public abstract class SocialRelationLocalServiceBaseImpl
 		return socialRelationPersistence.countWithDynamicQuery(dynamicQuery);
 	}
 
+	public SocialRelation fetchSocialRelation(long relationId)
+		throws SystemException {
+		return socialRelationPersistence.fetchByPrimaryKey(relationId);
+	}
+
 	/**
 	 * Returns the social relation with the primary key.
 	 *
@@ -294,6 +266,7 @@ public abstract class SocialRelationLocalServiceBaseImpl
 	 * @return the social relation that was updated
 	 * @throws SystemException if a system exception occurred
 	 */
+	@Indexable(type = IndexableType.REINDEX)
 	public SocialRelation updateSocialRelation(SocialRelation socialRelation)
 		throws SystemException {
 		return updateSocialRelation(socialRelation, true);
@@ -307,26 +280,12 @@ public abstract class SocialRelationLocalServiceBaseImpl
 	 * @return the social relation that was updated
 	 * @throws SystemException if a system exception occurred
 	 */
+	@Indexable(type = IndexableType.REINDEX)
 	public SocialRelation updateSocialRelation(SocialRelation socialRelation,
 		boolean merge) throws SystemException {
 		socialRelation.setNew(false);
 
-		socialRelation = socialRelationPersistence.update(socialRelation, merge);
-
-		Indexer indexer = IndexerRegistryUtil.getIndexer(getModelClassName());
-
-		if (indexer != null) {
-			try {
-				indexer.reindex(socialRelation);
-			}
-			catch (SearchException se) {
-				if (_log.isWarnEnabled()) {
-					_log.warn(se, se);
-				}
-			}
-		}
-
-		return socialRelation;
+		return socialRelationPersistence.update(socialRelation, merge);
 	}
 
 	/**
@@ -387,6 +346,101 @@ public abstract class SocialRelationLocalServiceBaseImpl
 	}
 
 	/**
+	 * Returns the social activity achievement local service.
+	 *
+	 * @return the social activity achievement local service
+	 */
+	public SocialActivityAchievementLocalService getSocialActivityAchievementLocalService() {
+		return socialActivityAchievementLocalService;
+	}
+
+	/**
+	 * Sets the social activity achievement local service.
+	 *
+	 * @param socialActivityAchievementLocalService the social activity achievement local service
+	 */
+	public void setSocialActivityAchievementLocalService(
+		SocialActivityAchievementLocalService socialActivityAchievementLocalService) {
+		this.socialActivityAchievementLocalService = socialActivityAchievementLocalService;
+	}
+
+	/**
+	 * Returns the social activity achievement persistence.
+	 *
+	 * @return the social activity achievement persistence
+	 */
+	public SocialActivityAchievementPersistence getSocialActivityAchievementPersistence() {
+		return socialActivityAchievementPersistence;
+	}
+
+	/**
+	 * Sets the social activity achievement persistence.
+	 *
+	 * @param socialActivityAchievementPersistence the social activity achievement persistence
+	 */
+	public void setSocialActivityAchievementPersistence(
+		SocialActivityAchievementPersistence socialActivityAchievementPersistence) {
+		this.socialActivityAchievementPersistence = socialActivityAchievementPersistence;
+	}
+
+	/**
+	 * Returns the social activity counter local service.
+	 *
+	 * @return the social activity counter local service
+	 */
+	public SocialActivityCounterLocalService getSocialActivityCounterLocalService() {
+		return socialActivityCounterLocalService;
+	}
+
+	/**
+	 * Sets the social activity counter local service.
+	 *
+	 * @param socialActivityCounterLocalService the social activity counter local service
+	 */
+	public void setSocialActivityCounterLocalService(
+		SocialActivityCounterLocalService socialActivityCounterLocalService) {
+		this.socialActivityCounterLocalService = socialActivityCounterLocalService;
+	}
+
+	/**
+	 * Returns the social activity counter persistence.
+	 *
+	 * @return the social activity counter persistence
+	 */
+	public SocialActivityCounterPersistence getSocialActivityCounterPersistence() {
+		return socialActivityCounterPersistence;
+	}
+
+	/**
+	 * Sets the social activity counter persistence.
+	 *
+	 * @param socialActivityCounterPersistence the social activity counter persistence
+	 */
+	public void setSocialActivityCounterPersistence(
+		SocialActivityCounterPersistence socialActivityCounterPersistence) {
+		this.socialActivityCounterPersistence = socialActivityCounterPersistence;
+	}
+
+	/**
+	 * Returns the social activity counter finder.
+	 *
+	 * @return the social activity counter finder
+	 */
+	public SocialActivityCounterFinder getSocialActivityCounterFinder() {
+		return socialActivityCounterFinder;
+	}
+
+	/**
+	 * Sets the social activity counter finder.
+	 *
+	 * @param socialActivityCounterFinder the social activity counter finder
+	 */
+	public void setSocialActivityCounterFinder(
+		SocialActivityCounterFinder socialActivityCounterFinder) {
+		this.socialActivityCounterFinder = socialActivityCounterFinder;
+	}
+
+	/**
 	 * Returns the social activity interpreter local service.
 	 *
 	 * @return the social activity interpreter local service
@@ -406,212 +460,98 @@ public abstract class SocialRelationLocalServiceBaseImpl
 	}
 
 	/**
-	 * Returns the social equity asset entry persistence.
+	 * Returns the social activity limit local service.
 	 *
-	 * @return the social equity asset entry persistence
+	 * @return the social activity limit local service
 	 */
-	public SocialEquityAssetEntryPersistence getSocialEquityAssetEntryPersistence() {
-		return socialEquityAssetEntryPersistence;
+	public SocialActivityLimitLocalService getSocialActivityLimitLocalService() {
+		return socialActivityLimitLocalService;
 	}
 
 	/**
-	 * Sets the social equity asset entry persistence.
+	 * Sets the social activity limit local service.
 	 *
-	 * @param socialEquityAssetEntryPersistence the social equity asset entry persistence
+	 * @param socialActivityLimitLocalService the social activity limit local service
 	 */
-	public void setSocialEquityAssetEntryPersistence(
-		SocialEquityAssetEntryPersistence socialEquityAssetEntryPersistence) {
-		this.socialEquityAssetEntryPersistence = socialEquityAssetEntryPersistence;
+	public void setSocialActivityLimitLocalService(
+		SocialActivityLimitLocalService socialActivityLimitLocalService) {
+		this.socialActivityLimitLocalService = socialActivityLimitLocalService;
 	}
 
 	/**
-	 * Returns the social equity group setting local service.
+	 * Returns the social activity limit persistence.
 	 *
-	 * @return the social equity group setting local service
+	 * @return the social activity limit persistence
 	 */
-	public SocialEquityGroupSettingLocalService getSocialEquityGroupSettingLocalService() {
-		return socialEquityGroupSettingLocalService;
+	public SocialActivityLimitPersistence getSocialActivityLimitPersistence() {
+		return socialActivityLimitPersistence;
 	}
 
 	/**
-	 * Sets the social equity group setting local service.
+	 * Sets the social activity limit persistence.
 	 *
-	 * @param socialEquityGroupSettingLocalService the social equity group setting local service
+	 * @param socialActivityLimitPersistence the social activity limit persistence
 	 */
-	public void setSocialEquityGroupSettingLocalService(
-		SocialEquityGroupSettingLocalService socialEquityGroupSettingLocalService) {
-		this.socialEquityGroupSettingLocalService = socialEquityGroupSettingLocalService;
+	public void setSocialActivityLimitPersistence(
+		SocialActivityLimitPersistence socialActivityLimitPersistence) {
+		this.socialActivityLimitPersistence = socialActivityLimitPersistence;
 	}
 
 	/**
-	 * Returns the social equity group setting persistence.
+	 * Returns the social activity setting local service.
 	 *
-	 * @return the social equity group setting persistence
+	 * @return the social activity setting local service
 	 */
-	public SocialEquityGroupSettingPersistence getSocialEquityGroupSettingPersistence() {
-		return socialEquityGroupSettingPersistence;
+	public SocialActivitySettingLocalService getSocialActivitySettingLocalService() {
+		return socialActivitySettingLocalService;
 	}
 
 	/**
-	 * Sets the social equity group setting persistence.
+	 * Sets the social activity setting local service.
 	 *
-	 * @param socialEquityGroupSettingPersistence the social equity group setting persistence
+	 * @param socialActivitySettingLocalService the social activity setting local service
 	 */
-	public void setSocialEquityGroupSettingPersistence(
-		SocialEquityGroupSettingPersistence socialEquityGroupSettingPersistence) {
-		this.socialEquityGroupSettingPersistence = socialEquityGroupSettingPersistence;
+	public void setSocialActivitySettingLocalService(
+		SocialActivitySettingLocalService socialActivitySettingLocalService) {
+		this.socialActivitySettingLocalService = socialActivitySettingLocalService;
 	}
 
 	/**
-	 * Returns the social equity history local service.
+	 * Returns the social activity setting remote service.
 	 *
-	 * @return the social equity history local service
+	 * @return the social activity setting remote service
 	 */
-	public SocialEquityHistoryLocalService getSocialEquityHistoryLocalService() {
-		return socialEquityHistoryLocalService;
+	public SocialActivitySettingService getSocialActivitySettingService() {
+		return socialActivitySettingService;
 	}
 
 	/**
-	 * Sets the social equity history local service.
+	 * Sets the social activity setting remote service.
 	 *
-	 * @param socialEquityHistoryLocalService the social equity history local service
+	 * @param socialActivitySettingService the social activity setting remote service
 	 */
-	public void setSocialEquityHistoryLocalService(
-		SocialEquityHistoryLocalService socialEquityHistoryLocalService) {
-		this.socialEquityHistoryLocalService = socialEquityHistoryLocalService;
+	public void setSocialActivitySettingService(
+		SocialActivitySettingService socialActivitySettingService) {
+		this.socialActivitySettingService = socialActivitySettingService;
 	}
 
 	/**
-	 * Returns the social equity history persistence.
+	 * Returns the social activity setting persistence.
 	 *
-	 * @return the social equity history persistence
+	 * @return the social activity setting persistence
 	 */
-	public SocialEquityHistoryPersistence getSocialEquityHistoryPersistence() {
-		return socialEquityHistoryPersistence;
+	public SocialActivitySettingPersistence getSocialActivitySettingPersistence() {
+		return socialActivitySettingPersistence;
 	}
 
 	/**
-	 * Sets the social equity history persistence.
+	 * Sets the social activity setting persistence.
 	 *
-	 * @param socialEquityHistoryPersistence the social equity history persistence
+	 * @param socialActivitySettingPersistence the social activity setting persistence
 	 */
-	public void setSocialEquityHistoryPersistence(
-		SocialEquityHistoryPersistence socialEquityHistoryPersistence) {
-		this.socialEquityHistoryPersistence = socialEquityHistoryPersistence;
-	}
-
-	/**
-	 * Returns the social equity log local service.
-	 *
-	 * @return the social equity log local service
-	 */
-	public SocialEquityLogLocalService getSocialEquityLogLocalService() {
-		return socialEquityLogLocalService;
-	}
-
-	/**
-	 * Sets the social equity log local service.
-	 *
-	 * @param socialEquityLogLocalService the social equity log local service
-	 */
-	public void setSocialEquityLogLocalService(
-		SocialEquityLogLocalService socialEquityLogLocalService) {
-		this.socialEquityLogLocalService = socialEquityLogLocalService;
-	}
-
-	/**
-	 * Returns the social equity log persistence.
-	 *
-	 * @return the social equity log persistence
-	 */
-	public SocialEquityLogPersistence getSocialEquityLogPersistence() {
-		return socialEquityLogPersistence;
-	}
-
-	/**
-	 * Sets the social equity log persistence.
-	 *
-	 * @param socialEquityLogPersistence the social equity log persistence
-	 */
-	public void setSocialEquityLogPersistence(
-		SocialEquityLogPersistence socialEquityLogPersistence) {
-		this.socialEquityLogPersistence = socialEquityLogPersistence;
-	}
-
-	/**
-	 * Returns the social equity setting local service.
-	 *
-	 * @return the social equity setting local service
-	 */
-	public SocialEquitySettingLocalService getSocialEquitySettingLocalService() {
-		return socialEquitySettingLocalService;
-	}
-
-	/**
-	 * Sets the social equity setting local service.
-	 *
-	 * @param socialEquitySettingLocalService the social equity setting local service
-	 */
-	public void setSocialEquitySettingLocalService(
-		SocialEquitySettingLocalService socialEquitySettingLocalService) {
-		this.socialEquitySettingLocalService = socialEquitySettingLocalService;
-	}
-
-	/**
-	 * Returns the social equity setting persistence.
-	 *
-	 * @return the social equity setting persistence
-	 */
-	public SocialEquitySettingPersistence getSocialEquitySettingPersistence() {
-		return socialEquitySettingPersistence;
-	}
-
-	/**
-	 * Sets the social equity setting persistence.
-	 *
-	 * @param socialEquitySettingPersistence the social equity setting persistence
-	 */
-	public void setSocialEquitySettingPersistence(
-		SocialEquitySettingPersistence socialEquitySettingPersistence) {
-		this.socialEquitySettingPersistence = socialEquitySettingPersistence;
-	}
-
-	/**
-	 * Returns the social equity user local service.
-	 *
-	 * @return the social equity user local service
-	 */
-	public SocialEquityUserLocalService getSocialEquityUserLocalService() {
-		return socialEquityUserLocalService;
-	}
-
-	/**
-	 * Sets the social equity user local service.
-	 *
-	 * @param socialEquityUserLocalService the social equity user local service
-	 */
-	public void setSocialEquityUserLocalService(
-		SocialEquityUserLocalService socialEquityUserLocalService) {
-		this.socialEquityUserLocalService = socialEquityUserLocalService;
-	}
-
-	/**
-	 * Returns the social equity user persistence.
-	 *
-	 * @return the social equity user persistence
-	 */
-	public SocialEquityUserPersistence getSocialEquityUserPersistence() {
-		return socialEquityUserPersistence;
-	}
-
-	/**
-	 * Sets the social equity user persistence.
-	 *
-	 * @param socialEquityUserPersistence the social equity user persistence
-	 */
-	public void setSocialEquityUserPersistence(
-		SocialEquityUserPersistence socialEquityUserPersistence) {
-		this.socialEquityUserPersistence = socialEquityUserPersistence;
+	public void setSocialActivitySettingPersistence(
+		SocialActivitySettingPersistence socialActivitySettingPersistence) {
+		this.socialActivitySettingPersistence = socialActivitySettingPersistence;
 	}
 
 	/**
@@ -747,60 +687,6 @@ public abstract class SocialRelationLocalServiceBaseImpl
 	}
 
 	/**
-	 * Returns the resource remote service.
-	 *
-	 * @return the resource remote service
-	 */
-	public ResourceService getResourceService() {
-		return resourceService;
-	}
-
-	/**
-	 * Sets the resource remote service.
-	 *
-	 * @param resourceService the resource remote service
-	 */
-	public void setResourceService(ResourceService resourceService) {
-		this.resourceService = resourceService;
-	}
-
-	/**
-	 * Returns the resource persistence.
-	 *
-	 * @return the resource persistence
-	 */
-	public ResourcePersistence getResourcePersistence() {
-		return resourcePersistence;
-	}
-
-	/**
-	 * Sets the resource persistence.
-	 *
-	 * @param resourcePersistence the resource persistence
-	 */
-	public void setResourcePersistence(ResourcePersistence resourcePersistence) {
-		this.resourcePersistence = resourcePersistence;
-	}
-
-	/**
-	 * Returns the resource finder.
-	 *
-	 * @return the resource finder
-	 */
-	public ResourceFinder getResourceFinder() {
-		return resourceFinder;
-	}
-
-	/**
-	 * Sets the resource finder.
-	 *
-	 * @param resourceFinder the resource finder
-	 */
-	public void setResourceFinder(ResourceFinder resourceFinder) {
-		this.resourceFinder = resourceFinder;
-	}
-
-	/**
 	 * Returns the user local service.
 	 *
 	 * @return the user local service
@@ -933,30 +819,28 @@ public abstract class SocialRelationLocalServiceBaseImpl
 	protected SocialActivityPersistence socialActivityPersistence;
 	@BeanReference(type = SocialActivityFinder.class)
 	protected SocialActivityFinder socialActivityFinder;
+	@BeanReference(type = SocialActivityAchievementLocalService.class)
+	protected SocialActivityAchievementLocalService socialActivityAchievementLocalService;
+	@BeanReference(type = SocialActivityAchievementPersistence.class)
+	protected SocialActivityAchievementPersistence socialActivityAchievementPersistence;
+	@BeanReference(type = SocialActivityCounterLocalService.class)
+	protected SocialActivityCounterLocalService socialActivityCounterLocalService;
+	@BeanReference(type = SocialActivityCounterPersistence.class)
+	protected SocialActivityCounterPersistence socialActivityCounterPersistence;
+	@BeanReference(type = SocialActivityCounterFinder.class)
+	protected SocialActivityCounterFinder socialActivityCounterFinder;
 	@BeanReference(type = SocialActivityInterpreterLocalService.class)
 	protected SocialActivityInterpreterLocalService socialActivityInterpreterLocalService;
-	@BeanReference(type = SocialEquityAssetEntryPersistence.class)
-	protected SocialEquityAssetEntryPersistence socialEquityAssetEntryPersistence;
-	@BeanReference(type = SocialEquityGroupSettingLocalService.class)
-	protected SocialEquityGroupSettingLocalService socialEquityGroupSettingLocalService;
-	@BeanReference(type = SocialEquityGroupSettingPersistence.class)
-	protected SocialEquityGroupSettingPersistence socialEquityGroupSettingPersistence;
-	@BeanReference(type = SocialEquityHistoryLocalService.class)
-	protected SocialEquityHistoryLocalService socialEquityHistoryLocalService;
-	@BeanReference(type = SocialEquityHistoryPersistence.class)
-	protected SocialEquityHistoryPersistence socialEquityHistoryPersistence;
-	@BeanReference(type = SocialEquityLogLocalService.class)
-	protected SocialEquityLogLocalService socialEquityLogLocalService;
-	@BeanReference(type = SocialEquityLogPersistence.class)
-	protected SocialEquityLogPersistence socialEquityLogPersistence;
-	@BeanReference(type = SocialEquitySettingLocalService.class)
-	protected SocialEquitySettingLocalService socialEquitySettingLocalService;
-	@BeanReference(type = SocialEquitySettingPersistence.class)
-	protected SocialEquitySettingPersistence socialEquitySettingPersistence;
-	@BeanReference(type = SocialEquityUserLocalService.class)
-	protected SocialEquityUserLocalService socialEquityUserLocalService;
-	@BeanReference(type = SocialEquityUserPersistence.class)
-	protected SocialEquityUserPersistence socialEquityUserPersistence;
+	@BeanReference(type = SocialActivityLimitLocalService.class)
+	protected SocialActivityLimitLocalService socialActivityLimitLocalService;
+	@BeanReference(type = SocialActivityLimitPersistence.class)
+	protected SocialActivityLimitPersistence socialActivityLimitPersistence;
+	@BeanReference(type = SocialActivitySettingLocalService.class)
+	protected SocialActivitySettingLocalService socialActivitySettingLocalService;
+	@BeanReference(type = SocialActivitySettingService.class)
+	protected SocialActivitySettingService socialActivitySettingService;
+	@BeanReference(type = SocialActivitySettingPersistence.class)
+	protected SocialActivitySettingPersistence socialActivitySettingPersistence;
 	@BeanReference(type = SocialRelationLocalService.class)
 	protected SocialRelationLocalService socialRelationLocalService;
 	@BeanReference(type = SocialRelationPersistence.class)
@@ -971,12 +855,6 @@ public abstract class SocialRelationLocalServiceBaseImpl
 	protected CounterLocalService counterLocalService;
 	@BeanReference(type = ResourceLocalService.class)
 	protected ResourceLocalService resourceLocalService;
-	@BeanReference(type = ResourceService.class)
-	protected ResourceService resourceService;
-	@BeanReference(type = ResourcePersistence.class)
-	protected ResourcePersistence resourcePersistence;
-	@BeanReference(type = ResourceFinder.class)
-	protected ResourceFinder resourceFinder;
 	@BeanReference(type = UserLocalService.class)
 	protected UserLocalService userLocalService;
 	@BeanReference(type = UserService.class)
@@ -987,6 +865,5 @@ public abstract class SocialRelationLocalServiceBaseImpl
 	protected UserFinder userFinder;
 	@BeanReference(type = PersistedModelLocalServiceRegistry.class)
 	protected PersistedModelLocalServiceRegistry persistedModelLocalServiceRegistry;
-	private static Log _log = LogFactoryUtil.getLog(SocialRelationLocalServiceBaseImpl.class);
 	private String _beanIdentifier;
 }

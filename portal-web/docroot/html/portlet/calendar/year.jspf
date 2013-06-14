@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -21,7 +21,7 @@
 		<tr>
 			<td>
 				<a href="<%= urlWithoutAnchor %>&<portlet:namespace />month=<%= selMonth %>&<portlet:namespace />day=<%= selDay %>&<portlet:namespace />year=<%= selYear - 1 %>&<portlet:namespace />eventType=<%= HtmlUtil.escape(eventType) + urlAnchor %>">
-				<img border="0" src="<%= themeDisplay.getPathThemeImages() %>/arrows/01_left.png" />
+				<img alt="<liferay-ui:message key="previous" />" border="0" src="<%= themeDisplay.getPathThemeImages() %>/arrows/01_left.png" />
 				</a>
 			</td>
 			<td>
@@ -36,7 +36,7 @@
 					for (int i = -10; i <= 10; i++) {
 					%>
 
-						<aui:option selected="<%= (curYear - selYear + i) == 0 %>" label="<%= curYear + i %>" />
+						<aui:option label="<%= curYear + i %>" selected="<%= (curYear - selYear + i) == 0 %>" />
 
 					<%
 					}
@@ -46,7 +46,7 @@
 			</td>
 			<td>
 				<a href="<%= urlWithoutAnchor %>&<portlet:namespace />month=<%= selMonth %>&<portlet:namespace />day=<%= selDay %>&<portlet:namespace />year=<%= selYear + 1 %>&<portlet:namespace />eventType=<%= HtmlUtil.escape(eventType) + urlAnchor %>">
-				<img border="0" src="<%= themeDisplay.getPathThemeImages() %>/arrows/01_right.png" />
+				<img alt="<liferay-ui:message key="next" />" border="0" src="<%= themeDisplay.getPathThemeImages() %>/arrows/01_right.png" />
 				</a>
 			</td>
 		</tr>
@@ -129,12 +129,12 @@
 			%>
 
 			<liferay-ui:calendar
-				month="<%= month %>"
-				day="<%= day %>"
-				year="<%= year %>"
-				headerPattern="MMMM"
 				data="<%= data %>"
+				day="<%= day %>"
+				headerPattern="MMMM"
+				month="<%= month %>"
 				showAllPotentialWeeks="<%= true %>"
+				year="<%= year %>"
 			/>
 		</liferay-ui:table-iterator>
 	</td>

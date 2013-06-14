@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -38,6 +38,14 @@ public class MemoryValueMapper implements ValueMapper {
 		_exceptions = exceptions;
 	}
 
+	public void appendException(Object exception) {
+		_exceptions.add(exception);
+	}
+
+	public Map<Object, Object> getMap() {
+		return _map;
+	}
+
 	public Object getNewValue(Object oldValue) throws Exception {
 		Object value = _map.get(oldValue);
 
@@ -53,27 +61,19 @@ public class MemoryValueMapper implements ValueMapper {
 		return value;
 	}
 
-	public void mapValue(Object oldValue, Object newValue) throws Exception {
-		_map.put(oldValue, newValue);
-	}
-
-	public void appendException(Object exception) {
-		_exceptions.add(exception);
-	}
-
 	public Iterator<Object> iterator() throws Exception {
 		return _map.keySet().iterator();
+	}
+
+	public void mapValue(Object oldValue, Object newValue) throws Exception {
+		_map.put(oldValue, newValue);
 	}
 
 	public int size() throws Exception {
 		return _map.size();
 	}
 
-	public Map<Object, Object> getMap() {
-		return _map;
-	}
-
-	private Map<Object, Object> _map;
 	private Set<Object> _exceptions;
+	private Map<Object, Object> _map;
 
 }

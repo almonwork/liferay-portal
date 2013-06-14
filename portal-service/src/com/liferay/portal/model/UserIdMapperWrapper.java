@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,6 +14,9 @@
 
 package com.liferay.portal.model;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * <p>
  * This class is a wrapper for {@link UserIdMapper}.
@@ -23,7 +26,8 @@ package com.liferay.portal.model;
  * @see       UserIdMapper
  * @generated
  */
-public class UserIdMapperWrapper implements UserIdMapper {
+public class UserIdMapperWrapper implements UserIdMapper,
+	ModelWrapper<UserIdMapper> {
 	public UserIdMapperWrapper(UserIdMapper userIdMapper) {
 		_userIdMapper = userIdMapper;
 	}
@@ -34,6 +38,50 @@ public class UserIdMapperWrapper implements UserIdMapper {
 
 	public String getModelClassName() {
 		return UserIdMapper.class.getName();
+	}
+
+	public Map<String, Object> getModelAttributes() {
+		Map<String, Object> attributes = new HashMap<String, Object>();
+
+		attributes.put("userIdMapperId", getUserIdMapperId());
+		attributes.put("userId", getUserId());
+		attributes.put("type", getType());
+		attributes.put("description", getDescription());
+		attributes.put("externalUserId", getExternalUserId());
+
+		return attributes;
+	}
+
+	public void setModelAttributes(Map<String, Object> attributes) {
+		Long userIdMapperId = (Long)attributes.get("userIdMapperId");
+
+		if (userIdMapperId != null) {
+			setUserIdMapperId(userIdMapperId);
+		}
+
+		Long userId = (Long)attributes.get("userId");
+
+		if (userId != null) {
+			setUserId(userId);
+		}
+
+		String type = (String)attributes.get("type");
+
+		if (type != null) {
+			setType(type);
+		}
+
+		String description = (String)attributes.get("description");
+
+		if (description != null) {
+			setDescription(description);
+		}
+
+		String externalUserId = (String)attributes.get("externalUserId");
+
+		if (externalUserId != null) {
+			setExternalUserId(externalUserId);
+		}
 	}
 
 	/**
@@ -184,10 +232,6 @@ public class UserIdMapperWrapper implements UserIdMapper {
 		return _userIdMapper.isEscapedModel();
 	}
 
-	public void setEscapedModel(boolean escapedModel) {
-		_userIdMapper.setEscapedModel(escapedModel);
-	}
-
 	public java.io.Serializable getPrimaryKeyObj() {
 		return _userIdMapper.getPrimaryKeyObj();
 	}
@@ -241,7 +285,14 @@ public class UserIdMapperWrapper implements UserIdMapper {
 		_userIdMapper.persist();
 	}
 
+	/**
+	 * @deprecated Renamed to {@link #getWrappedModel}
+	 */
 	public UserIdMapper getWrappedUserIdMapper() {
+		return _userIdMapper;
+	}
+
+	public UserIdMapper getWrappedModel() {
 		return _userIdMapper;
 	}
 

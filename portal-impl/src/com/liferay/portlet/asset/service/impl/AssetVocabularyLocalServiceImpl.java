@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -18,6 +18,7 @@ import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
+import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.UnicodeProperties;
@@ -107,12 +108,12 @@ public class AssetVocabularyLocalServiceImpl
 
 		// Resources
 
-		if (serviceContext.getAddGroupPermissions() ||
-			serviceContext.getAddGuestPermissions()) {
+		if (serviceContext.isAddGroupPermissions() ||
+			serviceContext.isAddGuestPermissions()) {
 
 			addVocabularyResources(
-				vocabulary, serviceContext.getAddGroupPermissions(),
-				serviceContext.getAddGuestPermissions());
+				vocabulary, serviceContext.isAddGroupPermissions(),
+				serviceContext.isAddGuestPermissions());
 		}
 		else {
 			addVocabularyResources(
@@ -144,6 +145,17 @@ public class AssetVocabularyLocalServiceImpl
 			vocabulary.getCompanyId(), vocabulary.getGroupId(),
 			vocabulary.getUserId(), AssetVocabulary.class.getName(),
 			vocabulary.getVocabularyId(), groupPermissions, guestPermissions);
+	}
+
+	public void deleteVocabularies(long groupId)
+		throws PortalException, SystemException {
+
+		List<AssetVocabulary> vocabularies =
+			assetVocabularyPersistence.findByGroupId(groupId);
+
+		for (AssetVocabulary vocabulary : vocabularies) {
+			deleteVocabulary(vocabulary);
+		}
 	}
 
 	public void deleteVocabulary(AssetVocabulary vocabulary)
@@ -202,7 +214,7 @@ public class AssetVocabularyLocalServiceImpl
 				continue;
 			}
 
-			for (AssetVocabulary groupVocabulary: groupVocabularies) {
+			for (AssetVocabulary groupVocabulary : groupVocabularies) {
 				UnicodeProperties settingsProperties =
 					groupVocabulary.getSettingsProperties();
 
@@ -262,6 +274,14 @@ public class AssetVocabularyLocalServiceImpl
 		vocabularies.add(vocabulary);
 
 		return vocabularies;
+	}
+
+	public List<AssetVocabulary> getGroupVocabularies(
+			long groupId, String name, int start, int end,
+			OrderByComparator obc)
+		throws SystemException {
+
+		return assetVocabularyFinder.findByG_N(groupId, name, start, end, obc);
 	}
 
 	public AssetVocabulary getGroupVocabulary(long groupId, String name)

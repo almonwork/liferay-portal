@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -23,9 +23,10 @@ import com.liferay.portalweb.portal.util.RuntimeVariables;
 public class ViewActivityBlogsEntryXSSTest extends BaseTestCase {
 	public void testViewActivityBlogsEntryXSS() throws Exception {
 		selenium.open("/group/joebloggs/home/");
+		loadRequiredJavaScriptModules();
 
 		for (int second = 0;; second++) {
-			if (second >= 60) {
+			if (second >= 90) {
 				fail("timeout");
 			}
 
@@ -40,17 +41,14 @@ public class ViewActivityBlogsEntryXSSTest extends BaseTestCase {
 			Thread.sleep(1000);
 		}
 
-		selenium.saveScreenShotAndSource();
 		selenium.clickAt("link=Activities Test Page",
 			RuntimeVariables.replace("Activities Test Page"));
 		selenium.waitForPageToLoad("30000");
-		selenium.saveScreenShotAndSource();
+		loadRequiredJavaScriptModules();
+		assertEquals(RuntimeVariables.replace("Powered By Liferay"),
+			selenium.getText("//footer[@id='footer']"));
 		assertEquals(RuntimeVariables.replace(
-				"Joe wrote a new blog entry, <script>alert(hello)</script>, in Liferay."),
+				"Joe wrote a new blog entry, <script>document.getElementById('footer').innerHTML=\"FAIL\";</script>, in Liferay."),
 			selenium.getText("//td[2]/div[1]"));
-		assertEquals(RuntimeVariables.replace("<script>alert(hello)</script>"),
-			selenium.getText("//td[2]/div[1]/a[1]"));
-		assertEquals(RuntimeVariables.replace("Liferay"),
-			selenium.getText("//td[2]/div[1]/a[2]"));
 	}
 }

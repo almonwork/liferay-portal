@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -92,14 +92,6 @@ public class SCProductEntryUtil {
 		return getPersistence()
 				   .findWithDynamicQuery(dynamicQuery, start, end,
 			orderByComparator);
-	}
-
-	/**
-	 * @see com.liferay.portal.service.persistence.BasePersistence#remove(com.liferay.portal.model.BaseModel)
-	 */
-	public static SCProductEntry remove(SCProductEntry scProductEntry)
-		throws SystemException {
-		return getPersistence().remove(scProductEntry);
 	}
 
 	/**
@@ -857,13 +849,14 @@ public class SCProductEntryUtil {
 	*
 	* @param repoGroupId the repo group ID
 	* @param repoArtifactId the repo artifact ID
+	* @return the s c product entry that was removed
 	* @throws SystemException if a system exception occurred
 	*/
-	public static void removeByRG_RA(java.lang.String repoGroupId,
-		java.lang.String repoArtifactId)
+	public static com.liferay.portlet.softwarecatalog.model.SCProductEntry removeByRG_RA(
+		java.lang.String repoGroupId, java.lang.String repoArtifactId)
 		throws com.liferay.portal.kernel.exception.SystemException,
 			com.liferay.portlet.softwarecatalog.NoSuchProductEntryException {
-		getPersistence().removeByRG_RA(repoGroupId, repoArtifactId);
+		return getPersistence().removeByRG_RA(repoGroupId, repoArtifactId);
 	}
 
 	/**
@@ -1199,11 +1192,10 @@ public class SCProductEntryUtil {
 		return _persistence;
 	}
 
+	/**
+	 * @deprecated
+	 */
 	public void setPersistence(SCProductEntryPersistence persistence) {
-		_persistence = persistence;
-
-		ReferenceRegistry.registerReference(SCProductEntryUtil.class,
-			"_persistence");
 	}
 
 	private static SCProductEntryPersistence _persistence;

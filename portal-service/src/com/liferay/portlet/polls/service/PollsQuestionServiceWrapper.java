@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,6 +14,8 @@
 
 package com.liferay.portlet.polls.service;
 
+import com.liferay.portal.service.ServiceWrapper;
+
 /**
  * <p>
  * This class is a wrapper for {@link PollsQuestionService}.
@@ -23,10 +25,29 @@ package com.liferay.portlet.polls.service;
  * @see       PollsQuestionService
  * @generated
  */
-public class PollsQuestionServiceWrapper implements PollsQuestionService {
+public class PollsQuestionServiceWrapper implements PollsQuestionService,
+	ServiceWrapper<PollsQuestionService> {
 	public PollsQuestionServiceWrapper(
 		PollsQuestionService pollsQuestionService) {
 		_pollsQuestionService = pollsQuestionService;
+	}
+
+	/**
+	* Returns the Spring bean ID for this bean.
+	*
+	* @return the Spring bean ID for this bean
+	*/
+	public java.lang.String getBeanIdentifier() {
+		return _pollsQuestionService.getBeanIdentifier();
+	}
+
+	/**
+	* Sets the Spring bean ID for this bean.
+	*
+	* @param beanIdentifier the Spring bean ID for this bean
+	*/
+	public void setBeanIdentifier(java.lang.String beanIdentifier) {
+		_pollsQuestionService.setBeanIdentifier(beanIdentifier);
 	}
 
 	public com.liferay.portlet.polls.model.PollsQuestion addQuestion(
@@ -73,12 +94,26 @@ public class PollsQuestionServiceWrapper implements PollsQuestionService {
 			neverExpire, choices, serviceContext);
 	}
 
+	/**
+	 * @deprecated Renamed to {@link #getWrappedService}
+	 */
 	public PollsQuestionService getWrappedPollsQuestionService() {
 		return _pollsQuestionService;
 	}
 
+	/**
+	 * @deprecated Renamed to {@link #setWrappedService}
+	 */
 	public void setWrappedPollsQuestionService(
 		PollsQuestionService pollsQuestionService) {
+		_pollsQuestionService = pollsQuestionService;
+	}
+
+	public PollsQuestionService getWrappedService() {
+		return _pollsQuestionService;
+	}
+
+	public void setWrappedService(PollsQuestionService pollsQuestionService) {
 		_pollsQuestionService = pollsQuestionService;
 	}
 

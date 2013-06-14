@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,6 +14,8 @@
 
 package com.liferay.portal.servlet.filters.minifier;
 
+import com.liferay.portal.kernel.cache.key.CacheKeyGenerator;
+import com.liferay.portal.kernel.cache.key.CacheKeyGeneratorUtil;
 import com.liferay.portal.kernel.configuration.Filter;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
@@ -37,6 +39,7 @@ import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.servlet.filters.BasePortalFilter;
 import com.liferay.portal.servlet.filters.dynamiccss.DynamicCSSUtil;
 import com.liferay.portal.util.JavaScriptBundleUtil;
+import com.liferay.portal.util.LimitedFilesCache;
 import com.liferay.portal.util.MinifierUtil;
 import com.liferay.portal.util.PropsUtil;
 import com.liferay.portal.util.PropsValues;
@@ -59,20 +62,10 @@ import javax.servlet.http.HttpServletResponse;
  */
 public class MinifierFilter extends BasePortalFilter {
 
-	@Override
-	public void init(FilterConfig filterConfig) {
-		super.init(filterConfig);
-
-		_servletContext = filterConfig.getServletContext();
-		_servletContextName = GetterUtil.getString(
-			_servletContext.getServletContextName());
-
-		if (Validator.isNull(_servletContextName)) {
-			_tempDir += "/portal";
-		}
-	}
-
-	protected String aggregateCss(String dir, String content)
+	/**
+	 * @see {@link DynamicCSSUtil#_propagateQueryString(String, String)}
+	 */
+	public static String aggregateCss(String dir, String content)
 		throws IOException {
 
 		StringBuilder sb = new StringBuilder(content.length());
@@ -89,7 +82,7 @@ public class MinifierFilter extends BasePortalFilter {
 				_CSS_IMPORT_END, importX + _CSS_IMPORT_BEGIN.length());
 
 			if ((importX == -1) || (importY == -1)) {
-				sb.append(content.substring(pos, content.length()));
+				sb.append(content.substring(pos));
 
 				break;
 			}
@@ -147,8 +140,7 @@ public class MinifierFilter extends BasePortalFilter {
 				importContent = StringUtil.replace(
 					importContent,
 					new String[] {
-						"url('" + relativePath,
-						"url(\"" + relativePath,
+						"url('" + relativePath, "url(\"" + relativePath,
 						"url(" + relativePath
 					},
 					new String[] {
@@ -167,6 +159,47 @@ public class MinifierFilter extends BasePortalFilter {
 		}
 
 		return sb.toString();
+	}
+
+	@Override
+	public void init(FilterConfig filterConfig) {
+		super.init(filterConfig);
+
+		_servletContext = filterConfig.getServletContext();
+		_servletContextName = GetterUtil.getString(
+			_servletContext.getServletContextName());
+
+		if (Validator.isNull(_servletContextName)) {
+			_tempDir += "/portal";
+		}
+
+		if (PropsValues.MINIFIER_FILES_LIMIT > 0) {
+			_limitedFilesCache = new LimitedFilesCache<String>(
+				PropsValues.MINIFIER_FILES_LIMIT);
+
+			if (_log.isDebugEnabled()) {
+				_log.debug(
+					"Minifier files limit " + PropsValues.MINIFIER_FILES_LIMIT);
+			}
+		}
+	}
+
+	protected String getCacheFileName(HttpServletRequest request) {
+		CacheKeyGenerator cacheKeyGenerator =
+			CacheKeyGeneratorUtil.getCacheKeyGenerator(
+				MinifierFilter.class.getName());
+
+		cacheKeyGenerator.append(request.getRequestURI());
+
+		String queryString = request.getQueryString();
+
+		if (queryString != null) {
+			cacheKeyGenerator.append(sterilizeQueryString(queryString));
+		}
+
+		String cacheKey = String.valueOf(cacheKeyGenerator.finish());
+
+		return _tempDir.concat(StringPool.SLASH).concat(cacheKey);
 	}
 
 	protected Object getMinifiedBundleContent(
@@ -195,24 +228,16 @@ public class MinifierFilter extends BasePortalFilter {
 			return null;
 		}
 
-		StringBundler sb = new StringBundler(4);
-
-		sb.append(_tempDir);
-		sb.append(request.getRequestURI());
-
-		String queryString = request.getQueryString();
-
-		if (queryString != null) {
-			sb.append(_QUESTION_SEPARATOR);
-			sb.append(sterilizeQueryString(queryString));
-		}
-
-		String cacheFileName = sb.toString();
+		String cacheFileName = getCacheFileName(request);
 
 		String[] fileNames = JavaScriptBundleUtil.getFileNames(
 			minifierBundleId);
 
 		File cacheFile = new File(cacheFileName);
+
+		if (_limitedFilesCache != null) {
+			_limitedFilesCache.put(cacheFileName);
+		}
 
 		if (cacheFile.exists()) {
 			boolean staleCache = false;
@@ -245,7 +270,7 @@ public class MinifierFilter extends BasePortalFilter {
 			minifiedContent = StringPool.BLANK;
 		}
 		else {
-			sb = new StringBundler(fileNames.length * 2);
+			StringBundler sb = new StringBundler(fileNames.length * 2);
 
 			for (String fileName : fileNames) {
 				String content = FileUtil.read(
@@ -309,25 +334,13 @@ public class MinifierFilter extends BasePortalFilter {
 			return null;
 		}
 
-		StringBundler sb = new StringBundler(4);
-
-		sb.append(_tempDir);
-		sb.append(requestURI);
-
-		String queryString = request.getQueryString();
-
-		if (queryString != null) {
-			sb.append(_QUESTION_SEPARATOR);
-			sb.append(sterilizeQueryString(queryString));
-		}
-
-		String cacheCommonFileName = sb.toString();
+		String cacheCommonFileName = getCacheFileName(request);
 
 		File cacheContentTypeFile = new File(
 			cacheCommonFileName + "_E_CONTENT_TYPE");
 		File cacheDataFile = new File(cacheCommonFileName + "_E_DATA");
 
-		if ((cacheDataFile.exists()) &&
+		if (cacheDataFile.exists() &&
 			(cacheDataFile.lastModified() >= file.lastModified())) {
 
 			if (cacheContentTypeFile.exists()) {
@@ -416,7 +429,7 @@ public class MinifierFilter extends BasePortalFilter {
 		String cssRealPath, String content) {
 
 		try {
-			content = DynamicCSSUtil.parseSass(cssRealPath, content);
+			content = DynamicCSSUtil.parseSass(request, cssRealPath, content);
 		}
 		catch (Exception e) {
 			_log.error("Unable to parse SASS on CSS " + cssRealPath, e);
@@ -479,8 +492,7 @@ public class MinifierFilter extends BasePortalFilter {
 
 	protected String sterilizeQueryString(String queryString) {
 		return StringUtil.replace(
-			queryString,
-			new String[] {StringPool.SLASH, StringPool.BACK_SLASH},
+			queryString, new String[] {StringPool.SLASH, StringPool.BACK_SLASH},
 			new String[] {StringPool.UNDERLINE, StringPool.UNDERLINE});
 	}
 
@@ -488,17 +500,15 @@ public class MinifierFilter extends BasePortalFilter {
 
 	private static final String _CSS_COMMENT_END = "*/";
 
+	private static final String _CSS_EXTENSION = ".css";
+
 	private static final String _CSS_IMPORT_BEGIN = "@import url(";
 
 	private static final String _CSS_IMPORT_END = ");";
 
-	private static final String _CSS_EXTENSION = ".css";
-
 	private static final String _JAVASCRIPT_EXTENSION = ".js";
 
 	private static final String _JSP_EXTENSION = ".jsp";
-
-	private static final String _QUESTION_SEPARATOR = "_Q_";
 
 	private static final String _TEMP_DIR =
 		SystemProperties.get(SystemProperties.TMP_DIR) + "/liferay/minifier";
@@ -508,6 +518,7 @@ public class MinifierFilter extends BasePortalFilter {
 	private static Pattern _pattern = Pattern.compile(
 		"^(\\.ie|\\.js\\.ie)([^}]*)}", Pattern.MULTILINE);
 
+	private LimitedFilesCache<String> _limitedFilesCache;
 	private ServletContext _servletContext;
 	private String _servletContextName;
 	private String _tempDir = _TEMP_DIR;

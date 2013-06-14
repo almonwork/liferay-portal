@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -15,7 +15,6 @@
 package com.liferay.portal.service;
 
 import com.liferay.portal.kernel.bean.PortalBeanLocatorUtil;
-import com.liferay.portal.kernel.util.MethodCache;
 import com.liferay.portal.kernel.util.ReferenceRegistry;
 
 /**
@@ -37,11 +36,68 @@ public class LayoutSetServiceUtil {
 	 *
 	 * Never modify this class directly. Add custom service methods to {@link com.liferay.portal.service.impl.LayoutSetServiceImpl} and rerun ServiceBuilder to regenerate this class.
 	 */
-	public static void updateLogo(long groupId, boolean privateLayout,
-		boolean logo, java.io.File file)
+
+	/**
+	* Returns the Spring bean ID for this bean.
+	*
+	* @return the Spring bean ID for this bean
+	*/
+	public static java.lang.String getBeanIdentifier() {
+		return getService().getBeanIdentifier();
+	}
+
+	/**
+	* Sets the Spring bean ID for this bean.
+	*
+	* @param beanIdentifier the Spring bean ID for this bean
+	*/
+	public static void setBeanIdentifier(java.lang.String beanIdentifier) {
+		getService().setBeanIdentifier(beanIdentifier);
+	}
+
+	/**
+	* Updates the state of the layout set prototype link.
+	*
+	* <p>
+	* <strong>Important:</strong> Setting
+	* <code>layoutSetPrototypeLinkEnabled</code> to <code>true</code> and
+	* <code>layoutSetPrototypeUuid</code> to <code>null</code> when the layout
+	* set prototype's current uuid is <code>null</code> will result in an
+	* <code>IllegalStateException</code>.
+	* </p>
+	*
+	* @param groupId the primary key of the group
+	* @param privateLayout whether the layout set is private to the group
+	* @param layoutSetPrototypeLinkEnabled whether the layout set prototype is
+	link enabled
+	* @param layoutSetPrototypeUuid the uuid of the layout set prototype to
+	link with
+	* @throws PortalException if a portal exception occurred
+	* @throws SystemException if a system exception occurred
+	*/
+	public static void updateLayoutSetPrototypeLinkEnabled(long groupId,
+		boolean privateLayout, boolean layoutSetPrototypeLinkEnabled,
+		java.lang.String layoutSetPrototypeUuid)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException {
-		getService().updateLogo(groupId, privateLayout, logo, file);
+		getService()
+			.updateLayoutSetPrototypeLinkEnabled(groupId, privateLayout,
+			layoutSetPrototypeLinkEnabled, layoutSetPrototypeUuid);
+	}
+
+	public static void updateLogo(long groupId, boolean privateLayout,
+		boolean logo, java.io.InputStream inputStream)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException {
+		getService().updateLogo(groupId, privateLayout, logo, inputStream);
+	}
+
+	public static void updateLogo(long groupId, boolean privateLayout,
+		boolean logo, java.io.InputStream inputStream, boolean cleanUpStream)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException {
+		getService()
+			.updateLogo(groupId, privateLayout, logo, inputStream, cleanUpStream);
 	}
 
 	public static com.liferay.portal.model.LayoutSet updateLookAndFeel(
@@ -75,20 +131,15 @@ public class LayoutSetServiceUtil {
 
 			ReferenceRegistry.registerReference(LayoutSetServiceUtil.class,
 				"_service");
-			MethodCache.remove(LayoutSetService.class);
 		}
 
 		return _service;
 	}
 
+	/**
+	 * @deprecated
+	 */
 	public void setService(LayoutSetService service) {
-		MethodCache.remove(LayoutSetService.class);
-
-		_service = service;
-
-		ReferenceRegistry.registerReference(LayoutSetServiceUtil.class,
-			"_service");
-		MethodCache.remove(LayoutSetService.class);
 	}
 
 	private static LayoutSetService _service;

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,6 +14,13 @@
 
 package com.liferay.portlet.documentlibrary.model;
 
+import com.liferay.portal.model.ModelWrapper;
+
+import java.sql.Blob;
+
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * <p>
  * This class is a wrapper for {@link DLContent}.
@@ -23,7 +30,7 @@ package com.liferay.portlet.documentlibrary.model;
  * @see       DLContent
  * @generated
  */
-public class DLContentWrapper implements DLContent {
+public class DLContentWrapper implements DLContent, ModelWrapper<DLContent> {
 	public DLContentWrapper(DLContent dlContent) {
 		_dlContent = dlContent;
 	}
@@ -34,6 +41,71 @@ public class DLContentWrapper implements DLContent {
 
 	public String getModelClassName() {
 		return DLContent.class.getName();
+	}
+
+	public Map<String, Object> getModelAttributes() {
+		Map<String, Object> attributes = new HashMap<String, Object>();
+
+		attributes.put("contentId", getContentId());
+		attributes.put("groupId", getGroupId());
+		attributes.put("companyId", getCompanyId());
+		attributes.put("repositoryId", getRepositoryId());
+		attributes.put("path", getPath());
+		attributes.put("version", getVersion());
+		attributes.put("data", getData());
+		attributes.put("size", getSize());
+
+		return attributes;
+	}
+
+	public void setModelAttributes(Map<String, Object> attributes) {
+		Long contentId = (Long)attributes.get("contentId");
+
+		if (contentId != null) {
+			setContentId(contentId);
+		}
+
+		Long groupId = (Long)attributes.get("groupId");
+
+		if (groupId != null) {
+			setGroupId(groupId);
+		}
+
+		Long companyId = (Long)attributes.get("companyId");
+
+		if (companyId != null) {
+			setCompanyId(companyId);
+		}
+
+		Long repositoryId = (Long)attributes.get("repositoryId");
+
+		if (repositoryId != null) {
+			setRepositoryId(repositoryId);
+		}
+
+		String path = (String)attributes.get("path");
+
+		if (path != null) {
+			setPath(path);
+		}
+
+		String version = (String)attributes.get("version");
+
+		if (version != null) {
+			setVersion(version);
+		}
+
+		Blob data = (Blob)attributes.get("data");
+
+		if (data != null) {
+			setData(data);
+		}
+
+		Long size = (Long)attributes.get("size");
+
+		if (size != null) {
+			setSize(size);
+		}
 	}
 
 	/**
@@ -106,24 +178,6 @@ public class DLContentWrapper implements DLContent {
 	*/
 	public void setCompanyId(long companyId) {
 		_dlContent.setCompanyId(companyId);
-	}
-
-	/**
-	* Returns the portlet ID of this document library content.
-	*
-	* @return the portlet ID of this document library content
-	*/
-	public java.lang.String getPortletId() {
-		return _dlContent.getPortletId();
-	}
-
-	/**
-	* Sets the portlet ID of this document library content.
-	*
-	* @param portletId the portlet ID of this document library content
-	*/
-	public void setPortletId(java.lang.String portletId) {
-		_dlContent.setPortletId(portletId);
 	}
 
 	/**
@@ -236,10 +290,6 @@ public class DLContentWrapper implements DLContent {
 		return _dlContent.isEscapedModel();
 	}
 
-	public void setEscapedModel(boolean escapedModel) {
-		_dlContent.setEscapedModel(escapedModel);
-	}
-
 	public java.io.Serializable getPrimaryKeyObj() {
 		return _dlContent.getPrimaryKeyObj();
 	}
@@ -294,7 +344,14 @@ public class DLContentWrapper implements DLContent {
 		_dlContent.persist();
 	}
 
+	/**
+	 * @deprecated Renamed to {@link #getWrappedModel}
+	 */
 	public DLContent getWrappedDLContent() {
+		return _dlContent;
+	}
+
+	public DLContent getWrappedModel() {
 		return _dlContent;
 	}
 

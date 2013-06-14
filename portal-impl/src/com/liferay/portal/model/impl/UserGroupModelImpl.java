@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -17,6 +17,7 @@ package com.liferay.portal.model.impl;
 import com.liferay.portal.kernel.bean.AutoEscapeBeanHandler;
 import com.liferay.portal.kernel.json.JSON;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.ProxyUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.model.CacheModel;
@@ -30,12 +31,12 @@ import com.liferay.portlet.expando.util.ExpandoBridgeFactoryUtil;
 
 import java.io.Serializable;
 
-import java.lang.reflect.Proxy;
-
 import java.sql.Types;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * The base model implementation for the UserGroup service. Represents a row in the &quot;UserGroup&quot; database table, with each column mapped to a property of this class.
@@ -65,11 +66,9 @@ public class UserGroupModelImpl extends BaseModelImpl<UserGroup>
 			{ "parentUserGroupId", Types.BIGINT },
 			{ "name", Types.VARCHAR },
 			{ "description", Types.VARCHAR },
-			{ "publicLayoutSetPrototypeId", Types.BIGINT },
-			{ "privateLayoutSetPrototypeId", Types.BIGINT },
 			{ "addedByLDAPImport", Types.BOOLEAN }
 		};
-	public static final String TABLE_SQL_CREATE = "create table UserGroup (userGroupId LONG not null primary key,companyId LONG,parentUserGroupId LONG,name VARCHAR(75) null,description STRING null,publicLayoutSetPrototypeId LONG,privateLayoutSetPrototypeId LONG,addedByLDAPImport BOOLEAN)";
+	public static final String TABLE_SQL_CREATE = "create table UserGroup (userGroupId LONG not null primary key,companyId LONG,parentUserGroupId LONG,name VARCHAR(75) null,description STRING null,addedByLDAPImport BOOLEAN)";
 	public static final String TABLE_SQL_DROP = "drop table UserGroup";
 	public static final String ORDER_BY_JPQL = " ORDER BY userGroup.name ASC";
 	public static final String ORDER_BY_SQL = " ORDER BY UserGroup.name ASC";
@@ -82,6 +81,12 @@ public class UserGroupModelImpl extends BaseModelImpl<UserGroup>
 	public static final boolean FINDER_CACHE_ENABLED = GetterUtil.getBoolean(com.liferay.portal.util.PropsUtil.get(
 				"value.object.finder.cache.enabled.com.liferay.portal.model.UserGroup"),
 			true);
+	public static final boolean COLUMN_BITMASK_ENABLED = GetterUtil.getBoolean(com.liferay.portal.util.PropsUtil.get(
+				"value.object.column.bitmask.enabled.com.liferay.portal.model.UserGroup"),
+			true);
+	public static long COMPANYID_COLUMN_BITMASK = 1L;
+	public static long NAME_COLUMN_BITMASK = 2L;
+	public static long PARENTUSERGROUPID_COLUMN_BITMASK = 4L;
 
 	/**
 	 * Converts the soap model instance into a normal model instance.
@@ -97,8 +102,6 @@ public class UserGroupModelImpl extends BaseModelImpl<UserGroup>
 		model.setParentUserGroupId(soapModel.getParentUserGroupId());
 		model.setName(soapModel.getName());
 		model.setDescription(soapModel.getDescription());
-		model.setPublicLayoutSetPrototypeId(soapModel.getPublicLayoutSetPrototypeId());
-		model.setPrivateLayoutSetPrototypeId(soapModel.getPrivateLayoutSetPrototypeId());
 		model.setAddedByLDAPImport(soapModel.getAddedByLDAPImport());
 
 		return model;
@@ -120,16 +123,14 @@ public class UserGroupModelImpl extends BaseModelImpl<UserGroup>
 		return models;
 	}
 
-	public Class<?> getModelClass() {
-		return UserGroup.class;
-	}
-
-	public String getModelClassName() {
-		return UserGroup.class.getName();
-	}
-
-	public static final String MAPPING_TABLE_GROUPS_USERGROUPS_NAME = com.liferay.portal.model.impl.GroupModelImpl.MAPPING_TABLE_GROUPS_USERGROUPS_NAME;
-	public static final boolean FINDER_CACHE_ENABLED_GROUPS_USERGROUPS = com.liferay.portal.model.impl.GroupModelImpl.FINDER_CACHE_ENABLED_GROUPS_USERGROUPS;
+	public static final String MAPPING_TABLE_GROUPS_USERGROUPS_NAME = "Groups_UserGroups";
+	public static final Object[][] MAPPING_TABLE_GROUPS_USERGROUPS_COLUMNS = {
+			{ "groupId", Types.BIGINT },
+			{ "userGroupId", Types.BIGINT }
+		};
+	public static final String MAPPING_TABLE_GROUPS_USERGROUPS_SQL_CREATE = "create table Groups_UserGroups (groupId LONG not null,userGroupId LONG not null,primary key (groupId, userGroupId))";
+	public static final boolean FINDER_CACHE_ENABLED_GROUPS_USERGROUPS = GetterUtil.getBoolean(com.liferay.portal.util.PropsUtil.get(
+				"value.object.finder.cache.enabled.Groups_UserGroups"), true);
 	public static final String MAPPING_TABLE_USERGROUPS_TEAMS_NAME = "UserGroups_Teams";
 	public static final Object[][] MAPPING_TABLE_USERGROUPS_TEAMS_COLUMNS = {
 			{ "userGroupId", Types.BIGINT },
@@ -138,8 +139,14 @@ public class UserGroupModelImpl extends BaseModelImpl<UserGroup>
 	public static final String MAPPING_TABLE_USERGROUPS_TEAMS_SQL_CREATE = "create table UserGroups_Teams (userGroupId LONG not null,teamId LONG not null,primary key (userGroupId, teamId))";
 	public static final boolean FINDER_CACHE_ENABLED_USERGROUPS_TEAMS = GetterUtil.getBoolean(com.liferay.portal.util.PropsUtil.get(
 				"value.object.finder.cache.enabled.UserGroups_Teams"), true);
-	public static final String MAPPING_TABLE_USERS_USERGROUPS_NAME = com.liferay.portal.model.impl.UserModelImpl.MAPPING_TABLE_USERS_USERGROUPS_NAME;
-	public static final boolean FINDER_CACHE_ENABLED_USERS_USERGROUPS = com.liferay.portal.model.impl.UserModelImpl.FINDER_CACHE_ENABLED_USERS_USERGROUPS;
+	public static final String MAPPING_TABLE_USERS_USERGROUPS_NAME = "Users_UserGroups";
+	public static final Object[][] MAPPING_TABLE_USERS_USERGROUPS_COLUMNS = {
+			{ "userGroupId", Types.BIGINT },
+			{ "userId", Types.BIGINT }
+		};
+	public static final String MAPPING_TABLE_USERS_USERGROUPS_SQL_CREATE = "create table Users_UserGroups (userGroupId LONG not null,userId LONG not null,primary key (userGroupId, userId))";
+	public static final boolean FINDER_CACHE_ENABLED_USERS_USERGROUPS = GetterUtil.getBoolean(com.liferay.portal.util.PropsUtil.get(
+				"value.object.finder.cache.enabled.Users_UserGroups"), true);
 	public static final long LOCK_EXPIRATION_TIME = GetterUtil.getLong(com.liferay.portal.util.PropsUtil.get(
 				"lock.expiration.time.com.liferay.portal.model.UserGroup"));
 
@@ -162,6 +169,67 @@ public class UserGroupModelImpl extends BaseModelImpl<UserGroup>
 		setPrimaryKey(((Long)primaryKeyObj).longValue());
 	}
 
+	public Class<?> getModelClass() {
+		return UserGroup.class;
+	}
+
+	public String getModelClassName() {
+		return UserGroup.class.getName();
+	}
+
+	@Override
+	public Map<String, Object> getModelAttributes() {
+		Map<String, Object> attributes = new HashMap<String, Object>();
+
+		attributes.put("userGroupId", getUserGroupId());
+		attributes.put("companyId", getCompanyId());
+		attributes.put("parentUserGroupId", getParentUserGroupId());
+		attributes.put("name", getName());
+		attributes.put("description", getDescription());
+		attributes.put("addedByLDAPImport", getAddedByLDAPImport());
+
+		return attributes;
+	}
+
+	@Override
+	public void setModelAttributes(Map<String, Object> attributes) {
+		Long userGroupId = (Long)attributes.get("userGroupId");
+
+		if (userGroupId != null) {
+			setUserGroupId(userGroupId);
+		}
+
+		Long companyId = (Long)attributes.get("companyId");
+
+		if (companyId != null) {
+			setCompanyId(companyId);
+		}
+
+		Long parentUserGroupId = (Long)attributes.get("parentUserGroupId");
+
+		if (parentUserGroupId != null) {
+			setParentUserGroupId(parentUserGroupId);
+		}
+
+		String name = (String)attributes.get("name");
+
+		if (name != null) {
+			setName(name);
+		}
+
+		String description = (String)attributes.get("description");
+
+		if (description != null) {
+			setDescription(description);
+		}
+
+		Boolean addedByLDAPImport = (Boolean)attributes.get("addedByLDAPImport");
+
+		if (addedByLDAPImport != null) {
+			setAddedByLDAPImport(addedByLDAPImport);
+		}
+	}
+
 	@JSON
 	public long getUserGroupId() {
 		return _userGroupId;
@@ -177,6 +245,8 @@ public class UserGroupModelImpl extends BaseModelImpl<UserGroup>
 	}
 
 	public void setCompanyId(long companyId) {
+		_columnBitmask |= COMPANYID_COLUMN_BITMASK;
+
 		if (!_setOriginalCompanyId) {
 			_setOriginalCompanyId = true;
 
@@ -196,7 +266,19 @@ public class UserGroupModelImpl extends BaseModelImpl<UserGroup>
 	}
 
 	public void setParentUserGroupId(long parentUserGroupId) {
+		_columnBitmask |= PARENTUSERGROUPID_COLUMN_BITMASK;
+
+		if (!_setOriginalParentUserGroupId) {
+			_setOriginalParentUserGroupId = true;
+
+			_originalParentUserGroupId = _parentUserGroupId;
+		}
+
 		_parentUserGroupId = parentUserGroupId;
+	}
+
+	public long getOriginalParentUserGroupId() {
+		return _originalParentUserGroupId;
 	}
 
 	@JSON
@@ -210,6 +292,8 @@ public class UserGroupModelImpl extends BaseModelImpl<UserGroup>
 	}
 
 	public void setName(String name) {
+		_columnBitmask = -1L;
+
 		if (_originalName == null) {
 			_originalName = _name;
 		}
@@ -236,24 +320,6 @@ public class UserGroupModelImpl extends BaseModelImpl<UserGroup>
 	}
 
 	@JSON
-	public long getPublicLayoutSetPrototypeId() {
-		return _publicLayoutSetPrototypeId;
-	}
-
-	public void setPublicLayoutSetPrototypeId(long publicLayoutSetPrototypeId) {
-		_publicLayoutSetPrototypeId = publicLayoutSetPrototypeId;
-	}
-
-	@JSON
-	public long getPrivateLayoutSetPrototypeId() {
-		return _privateLayoutSetPrototypeId;
-	}
-
-	public void setPrivateLayoutSetPrototypeId(long privateLayoutSetPrototypeId) {
-		_privateLayoutSetPrototypeId = privateLayoutSetPrototypeId;
-	}
-
-	@JSON
 	public boolean getAddedByLDAPImport() {
 		return _addedByLDAPImport;
 	}
@@ -266,35 +332,32 @@ public class UserGroupModelImpl extends BaseModelImpl<UserGroup>
 		_addedByLDAPImport = addedByLDAPImport;
 	}
 
+	public long getColumnBitmask() {
+		return _columnBitmask;
+	}
+
 	@Override
 	public UserGroup toEscapedModel() {
-		if (isEscapedModel()) {
-			return (UserGroup)this;
+		if (_escapedModelProxy == null) {
+			_escapedModelProxy = (UserGroup)ProxyUtil.newProxyInstance(_classLoader,
+					_escapedModelProxyInterfaces,
+					new AutoEscapeBeanHandler(this));
 		}
-		else {
-			if (_escapedModelProxy == null) {
-				_escapedModelProxy = (UserGroup)Proxy.newProxyInstance(_classLoader,
-						_escapedModelProxyInterfaces,
-						new AutoEscapeBeanHandler(this));
-			}
 
-			return _escapedModelProxy;
-		}
+		return _escapedModelProxy;
 	}
 
 	@Override
 	public ExpandoBridge getExpandoBridge() {
-		if (_expandoBridge == null) {
-			_expandoBridge = ExpandoBridgeFactoryUtil.getExpandoBridge(getCompanyId(),
-					UserGroup.class.getName(), getPrimaryKey());
-		}
-
-		return _expandoBridge;
+		return ExpandoBridgeFactoryUtil.getExpandoBridge(getCompanyId(),
+			UserGroup.class.getName(), getPrimaryKey());
 	}
 
 	@Override
 	public void setExpandoBridgeAttributes(ServiceContext serviceContext) {
-		getExpandoBridge().setAttributes(serviceContext);
+		ExpandoBridge expandoBridge = getExpandoBridge();
+
+		expandoBridge.setAttributes(serviceContext);
 	}
 
 	@Override
@@ -306,8 +369,6 @@ public class UserGroupModelImpl extends BaseModelImpl<UserGroup>
 		userGroupImpl.setParentUserGroupId(getParentUserGroupId());
 		userGroupImpl.setName(getName());
 		userGroupImpl.setDescription(getDescription());
-		userGroupImpl.setPublicLayoutSetPrototypeId(getPublicLayoutSetPrototypeId());
-		userGroupImpl.setPrivateLayoutSetPrototypeId(getPrivateLayoutSetPrototypeId());
 		userGroupImpl.setAddedByLDAPImport(getAddedByLDAPImport());
 
 		userGroupImpl.resetOriginalValues();
@@ -365,7 +426,13 @@ public class UserGroupModelImpl extends BaseModelImpl<UserGroup>
 
 		userGroupModelImpl._setOriginalCompanyId = false;
 
+		userGroupModelImpl._originalParentUserGroupId = userGroupModelImpl._parentUserGroupId;
+
+		userGroupModelImpl._setOriginalParentUserGroupId = false;
+
 		userGroupModelImpl._originalName = userGroupModelImpl._name;
+
+		userGroupModelImpl._columnBitmask = 0;
 	}
 
 	@Override
@@ -394,10 +461,6 @@ public class UserGroupModelImpl extends BaseModelImpl<UserGroup>
 			userGroupCacheModel.description = null;
 		}
 
-		userGroupCacheModel.publicLayoutSetPrototypeId = getPublicLayoutSetPrototypeId();
-
-		userGroupCacheModel.privateLayoutSetPrototypeId = getPrivateLayoutSetPrototypeId();
-
 		userGroupCacheModel.addedByLDAPImport = getAddedByLDAPImport();
 
 		return userGroupCacheModel;
@@ -405,7 +468,7 @@ public class UserGroupModelImpl extends BaseModelImpl<UserGroup>
 
 	@Override
 	public String toString() {
-		StringBundler sb = new StringBundler(17);
+		StringBundler sb = new StringBundler(13);
 
 		sb.append("{userGroupId=");
 		sb.append(getUserGroupId());
@@ -417,10 +480,6 @@ public class UserGroupModelImpl extends BaseModelImpl<UserGroup>
 		sb.append(getName());
 		sb.append(", description=");
 		sb.append(getDescription());
-		sb.append(", publicLayoutSetPrototypeId=");
-		sb.append(getPublicLayoutSetPrototypeId());
-		sb.append(", privateLayoutSetPrototypeId=");
-		sb.append(getPrivateLayoutSetPrototypeId());
 		sb.append(", addedByLDAPImport=");
 		sb.append(getAddedByLDAPImport());
 		sb.append("}");
@@ -429,7 +488,7 @@ public class UserGroupModelImpl extends BaseModelImpl<UserGroup>
 	}
 
 	public String toXmlString() {
-		StringBundler sb = new StringBundler(28);
+		StringBundler sb = new StringBundler(22);
 
 		sb.append("<model><model-name>");
 		sb.append("com.liferay.portal.model.UserGroup");
@@ -456,14 +515,6 @@ public class UserGroupModelImpl extends BaseModelImpl<UserGroup>
 		sb.append(getDescription());
 		sb.append("]]></column-value></column>");
 		sb.append(
-			"<column><column-name>publicLayoutSetPrototypeId</column-name><column-value><![CDATA[");
-		sb.append(getPublicLayoutSetPrototypeId());
-		sb.append("]]></column-value></column>");
-		sb.append(
-			"<column><column-name>privateLayoutSetPrototypeId</column-name><column-value><![CDATA[");
-		sb.append(getPrivateLayoutSetPrototypeId());
-		sb.append("]]></column-value></column>");
-		sb.append(
 			"<column><column-name>addedByLDAPImport</column-name><column-value><![CDATA[");
 		sb.append(getAddedByLDAPImport());
 		sb.append("]]></column-value></column>");
@@ -482,12 +533,12 @@ public class UserGroupModelImpl extends BaseModelImpl<UserGroup>
 	private long _originalCompanyId;
 	private boolean _setOriginalCompanyId;
 	private long _parentUserGroupId;
+	private long _originalParentUserGroupId;
+	private boolean _setOriginalParentUserGroupId;
 	private String _name;
 	private String _originalName;
 	private String _description;
-	private long _publicLayoutSetPrototypeId;
-	private long _privateLayoutSetPrototypeId;
 	private boolean _addedByLDAPImport;
-	private transient ExpandoBridge _expandoBridge;
+	private long _columnBitmask;
 	private UserGroup _escapedModelProxy;
 }

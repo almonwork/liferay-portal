@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -28,9 +28,10 @@ public class TearDownWCWebContentTest extends BaseTestCase {
 			switch (label) {
 			case 1:
 				selenium.open("/web/guest/home/");
+				loadRequiredJavaScriptModules();
 
 				for (int second = 0;; second++) {
-					if (second >= 60) {
+					if (second >= 90) {
 						fail("timeout");
 					}
 
@@ -45,110 +46,34 @@ public class TearDownWCWebContentTest extends BaseTestCase {
 					Thread.sleep(1000);
 				}
 
-				selenium.saveScreenShotAndSource();
 				selenium.clickAt("link=Control Panel",
 					RuntimeVariables.replace("Control Panel"));
 				selenium.waitForPageToLoad("30000");
-				selenium.saveScreenShotAndSource();
+				loadRequiredJavaScriptModules();
 				selenium.clickAt("link=Web Content",
 					RuntimeVariables.replace("Web Content"));
 				selenium.waitForPageToLoad("30000");
-				selenium.saveScreenShotAndSource();
+				loadRequiredJavaScriptModules();
 
-				boolean webContent1Present = selenium.isElementPresent(
+				boolean webContentPresent = selenium.isElementPresent(
 						"_15_rowIds");
 
-				if (!webContent1Present) {
+				if (!webContentPresent) {
 					label = 2;
 
 					continue;
 				}
 
-				selenium.clickAt("_15_rowIds", RuntimeVariables.replace("Flag"));
+				selenium.clickAt("//input[@name='_15_allRowIds']",
+					RuntimeVariables.replace("All Rows"));
 				selenium.click(RuntimeVariables.replace(
 						"//input[@value='Delete']"));
 				selenium.waitForPageToLoad("30000");
+				loadRequiredJavaScriptModules();
 				assertTrue(selenium.getConfirmation()
 								   .matches("^Are you sure you want to delete the selected web content[\\s\\S]$"));
-				selenium.saveScreenShotAndSource();
 
 			case 2:
-
-				boolean webContent2Present = selenium.isElementPresent(
-						"_15_rowIds");
-
-				if (!webContent2Present) {
-					label = 3;
-
-					continue;
-				}
-
-				selenium.clickAt("_15_rowIds", RuntimeVariables.replace("Flag"));
-				selenium.click(RuntimeVariables.replace(
-						"//input[@value='Delete']"));
-				selenium.waitForPageToLoad("30000");
-				assertTrue(selenium.getConfirmation()
-								   .matches("^Are you sure you want to delete the selected web content[\\s\\S]$"));
-				selenium.saveScreenShotAndSource();
-
-			case 3:
-
-				boolean webContent3Present = selenium.isElementPresent(
-						"_15_rowIds");
-
-				if (!webContent3Present) {
-					label = 4;
-
-					continue;
-				}
-
-				selenium.clickAt("_15_rowIds", RuntimeVariables.replace("Flag"));
-				selenium.click(RuntimeVariables.replace(
-						"//input[@value='Delete']"));
-				selenium.waitForPageToLoad("30000");
-				assertTrue(selenium.getConfirmation()
-								   .matches("^Are you sure you want to delete the selected web content[\\s\\S]$"));
-				selenium.saveScreenShotAndSource();
-
-			case 4:
-
-				boolean webContent4Present = selenium.isElementPresent(
-						"_15_rowIds");
-
-				if (!webContent4Present) {
-					label = 5;
-
-					continue;
-				}
-
-				selenium.clickAt("_15_rowIds", RuntimeVariables.replace("Flag"));
-				selenium.click(RuntimeVariables.replace(
-						"//input[@value='Delete']"));
-				selenium.waitForPageToLoad("30000");
-				assertTrue(selenium.getConfirmation()
-								   .matches("^Are you sure you want to delete the selected web content[\\s\\S]$"));
-				selenium.saveScreenShotAndSource();
-
-			case 5:
-
-				boolean webContent5Present = selenium.isElementPresent(
-						"_15_rowIds");
-
-				if (!webContent5Present) {
-					label = 6;
-
-					continue;
-				}
-
-				selenium.clickAt("_15_rowIds", RuntimeVariables.replace("Flag"));
-				selenium.click(RuntimeVariables.replace(
-						"//input[@value='Delete']"));
-				selenium.waitForPageToLoad("30000");
-				assertTrue(selenium.getConfirmation()
-								   .matches("^Are you sure you want to delete the selected web content[\\s\\S]$"));
-				selenium.saveScreenShotAndSource();
-
-			case 6:
 			case 100:
 				label = -1;
 			}

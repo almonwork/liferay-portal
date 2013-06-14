@@ -24,19 +24,29 @@
 	<td>Blogs Test Page2</td>
 </tr>
 <tr>
+	<td>waitForText</td>
+	<td>//span[@class='portlet-title-text']</td>
+	<td>Blogs (Blogs Test Page2)</td>
+</tr>
+<tr>
 	<td>assertText</td>
 	<td>//span[@class='portlet-title-text']</td>
 	<td>Blogs (Blogs Test Page2)</td>
 </tr>
 <tr>
 	<td>assertText</td>
-	<td>//div[@class='entry-title']/a</td>
+	<td>//div[@class='entry-title']/h2/a</td>
 	<td>Blogs Entry2 Title</td>
 </tr>
 <tr>
 	<td>assertText</td>
 	<td>//div[@class='entry-body']/p</td>
 	<td>Blogs Entry2 Content</td>
+</tr>
+<tr>
+	<td>waitForText</td>
+	<td>//span[@class='comments']/a</td>
+	<td>0 Comments</td>
 </tr>
 <tr>
 	<td>assertText</td>
@@ -47,6 +57,11 @@
 	<td>clickAtAndWait</td>
 	<td>//span[@class='comments']/a</td>
 	<td>0 Comments</td>
+</tr>
+<tr>
+	<td>waitForText</td>
+	<td>//h1[@class='header-title']/span</td>
+	<td>Blogs Entry2 Title</td>
 </tr>
 <tr>
 	<td>assertText</td>
@@ -89,13 +104,18 @@
 	<td>\8</td>
 </tr>
 <tr>
-	<td>clickAtAndWait</td>
+	<td>clickAt</td>
 	<td>//input[@value='Reply']</td>
 	<td>Reply</td>
 </tr>
 <tr>
+	<td>waitForText</td>
+	<td>//div[@class='lfr-message-response portlet-msg-success']</td>
+	<td>Your request processed successfully.</td>
+</tr>
+<tr>
 	<td>assertText</td>
-	<td>//div[@class='portlet-msg-success']</td>
+	<td>//div[@class='lfr-message-response portlet-msg-success']</td>
 	<td>Your request processed successfully.</td>
 </tr>
 <tr>
@@ -105,10 +125,9 @@
 </tr>
 <tr>
 	<td>assertText</td>
-	<td>//div/div[3]/div/div[1]</td>
+	<td>xPath=(//div[@class='lfr-discussion-message'])[1]</td>
 	<td>Blogs Entry2 Comment1 Body</td>
 </tr>
-
 </tbody></table>
 </body>
 </html>

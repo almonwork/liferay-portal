@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -27,12 +27,6 @@ import java.sql.ResultSet;
  */
 public class UpgradeVirtualHost extends UpgradeProcess {
 
-	@Override
-	protected void doUpgrade() throws Exception {
-		updateCompany();
-		updateLayoutSet();
-	}
-
 	protected void addVirtualHost(
 			long virtualHostId, long companyId, long layoutSetId,
 			String hostname)
@@ -44,17 +38,23 @@ public class UpgradeVirtualHost extends UpgradeProcess {
 					", " + layoutSetId + ", '" + hostname + "')");
 	}
 
+	@Override
+	protected void doUpgrade() throws Exception {
+		updateCompany();
+		updateLayoutSet();
+	}
+
 	protected void updateCompany() throws Exception {
 		Connection con = null;
 		PreparedStatement ps = null;
 		ResultSet rs = null;
 
 		try {
-			con = DataAccess.getConnection();
+			con = DataAccess.getUpgradeOptimizedConnection();
 
 			ps = con.prepareStatement(
 				"select companyId, virtualHost from Company where " +
-					"virtualHost != ?");
+					"virtualHost != ? and virtualHost is not null");
 
 			ps.setString(1, StringPool.BLANK);
 
@@ -82,11 +82,11 @@ public class UpgradeVirtualHost extends UpgradeProcess {
 		ResultSet rs = null;
 
 		try {
-			con = DataAccess.getConnection();
+			con = DataAccess.getUpgradeOptimizedConnection();
 
 			ps = con.prepareStatement(
 				"select layoutSetId, companyId, virtualHost from LayoutSet " +
-					"where virtualHost != ?");
+					"where virtualHost != ? and virtualHost is not null");
 
 			ps.setString(1, StringPool.BLANK);
 

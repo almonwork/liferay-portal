@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -25,10 +25,13 @@ import com.liferay.portal.kernel.portlet.PortletLayoutListener;
 import com.liferay.portal.kernel.search.Indexer;
 import com.liferay.portal.kernel.search.OpenSearch;
 import com.liferay.portal.kernel.servlet.URLEncoder;
+import com.liferay.portal.kernel.template.PortletDisplayTemplateHandler;
+import com.liferay.portal.kernel.trash.TrashHandler;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.webdav.WebDAVStorage;
 import com.liferay.portal.kernel.workflow.WorkflowHandler;
 import com.liferay.portal.kernel.xmlrpc.Method;
+import com.liferay.portal.security.permission.PermissionPropagator;
 import com.liferay.portlet.asset.model.AssetRendererFactory;
 import com.liferay.portlet.expando.model.CustomAttributesDisplay;
 import com.liferay.portlet.social.model.SocialActivityInterpreter;
@@ -58,6 +61,7 @@ public class PortletBagImpl implements PortletBag {
 		FriendlyURLMapper friendlyURLMapperInstance,
 		URLEncoder urlEncoderInstance,
 		PortletDataHandler portletDataHandlerInstance,
+		PortletDisplayTemplateHandler portletDisplayTemplateHandlerInstance,
 		PortletLayoutListener portletLayoutListenerInstance,
 		PollerProcessor pollerProcessorInstance,
 		MessageListener popMessageListenerInstance,
@@ -68,6 +72,8 @@ public class PortletBagImpl implements PortletBag {
 		List<AssetRendererFactory> assetRendererFactoryInstances,
 		List<AtomCollectionAdapter<?>> atomCollectionAdapters,
 		List<CustomAttributesDisplay> customAttributesDisplayInstances,
+		PermissionPropagator permissionPropagatorInstance,
+		List<TrashHandler> trashHandlerInstances,
 		List<WorkflowHandler> workflowHandlerInstances,
 		PreferencesValidator preferencesValidatorInstance,
 		Map<String, ResourceBundle> resourceBundles) {
@@ -81,6 +87,8 @@ public class PortletBagImpl implements PortletBag {
 		_friendlyURLMapperInstance = friendlyURLMapperInstance;
 		_urlEncoderInstance = urlEncoderInstance;
 		_portletDataHandlerInstance = portletDataHandlerInstance;
+		_portletDisplayTemplateHandlerInstance =
+			portletDisplayTemplateHandlerInstance;
 		_portletLayoutListenerInstance = portletLayoutListenerInstance;
 		_pollerProcessorInstance = pollerProcessorInstance;
 		_popMessageListenerInstance = popMessageListenerInstance;
@@ -92,6 +100,8 @@ public class PortletBagImpl implements PortletBag {
 		_assetRendererFactoryInstances = assetRendererFactoryInstances;
 		_atomCollectionAdapterInstances = atomCollectionAdapters;
 		_customAttributesDisplayInstances = customAttributesDisplayInstances;
+		_permissionPropagatorInstance = permissionPropagatorInstance;
+		_trashHandlerInstances = trashHandlerInstances;
 		_workflowHandlerInstances = workflowHandlerInstances;
 		_preferencesValidatorInstance = preferencesValidatorInstance;
 		_resourceBundles = resourceBundles;
@@ -104,6 +114,7 @@ public class PortletBagImpl implements PortletBag {
 			getConfigurationActionInstance(), getIndexerInstances(),
 			getOpenSearchInstance(), getFriendlyURLMapperInstance(),
 			getURLEncoderInstance(), getPortletDataHandlerInstance(),
+			getPortletDisplayTemplateHandlerInstance(),
 			getPortletLayoutListenerInstance(), getPollerProcessorInstance(),
 			getPopMessageListenerInstance(),
 			getSocialActivityInterpreterInstance(),
@@ -112,6 +123,7 @@ public class PortletBagImpl implements PortletBag {
 			getAssetRendererFactoryInstances(),
 			getAtomCollectionAdapterInstances(),
 			getCustomAttributesDisplayInstances(),
+			getPermissionPropagatorInstance(), getTrashHandlerInstances(),
 			getWorkflowHandlerInstances(), getPreferencesValidatorInstance(),
 			getResourceBundles());
 	}
@@ -148,6 +160,10 @@ public class PortletBagImpl implements PortletBag {
 		return _openSearchInstance;
 	}
 
+	public PermissionPropagator getPermissionPropagatorInstance() {
+		return _permissionPropagatorInstance;
+	}
+
 	public PollerProcessor getPollerProcessorInstance() {
 		return _pollerProcessorInstance;
 	}
@@ -158,6 +174,12 @@ public class PortletBagImpl implements PortletBag {
 
 	public PortletDataHandler getPortletDataHandlerInstance() {
 		return _portletDataHandlerInstance;
+	}
+
+	public PortletDisplayTemplateHandler
+		getPortletDisplayTemplateHandlerInstance() {
+
+		return _portletDisplayTemplateHandlerInstance;
 	}
 
 	public Portlet getPortletInstance() {
@@ -208,6 +230,10 @@ public class PortletBagImpl implements PortletBag {
 		return _socialRequestInterpreterInstance;
 	}
 
+	public List<TrashHandler> getTrashHandlerInstances() {
+		return _trashHandlerInstances;
+	}
+
 	public URLEncoder getURLEncoderInstance() {
 		return _urlEncoderInstance;
 	}
@@ -240,9 +266,12 @@ public class PortletBagImpl implements PortletBag {
 	private FriendlyURLMapper _friendlyURLMapperInstance;
 	private List<Indexer> _indexerInstances;
 	private OpenSearch _openSearchInstance;
+	private PermissionPropagator _permissionPropagatorInstance;
 	private PollerProcessor _pollerProcessorInstance;
 	private MessageListener _popMessageListenerInstance;
 	private PortletDataHandler _portletDataHandlerInstance;
+	private PortletDisplayTemplateHandler
+		_portletDisplayTemplateHandlerInstance;
 	private Portlet _portletInstance;
 	private PortletLayoutListener _portletLayoutListenerInstance;
 	private String _portletName;
@@ -251,9 +280,10 @@ public class PortletBagImpl implements PortletBag {
 	private ServletContext _servletContext;
 	private SocialActivityInterpreter _socialActivityInterpreterInstance;
 	private SocialRequestInterpreter _socialRequestInterpreterInstance;
+	private List<TrashHandler> _trashHandlerInstances;
 	private URLEncoder _urlEncoderInstance;
 	private WebDAVStorage _webDAVStorageInstance;
-	private Method _xmlRpcMethodInstance;
 	private List<WorkflowHandler> _workflowHandlerInstances;
+	private Method _xmlRpcMethodInstance;
 
 }

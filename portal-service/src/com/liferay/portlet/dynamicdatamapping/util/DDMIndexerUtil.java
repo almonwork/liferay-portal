@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -15,6 +15,7 @@
 package com.liferay.portlet.dynamicdatamapping.util;
 
 import com.liferay.portal.kernel.search.Document;
+import com.liferay.portal.kernel.security.pacl.permission.PortalRuntimePermission;
 import com.liferay.portlet.dynamicdatamapping.model.DDMStructure;
 import com.liferay.portlet.dynamicdatamapping.storage.Fields;
 
@@ -34,10 +35,14 @@ public class DDMIndexerUtil {
 	}
 
 	public static DDMIndexer getDDMIndexer() {
+		PortalRuntimePermission.checkGetBeanProperty(DDMIndexerUtil.class);
+
 		return _ddmIndexer;
 	}
 
 	public void setDDMIndexer(DDMIndexer ddmIndexer) {
+		PortalRuntimePermission.checkSetBeanProperty(getClass());
+
 		_ddmIndexer = ddmIndexer;
 	}
 

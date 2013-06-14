@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,6 +14,9 @@
 
 package com.liferay.portal.model;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * <p>
  * This class is a wrapper for {@link BrowserTracker}.
@@ -23,7 +26,8 @@ package com.liferay.portal.model;
  * @see       BrowserTracker
  * @generated
  */
-public class BrowserTrackerWrapper implements BrowserTracker {
+public class BrowserTrackerWrapper implements BrowserTracker,
+	ModelWrapper<BrowserTracker> {
 	public BrowserTrackerWrapper(BrowserTracker browserTracker) {
 		_browserTracker = browserTracker;
 	}
@@ -34,6 +38,36 @@ public class BrowserTrackerWrapper implements BrowserTracker {
 
 	public String getModelClassName() {
 		return BrowserTracker.class.getName();
+	}
+
+	public Map<String, Object> getModelAttributes() {
+		Map<String, Object> attributes = new HashMap<String, Object>();
+
+		attributes.put("browserTrackerId", getBrowserTrackerId());
+		attributes.put("userId", getUserId());
+		attributes.put("browserKey", getBrowserKey());
+
+		return attributes;
+	}
+
+	public void setModelAttributes(Map<String, Object> attributes) {
+		Long browserTrackerId = (Long)attributes.get("browserTrackerId");
+
+		if (browserTrackerId != null) {
+			setBrowserTrackerId(browserTrackerId);
+		}
+
+		Long userId = (Long)attributes.get("userId");
+
+		if (userId != null) {
+			setUserId(userId);
+		}
+
+		Long browserKey = (Long)attributes.get("browserKey");
+
+		if (browserKey != null) {
+			setBrowserKey(browserKey);
+		}
 	}
 
 	/**
@@ -148,10 +182,6 @@ public class BrowserTrackerWrapper implements BrowserTracker {
 		return _browserTracker.isEscapedModel();
 	}
 
-	public void setEscapedModel(boolean escapedModel) {
-		_browserTracker.setEscapedModel(escapedModel);
-	}
-
 	public java.io.Serializable getPrimaryKeyObj() {
 		return _browserTracker.getPrimaryKeyObj();
 	}
@@ -205,7 +235,14 @@ public class BrowserTrackerWrapper implements BrowserTracker {
 		_browserTracker.persist();
 	}
 
+	/**
+	 * @deprecated Renamed to {@link #getWrappedModel}
+	 */
 	public BrowserTracker getWrappedBrowserTracker() {
+		return _browserTracker;
+	}
+
+	public BrowserTracker getWrappedModel() {
 		return _browserTracker;
 	}
 

@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -28,23 +28,49 @@
 <%-- Available Translations --%>
 
 <%
-Locale[] availableLocales = LanguageUtil.getAvailableLocales();
+if (!themeDisplay.isSignedIn() && layout.isPublicLayout()) {
+	String completeURL = PortalUtil.getCurrentCompleteURL(request);
 
-for (Locale curLocale : availableLocales) {
-	if (!curLocale.equals(locale)) {
-		String alternateFriendlyURL = PortalUtil.getLayoutFriendlyURL(layout, themeDisplay, curLocale);
+	String canonicalURL = PortalUtil.getCanonicalURL(completeURL, themeDisplay, layout);
 %>
 
-		<link href="<%= alternateFriendlyURL %>" hreflang="<%= LocaleUtil.toW3cLanguageId(curLocale) %>" rel="alternate" title="<%= layout.getHTMLTitle(curLocale) %>" />
+	<link href="<%= HtmlUtil.escapeAttribute(canonicalURL) %>" rel="canonical" />
+
+	<%
+	Locale defaultLocale = LocaleUtil.getDefault();
+	%>
+
+	<c:if test="<%= locale.equals(defaultLocale) %>">
+
+		<%
+		boolean showAlternateLinks = GetterUtil.getBoolean(layout.getTypeSettingsProperty("show-alternate-links"), true);
+
+		if (showAlternateLinks) {
+			Locale[] availableLocales = PortalUtil.getAlternateLocales(request);
+
+			if (availableLocales.length > 1) {
+				for (Locale curLocale : availableLocales) {
+					if (!curLocale.equals(defaultLocale)) {
+		%>
+
+						<link href="<%= HtmlUtil.escapeAttribute(PortalUtil.getAlternateURL(canonicalURL, themeDisplay, curLocale)) %>" hreflang="<%= LocaleUtil.toW3cLanguageId(curLocale) %>" rel="alternate" />
+
+		<%
+					}
+				}
+			}
+		}
+		%>
+
+	</c:if>
 
 <%
-	}
 }
 %>
 
 <%-- Portal CSS --%>
 
-<link href="<%= HtmlUtil.escape(PortalUtil.getStaticResourceURL(request, themeDisplay.getCDNHost() + themeDisplay.getPathContext() + "/html/portal/css.jsp")) %>" rel="stylesheet" type="text/css" />
+<link href="<%= HtmlUtil.escapeAttribute(PortalUtil.getStaticResourceURL(request, themeDisplay.getCDNDynamicResourcesHost() + themeDisplay.getPathContext() + "/html/css/main.css")) %>" rel="stylesheet" type="text/css" />
 
 <%
 List<Portlet> portlets = null;
@@ -122,7 +148,7 @@ if (markupHeaders != null) {
 	}
 }
 
-StringBundler pageTopSB = (StringBundler)request.getAttribute(WebKeys.PAGE_TOP);
+StringBundler pageTopSB = OutputTag.getData(request, WebKeys.PAGE_TOP);
 %>
 
 <c:if test="<%= pageTopSB != null %>">
@@ -135,65 +161,7 @@ StringBundler pageTopSB = (StringBundler)request.getAttribute(WebKeys.PAGE_TOP);
 
 <%-- Theme CSS --%>
 
-<link class="lfr-css-file" href="<%= HtmlUtil.escape(PortalUtil.getStaticResourceURL(request, themeDisplay.getPathThemeCss() + "/main.css")) %>" rel="stylesheet" type="text/css" />
-
-<style type="text/css">
-	/* <![CDATA[ */
-		<c:if test="<%= !themeDisplay.getCompanyLogo().equals(StringPool.BLANK) %>">
-			#heading .logo {
-				background: url(<%= HtmlUtil.escape(themeDisplay.getCompanyLogo()) %>) no-repeat;
-				display: block;
-				font-size: 0;
-				height: <%= themeDisplay.getCompanyLogoHeight() %>px;
-				text-indent: -9999px;
-				width: <%= themeDisplay.getCompanyLogoWidth() %>px;
-			}
-		</c:if>
-
-		<c:if test="<%= BrowserSnifferUtil.isIe(request) && (BrowserSnifferUtil.getMajorVersion(request) < 7) %>">
-			img, .png {
-				position: relative;
-				behavior: expression(
-					(this.runtimeStyle.behavior = "none") &&
-					(
-						this.pngSet || (this.src && this.src.toLowerCase().indexOf('spacer.png') > -1) ?
-							this.pngSet = true :
-								(
-									this.nodeName == "IMG" &&
-									(
-										(
-											(this.src.toLowerCase().indexOf('.png') > -1) ||
-											(this.className && ([''].concat(this.className.split(' ')).concat(['']).join('|').indexOf('|png|')) > -1)
-										) &&
-										(this.className.indexOf('no-png-fix') == -1)
-									) ?
-										(
-											this.runtimeStyle.backgroundImage = "none",
-											this.runtimeStyle.filter = "progid:DXImageTransform.Microsoft.AlphaImageLoader(src='" + this.src + "', sizingMethod='image')",
-											this.src = "<%= themeDisplay.getPathThemeImages() %>/spacer.png"
-										) :
-											(
-												(
-													(this.currentStyle.backgroundImage.toLowerCase().indexOf('.png') > -1) ||
-													(this.className && ([''].concat(this.className.split(' ')).concat(['']).join('|').indexOf('|png|')) > -1)
-												) ?
-													(
-															this.origBg = this.origBg ?
-																this.origBg :
-																this.currentStyle.backgroundImage.toString().replace('url("','').replace('")',''),
-																this.runtimeStyle.filter = "progid:DXImageTransform.Microsoft.AlphaImageLoader(src='" + this.origBg + "', sizingMethod='crop')",
-																this.runtimeStyle.backgroundImage = "none"
-													) :
-														''
-											)
-								),
-								this.pngSet = true
-					)
-				);
-			}
-		</c:if>
-	/* ]]> */
-</style>
+<link class="lfr-css-file" href="<%= HtmlUtil.escapeAttribute(PortalUtil.getStaticResourceURL(request, themeDisplay.getPathThemeCss() + "/main.css")) %>" rel="stylesheet" type="text/css" />
 
 <%-- User Inputted Layout CSS --%>
 
@@ -212,7 +180,7 @@ StringBundler pageTopSB = (StringBundler)request.getAttribute(WebKeys.PAGE_TOP);
 		for (Portlet portlet : portlets) {
 			PortletPreferences portletSetup = PortletPreferencesFactoryUtil.getStrictLayoutPortletSetup(layout, portlet.getPortletId());
 
-			String portletSetupCss = portletSetup.getValue("portlet-setup-css", StringPool.BLANK);
+			String portletSetupCss = portletSetup.getValue("portletSetupCss", StringPool.BLANK);
 		%>
 
 			<c:if test="<%= Validator.isNotNull(portletSetupCss) %>">

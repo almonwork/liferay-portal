@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -18,35 +18,56 @@ package com.liferay.portlet.documentlibrary.service.persistence;
  * @author Brian Wing Shun Chan
  */
 public interface DLFolderFinder {
-	public int countF_FE_FS_ByG_F_S(long groupId, long folderId, int status,
-		boolean includeMountFolders)
+	public int countF_FE_FS_ByG_F_M_M(long groupId, long folderId,
+		java.lang.String[] mimeTypes, boolean includeMountFolders,
+		com.liferay.portal.kernel.dao.orm.QueryDefinition queryDefinition)
 		throws com.liferay.portal.kernel.exception.SystemException;
 
-	public int countFE_FS_ByG_F_S(long groupId, long folderId, int status)
+	public int countFE_ByG_F(long groupId, long folderId,
+		com.liferay.portal.kernel.dao.orm.QueryDefinition queryDefinition)
 		throws com.liferay.portal.kernel.exception.SystemException;
 
-	public int filterCountF_FE_FS_ByG_F_S(long groupId, long folderId,
-		int status, boolean includeMountFolders)
+	public int countFE_FS_ByG_F(long groupId, long folderId,
+		com.liferay.portal.kernel.dao.orm.QueryDefinition queryDefinition)
 		throws com.liferay.portal.kernel.exception.SystemException;
 
-	public int filterCountFE_FS_ByG_F_S(long groupId, long folderId, int status)
+	public int filterCountF_FE_FS_ByG_F_M_M(long groupId, long folderId,
+		java.lang.String[] mimeTypes, boolean includeMountFolders,
+		com.liferay.portal.kernel.dao.orm.QueryDefinition queryDefinition)
 		throws com.liferay.portal.kernel.exception.SystemException;
 
-	public java.util.List<java.lang.Object> filterFindF_FE_FS_ByG_F_S(
-		long groupId, long folderId, int status, boolean includeMountFolders,
-		int start, int end, com.liferay.portal.kernel.util.OrderByComparator obc)
+	public int filterCountFE_ByG_F(long groupId, long folderId,
+		com.liferay.portal.kernel.dao.orm.QueryDefinition queryDefinition)
 		throws com.liferay.portal.kernel.exception.SystemException;
 
-	public java.util.List<java.lang.Object> filterFindFE_FS_ByG_F_S(
-		long groupId, long folderId, int status, int start, int end)
+	public int filterCountFE_FS_ByG_F(long groupId, long folderId,
+		com.liferay.portal.kernel.dao.orm.QueryDefinition queryDefinition)
 		throws com.liferay.portal.kernel.exception.SystemException;
 
-	public java.util.List<java.lang.Object> findF_FE_FS_ByG_F_S(long groupId,
-		long folderId, int status, boolean includeMountFolders, int start,
-		int end, com.liferay.portal.kernel.util.OrderByComparator obc)
+	public int filterCountFE_FS_ByG_F_M(long groupId, long folderId,
+		java.lang.String[] mimeTypes,
+		com.liferay.portal.kernel.dao.orm.QueryDefinition queryDefinition)
 		throws com.liferay.portal.kernel.exception.SystemException;
 
-	public java.util.List<java.lang.Object> findFE_FS_ByG_F_S(long groupId,
-		long folderId, int status, int start, int end)
+	public java.util.List<java.lang.Object> filterFindF_FE_FS_ByG_F_M_M(
+		long groupId, long folderId, java.lang.String[] mimeTypes,
+		boolean includeMountFolders,
+		com.liferay.portal.kernel.dao.orm.QueryDefinition queryDefinition)
+		throws com.liferay.portal.kernel.exception.SystemException;
+
+	public java.util.List<java.lang.Object> filterFindFE_FS_ByG_F(
+		long groupId, long folderId,
+		com.liferay.portal.kernel.dao.orm.QueryDefinition queryDefinition)
+		throws com.liferay.portal.kernel.exception.SystemException;
+
+	public java.util.List<java.lang.Object> findF_FE_FS_ByG_F_M_M(
+		long groupId, long folderId, java.lang.String[] mimeTypes,
+		boolean includeMountFolders,
+		com.liferay.portal.kernel.dao.orm.QueryDefinition queryDefinition)
+		throws com.liferay.portal.kernel.exception.SystemException;
+
+	public java.util.List<java.lang.Object> findFE_FS_ByG_F(long groupId,
+		long folderId,
+		com.liferay.portal.kernel.dao.orm.QueryDefinition queryDefinition)
 		throws com.liferay.portal.kernel.exception.SystemException;
 }

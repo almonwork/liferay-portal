@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -38,8 +38,8 @@ public class ReleaseInfoBuilder {
 
 			// Get version
 
-			Properties releaseProps =
-				_fileUtil.toProperties("../release.properties");
+			Properties releaseProps = _fileUtil.toProperties(
+				"../release.properties");
 
 			String version = releaseProps.getProperty("lp.version");
 
@@ -49,39 +49,37 @@ public class ReleaseInfoBuilder {
 
 			String content = _fileUtil.read(file);
 
-			int x = content.indexOf("String version = \"");
+			int x = content.indexOf("String _VERSION = \"");
+
 			x = content.indexOf("\"", x) + 1;
+
 			int y = content.indexOf("\"", x);
 
-			content =
-				content.substring(0, x) + version +
-				content.substring(y, content.length());
+			content = content.substring(0, x) + version + content.substring(y);
 
 			// Get build
 
-			x = content.indexOf("String build = \"");
+			x = content.indexOf("String _BUILD = \"");
 			x = content.indexOf("\"", x) + 1;
+
 			y = content.indexOf("\"", x);
 
 			int build = GetterUtil.getInteger(content.substring(x, y)) + 1;
 
-			content =
-				content.substring(0, x) + build +
-				content.substring(y, content.length());
+			content = content.substring(0, x) + build + content.substring(y);
 
 			// Get date
 
-			DateFormat df = DateFormat.getDateInstance(DateFormat.LONG);
+			DateFormat dateFormat = DateFormat.getDateInstance(DateFormat.LONG);
 
-			String date = df.format(new Date());
+			String date = dateFormat.format(new Date());
 
-			x = content.indexOf("String date = \"");
+			x = content.indexOf("String _DATE = \"");
 			x = content.indexOf("\"", x) + 1;
+
 			y = content.indexOf("\"", x);
 
-			content =
-				content.substring(0, x) + date +
-				content.substring(y, content.length());
+			content = content.substring(0, x) + date + content.substring(y);
 
 			// Update ReleaseInfo.java
 
@@ -97,9 +95,7 @@ public class ReleaseInfoBuilder {
 			y = content.indexOf(", FALSE);", x);
 			x = content.lastIndexOf(" ", y - 1) + 1;
 
-			content =
-				content.substring(0, x) + build +
-				content.substring(y, content.length());
+			content = content.substring(0, x) + build + content.substring(y);
 
 			_fileUtil.write(file, content);
 		}

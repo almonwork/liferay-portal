@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,7 +14,8 @@
 
 package com.liferay.portalweb.portlet.webcontentdisplay.webcontent.addportletscopedefaultwcwebcontentwcd;
 
-import com.liferay.portalweb.portal.BaseTests;
+import com.liferay.portalweb.portal.BaseTestSuite;
+import com.liferay.portalweb.portal.util.TearDownPageTest;
 
 import junit.framework.Test;
 import junit.framework.TestSuite;
@@ -22,13 +23,11 @@ import junit.framework.TestSuite;
 /**
  * @author Brian Wing Shun Chan
  */
-public class AddPortletScopeDefaultWCWebContentWCDTests extends BaseTests {
-
+public class AddPortletScopeDefaultWCWebContentWCDTests extends BaseTestSuite {
 	public static Test suite() {
 		TestSuite testSuite = new TestSuite();
-
-		testSuite.addTestSuite(AddPageWCDTest.class);
-		testSuite.addTestSuite(AddPortletWCDTest.class);
+		testSuite.addTestSuite(AddPageWCD1Test.class);
+		testSuite.addTestSuite(AddPortletWCD1Test.class);
 		testSuite.addTestSuite(AddPageWCD2Test.class);
 		testSuite.addTestSuite(AddPortletWCD2Test.class);
 		testSuite.addTestSuite(AddPageWCD3Test.class);
@@ -38,22 +37,17 @@ public class AddPortletScopeDefaultWCWebContentWCDTests extends BaseTests {
 		testSuite.addTestSuite(ConfigurePortletScopePage2Test.class);
 		testSuite.addTestSuite(AddPortletScopeDefaultWCWebContentWCDTest.class);
 		testSuite.addTestSuite(ViewScopeDefaultWCWebContentDefaultTest.class);
-		testSuite.addTestSuite(
-			ViewScopeDefaultWCWebContentNullCurrentPageTest.class);
+		testSuite.addTestSuite(ViewScopeDefaultWCWebContentNullCurrentPageTest.class);
 		testSuite.addTestSuite(ViewScopeDefaultWCWebContentNullPage2Test.class);
 		testSuite.addTestSuite(ViewScopeDefaultWebContentListDefaultTest.class);
-		testSuite.addTestSuite(
-			ViewScopeDefaultWebContentListCurrentPageTest.class);
+		testSuite.addTestSuite(ViewScopeDefaultWebContentListCurrentPageTest.class);
 		testSuite.addTestSuite(ViewScopeDefaultWebContentListPage2Test.class);
-		testSuite.addTestSuite(
-			ViewScopeDefaultWCWebContentListDefaultCPTest.class);
-		testSuite.addTestSuite(
-			ViewScopeDefaultWCWebContentListCurrentPageCPTest.class);
+		testSuite.addTestSuite(ViewScopeDefaultWCWebContentListDefaultCPTest.class);
+		testSuite.addTestSuite(ViewScopeDefaultWCWebContentListCurrentPageCPTest.class);
 		testSuite.addTestSuite(TearDownPortletScopeTest.class);
 		testSuite.addTestSuite(TearDownScopeWebContentTest.class);
 		testSuite.addTestSuite(TearDownPageTest.class);
 
 		return testSuite;
 	}
-
 }

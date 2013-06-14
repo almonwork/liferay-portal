@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -19,7 +19,8 @@ import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.transaction.Isolation;
 import com.liferay.portal.kernel.transaction.Propagation;
 import com.liferay.portal.kernel.transaction.Transactional;
-import com.liferay.portal.service.PersistedModelLocalService;
+import com.liferay.portal.service.BaseLocalService;
+import com.liferay.portal.service.PermissionedModelLocalService;
 
 /**
  * The interface for the bookmarks folder local service.
@@ -36,7 +37,8 @@ import com.liferay.portal.service.PersistedModelLocalService;
  */
 @Transactional(isolation = Isolation.PORTAL, rollbackFor =  {
 	PortalException.class, SystemException.class})
-public interface BookmarksFolderLocalService extends PersistedModelLocalService {
+public interface BookmarksFolderLocalService extends BaseLocalService,
+	PermissionedModelLocalService {
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
@@ -67,10 +69,12 @@ public interface BookmarksFolderLocalService extends PersistedModelLocalService 
 	* Deletes the bookmarks folder with the primary key from the database. Also notifies the appropriate model listeners.
 	*
 	* @param folderId the primary key of the bookmarks folder
+	* @return the bookmarks folder that was removed
 	* @throws PortalException if a bookmarks folder with the primary key could not be found
 	* @throws SystemException if a system exception occurred
 	*/
-	public void deleteBookmarksFolder(long folderId)
+	public com.liferay.portlet.bookmarks.model.BookmarksFolder deleteBookmarksFolder(
+		long folderId)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException;
 
@@ -78,11 +82,14 @@ public interface BookmarksFolderLocalService extends PersistedModelLocalService 
 	* Deletes the bookmarks folder from the database. Also notifies the appropriate model listeners.
 	*
 	* @param bookmarksFolder the bookmarks folder
+	* @return the bookmarks folder that was removed
 	* @throws SystemException if a system exception occurred
 	*/
-	public void deleteBookmarksFolder(
+	public com.liferay.portlet.bookmarks.model.BookmarksFolder deleteBookmarksFolder(
 		com.liferay.portlet.bookmarks.model.BookmarksFolder bookmarksFolder)
 		throws com.liferay.portal.kernel.exception.SystemException;
+
+	public com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery();
 
 	/**
 	* Performs a dynamic query on the database and returns the matching rows.
@@ -144,6 +151,11 @@ public interface BookmarksFolderLocalService extends PersistedModelLocalService 
 	*/
 	public long dynamicQueryCount(
 		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery)
+		throws com.liferay.portal.kernel.exception.SystemException;
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public com.liferay.portlet.bookmarks.model.BookmarksFolder fetchBookmarksFolder(
+		long folderId)
 		throws com.liferay.portal.kernel.exception.SystemException;
 
 	/**
@@ -250,28 +262,6 @@ public interface BookmarksFolderLocalService extends PersistedModelLocalService 
 		long userId, long parentFolderId, java.lang.String name,
 		java.lang.String description,
 		com.liferay.portal.service.ServiceContext serviceContext)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException;
-
-	public void addFolderResources(
-		com.liferay.portlet.bookmarks.model.BookmarksFolder folder,
-		boolean addGroupPermissions, boolean addGuestPermissions)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException;
-
-	public void addFolderResources(
-		com.liferay.portlet.bookmarks.model.BookmarksFolder folder,
-		java.lang.String[] groupPermissions, java.lang.String[] guestPermissions)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException;
-
-	public void addFolderResources(long folderId, boolean addGroupPermissions,
-		boolean addGuestPermissions)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException;
-
-	public void addFolderResources(long folderId,
-		java.lang.String[] groupPermissions, java.lang.String[] guestPermissions)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException;
 

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -17,6 +17,7 @@ package com.liferay.portal.model.impl;
 import com.liferay.portal.kernel.bean.AutoEscapeBeanHandler;
 import com.liferay.portal.kernel.json.JSON;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.ProxyUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.model.CacheModel;
@@ -30,12 +31,12 @@ import com.liferay.portlet.expando.util.ExpandoBridgeFactoryUtil;
 
 import java.io.Serializable;
 
-import java.lang.reflect.Proxy;
-
 import java.sql.Types;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * The base model implementation for the Portlet service. Represents a row in the &quot;Portlet&quot; database table, with each column mapped to a property of this class.
@@ -77,6 +78,11 @@ public class PortletModelImpl extends BaseModelImpl<Portlet>
 	public static final boolean FINDER_CACHE_ENABLED = GetterUtil.getBoolean(com.liferay.portal.util.PropsUtil.get(
 				"value.object.finder.cache.enabled.com.liferay.portal.model.Portlet"),
 			true);
+	public static final boolean COLUMN_BITMASK_ENABLED = GetterUtil.getBoolean(com.liferay.portal.util.PropsUtil.get(
+				"value.object.column.bitmask.enabled.com.liferay.portal.model.Portlet"),
+			true);
+	public static long COMPANYID_COLUMN_BITMASK = 1L;
+	public static long PORTLETID_COLUMN_BITMASK = 2L;
 
 	/**
 	 * Converts the soap model instance into a normal model instance.
@@ -112,14 +118,6 @@ public class PortletModelImpl extends BaseModelImpl<Portlet>
 		return models;
 	}
 
-	public Class<?> getModelClass() {
-		return Portlet.class;
-	}
-
-	public String getModelClassName() {
-		return Portlet.class.getName();
-	}
-
 	public static final long LOCK_EXPIRATION_TIME = GetterUtil.getLong(com.liferay.portal.util.PropsUtil.get(
 				"lock.expiration.time.com.liferay.portal.model.Portlet"));
 
@@ -142,6 +140,60 @@ public class PortletModelImpl extends BaseModelImpl<Portlet>
 		setPrimaryKey(((Long)primaryKeyObj).longValue());
 	}
 
+	public Class<?> getModelClass() {
+		return Portlet.class;
+	}
+
+	public String getModelClassName() {
+		return Portlet.class.getName();
+	}
+
+	@Override
+	public Map<String, Object> getModelAttributes() {
+		Map<String, Object> attributes = new HashMap<String, Object>();
+
+		attributes.put("id", getId());
+		attributes.put("companyId", getCompanyId());
+		attributes.put("portletId", getPortletId());
+		attributes.put("roles", getRoles());
+		attributes.put("active", getActive());
+
+		return attributes;
+	}
+
+	@Override
+	public void setModelAttributes(Map<String, Object> attributes) {
+		Long id = (Long)attributes.get("id");
+
+		if (id != null) {
+			setId(id);
+		}
+
+		Long companyId = (Long)attributes.get("companyId");
+
+		if (companyId != null) {
+			setCompanyId(companyId);
+		}
+
+		String portletId = (String)attributes.get("portletId");
+
+		if (portletId != null) {
+			setPortletId(portletId);
+		}
+
+		String roles = (String)attributes.get("roles");
+
+		if (roles != null) {
+			setRoles(roles);
+		}
+
+		Boolean active = (Boolean)attributes.get("active");
+
+		if (active != null) {
+			setActive(active);
+		}
+	}
+
 	@JSON
 	public long getId() {
 		return _id;
@@ -157,6 +209,8 @@ public class PortletModelImpl extends BaseModelImpl<Portlet>
 	}
 
 	public void setCompanyId(long companyId) {
+		_columnBitmask |= COMPANYID_COLUMN_BITMASK;
+
 		if (!_setOriginalCompanyId) {
 			_setOriginalCompanyId = true;
 
@@ -181,6 +235,8 @@ public class PortletModelImpl extends BaseModelImpl<Portlet>
 	}
 
 	public void setPortletId(String portletId) {
+		_columnBitmask |= PORTLETID_COLUMN_BITMASK;
+
 		if (_originalPortletId == null) {
 			_originalPortletId = _portletId;
 		}
@@ -219,35 +275,32 @@ public class PortletModelImpl extends BaseModelImpl<Portlet>
 		_active = active;
 	}
 
+	public long getColumnBitmask() {
+		return _columnBitmask;
+	}
+
 	@Override
 	public Portlet toEscapedModel() {
-		if (isEscapedModel()) {
-			return (Portlet)this;
+		if (_escapedModelProxy == null) {
+			_escapedModelProxy = (Portlet)ProxyUtil.newProxyInstance(_classLoader,
+					_escapedModelProxyInterfaces,
+					new AutoEscapeBeanHandler(this));
 		}
-		else {
-			if (_escapedModelProxy == null) {
-				_escapedModelProxy = (Portlet)Proxy.newProxyInstance(_classLoader,
-						_escapedModelProxyInterfaces,
-						new AutoEscapeBeanHandler(this));
-			}
 
-			return _escapedModelProxy;
-		}
+		return _escapedModelProxy;
 	}
 
 	@Override
 	public ExpandoBridge getExpandoBridge() {
-		if (_expandoBridge == null) {
-			_expandoBridge = ExpandoBridgeFactoryUtil.getExpandoBridge(getCompanyId(),
-					Portlet.class.getName(), getPrimaryKey());
-		}
-
-		return _expandoBridge;
+		return ExpandoBridgeFactoryUtil.getExpandoBridge(getCompanyId(),
+			Portlet.class.getName(), getPrimaryKey());
 	}
 
 	@Override
 	public void setExpandoBridgeAttributes(ServiceContext serviceContext) {
-		getExpandoBridge().setAttributes(serviceContext);
+		ExpandoBridge expandoBridge = getExpandoBridge();
+
+		expandoBridge.setAttributes(serviceContext);
 	}
 
 	@Override
@@ -318,6 +371,8 @@ public class PortletModelImpl extends BaseModelImpl<Portlet>
 		portletModelImpl._setOriginalCompanyId = false;
 
 		portletModelImpl._originalPortletId = portletModelImpl._portletId;
+
+		portletModelImpl._columnBitmask = 0;
 	}
 
 	@Override
@@ -413,6 +468,6 @@ public class PortletModelImpl extends BaseModelImpl<Portlet>
 	private String _originalPortletId;
 	private String _roles;
 	private boolean _active;
-	private transient ExpandoBridge _expandoBridge;
+	private long _columnBitmask;
 	private Portlet _escapedModelProxy;
 }

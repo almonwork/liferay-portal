@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -35,15 +35,15 @@ public interface LiferayPortletResponse extends PortletResponse {
 
 	public PortletURL createActionURL();
 
-	public LiferayPortletURL createLiferayPortletURL(String lifecycle);
-
-	public LiferayPortletURL createLiferayPortletURL(
-		String portletName, String lifecycle);
+	public LiferayPortletURL createActionURL(String portletName);
 
 	public LiferayPortletURL createLiferayPortletURL(
 		long plid, String portletName, String lifecycle);
 
-	public LiferayPortletURL createActionURL(String portletName);
+	public LiferayPortletURL createLiferayPortletURL(String lifecycle);
+
+	public LiferayPortletURL createLiferayPortletURL(
+		String portletName, String lifecycle);
 
 	public PortletURL createRenderURL();
 

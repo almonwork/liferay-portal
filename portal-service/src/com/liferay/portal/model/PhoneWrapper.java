@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,6 +14,10 @@
 
 package com.liferay.portal.model;
 
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * <p>
  * This class is a wrapper for {@link Phone}.
@@ -23,7 +27,7 @@ package com.liferay.portal.model;
  * @see       Phone
  * @generated
  */
-public class PhoneWrapper implements Phone {
+public class PhoneWrapper implements Phone, ModelWrapper<Phone> {
 	public PhoneWrapper(Phone phone) {
 		_phone = phone;
 	}
@@ -34,6 +38,99 @@ public class PhoneWrapper implements Phone {
 
 	public String getModelClassName() {
 		return Phone.class.getName();
+	}
+
+	public Map<String, Object> getModelAttributes() {
+		Map<String, Object> attributes = new HashMap<String, Object>();
+
+		attributes.put("phoneId", getPhoneId());
+		attributes.put("companyId", getCompanyId());
+		attributes.put("userId", getUserId());
+		attributes.put("userName", getUserName());
+		attributes.put("createDate", getCreateDate());
+		attributes.put("modifiedDate", getModifiedDate());
+		attributes.put("classNameId", getClassNameId());
+		attributes.put("classPK", getClassPK());
+		attributes.put("number", getNumber());
+		attributes.put("extension", getExtension());
+		attributes.put("typeId", getTypeId());
+		attributes.put("primary", getPrimary());
+
+		return attributes;
+	}
+
+	public void setModelAttributes(Map<String, Object> attributes) {
+		Long phoneId = (Long)attributes.get("phoneId");
+
+		if (phoneId != null) {
+			setPhoneId(phoneId);
+		}
+
+		Long companyId = (Long)attributes.get("companyId");
+
+		if (companyId != null) {
+			setCompanyId(companyId);
+		}
+
+		Long userId = (Long)attributes.get("userId");
+
+		if (userId != null) {
+			setUserId(userId);
+		}
+
+		String userName = (String)attributes.get("userName");
+
+		if (userName != null) {
+			setUserName(userName);
+		}
+
+		Date createDate = (Date)attributes.get("createDate");
+
+		if (createDate != null) {
+			setCreateDate(createDate);
+		}
+
+		Date modifiedDate = (Date)attributes.get("modifiedDate");
+
+		if (modifiedDate != null) {
+			setModifiedDate(modifiedDate);
+		}
+
+		Long classNameId = (Long)attributes.get("classNameId");
+
+		if (classNameId != null) {
+			setClassNameId(classNameId);
+		}
+
+		Long classPK = (Long)attributes.get("classPK");
+
+		if (classPK != null) {
+			setClassPK(classPK);
+		}
+
+		String number = (String)attributes.get("number");
+
+		if (number != null) {
+			setNumber(number);
+		}
+
+		String extension = (String)attributes.get("extension");
+
+		if (extension != null) {
+			setExtension(extension);
+		}
+
+		Integer typeId = (Integer)attributes.get("typeId");
+
+		if (typeId != null) {
+			setTypeId(typeId);
+		}
+
+		Boolean primary = (Boolean)attributes.get("primary");
+
+		if (primary != null) {
+			setPrimary(primary);
+		}
 	}
 
 	/**
@@ -191,6 +288,10 @@ public class PhoneWrapper implements Phone {
 		return _phone.getClassName();
 	}
 
+	public void setClassName(java.lang.String className) {
+		_phone.setClassName(className);
+	}
+
 	/**
 	* Returns the class name ID of this phone.
 	*
@@ -328,10 +429,6 @@ public class PhoneWrapper implements Phone {
 		return _phone.isEscapedModel();
 	}
 
-	public void setEscapedModel(boolean escapedModel) {
-		_phone.setEscapedModel(escapedModel);
-	}
-
 	public java.io.Serializable getPrimaryKeyObj() {
 		return _phone.getPrimaryKeyObj();
 	}
@@ -391,7 +488,14 @@ public class PhoneWrapper implements Phone {
 		return _phone.getType();
 	}
 
+	/**
+	 * @deprecated Renamed to {@link #getWrappedModel}
+	 */
 	public Phone getWrappedPhone() {
+		return _phone;
+	}
+
+	public Phone getWrappedModel() {
 		return _phone;
 	}
 

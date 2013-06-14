@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -20,9 +20,6 @@ import com.liferay.portal.kernel.xml.Element;
 import com.liferay.portal.kernel.xml.Node;
 import com.liferay.portal.kernel.xml.ProcessingInstruction;
 import com.liferay.portal.kernel.xml.QName;
-import com.liferay.util.xml.XMLFormatter;
-
-import java.io.IOException;
 
 import java.util.Iterator;
 import java.util.List;
@@ -101,23 +98,6 @@ public class BranchImpl extends NodeImpl implements Branch {
 		org.dom4j.Branch branch = ((BranchImpl)obj).getWrappedBranch();
 
 		return _branch.equals(branch);
-	}
-
-	@Override
-	public String formattedString() throws IOException {
-		return XMLFormatter.toString(_branch);
-	}
-
-	@Override
-	public String formattedString(String indent) throws IOException {
-		return XMLFormatter.toString(_branch, indent);
-	}
-
-	@Override
-	public String formattedString(String indent, boolean expandEmptyElements)
-		throws IOException {
-
-		return XMLFormatter.toString(_branch, indent, expandEmptyElements);
 	}
 
 	public org.dom4j.Branch getWrappedBranch() {

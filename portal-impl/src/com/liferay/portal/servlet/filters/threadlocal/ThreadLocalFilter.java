@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,6 +14,8 @@
 
 package com.liferay.portal.servlet.filters.threadlocal;
 
+import com.liferay.portal.kernel.cache.Lifecycle;
+import com.liferay.portal.kernel.cache.ThreadLocalCacheManager;
 import com.liferay.portal.kernel.servlet.TryFinallyFilter;
 import com.liferay.portal.kernel.util.CentralizedThreadLocal;
 import com.liferay.portal.servlet.filters.BasePortalFilter;
@@ -30,6 +32,8 @@ public class ThreadLocalFilter
 	public void doFilterFinally(
 		HttpServletRequest request, HttpServletResponse response,
 		Object ojbect) {
+
+		ThreadLocalCacheManager.clearAll(Lifecycle.REQUEST);
 
 		CentralizedThreadLocal.clearShortLivedThreadLocals();
 	}

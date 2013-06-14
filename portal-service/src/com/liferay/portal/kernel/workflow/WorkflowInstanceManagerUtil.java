@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,6 +14,7 @@
 
 package com.liferay.portal.kernel.workflow;
 
+import com.liferay.portal.kernel.security.pacl.permission.PortalRuntimePermission;
 import com.liferay.portal.kernel.util.OrderByComparator;
 
 import java.io.Serializable;
@@ -25,6 +26,8 @@ import java.util.Map;
  * @author Micha Kiener
  * @author Shuyang Zhou
  * @author Brian Wing Shun Chan
+ * @author Marcellus Tavares
+ * @author Raymond Augé
  */
 public class WorkflowInstanceManagerUtil {
 
@@ -32,7 +35,7 @@ public class WorkflowInstanceManagerUtil {
 			long companyId, long workflowInstanceId)
 		throws WorkflowException {
 
-		_workflowInstanceManager.deleteWorkflowInstance(
+		getWorkflowInstanceManager().deleteWorkflowInstance(
 			companyId, workflowInstanceId);
 	}
 
@@ -40,7 +43,7 @@ public class WorkflowInstanceManagerUtil {
 			long companyId, long userId, long workflowInstanceId)
 		throws WorkflowException {
 
-		return _workflowInstanceManager.getNextTransitionNames(
+		return getWorkflowInstanceManager().getNextTransitionNames(
 			companyId, userId, workflowInstanceId);
 	}
 
@@ -48,7 +51,7 @@ public class WorkflowInstanceManagerUtil {
 			long companyId, long workflowInstanceId)
 		throws WorkflowException {
 
-		return _workflowInstanceManager.getWorkflowInstance(
+		return getWorkflowInstanceManager().getWorkflowInstance(
 			companyId, workflowInstanceId);
 	}
 
@@ -57,8 +60,17 @@ public class WorkflowInstanceManagerUtil {
 			Long assetClassPK, Boolean completed)
 		throws WorkflowException {
 
-		return _workflowInstanceManager.getWorkflowInstanceCount(
+		return getWorkflowInstanceManager().getWorkflowInstanceCount(
 			companyId, userId, assetClassName, assetClassPK, completed);
+	}
+
+	public static int getWorkflowInstanceCount(
+			long companyId, Long userId, String[] assetClassNames,
+			Boolean completed)
+		throws WorkflowException {
+
+		return getWorkflowInstanceManager().getWorkflowInstanceCount(
+			companyId, userId, assetClassNames, completed);
 	}
 
 	public static int getWorkflowInstanceCount(
@@ -66,24 +78,38 @@ public class WorkflowInstanceManagerUtil {
 			Integer workflowDefinitionVersion, Boolean completed)
 		throws WorkflowException {
 
-		return _workflowInstanceManager.getWorkflowInstanceCount(
+		return getWorkflowInstanceManager().getWorkflowInstanceCount(
 			companyId, workflowDefinitionName, workflowDefinitionVersion,
 			completed);
 	}
 
 	public static WorkflowInstanceManager getWorkflowInstanceManager() {
+		PortalRuntimePermission.checkGetBeanProperty(
+			WorkflowInstanceManagerUtil.class);
+
 		return _workflowInstanceManager;
 	}
 
 	public static List<WorkflowInstance> getWorkflowInstances(
 			long companyId, Long userId, String assetClassName,
-			Long assetClassPK, Boolean completed, int start,
-			int end, OrderByComparator orderByComparator)
+			Long assetClassPK, Boolean completed, int start, int end,
+			OrderByComparator orderByComparator)
 		throws WorkflowException {
 
-		return _workflowInstanceManager.getWorkflowInstances(
-			companyId, userId, assetClassName, assetClassPK,
-			completed, start, end, orderByComparator);
+		return getWorkflowInstanceManager().getWorkflowInstances(
+			companyId, userId, assetClassName, assetClassPK, completed, start,
+			end, orderByComparator);
+	}
+
+	public static List<WorkflowInstance> getWorkflowInstances(
+			long companyId, Long userId, String[] assetClassNames,
+			Boolean completed, int start, int end,
+			OrderByComparator orderByComparator)
+		throws WorkflowException {
+
+		return getWorkflowInstanceManager().getWorkflowInstances(
+			companyId, userId, assetClassNames, completed, start, end,
+			orderByComparator);
 	}
 
 	public static List<WorkflowInstance> getWorkflowInstances(
@@ -92,10 +118,9 @@ public class WorkflowInstanceManagerUtil {
 			int end, OrderByComparator orderByComparator)
 		throws WorkflowException {
 
-		return _workflowInstanceManager.getWorkflowInstances(
-			companyId, workflowDefinitionName,
-			workflowDefinitionVersion, completed, start,
-			end, orderByComparator);
+		return getWorkflowInstanceManager().getWorkflowInstances(
+			companyId, workflowDefinitionName, workflowDefinitionVersion,
+			completed, start, end, orderByComparator);
 	}
 
 	public static WorkflowInstance signalWorkflowInstance(
@@ -103,7 +128,7 @@ public class WorkflowInstanceManagerUtil {
 			String transitionName, Map<String, Serializable> workflowContext)
 		throws WorkflowException {
 
-		return _workflowInstanceManager.signalWorkflowInstance(
+		return getWorkflowInstanceManager().signalWorkflowInstance(
 			companyId, userId, workflowInstanceId, transitionName,
 			workflowContext);
 	}
@@ -114,7 +139,7 @@ public class WorkflowInstanceManagerUtil {
 			String transitionName, Map<String, Serializable> workflowContext)
 		throws WorkflowException {
 
-		return _workflowInstanceManager.startWorkflowInstance(
+		return getWorkflowInstanceManager().startWorkflowInstance(
 			companyId, groupId, userId, workflowDefinitionName,
 			workflowDefinitionVersion, transitionName, workflowContext);
 	}
@@ -124,12 +149,14 @@ public class WorkflowInstanceManagerUtil {
 			Map<String, Serializable> workflowContext)
 		throws WorkflowException {
 
-		return _workflowInstanceManager.updateWorkflowContext(
+		return getWorkflowInstanceManager().updateWorkflowContext(
 			companyId, workflowInstanceId, workflowContext);
 	}
 
 	public void setWorkflowInstanceManager(
 		WorkflowInstanceManager workflowInstanceManager) {
+
+		PortalRuntimePermission.checkSetBeanProperty(getClass());
 
 		_workflowInstanceManager = workflowInstanceManager;
 	}

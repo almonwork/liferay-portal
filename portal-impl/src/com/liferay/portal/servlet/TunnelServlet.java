@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -132,7 +132,7 @@ public class TunnelServlet extends HttpServlet {
 					PrincipalThreadLocal.setName(user.getUserId());
 
 					PermissionChecker permissionChecker =
-						PermissionCheckerFactoryUtil.create(user, true);
+						PermissionCheckerFactoryUtil.create(user);
 
 					PermissionThreadLocal.setPermissionChecker(
 						permissionChecker);
@@ -162,13 +162,20 @@ public class TunnelServlet extends HttpServlet {
 		}
 
 		if (returnObj != null) {
-			ObjectOutputStream oos = new ObjectOutputStream(
-				response.getOutputStream());
+			try {
+				ObjectOutputStream oos = new ObjectOutputStream(
+					response.getOutputStream());
 
-			oos.writeObject(returnObj);
+				oos.writeObject(returnObj);
 
-			oos.flush();
-			oos.close();
+				oos.flush();
+				oos.close();
+			}
+			catch (IOException ioe) {
+				_log.error(ioe, ioe);
+
+				throw ioe;
+			}
 		}
 	}
 

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -32,10 +32,12 @@ public class EventsProcessorUtil {
 		_instance.process(key, classes, null, null, null, null);
 	}
 
-	public static void process(String key, String[] classes, String[] ids)
+	public static void process(
+			String key, String[] classes, HttpServletRequest request,
+			HttpServletResponse response)
 		throws ActionException {
 
-		_instance.process(key, classes, ids, null, null, null);
+		_instance.process(key, classes, null, request, response, null);
 	}
 
 	public static void process(
@@ -45,12 +47,10 @@ public class EventsProcessorUtil {
 		_instance.process(key, classes, null, null, null, session);
 	}
 
-	public static void process(
-			String key, String[] classes, HttpServletRequest request,
-			HttpServletResponse response)
+	public static void process(String key, String[] classes, String[] ids)
 		throws ActionException {
 
-		_instance.process(key, classes, null, request, response, null);
+		_instance.process(key, classes, ids, null, null, null);
 	}
 
 	public static void registerEvent(String key, Object event) {

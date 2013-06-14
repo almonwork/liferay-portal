@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -42,11 +42,11 @@ public interface DestinationNames {
 	public static final String DOCUMENT_LIBRARY_AUDIO_PROCESSOR =
 		"liferay/document_library_audio_processor";
 
-	public static final String DOCUMENT_LIBRARY_FOLDER_LAST_POST_DATE =
-		"liferay/document_library_folder_last_post_date";
-
 	public static final String DOCUMENT_LIBRARY_HOOK =
 		"liferay/document_library_hook";
+
+	public static final String DOCUMENT_LIBRARY_IMAGE_PROCESSOR =
+		"liferay/document_library_image_processor";
 
 	public static final String DOCUMENT_LIBRARY_PDF_PROCESSOR =
 		"liferay/document_library_pdf_processor";

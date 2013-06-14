@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -17,6 +17,9 @@ package com.liferay.portal.kernel.util;
 import java.io.Serializable;
 
 import java.lang.reflect.Method;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @author Brian Wing Shun Chan
@@ -58,8 +61,7 @@ public class MethodKey implements Serializable {
 		for (int i = 0; i < parameterTypeNames.length; i++) {
 			String parameterTypeName = parameterTypeNames[i];
 
-			_parameterTypes[i] = Class.forName(
-				parameterTypeName, true, classLoader);
+			_parameterTypes[i] = _getClass(parameterTypeName, classLoader);
 		}
 	}
 
@@ -71,7 +73,9 @@ public class MethodKey implements Serializable {
 
 		MethodKey methodKey = (MethodKey)obj;
 
-		if (toString().equals(methodKey.toString())) {
+		String string = toString();
+
+		if (string.equals(methodKey.toString())) {
 			return true;
 		}
 		else {
@@ -101,25 +105,53 @@ public class MethodKey implements Serializable {
 		return _toString();
 	}
 
+	private Class<?> _getClass(String typeName, ClassLoader classLoader)
+		throws ClassNotFoundException {
+
+		if (_primitiveClasses.containsKey(typeName)) {
+			return _primitiveClasses.get(typeName);
+		}
+		else {
+			return Class.forName(typeName, true, classLoader);
+		}
+	}
+
 	private String _toString() {
 		if (_toString == null) {
-			StringBundler sb = new StringBundler();
-
-			sb.append(_className);
-			sb.append(_methodName);
-
 			if ((_parameterTypes != null) && (_parameterTypes.length > 0)) {
+				StringBundler sb = new StringBundler(
+					3 + _parameterTypes.length);
+
+				sb.append(_className);
+				sb.append(_methodName);
 				sb.append(StringPool.DASH);
 
 				for (Class<?> parameterType : _parameterTypes) {
 					sb.append(parameterType.getName());
 				}
-			}
 
-			_toString = sb.toString();
+				_toString = sb.toString();
+			}
+			else {
+				_toString = _className.concat(_methodName);
+			}
 		}
 
 		return _toString;
+	}
+
+	private static Map<String, Class<?>> _primitiveClasses =
+		new HashMap<String, Class<?>>();
+
+	static {
+		_primitiveClasses.put("byte", byte.class);
+		_primitiveClasses.put("boolean", boolean.class);
+		_primitiveClasses.put("char", char.class);
+		_primitiveClasses.put("double", double.class);
+		_primitiveClasses.put("float", float.class);
+		_primitiveClasses.put("int", int.class);
+		_primitiveClasses.put("long", long.class);
+		_primitiveClasses.put("short", short.class);
 	}
 
 	private String _className;

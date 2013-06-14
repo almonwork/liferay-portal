@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -20,15 +20,10 @@ import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.service.PortalPreferencesLocalServiceUtil;
-import com.liferay.portal.service.impl.PortletPreferencesLocalUtil;
-import com.liferay.portlet.BasePreferencesImpl;
-import com.liferay.portlet.PortalPreferencesImpl;
-import com.liferay.portlet.PortalPreferencesWrapper;
 import com.liferay.util.ContentUtil;
 
-import java.io.Serializable;
-
-import java.util.Map;
+import java.util.Enumeration;
+import java.util.Properties;
 
 import javax.portlet.PortletPreferences;
 
@@ -252,20 +247,41 @@ public class PrefsPropsUtil {
 		long ownerId = companyId;
 		int ownerType = PortletKeys.PREFS_OWNER_TYPE_COMPANY;
 
-		Map<Serializable, BasePreferencesImpl> preferencesPool =
-			PortletPreferencesLocalUtil.getPreferencesPool(ownerId, ownerType);
+		return PortalPreferencesLocalServiceUtil.getPreferences(
+			companyId, ownerId, ownerType);
+	}
 
-		PortalPreferencesImpl portalPreferencesImpl =
-			(PortalPreferencesImpl)preferencesPool.get(companyId);
+	public static Properties getProperties(
+		PortletPreferences preferences, long companyId, String prefix,
+		boolean removePrefix) {
 
-		if (portalPreferencesImpl == null) {
-			return PortalPreferencesLocalServiceUtil.getPreferences(
-				companyId, ownerId, ownerType);
+		Properties newProperties = new Properties();
+
+		Enumeration<String> enu = preferences.getNames();
+
+		while (enu.hasMoreElements()) {
+			String key = enu.nextElement();
+
+			if (key.startsWith(prefix)) {
+				String value = preferences.getValue(key, StringPool.BLANK);
+
+				if (removePrefix) {
+					key = key.substring(prefix.length());
+				}
+
+				newProperties.setProperty(key, value);
+			}
 		}
-		else {
-			return new PortalPreferencesWrapper(
-				(PortalPreferencesImpl)portalPreferencesImpl.clone());
-		}
+
+		return newProperties;
+	}
+
+	public static Properties getProperties(String prefix, boolean removePrefix)
+		throws SystemException {
+
+		PortletPreferences preferences = getPreferences();
+
+		return getProperties(preferences, 0, prefix, removePrefix);
 	}
 
 	public static short getShort(long companyId, String name)
@@ -354,35 +370,70 @@ public class PrefsPropsUtil {
 		PortletPreferences preferences, long companyId, String name,
 		double defaultValue) {
 
-		return preferences.getValue(name, String.valueOf(defaultValue));
+		String value = getString(preferences, companyId, name);
+
+		if (value != null) {
+			return value;
+		}
+		else {
+			return String.valueOf(defaultValue);
+		}
 	}
 
 	public static String getString(
 		PortletPreferences preferences, long companyId, String name,
 		int defaultValue) {
 
-		return preferences.getValue(name, String.valueOf(defaultValue));
+		String value = getString(preferences, companyId, name);
+
+		if (value != null) {
+			return value;
+		}
+		else {
+			return String.valueOf(defaultValue);
+		}
 	}
 
 	public static String getString(
 		PortletPreferences preferences, long companyId, String name,
 		long defaultValue) {
 
-		return preferences.getValue(name, String.valueOf(defaultValue));
+		String value = getString(preferences, companyId, name);
+
+		if (value != null) {
+			return value;
+		}
+		else {
+			return String.valueOf(defaultValue);
+		}
 	}
 
 	public static String getString(
 		PortletPreferences preferences, long companyId, String name,
 		short defaultValue) {
 
-		return preferences.getValue(name, String.valueOf(defaultValue));
+		String value = getString(preferences, companyId, name);
+
+		if (value != null) {
+			return value;
+		}
+		else {
+			return String.valueOf(defaultValue);
+		}
 	}
 
 	public static String getString(
 		PortletPreferences preferences, long companyId, String name,
 		String defaultValue) {
 
-		return preferences.getValue(name, defaultValue);
+		String value = getString(preferences, companyId, name);
+
+		if (value != null) {
+			return value;
+		}
+		else {
+			return defaultValue;
+		}
 	}
 
 	public static String getString(String name) throws SystemException {
@@ -459,6 +510,20 @@ public class PrefsPropsUtil {
 		PortletPreferences preferences = getPreferences();
 
 		return getStringArray(preferences, 0, name, delimiter, defaultValue);
+	}
+
+	public static String getStringFromNames(long companyId, String... names)
+		throws SystemException {
+
+		for (String name : names) {
+			String value = getString(companyId, name);
+
+			if (Validator.isNotNull(value)) {
+				return value;
+			}
+		}
+
+		return null;
 	}
 
 }

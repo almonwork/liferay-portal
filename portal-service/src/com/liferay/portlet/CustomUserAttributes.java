@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -21,8 +21,8 @@ import java.util.Map;
  */
 public interface CustomUserAttributes extends Cloneable {
 
-	public String getValue(String name, Map<String, String> userInfo);
-
 	public Object clone();
+
+	public String getValue(String name, Map<String, String> userInfo);
 
 }

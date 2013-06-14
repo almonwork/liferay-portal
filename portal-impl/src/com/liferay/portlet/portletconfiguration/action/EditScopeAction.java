@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -24,6 +24,7 @@ import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.Tuple;
 import com.liferay.portal.kernel.util.Validator;
+import com.liferay.portal.model.GroupConstants;
 import com.liferay.portal.model.Layout;
 import com.liferay.portal.model.Portlet;
 import com.liferay.portal.security.auth.PrincipalException;
@@ -84,9 +85,19 @@ public class EditScopeAction extends EditConfigurationAction {
 		}
 
 		if (SessionErrors.isEmpty(actionRequest)) {
+			String portletResource = ParamUtil.getString(
+				actionRequest, "portletResource");
+
 			SessionMessages.add(
 				actionRequest,
-				portletConfig.getPortletName() + ".doConfigure");
+				portletConfig.getPortletName() +
+					SessionMessages.KEY_SUFFIX_REFRESH_PORTLET,
+				portletResource);
+
+			SessionMessages.add(
+				actionRequest,
+				portletConfig.getPortletName() +
+					SessionMessages.KEY_SUFFIX_UPDATED_CONFIGURATION);
 
 			String redirect = PortalUtil.escapeRedirect(
 				ParamUtil.getString(actionRequest, "redirect"));
@@ -121,9 +132,7 @@ public class EditScopeAction extends EditConfigurationAction {
 			renderRequest, "portlet.portlet_configuration.edit_scope"));
 	}
 
-	protected Tuple getNewScope(ActionRequest actionRequest)
-		throws Exception {
-
+	protected Tuple getNewScope(ActionRequest actionRequest) throws Exception {
 		ThemeDisplay themeDisplay = (ThemeDisplay)actionRequest.getAttribute(
 			WebKeys.THEME_DISPLAY);
 
@@ -153,9 +162,10 @@ public class EditScopeAction extends EditConfigurationAction {
 				String name = String.valueOf(scopeLayout.getPlid());
 
 				GroupLocalServiceUtil.addGroup(
-					themeDisplay.getUserId(), Layout.class.getName(),
-					scopeLayout.getPlid(), name, null, 0, null, false, true,
-					null);
+					themeDisplay.getUserId(),
+					GroupConstants.DEFAULT_PARENT_GROUP_ID,
+					Layout.class.getName(), scopeLayout.getPlid(), name, null,
+					0, null, false, true, null);
 			}
 
 			scopeGroupId = scopeLayout.getGroupId();
@@ -183,7 +193,7 @@ public class EditScopeAction extends EditConfigurationAction {
 				layout, portlet.getPortletId());
 
 		String scopeType = GetterUtil.getString(
-			preferences.getValue("lfr-scope-type", null));
+			preferences.getValue("lfrScopeType", null));
 
 		if (Validator.isNull(scopeType)) {
 			return null;
@@ -257,7 +267,7 @@ public class EditScopeAction extends EditConfigurationAction {
 
 		String scopeType = ParamUtil.getString(actionRequest, "scopeType");
 
-		preferences.setValue("lfr-scope-type", scopeType);
+		preferences.setValue("lfrScopeType", scopeType);
 
 		String scopeLayoutUuid = ParamUtil.getString(
 			actionRequest, "scopeLayoutUuid");
@@ -285,10 +295,10 @@ public class EditScopeAction extends EditConfigurationAction {
 
 		if (!newPortletTitle.equals(portletTitle)) {
 			preferences.setValue(
-				"portlet-setup-title-" + themeDisplay.getLanguageId(),
+				"portletSetupTitle_" + themeDisplay.getLanguageId(),
 				newPortletTitle);
 			preferences.setValue(
-				"portlet-setup-use-custom-title", Boolean.TRUE.toString());
+				"portletSetupUseCustomTitle", Boolean.TRUE.toString());
 		}
 
 		preferences.store();

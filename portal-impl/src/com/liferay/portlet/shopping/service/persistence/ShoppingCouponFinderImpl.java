@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -36,10 +36,10 @@ public class ShoppingCouponFinderImpl
 	extends BasePersistenceImpl<ShoppingCoupon>
 	implements ShoppingCouponFinder {
 
-	public static String COUNT_BY_G_C_C_A_DT =
+	public static final String COUNT_BY_G_C_C_A_DT =
 		ShoppingCouponFinder.class.getName() + ".countByG_C_C_A_DT";
 
-	public static String FIND_BY_G_C_C_A_DT =
+	public static final String FIND_BY_G_C_C_A_DT =
 		ShoppingCouponFinder.class.getName() + ".findByG_C_C_A_DT";
 
 	public int countByG_C_C_A_DT(
@@ -72,7 +72,7 @@ public class ShoppingCouponFinderImpl
 			qPos.add(discountType);
 			qPos.add(discountType);
 
-			Iterator<Long> itr = q.list().iterator();
+			Iterator<Long> itr = q.iterate();
 
 			if (itr.hasNext()) {
 				Long count = itr.next();

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,6 +14,12 @@
 
 package com.liferay.portlet.shopping.model;
 
+import com.liferay.portal.model.ModelWrapper;
+
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * <p>
  * This class is a wrapper for {@link ShoppingCart}.
@@ -23,7 +29,8 @@ package com.liferay.portlet.shopping.model;
  * @see       ShoppingCart
  * @generated
  */
-public class ShoppingCartWrapper implements ShoppingCart {
+public class ShoppingCartWrapper implements ShoppingCart,
+	ModelWrapper<ShoppingCart> {
 	public ShoppingCartWrapper(ShoppingCart shoppingCart) {
 		_shoppingCart = shoppingCart;
 	}
@@ -34,6 +41,92 @@ public class ShoppingCartWrapper implements ShoppingCart {
 
 	public String getModelClassName() {
 		return ShoppingCart.class.getName();
+	}
+
+	public Map<String, Object> getModelAttributes() {
+		Map<String, Object> attributes = new HashMap<String, Object>();
+
+		attributes.put("cartId", getCartId());
+		attributes.put("groupId", getGroupId());
+		attributes.put("companyId", getCompanyId());
+		attributes.put("userId", getUserId());
+		attributes.put("userName", getUserName());
+		attributes.put("createDate", getCreateDate());
+		attributes.put("modifiedDate", getModifiedDate());
+		attributes.put("itemIds", getItemIds());
+		attributes.put("couponCodes", getCouponCodes());
+		attributes.put("altShipping", getAltShipping());
+		attributes.put("insure", getInsure());
+
+		return attributes;
+	}
+
+	public void setModelAttributes(Map<String, Object> attributes) {
+		Long cartId = (Long)attributes.get("cartId");
+
+		if (cartId != null) {
+			setCartId(cartId);
+		}
+
+		Long groupId = (Long)attributes.get("groupId");
+
+		if (groupId != null) {
+			setGroupId(groupId);
+		}
+
+		Long companyId = (Long)attributes.get("companyId");
+
+		if (companyId != null) {
+			setCompanyId(companyId);
+		}
+
+		Long userId = (Long)attributes.get("userId");
+
+		if (userId != null) {
+			setUserId(userId);
+		}
+
+		String userName = (String)attributes.get("userName");
+
+		if (userName != null) {
+			setUserName(userName);
+		}
+
+		Date createDate = (Date)attributes.get("createDate");
+
+		if (createDate != null) {
+			setCreateDate(createDate);
+		}
+
+		Date modifiedDate = (Date)attributes.get("modifiedDate");
+
+		if (modifiedDate != null) {
+			setModifiedDate(modifiedDate);
+		}
+
+		String itemIds = (String)attributes.get("itemIds");
+
+		if (itemIds != null) {
+			setItemIds(itemIds);
+		}
+
+		String couponCodes = (String)attributes.get("couponCodes");
+
+		if (couponCodes != null) {
+			setCouponCodes(couponCodes);
+		}
+
+		Integer altShipping = (Integer)attributes.get("altShipping");
+
+		if (altShipping != null) {
+			setAltShipping(altShipping);
+		}
+
+		Boolean insure = (Boolean)attributes.get("insure");
+
+		if (insure != null) {
+			setInsure(insure);
+		}
 	}
 
 	/**
@@ -301,10 +394,6 @@ public class ShoppingCartWrapper implements ShoppingCart {
 		return _shoppingCart.isEscapedModel();
 	}
 
-	public void setEscapedModel(boolean escapedModel) {
-		_shoppingCart.setEscapedModel(escapedModel);
-	}
-
 	public java.io.Serializable getPrimaryKeyObj() {
 		return _shoppingCart.getPrimaryKeyObj();
 	}
@@ -378,7 +467,14 @@ public class ShoppingCartWrapper implements ShoppingCart {
 		return _shoppingCart.getItemsSize();
 	}
 
+	/**
+	 * @deprecated Renamed to {@link #getWrappedModel}
+	 */
 	public ShoppingCart getWrappedShoppingCart() {
+		return _shoppingCart;
+	}
+
+	public ShoppingCart getWrappedModel() {
 		return _shoppingCart;
 	}
 

@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -16,55 +16,4 @@
 
 <%@ include file="/html/portlet/document_library/init.jsp" %>
 
-<%
-FileVersion fileVersion = (FileVersion)request.getAttribute(WebKeys.DOCUMENT_LIBRARY_FILE_VERSION);
-
-FileEntry fileEntry = fileVersion.getFileEntry();
-
-boolean showThumbnail = false;
-
-if (fileEntry.getVersion().equals(fileVersion.getVersion())) {
-	showThumbnail = true;
-}
-
-String src = null;
-
-if (showThumbnail) {
-	src = themeDisplay.getPortalURL() + themeDisplay.getPathContext() + "/documents/" + themeDisplay.getScopeGroupId() + StringPool.SLASH + fileEntry.getFolderId() + StringPool.SLASH + HttpUtil.encodeURL(HtmlUtil.unescape(fileEntry.getTitle())) + "?version=" + fileVersion.getVersion();
-}
-%>
-
-<div class="asset-resource-info">
-	<aui:a href='<%= themeDisplay.getPortalURL() + themeDisplay.getPathContext() + "/documents/" + fileVersion.getRepositoryId() + StringPool.SLASH + fileEntry.getFolderId() + StringPool.SLASH + HttpUtil.encodeURL(HtmlUtil.unescape(fileEntry.getTitle())) + "?version=" + fileVersion.getVersion() %>'>
-		<c:choose>
-			<c:when test="<%= showThumbnail && PDFProcessor.hasImages(fileEntry, fileVersion.getVersion()) %>">
-				<div>
-					<img src="<%= src %>&documentThumbnail=1" />
-
-					<%= fileVersion.getTitle() %>
-				</div>
-			</c:when>
-			<c:when test="<%= showThumbnail && VideoProcessor.hasVideo(fileEntry, fileVersion.getVersion()) %>">
-				<div>
-					<img src="<%= src %>&videoThumbnail=1" />
-
-					<%= fileVersion.getTitle() %>
-				</div>
-			</c:when>
-			<c:otherwise>
-				<img class="dl-file-icon" src="<%= themeDisplay.getPathThemeImages() %>/file_system/small/<%= fileVersion.getIcon() %>.png" /><%= HtmlUtil.escape(fileVersion.getTitle()) %>
-			</c:otherwise>
-		</c:choose>
-	</aui:a>
-</div>
-
-<p class="asset-description"><%= HtmlUtil.escape(fileVersion.getDescription()) %></p>
-
-<liferay-ui:custom-attributes-available className="<%= DLFileEntryConstants.getClassName() %>">
-	<liferay-ui:custom-attribute-list
-		className="<%= DLFileEntryConstants.getClassName() %>"
-		classPK="<%= (fileVersion != null) ? fileVersion.getFileVersionId() : 0 %>"
-		editable="<%= false %>"
-		label="<%= true %>"
-	/>
-</liferay-ui:custom-attributes-available>
+<liferay-util:include page="/html/portlet/document_library/view_file_entry.jsp" />

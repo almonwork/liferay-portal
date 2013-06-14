@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -28,9 +28,10 @@ public class TearDownArchivedSetupTest extends BaseTestCase {
 			switch (label) {
 			case 1:
 				selenium.open("/web/guest/home/");
+				loadRequiredJavaScriptModules();
 
 				for (int second = 0;; second++) {
-					if (second >= 60) {
+					if (second >= 90) {
 						fail("timeout");
 					}
 
@@ -45,15 +46,17 @@ public class TearDownArchivedSetupTest extends BaseTestCase {
 					Thread.sleep(1000);
 				}
 
-				selenium.saveScreenShotAndSource();
 				selenium.clickAt("link=Web Form Test Page",
-					RuntimeVariables.replace(""));
+					RuntimeVariables.replace("Web Form Test Page"));
 				selenium.waitForPageToLoad("30000");
-				selenium.saveScreenShotAndSource();
+				loadRequiredJavaScriptModules();
+				Thread.sleep(5000);
+				assertEquals(RuntimeVariables.replace("Options"),
+					selenium.getText("//strong/a"));
 				selenium.click("//strong/a");
 
 				for (int second = 0;; second++) {
-					if (second >= 60) {
+					if (second >= 90) {
 						fail("timeout");
 					}
 
@@ -69,17 +72,19 @@ public class TearDownArchivedSetupTest extends BaseTestCase {
 					Thread.sleep(1000);
 				}
 
-				selenium.saveScreenShotAndSource();
+				assertEquals(RuntimeVariables.replace("Configuration"),
+					selenium.getText(
+						"//div[@class='lfr-component lfr-menu-list']/ul/li[2]/a"));
 				selenium.click(
 					"//div[@class='lfr-component lfr-menu-list']/ul/li[2]/a");
 
 				for (int second = 0;; second++) {
-					if (second >= 60) {
+					if (second >= 90) {
 						fail("timeout");
 					}
 
 					try {
-						if (selenium.isVisible("//span[@class='taglib-text']")) {
+						if (selenium.isVisible("//a[@id='_86_rjus']/span")) {
 							break;
 						}
 					}
@@ -89,32 +94,33 @@ public class TearDownArchivedSetupTest extends BaseTestCase {
 					Thread.sleep(1000);
 				}
 
-				selenium.saveScreenShotAndSource();
+				assertEquals(RuntimeVariables.replace("Archive/Restore Setup"),
+					selenium.getText("//a[@id='_86_rjus']/span"));
 				selenium.click(RuntimeVariables.replace(
-						"//span[@class='taglib-text']"));
+						"//a[@id='_86_rjus']/span"));
 				selenium.waitForPageToLoad("30000");
-				selenium.saveScreenShotAndSource();
+				loadRequiredJavaScriptModules();
 
 				boolean archiveSetup1Present = selenium.isElementPresent(
-						"//td[4]/span/ul/li/strong/a");
+						"//div[@class='portlet-msg-info']");
 
-				if (!archiveSetup1Present) {
+				if (archiveSetup1Present) {
 					label = 2;
 
 					continue;
 				}
 
-				selenium.clickAt("//td[4]/span/ul/li/strong/a",
+				selenium.clickAt("//span[@title='Actions']/ul/li/strong/a",
 					RuntimeVariables.replace("Actions"));
 
 				for (int second = 0;; second++) {
-					if (second >= 60) {
+					if (second >= 90) {
 						fail("timeout");
 					}
 
 					try {
 						if (selenium.isVisible(
-									"//div[@class='lfr-component lfr-menu-list']/ul/li[2]/a")) {
+									"//a[@id='_86_ocerSearchContainer_1_menu_delete']")) {
 							break;
 						}
 					}
@@ -124,36 +130,36 @@ public class TearDownArchivedSetupTest extends BaseTestCase {
 					Thread.sleep(1000);
 				}
 
-				selenium.saveScreenShotAndSource();
+				assertEquals(RuntimeVariables.replace("Delete"),
+					selenium.getText(
+						"//a[@id='_86_ocerSearchContainer_1_menu_delete']"));
 				selenium.click(RuntimeVariables.replace(
-						"//div[@class='lfr-component lfr-menu-list']/ul/li[2]/a"));
+						"//a[@id='_86_ocerSearchContainer_1_menu_delete']"));
 				selenium.waitForPageToLoad("30000");
+				loadRequiredJavaScriptModules();
 				assertTrue(selenium.getConfirmation()
 								   .matches("^Are you sure you want to delete this[\\s\\S]$"));
-				selenium.saveScreenShotAndSource();
-
-			case 2:
 
 				boolean archiveSetup2Present = selenium.isElementPresent(
-						"//td[4]/span/ul/li/strong/a");
+						"//div[@class='portlet-msg-info']");
 
-				if (!archiveSetup2Present) {
+				if (archiveSetup2Present) {
 					label = 3;
 
 					continue;
 				}
 
-				selenium.clickAt("//td[4]/span/ul/li/strong/a",
+				selenium.clickAt("//span[@title='Actions']/ul/li/strong/a",
 					RuntimeVariables.replace("Actions"));
 
 				for (int second = 0;; second++) {
-					if (second >= 60) {
+					if (second >= 90) {
 						fail("timeout");
 					}
 
 					try {
 						if (selenium.isVisible(
-									"//div[@class='lfr-component lfr-menu-list']/ul/li[2]/a")) {
+									"//a[@id='_86_ocerSearchContainer_1_menu_delete']")) {
 							break;
 						}
 					}
@@ -163,36 +169,35 @@ public class TearDownArchivedSetupTest extends BaseTestCase {
 					Thread.sleep(1000);
 				}
 
-				selenium.saveScreenShotAndSource();
+				assertEquals(RuntimeVariables.replace("Delete"),
+					selenium.getText(
+						"//a[@id='_86_ocerSearchContainer_1_menu_delete']"));
 				selenium.click(RuntimeVariables.replace(
-						"//div[@class='lfr-component lfr-menu-list']/ul/li[2]/a"));
+						"//a[@id='_86_ocerSearchContainer_1_menu_delete']"));
 				selenium.waitForPageToLoad("30000");
+				loadRequiredJavaScriptModules();
 				assertTrue(selenium.getConfirmation()
 								   .matches("^Are you sure you want to delete this[\\s\\S]$"));
-				selenium.saveScreenShotAndSource();
-
-			case 3:
 
 				boolean archiveSetup3Present = selenium.isElementPresent(
-						"//td[4]/span/ul/li/strong/a");
+						"//div[@class='portlet-msg-info']");
 
-				if (!archiveSetup3Present) {
+				if (archiveSetup3Present) {
 					label = 4;
 
 					continue;
 				}
 
-				selenium.clickAt("//td[4]/span/ul/li/strong/a",
+				selenium.clickAt("//span[@title='Actions']/ul/li/strong/a",
 					RuntimeVariables.replace("Actions"));
 
 				for (int second = 0;; second++) {
-					if (second >= 60) {
+					if (second >= 90) {
 						fail("timeout");
 					}
 
 					try {
-						if (selenium.isVisible(
-									"//div[@class='lfr-component lfr-menu-list']/ul/li[2]/a")) {
+						if (selenium.isVisible("//a[@id='_86_ctvk']")) {
 							break;
 						}
 					}
@@ -202,36 +207,33 @@ public class TearDownArchivedSetupTest extends BaseTestCase {
 					Thread.sleep(1000);
 				}
 
-				selenium.saveScreenShotAndSource();
-				selenium.click(RuntimeVariables.replace(
-						"//div[@class='lfr-component lfr-menu-list']/ul/li[2]/a"));
+				assertEquals(RuntimeVariables.replace("Delete"),
+					selenium.getText("//a[@id='_86_ctvk']"));
+				selenium.click(RuntimeVariables.replace("//a[@id='_86_ctvk']"));
 				selenium.waitForPageToLoad("30000");
+				loadRequiredJavaScriptModules();
 				assertTrue(selenium.getConfirmation()
 								   .matches("^Are you sure you want to delete this[\\s\\S]$"));
-				selenium.saveScreenShotAndSource();
-
-			case 4:
 
 				boolean archiveSetup4Present = selenium.isElementPresent(
-						"//td[4]/span/ul/li/strong/a");
+						"//div[@class='portlet-msg-info']");
 
-				if (!archiveSetup4Present) {
+				if (archiveSetup4Present) {
 					label = 5;
 
 					continue;
 				}
 
-				selenium.clickAt("//td[4]/span/ul/li/strong/a",
+				selenium.clickAt("//span[@title='Actions']/ul/li/strong/a",
 					RuntimeVariables.replace("Actions"));
 
 				for (int second = 0;; second++) {
-					if (second >= 60) {
+					if (second >= 90) {
 						fail("timeout");
 					}
 
 					try {
-						if (selenium.isVisible(
-									"//div[@class='lfr-component lfr-menu-list']/ul/li[2]/a")) {
+						if (selenium.isVisible("//a[@id='_86_ctvk']")) {
 							break;
 						}
 					}
@@ -241,36 +243,34 @@ public class TearDownArchivedSetupTest extends BaseTestCase {
 					Thread.sleep(1000);
 				}
 
-				selenium.saveScreenShotAndSource();
-				selenium.click(RuntimeVariables.replace(
-						"//div[@class='lfr-component lfr-menu-list']/ul/li[2]/a"));
+				assertEquals(RuntimeVariables.replace("Delete"),
+					selenium.getText("//a[@id='_86_ctvk']"));
+				selenium.click(RuntimeVariables.replace("//a[@id='_86_ctvk']"));
 				selenium.waitForPageToLoad("30000");
+				loadRequiredJavaScriptModules();
 				assertTrue(selenium.getConfirmation()
 								   .matches("^Are you sure you want to delete this[\\s\\S]$"));
-				selenium.saveScreenShotAndSource();
-
-			case 5:
 
 				boolean archiveSetup5Present = selenium.isElementPresent(
-						"//td[4]/span/ul/li/strong/a");
+						"//div[@class='portlet-msg-info']");
 
-				if (!archiveSetup5Present) {
+				if (archiveSetup5Present) {
 					label = 6;
 
 					continue;
 				}
 
-				selenium.clickAt("//td[4]/span/ul/li/strong/a",
+				selenium.clickAt("//span[@title='Actions']/ul/li/strong/a",
 					RuntimeVariables.replace("Actions"));
 
 				for (int second = 0;; second++) {
-					if (second >= 60) {
+					if (second >= 90) {
 						fail("timeout");
 					}
 
 					try {
 						if (selenium.isVisible(
-									"//div[@class='lfr-component lfr-menu-list']/ul/li[2]/a")) {
+									"//a[@id='_86_ocerSearchContainer_1_menu_delete']")) {
 							break;
 						}
 					}
@@ -280,14 +280,20 @@ public class TearDownArchivedSetupTest extends BaseTestCase {
 					Thread.sleep(1000);
 				}
 
-				selenium.saveScreenShotAndSource();
+				assertEquals(RuntimeVariables.replace("Delete"),
+					selenium.getText(
+						"//a[@id='_86_ocerSearchContainer_1_menu_delete']"));
 				selenium.click(RuntimeVariables.replace(
-						"//div[@class='lfr-component lfr-menu-list']/ul/li[2]/a"));
+						"//a[@id='_86_ocerSearchContainer_1_menu_delete']"));
 				selenium.waitForPageToLoad("30000");
+				loadRequiredJavaScriptModules();
 				assertTrue(selenium.getConfirmation()
 								   .matches("^Are you sure you want to delete this[\\s\\S]$"));
-				selenium.saveScreenShotAndSource();
 
+			case 2:
+			case 3:
+			case 4:
+			case 5:
 			case 6:
 			case 100:
 				label = -1;

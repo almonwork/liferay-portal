@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -23,14 +23,15 @@ import com.liferay.portalweb.portal.util.RuntimeVariables;
 public class EditWikiFrontPageTest extends BaseTestCase {
 	public void testEditWikiFrontPage() throws Exception {
 		selenium.open("/web/guest/home/");
+		loadRequiredJavaScriptModules();
 
 		for (int second = 0;; second++) {
-			if (second >= 60) {
+			if (second >= 90) {
 				fail("timeout");
 			}
 
 			try {
-				if (selenium.isElementPresent("link=Wiki Display Test Page")) {
+				if (selenium.isVisible("link=Wiki Display Test Page")) {
 					break;
 				}
 			}
@@ -40,39 +41,141 @@ public class EditWikiFrontPageTest extends BaseTestCase {
 			Thread.sleep(1000);
 		}
 
-		selenium.saveScreenShotAndSource();
-		selenium.click(RuntimeVariables.replace("link=Wiki Display Test Page"));
+		selenium.clickAt("link=Wiki Display Test Page",
+			RuntimeVariables.replace("Wiki Display Test Page"));
 		selenium.waitForPageToLoad("30000");
-		selenium.saveScreenShotAndSource();
-		assertEquals(RuntimeVariables.replace(
-				"This is a wiki frontpage article test."),
-			selenium.getText("//div[5]/div"));
-		selenium.clickAt("link=Edit", RuntimeVariables.replace(""));
+		loadRequiredJavaScriptModules();
+		assertEquals(RuntimeVariables.replace("Wiki FrontPage Content"),
+			selenium.getText("//div[@class='wiki-body']/p"));
+		assertEquals(RuntimeVariables.replace("Edit"),
+			selenium.getText("//span[contains(.,'Edit')]/a/span"));
+		selenium.clickAt("//span[contains(.,'Edit')]/a/span",
+			RuntimeVariables.replace("Edit"));
 		selenium.waitForPageToLoad("30000");
-		selenium.saveScreenShotAndSource();
-		selenium.type("//textarea",
-			RuntimeVariables.replace(
-				"This is an edited wiki frontpage article test."));
-		selenium.saveScreenShotAndSource();
+		loadRequiredJavaScriptModules();
+
+		for (int second = 0;; second++) {
+			if (second >= 90) {
+				fail("timeout");
+			}
+
+			try {
+				if (selenium.isElementPresent(
+							"//textarea[contains(@id,'_editor') and contains(@style,'display: none;')]")) {
+					break;
+				}
+			}
+			catch (Exception e) {
+			}
+
+			Thread.sleep(1000);
+		}
+
+		assertEquals(RuntimeVariables.replace("Source"),
+			selenium.getText("//span[.='Source']"));
+		selenium.clickAt("//span[.='Source']",
+			RuntimeVariables.replace("Source"));
+
+		for (int second = 0;; second++) {
+			if (second >= 90) {
+				fail("timeout");
+			}
+
+			try {
+				if (selenium.isVisible("//a[@class='cke_button_source cke_on']")) {
+					break;
+				}
+			}
+			catch (Exception e) {
+			}
+
+			Thread.sleep(1000);
+		}
+
+		for (int second = 0;; second++) {
+			if (second >= 90) {
+				fail("timeout");
+			}
+
+			try {
+				if (selenium.isVisible(
+							"//td[contains(@id,'cke_contents__54')]/textarea")) {
+					break;
+				}
+			}
+			catch (Exception e) {
+			}
+
+			Thread.sleep(1000);
+		}
+
+		selenium.type("//td[contains(@id,'cke_contents__54')]/textarea",
+			RuntimeVariables.replace("Wiki FrontPage Content Edit"));
+		assertEquals(RuntimeVariables.replace("Source"),
+			selenium.getText("//span[.='Source']"));
+		selenium.clickAt("//span[.='Source']",
+			RuntimeVariables.replace("Source"));
+
+		for (int second = 0;; second++) {
+			if (second >= 90) {
+				fail("timeout");
+			}
+
+			try {
+				if (selenium.isElementPresent(
+							"//textarea[contains(@id,'_editor') and contains(@style,'display: none;')]")) {
+					break;
+				}
+			}
+			catch (Exception e) {
+			}
+
+			Thread.sleep(1000);
+		}
+
+		assertTrue(selenium.isVisible(
+				"//td[contains(@id,'cke_contents__54')]/iframe"));
+		selenium.selectFrame("//td[contains(@id,'cke_contents__54')]/iframe");
+
+		for (int second = 0;; second++) {
+			if (second >= 90) {
+				fail("timeout");
+			}
+
+			try {
+				if (RuntimeVariables.replace("Wiki FrontPage Content Edit")
+										.equals(selenium.getText("//body"))) {
+					break;
+				}
+			}
+			catch (Exception e) {
+			}
+
+			Thread.sleep(1000);
+		}
+
+		selenium.selectFrame("relative=top");
 		selenium.clickAt("//input[@value='Publish']",
-			RuntimeVariables.replace(""));
+			RuntimeVariables.replace("Publish"));
 		selenium.waitForPageToLoad("30000");
-		selenium.saveScreenShotAndSource();
+		loadRequiredJavaScriptModules();
 		assertEquals(RuntimeVariables.replace(
-				"This is an edited wiki frontpage article test."),
-			selenium.getText("//div[6]/div"));
-		assertNotEquals(RuntimeVariables.replace(
-				"This is a wiki frontpage article test."),
-			selenium.getText("//div[6]/div"));
+				"Your request completed successfully."),
+			selenium.getText("//div[@class='portlet-msg-success']"));
+		assertEquals(RuntimeVariables.replace("Wiki FrontPage Content Edit"),
+			selenium.getText("//div[@class='wiki-body']/p"));
+		assertNotEquals(RuntimeVariables.replace("Wiki FrontPage Content"),
+			selenium.getText("//div[@class='wiki-body']/p"));
 		selenium.open("/web/guest/home/");
+		loadRequiredJavaScriptModules();
 
 		for (int second = 0;; second++) {
-			if (second >= 60) {
+			if (second >= 90) {
 				fail("timeout");
 			}
 
 			try {
-				if (selenium.isElementPresent("link=Wiki Test Page")) {
+				if (selenium.isVisible("link=Wiki Display Test Page")) {
 					break;
 				}
 			}
@@ -82,18 +185,24 @@ public class EditWikiFrontPageTest extends BaseTestCase {
 			Thread.sleep(1000);
 		}
 
-		selenium.saveScreenShotAndSource();
-		selenium.clickAt("link=Wiki Test Page", RuntimeVariables.replace(""));
+		selenium.clickAt("link=Wiki Display Test Page",
+			RuntimeVariables.replace("Wiki Display Test Page"));
 		selenium.waitForPageToLoad("30000");
-		selenium.saveScreenShotAndSource();
-		selenium.clickAt("link=Details", RuntimeVariables.replace(""));
+		loadRequiredJavaScriptModules();
+		assertEquals(RuntimeVariables.replace("Details"),
+			selenium.getText("//div[3]/span[2]/a/span"));
+		selenium.clickAt("//div[3]/span[2]/a/span",
+			RuntimeVariables.replace("Details"));
 		selenium.waitForPageToLoad("30000");
-		selenium.saveScreenShotAndSource();
-		selenium.clickAt("link=History", RuntimeVariables.replace(""));
+		loadRequiredJavaScriptModules();
+		selenium.clickAt("link=History", RuntimeVariables.replace("History"));
 		selenium.waitForPageToLoad("30000");
-		selenium.saveScreenShotAndSource();
-		assertTrue(selenium.isElementPresent("link=1.2"));
-		assertTrue(selenium.isElementPresent("link=1.1"));
-		assertTrue(selenium.isElementPresent("link=1.0 (Minor Edit)"));
+		loadRequiredJavaScriptModules();
+		assertEquals(RuntimeVariables.replace("1.2"),
+			selenium.getText("//td[4]/a"));
+		assertEquals(RuntimeVariables.replace("1.1"),
+			selenium.getText("//tr[4]/td[4]/a"));
+		assertEquals(RuntimeVariables.replace("1.0 (Minor Edit)"),
+			selenium.getText("//tr[5]/td[4]/a"));
 	}
 }

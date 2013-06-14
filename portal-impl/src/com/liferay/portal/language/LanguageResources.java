@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -17,12 +17,13 @@ package com.liferay.portal.language;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.util.CharPool;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.PropertiesUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
-import com.liferay.portal.kernel.util.Validator;
+import com.liferay.portal.security.lang.PortalSecurityManagerThreadLocal;
 import com.liferay.portal.tools.LangBuilder;
 
 import java.io.InputStream;
@@ -49,8 +50,7 @@ public class LanguageResources {
 
 		if (value.endsWith(LangBuilder.AUTOMATIC_TRANSLATION)) {
 			value = value.substring(
-				0,
-				value.length() - LangBuilder.AUTOMATIC_TRANSLATION.length());
+				0, value.length() - LangBuilder.AUTOMATIC_TRANSLATION.length());
 		}
 
 		return value;
@@ -91,26 +91,29 @@ public class LanguageResources {
 	}
 
 	public static Locale getSuperLocale(Locale locale) {
-		if (Validator.isNotNull(locale.getVariant())) {
+		String variant = locale.getVariant();
+
+		if (variant.length() > 0) {
 			return new Locale(locale.getLanguage(), locale.getCountry());
 		}
 
-		if (Validator.isNotNull(locale.getCountry())) {
-			if (LanguageUtil.isDuplicateLanguageCode(locale.getLanguage())) {
-				Locale priorityLocale = LanguageUtil.getLocale(
-					locale.getLanguage());
+		String country = locale.getCountry();
 
-				if (!locale.equals(priorityLocale)) {
-					return new Locale(
-						priorityLocale.getLanguage(),
-						priorityLocale.getCountry());
-				}
+		if (country.length() > 0) {
+			Locale priorityLocale = LanguageUtil.getLocale(
+				locale.getLanguage());
+
+			if ((priorityLocale != null) && !locale.equals(priorityLocale)) {
+				return new Locale(
+					priorityLocale.getLanguage(), priorityLocale.getCountry());
 			}
 
 			return LocaleUtil.fromLanguageId(locale.getLanguage());
 		}
 
-		if (Validator.isNotNull(locale.getLanguage())) {
+		String language = locale.getLanguage();
+
+		if (language.length() > 0) {
 			return _blankLocale;
 		}
 
@@ -141,21 +144,19 @@ public class LanguageResources {
 	}
 
 	public void setConfig(String config) {
-		_config = config;
+		_configNames = StringUtil.split(
+			config.replace(CharPool.PERIOD, CharPool.SLASH));
 	}
 
 	private static Map<String, String> _loadLocale(Locale locale) {
-		String[] names = StringUtil.split(
-			_config.replace(StringPool.PERIOD, StringPool.SLASH));
-
 		Map<String, String> languageMap = null;
 
-		if (names.length > 0) {
+		if (_configNames.length > 0) {
 			String localeName = locale.toString();
 
 			languageMap = new HashMap<String, String>();
 
-			for (String name : names) {
+			for (String name : _configNames) {
 				StringBundler sb = new StringBundler(4);
 
 				sb.append(name);
@@ -184,7 +185,11 @@ public class LanguageResources {
 	private static Properties _loadProperties(String name) {
 		Properties properties = new Properties();
 
+		boolean enabled = PortalSecurityManagerThreadLocal.isEnabled();
+
 		try {
+			PortalSecurityManagerThreadLocal.setEnabled(false);
+
 			ClassLoader classLoader = LanguageResources.class.getClassLoader();
 
 			URL url = classLoader.getResource(name);
@@ -212,6 +217,9 @@ public class LanguageResources {
 				_log.warn(e, e);
 			}
 		}
+		finally {
+			PortalSecurityManagerThreadLocal.setEnabled(enabled);
+		}
 
 		return properties;
 	}
@@ -219,7 +227,7 @@ public class LanguageResources {
 	private static Log _log = LogFactoryUtil.getLog(LanguageResources.class);
 
 	private static Locale _blankLocale = new Locale(StringPool.BLANK);
-	private static String _config;
+	private static String[] _configNames;
 	private static Map<Locale, Map<String, String>> _languageMaps =
 		new ConcurrentHashMap<Locale, Map<String, String>>(64);
 

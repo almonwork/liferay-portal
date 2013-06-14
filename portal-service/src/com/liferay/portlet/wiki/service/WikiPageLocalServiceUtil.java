@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -15,7 +15,6 @@
 package com.liferay.portlet.wiki.service;
 
 import com.liferay.portal.kernel.bean.PortalBeanLocatorUtil;
-import com.liferay.portal.kernel.util.MethodCache;
 import com.liferay.portal.kernel.util.ReferenceRegistry;
 
 /**
@@ -66,25 +65,32 @@ public class WikiPageLocalServiceUtil {
 	* Deletes the wiki page with the primary key from the database. Also notifies the appropriate model listeners.
 	*
 	* @param pageId the primary key of the wiki page
+	* @return the wiki page that was removed
 	* @throws PortalException if a wiki page with the primary key could not be found
 	* @throws SystemException if a system exception occurred
 	*/
-	public static void deleteWikiPage(long pageId)
+	public static com.liferay.portlet.wiki.model.WikiPage deleteWikiPage(
+		long pageId)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException {
-		getService().deleteWikiPage(pageId);
+		return getService().deleteWikiPage(pageId);
 	}
 
 	/**
 	* Deletes the wiki page from the database. Also notifies the appropriate model listeners.
 	*
 	* @param wikiPage the wiki page
+	* @return the wiki page that was removed
 	* @throws SystemException if a system exception occurred
 	*/
-	public static void deleteWikiPage(
+	public static com.liferay.portlet.wiki.model.WikiPage deleteWikiPage(
 		com.liferay.portlet.wiki.model.WikiPage wikiPage)
 		throws com.liferay.portal.kernel.exception.SystemException {
-		getService().deleteWikiPage(wikiPage);
+		return getService().deleteWikiPage(wikiPage);
+	}
+
+	public static com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery() {
+		return getService().dynamicQuery();
 	}
 
 	/**
@@ -156,6 +162,11 @@ public class WikiPageLocalServiceUtil {
 		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery)
 		throws com.liferay.portal.kernel.exception.SystemException {
 		return getService().dynamicQueryCount(dynamicQuery);
+	}
+
+	public static com.liferay.portlet.wiki.model.WikiPage fetchWikiPage(
+		long pageId) throws com.liferay.portal.kernel.exception.SystemException {
+		return getService().fetchWikiPage(pageId);
 	}
 
 	/**
@@ -294,6 +305,22 @@ public class WikiPageLocalServiceUtil {
 			serviceContext);
 	}
 
+	public static void addPageAttachment(long userId, long nodeId,
+		java.lang.String title, java.lang.String fileName, java.io.File file)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException {
+		getService().addPageAttachment(userId, nodeId, title, fileName, file);
+	}
+
+	public static void addPageAttachment(long userId, long nodeId,
+		java.lang.String title, java.lang.String fileName,
+		java.io.InputStream inputStream)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException {
+		getService()
+			.addPageAttachment(userId, nodeId, title, fileName, inputStream);
+	}
+
 	public static void addPageAttachment(long companyId,
 		java.lang.String dirName, java.util.Date modifiedDate,
 		java.lang.String fileName, java.io.InputStream inputStream)
@@ -304,19 +331,12 @@ public class WikiPageLocalServiceUtil {
 			inputStream);
 	}
 
-	public static void addPageAttachment(long userId, long nodeId,
-		java.lang.String title, java.lang.String fileName, byte[] bytes)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
-		getService().addPageAttachment(userId, nodeId, title, fileName, bytes);
-	}
-
 	public static void addPageAttachments(long userId, long nodeId,
 		java.lang.String title,
-		java.util.List<com.liferay.portal.kernel.util.ObjectValuePair<java.lang.String, byte[]>> files)
+		java.util.List<com.liferay.portal.kernel.util.ObjectValuePair<java.lang.String, java.io.InputStream>> inputStreams)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException {
-		getService().addPageAttachments(userId, nodeId, title, files);
+		getService().addPageAttachments(userId, nodeId, title, inputStreams);
 	}
 
 	public static void addPageResources(long nodeId, java.lang.String title,
@@ -355,12 +375,13 @@ public class WikiPageLocalServiceUtil {
 
 	public static java.lang.String addTempPageAttachment(long userId,
 		java.lang.String fileName, java.lang.String tempFolderName,
-		java.io.File file)
+		java.io.InputStream inputStream)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException,
 			java.io.IOException {
 		return getService()
-				   .addTempPageAttachment(userId, fileName, tempFolderName, file);
+				   .addTempPageAttachment(userId, fileName, tempFolderName,
+			inputStream);
 	}
 
 	public static void changeParent(long userId, long nodeId,
@@ -405,7 +426,8 @@ public class WikiPageLocalServiceUtil {
 	}
 
 	public static void deleteTempPageAttachment(long userId,
-		java.lang.String fileName, java.lang.String tempFolderName) {
+		java.lang.String fileName, java.lang.String tempFolderName)
+		throws com.liferay.portal.kernel.exception.PortalException {
 		getService().deleteTempPageAttachment(userId, fileName, tempFolderName);
 	}
 
@@ -721,20 +743,15 @@ public class WikiPageLocalServiceUtil {
 
 			ReferenceRegistry.registerReference(WikiPageLocalServiceUtil.class,
 				"_service");
-			MethodCache.remove(WikiPageLocalService.class);
 		}
 
 		return _service;
 	}
 
+	/**
+	 * @deprecated
+	 */
 	public void setService(WikiPageLocalService service) {
-		MethodCache.remove(WikiPageLocalService.class);
-
-		_service = service;
-
-		ReferenceRegistry.registerReference(WikiPageLocalServiceUtil.class,
-			"_service");
-		MethodCache.remove(WikiPageLocalService.class);
 	}
 
 	private static WikiPageLocalService _service;

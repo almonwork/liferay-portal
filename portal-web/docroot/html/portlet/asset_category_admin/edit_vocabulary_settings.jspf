@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -17,7 +17,13 @@
 <%
 PortletPreferences preferences = renderRequest.getPreferences();
 
-long[] availableClassNameIds = AssetRendererFactoryRegistryUtil.getClassNameIds();
+List<Long> availableClassNameIds = new ArrayList<Long>();
+
+for (AssetRendererFactory assetRendererFactory : AssetRendererFactoryRegistryUtil.getAssetRendererFactories()) {
+	if (assetRendererFactory.isCategorizable()) {
+		availableClassNameIds.add(assetRendererFactory.getClassNameId());
+	}
+}
 
 boolean required = false;
 
@@ -47,7 +53,7 @@ if ((requiredClassNameIds == null) || (requiredClassNameIds.length == 0)) {
 <aui:input cssClass="vocabulary-checkbox" helpMessage="multi-valued-help" label="allow-multiple-categories" name="multiValued" type="checkbox" value="<%= (vocabulary != null) ? vocabulary.isMultiValued() : true %>" />
 
 <liferay-ui:panel collapsible="<%= true %>" defaultState="closed" extended="<%= false %>" id="vocabularyExtraFieldsPanelContainer" persistState="<%= true %>" title="associated-asset-types">
-	<aui:fieldset id='<%= renderResponse.getNamespace() + "extraFields" %>'>
+	<aui:fieldset id="extraFields">
 
 		<%
 		List<String> indexes = new ArrayList<String>();
@@ -96,8 +102,8 @@ if ((requiredClassNameIds == null) || (requiredClassNameIds.length == 0)) {
 							<aui:option label="all-asset-types" value="<%= AssetCategoryConstants.ALL_CLASS_NAME_IDS %>" />
 
 							<%
-							for (int i = 0; i < availableClassNameIds.length; i++) {
-								long availableClassNameId = availableClassNameIds[i];
+							for (int i = 0; i < availableClassNameIds.size(); i++) {
+								long availableClassNameId = availableClassNameIds.get(i);
 
 								boolean selected = false;
 
@@ -132,12 +138,12 @@ if ((requiredClassNameIds == null) || (requiredClassNameIds.length == 0)) {
 
 	var autoFields = new Liferay.AutoFields(
 		{
-			contentBox: extraFields,
+			contentBox: '#<portlet:namespace />extraFields',
 			fieldIndexes: '<portlet:namespace />indexes'
 		}
 	).render();
 
-	extraFields.setData('autofieldsInstance', autoFields);
+	extraFields.setData('autoFieldsInstance', autoFields);
 </aui:script>
 
 <%!

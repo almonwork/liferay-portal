@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -15,7 +15,13 @@
 package com.liferay.portal.kernel.test;
 
 import com.liferay.portal.kernel.util.MapUtil;
+import com.liferay.portal.kernel.util.StringUtil;
 
+import java.io.InputStream;
+
+import java.sql.Blob;
+
+import java.util.Arrays;
 import java.util.Map;
 
 /**
@@ -23,43 +29,83 @@ import java.util.Map;
  */
 public class TestCase extends junit.framework.TestCase {
 
-	protected void assertEquals(double expected, double actual)
+	protected void assertEquals(Blob expectedBlob, Blob actualBlob)
 		throws Exception {
 
-		assertEquals(expected, actual, 0);
+		InputStream expectInputStream = expectedBlob.getBinaryStream();
+		InputStream actualInputStream = actualBlob.getBinaryStream();
+
+		while (true) {
+			int expectValue = expectInputStream.read();
+			int actualValue = actualInputStream.read();
+
+			assertEquals(expectValue, actualValue);
+
+			if (expectValue == -1) {
+				break;
+			}
+		}
+
+		expectInputStream.close();
+		actualInputStream.close();
+	}
+
+	protected void assertEquals(double expectedDouble, double actualDouble)
+		throws Exception {
+
+		assertEquals(expectedDouble, actualDouble, 0);
 	}
 
 	protected void assertEquals(
-		Map<String, ?> expected, Map<String, ?> actual) {
+		Map<String, ?> expectedMap, Map<String, ?> actualMap) {
 
 		assertEquals(
-			"The maps are different sizes", expected.size(), actual.size());
+			"The maps are different sizes", expectedMap.size(),
+			actualMap.size());
 
-		for (String name : expected.keySet()) {
+		for (String name : expectedMap.keySet()) {
 			assertEquals(
 				"The values for key '" + name + "' are different",
-				MapUtil.getString(expected, name),
-				MapUtil.getString(actual, name));
+				MapUtil.getString(expectedMap, name),
+				MapUtil.getString(actualMap, name));
 		}
 	}
 
-	protected void assertEqualsIgnoreCase(String expected, String actual) {
-		if (expected != null) {
-			expected = expected.toLowerCase();
+	protected void assertEqualsIgnoreCase(
+		String expectedString, String actualString) {
+
+		if (expectedString != null) {
+			expectedString = expectedString.toLowerCase();
 		}
 
-		if (actual != null) {
-			actual = actual.toLowerCase();
+		if (actualString != null) {
+			actualString = actualString.toLowerCase();
 		}
 
-		assertEquals(expected, actual);
+		assertEquals(expectedString, actualString);
 	}
 
-	protected void assertLessThan(double expected, double actual)
+	protected void assertEqualsSorted(
+		String[] expectedStringArray, String[] actualStringArray) {
+
+		if (expectedStringArray != null) {
+			Arrays.sort(expectedStringArray);
+		}
+
+		if (actualStringArray != null) {
+			Arrays.sort(actualStringArray);
+		}
+
+		assertEquals(
+			StringUtil.merge(expectedStringArray),
+			StringUtil.merge(actualStringArray));
+	}
+
+	protected void assertLessThan(double expectedDouble, double actualDouble)
 		throws Exception {
 
-		if (actual > expected) {
-			fail(actual + " is not less than " + expected);
+		if (actualDouble > expectedDouble) {
+			fail(actualDouble + " is not less than " + expectedDouble);
 		}
 	}
 

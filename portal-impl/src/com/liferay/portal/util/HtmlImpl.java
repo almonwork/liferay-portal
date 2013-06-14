@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -99,6 +99,16 @@ public class HtmlImpl implements Html {
 					replacement = "&#187;";
 
 					break;
+
+				case '\u2013':
+					replacement = "&#x2013;";
+
+					break;
+
+				case '\u2014':
+					replacement = "&#x2014;";
+
+					break;
 			}
 
 			if (replacement != null) {
@@ -162,7 +172,7 @@ public class HtmlImpl implements Html {
 		for (int i = 0; i < text.length(); i++) {
 			char c = text.charAt(i);
 
-			if ((Character.isLetterOrDigit(c)) ||
+			if (Character.isLetterOrDigit(c) ||
 				(c == CharPool.DASH) || (c == CharPool.UNDERLINE)) {
 
 				sb.append(c);
@@ -332,7 +342,7 @@ public class HtmlImpl implements Html {
 		}
 
 		if (y == -1) {
-			sb.append(text.substring(x, text.length()));
+			sb.append(text.substring(x));
 		}
 
 		return sb.toString();
@@ -454,7 +464,7 @@ public class HtmlImpl implements Html {
 	}
 
 	protected boolean isScriptTag(String text, int pos) {
-		if (pos + _TAG_SCRIPT.length + 1 <= text.length()) {
+		if ((pos + _TAG_SCRIPT.length + 1) <= text.length()) {
 			char item;
 
 			for (int i = 0; i < _TAG_SCRIPT.length; i++) {
@@ -476,12 +486,12 @@ public class HtmlImpl implements Html {
 		}
 	}
 
-	private static final String[] _MS_WORD_UNICODE = new String[] {
-		"\u00ae", "\u2019", "\u201c", "\u201d"
-	};
-
 	private static final String[] _MS_WORD_HTML = new String[] {
 		"&reg;", StringPool.APOSTROPHE, StringPool.QUOTE, StringPool.QUOTE
+	};
+
+	private static final String[] _MS_WORD_UNICODE = new String[] {
+		"\u00ae", "\u2019", "\u201c", "\u201d"
 	};
 
 	private static final char[] _TAG_SCRIPT = {'s', 'c', 'r', 'i', 'p', 't'};

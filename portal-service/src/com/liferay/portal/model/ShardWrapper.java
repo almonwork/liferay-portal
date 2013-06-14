@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,6 +14,9 @@
 
 package com.liferay.portal.model;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * <p>
  * This class is a wrapper for {@link Shard}.
@@ -23,7 +26,7 @@ package com.liferay.portal.model;
  * @see       Shard
  * @generated
  */
-public class ShardWrapper implements Shard {
+public class ShardWrapper implements Shard, ModelWrapper<Shard> {
 	public ShardWrapper(Shard shard) {
 		_shard = shard;
 	}
@@ -34,6 +37,43 @@ public class ShardWrapper implements Shard {
 
 	public String getModelClassName() {
 		return Shard.class.getName();
+	}
+
+	public Map<String, Object> getModelAttributes() {
+		Map<String, Object> attributes = new HashMap<String, Object>();
+
+		attributes.put("shardId", getShardId());
+		attributes.put("classNameId", getClassNameId());
+		attributes.put("classPK", getClassPK());
+		attributes.put("name", getName());
+
+		return attributes;
+	}
+
+	public void setModelAttributes(Map<String, Object> attributes) {
+		Long shardId = (Long)attributes.get("shardId");
+
+		if (shardId != null) {
+			setShardId(shardId);
+		}
+
+		Long classNameId = (Long)attributes.get("classNameId");
+
+		if (classNameId != null) {
+			setClassNameId(classNameId);
+		}
+
+		Long classPK = (Long)attributes.get("classPK");
+
+		if (classPK != null) {
+			setClassPK(classPK);
+		}
+
+		String name = (String)attributes.get("name");
+
+		if (name != null) {
+			setName(name);
+		}
 	}
 
 	/**
@@ -79,6 +119,10 @@ public class ShardWrapper implements Shard {
 	*/
 	public java.lang.String getClassName() {
 		return _shard.getClassName();
+	}
+
+	public void setClassName(java.lang.String className) {
+		_shard.setClassName(className);
 	}
 
 	/**
@@ -155,10 +199,6 @@ public class ShardWrapper implements Shard {
 		return _shard.isEscapedModel();
 	}
 
-	public void setEscapedModel(boolean escapedModel) {
-		_shard.setEscapedModel(escapedModel);
-	}
-
 	public java.io.Serializable getPrimaryKeyObj() {
 		return _shard.getPrimaryKeyObj();
 	}
@@ -212,7 +252,14 @@ public class ShardWrapper implements Shard {
 		_shard.persist();
 	}
 
+	/**
+	 * @deprecated Renamed to {@link #getWrappedModel}
+	 */
 	public Shard getWrappedShard() {
+		return _shard;
+	}
+
+	public Shard getWrappedModel() {
 		return _shard;
 	}
 

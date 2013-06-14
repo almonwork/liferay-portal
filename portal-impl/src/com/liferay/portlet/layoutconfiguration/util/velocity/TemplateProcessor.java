@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,16 +14,26 @@
 
 package com.liferay.portlet.layoutconfiguration.util.velocity;
 
+import com.liferay.portal.kernel.exception.SystemException;
+import com.liferay.portal.kernel.portlet.PortletContainerUtil;
+import com.liferay.portal.kernel.servlet.StringServletResponse;
+import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
-import com.liferay.portal.kernel.util.WebKeys;
+import com.liferay.portal.kernel.util.Validator;
+import com.liferay.portal.model.LayoutTypePortlet;
 import com.liferay.portal.model.Portlet;
-import com.liferay.portal.util.comparator.PortletRenderWeightComparator;
+import com.liferay.portal.service.PortletLocalServiceUtil;
+import com.liferay.portal.theme.ThemeDisplay;
+import com.liferay.portal.util.WebKeys;
+import com.liferay.portlet.layoutconfiguration.util.PortletRenderer;
 
-import java.util.HashMap;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
-import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -35,15 +45,42 @@ import javax.servlet.http.HttpServletResponse;
 public class TemplateProcessor implements ColumnProcessor {
 
 	public TemplateProcessor(
-		ServletContext servletContext, HttpServletRequest request,
-		HttpServletResponse response, String portletId) {
+			HttpServletRequest request, HttpServletResponse response,
+			String portletId)
+		throws SystemException {
 
-		_servletContext = servletContext;
 		_request = request;
 		_response = response;
-		_portletId = portletId;
-		_portletsMap = new TreeMap<Portlet, Object[]>(
-			new PortletRenderWeightComparator());
+
+		if (Validator.isNotNull(portletId)) {
+			ThemeDisplay themeDisplay = (ThemeDisplay)request.getAttribute(
+				com.liferay.portal.util.WebKeys.THEME_DISPLAY);
+
+			_portlet = PortletLocalServiceUtil.getPortletById(
+				themeDisplay.getCompanyId(), portletId);
+		}
+
+		_portletAjaxRender = GetterUtil.getBoolean(
+			request.getAttribute(WebKeys.PORTLET_AJAX_RENDER));
+
+		_portletRenderers = new TreeMap<Integer, List<PortletRenderer>>(
+			new Comparator<Integer>() {
+
+				public int compare(
+					Integer renderWeight1, Integer renderWeight2) {
+
+					return renderWeight2.compareTo(renderWeight1);
+				}
+
+			});
+	}
+
+	public Map<Integer, List<PortletRenderer>> getPortletRenderers() {
+		return _portletRenderers;
+	}
+
+	public boolean isPortletAjaxRender() {
+		return _portletAjaxRender;
 	}
 
 	public String processColumn(String columnId) throws Exception {
@@ -53,34 +90,89 @@ public class TemplateProcessor implements ColumnProcessor {
 	public String processColumn(String columnId, String classNames)
 		throws Exception {
 
-		Map<String, String> attributes = new HashMap<String, String>();
+		ThemeDisplay themeDisplay = (ThemeDisplay)_request.getAttribute(
+			WebKeys.THEME_DISPLAY);
 
-		attributes.put("id", columnId);
-		attributes.put("classNames", classNames);
+		LayoutTypePortlet layoutTypePortlet =
+			themeDisplay.getLayoutTypePortlet();
 
-		PortletColumnLogic logic = new PortletColumnLogic(
-			_servletContext, _request, _response);
+		List<Portlet> portlets = layoutTypePortlet.getAllPortlets(columnId);
 
-		String content = logic.processContent(attributes);
+		StringBundler sb = new StringBundler(portlets.size() + 11);
 
-		_portletsMap.putAll(logic.getPortletsMap());
+		sb.append("<div class=\"");
+		sb.append("portlet-dropzone");
 
-		return content;
+		if (layoutTypePortlet.isCustomizable() &&
+			layoutTypePortlet.isColumnDisabled(columnId)) {
+
+			sb.append(" portlet-dropzone-disabled");
+		}
+
+		if (layoutTypePortlet.isColumnCustomizable(columnId)) {
+			sb.append(" customizable");
+		}
+
+		if (portlets.isEmpty()) {
+			sb.append(" empty");
+		}
+
+		if (Validator.isNotNull(classNames)) {
+			sb.append(" ");
+			sb.append(classNames);
+		}
+
+		sb.append("\" id=\"layout-column_");
+		sb.append(columnId);
+		sb.append("\">");
+
+		for (int i = 0; i < portlets.size(); i++) {
+			Portlet portlet = portlets.get(i);
+
+			Integer columnCount = new Integer(portlets.size());
+			Integer columnPos = new Integer(i);
+
+			PortletRenderer portletRenderer = new PortletRenderer(
+				portlet, columnId, columnCount, columnPos);
+
+			if (_portletAjaxRender && (portlet.getRenderWeight() < 1)) {
+				StringBundler renderResult = portletRenderer.renderAjax(
+					_request, _response);
+
+				sb.append(renderResult);
+			}
+			else {
+				Integer renderWeight = portlet.getRenderWeight();
+
+				List<PortletRenderer> portletRenderers = _portletRenderers.get(
+					renderWeight);
+
+				if (portletRenderers == null) {
+					portletRenderers = new ArrayList<PortletRenderer>();
+
+					_portletRenderers.put(renderWeight, portletRenderers);
+				}
+
+				portletRenderers.add(portletRenderer);
+
+				sb.append("[$TEMPLATE_PORTLET_");
+				sb.append(portlet.getPortletId());
+				sb.append("$]");
+			}
+		}
+
+		sb.append("</div>");
+
+		return sb.toString();
 	}
 
 	public String processMax() throws Exception {
-		return processMax(StringPool.BLANK);
-	}
+		StringServletResponse stringServletResponse =
+			new StringServletResponse(_response);
 
-	public String processMax(String classNames) throws Exception {
-		Map<String, String> attributes = new HashMap<String, String>();
+		PortletContainerUtil.render(_request, stringServletResponse, _portlet);
 
-		attributes.put("classNames", classNames);
-
-		RuntimeLogic logic = new PortletLogic(
-			_servletContext, _request, _response, _portletId);
-
-		return logic.processContent(attributes);
+		return stringServletResponse.getString();
 	}
 
 	public String processPortlet(String portletId) throws Exception {
@@ -88,24 +180,23 @@ public class TemplateProcessor implements ColumnProcessor {
 			_request.setAttribute(
 				WebKeys.RENDER_PORTLET_RESOURCE, Boolean.TRUE);
 
-			RuntimeLogic logic = new PortletLogic(
-				_servletContext, _request, _response, portletId);
+			StringServletResponse stringServletResponse =
+				new StringServletResponse(_response);
 
-			return logic.processContent(new HashMap<String, String>());
+			PortletContainerUtil.render(
+				_request, stringServletResponse, _portlet);
+
+			return stringServletResponse.getString();
 		}
 		finally {
 			_request.removeAttribute(WebKeys.RENDER_PORTLET_RESOURCE);
 		}
 	}
 
-	public Map<Portlet, Object[]> getPortletsMap() {
-		return _portletsMap;
-	}
-
-	private ServletContext _servletContext;
+	private Portlet _portlet;
+	private boolean _portletAjaxRender;
+	private Map<Integer, List<PortletRenderer>> _portletRenderers;
 	private HttpServletRequest _request;
 	private HttpServletResponse _response;
-	private String _portletId;
-	private Map<Portlet, Object[]> _portletsMap;
 
 }

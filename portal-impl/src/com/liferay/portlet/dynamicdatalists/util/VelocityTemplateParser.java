@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,8 +14,12 @@
 
 package com.liferay.portlet.dynamicdatalists.util;
 
+import com.liferay.portal.kernel.template.StringTemplateResource;
+import com.liferay.portal.kernel.template.TemplateContextType;
+import com.liferay.portal.kernel.template.TemplateManager;
+import com.liferay.portal.kernel.template.TemplateManagerUtil;
+import com.liferay.portal.kernel.template.TemplateResource;
 import com.liferay.portal.kernel.templateparser.TemplateContext;
-import com.liferay.portal.kernel.velocity.VelocityEngineUtil;
 import com.liferay.portal.util.PropsValues;
 import com.liferay.util.ContentUtil;
 
@@ -38,7 +42,14 @@ public class VelocityTemplateParser extends
 
 	@Override
 	protected TemplateContext getTemplateContext() throws Exception {
-		return VelocityEngineUtil.getWrappedStandardToolsContext();
+		TemplateResource templateResource = new StringTemplateResource(
+			getTemplateId(), getScript());
+		TemplateResource errorTemplateResource = new StringTemplateResource(
+			getErrorTemplateId(), getErrorTemplateContent());
+
+		return TemplateManagerUtil.getTemplate(
+			TemplateManager.VELOCITY, templateResource, errorTemplateResource,
+			TemplateContextType.STANDARD);
 	}
 
 }

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,6 +14,8 @@
 
 package com.liferay.portlet.asset.service;
 
+import com.liferay.portal.service.ServiceWrapper;
+
 /**
  * <p>
  * This class is a wrapper for {@link AssetTagService}.
@@ -23,9 +25,28 @@ package com.liferay.portlet.asset.service;
  * @see       AssetTagService
  * @generated
  */
-public class AssetTagServiceWrapper implements AssetTagService {
+public class AssetTagServiceWrapper implements AssetTagService,
+	ServiceWrapper<AssetTagService> {
 	public AssetTagServiceWrapper(AssetTagService assetTagService) {
 		_assetTagService = assetTagService;
+	}
+
+	/**
+	* Returns the Spring bean ID for this bean.
+	*
+	* @return the Spring bean ID for this bean
+	*/
+	public java.lang.String getBeanIdentifier() {
+		return _assetTagService.getBeanIdentifier();
+	}
+
+	/**
+	* Sets the Spring bean ID for this bean.
+	*
+	* @param beanIdentifier the Spring bean ID for this bean
+	*/
+	public void setBeanIdentifier(java.lang.String beanIdentifier) {
+		_assetTagService.setBeanIdentifier(beanIdentifier);
 	}
 
 	public com.liferay.portlet.asset.model.AssetTag addTag(
@@ -113,6 +134,17 @@ public class AssetTagServiceWrapper implements AssetTagService {
 		return _assetTagService.getTags(className, classPK);
 	}
 
+	public int getTagsCount(long groupId, long classNameId,
+		java.lang.String name)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return _assetTagService.getTagsCount(groupId, classNameId, name);
+	}
+
+	public int getTagsCount(long groupId, java.lang.String name)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return _assetTagService.getTagsCount(groupId, name);
+	}
+
 	public int getTagsCount(long groupId, java.lang.String name,
 		java.lang.String[] tagProperties)
 		throws com.liferay.portal.kernel.exception.SystemException {
@@ -148,11 +180,25 @@ public class AssetTagServiceWrapper implements AssetTagService {
 			serviceContext);
 	}
 
+	/**
+	 * @deprecated Renamed to {@link #getWrappedService}
+	 */
 	public AssetTagService getWrappedAssetTagService() {
 		return _assetTagService;
 	}
 
+	/**
+	 * @deprecated Renamed to {@link #setWrappedService}
+	 */
 	public void setWrappedAssetTagService(AssetTagService assetTagService) {
+		_assetTagService = assetTagService;
+	}
+
+	public AssetTagService getWrappedService() {
+		return _assetTagService;
+	}
+
+	public void setWrappedService(AssetTagService assetTagService) {
 		_assetTagService = assetTagService;
 	}
 

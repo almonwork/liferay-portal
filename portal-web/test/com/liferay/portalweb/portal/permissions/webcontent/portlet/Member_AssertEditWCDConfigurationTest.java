@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -24,15 +24,16 @@ public class Member_AssertEditWCDConfigurationTest extends BaseTestCase {
 	public void testMember_AssertEditWCDConfiguration()
 		throws Exception {
 		selenium.open("/web/guest/home/");
+		loadRequiredJavaScriptModules();
 
 		for (int second = 0;; second++) {
-			if (second >= 60) {
+			if (second >= 90) {
 				fail("timeout");
 			}
 
 			try {
 				if (selenium.isElementPresent(
-							"link=Web Content Display Test Page")) {
+							"link=Web Content Display Permissions Page")) {
 					break;
 				}
 			}
@@ -42,15 +43,15 @@ public class Member_AssertEditWCDConfigurationTest extends BaseTestCase {
 			Thread.sleep(1000);
 		}
 
-		selenium.saveScreenShotAndSource();
-		selenium.clickAt("link=Web Content Display Test Page",
-			RuntimeVariables.replace(""));
+		selenium.clickAt("link=Web Content Display Permissions Page",
+			RuntimeVariables.replace("Web Content Display Permissions Page"));
 		selenium.waitForPageToLoad("30000");
-		selenium.saveScreenShotAndSource();
+		loadRequiredJavaScriptModules();
+		Thread.sleep(5000);
 		selenium.clickAt("//strong/a", RuntimeVariables.replace("Options"));
 
 		for (int second = 0;; second++) {
-			if (second >= 60) {
+			if (second >= 90) {
 				fail("timeout");
 			}
 
@@ -66,11 +67,11 @@ public class Member_AssertEditWCDConfigurationTest extends BaseTestCase {
 			Thread.sleep(1000);
 		}
 
-		selenium.saveScreenShotAndSource();
-		selenium.click("//div[@class='lfr-component lfr-menu-list']/ul/li[2]/a");
+		selenium.clickAt("//div[@class='lfr-component lfr-menu-list']/ul/li[2]/a",
+			RuntimeVariables.replace("Configuration"));
 
 		for (int second = 0;; second++) {
-			if (second >= 60) {
+			if (second >= 90) {
 				fail("timeout");
 			}
 
@@ -85,10 +86,9 @@ public class Member_AssertEditWCDConfigurationTest extends BaseTestCase {
 			Thread.sleep(1000);
 		}
 
-		selenium.saveScreenShotAndSource();
-		assertTrue(selenium.isElementPresent("link=Setup"));
-		assertTrue(selenium.isElementPresent("link=Supported Clients"));
-		assertTrue(selenium.isElementPresent("link=Permissions"));
-		assertTrue(selenium.isElementPresent("link=Sharing"));
+		assertTrue(selenium.isVisible("link=Setup"));
+		assertTrue(selenium.isVisible("link=Supported Clients"));
+		assertTrue(selenium.isVisible("link=Sharing"));
+		assertTrue(selenium.isVisible("link=Scope"));
 	}
 }

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -82,13 +82,15 @@ public interface Folder extends RepositoryModel<Folder> {
 
 	public boolean isLocked();
 
+	public boolean isMountPoint();
+
+	public boolean isRoot();
+
 	public boolean isSupportsLocking();
 
 	public boolean isSupportsMetadata();
 
-	public boolean isMountPoint();
-
-	public boolean isRoot();
+	public boolean isSupportsMultipleUpload();
 
 	public boolean isSupportsShortcuts();
 

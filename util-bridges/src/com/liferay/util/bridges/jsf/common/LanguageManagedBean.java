@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -47,10 +47,6 @@ public class LanguageManagedBean implements Map<String, String> {
 		throw new UnsupportedOperationException();
 	}
 
-	public boolean isEmpty() {
-		throw new UnsupportedOperationException();
-	}
-
 	public Set<Entry<String, String>> entrySet() {
 		throw new UnsupportedOperationException();
 	}
@@ -76,6 +72,10 @@ public class LanguageManagedBean implements Map<String, String> {
 		}
 
 		return value;
+	}
+
+	public boolean isEmpty() {
+		throw new UnsupportedOperationException();
 	}
 
 	public Set<String> keySet() {

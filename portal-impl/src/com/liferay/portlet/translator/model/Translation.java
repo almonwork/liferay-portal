@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -24,23 +24,40 @@ import java.io.UnsupportedEncodingException;
  */
 public class Translation implements Serializable {
 
-	public Translation(String translationId, String fromText) {
-		_translationId = translationId;
+	public Translation(
+		String fromLanguageId, String toLanguageId, String fromText) {
+
+		_fromLanguageId = fromLanguageId;
+		_toLanguageId = toLanguageId;
+
 		setFromText(fromText);
 	}
 
-	public Translation(String translationId, String fromText, String toText) {
-		_translationId = translationId;
+	public Translation(
+		String fromLanguageId, String toLanguageId, String fromText,
+		String toText) {
+
+		_fromLanguageId = fromLanguageId;
+		_toLanguageId = toLanguageId;
+
 		setFromText(fromText);
 		setToText(toText);
 	}
 
-	public String getTranslationId() {
-		return _translationId;
+	public String getFromLanguageId() {
+		return _fromLanguageId;
 	}
 
 	public String getFromText() {
 		return _fromText;
+	}
+
+	public String getToLanguageId() {
+		return _toLanguageId;
+	}
+
+	public String getToText() {
+		return _toText;
 	}
 
 	public void setFromText(String fromText) {
@@ -51,10 +68,6 @@ public class Translation implements Serializable {
 		}
 	}
 
-	public String getToText() {
-		return _toText;
-	}
-
 	public void setToText(String toText) {
 		try {
 			_toText = new String(toText.getBytes(), StringPool.UTF8);
@@ -63,8 +76,9 @@ public class Translation implements Serializable {
 		}
 	}
 
-	private String _translationId;
+	private String _fromLanguageId;
 	private String _fromText;
+	private String _toLanguageId;
 	private String _toText;
 
 }

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,6 +14,8 @@
 
 package com.liferay.portlet.polls.service;
 
+import com.liferay.portal.service.ServiceWrapper;
+
 /**
  * <p>
  * This class is a wrapper for {@link PollsChoiceLocalService}.
@@ -23,7 +25,8 @@ package com.liferay.portlet.polls.service;
  * @see       PollsChoiceLocalService
  * @generated
  */
-public class PollsChoiceLocalServiceWrapper implements PollsChoiceLocalService {
+public class PollsChoiceLocalServiceWrapper implements PollsChoiceLocalService,
+	ServiceWrapper<PollsChoiceLocalService> {
 	public PollsChoiceLocalServiceWrapper(
 		PollsChoiceLocalService pollsChoiceLocalService) {
 		_pollsChoiceLocalService = pollsChoiceLocalService;
@@ -57,25 +60,32 @@ public class PollsChoiceLocalServiceWrapper implements PollsChoiceLocalService {
 	* Deletes the polls choice with the primary key from the database. Also notifies the appropriate model listeners.
 	*
 	* @param choiceId the primary key of the polls choice
+	* @return the polls choice that was removed
 	* @throws PortalException if a polls choice with the primary key could not be found
 	* @throws SystemException if a system exception occurred
 	*/
-	public void deletePollsChoice(long choiceId)
+	public com.liferay.portlet.polls.model.PollsChoice deletePollsChoice(
+		long choiceId)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException {
-		_pollsChoiceLocalService.deletePollsChoice(choiceId);
+		return _pollsChoiceLocalService.deletePollsChoice(choiceId);
 	}
 
 	/**
 	* Deletes the polls choice from the database. Also notifies the appropriate model listeners.
 	*
 	* @param pollsChoice the polls choice
+	* @return the polls choice that was removed
 	* @throws SystemException if a system exception occurred
 	*/
-	public void deletePollsChoice(
+	public com.liferay.portlet.polls.model.PollsChoice deletePollsChoice(
 		com.liferay.portlet.polls.model.PollsChoice pollsChoice)
 		throws com.liferay.portal.kernel.exception.SystemException {
-		_pollsChoiceLocalService.deletePollsChoice(pollsChoice);
+		return _pollsChoiceLocalService.deletePollsChoice(pollsChoice);
+	}
+
+	public com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery() {
+		return _pollsChoiceLocalService.dynamicQuery();
 	}
 
 	/**
@@ -147,6 +157,12 @@ public class PollsChoiceLocalServiceWrapper implements PollsChoiceLocalService {
 		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery)
 		throws com.liferay.portal.kernel.exception.SystemException {
 		return _pollsChoiceLocalService.dynamicQueryCount(dynamicQuery);
+	}
+
+	public com.liferay.portlet.polls.model.PollsChoice fetchPollsChoice(
+		long choiceId)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return _pollsChoiceLocalService.fetchPollsChoice(choiceId);
 	}
 
 	/**
@@ -280,11 +296,26 @@ public class PollsChoiceLocalServiceWrapper implements PollsChoiceLocalService {
 			name, description);
 	}
 
+	/**
+	 * @deprecated Renamed to {@link #getWrappedService}
+	 */
 	public PollsChoiceLocalService getWrappedPollsChoiceLocalService() {
 		return _pollsChoiceLocalService;
 	}
 
+	/**
+	 * @deprecated Renamed to {@link #setWrappedService}
+	 */
 	public void setWrappedPollsChoiceLocalService(
+		PollsChoiceLocalService pollsChoiceLocalService) {
+		_pollsChoiceLocalService = pollsChoiceLocalService;
+	}
+
+	public PollsChoiceLocalService getWrappedService() {
+		return _pollsChoiceLocalService;
+	}
+
+	public void setWrappedService(
 		PollsChoiceLocalService pollsChoiceLocalService) {
 		_pollsChoiceLocalService = pollsChoiceLocalService;
 	}

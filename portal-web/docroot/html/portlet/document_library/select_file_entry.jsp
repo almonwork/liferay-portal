@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -30,7 +30,7 @@ if (folder != null) {
 
 <aui:form method="post" name="fm">
 	<liferay-ui:header
-		title="documents-home"
+		title="home"
 	/>
 
 	<liferay-ui:breadcrumb showGuestGroup="<%= false %>" showLayout="<%= false %>" showParentGroups="<%= false %>" />
@@ -79,12 +79,6 @@ if (folder != null) {
 
 		sb.append("<img align=\"left\" border=\"0\" src=\"");
 		sb.append(themeDisplay.getPathThemeImages());
-		sb.append("/common/folder.png\">");
-		sb.append(curFolder.getName());
-
-		row.addText(sb.toString(), rowURL);
-
-		// Statistics
 
 		List<Long> subfolderIds = DLAppServiceUtil.getSubfolderIds(groupId, curFolder.getFolderId(), false);
 
@@ -94,6 +88,19 @@ if (folder != null) {
 		subfolderIds.add(curFolder.getFolderId());
 
 		int fileEntriesCount = DLAppServiceUtil.getFoldersFileEntriesCount(groupId, subfolderIds, WorkflowConstants.STATUS_APPROVED);
+
+		if ((foldersCount + fileEntriesCount) > 0) {
+			sb.append("/common/folder_full_document.png\">");
+		}
+		else {
+			sb.append("/common/folder_empty.png\">");
+		}
+
+		sb.append(curFolder.getName());
+
+		row.addText(sb.toString(), rowURL);
+
+		// Statistics
 
 		row.addText(String.valueOf(foldersCount), rowURL);
 		row.addText(String.valueOf(fileEntriesCount), rowURL);
@@ -115,30 +122,30 @@ if (folder != null) {
 	/>
 
 	<%
-	headerNames.clear();
+		headerNames.clear();
 
-	headerNames.add("document");
-	headerNames.add("size");
+			headerNames.add("document");
+			headerNames.add("size");
 
-	if (PropsValues.DL_FILE_ENTRY_READ_COUNT_ENABLED) {
+			if (PropsValues.DL_FILE_ENTRY_READ_COUNT_ENABLED) {
 		headerNames.add("downloads");
-	}
+			}
 
-	headerNames.add("locked");
+			headerNames.add("locked");
 
-	searchContainer = new SearchContainer(renderRequest, null, null, "cur2", SearchContainer.DEFAULT_DELTA, portletURL, headerNames, null);
+			searchContainer = new SearchContainer(renderRequest, null, null, "cur2", SearchContainer.DEFAULT_DELTA, portletURL, headerNames, null);
 
-	total = DLAppServiceUtil.getFileEntriesCount(groupId, folderId);
+			total = DLAppServiceUtil.getFileEntriesCount(groupId, folderId);
 
-	searchContainer.setTotal(total);
+			searchContainer.setTotal(total);
 
-	results = DLAppServiceUtil.getFileEntries(groupId, folderId, searchContainer.getStart(), searchContainer.getEnd());
+			results = DLAppServiceUtil.getFileEntries(groupId, folderId, searchContainer.getStart(), searchContainer.getEnd());
 
-	searchContainer.setResults(results);
+			searchContainer.setResults(results);
 
-	resultRows = searchContainer.getResultRows();
+			resultRows = searchContainer.getResultRows();
 
-	for (int i = 0; i < results.size(); i++) {
+			for (int i = 0; i < results.size(); i++) {
 		FileEntry fileEntry = (FileEntry)results.get(i);
 
 		fileEntry = fileEntry.toEscapedModel();
@@ -161,7 +168,7 @@ if (folder != null) {
 
 		sb.setIndex(0);
 
-		sb.append(_getFileEntryImage(fileEntry, themeDisplay));
+		sb.append(DLUtil.getFileEntryImage(fileEntry, themeDisplay));
 		sb.append(fileEntry.getTitle());
 
 		if (Validator.isNotNull(fileEntry.getDescription())) {
@@ -173,7 +180,7 @@ if (folder != null) {
 
 		// Statistics
 
-		row.addText(TextFormatter.formatKB(fileEntry.getSize(), locale) + "k", rowHREF);
+		row.addText(TextFormatter.formatStorageSize(fileEntry.getSize(), locale), rowHREF);
 
 		if (PropsValues.DL_FILE_ENTRY_READ_COUNT_ENABLED) {
 			row.addText(String.valueOf(fileEntry.getReadCount()), rowHREF);
@@ -186,7 +193,7 @@ if (folder != null) {
 		// Add result row
 
 		resultRows.add(row);
-	}
+			}
 	%>
 
 	<liferay-ui:search-iterator searchContainer="<%= searchContainer %>" />

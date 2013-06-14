@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -28,8 +28,8 @@ String redirect = ParamUtil.getString(request, "redirect");
 
 	<aui:fieldset>
 		<aui:select label="vocabularies" name="preferences--allAssetVocabularies--">
-			<aui:option selected='<%= allAssetVocabularies %>' label="all" value="<%= true %>" />
-			<aui:option selected='<%= !allAssetVocabularies %>' label="filter[action]" value="<%= false %>" />
+			<aui:option label="all" selected='<%= allAssetVocabularies %>' value="<%= true %>" />
+			<aui:option label="filter[action]" selected='<%= !allAssetVocabularies %>' value="<%= false %>" />
 		</aui:select>
 
 		<aui:input name="preferences--assetVocabularyIds--" type="hidden" />
@@ -45,7 +45,9 @@ String redirect = ParamUtil.getString(request, "redirect");
 			try {
 				AssetVocabulary vocabulary = AssetVocabularyLocalServiceUtil.getVocabulary(vocabularyId);
 
-				typesLeftList.add(new KeyValuePair(String.valueOf(vocabularyId), _getName(vocabulary, themeDisplay)));
+				vocabulary = vocabulary.toEscapedModel();
+
+				typesLeftList.add(new KeyValuePair(String.valueOf(vocabularyId), _getTitle(vocabulary, themeDisplay)));
 			}
 			catch (NoSuchVocabularyException nsve) {
 			}
@@ -63,7 +65,7 @@ String redirect = ParamUtil.getString(request, "redirect");
 
 				vocabulary = vocabulary.toEscapedModel();
 
-				typesRightList.add(new KeyValuePair(String.valueOf(vocabularyId), _getName(vocabulary, themeDisplay)));
+				typesRightList.add(new KeyValuePair(String.valueOf(vocabularyId), _getTitle(vocabulary, themeDisplay)));
 			}
 		}
 
@@ -72,13 +74,13 @@ String redirect = ParamUtil.getString(request, "redirect");
 
 		<div class="<%= allAssetVocabularies ? "aui-helper-hidden" : "" %>" id="<portlet:namespace />assetVocabulariesBoxes">
 			<liferay-ui:input-move-boxes
-				leftTitle="current"
-				rightTitle="available"
 				leftBoxName="currentAssetVocabularyIds"
-				rightBoxName="availableAssetVocabularyIds"
-				leftReorder="true"
 				leftList="<%= typesLeftList %>"
+				leftReorder="true"
+				leftTitle="current"
+				rightBoxName="availableAssetVocabularyIds"
 				rightList="<%= typesRightList %>"
+				rightTitle="available"
 			/>
 		</div>
 	</aui:fieldset>
@@ -106,13 +108,13 @@ String redirect = ParamUtil.getString(request, "redirect");
 </aui:script>
 
 <%!
-private String _getName(AssetVocabulary vocabulary, ThemeDisplay themeDisplay) {
-	String name = vocabulary.getName();
+private String _getTitle(AssetVocabulary vocabulary, ThemeDisplay themeDisplay) {
+	String title = vocabulary.getTitle(themeDisplay.getLanguageId());
 
 	if (vocabulary.getGroupId() == themeDisplay.getCompanyGroupId()) {
-		name += " (" + LanguageUtil.get(themeDisplay.getLocale(), "global") + ")";
+		title += " (" + LanguageUtil.get(themeDisplay.getLocale(), "global") + ")";
 	}
 
-	return name;
+	return title;
 }
 %>

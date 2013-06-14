@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -33,7 +33,7 @@ public class KMPSearch {
 		int i = 0;
 		int j = -1;
 
-		while (i < length - 1) {
+		while (i < (length - 1)) {
 			if ((j == -1) || (pattern[i] == pattern[j])) {
 				i++;
 				j++;
@@ -58,7 +58,7 @@ public class KMPSearch {
 		int i = 0;
 		int j = -1;
 
-		while (i < length - 1) {
+		while (i < (length - 1)) {
 			if ((j == -1) || (pattern[i] == pattern[j])) {
 				i++;
 				j++;
@@ -83,7 +83,7 @@ public class KMPSearch {
 		int i = 0;
 		int j = -1;
 
-		while (i < length - 1) {
+		while (i < (length - 1)) {
 			if ((j == -1) || (pattern.charAt(i) == pattern.charAt(j))) {
 				i++;
 				j++;
@@ -122,7 +122,7 @@ public class KMPSearch {
 		int i = 0;
 		int j = 0;
 
-		while (i < length && j < patternLength) {
+		while ((i < length) && (j < patternLength)) {
 			if ((j == -1) || (text[i + offset] == pattern[j])) {
 				i++;
 				j++;
@@ -164,7 +164,7 @@ public class KMPSearch {
 		int i = 0;
 		int j = 0;
 
-		while (i < length && j < patternLength) {
+		while ((i < length) && (j < patternLength)) {
 			if ((j == -1) || (text[i + offset] == pattern[j])) {
 				i++;
 				j++;
@@ -188,8 +188,8 @@ public class KMPSearch {
 		return search(text, 0, text.length(), pattern, nexts);
 	}
 
-	public static int search(CharSequence text, CharSequence pattern,
-		int[] nexts) {
+	public static int search(
+		CharSequence text, CharSequence pattern, int[] nexts) {
 
 		return search(text, 0, text.length(), pattern, nexts);
 	}
@@ -209,7 +209,7 @@ public class KMPSearch {
 		int i = 0;
 		int j = 0;
 
-		while (i < length && j < patternLength) {
+		while ((i < length) && (j < patternLength)) {
 			if (j == -1) {
 				i++;
 				j++;

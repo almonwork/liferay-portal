@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,6 +14,10 @@
 
 package com.liferay.portal.model;
 
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * <p>
  * This class is a wrapper for {@link Image}.
@@ -23,7 +27,7 @@ package com.liferay.portal.model;
  * @see       Image
  * @generated
  */
-public class ImageWrapper implements Image {
+public class ImageWrapper implements Image, ModelWrapper<Image> {
 	public ImageWrapper(Image image) {
 		_image = image;
 	}
@@ -34,6 +38,64 @@ public class ImageWrapper implements Image {
 
 	public String getModelClassName() {
 		return Image.class.getName();
+	}
+
+	public Map<String, Object> getModelAttributes() {
+		Map<String, Object> attributes = new HashMap<String, Object>();
+
+		attributes.put("imageId", getImageId());
+		attributes.put("modifiedDate", getModifiedDate());
+		attributes.put("text", getText());
+		attributes.put("type", getType());
+		attributes.put("height", getHeight());
+		attributes.put("width", getWidth());
+		attributes.put("size", getSize());
+
+		return attributes;
+	}
+
+	public void setModelAttributes(Map<String, Object> attributes) {
+		Long imageId = (Long)attributes.get("imageId");
+
+		if (imageId != null) {
+			setImageId(imageId);
+		}
+
+		Date modifiedDate = (Date)attributes.get("modifiedDate");
+
+		if (modifiedDate != null) {
+			setModifiedDate(modifiedDate);
+		}
+
+		String text = (String)attributes.get("text");
+
+		if (text != null) {
+			setText(text);
+		}
+
+		String type = (String)attributes.get("type");
+
+		if (type != null) {
+			setType(type);
+		}
+
+		Integer height = (Integer)attributes.get("height");
+
+		if (height != null) {
+			setHeight(height);
+		}
+
+		Integer width = (Integer)attributes.get("width");
+
+		if (width != null) {
+			setWidth(width);
+		}
+
+		Integer size = (Integer)attributes.get("size");
+
+		if (size != null) {
+			setSize(size);
+		}
 	}
 
 	/**
@@ -200,10 +262,6 @@ public class ImageWrapper implements Image {
 		return _image.isEscapedModel();
 	}
 
-	public void setEscapedModel(boolean escapedModel) {
-		_image.setEscapedModel(escapedModel);
-	}
-
 	public java.io.Serializable getPrimaryKeyObj() {
 		return _image.getPrimaryKeyObj();
 	}
@@ -265,7 +323,14 @@ public class ImageWrapper implements Image {
 		_image.setTextObj(textObj);
 	}
 
+	/**
+	 * @deprecated Renamed to {@link #getWrappedModel}
+	 */
 	public Image getWrappedImage() {
+		return _image;
+	}
+
+	public Image getWrappedModel() {
 		return _image;
 	}
 

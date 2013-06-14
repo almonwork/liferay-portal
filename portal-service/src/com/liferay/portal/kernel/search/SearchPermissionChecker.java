@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -26,8 +26,6 @@ public interface SearchPermissionChecker {
 	public Query getPermissionQuery(
 		long companyId, long[] groupIds, long userId, String className,
 		Query query, SearchContext searchContext);
-
-	public void updatePermissionFields(long resourceId);
 
 	public void updatePermissionFields(String name, String primKey);
 

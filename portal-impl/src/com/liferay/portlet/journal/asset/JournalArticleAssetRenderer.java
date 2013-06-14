@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -16,6 +16,7 @@ package com.liferay.portlet.journal.asset;
 
 import com.liferay.portal.kernel.portlet.LiferayPortletRequest;
 import com.liferay.portal.kernel.portlet.LiferayPortletResponse;
+import com.liferay.portal.kernel.util.HtmlUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.model.Group;
 import com.liferay.portal.security.permission.ActionKeys;
@@ -31,6 +32,7 @@ import com.liferay.portlet.journal.model.JournalArticle;
 import com.liferay.portlet.journal.model.JournalArticleConstants;
 import com.liferay.portlet.journal.service.permission.JournalArticlePermission;
 
+import java.util.Date;
 import java.util.Locale;
 
 import javax.portlet.PortletRequest;
@@ -53,6 +55,10 @@ public class JournalArticleAssetRenderer extends BaseAssetRenderer {
 		return _article;
 	}
 
+	public String getAssetRendererFactoryClassName() {
+		return JournalArticleAssetRendererFactory.CLASS_NAME;
+	}
+
 	@Override
 	public String[] getAvailableLocales() {
 		return _article.getAvailableLocales();
@@ -61,7 +67,7 @@ public class JournalArticleAssetRenderer extends BaseAssetRenderer {
 	public long getClassPK() {
 		if ((_article.isDraft() || _article.isPending()) &&
 			(_article.getVersion() !=
-				JournalArticleConstants.DEFAULT_VERSION)) {
+				JournalArticleConstants.VERSION_DEFAULT)) {
 
 			return _article.getPrimaryKey();
 		}
@@ -140,30 +146,34 @@ public class JournalArticleAssetRenderer extends BaseAssetRenderer {
 			String noSuchEntryRedirect)
 		throws Exception {
 
+		if (Validator.isNull(_article.getLayoutUuid())) {
+			return noSuchEntryRedirect;
+		}
+
 		ThemeDisplay themeDisplay =
 			(ThemeDisplay)liferayPortletRequest.getAttribute(
 				WebKeys.THEME_DISPLAY);
 
-		String urlViewInContext = null;
+		Group group = themeDisplay.getScopeGroup();
 
-		if (Validator.isNotNull(_article.getLayoutUuid())) {
-			Group group = themeDisplay.getScopeGroup();
-
-			if (group.getGroupId() != _article.getGroupId()) {
-				group = GroupLocalServiceUtil.getGroup(_article.getGroupId());
-			}
-
-			urlViewInContext =
-				PortalUtil.getGroupFriendlyURL(group, false, themeDisplay) +
-					JournalArticleConstants.CANONICAL_URL_SEPARATOR +
-						_article.getUrlTitle();
+		if (group.getGroupId() != _article.getGroupId()) {
+			group = GroupLocalServiceUtil.getGroup(_article.getGroupId());
 		}
 
-		return urlViewInContext;
+		String groupFriendlyURL = PortalUtil.getGroupFriendlyURL(
+			group, false, themeDisplay);
+
+		return groupFriendlyURL.concat(
+			JournalArticleConstants.CANONICAL_URL_SEPARATOR).concat(
+				HtmlUtil.escape(_article.getUrlTitle()));
 	}
 
 	public long getUserId() {
 		return _article.getUserId();
+	}
+
+	public String getUserName() {
+		return _article.getUserName();
 	}
 
 	public String getUuid() {
@@ -178,17 +188,36 @@ public class JournalArticleAssetRenderer extends BaseAssetRenderer {
 	@Override
 	public boolean hasEditPermission(PermissionChecker permissionChecker) {
 		return JournalArticlePermission.contains(
-			permissionChecker,_article, ActionKeys.UPDATE);
+			permissionChecker, _article, ActionKeys.UPDATE);
 	}
 
 	@Override
 	public boolean hasViewPermission(PermissionChecker permissionChecker) {
 		return JournalArticlePermission.contains(
-			permissionChecker,_article, ActionKeys.VIEW);
+			permissionChecker, _article, ActionKeys.VIEW);
 	}
 
 	@Override
 	public boolean isConvertible() {
+		return true;
+	}
+
+	@Override
+	public boolean isDisplayable() {
+		Date now = new Date();
+
+		Date displayDate = _article.getDisplayDate();
+
+		if ((displayDate != null) && displayDate.after(now)) {
+			return false;
+		}
+
+		Date expirationDate = _article.getExpirationDate();
+
+		if ((expirationDate != null) && expirationDate.before(now)) {
+			return false;
+		}
+
 		return true;
 	}
 

@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -50,10 +50,26 @@ String language = BeanParamUtil.getString(template, request, "language", DDMTemp
 	Liferay.Util.inlineEditor(
 		{
 			button: '#<portlet:namespace />editorButton',
-			id: '<portlet:namespace />scriptContent',
+			cache: false,
+			id: '<portlet:namespace />scriptContentIFrame',
 			textarea: '<portlet:namespace />scriptContent',
-			title: '<liferay-ui:message key="editor" />',
-			uri: '<portlet:renderURL windowState="<%= LiferayWindowState.POP_UP.toString() %>"><portlet:param name="struts_action" value="/dynamic_data_mapping/edit_template_script" /></portlet:renderURL>&<portlet:namespace />language=' + document.<portlet:namespace />fm.<portlet:namespace />language.value
+			title: '<%= UnicodeLanguageUtil.get(pageContext, "editor") %>',
+
+			<%
+			Group controlPanelGroup = GroupLocalServiceUtil.getGroup(company.getCompanyId(), GroupConstants.CONTROL_PANEL);
+
+			long controlPanelPlid = LayoutLocalServiceUtil.getDefaultPlid(controlPanelGroup.getGroupId(), true);
+
+			PortletURL portletURL = PortletURLFactoryUtil.create(request, PortletKeys.JOURNAL, controlPanelPlid, PortletRequest.RENDER_PHASE);
+
+			portletURL.setParameter("struts_action", "/journal/edit_template_xsl");
+			portletURL.setParameter("editorContentInputElement", "#" + renderResponse.getNamespace() + "scriptContent");
+			portletURL.setParameter("editorContentOutputElement", "#" + renderResponse.getNamespace() + "scriptContent");
+			portletURL.setPortletMode(PortletMode.VIEW);
+			portletURL.setWindowState(LiferayWindowState.POP_UP);
+			%>
+
+			uri: '<%= portletURL.toString() %>&langType=' + document.<portlet:namespace />fm.<portlet:namespace />language.value
 		}
 	);
 

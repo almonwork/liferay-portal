@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -35,8 +35,11 @@ public class TaskQueue<E> {
 		}
 
 		_capacity = capacity;
+
 		_headNode = new Node<E>(null);
 		_tailNode = _headNode;
+
+		_notEmptyCondition = _takeLock.newCondition();
 	}
 
 	public int drainTo(Collection<E> collection) {
@@ -110,39 +113,41 @@ public class TaskQueue<E> {
 		_putLock.lock();
 
 		try {
-			if (_count.get() < _capacity) {
+
+			// Take a snapshot of count before enqueue
+
+			count = _count.get();
+
+			if (count < _capacity) {
 				_enqueue(element);
 
-				count = _count.getAndIncrement();
+				_count.getAndIncrement();
 
-				_takeLock.lock();
+				if (count == 0) {
 
-				try {
-					hasWaiterMarker[0] = _takeLock.hasWaiters(
-						_notEmptyCondition);
+					// Signal takers right after enqueue to increase the
+					// possibility of a concurrent token
 
-					if (!hasWaiterMarker[0] && (count >= _count.get())) {
-						hasWaiterMarker[0] = true;
+					_takeLock.lock();
+
+					try {
+						_notEmptyCondition.signal();
+					}
+					finally {
+						_takeLock.unlock();
 					}
 				}
-				finally {
-					_takeLock.unlock();
+
+				// After enqueue, a non-increasing count implies a concurrent
+				// token because there are spare threads
+
+				if (count >= _count.get()) {
+					hasWaiterMarker[0] = true;
 				}
 			}
 		}
 		finally {
 			_putLock.unlock();
-		}
-
-		if (count == 0) {
-			_takeLock.lock();
-
-			try {
-				_notEmptyCondition.signal();
-			}
-			finally {
-				_takeLock.unlock();
-			}
 		}
 
 		return count >= 0;
@@ -315,10 +320,10 @@ public class TaskQueue<E> {
 	private final int _capacity;
 	private final AtomicInteger _count = new AtomicInteger();
 	private Node<E> _headNode;
+	private final Condition _notEmptyCondition;
 	private final ReentrantLock _putLock = new ReentrantLock();
 	private Node<E> _tailNode;
-	private final ReentrantLock _takeLock = new ReentrantLock();
-	private final Condition _notEmptyCondition = _takeLock.newCondition();
+	private final ReentrantLock _takeLock = new ReentrantLock(true);
 
 	private static class Node<E> {
 

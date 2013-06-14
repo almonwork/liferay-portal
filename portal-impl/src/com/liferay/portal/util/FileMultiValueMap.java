@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -213,7 +213,7 @@ public class FileMultiValueMap<K extends Serializable, V extends Serializable>
 			values = new HashSet<V>();
 		}
 
-		for (V value: values) {
+		for (V value : values) {
 			if (!curValues.contains(value)) {
 				curValues.add(value);
 
@@ -302,10 +302,8 @@ public class FileMultiValueMap<K extends Serializable, V extends Serializable>
 	private void _deleteDatabase() throws Throwable {
 		File[] files = new File[] {
 			new File(_fileName + ".properties"),
-			new File(_fileName + ".script"),
-			new File(_fileName + ".log"),
-			new File(_fileName + ".data"),
-			new File(_fileName + ".backup")
+			new File(_fileName + ".script"), new File(_fileName + ".log"),
+			new File(_fileName + ".data"), new File(_fileName + ".backup")
 		};
 
 		for (File file : files) {

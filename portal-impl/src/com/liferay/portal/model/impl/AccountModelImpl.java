@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -18,6 +18,7 @@ import com.liferay.portal.kernel.bean.AutoEscapeBeanHandler;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.json.JSON;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.ProxyUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.model.Account;
@@ -32,13 +33,13 @@ import com.liferay.portlet.expando.util.ExpandoBridgeFactoryUtil;
 
 import java.io.Serializable;
 
-import java.lang.reflect.Proxy;
-
 import java.sql.Types;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * The base model implementation for the Account service. Represents a row in the &quot;Account_&quot; database table, with each column mapped to a property of this class.
@@ -91,6 +92,7 @@ public class AccountModelImpl extends BaseModelImpl<Account>
 	public static final boolean FINDER_CACHE_ENABLED = GetterUtil.getBoolean(com.liferay.portal.util.PropsUtil.get(
 				"value.object.finder.cache.enabled.com.liferay.portal.model.Account"),
 			true);
+	public static final boolean COLUMN_BITMASK_ENABLED = false;
 
 	/**
 	 * Converts the soap model instance into a normal model instance.
@@ -137,14 +139,6 @@ public class AccountModelImpl extends BaseModelImpl<Account>
 		return models;
 	}
 
-	public Class<?> getModelClass() {
-		return Account.class;
-	}
-
-	public String getModelClassName() {
-		return Account.class.getName();
-	}
-
 	public static final long LOCK_EXPIRATION_TIME = GetterUtil.getLong(com.liferay.portal.util.PropsUtil.get(
 				"lock.expiration.time.com.liferay.portal.model.Account"));
 
@@ -165,6 +159,137 @@ public class AccountModelImpl extends BaseModelImpl<Account>
 
 	public void setPrimaryKeyObj(Serializable primaryKeyObj) {
 		setPrimaryKey(((Long)primaryKeyObj).longValue());
+	}
+
+	public Class<?> getModelClass() {
+		return Account.class;
+	}
+
+	public String getModelClassName() {
+		return Account.class.getName();
+	}
+
+	@Override
+	public Map<String, Object> getModelAttributes() {
+		Map<String, Object> attributes = new HashMap<String, Object>();
+
+		attributes.put("accountId", getAccountId());
+		attributes.put("companyId", getCompanyId());
+		attributes.put("userId", getUserId());
+		attributes.put("userName", getUserName());
+		attributes.put("createDate", getCreateDate());
+		attributes.put("modifiedDate", getModifiedDate());
+		attributes.put("parentAccountId", getParentAccountId());
+		attributes.put("name", getName());
+		attributes.put("legalName", getLegalName());
+		attributes.put("legalId", getLegalId());
+		attributes.put("legalType", getLegalType());
+		attributes.put("sicCode", getSicCode());
+		attributes.put("tickerSymbol", getTickerSymbol());
+		attributes.put("industry", getIndustry());
+		attributes.put("type", getType());
+		attributes.put("size", getSize());
+
+		return attributes;
+	}
+
+	@Override
+	public void setModelAttributes(Map<String, Object> attributes) {
+		Long accountId = (Long)attributes.get("accountId");
+
+		if (accountId != null) {
+			setAccountId(accountId);
+		}
+
+		Long companyId = (Long)attributes.get("companyId");
+
+		if (companyId != null) {
+			setCompanyId(companyId);
+		}
+
+		Long userId = (Long)attributes.get("userId");
+
+		if (userId != null) {
+			setUserId(userId);
+		}
+
+		String userName = (String)attributes.get("userName");
+
+		if (userName != null) {
+			setUserName(userName);
+		}
+
+		Date createDate = (Date)attributes.get("createDate");
+
+		if (createDate != null) {
+			setCreateDate(createDate);
+		}
+
+		Date modifiedDate = (Date)attributes.get("modifiedDate");
+
+		if (modifiedDate != null) {
+			setModifiedDate(modifiedDate);
+		}
+
+		Long parentAccountId = (Long)attributes.get("parentAccountId");
+
+		if (parentAccountId != null) {
+			setParentAccountId(parentAccountId);
+		}
+
+		String name = (String)attributes.get("name");
+
+		if (name != null) {
+			setName(name);
+		}
+
+		String legalName = (String)attributes.get("legalName");
+
+		if (legalName != null) {
+			setLegalName(legalName);
+		}
+
+		String legalId = (String)attributes.get("legalId");
+
+		if (legalId != null) {
+			setLegalId(legalId);
+		}
+
+		String legalType = (String)attributes.get("legalType");
+
+		if (legalType != null) {
+			setLegalType(legalType);
+		}
+
+		String sicCode = (String)attributes.get("sicCode");
+
+		if (sicCode != null) {
+			setSicCode(sicCode);
+		}
+
+		String tickerSymbol = (String)attributes.get("tickerSymbol");
+
+		if (tickerSymbol != null) {
+			setTickerSymbol(tickerSymbol);
+		}
+
+		String industry = (String)attributes.get("industry");
+
+		if (industry != null) {
+			setIndustry(industry);
+		}
+
+		String type = (String)attributes.get("type");
+
+		if (type != null) {
+			setType(type);
+		}
+
+		String size = (String)attributes.get("size");
+
+		if (size != null) {
+			setSize(size);
+		}
 	}
 
 	@JSON
@@ -371,33 +496,26 @@ public class AccountModelImpl extends BaseModelImpl<Account>
 
 	@Override
 	public Account toEscapedModel() {
-		if (isEscapedModel()) {
-			return (Account)this;
+		if (_escapedModelProxy == null) {
+			_escapedModelProxy = (Account)ProxyUtil.newProxyInstance(_classLoader,
+					_escapedModelProxyInterfaces,
+					new AutoEscapeBeanHandler(this));
 		}
-		else {
-			if (_escapedModelProxy == null) {
-				_escapedModelProxy = (Account)Proxy.newProxyInstance(_classLoader,
-						_escapedModelProxyInterfaces,
-						new AutoEscapeBeanHandler(this));
-			}
 
-			return _escapedModelProxy;
-		}
+		return _escapedModelProxy;
 	}
 
 	@Override
 	public ExpandoBridge getExpandoBridge() {
-		if (_expandoBridge == null) {
-			_expandoBridge = ExpandoBridgeFactoryUtil.getExpandoBridge(getCompanyId(),
-					Account.class.getName(), getPrimaryKey());
-		}
-
-		return _expandoBridge;
+		return ExpandoBridgeFactoryUtil.getExpandoBridge(getCompanyId(),
+			Account.class.getName(), getPrimaryKey());
 	}
 
 	@Override
 	public void setExpandoBridgeAttributes(ServiceContext serviceContext) {
-		getExpandoBridge().setAttributes(serviceContext);
+		ExpandoBridge expandoBridge = getExpandoBridge();
+
+		expandoBridge.setAttributes(serviceContext);
 	}
 
 	@Override
@@ -726,6 +844,5 @@ public class AccountModelImpl extends BaseModelImpl<Account>
 	private String _industry;
 	private String _type;
 	private String _size;
-	private transient ExpandoBridge _expandoBridge;
 	private Account _escapedModelProxy;
 }

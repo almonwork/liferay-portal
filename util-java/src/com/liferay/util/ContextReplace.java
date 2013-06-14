@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -17,7 +17,6 @@ package com.liferay.util;
 import com.liferay.portal.kernel.util.StringUtil;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -47,6 +46,11 @@ public class ContextReplace implements Cloneable {
 		}
 	}
 
+	@Override
+	public Object clone() {
+		return new ContextReplace(_context);
+	}
+
 	public String replace(String text) {
 		if (text == null) {
 			return null;
@@ -59,21 +63,11 @@ public class ContextReplace implements Cloneable {
 		return StringUtil.replace(text, _keys, _values);
 	}
 
-	@Override
-	public Object clone() {
-		return new ContextReplace(_context);
-	}
-
 	private void _updateArrays() {
 		List<String> keys = new ArrayList<String>();
 		List<String> values = new ArrayList<String>();
 
-		Iterator<Map.Entry<String, String>> itr =
-			_context.entrySet().iterator();
-
-		while (itr.hasNext()) {
-			Map.Entry<String, String> entry = itr.next();
-
+		for (Map.Entry<String, String> entry : _context.entrySet()) {
 			String entryKey = entry.getKey();
 			String entryValue = entry.getValue();
 

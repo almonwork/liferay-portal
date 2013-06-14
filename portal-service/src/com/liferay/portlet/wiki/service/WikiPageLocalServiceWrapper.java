@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,6 +14,8 @@
 
 package com.liferay.portlet.wiki.service;
 
+import com.liferay.portal.service.ServiceWrapper;
+
 /**
  * <p>
  * This class is a wrapper for {@link WikiPageLocalService}.
@@ -23,7 +25,8 @@ package com.liferay.portlet.wiki.service;
  * @see       WikiPageLocalService
  * @generated
  */
-public class WikiPageLocalServiceWrapper implements WikiPageLocalService {
+public class WikiPageLocalServiceWrapper implements WikiPageLocalService,
+	ServiceWrapper<WikiPageLocalService> {
 	public WikiPageLocalServiceWrapper(
 		WikiPageLocalService wikiPageLocalService) {
 		_wikiPageLocalService = wikiPageLocalService;
@@ -56,24 +59,31 @@ public class WikiPageLocalServiceWrapper implements WikiPageLocalService {
 	* Deletes the wiki page with the primary key from the database. Also notifies the appropriate model listeners.
 	*
 	* @param pageId the primary key of the wiki page
+	* @return the wiki page that was removed
 	* @throws PortalException if a wiki page with the primary key could not be found
 	* @throws SystemException if a system exception occurred
 	*/
-	public void deleteWikiPage(long pageId)
+	public com.liferay.portlet.wiki.model.WikiPage deleteWikiPage(long pageId)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException {
-		_wikiPageLocalService.deleteWikiPage(pageId);
+		return _wikiPageLocalService.deleteWikiPage(pageId);
 	}
 
 	/**
 	* Deletes the wiki page from the database. Also notifies the appropriate model listeners.
 	*
 	* @param wikiPage the wiki page
+	* @return the wiki page that was removed
 	* @throws SystemException if a system exception occurred
 	*/
-	public void deleteWikiPage(com.liferay.portlet.wiki.model.WikiPage wikiPage)
+	public com.liferay.portlet.wiki.model.WikiPage deleteWikiPage(
+		com.liferay.portlet.wiki.model.WikiPage wikiPage)
 		throws com.liferay.portal.kernel.exception.SystemException {
-		_wikiPageLocalService.deleteWikiPage(wikiPage);
+		return _wikiPageLocalService.deleteWikiPage(wikiPage);
+	}
+
+	public com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery() {
+		return _wikiPageLocalService.dynamicQuery();
 	}
 
 	/**
@@ -145,6 +155,11 @@ public class WikiPageLocalServiceWrapper implements WikiPageLocalService {
 		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery)
 		throws com.liferay.portal.kernel.exception.SystemException {
 		return _wikiPageLocalService.dynamicQueryCount(dynamicQuery);
+	}
+
+	public com.liferay.portlet.wiki.model.WikiPage fetchWikiPage(long pageId)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return _wikiPageLocalService.fetchWikiPage(pageId);
 	}
 
 	/**
@@ -281,6 +296,23 @@ public class WikiPageLocalServiceWrapper implements WikiPageLocalService {
 			summary, minorEdit, serviceContext);
 	}
 
+	public void addPageAttachment(long userId, long nodeId,
+		java.lang.String title, java.lang.String fileName, java.io.File file)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException {
+		_wikiPageLocalService.addPageAttachment(userId, nodeId, title,
+			fileName, file);
+	}
+
+	public void addPageAttachment(long userId, long nodeId,
+		java.lang.String title, java.lang.String fileName,
+		java.io.InputStream inputStream)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException {
+		_wikiPageLocalService.addPageAttachment(userId, nodeId, title,
+			fileName, inputStream);
+	}
+
 	public void addPageAttachment(long companyId, java.lang.String dirName,
 		java.util.Date modifiedDate, java.lang.String fileName,
 		java.io.InputStream inputStream)
@@ -290,20 +322,13 @@ public class WikiPageLocalServiceWrapper implements WikiPageLocalService {
 			modifiedDate, fileName, inputStream);
 	}
 
-	public void addPageAttachment(long userId, long nodeId,
-		java.lang.String title, java.lang.String fileName, byte[] bytes)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
-		_wikiPageLocalService.addPageAttachment(userId, nodeId, title,
-			fileName, bytes);
-	}
-
 	public void addPageAttachments(long userId, long nodeId,
 		java.lang.String title,
-		java.util.List<com.liferay.portal.kernel.util.ObjectValuePair<java.lang.String, byte[]>> files)
+		java.util.List<com.liferay.portal.kernel.util.ObjectValuePair<java.lang.String, java.io.InputStream>> inputStreams)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException {
-		_wikiPageLocalService.addPageAttachments(userId, nodeId, title, files);
+		_wikiPageLocalService.addPageAttachments(userId, nodeId, title,
+			inputStreams);
 	}
 
 	public void addPageResources(long nodeId, java.lang.String title,
@@ -340,12 +365,12 @@ public class WikiPageLocalServiceWrapper implements WikiPageLocalService {
 
 	public java.lang.String addTempPageAttachment(long userId,
 		java.lang.String fileName, java.lang.String tempFolderName,
-		java.io.File file)
+		java.io.InputStream inputStream)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException,
 			java.io.IOException {
 		return _wikiPageLocalService.addTempPageAttachment(userId, fileName,
-			tempFolderName, file);
+			tempFolderName, inputStream);
 	}
 
 	public void changeParent(long userId, long nodeId, java.lang.String title,
@@ -389,7 +414,8 @@ public class WikiPageLocalServiceWrapper implements WikiPageLocalService {
 	}
 
 	public void deleteTempPageAttachment(long userId,
-		java.lang.String fileName, java.lang.String tempFolderName) {
+		java.lang.String fileName, java.lang.String tempFolderName)
+		throws com.liferay.portal.kernel.exception.PortalException {
 		_wikiPageLocalService.deleteTempPageAttachment(userId, fileName,
 			tempFolderName);
 	}
@@ -694,12 +720,26 @@ public class WikiPageLocalServiceWrapper implements WikiPageLocalService {
 		_wikiPageLocalService.validateTitle(title);
 	}
 
+	/**
+	 * @deprecated Renamed to {@link #getWrappedService}
+	 */
 	public WikiPageLocalService getWrappedWikiPageLocalService() {
 		return _wikiPageLocalService;
 	}
 
+	/**
+	 * @deprecated Renamed to {@link #setWrappedService}
+	 */
 	public void setWrappedWikiPageLocalService(
 		WikiPageLocalService wikiPageLocalService) {
+		_wikiPageLocalService = wikiPageLocalService;
+	}
+
+	public WikiPageLocalService getWrappedService() {
+		return _wikiPageLocalService;
+	}
+
+	public void setWrappedService(WikiPageLocalService wikiPageLocalService) {
 		_wikiPageLocalService = wikiPageLocalService;
 	}
 

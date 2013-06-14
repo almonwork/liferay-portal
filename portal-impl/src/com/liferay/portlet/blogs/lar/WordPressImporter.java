@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -183,8 +183,7 @@ public class WordPressImporter {
 				SAXReaderUtil.createQName("comment_parent", _NS_WP)));
 
 		if (commentParentId == 0) {
-			commentParentId =
-				messageDisplay.getMessage().getMessageId();
+			commentParentId = messageDisplay.getMessage().getMessageId();
 		}
 		else {
 			commentParentId = messageIdMap.get(commentParentId);
@@ -209,13 +208,13 @@ public class WordPressImporter {
 			Map<String, Long> userMap, DateFormat dateFormat, Element entryEl)
 		throws PortalException, SystemException {
 
-		long userId = context.getUserId(null);
-
 		String creator = entryEl.elementText(
 			SAXReaderUtil.createQName("creator", _NS_DC));
 
-		if (userMap.containsKey(creator)) {
-			userId = userMap.get(creator);
+		Long userId = userMap.get(creator);
+
+		if (userId == null) {
+			userId = context.getUserId(null);
 		}
 
 		String title = entryEl.elementTextTrim("title");
@@ -295,8 +294,8 @@ public class WordPressImporter {
 			entry = BlogsEntryLocalServiceUtil.addEntry(
 				userId, title, StringPool.BLANK, content, displayDateMonth,
 				displayDateDay, displayDateYear, displayDateHour,
-				displayDateMinute, allowPingbacks, allowTrackbacks,
-				null, false, null, null, serviceContext);
+				displayDateMinute, allowPingbacks, allowTrackbacks, null, false,
+				null, null, null, serviceContext);
 		}
 		catch (Exception e) {
 			_log.error("Add entry " + title, e);

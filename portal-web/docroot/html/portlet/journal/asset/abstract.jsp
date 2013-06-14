@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -46,7 +46,7 @@ else {
 		src = articleDisplay.getSmallImageURL();
 	}
 	else {
-		src = themeDisplay.getPathImage() + "/journal/article?img_id=" + articleDisplay.getSmallImageId() + "&t=" + ImageServletTokenUtil.getToken(articleDisplay.getSmallImageId()) ;
+		src = themeDisplay.getPathImage() + "/journal/article?img_id=" + articleDisplay.getSmallImageId() + "&t=" + WebServerServletTokenUtil.getToken(articleDisplay.getSmallImageId()) ;
 	}
 	%>
 
@@ -59,8 +59,8 @@ else {
 String summary = articleDisplay.getDescription();
 
 if (Validator.isNull(summary)) {
-	summary = StringUtil.shorten(HtmlUtil.stripHtml(articleDisplay.getContent()), abstractLength);
+	summary = HtmlUtil.stripHtml(articleDisplay.getContent());
 }
 %>
 
-<%= summary %>
+<%= StringUtil.shorten(summary, abstractLength) %>

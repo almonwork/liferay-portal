@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -50,7 +50,12 @@ if (row == null) {
 %>
 
 <liferay-ui:icon-menu showExpanded="<%= view %>" showWhenSingleIcon="<%= view %>">
-	<c:if test="<%= OrganizationPermissionUtil.contains(permissionChecker, organizationId, ActionKeys.UPDATE) %>">
+
+	<%
+	boolean hasUpdatePermission = OrganizationPermissionUtil.contains(permissionChecker, organizationId, ActionKeys.UPDATE);
+	%>
+
+	<c:if test="<%= hasUpdatePermission %>">
 		<portlet:renderURL var="editOrganizationURL">
 			<portlet:param name="struts_action" value="/users_admin/edit_organization" />
 			<portlet:param name="redirect" value="<%= redirect %>" />
@@ -77,10 +82,11 @@ if (row == null) {
 		/>
 	</c:if>--%>
 
-	<c:if test="<%= organizationGroup.isSite() && (OrganizationPermissionUtil.contains(permissionChecker, organizationId, ActionKeys.MANAGE_STAGING) || OrganizationPermissionUtil.contains(permissionChecker, organizationId, ActionKeys.UPDATE)) %>">
-		<liferay-portlet:actionURL doAsGroupId="<%= organizationGroupId %>" portletName="<%= PortletKeys.SITE_SETTINGS %>" var="editSettingsURL">
+	<c:if test="<%= organizationGroup.isSite() && (GroupPermissionUtil.contains(permissionChecker, organizationGroup, ActionKeys.MANAGE_STAGING) || hasUpdatePermission) %>">
+		<liferay-portlet:renderURL doAsGroupId="<%= organizationGroupId %>" portletName="<%= PortletKeys.SITE_SETTINGS %>" var="editSettingsURL">
 			<portlet:param name="struts_action" value="/sites_admin/edit_site" />
-		</liferay-portlet:actionURL>
+			<portlet:param name="viewOrganizationsRedirect" value="<%= currentURL %>" />
+		</liferay-portlet:renderURL>
 
 		<liferay-ui:icon
 			image="configuration"
@@ -158,6 +164,7 @@ if (row == null) {
 		<%
 		}
 		%>
+
 	</c:if>
 
 	<c:if test="<%= OrganizationPermissionUtil.contains(permissionChecker, organizationId, ActionKeys.DELETE) %>">

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,6 +14,8 @@
 
 package com.liferay.portlet.blogs.service;
 
+import com.liferay.portal.service.ServiceWrapper;
+
 /**
  * <p>
  * This class is a wrapper for {@link BlogsEntryService}.
@@ -23,9 +25,28 @@ package com.liferay.portlet.blogs.service;
  * @see       BlogsEntryService
  * @generated
  */
-public class BlogsEntryServiceWrapper implements BlogsEntryService {
+public class BlogsEntryServiceWrapper implements BlogsEntryService,
+	ServiceWrapper<BlogsEntryService> {
 	public BlogsEntryServiceWrapper(BlogsEntryService blogsEntryService) {
 		_blogsEntryService = blogsEntryService;
+	}
+
+	/**
+	* Returns the Spring bean ID for this bean.
+	*
+	* @return the Spring bean ID for this bean
+	*/
+	public java.lang.String getBeanIdentifier() {
+		return _blogsEntryService.getBeanIdentifier();
+	}
+
+	/**
+	* Sets the Spring bean ID for this bean.
+	*
+	* @param beanIdentifier the Spring bean ID for this bean
+	*/
+	public void setBeanIdentifier(java.lang.String beanIdentifier) {
+		_blogsEntryService.setBeanIdentifier(beanIdentifier);
 	}
 
 	public com.liferay.portlet.blogs.model.BlogsEntry addEntry(
@@ -34,14 +55,16 @@ public class BlogsEntryServiceWrapper implements BlogsEntryService {
 		int displayDateYear, int displayDateHour, int displayDateMinute,
 		boolean allowPingbacks, boolean allowTrackbacks,
 		java.lang.String[] trackbacks, boolean smallImage,
-		java.lang.String smallImageURL, java.io.File smallFile,
+		java.lang.String smallImageURL, java.lang.String smallImageFileName,
+		java.io.InputStream smallImageInputStream,
 		com.liferay.portal.service.ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException {
 		return _blogsEntryService.addEntry(title, description, content,
 			displayDateMonth, displayDateDay, displayDateYear, displayDateHour,
 			displayDateMinute, allowPingbacks, allowTrackbacks, trackbacks,
-			smallImage, smallImageURL, smallFile, serviceContext);
+			smallImage, smallImageURL, smallImageFileName,
+			smallImageInputStream, serviceContext);
 	}
 
 	public void deleteEntry(long entryId)
@@ -51,21 +74,23 @@ public class BlogsEntryServiceWrapper implements BlogsEntryService {
 	}
 
 	public java.util.List<com.liferay.portlet.blogs.model.BlogsEntry> getCompanyEntries(
-		long companyId, int status, int max)
+		long companyId, java.util.Date displayDate, int status, int max)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException {
-		return _blogsEntryService.getCompanyEntries(companyId, status, max);
+		return _blogsEntryService.getCompanyEntries(companyId, displayDate,
+			status, max);
 	}
 
-	public java.lang.String getCompanyEntriesRSS(long companyId, int status,
-		int max, java.lang.String type, double version,
-		java.lang.String displayStyle, java.lang.String feedURL,
-		java.lang.String entryURL,
+	public java.lang.String getCompanyEntriesRSS(long companyId,
+		java.util.Date displayDate, int status, int max, java.lang.String type,
+		double version, java.lang.String displayStyle,
+		java.lang.String feedURL, java.lang.String entryURL,
 		com.liferay.portal.theme.ThemeDisplay themeDisplay)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException {
-		return _blogsEntryService.getCompanyEntriesRSS(companyId, status, max,
-			type, version, displayStyle, feedURL, entryURL, themeDisplay);
+		return _blogsEntryService.getCompanyEntriesRSS(companyId, displayDate,
+			status, max, type, version, displayStyle, feedURL, entryURL,
+			themeDisplay);
 	}
 
 	public com.liferay.portlet.blogs.model.BlogsEntry getEntry(long entryId)
@@ -82,6 +107,20 @@ public class BlogsEntryServiceWrapper implements BlogsEntryService {
 	}
 
 	public java.util.List<com.liferay.portlet.blogs.model.BlogsEntry> getGroupEntries(
+		long groupId, java.util.Date displayDate, int status, int max)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return _blogsEntryService.getGroupEntries(groupId, displayDate, status,
+			max);
+	}
+
+	public java.util.List<com.liferay.portlet.blogs.model.BlogsEntry> getGroupEntries(
+		long groupId, java.util.Date displayDate, int status, int start, int end)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return _blogsEntryService.getGroupEntries(groupId, displayDate, status,
+			start, end);
+	}
+
+	public java.util.List<com.liferay.portlet.blogs.model.BlogsEntry> getGroupEntries(
 		long groupId, int status, int max)
 		throws com.liferay.portal.kernel.exception.SystemException {
 		return _blogsEntryService.getGroupEntries(groupId, status, max);
@@ -93,48 +132,68 @@ public class BlogsEntryServiceWrapper implements BlogsEntryService {
 		return _blogsEntryService.getGroupEntries(groupId, status, start, end);
 	}
 
+	public int getGroupEntriesCount(long groupId, java.util.Date displayDate,
+		int status) throws com.liferay.portal.kernel.exception.SystemException {
+		return _blogsEntryService.getGroupEntriesCount(groupId, displayDate,
+			status);
+	}
+
 	public int getGroupEntriesCount(long groupId, int status)
 		throws com.liferay.portal.kernel.exception.SystemException {
 		return _blogsEntryService.getGroupEntriesCount(groupId, status);
 	}
 
-	public java.lang.String getGroupEntriesRSS(long groupId, int status,
-		int max, java.lang.String type, double version,
-		java.lang.String displayStyle, java.lang.String feedURL,
-		java.lang.String entryURL,
+	public java.lang.String getGroupEntriesRSS(long groupId,
+		java.util.Date displayDate, int status, int max, java.lang.String type,
+		double version, java.lang.String displayStyle,
+		java.lang.String feedURL, java.lang.String entryURL,
 		com.liferay.portal.theme.ThemeDisplay themeDisplay)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException {
-		return _blogsEntryService.getGroupEntriesRSS(groupId, status, max,
-			type, version, displayStyle, feedURL, entryURL, themeDisplay);
+		return _blogsEntryService.getGroupEntriesRSS(groupId, displayDate,
+			status, max, type, version, displayStyle, feedURL, entryURL,
+			themeDisplay);
 	}
 
 	public java.util.List<com.liferay.portlet.blogs.model.BlogsEntry> getGroupsEntries(
-		long companyId, long groupId, int status, int max)
+		long companyId, long groupId, java.util.Date displayDate, int status,
+		int max)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException {
-		return _blogsEntryService.getGroupsEntries(companyId, groupId, status,
-			max);
+		return _blogsEntryService.getGroupsEntries(companyId, groupId,
+			displayDate, status, max);
 	}
 
 	public java.util.List<com.liferay.portlet.blogs.model.BlogsEntry> getOrganizationEntries(
-		long organizationId, int status, int max)
+		long organizationId, java.util.Date displayDate, int status, int max)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException {
 		return _blogsEntryService.getOrganizationEntries(organizationId,
-			status, max);
+			displayDate, status, max);
 	}
 
 	public java.lang.String getOrganizationEntriesRSS(long organizationId,
-		int status, int max, java.lang.String type, double version,
-		java.lang.String displayStyle, java.lang.String feedURL,
-		java.lang.String entryURL,
+		java.util.Date displayDate, int status, int max, java.lang.String type,
+		double version, java.lang.String displayStyle,
+		java.lang.String feedURL, java.lang.String entryURL,
 		com.liferay.portal.theme.ThemeDisplay themeDisplay)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException {
 		return _blogsEntryService.getOrganizationEntriesRSS(organizationId,
-			status, max, type, version, displayStyle, feedURL, entryURL,
-			themeDisplay);
+			displayDate, status, max, type, version, displayStyle, feedURL,
+			entryURL, themeDisplay);
+	}
+
+	public void moveEntryToTrash(long entryId)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException {
+		_blogsEntryService.moveEntryToTrash(entryId);
+	}
+
+	public void restoreEntryFromTrash(long entryId)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException {
+		_blogsEntryService.restoreEntryFromTrash(entryId);
 	}
 
 	public void subscribe(long groupId)
@@ -155,22 +214,37 @@ public class BlogsEntryServiceWrapper implements BlogsEntryService {
 		int displayDateYear, int displayDateHour, int displayDateMinute,
 		boolean allowPingbacks, boolean allowTrackbacks,
 		java.lang.String[] trackbacks, boolean smallImage,
-		java.lang.String smallImageURL, java.io.File smallFile,
+		java.lang.String smallImageURL, java.lang.String smallImageFileName,
+		java.io.InputStream smallImageInputStream,
 		com.liferay.portal.service.ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException {
 		return _blogsEntryService.updateEntry(entryId, title, description,
 			content, displayDateMonth, displayDateDay, displayDateYear,
 			displayDateHour, displayDateMinute, allowPingbacks,
-			allowTrackbacks, trackbacks, smallImage, smallImageURL, smallFile,
-			serviceContext);
+			allowTrackbacks, trackbacks, smallImage, smallImageURL,
+			smallImageFileName, smallImageInputStream, serviceContext);
 	}
 
+	/**
+	 * @deprecated Renamed to {@link #getWrappedService}
+	 */
 	public BlogsEntryService getWrappedBlogsEntryService() {
 		return _blogsEntryService;
 	}
 
+	/**
+	 * @deprecated Renamed to {@link #setWrappedService}
+	 */
 	public void setWrappedBlogsEntryService(BlogsEntryService blogsEntryService) {
+		_blogsEntryService = blogsEntryService;
+	}
+
+	public BlogsEntryService getWrappedService() {
+		return _blogsEntryService;
+	}
+
+	public void setWrappedService(BlogsEntryService blogsEntryService) {
 		_blogsEntryService = blogsEntryService;
 	}
 

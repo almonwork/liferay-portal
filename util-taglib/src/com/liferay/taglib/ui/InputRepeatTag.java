@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -50,8 +50,7 @@ public class InputRepeatTag extends IncludeTag {
 		request.setAttribute("liferay-ui:input-repeat:event", _event);
 	}
 
-	private static final String _PAGE =
-		"/html/taglib/ui/input_repeat/page.jsp";
+	private static final String _PAGE = "/html/taglib/ui/input_repeat/page.jsp";
 
 	private String _cssClass;
 	private CalEvent _event;

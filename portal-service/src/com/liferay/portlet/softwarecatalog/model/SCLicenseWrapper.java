@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,6 +14,11 @@
 
 package com.liferay.portlet.softwarecatalog.model;
 
+import com.liferay.portal.model.ModelWrapper;
+
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * <p>
  * This class is a wrapper for {@link SCLicense}.
@@ -23,7 +28,7 @@ package com.liferay.portlet.softwarecatalog.model;
  * @see       SCLicense
  * @generated
  */
-public class SCLicenseWrapper implements SCLicense {
+public class SCLicenseWrapper implements SCLicense, ModelWrapper<SCLicense> {
 	public SCLicenseWrapper(SCLicense scLicense) {
 		_scLicense = scLicense;
 	}
@@ -34,6 +39,57 @@ public class SCLicenseWrapper implements SCLicense {
 
 	public String getModelClassName() {
 		return SCLicense.class.getName();
+	}
+
+	public Map<String, Object> getModelAttributes() {
+		Map<String, Object> attributes = new HashMap<String, Object>();
+
+		attributes.put("licenseId", getLicenseId());
+		attributes.put("name", getName());
+		attributes.put("url", getUrl());
+		attributes.put("openSource", getOpenSource());
+		attributes.put("active", getActive());
+		attributes.put("recommended", getRecommended());
+
+		return attributes;
+	}
+
+	public void setModelAttributes(Map<String, Object> attributes) {
+		Long licenseId = (Long)attributes.get("licenseId");
+
+		if (licenseId != null) {
+			setLicenseId(licenseId);
+		}
+
+		String name = (String)attributes.get("name");
+
+		if (name != null) {
+			setName(name);
+		}
+
+		String url = (String)attributes.get("url");
+
+		if (url != null) {
+			setUrl(url);
+		}
+
+		Boolean openSource = (Boolean)attributes.get("openSource");
+
+		if (openSource != null) {
+			setOpenSource(openSource);
+		}
+
+		Boolean active = (Boolean)attributes.get("active");
+
+		if (active != null) {
+			setActive(active);
+		}
+
+		Boolean recommended = (Boolean)attributes.get("recommended");
+
+		if (recommended != null) {
+			setRecommended(recommended);
+		}
 	}
 
 	/**
@@ -209,10 +265,6 @@ public class SCLicenseWrapper implements SCLicense {
 		return _scLicense.isEscapedModel();
 	}
 
-	public void setEscapedModel(boolean escapedModel) {
-		_scLicense.setEscapedModel(escapedModel);
-	}
-
 	public java.io.Serializable getPrimaryKeyObj() {
 		return _scLicense.getPrimaryKeyObj();
 	}
@@ -267,7 +319,14 @@ public class SCLicenseWrapper implements SCLicense {
 		_scLicense.persist();
 	}
 
+	/**
+	 * @deprecated Renamed to {@link #getWrappedModel}
+	 */
 	public SCLicense getWrappedSCLicense() {
+		return _scLicense;
+	}
+
+	public SCLicense getWrappedModel() {
 		return _scLicense;
 	}
 

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -47,9 +47,13 @@ public class WikiPageAssetRenderer extends BaseAssetRenderer {
 		_page = page;
 	}
 
+	public String getAssetRendererFactoryClassName() {
+		return WikiPageAssetRendererFactory.CLASS_NAME;
+	}
+
 	public long getClassPK() {
 		if (!_page.isApproved() &&
-			(_page.getVersion() != WikiPageConstants.DEFAULT_VERSION)) {
+			(_page.getVersion() != WikiPageConstants.VERSION_DEFAULT)) {
 
 			return _page.getPageId();
 		}
@@ -146,16 +150,17 @@ public class WikiPageAssetRenderer extends BaseAssetRenderer {
 		LiferayPortletResponse liferayPortletResponse,
 		String noSuchEntryRedirect) {
 
-		ThemeDisplay themeDisplay =
-			(ThemeDisplay)liferayPortletRequest.getAttribute(
-				WebKeys.THEME_DISPLAY);
-
-		return themeDisplay.getPathMain() +
-			"/wiki/find_page?pageResourcePrimKey=" + _page.getResourcePrimKey();
+		return getURLViewInContext(
+			liferayPortletRequest, noSuchEntryRedirect, "/wiki/find_page",
+			"pageResourcePrimKey", _page.getResourcePrimKey());
 	}
 
 	public long getUserId() {
 		return _page.getUserId();
+	}
+
+	public String getUserName() {
+		return _page.getUserName();
 	}
 
 	public String getUuid() {

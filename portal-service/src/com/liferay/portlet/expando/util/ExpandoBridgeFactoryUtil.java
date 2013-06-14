@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,6 +14,7 @@
 
 package com.liferay.portlet.expando.util;
 
+import com.liferay.portal.kernel.security.pacl.permission.PortalRuntimePermission;
 import com.liferay.portal.security.auth.CompanyThreadLocal;
 import com.liferay.portlet.expando.model.ExpandoBridge;
 
@@ -56,11 +57,16 @@ public class ExpandoBridgeFactoryUtil {
 	}
 
 	public static ExpandoBridgeFactory getExpandoBridgeFactory() {
+		PortalRuntimePermission.checkGetBeanProperty(
+			ExpandoBridgeFactoryUtil.class);
+
 		return _expandoBridgeFactory;
 	}
 
 	public void setExpandoBridgeFactory(
 		ExpandoBridgeFactory expandoBridgeFactory) {
+
+		PortalRuntimePermission.checkSetBeanProperty(getClass());
 
 		_expandoBridgeFactory = expandoBridgeFactory;
 	}

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -16,6 +16,7 @@ package com.liferay.portal.model.impl;
 
 import com.liferay.portal.kernel.bean.AutoEscapeBeanHandler;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.ProxyUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.model.CacheModel;
@@ -28,9 +29,10 @@ import com.liferay.portlet.expando.util.ExpandoBridgeFactoryUtil;
 
 import java.io.Serializable;
 
-import java.lang.reflect.Proxy;
-
 import java.sql.Types;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * The base model implementation for the ServiceComponent service. Represents a row in the &quot;ServiceComponent&quot; database table, with each column mapped to a property of this class.
@@ -73,15 +75,11 @@ public class ServiceComponentModelImpl extends BaseModelImpl<ServiceComponent>
 	public static final boolean FINDER_CACHE_ENABLED = GetterUtil.getBoolean(com.liferay.portal.util.PropsUtil.get(
 				"value.object.finder.cache.enabled.com.liferay.portal.model.ServiceComponent"),
 			true);
-
-	public Class<?> getModelClass() {
-		return ServiceComponent.class;
-	}
-
-	public String getModelClassName() {
-		return ServiceComponent.class.getName();
-	}
-
+	public static final boolean COLUMN_BITMASK_ENABLED = GetterUtil.getBoolean(com.liferay.portal.util.PropsUtil.get(
+				"value.object.column.bitmask.enabled.com.liferay.portal.model.ServiceComponent"),
+			true);
+	public static long BUILDNAMESPACE_COLUMN_BITMASK = 1L;
+	public static long BUILDNUMBER_COLUMN_BITMASK = 2L;
 	public static final long LOCK_EXPIRATION_TIME = GetterUtil.getLong(com.liferay.portal.util.PropsUtil.get(
 				"lock.expiration.time.com.liferay.portal.model.ServiceComponent"));
 
@@ -104,6 +102,60 @@ public class ServiceComponentModelImpl extends BaseModelImpl<ServiceComponent>
 		setPrimaryKey(((Long)primaryKeyObj).longValue());
 	}
 
+	public Class<?> getModelClass() {
+		return ServiceComponent.class;
+	}
+
+	public String getModelClassName() {
+		return ServiceComponent.class.getName();
+	}
+
+	@Override
+	public Map<String, Object> getModelAttributes() {
+		Map<String, Object> attributes = new HashMap<String, Object>();
+
+		attributes.put("serviceComponentId", getServiceComponentId());
+		attributes.put("buildNamespace", getBuildNamespace());
+		attributes.put("buildNumber", getBuildNumber());
+		attributes.put("buildDate", getBuildDate());
+		attributes.put("data", getData());
+
+		return attributes;
+	}
+
+	@Override
+	public void setModelAttributes(Map<String, Object> attributes) {
+		Long serviceComponentId = (Long)attributes.get("serviceComponentId");
+
+		if (serviceComponentId != null) {
+			setServiceComponentId(serviceComponentId);
+		}
+
+		String buildNamespace = (String)attributes.get("buildNamespace");
+
+		if (buildNamespace != null) {
+			setBuildNamespace(buildNamespace);
+		}
+
+		Long buildNumber = (Long)attributes.get("buildNumber");
+
+		if (buildNumber != null) {
+			setBuildNumber(buildNumber);
+		}
+
+		Long buildDate = (Long)attributes.get("buildDate");
+
+		if (buildDate != null) {
+			setBuildDate(buildDate);
+		}
+
+		String data = (String)attributes.get("data");
+
+		if (data != null) {
+			setData(data);
+		}
+	}
+
 	public long getServiceComponentId() {
 		return _serviceComponentId;
 	}
@@ -122,6 +174,8 @@ public class ServiceComponentModelImpl extends BaseModelImpl<ServiceComponent>
 	}
 
 	public void setBuildNamespace(String buildNamespace) {
+		_columnBitmask = -1L;
+
 		if (_originalBuildNamespace == null) {
 			_originalBuildNamespace = _buildNamespace;
 		}
@@ -138,6 +192,8 @@ public class ServiceComponentModelImpl extends BaseModelImpl<ServiceComponent>
 	}
 
 	public void setBuildNumber(long buildNumber) {
+		_columnBitmask = -1L;
+
 		if (!_setOriginalBuildNumber) {
 			_setOriginalBuildNumber = true;
 
@@ -172,35 +228,32 @@ public class ServiceComponentModelImpl extends BaseModelImpl<ServiceComponent>
 		_data = data;
 	}
 
+	public long getColumnBitmask() {
+		return _columnBitmask;
+	}
+
 	@Override
 	public ServiceComponent toEscapedModel() {
-		if (isEscapedModel()) {
-			return (ServiceComponent)this;
+		if (_escapedModelProxy == null) {
+			_escapedModelProxy = (ServiceComponent)ProxyUtil.newProxyInstance(_classLoader,
+					_escapedModelProxyInterfaces,
+					new AutoEscapeBeanHandler(this));
 		}
-		else {
-			if (_escapedModelProxy == null) {
-				_escapedModelProxy = (ServiceComponent)Proxy.newProxyInstance(_classLoader,
-						_escapedModelProxyInterfaces,
-						new AutoEscapeBeanHandler(this));
-			}
 
-			return _escapedModelProxy;
-		}
+		return _escapedModelProxy;
 	}
 
 	@Override
 	public ExpandoBridge getExpandoBridge() {
-		if (_expandoBridge == null) {
-			_expandoBridge = ExpandoBridgeFactoryUtil.getExpandoBridge(0,
-					ServiceComponent.class.getName(), getPrimaryKey());
-		}
-
-		return _expandoBridge;
+		return ExpandoBridgeFactoryUtil.getExpandoBridge(0,
+			ServiceComponent.class.getName(), getPrimaryKey());
 	}
 
 	@Override
 	public void setExpandoBridgeAttributes(ServiceContext serviceContext) {
-		getExpandoBridge().setAttributes(serviceContext);
+		ExpandoBridge expandoBridge = getExpandoBridge();
+
+		expandoBridge.setAttributes(serviceContext);
 	}
 
 	@Override
@@ -288,6 +341,8 @@ public class ServiceComponentModelImpl extends BaseModelImpl<ServiceComponent>
 		serviceComponentModelImpl._originalBuildNumber = serviceComponentModelImpl._buildNumber;
 
 		serviceComponentModelImpl._setOriginalBuildNumber = false;
+
+		serviceComponentModelImpl._columnBitmask = 0;
 	}
 
 	@Override
@@ -383,6 +438,6 @@ public class ServiceComponentModelImpl extends BaseModelImpl<ServiceComponent>
 	private boolean _setOriginalBuildNumber;
 	private long _buildDate;
 	private String _data;
-	private transient ExpandoBridge _expandoBridge;
+	private long _columnBitmask;
 	private ServiceComponent _escapedModelProxy;
 }

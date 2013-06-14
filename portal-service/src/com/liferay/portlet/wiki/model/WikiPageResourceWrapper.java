@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,6 +14,11 @@
 
 package com.liferay.portlet.wiki.model;
 
+import com.liferay.portal.model.ModelWrapper;
+
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * <p>
  * This class is a wrapper for {@link WikiPageResource}.
@@ -23,7 +28,8 @@ package com.liferay.portlet.wiki.model;
  * @see       WikiPageResource
  * @generated
  */
-public class WikiPageResourceWrapper implements WikiPageResource {
+public class WikiPageResourceWrapper implements WikiPageResource,
+	ModelWrapper<WikiPageResource> {
 	public WikiPageResourceWrapper(WikiPageResource wikiPageResource) {
 		_wikiPageResource = wikiPageResource;
 	}
@@ -34,6 +40,43 @@ public class WikiPageResourceWrapper implements WikiPageResource {
 
 	public String getModelClassName() {
 		return WikiPageResource.class.getName();
+	}
+
+	public Map<String, Object> getModelAttributes() {
+		Map<String, Object> attributes = new HashMap<String, Object>();
+
+		attributes.put("uuid", getUuid());
+		attributes.put("resourcePrimKey", getResourcePrimKey());
+		attributes.put("nodeId", getNodeId());
+		attributes.put("title", getTitle());
+
+		return attributes;
+	}
+
+	public void setModelAttributes(Map<String, Object> attributes) {
+		String uuid = (String)attributes.get("uuid");
+
+		if (uuid != null) {
+			setUuid(uuid);
+		}
+
+		Long resourcePrimKey = (Long)attributes.get("resourcePrimKey");
+
+		if (resourcePrimKey != null) {
+			setResourcePrimKey(resourcePrimKey);
+		}
+
+		Long nodeId = (Long)attributes.get("nodeId");
+
+		if (nodeId != null) {
+			setNodeId(nodeId);
+		}
+
+		String title = (String)attributes.get("title");
+
+		if (title != null) {
+			setTitle(title);
+		}
 	}
 
 	/**
@@ -146,10 +189,6 @@ public class WikiPageResourceWrapper implements WikiPageResource {
 		return _wikiPageResource.isEscapedModel();
 	}
 
-	public void setEscapedModel(boolean escapedModel) {
-		_wikiPageResource.setEscapedModel(escapedModel);
-	}
-
 	public java.io.Serializable getPrimaryKeyObj() {
 		return _wikiPageResource.getPrimaryKeyObj();
 	}
@@ -204,7 +243,14 @@ public class WikiPageResourceWrapper implements WikiPageResource {
 		_wikiPageResource.persist();
 	}
 
+	/**
+	 * @deprecated Renamed to {@link #getWrappedModel}
+	 */
 	public WikiPageResource getWrappedWikiPageResource() {
+		return _wikiPageResource;
+	}
+
+	public WikiPageResource getWrappedModel() {
 		return _wikiPageResource;
 	}
 

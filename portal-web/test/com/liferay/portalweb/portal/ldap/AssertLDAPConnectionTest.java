@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -23,9 +23,10 @@ import com.liferay.portalweb.portal.util.RuntimeVariables;
 public class AssertLDAPConnectionTest extends BaseTestCase {
 	public void testAssertLDAPConnection() throws Exception {
 		selenium.open("/web/guest/home/");
+		loadRequiredJavaScriptModules();
 
 		for (int second = 0;; second++) {
-			if (second >= 60) {
+			if (second >= 90) {
 				fail("timeout");
 			}
 
@@ -40,22 +41,21 @@ public class AssertLDAPConnectionTest extends BaseTestCase {
 			Thread.sleep(1000);
 		}
 
-		selenium.saveScreenShotAndSource();
 		selenium.clickAt("link=Control Panel",
 			RuntimeVariables.replace("Control Panel"));
 		selenium.waitForPageToLoad("30000");
-		selenium.saveScreenShotAndSource();
+		loadRequiredJavaScriptModules();
 		selenium.clickAt("link=Portal Settings",
 			RuntimeVariables.replace("Portal Settings"));
 		selenium.waitForPageToLoad("30000");
-		selenium.saveScreenShotAndSource();
+		loadRequiredJavaScriptModules();
 		assertTrue(selenium.isPartialText(
 				"//a[@id='_130_authenticationLink']", "Authentication"));
 		selenium.clickAt("//a[@id='_130_authenticationLink']",
 			RuntimeVariables.replace("Authentication"));
 
 		for (int second = 0;; second++) {
-			if (second >= 60) {
+			if (second >= 90) {
 				fail("timeout");
 			}
 
@@ -70,11 +70,10 @@ public class AssertLDAPConnectionTest extends BaseTestCase {
 			Thread.sleep(1000);
 		}
 
-		selenium.saveScreenShotAndSource();
 		selenium.clickAt("link=LDAP", RuntimeVariables.replace("LDAP"));
 
 		for (int second = 0;; second++) {
-			if (second >= 60) {
+			if (second >= 90) {
 				fail("timeout");
 			}
 
@@ -90,20 +89,18 @@ public class AssertLDAPConnectionTest extends BaseTestCase {
 			Thread.sleep(1000);
 		}
 
-		selenium.saveScreenShotAndSource();
 		assertTrue(selenium.isChecked(
 				"//input[@id='_130_ldap.auth.enabledCheckbox']"));
-		selenium.saveScreenShotAndSource();
 		assertEquals(RuntimeVariables.replace("Test LDAP 1"),
 			selenium.getText("//fieldset[2]/div/div/table/tbody/tr/td[1]"));
 		selenium.clickAt("//img[@alt='Edit']", RuntimeVariables.replace("Edit"));
 		selenium.waitForPageToLoad("30000");
-		selenium.saveScreenShotAndSource();
+		loadRequiredJavaScriptModules();
 		selenium.clickAt("//input[@value='Test LDAP Connection']",
 			RuntimeVariables.replace("Test LDAP Connection"));
 
 		for (int second = 0;; second++) {
-			if (second >= 60) {
+			if (second >= 90) {
 				fail("timeout");
 			}
 
@@ -118,10 +115,8 @@ public class AssertLDAPConnectionTest extends BaseTestCase {
 			Thread.sleep(1000);
 		}
 
-		selenium.saveScreenShotAndSource();
-
 		for (int second = 0;; second++) {
-			if (second >= 60) {
+			if (second >= 90) {
 				fail("timeout");
 			}
 
@@ -139,7 +134,6 @@ public class AssertLDAPConnectionTest extends BaseTestCase {
 			Thread.sleep(1000);
 		}
 
-		selenium.saveScreenShotAndSource();
 		assertEquals(RuntimeVariables.replace(
 				"Liferay has successfully connected to the LDAP server."),
 			selenium.getText("//div[1]/div[2]"));

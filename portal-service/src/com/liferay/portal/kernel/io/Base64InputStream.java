@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -54,7 +54,7 @@ public class Base64InputStream extends InputStream {
 	}
 
 	@Override
-	public int read(byte[] buffer, int offset, int length) throws IOException {
+	public int read(byte[] bytes, int offset, int length) throws IOException {
 		if ((length <= 0) || (offset < 0)) {
 			return -1;
 		}
@@ -62,7 +62,7 @@ public class Base64InputStream extends InputStream {
 		int initialLength = length;
 
 		while ((_avaiableBytes > 0) && (length > 0)) {
-			buffer[offset++] = _unitBuffer[_unitBufferIndex++];
+			bytes[offset++] = _unitBuffer[_unitBufferIndex++];
 
 			_avaiableBytes--;
 			length--;
@@ -71,7 +71,7 @@ public class Base64InputStream extends InputStream {
 		int bytesLength = length - (length % 3);
 
 		while (bytesLength > 0) {
-			int returnValue = decodeUnit(buffer, offset);
+			int returnValue = decodeUnit(bytes, offset);
 
 			if (returnValue > 0) {
 				offset += returnValue;
@@ -96,7 +96,7 @@ public class Base64InputStream extends InputStream {
 				break;
 			}
 
-			buffer[offset++] = (byte)intValue;
+			bytes[offset++] = (byte)intValue;
 
 			length--;
 		}

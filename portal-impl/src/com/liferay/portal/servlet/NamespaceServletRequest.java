@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,9 +14,9 @@
 
 package com.liferay.portal.servlet;
 
+import com.liferay.portal.kernel.servlet.DynamicServletRequest;
 import com.liferay.portal.kernel.util.JavaConstants;
 import com.liferay.portal.util.PropsValues;
-import com.liferay.util.servlet.DynamicServletRequest;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -47,6 +47,11 @@ public class NamespaceServletRequest extends DynamicServletRequest {
 		reservedAttrs.add(JavaConstants.JAVAX_PORTLET_PORTLET);
 		reservedAttrs.add(JavaConstants.JAVAX_PORTLET_REQUEST);
 		reservedAttrs.add(JavaConstants.JAVAX_PORTLET_RESPONSE);
+		reservedAttrs.add(JavaConstants.JAVAX_SERVLET_INCLUDE_CONTEXT_PATH);
+		reservedAttrs.add(JavaConstants.JAVAX_SERVLET_INCLUDE_PATH_INFO);
+		reservedAttrs.add(JavaConstants.JAVAX_SERVLET_INCLUDE_QUERY_STRING);
+		reservedAttrs.add(JavaConstants.JAVAX_SERVLET_INCLUDE_REQUEST_URI);
+		reservedAttrs.add(JavaConstants.JAVAX_SERVLET_INCLUDE_SERVLET_PATH);
 		reservedAttrs.add(MimeResponse.MARKUP_HEAD_ELEMENT);
 		reservedAttrs.add(PortletRequest.LIFECYCLE_PHASE);
 	}
@@ -89,8 +94,7 @@ public class NamespaceServletRequest extends DynamicServletRequest {
 			String name = enu.nextElement();
 
 			if (name.startsWith(_attrNamespace)) {
-				names.add(
-					name.substring(_attrNamespace.length(), name.length()));
+				names.add(name.substring(_attrNamespace.length()));
 			}
 			else if (_isReservedParam(name)) {
 				names.add(name);
@@ -98,6 +102,31 @@ public class NamespaceServletRequest extends DynamicServletRequest {
 		}
 
 		return Collections.enumeration(names);
+	}
+
+	@Override
+	public String getParameter(String name) {
+		if (name == null) {
+			throw new IllegalArgumentException();
+		}
+
+		String value = super.getParameter(name);
+
+		if (value == null) {
+			value = super.getParameter(_paramNamespace + name);
+		}
+
+		return value;
+	}
+
+	@Override
+	public void removeAttribute(String name) {
+		if (_isReservedParam(name)) {
+			super.removeAttribute(name);
+		}
+		else {
+			super.removeAttribute(_attrNamespace + name);
+		}
 	}
 
 	@Override
@@ -119,31 +148,6 @@ public class NamespaceServletRequest extends DynamicServletRequest {
 		else {
 			setAttribute(name, value);
 		}
-	}
-
-	@Override
-	public void removeAttribute(String name) {
-		if (_isReservedParam(name)) {
-			super.removeAttribute(name);
-		}
-		else {
-			super.removeAttribute(_attrNamespace + name);
-		}
-	}
-
-	@Override
-	public String getParameter(String name) {
-		if (name == null) {
-			throw new IllegalArgumentException();
-		}
-
-		String value = super.getParameter(name);
-
-		if (value == null) {
-			value = super.getParameter(_paramNamespace + name);
-		}
-
-		return value;
 	}
 
 	private boolean _isReservedParam(String name) {

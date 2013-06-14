@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -22,5 +22,7 @@ public class BlogsActivityKeys {
 	public static final int ADD_COMMENT = 1;
 
 	public static final int ADD_ENTRY = 2;
+
+	public static final int UPDATE_ENTRY = 3;
 
 }

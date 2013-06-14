@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -18,6 +18,8 @@
 
 <%
 String strutsAction = ParamUtil.getString(request, "struts_action");
+
+String cmd = ParamUtil.getString(request, Constants.CMD);
 
 String tabs2 = ParamUtil.getString(request, "tabs2", "version-history");
 
@@ -77,7 +79,7 @@ portletURL.setParameter("fileEntryId", String.valueOf(fileEntryId));
 </portlet:actionURL>
 
 <aui:form action="<%= moveFileEntryURL %>" enctype="multipart/form-data" method="post" name="fm" onSubmit='<%= "event.preventDefault(); " + renderResponse.getNamespace() + "saveFileEntry(false);" %>'>
-	<aui:input name="<%= Constants.CMD %>" type="hidden" value="<%= Constants.MOVE %>" />
+	<aui:input name="<%= Constants.CMD %>" type="hidden" value="<%= cmd.equals(Constants.MOVE_FROM_TRASH) ? Constants.MOVE_FROM_TRASH : Constants.MOVE %>" />
 	<aui:input name="redirect" type="hidden" value="<%= redirect %>" />
 	<aui:input name="fileEntryId" type="hidden" value="<%= fileEntryId %>" />
 	<aui:input name="newFolderId" type="hidden" value="<%= folderId %>" />
@@ -107,9 +109,8 @@ portletURL.setParameter("fileEntryId", String.valueOf(fileEntryId));
 			folderName = folder.getName();
 		}
 		else {
-			folderName = LanguageUtil.get(pageContext, "documents-home");
+			folderName = LanguageUtil.get(pageContext, "home");
 		}
-
 		%>
 
 		<portlet:renderURL var="viewFolderURL">
@@ -129,7 +130,7 @@ portletURL.setParameter("fileEntryId", String.valueOf(fileEntryId));
 		<aui:field-wrapper label="new-folder">
 			<aui:a href="<%= viewFolderURL %>" id="folderName"><%= folderName %></aui:a>
 
-			<portlet:renderURL windowState="<%= LiferayWindowState.POP_UP.toString() %>" var="selectFolderURL">
+			<portlet:renderURL var="selectFolderURL" windowState="<%= LiferayWindowState.POP_UP.toString() %>">
 				<portlet:param name="struts_action" value="/document_library/select_folder" />
 				<portlet:param name="folderId" value="<%= String.valueOf(folderId) %>" />
 			</portlet:renderURL>
@@ -155,12 +156,14 @@ portletURL.setParameter("fileEntryId", String.valueOf(fileEntryId));
 	}
 
 	function <portlet:namespace />selectFolder(folderId, folderName) {
-		document.<portlet:namespace />fm.<portlet:namespace />newFolderId.value = folderId;
+		var folderData = {
+			idString: 'newFolderId',
+			idValue: folderId,
+			nameString: 'folderName',
+			nameValue: folderName
+		};
 
-		var nameEl = document.getElementById("<portlet:namespace />folderName");
-
-		nameEl.href = "javascript:location = '<portlet:renderURL><portlet:param name="struts_action" value="/document_library/view" /></portlet:renderURL>&<portlet:namespace />folderId=" + folderId + "'; void('');";
-		nameEl.innerHTML = folderName + "&nbsp;";
+		Liferay.Util.selectFolder(folderData, '<portlet:renderURL><portlet:param name="struts_action" value="/document_library/view" /></portlet:renderURL>', '<portlet:namespace />');
 	}
 
 	<c:if test="<%= windowState.equals(WindowState.MAXIMIZED) %>">

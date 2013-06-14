@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -77,12 +77,12 @@ public class DoubleClickFilter extends BasePortalFilter {
 				ok = true;
 			}
 			finally {
-				if (_log.isDebugEnabled()) {
+				if (stopWatch != null) {
 					String completeURL = HttpUtil.getCompleteURL(request);
 
 					if (ok) {
 						_log.debug(
-							"Double click prevention succeded in " +
+							"Double click prevention succeeded in " +
 								stopWatch.getTime() + " ms for " + completeURL);
 					}
 					else {

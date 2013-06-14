@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,7 +14,6 @@
 
 package com.liferay.portal.service.persistence;
 
-import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.model.PortalPreferences;
 
 /**
@@ -190,9 +189,11 @@ public interface PortalPreferencesPersistence extends BasePersistence<PortalPref
 	*
 	* @param ownerId the owner ID
 	* @param ownerType the owner type
+	* @return the portal preferences that was removed
 	* @throws SystemException if a system exception occurred
 	*/
-	public void removeByO_O(long ownerId, int ownerType)
+	public com.liferay.portal.model.PortalPreferences removeByO_O(
+		long ownerId, int ownerType)
 		throws com.liferay.portal.NoSuchPreferencesException,
 			com.liferay.portal.kernel.exception.SystemException;
 
@@ -223,7 +224,4 @@ public interface PortalPreferencesPersistence extends BasePersistence<PortalPref
 	*/
 	public int countAll()
 		throws com.liferay.portal.kernel.exception.SystemException;
-
-	public PortalPreferences remove(PortalPreferences portalPreferences)
-		throws SystemException;
 }

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -33,13 +33,16 @@ public abstract class BaseScriptingExecutor implements ScriptingExecutor {
 
 	public Map<String, Object> eval(
 			Set<String> allowedClasses, Map<String, Object> inputObjects,
-			Set<String> outputNames, File scriptFile)
+			Set<String> outputNames, File scriptFile,
+			ClassLoader... classloaders)
 		throws ScriptingException {
 
 		try {
 			String script = FileUtil.read(scriptFile);
 
-			return eval(allowedClasses, inputObjects, outputNames, script);
+			return eval(
+				allowedClasses, inputObjects, outputNames, script,
+				classloaders);
 		}
 		catch (IOException ioe) {
 			throw new ScriptingException(ioe);

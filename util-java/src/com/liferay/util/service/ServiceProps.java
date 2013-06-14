@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -17,6 +17,7 @@ package com.liferay.util.service;
 import com.liferay.portal.kernel.configuration.Configuration;
 import com.liferay.portal.kernel.configuration.ConfigurationFactoryUtil;
 import com.liferay.portal.kernel.configuration.Filter;
+import com.liferay.portal.kernel.portlet.PortletClassLoaderUtil;
 
 import java.util.Properties;
 
@@ -63,7 +64,7 @@ public class ServiceProps {
 
 	private ServiceProps() {
 		_configuration = ConfigurationFactoryUtil.getConfiguration(
-			ServiceProps.class.getClassLoader(), "service");
+			PortletClassLoaderUtil.getClassLoader(), "service");
 	}
 
 	private static ServiceProps _instance = new ServiceProps();

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -20,6 +20,7 @@ import com.liferay.portal.kernel.portlet.LiferayPortletRequest;
 import com.liferay.portal.kernel.portlet.LiferayPortletResponse;
 import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.repository.model.FileVersion;
+import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.security.permission.ActionKeys;
 import com.liferay.portal.security.permission.PermissionChecker;
 import com.liferay.portal.theme.ThemeDisplay;
@@ -30,9 +31,17 @@ import com.liferay.portlet.asset.model.AssetRenderer;
 import com.liferay.portlet.asset.model.BaseAssetRendererFactory;
 import com.liferay.portlet.assetpublisher.util.AssetPublisherUtil;
 import com.liferay.portlet.documentlibrary.model.DLFileEntry;
+import com.liferay.portlet.documentlibrary.model.DLFileEntryType;
 import com.liferay.portlet.documentlibrary.service.DLAppLocalServiceUtil;
+import com.liferay.portlet.documentlibrary.service.DLFileEntryTypeServiceUtil;
 import com.liferay.portlet.documentlibrary.service.permission.DLFileEntryPermission;
+import com.liferay.portlet.documentlibrary.service.permission.DLFileEntryTypePermission;
 import com.liferay.portlet.documentlibrary.service.permission.DLPermission;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 
 import javax.portlet.PortletRequest;
 import javax.portlet.PortletURL;
@@ -68,11 +77,29 @@ public class DLFileEntryAssetRendererFactory extends BaseAssetRendererFactory {
 			fileVersion = fileEntry.getFileVersion();
 		}
 
-		return new DLFileEntryAssetRenderer(fileEntry, fileVersion);
+		return new DLFileEntryAssetRenderer(fileEntry, fileVersion, type);
 	}
 
 	public String getClassName() {
 		return CLASS_NAME;
+	}
+
+	@Override
+	public Map<Long, String> getClassTypes(long[] groupIds, Locale locale)
+		throws Exception {
+
+		Map<Long, String> classTypes = new HashMap<Long, String>();
+
+		List<DLFileEntryType> dlFileEntryTypes =
+			DLFileEntryTypeServiceUtil.getFileEntryTypes(groupIds);
+
+		for (DLFileEntryType dlFileEntryType : dlFileEntryTypes) {
+			classTypes.put(
+				dlFileEntryType.getFileEntryTypeId(),
+				dlFileEntryType.getName());
+		}
+
+		return classTypes;
 	}
 
 	public String getType() {
@@ -94,6 +121,18 @@ public class DLFileEntryAssetRendererFactory extends BaseAssetRendererFactory {
 		if (!DLPermission.contains(
 				themeDisplay.getPermissionChecker(),
 				themeDisplay.getScopeGroupId(), ActionKeys.ADD_DOCUMENT)) {
+
+			return null;
+		}
+
+		long classTypeId = GetterUtil.getLong(
+			liferayPortletRequest.getAttribute(
+				WebKeys.ASSET_RENDERER_FACTORY_CLASS_TYPE_ID));
+
+		if ((classTypeId > 0) &&
+			!DLFileEntryTypePermission.contains(
+				themeDisplay.getPermissionChecker(), classTypeId,
+				ActionKeys.VIEW)) {
 
 			return null;
 		}
@@ -124,8 +163,15 @@ public class DLFileEntryAssetRendererFactory extends BaseAssetRendererFactory {
 	}
 
 	@Override
+	public boolean isLinkable() {
+		return _LINKABLE;
+	}
+
+	@Override
 	protected String getIconPath(ThemeDisplay themeDisplay) {
 		return themeDisplay.getPathThemeImages() + "/common/clip.png";
 	}
+
+	private static final boolean _LINKABLE = true;
 
 }

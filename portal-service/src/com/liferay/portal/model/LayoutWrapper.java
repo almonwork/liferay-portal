@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,6 +14,10 @@
 
 package com.liferay.portal.model;
 
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * <p>
  * This class is a wrapper for {@link Layout}.
@@ -23,7 +27,7 @@ package com.liferay.portal.model;
  * @see       Layout
  * @generated
  */
-public class LayoutWrapper implements Layout {
+public class LayoutWrapper implements Layout, ModelWrapper<Layout> {
 	public LayoutWrapper(Layout layout) {
 		_layout = layout;
 	}
@@ -34,6 +38,223 @@ public class LayoutWrapper implements Layout {
 
 	public String getModelClassName() {
 		return Layout.class.getName();
+	}
+
+	public Map<String, Object> getModelAttributes() {
+		Map<String, Object> attributes = new HashMap<String, Object>();
+
+		attributes.put("uuid", getUuid());
+		attributes.put("plid", getPlid());
+		attributes.put("groupId", getGroupId());
+		attributes.put("companyId", getCompanyId());
+		attributes.put("createDate", getCreateDate());
+		attributes.put("modifiedDate", getModifiedDate());
+		attributes.put("privateLayout", getPrivateLayout());
+		attributes.put("layoutId", getLayoutId());
+		attributes.put("parentLayoutId", getParentLayoutId());
+		attributes.put("name", getName());
+		attributes.put("title", getTitle());
+		attributes.put("description", getDescription());
+		attributes.put("keywords", getKeywords());
+		attributes.put("robots", getRobots());
+		attributes.put("type", getType());
+		attributes.put("typeSettings", getTypeSettings());
+		attributes.put("hidden", getHidden());
+		attributes.put("friendlyURL", getFriendlyURL());
+		attributes.put("iconImage", getIconImage());
+		attributes.put("iconImageId", getIconImageId());
+		attributes.put("themeId", getThemeId());
+		attributes.put("colorSchemeId", getColorSchemeId());
+		attributes.put("wapThemeId", getWapThemeId());
+		attributes.put("wapColorSchemeId", getWapColorSchemeId());
+		attributes.put("css", getCss());
+		attributes.put("priority", getPriority());
+		attributes.put("layoutPrototypeUuid", getLayoutPrototypeUuid());
+		attributes.put("layoutPrototypeLinkEnabled",
+			getLayoutPrototypeLinkEnabled());
+		attributes.put("sourcePrototypeLayoutUuid",
+			getSourcePrototypeLayoutUuid());
+
+		return attributes;
+	}
+
+	public void setModelAttributes(Map<String, Object> attributes) {
+		String uuid = (String)attributes.get("uuid");
+
+		if (uuid != null) {
+			setUuid(uuid);
+		}
+
+		Long plid = (Long)attributes.get("plid");
+
+		if (plid != null) {
+			setPlid(plid);
+		}
+
+		Long groupId = (Long)attributes.get("groupId");
+
+		if (groupId != null) {
+			setGroupId(groupId);
+		}
+
+		Long companyId = (Long)attributes.get("companyId");
+
+		if (companyId != null) {
+			setCompanyId(companyId);
+		}
+
+		Date createDate = (Date)attributes.get("createDate");
+
+		if (createDate != null) {
+			setCreateDate(createDate);
+		}
+
+		Date modifiedDate = (Date)attributes.get("modifiedDate");
+
+		if (modifiedDate != null) {
+			setModifiedDate(modifiedDate);
+		}
+
+		Boolean privateLayout = (Boolean)attributes.get("privateLayout");
+
+		if (privateLayout != null) {
+			setPrivateLayout(privateLayout);
+		}
+
+		Long layoutId = (Long)attributes.get("layoutId");
+
+		if (layoutId != null) {
+			setLayoutId(layoutId);
+		}
+
+		Long parentLayoutId = (Long)attributes.get("parentLayoutId");
+
+		if (parentLayoutId != null) {
+			setParentLayoutId(parentLayoutId);
+		}
+
+		String name = (String)attributes.get("name");
+
+		if (name != null) {
+			setName(name);
+		}
+
+		String title = (String)attributes.get("title");
+
+		if (title != null) {
+			setTitle(title);
+		}
+
+		String description = (String)attributes.get("description");
+
+		if (description != null) {
+			setDescription(description);
+		}
+
+		String keywords = (String)attributes.get("keywords");
+
+		if (keywords != null) {
+			setKeywords(keywords);
+		}
+
+		String robots = (String)attributes.get("robots");
+
+		if (robots != null) {
+			setRobots(robots);
+		}
+
+		String type = (String)attributes.get("type");
+
+		if (type != null) {
+			setType(type);
+		}
+
+		String typeSettings = (String)attributes.get("typeSettings");
+
+		if (typeSettings != null) {
+			setTypeSettings(typeSettings);
+		}
+
+		Boolean hidden = (Boolean)attributes.get("hidden");
+
+		if (hidden != null) {
+			setHidden(hidden);
+		}
+
+		String friendlyURL = (String)attributes.get("friendlyURL");
+
+		if (friendlyURL != null) {
+			setFriendlyURL(friendlyURL);
+		}
+
+		Boolean iconImage = (Boolean)attributes.get("iconImage");
+
+		if (iconImage != null) {
+			setIconImage(iconImage);
+		}
+
+		Long iconImageId = (Long)attributes.get("iconImageId");
+
+		if (iconImageId != null) {
+			setIconImageId(iconImageId);
+		}
+
+		String themeId = (String)attributes.get("themeId");
+
+		if (themeId != null) {
+			setThemeId(themeId);
+		}
+
+		String colorSchemeId = (String)attributes.get("colorSchemeId");
+
+		if (colorSchemeId != null) {
+			setColorSchemeId(colorSchemeId);
+		}
+
+		String wapThemeId = (String)attributes.get("wapThemeId");
+
+		if (wapThemeId != null) {
+			setWapThemeId(wapThemeId);
+		}
+
+		String wapColorSchemeId = (String)attributes.get("wapColorSchemeId");
+
+		if (wapColorSchemeId != null) {
+			setWapColorSchemeId(wapColorSchemeId);
+		}
+
+		String css = (String)attributes.get("css");
+
+		if (css != null) {
+			setCss(css);
+		}
+
+		Integer priority = (Integer)attributes.get("priority");
+
+		if (priority != null) {
+			setPriority(priority);
+		}
+
+		String layoutPrototypeUuid = (String)attributes.get(
+				"layoutPrototypeUuid");
+
+		if (layoutPrototypeUuid != null) {
+			setLayoutPrototypeUuid(layoutPrototypeUuid);
+		}
+
+		Boolean layoutPrototypeLinkEnabled = (Boolean)attributes.get(
+				"layoutPrototypeLinkEnabled");
+
+		if (layoutPrototypeLinkEnabled != null) {
+			setLayoutPrototypeLinkEnabled(layoutPrototypeLinkEnabled);
+		}
+
+		String sourcePrototypeLayoutUuid = (String)attributes.get(
+				"sourcePrototypeLayoutUuid");
+
+		if (sourcePrototypeLayoutUuid != null) {
+			setSourcePrototypeLayoutUuid(sourcePrototypeLayoutUuid);
+		}
 	}
 
 	/**
@@ -277,6 +498,14 @@ public class LayoutWrapper implements Layout {
 		return _layout.getName(languageId, useDefault);
 	}
 
+	public java.lang.String getNameCurrentLanguageId() {
+		return _layout.getNameCurrentLanguageId();
+	}
+
+	public java.lang.String getNameCurrentValue() {
+		return _layout.getNameCurrentValue();
+	}
+
 	/**
 	* Returns a map of the locales and localized names of this layout.
 	*
@@ -315,6 +544,10 @@ public class LayoutWrapper implements Layout {
 	public void setName(java.lang.String name, java.util.Locale locale,
 		java.util.Locale defaultLocale) {
 		_layout.setName(name, locale, defaultLocale);
+	}
+
+	public void setNameCurrentLanguageId(java.lang.String languageId) {
+		_layout.setNameCurrentLanguageId(languageId);
 	}
 
 	/**
@@ -391,6 +624,14 @@ public class LayoutWrapper implements Layout {
 		return _layout.getTitle(languageId, useDefault);
 	}
 
+	public java.lang.String getTitleCurrentLanguageId() {
+		return _layout.getTitleCurrentLanguageId();
+	}
+
+	public java.lang.String getTitleCurrentValue() {
+		return _layout.getTitleCurrentValue();
+	}
+
 	/**
 	* Returns a map of the locales and localized titles of this layout.
 	*
@@ -429,6 +670,10 @@ public class LayoutWrapper implements Layout {
 	public void setTitle(java.lang.String title, java.util.Locale locale,
 		java.util.Locale defaultLocale) {
 		_layout.setTitle(title, locale, defaultLocale);
+	}
+
+	public void setTitleCurrentLanguageId(java.lang.String languageId) {
+		_layout.setTitleCurrentLanguageId(languageId);
 	}
 
 	/**
@@ -506,6 +751,14 @@ public class LayoutWrapper implements Layout {
 		return _layout.getDescription(languageId, useDefault);
 	}
 
+	public java.lang.String getDescriptionCurrentLanguageId() {
+		return _layout.getDescriptionCurrentLanguageId();
+	}
+
+	public java.lang.String getDescriptionCurrentValue() {
+		return _layout.getDescriptionCurrentValue();
+	}
+
 	/**
 	* Returns a map of the locales and localized descriptions of this layout.
 	*
@@ -545,6 +798,10 @@ public class LayoutWrapper implements Layout {
 	public void setDescription(java.lang.String description,
 		java.util.Locale locale, java.util.Locale defaultLocale) {
 		_layout.setDescription(description, locale, defaultLocale);
+	}
+
+	public void setDescriptionCurrentLanguageId(java.lang.String languageId) {
+		_layout.setDescriptionCurrentLanguageId(languageId);
 	}
 
 	/**
@@ -622,6 +879,14 @@ public class LayoutWrapper implements Layout {
 		return _layout.getKeywords(languageId, useDefault);
 	}
 
+	public java.lang.String getKeywordsCurrentLanguageId() {
+		return _layout.getKeywordsCurrentLanguageId();
+	}
+
+	public java.lang.String getKeywordsCurrentValue() {
+		return _layout.getKeywordsCurrentValue();
+	}
+
 	/**
 	* Returns a map of the locales and localized keywordses of this layout.
 	*
@@ -660,6 +925,10 @@ public class LayoutWrapper implements Layout {
 	public void setKeywords(java.lang.String keywords, java.util.Locale locale,
 		java.util.Locale defaultLocale) {
 		_layout.setKeywords(keywords, locale, defaultLocale);
+	}
+
+	public void setKeywordsCurrentLanguageId(java.lang.String languageId) {
+		_layout.setKeywordsCurrentLanguageId(languageId);
 	}
 
 	/**
@@ -737,6 +1006,14 @@ public class LayoutWrapper implements Layout {
 		return _layout.getRobots(languageId, useDefault);
 	}
 
+	public java.lang.String getRobotsCurrentLanguageId() {
+		return _layout.getRobotsCurrentLanguageId();
+	}
+
+	public java.lang.String getRobotsCurrentValue() {
+		return _layout.getRobotsCurrentValue();
+	}
+
 	/**
 	* Returns a map of the locales and localized robotses of this layout.
 	*
@@ -775,6 +1052,10 @@ public class LayoutWrapper implements Layout {
 	public void setRobots(java.lang.String robots, java.util.Locale locale,
 		java.util.Locale defaultLocale) {
 		_layout.setRobots(robots, locale, defaultLocale);
+	}
+
+	public void setRobotsCurrentLanguageId(java.lang.String languageId) {
+		_layout.setRobotsCurrentLanguageId(languageId);
 	}
 
 	/**
@@ -1079,6 +1360,25 @@ public class LayoutWrapper implements Layout {
 		_layout.setLayoutPrototypeLinkEnabled(layoutPrototypeLinkEnabled);
 	}
 
+	/**
+	* Returns the source prototype layout uuid of this layout.
+	*
+	* @return the source prototype layout uuid of this layout
+	*/
+	public java.lang.String getSourcePrototypeLayoutUuid() {
+		return _layout.getSourcePrototypeLayoutUuid();
+	}
+
+	/**
+	* Sets the source prototype layout uuid of this layout.
+	*
+	* @param sourcePrototypeLayoutUuid the source prototype layout uuid of this layout
+	*/
+	public void setSourcePrototypeLayoutUuid(
+		java.lang.String sourcePrototypeLayoutUuid) {
+		_layout.setSourcePrototypeLayoutUuid(sourcePrototypeLayoutUuid);
+	}
+
 	public boolean isNew() {
 		return _layout.isNew();
 	}
@@ -1097,10 +1397,6 @@ public class LayoutWrapper implements Layout {
 
 	public boolean isEscapedModel() {
 		return _layout.isEscapedModel();
-	}
-
-	public void setEscapedModel(boolean escapedModel) {
-		_layout.setEscapedModel(escapedModel);
 	}
 
 	public java.io.Serializable getPrimaryKeyObj() {
@@ -1283,6 +1579,11 @@ public class LayoutWrapper implements Layout {
 		return _layout.getTypeSettingsProperty(key);
 	}
 
+	public java.lang.String getTypeSettingsProperty(java.lang.String key,
+		java.lang.String defaultValue) {
+		return _layout.getTypeSettingsProperty(key, defaultValue);
+	}
+
 	public com.liferay.portal.model.ColorScheme getWapColorScheme()
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException {
@@ -1339,6 +1640,10 @@ public class LayoutWrapper implements Layout {
 		return _layout.isInheritWapLookAndFeel();
 	}
 
+	public boolean isLayoutPrototypeLinkActive() {
+		return _layout.isLayoutPrototypeLinkActive();
+	}
+
 	public boolean isPublicLayout() {
 		return _layout.isPublicLayout();
 	}
@@ -1380,12 +1685,23 @@ public class LayoutWrapper implements Layout {
 		return _layout.isTypeURL();
 	}
 
+	public void setLayoutSet(com.liferay.portal.model.LayoutSet layoutSet) {
+		_layout.setLayoutSet(layoutSet);
+	}
+
 	public void setTypeSettingsProperties(
 		com.liferay.portal.kernel.util.UnicodeProperties typeSettingsProperties) {
 		_layout.setTypeSettingsProperties(typeSettingsProperties);
 	}
 
+	/**
+	 * @deprecated Renamed to {@link #getWrappedModel}
+	 */
 	public Layout getWrappedLayout() {
+		return _layout;
+	}
+
+	public Layout getWrappedModel() {
 		return _layout;
 	}
 

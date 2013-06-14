@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -53,6 +53,12 @@ public abstract class BaseCacheKeyGenerator implements CacheKeyGenerator {
 		return cacheKey;
 	}
 
+	public boolean isCallingGetCacheKeyThreadSafe() {
+		return _CALLING_GET_CACHE_KEY_THREAD_SAFE;
+	}
+
 	protected StringBundler keyBundler = new StringBundler();
+
+	private static final boolean _CALLING_GET_CACHE_KEY_THREAD_SAFE = true;
 
 }

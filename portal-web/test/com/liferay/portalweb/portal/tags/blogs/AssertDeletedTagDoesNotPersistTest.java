@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -23,14 +23,15 @@ import com.liferay.portalweb.portal.util.RuntimeVariables;
 public class AssertDeletedTagDoesNotPersistTest extends BaseTestCase {
 	public void testAssertDeletedTagDoesNotPersist() throws Exception {
 		selenium.open("/web/guest/home/");
+		loadRequiredJavaScriptModules();
 
 		for (int second = 0;; second++) {
-			if (second >= 60) {
+			if (second >= 90) {
 				fail("timeout");
 			}
 
 			try {
-				if (selenium.isElementPresent("link=Blogs Tags Test Page")) {
+				if (selenium.isVisible("link=Blogs Tags Test Page")) {
 					break;
 				}
 			}
@@ -40,42 +41,25 @@ public class AssertDeletedTagDoesNotPersistTest extends BaseTestCase {
 			Thread.sleep(1000);
 		}
 
-		selenium.saveScreenShotAndSource();
 		selenium.clickAt("link=Blogs Tags Test Page",
-			RuntimeVariables.replace(""));
+			RuntimeVariables.replace("Blogs Tags Test Page"));
 		selenium.waitForPageToLoad("30000");
-		selenium.saveScreenShotAndSource();
-
-		for (int second = 0;; second++) {
-			if (second >= 60) {
-				fail("timeout");
-			}
-
-			try {
-				if (selenium.isElementPresent("link=Tags1 Blogs1 Test1 Entry1")) {
-					break;
-				}
-			}
-			catch (Exception e) {
-			}
-
-			Thread.sleep(1000);
-		}
-
-		selenium.saveScreenShotAndSource();
-		selenium.clickAt("link=Tags1 Blogs1 Test1 Entry1",
-			RuntimeVariables.replace(""));
+		loadRequiredJavaScriptModules();
+		assertEquals(RuntimeVariables.replace("Tags Blog Entry1 Title"),
+			selenium.getText("xPath=(//div[@class='entry-title']/h2/a)[3]"));
+		selenium.clickAt("xPath=(//div[@class='entry-title']/h2/a)[3]",
+			RuntimeVariables.replace("Tags Blog Entry1 Title"));
 		selenium.waitForPageToLoad("30000");
-		selenium.saveScreenShotAndSource();
+		loadRequiredJavaScriptModules();
 		assertFalse(selenium.isTextPresent("selenium2 liferay2"));
 
 		for (int second = 0;; second++) {
-			if (second >= 60) {
+			if (second >= 90) {
 				fail("timeout");
 			}
 
 			try {
-				if (selenium.isElementPresent("link=Blogs Tags Test Page")) {
+				if (selenium.isVisible("link=Blogs Tags Test Page")) {
 					break;
 				}
 			}
@@ -85,19 +69,20 @@ public class AssertDeletedTagDoesNotPersistTest extends BaseTestCase {
 			Thread.sleep(1000);
 		}
 
-		selenium.saveScreenShotAndSource();
 		selenium.clickAt("link=Blogs Tags Test Page",
-			RuntimeVariables.replace(""));
+			RuntimeVariables.replace("Blogs Tags Test Page"));
 		selenium.waitForPageToLoad("30000");
-		selenium.saveScreenShotAndSource();
+		loadRequiredJavaScriptModules();
 
 		for (int second = 0;; second++) {
-			if (second >= 60) {
+			if (second >= 90) {
 				fail("timeout");
 			}
 
 			try {
-				if (selenium.isElementPresent("link=Tags2 Blogs2 Test2 Entry2")) {
+				if (RuntimeVariables.replace("Tags Blog Entry2 Title")
+										.equals(selenium.getText(
+								"xPath=(//div[@class='entry-title']/h2/a)[2]"))) {
 					break;
 				}
 			}
@@ -107,20 +92,21 @@ public class AssertDeletedTagDoesNotPersistTest extends BaseTestCase {
 			Thread.sleep(1000);
 		}
 
-		selenium.saveScreenShotAndSource();
-		selenium.clickAt("link=Tags2 Blogs2 Test2 Entry2",
-			RuntimeVariables.replace(""));
+		assertEquals(RuntimeVariables.replace("Tags Blog Entry2 Title"),
+			selenium.getText("xPath=(//div[@class='entry-title']/h2/a)[2]"));
+		selenium.clickAt("xPath=(//div[@class='entry-title']/h2/a)[2]",
+			RuntimeVariables.replace("Tags Blog Entry2 Title"));
 		selenium.waitForPageToLoad("30000");
-		selenium.saveScreenShotAndSource();
+		loadRequiredJavaScriptModules();
 		assertFalse(selenium.isTextPresent("selenium2 liferay2"));
 
 		for (int second = 0;; second++) {
-			if (second >= 60) {
+			if (second >= 90) {
 				fail("timeout");
 			}
 
 			try {
-				if (selenium.isElementPresent("link=Blogs Tags Test Page")) {
+				if (selenium.isVisible("link=Blogs Tags Test Page")) {
 					break;
 				}
 			}
@@ -130,19 +116,20 @@ public class AssertDeletedTagDoesNotPersistTest extends BaseTestCase {
 			Thread.sleep(1000);
 		}
 
-		selenium.saveScreenShotAndSource();
 		selenium.clickAt("link=Blogs Tags Test Page",
-			RuntimeVariables.replace(""));
+			RuntimeVariables.replace("Blogs Tags Test Page"));
 		selenium.waitForPageToLoad("30000");
-		selenium.saveScreenShotAndSource();
+		loadRequiredJavaScriptModules();
 
 		for (int second = 0;; second++) {
-			if (second >= 60) {
+			if (second >= 90) {
 				fail("timeout");
 			}
 
 			try {
-				if (selenium.isElementPresent("link=Tags3 Blogs3 Test3 Entry3")) {
+				if (RuntimeVariables.replace("Tags Blog Entry3 Title")
+										.equals(selenium.getText(
+								"xPath=(//div[@class='entry-title']/h2/a)[1]"))) {
 					break;
 				}
 			}
@@ -152,11 +139,44 @@ public class AssertDeletedTagDoesNotPersistTest extends BaseTestCase {
 			Thread.sleep(1000);
 		}
 
-		selenium.saveScreenShotAndSource();
-		selenium.clickAt("link=Tags3 Blogs3 Test3 Entry3",
-			RuntimeVariables.replace(""));
+		assertEquals(RuntimeVariables.replace("Tags Blog Entry3 Title"),
+			selenium.getText("xPath=(//div[@class='entry-title']/h2/a)[1]"));
+		selenium.clickAt("xPath=(//div[@class='entry-title']/h2/a)[1]",
+			RuntimeVariables.replace("Tags Blog Entry3 Title"));
 		selenium.waitForPageToLoad("30000");
-		selenium.saveScreenShotAndSource();
+		loadRequiredJavaScriptModules();
 		assertFalse(selenium.isTextPresent("selenium2 liferay2"));
+		selenium.open("/web/guest/home/");
+		loadRequiredJavaScriptModules();
+
+		for (int second = 0;; second++) {
+			if (second >= 90) {
+				fail("timeout");
+			}
+
+			try {
+				if (selenium.isVisible("link=Blogs Tags Test Page")) {
+					break;
+				}
+			}
+			catch (Exception e) {
+			}
+
+			Thread.sleep(1000);
+		}
+
+		selenium.clickAt("link=Blogs Tags Test Page",
+			RuntimeVariables.replace("Blogs Tags Test Page"));
+		selenium.waitForPageToLoad("30000");
+		loadRequiredJavaScriptModules();
+		selenium.type("//input[@id='_33_keywords']",
+			RuntimeVariables.replace("\"selenium2 liferay2\""));
+		selenium.clickAt("//input[@value='Search']",
+			RuntimeVariables.replace("Search"));
+		selenium.waitForPageToLoad("30000");
+		loadRequiredJavaScriptModules();
+		assertEquals(RuntimeVariables.replace(
+				"No entries were found that matched the keywords: \"selenium2 liferay2\"."),
+			selenium.getText("//div[@class='portlet-msg-info']"));
 	}
 }

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -24,10 +24,31 @@ import java.net.InetAddress;
 /**
  * @author Tina Tian
  */
-public class ClusterNode implements Serializable {
+public class ClusterNode implements Comparable<ClusterNode>, Serializable {
 
 	public ClusterNode(String clusterNodeId) {
 		_clusterNodeId = clusterNodeId;
+	}
+
+	public int compareTo(ClusterNode clusterNode) {
+		InetAddress inetAddress = clusterNode._inetAddress;
+
+		String ipAddress = inetAddress.getHostAddress();
+
+		String curIpAddress = _inetAddress.getHostAddress();
+
+		int value = curIpAddress.compareTo(ipAddress);
+
+		if (value == 0) {
+			if (_port > clusterNode._port) {
+				value = 1;
+			}
+			else if (_port < clusterNode._port) {
+				value = -1;
+			}
+		}
+
+		return value;
 	}
 
 	@Override

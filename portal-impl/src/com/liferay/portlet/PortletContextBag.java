@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -29,10 +29,6 @@ public class PortletContextBag {
 		_servletContextName = servletContextName;
 	}
 
-	public String getServletContextName() {
-		return _servletContextName;
-	}
-
 	public Map<String, CustomUserAttributes> getCustomUserAttributes() {
 		return _customUserAttributes;
 	}
@@ -45,11 +41,15 @@ public class PortletContextBag {
 		return _urlListeners;
 	}
 
-	private String _servletContextName;
+	public String getServletContextName() {
+		return _servletContextName;
+	}
+
 	private Map<String, CustomUserAttributes> _customUserAttributes =
 		new HashMap<String, CustomUserAttributes>();
 	private Map<String, PortletFilter> _portletFilters =
 		new HashMap<String, PortletFilter>();
+	private String _servletContextName;
 	private Map<String, PortletURLGenerationListener> _urlListeners =
 		new HashMap<String, PortletURLGenerationListener>();
 

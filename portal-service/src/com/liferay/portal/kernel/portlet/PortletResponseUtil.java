@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -284,9 +284,9 @@ public class PortletResponseUtil {
 		}
 
 		mimeResponse.setProperty(
-			HttpHeaders.CACHE_CONTROL, HttpHeaders.CACHE_CONTROL_PUBLIC_VALUE);
+			HttpHeaders.CACHE_CONTROL, HttpHeaders.CACHE_CONTROL_PRIVATE_VALUE);
 		mimeResponse.setProperty(
-			HttpHeaders.PRAGMA, HttpHeaders.PRAGMA_PUBLIC_VALUE);
+			HttpHeaders.PRAGMA, HttpHeaders.PRAGMA_NO_CACHE_VALUE);
 
 		if (Validator.isNotNull(fileName)) {
 			String contentDisposition =

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -23,7 +23,7 @@ import com.liferay.portal.kernel.xml.SAXReaderUtil;
 import com.liferay.portal.util.InitUtil;
 import com.liferay.util.xml.XMLFormatter;
 
-import java.util.Iterator;
+import java.util.List;
 
 /**
  * @author Brian Wing Shun Chan
@@ -45,16 +45,15 @@ public class WebXML23Converter {
 		try {
 			String webXML24 = FileUtil.read(input);
 
-			Document doc = SAXReaderUtil.read(webXML24);
+			Document document = SAXReaderUtil.read(webXML24);
 
-			Element root = doc.getRootElement();
+			Element rootElement = document.getRootElement();
 
 			double version = GetterUtil.getDouble(
-				root.attributeValue("version"));
+				rootElement.attributeValue("version"));
 
 			if (version == 2.4) {
-				System.out.println(
-					"Convert web.xml because it is Servlet 2.4");
+				System.out.println("Convert web.xml because it is Servlet 2.4");
 			}
 			else {
 				System.out.println(
@@ -63,27 +62,24 @@ public class WebXML23Converter {
 				return;
 			}
 
-			Iterator<Element> itr1 = root.elements("filter-mapping").iterator();
+			List<Element> filterMappingElements = rootElement.elements(
+				"filter-mapping");
 
-			while (itr1.hasNext()) {
-				Element filterMapping = itr1.next();
+			for (Element filterMappingElement : filterMappingElements) {
+				List<Element> dispatcherElements =
+					filterMappingElement.elements("dispatcher");
 
-				Iterator<Element> itr2 = filterMapping.elements(
-					"dispatcher").iterator();
-
-				while (itr2.hasNext()) {
-					Element dispatcher = itr2.next();
-
-					dispatcher.detach();
+				for (Element dispatcherElement : dispatcherElements) {
+					dispatcherElement.detach();
 				}
 			}
 
-			String webXML23 = doc.formattedString();
+			String webXML23 = document.formattedString();
 
 			int x = webXML23.indexOf("<web-app");
 			int y = webXML23.indexOf(">", x);
 
-			webXML23 = webXML23.substring(0, x) + "<!DOCTYPE web-app PUBLIC \"-//Sun Microsystems, Inc.//DTD Web Application 2.3//EN\" \"http://java.sun.com/dtd/web-app_2_3.dtd\"><web-app>" + webXML23.substring(y + 1, webXML23.length());
+			webXML23 = webXML23.substring(0, x) + "<!DOCTYPE web-app PUBLIC \"-//Sun Microsystems, Inc.//DTD Web Application 2.3//EN\" \"http://java.sun.com/dtd/web-app_2_3.dtd\"><web-app>" + webXML23.substring(y + 1);
 
 			webXML23 = StringUtil.replace(
 				webXML23,

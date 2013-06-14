@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,6 +14,9 @@
 
 package com.liferay.portal.model;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * <p>
  * This class is a wrapper for {@link ServiceComponent}.
@@ -23,7 +26,8 @@ package com.liferay.portal.model;
  * @see       ServiceComponent
  * @generated
  */
-public class ServiceComponentWrapper implements ServiceComponent {
+public class ServiceComponentWrapper implements ServiceComponent,
+	ModelWrapper<ServiceComponent> {
 	public ServiceComponentWrapper(ServiceComponent serviceComponent) {
 		_serviceComponent = serviceComponent;
 	}
@@ -34,6 +38,50 @@ public class ServiceComponentWrapper implements ServiceComponent {
 
 	public String getModelClassName() {
 		return ServiceComponent.class.getName();
+	}
+
+	public Map<String, Object> getModelAttributes() {
+		Map<String, Object> attributes = new HashMap<String, Object>();
+
+		attributes.put("serviceComponentId", getServiceComponentId());
+		attributes.put("buildNamespace", getBuildNamespace());
+		attributes.put("buildNumber", getBuildNumber());
+		attributes.put("buildDate", getBuildDate());
+		attributes.put("data", getData());
+
+		return attributes;
+	}
+
+	public void setModelAttributes(Map<String, Object> attributes) {
+		Long serviceComponentId = (Long)attributes.get("serviceComponentId");
+
+		if (serviceComponentId != null) {
+			setServiceComponentId(serviceComponentId);
+		}
+
+		String buildNamespace = (String)attributes.get("buildNamespace");
+
+		if (buildNamespace != null) {
+			setBuildNamespace(buildNamespace);
+		}
+
+		Long buildNumber = (Long)attributes.get("buildNumber");
+
+		if (buildNumber != null) {
+			setBuildNumber(buildNumber);
+		}
+
+		Long buildDate = (Long)attributes.get("buildDate");
+
+		if (buildDate != null) {
+			setBuildDate(buildDate);
+		}
+
+		String data = (String)attributes.get("data");
+
+		if (data != null) {
+			setData(data);
+		}
 	}
 
 	/**
@@ -164,10 +212,6 @@ public class ServiceComponentWrapper implements ServiceComponent {
 		return _serviceComponent.isEscapedModel();
 	}
 
-	public void setEscapedModel(boolean escapedModel) {
-		_serviceComponent.setEscapedModel(escapedModel);
-	}
-
 	public java.io.Serializable getPrimaryKeyObj() {
 		return _serviceComponent.getPrimaryKeyObj();
 	}
@@ -222,19 +266,26 @@ public class ServiceComponentWrapper implements ServiceComponent {
 		_serviceComponent.persist();
 	}
 
-	public java.lang.String getTablesSQL() {
-		return _serviceComponent.getTablesSQL();
+	public java.lang.String getIndexesSQL() {
+		return _serviceComponent.getIndexesSQL();
 	}
 
 	public java.lang.String getSequencesSQL() {
 		return _serviceComponent.getSequencesSQL();
 	}
 
-	public java.lang.String getIndexesSQL() {
-		return _serviceComponent.getIndexesSQL();
+	public java.lang.String getTablesSQL() {
+		return _serviceComponent.getTablesSQL();
 	}
 
+	/**
+	 * @deprecated Renamed to {@link #getWrappedModel}
+	 */
 	public ServiceComponent getWrappedServiceComponent() {
+		return _serviceComponent;
+	}
+
+	public ServiceComponent getWrappedModel() {
 		return _serviceComponent;
 	}
 

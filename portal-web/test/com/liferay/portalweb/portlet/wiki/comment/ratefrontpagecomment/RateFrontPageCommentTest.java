@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -23,14 +23,15 @@ import com.liferay.portalweb.portal.util.RuntimeVariables;
 public class RateFrontPageCommentTest extends BaseTestCase {
 	public void testRateFrontPageComment() throws Exception {
 		selenium.open("/web/guest/home/");
+		loadRequiredJavaScriptModules();
 
 		for (int second = 0;; second++) {
-			if (second >= 60) {
+			if (second >= 90) {
 				fail("timeout");
 			}
 
 			try {
-				if (selenium.isElementPresent("link=Wiki Test Page")) {
+				if (selenium.isVisible("link=Wiki Test Page")) {
 					break;
 				}
 			}
@@ -40,39 +41,24 @@ public class RateFrontPageCommentTest extends BaseTestCase {
 			Thread.sleep(1000);
 		}
 
-		selenium.saveScreenShotAndSource();
-		selenium.clickAt("link=Wiki Test Page", RuntimeVariables.replace(""));
+		selenium.clickAt("link=Wiki Test Page",
+			RuntimeVariables.replace("Wiki Test Page"));
 		selenium.waitForPageToLoad("30000");
-		selenium.saveScreenShotAndSource();
-
-		for (int second = 0;; second++) {
-			if (second >= 60) {
-				fail("timeout");
-			}
-
-			try {
-				if (selenium.isTextPresent("0 (0 Votes)")) {
-					break;
-				}
-			}
-			catch (Exception e) {
-			}
-
-			Thread.sleep(1000);
-		}
-
-		selenium.saveScreenShotAndSource();
-		assertTrue(selenium.isTextPresent("0 (0 Votes)"));
+		loadRequiredJavaScriptModules();
+		assertEquals(RuntimeVariables.replace("0 (0 Votes)"),
+			selenium.getText("//div[3]/div/div[2]/div/div/div/div"));
 		selenium.clickAt("//div[@class='taglib-ratings thumbs']/div/div/a[1]",
 			RuntimeVariables.replace(""));
 
 		for (int second = 0;; second++) {
-			if (second >= 60) {
+			if (second >= 90) {
 				fail("timeout");
 			}
 
 			try {
-				if (selenium.isTextPresent("+1 (1 Vote)")) {
+				if (RuntimeVariables.replace("+1 (1 Vote)")
+										.equals(selenium.getText(
+								"//div[3]/div/div[2]/div/div/div/div"))) {
 					break;
 				}
 			}
@@ -82,18 +68,20 @@ public class RateFrontPageCommentTest extends BaseTestCase {
 			Thread.sleep(1000);
 		}
 
-		selenium.saveScreenShotAndSource();
-		assertTrue(selenium.isTextPresent("+1 (1 Vote)"));
+		assertEquals(RuntimeVariables.replace("+1 (1 Vote)"),
+			selenium.getText("//div[3]/div/div[2]/div/div/div/div"));
 		selenium.clickAt("//div[@class='taglib-ratings thumbs']/div/div/a[1]",
 			RuntimeVariables.replace(""));
 
 		for (int second = 0;; second++) {
-			if (second >= 60) {
+			if (second >= 90) {
 				fail("timeout");
 			}
 
 			try {
-				if (selenium.isTextPresent("0 (0 Votes)")) {
+				if (RuntimeVariables.replace("0 (0 Votes)")
+										.equals(selenium.getText(
+								"//div[3]/div/div[2]/div/div/div/div"))) {
 					break;
 				}
 			}
@@ -103,18 +91,20 @@ public class RateFrontPageCommentTest extends BaseTestCase {
 			Thread.sleep(1000);
 		}
 
-		selenium.saveScreenShotAndSource();
-		assertTrue(selenium.isTextPresent("0 (0 Votes)"));
+		assertEquals(RuntimeVariables.replace("0 (0 Votes)"),
+			selenium.getText("//div[3]/div/div[2]/div/div/div/div"));
 		selenium.clickAt("//div[@class='taglib-ratings thumbs']/div/div/a[2]",
 			RuntimeVariables.replace(""));
 
 		for (int second = 0;; second++) {
-			if (second >= 60) {
+			if (second >= 90) {
 				fail("timeout");
 			}
 
 			try {
-				if (selenium.isTextPresent("-1 (1 Vote)")) {
+				if (RuntimeVariables.replace("-1 (1 Vote)")
+										.equals(selenium.getText(
+								"//div[3]/div/div[2]/div/div/div/div"))) {
 					break;
 				}
 			}
@@ -124,18 +114,20 @@ public class RateFrontPageCommentTest extends BaseTestCase {
 			Thread.sleep(1000);
 		}
 
-		selenium.saveScreenShotAndSource();
-		assertTrue(selenium.isTextPresent("-1 (1 Vote)"));
+		assertEquals(RuntimeVariables.replace("-1 (1 Vote)"),
+			selenium.getText("//div[3]/div/div[2]/div/div/div/div"));
 		selenium.clickAt("//div[@class='taglib-ratings thumbs']/div/div/a[2]",
 			RuntimeVariables.replace(""));
 
 		for (int second = 0;; second++) {
-			if (second >= 60) {
+			if (second >= 90) {
 				fail("timeout");
 			}
 
 			try {
-				if (selenium.isTextPresent("0 (0 Votes)")) {
+				if (RuntimeVariables.replace("0 (0 Votes)")
+										.equals(selenium.getText(
+								"//div[3]/div/div[2]/div/div/div/div"))) {
 					break;
 				}
 			}
@@ -145,7 +137,7 @@ public class RateFrontPageCommentTest extends BaseTestCase {
 			Thread.sleep(1000);
 		}
 
-		selenium.saveScreenShotAndSource();
-		assertTrue(selenium.isTextPresent("0 (0 Votes)"));
+		assertEquals(RuntimeVariables.replace("0 (0 Votes)"),
+			selenium.getText("//div[3]/div/div[2]/div/div/div/div"));
 	}
 }

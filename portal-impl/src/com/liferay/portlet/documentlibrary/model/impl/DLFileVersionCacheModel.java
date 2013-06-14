@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -20,6 +20,8 @@ import com.liferay.portal.model.CacheModel;
 
 import com.liferay.portlet.documentlibrary.model.DLFileVersion;
 
+import java.io.Serializable;
+
 import java.util.Date;
 
 /**
@@ -29,12 +31,15 @@ import java.util.Date;
  * @see DLFileVersion
  * @generated
  */
-public class DLFileVersionCacheModel implements CacheModel<DLFileVersion> {
+public class DLFileVersionCacheModel implements CacheModel<DLFileVersion>,
+	Serializable {
 	@Override
 	public String toString() {
-		StringBundler sb = new StringBundler(43);
+		StringBundler sb = new StringBundler(49);
 
-		sb.append("{fileVersionId=");
+		sb.append("{uuid=");
+		sb.append(uuid);
+		sb.append(", fileVersionId=");
 		sb.append(fileVersionId);
 		sb.append(", groupId=");
 		sb.append(groupId);
@@ -46,8 +51,12 @@ public class DLFileVersionCacheModel implements CacheModel<DLFileVersion> {
 		sb.append(userName);
 		sb.append(", createDate=");
 		sb.append(createDate);
+		sb.append(", modifiedDate=");
+		sb.append(modifiedDate);
 		sb.append(", repositoryId=");
 		sb.append(repositoryId);
+		sb.append(", folderId=");
+		sb.append(folderId);
 		sb.append(", fileEntryId=");
 		sb.append(fileEntryId);
 		sb.append(", extension=");
@@ -84,6 +93,13 @@ public class DLFileVersionCacheModel implements CacheModel<DLFileVersion> {
 	public DLFileVersion toEntityModel() {
 		DLFileVersionImpl dlFileVersionImpl = new DLFileVersionImpl();
 
+		if (uuid == null) {
+			dlFileVersionImpl.setUuid(StringPool.BLANK);
+		}
+		else {
+			dlFileVersionImpl.setUuid(uuid);
+		}
+
 		dlFileVersionImpl.setFileVersionId(fileVersionId);
 		dlFileVersionImpl.setGroupId(groupId);
 		dlFileVersionImpl.setCompanyId(companyId);
@@ -103,7 +119,15 @@ public class DLFileVersionCacheModel implements CacheModel<DLFileVersion> {
 			dlFileVersionImpl.setCreateDate(new Date(createDate));
 		}
 
+		if (modifiedDate == Long.MIN_VALUE) {
+			dlFileVersionImpl.setModifiedDate(null);
+		}
+		else {
+			dlFileVersionImpl.setModifiedDate(new Date(modifiedDate));
+		}
+
 		dlFileVersionImpl.setRepositoryId(repositoryId);
+		dlFileVersionImpl.setFolderId(folderId);
 		dlFileVersionImpl.setFileEntryId(fileEntryId);
 
 		if (extension == null) {
@@ -180,13 +204,16 @@ public class DLFileVersionCacheModel implements CacheModel<DLFileVersion> {
 		return dlFileVersionImpl;
 	}
 
+	public String uuid;
 	public long fileVersionId;
 	public long groupId;
 	public long companyId;
 	public long userId;
 	public String userName;
 	public long createDate;
+	public long modifiedDate;
 	public long repositoryId;
+	public long folderId;
 	public long fileEntryId;
 	public String extension;
 	public String mimeType;

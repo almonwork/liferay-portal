@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -91,13 +91,6 @@ public class CountryUtil {
 		return getPersistence()
 				   .findWithDynamicQuery(dynamicQuery, start, end,
 			orderByComparator);
-	}
-
-	/**
-	 * @see com.liferay.portal.service.persistence.BasePersistence#remove(com.liferay.portal.model.BaseModel)
-	 */
-	public static Country remove(Country country) throws SystemException {
-		return getPersistence().remove(country);
 	}
 
 	/**
@@ -490,36 +483,42 @@ public class CountryUtil {
 	* Removes the country where name = &#63; from the database.
 	*
 	* @param name the name
+	* @return the country that was removed
 	* @throws SystemException if a system exception occurred
 	*/
-	public static void removeByName(java.lang.String name)
+	public static com.liferay.portal.model.Country removeByName(
+		java.lang.String name)
 		throws com.liferay.portal.NoSuchCountryException,
 			com.liferay.portal.kernel.exception.SystemException {
-		getPersistence().removeByName(name);
+		return getPersistence().removeByName(name);
 	}
 
 	/**
 	* Removes the country where a2 = &#63; from the database.
 	*
 	* @param a2 the a2
+	* @return the country that was removed
 	* @throws SystemException if a system exception occurred
 	*/
-	public static void removeByA2(java.lang.String a2)
+	public static com.liferay.portal.model.Country removeByA2(
+		java.lang.String a2)
 		throws com.liferay.portal.NoSuchCountryException,
 			com.liferay.portal.kernel.exception.SystemException {
-		getPersistence().removeByA2(a2);
+		return getPersistence().removeByA2(a2);
 	}
 
 	/**
 	* Removes the country where a3 = &#63; from the database.
 	*
 	* @param a3 the a3
+	* @return the country that was removed
 	* @throws SystemException if a system exception occurred
 	*/
-	public static void removeByA3(java.lang.String a3)
+	public static com.liferay.portal.model.Country removeByA3(
+		java.lang.String a3)
 		throws com.liferay.portal.NoSuchCountryException,
 			com.liferay.portal.kernel.exception.SystemException {
-		getPersistence().removeByA3(a3);
+		return getPersistence().removeByA3(a3);
 	}
 
 	/**
@@ -613,10 +612,10 @@ public class CountryUtil {
 		return _persistence;
 	}
 
+	/**
+	 * @deprecated
+	 */
 	public void setPersistence(CountryPersistence persistence) {
-		_persistence = persistence;
-
-		ReferenceRegistry.registerReference(CountryUtil.class, "_persistence");
 	}
 
 	private static CountryPersistence _persistence;

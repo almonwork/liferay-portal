@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,7 +14,6 @@
 
 package com.liferay.portal.service.persistence;
 
-import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.model.Release;
 
 /**
@@ -179,9 +178,11 @@ public interface ReleasePersistence extends BasePersistence<Release> {
 	* Removes the release where servletContextName = &#63; from the database.
 	*
 	* @param servletContextName the servlet context name
+	* @return the release that was removed
 	* @throws SystemException if a system exception occurred
 	*/
-	public void removeByServletContextName(java.lang.String servletContextName)
+	public com.liferay.portal.model.Release removeByServletContextName(
+		java.lang.String servletContextName)
 		throws com.liferay.portal.NoSuchReleaseException,
 			com.liferay.portal.kernel.exception.SystemException;
 
@@ -211,6 +212,4 @@ public interface ReleasePersistence extends BasePersistence<Release> {
 	*/
 	public int countAll()
 		throws com.liferay.portal.kernel.exception.SystemException;
-
-	public Release remove(Release release) throws SystemException;
 }

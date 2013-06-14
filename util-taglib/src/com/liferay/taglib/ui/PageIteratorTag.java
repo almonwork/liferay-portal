@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -51,6 +51,10 @@ public class PageIteratorTag extends IncludeTag {
 		_formName = formName;
 	}
 
+	public void setId(String id) {
+		_id = id;
+	}
+
 	public void setJsCall(String jsCall) {
 		_jsCall = jsCall;
 	}
@@ -93,6 +97,7 @@ public class PageIteratorTag extends IncludeTag {
 		_deltaConfigurable = SearchContainer.DEFAULT_DELTA_CONFIGURABLE;
 		_deltaParam = SearchContainer.DEFAULT_DELTA_PARAM;
 		_formName = "fm";
+		_id = null;
 		_jsCall = null;
 		_maxPages = 10;
 		_pages = 0;
@@ -124,8 +129,7 @@ public class PageIteratorTag extends IncludeTag {
 
 		request.setAttribute(
 			"liferay-ui:page-iterator:cur", String.valueOf(_cur));
-		request.setAttribute(
-			"liferay-ui:page-iterator:curParam", _curParam);
+		request.setAttribute("liferay-ui:page-iterator:curParam", _curParam);
 		request.setAttribute(
 			"liferay-ui:page-iterator:delta", String.valueOf(_delta));
 		request.setAttribute(
@@ -133,8 +137,8 @@ public class PageIteratorTag extends IncludeTag {
 			String.valueOf(_deltaConfigurable));
 		request.setAttribute(
 			"liferay-ui:page-iterator:deltaParam", _deltaParam);
-		request.setAttribute(
-			"liferay-ui:page-iterator:formName", _formName);
+		request.setAttribute("liferay-ui:page-iterator:formName", _formName);
+		request.setAttribute("liferay-ui:page-iterator:id", _id);
 		request.setAttribute("liferay-ui:page-iterator:jsCall", _jsCall);
 		request.setAttribute(
 			"liferay-ui:page-iterator:maxPages", String.valueOf(_maxPages));
@@ -145,8 +149,7 @@ public class PageIteratorTag extends IncludeTag {
 			"liferay-ui:page-iterator:total", String.valueOf(_total));
 		request.setAttribute("liferay-ui:page-iterator:type", _type);
 		request.setAttribute("liferay-ui:page-iterator:url", _url);
-		request.setAttribute(
-			"liferay-ui:page-iterator:urlAnchor", _urlAnchor);
+		request.setAttribute("liferay-ui:page-iterator:urlAnchor", _urlAnchor);
 	}
 
 	private static final String _END_PAGE =
@@ -162,6 +165,7 @@ public class PageIteratorTag extends IncludeTag {
 		SearchContainer.DEFAULT_DELTA_CONFIGURABLE;
 	private String _deltaParam = SearchContainer.DEFAULT_DELTA_PARAM;
 	private String _formName = "fm";
+	private String _id;
 	private String _jsCall;
 	private int _maxPages = 10;
 	private int _pages;

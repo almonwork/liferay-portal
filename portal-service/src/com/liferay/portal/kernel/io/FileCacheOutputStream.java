@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -116,11 +116,11 @@ public class FileCacheOutputStream extends OutputStream {
 
 	private static final String _EXTENSION = ".fcos";
 
-	protected FileInputStream _fis;
-	protected File _tempFile;
-	protected UnsyncBufferedOutputStream _ubos;
-
 	private static Log _log = LogFactoryUtil.getLog(
 		FileCacheOutputStream.class);
+
+	private FileInputStream _fis;
+	private File _tempFile;
+	private UnsyncBufferedOutputStream _ubos;
 
 }

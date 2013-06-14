@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -59,6 +59,7 @@ public class LayoutSoap implements Serializable {
 		soapModel.setPriority(model.getPriority());
 		soapModel.setLayoutPrototypeUuid(model.getLayoutPrototypeUuid());
 		soapModel.setLayoutPrototypeLinkEnabled(model.getLayoutPrototypeLinkEnabled());
+		soapModel.setSourcePrototypeLayoutUuid(model.getSourcePrototypeLayoutUuid());
 
 		return soapModel;
 	}
@@ -352,6 +353,14 @@ public class LayoutSoap implements Serializable {
 		_layoutPrototypeLinkEnabled = layoutPrototypeLinkEnabled;
 	}
 
+	public String getSourcePrototypeLayoutUuid() {
+		return _sourcePrototypeLayoutUuid;
+	}
+
+	public void setSourcePrototypeLayoutUuid(String sourcePrototypeLayoutUuid) {
+		_sourcePrototypeLayoutUuid = sourcePrototypeLayoutUuid;
+	}
+
 	private String _uuid;
 	private long _plid;
 	private long _groupId;
@@ -380,4 +389,5 @@ public class LayoutSoap implements Serializable {
 	private int _priority;
 	private String _layoutPrototypeUuid;
 	private boolean _layoutPrototypeLinkEnabled;
+	private String _sourcePrototypeLayoutUuid;
 }

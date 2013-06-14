@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -15,7 +15,6 @@
 package com.liferay.portal.service;
 
 import com.liferay.portal.kernel.bean.PortalBeanLocatorUtil;
-import com.liferay.portal.kernel.util.MethodCache;
 import com.liferay.portal.kernel.util.ReferenceRegistry;
 
 /**
@@ -66,25 +65,32 @@ public class PasswordPolicyRelLocalServiceUtil {
 	* Deletes the password policy rel with the primary key from the database. Also notifies the appropriate model listeners.
 	*
 	* @param passwordPolicyRelId the primary key of the password policy rel
+	* @return the password policy rel that was removed
 	* @throws PortalException if a password policy rel with the primary key could not be found
 	* @throws SystemException if a system exception occurred
 	*/
-	public static void deletePasswordPolicyRel(long passwordPolicyRelId)
+	public static com.liferay.portal.model.PasswordPolicyRel deletePasswordPolicyRel(
+		long passwordPolicyRelId)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException {
-		getService().deletePasswordPolicyRel(passwordPolicyRelId);
+		return getService().deletePasswordPolicyRel(passwordPolicyRelId);
 	}
 
 	/**
 	* Deletes the password policy rel from the database. Also notifies the appropriate model listeners.
 	*
 	* @param passwordPolicyRel the password policy rel
+	* @return the password policy rel that was removed
 	* @throws SystemException if a system exception occurred
 	*/
-	public static void deletePasswordPolicyRel(
+	public static com.liferay.portal.model.PasswordPolicyRel deletePasswordPolicyRel(
 		com.liferay.portal.model.PasswordPolicyRel passwordPolicyRel)
 		throws com.liferay.portal.kernel.exception.SystemException {
-		getService().deletePasswordPolicyRel(passwordPolicyRel);
+		return getService().deletePasswordPolicyRel(passwordPolicyRel);
+	}
+
+	public static com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery() {
+		return getService().dynamicQuery();
 	}
 
 	/**
@@ -156,6 +162,12 @@ public class PasswordPolicyRelLocalServiceUtil {
 		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery)
 		throws com.liferay.portal.kernel.exception.SystemException {
 		return getService().dynamicQueryCount(dynamicQuery);
+	}
+
+	public static com.liferay.portal.model.PasswordPolicyRel fetchPasswordPolicyRel(
+		long passwordPolicyRelId)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getService().fetchPasswordPolicyRel(passwordPolicyRelId);
 	}
 
 	/**
@@ -327,20 +339,15 @@ public class PasswordPolicyRelLocalServiceUtil {
 
 			ReferenceRegistry.registerReference(PasswordPolicyRelLocalServiceUtil.class,
 				"_service");
-			MethodCache.remove(PasswordPolicyRelLocalService.class);
 		}
 
 		return _service;
 	}
 
+	/**
+	 * @deprecated
+	 */
 	public void setService(PasswordPolicyRelLocalService service) {
-		MethodCache.remove(PasswordPolicyRelLocalService.class);
-
-		_service = service;
-
-		ReferenceRegistry.registerReference(PasswordPolicyRelLocalServiceUtil.class,
-			"_service");
-		MethodCache.remove(PasswordPolicyRelLocalService.class);
 	}
 
 	private static PasswordPolicyRelLocalService _service;

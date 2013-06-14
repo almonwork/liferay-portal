@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -20,6 +20,8 @@ import com.liferay.portal.service.ServiceContext;
 import com.liferay.portlet.expando.model.ExpandoBridge;
 
 import java.io.Serializable;
+
+import java.util.Date;
 
 /**
  * The base model interface for the LayoutSet service. Represents a row in the &quot;LayoutSet&quot; database table, with each column mapped to a property of this class.
@@ -96,6 +98,34 @@ public interface LayoutSetModel extends BaseModel<LayoutSet> {
 	 * @param companyId the company ID of this layout set
 	 */
 	public void setCompanyId(long companyId);
+
+	/**
+	 * Returns the create date of this layout set.
+	 *
+	 * @return the create date of this layout set
+	 */
+	public Date getCreateDate();
+
+	/**
+	 * Sets the create date of this layout set.
+	 *
+	 * @param createDate the create date of this layout set
+	 */
+	public void setCreateDate(Date createDate);
+
+	/**
+	 * Returns the modified date of this layout set.
+	 *
+	 * @return the modified date of this layout set
+	 */
+	public Date getModifiedDate();
+
+	/**
+	 * Sets the modified date of this layout set.
+	 *
+	 * @param modifiedDate the modified date of this layout set
+	 */
+	public void setModifiedDate(Date modifiedDate);
 
 	/**
 	 * Returns the private layout of this layout set.
@@ -303,8 +333,6 @@ public interface LayoutSetModel extends BaseModel<LayoutSet> {
 	public void setCachedModel(boolean cachedModel);
 
 	public boolean isEscapedModel();
-
-	public void setEscapedModel(boolean escapedModel);
 
 	public Serializable getPrimaryKeyObj();
 

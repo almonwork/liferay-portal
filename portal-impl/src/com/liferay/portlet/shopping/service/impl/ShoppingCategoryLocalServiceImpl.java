@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -38,8 +38,8 @@ public class ShoppingCategoryLocalServiceImpl
 	extends ShoppingCategoryLocalServiceBaseImpl {
 
 	public ShoppingCategory addCategory(
-			long userId, long parentCategoryId, String name,
-			String description, ServiceContext serviceContext)
+			long userId, long parentCategoryId, String name, String description,
+			ServiceContext serviceContext)
 		throws PortalException, SystemException {
 
 		// Category
@@ -70,12 +70,12 @@ public class ShoppingCategoryLocalServiceImpl
 
 		// Resources
 
-		if (serviceContext.getAddGroupPermissions() ||
-			serviceContext.getAddGuestPermissions()) {
+		if (serviceContext.isAddGroupPermissions() ||
+			serviceContext.isAddGuestPermissions()) {
 
 			addCategoryResources(
-				category, serviceContext.getAddGroupPermissions(),
-				serviceContext.getAddGuestPermissions());
+				category, serviceContext.isAddGroupPermissions(),
+				serviceContext.isAddGuestPermissions());
 		}
 		else {
 			addCategoryResources(

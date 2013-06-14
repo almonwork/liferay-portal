@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,6 +14,10 @@
 
 package com.liferay.portal.model;
 
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * <p>
  * This class is a wrapper for {@link Website}.
@@ -23,7 +27,7 @@ package com.liferay.portal.model;
  * @see       Website
  * @generated
  */
-public class WebsiteWrapper implements Website {
+public class WebsiteWrapper implements Website, ModelWrapper<Website> {
 	public WebsiteWrapper(Website website) {
 		_website = website;
 	}
@@ -34,6 +38,92 @@ public class WebsiteWrapper implements Website {
 
 	public String getModelClassName() {
 		return Website.class.getName();
+	}
+
+	public Map<String, Object> getModelAttributes() {
+		Map<String, Object> attributes = new HashMap<String, Object>();
+
+		attributes.put("websiteId", getWebsiteId());
+		attributes.put("companyId", getCompanyId());
+		attributes.put("userId", getUserId());
+		attributes.put("userName", getUserName());
+		attributes.put("createDate", getCreateDate());
+		attributes.put("modifiedDate", getModifiedDate());
+		attributes.put("classNameId", getClassNameId());
+		attributes.put("classPK", getClassPK());
+		attributes.put("url", getUrl());
+		attributes.put("typeId", getTypeId());
+		attributes.put("primary", getPrimary());
+
+		return attributes;
+	}
+
+	public void setModelAttributes(Map<String, Object> attributes) {
+		Long websiteId = (Long)attributes.get("websiteId");
+
+		if (websiteId != null) {
+			setWebsiteId(websiteId);
+		}
+
+		Long companyId = (Long)attributes.get("companyId");
+
+		if (companyId != null) {
+			setCompanyId(companyId);
+		}
+
+		Long userId = (Long)attributes.get("userId");
+
+		if (userId != null) {
+			setUserId(userId);
+		}
+
+		String userName = (String)attributes.get("userName");
+
+		if (userName != null) {
+			setUserName(userName);
+		}
+
+		Date createDate = (Date)attributes.get("createDate");
+
+		if (createDate != null) {
+			setCreateDate(createDate);
+		}
+
+		Date modifiedDate = (Date)attributes.get("modifiedDate");
+
+		if (modifiedDate != null) {
+			setModifiedDate(modifiedDate);
+		}
+
+		Long classNameId = (Long)attributes.get("classNameId");
+
+		if (classNameId != null) {
+			setClassNameId(classNameId);
+		}
+
+		Long classPK = (Long)attributes.get("classPK");
+
+		if (classPK != null) {
+			setClassPK(classPK);
+		}
+
+		String url = (String)attributes.get("url");
+
+		if (url != null) {
+			setUrl(url);
+		}
+
+		Integer typeId = (Integer)attributes.get("typeId");
+
+		if (typeId != null) {
+			setTypeId(typeId);
+		}
+
+		Boolean primary = (Boolean)attributes.get("primary");
+
+		if (primary != null) {
+			setPrimary(primary);
+		}
 	}
 
 	/**
@@ -191,6 +281,10 @@ public class WebsiteWrapper implements Website {
 		return _website.getClassName();
 	}
 
+	public void setClassName(java.lang.String className) {
+		_website.setClassName(className);
+	}
+
 	/**
 	* Returns the class name ID of this website.
 	*
@@ -310,10 +404,6 @@ public class WebsiteWrapper implements Website {
 		return _website.isEscapedModel();
 	}
 
-	public void setEscapedModel(boolean escapedModel) {
-		_website.setEscapedModel(escapedModel);
-	}
-
 	public java.io.Serializable getPrimaryKeyObj() {
 		return _website.getPrimaryKeyObj();
 	}
@@ -373,7 +463,14 @@ public class WebsiteWrapper implements Website {
 		return _website.getType();
 	}
 
+	/**
+	 * @deprecated Renamed to {@link #getWrappedModel}
+	 */
 	public Website getWrappedWebsite() {
+		return _website;
+	}
+
+	public Website getWrappedModel() {
 		return _website;
 	}
 

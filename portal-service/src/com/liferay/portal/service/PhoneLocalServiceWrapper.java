@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -23,7 +23,8 @@ package com.liferay.portal.service;
  * @see       PhoneLocalService
  * @generated
  */
-public class PhoneLocalServiceWrapper implements PhoneLocalService {
+public class PhoneLocalServiceWrapper implements PhoneLocalService,
+	ServiceWrapper<PhoneLocalService> {
 	public PhoneLocalServiceWrapper(PhoneLocalService phoneLocalService) {
 		_phoneLocalService = phoneLocalService;
 	}
@@ -55,24 +56,31 @@ public class PhoneLocalServiceWrapper implements PhoneLocalService {
 	* Deletes the phone with the primary key from the database. Also notifies the appropriate model listeners.
 	*
 	* @param phoneId the primary key of the phone
+	* @return the phone that was removed
 	* @throws PortalException if a phone with the primary key could not be found
 	* @throws SystemException if a system exception occurred
 	*/
-	public void deletePhone(long phoneId)
+	public com.liferay.portal.model.Phone deletePhone(long phoneId)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException {
-		_phoneLocalService.deletePhone(phoneId);
+		return _phoneLocalService.deletePhone(phoneId);
 	}
 
 	/**
 	* Deletes the phone from the database. Also notifies the appropriate model listeners.
 	*
 	* @param phone the phone
+	* @return the phone that was removed
 	* @throws SystemException if a system exception occurred
 	*/
-	public void deletePhone(com.liferay.portal.model.Phone phone)
+	public com.liferay.portal.model.Phone deletePhone(
+		com.liferay.portal.model.Phone phone)
 		throws com.liferay.portal.kernel.exception.SystemException {
-		_phoneLocalService.deletePhone(phone);
+		return _phoneLocalService.deletePhone(phone);
+	}
+
+	public com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery() {
+		return _phoneLocalService.dynamicQuery();
 	}
 
 	/**
@@ -144,6 +152,11 @@ public class PhoneLocalServiceWrapper implements PhoneLocalService {
 		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery)
 		throws com.liferay.portal.kernel.exception.SystemException {
 		return _phoneLocalService.dynamicQueryCount(dynamicQuery);
+	}
+
+	public com.liferay.portal.model.Phone fetchPhone(long phoneId)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return _phoneLocalService.fetchPhone(phoneId);
 	}
 
 	/**
@@ -275,11 +288,25 @@ public class PhoneLocalServiceWrapper implements PhoneLocalService {
 			typeId, primary);
 	}
 
+	/**
+	 * @deprecated Renamed to {@link #getWrappedService}
+	 */
 	public PhoneLocalService getWrappedPhoneLocalService() {
 		return _phoneLocalService;
 	}
 
+	/**
+	 * @deprecated Renamed to {@link #setWrappedService}
+	 */
 	public void setWrappedPhoneLocalService(PhoneLocalService phoneLocalService) {
+		_phoneLocalService = phoneLocalService;
+	}
+
+	public PhoneLocalService getWrappedService() {
+		return _phoneLocalService;
+	}
+
+	public void setWrappedService(PhoneLocalService phoneLocalService) {
 		_phoneLocalService = phoneLocalService;
 	}
 

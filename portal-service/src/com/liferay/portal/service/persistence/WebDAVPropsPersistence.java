@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,7 +14,6 @@
 
 package com.liferay.portal.service.persistence;
 
-import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.model.WebDAVProps;
 
 /**
@@ -186,9 +185,11 @@ public interface WebDAVPropsPersistence extends BasePersistence<WebDAVProps> {
 	*
 	* @param classNameId the class name ID
 	* @param classPK the class p k
+	* @return the web d a v props that was removed
 	* @throws SystemException if a system exception occurred
 	*/
-	public void removeByC_C(long classNameId, long classPK)
+	public com.liferay.portal.model.WebDAVProps removeByC_C(long classNameId,
+		long classPK)
 		throws com.liferay.portal.NoSuchWebDAVPropsException,
 			com.liferay.portal.kernel.exception.SystemException;
 
@@ -219,7 +220,4 @@ public interface WebDAVPropsPersistence extends BasePersistence<WebDAVProps> {
 	*/
 	public int countAll()
 		throws com.liferay.portal.kernel.exception.SystemException;
-
-	public WebDAVProps remove(WebDAVProps webDAVProps)
-		throws SystemException;
 }

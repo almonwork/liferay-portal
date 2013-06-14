@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -23,15 +23,16 @@ import com.liferay.portalweb.portal.util.RuntimeVariables;
 public class Portlet_AddSubfolderTest extends BaseTestCase {
 	public void testPortlet_AddSubfolder() throws Exception {
 		selenium.open("/web/guest/home/");
+		loadRequiredJavaScriptModules();
 
 		for (int second = 0;; second++) {
-			if (second >= 60) {
+			if (second >= 90) {
 				fail("timeout");
 			}
 
 			try {
 				if (selenium.isElementPresent(
-							"link=Image Gallery Permissions Test Page")) {
+							"link=Media Gallery Permissions Test Page")) {
 					break;
 				}
 			}
@@ -41,30 +42,35 @@ public class Portlet_AddSubfolderTest extends BaseTestCase {
 			Thread.sleep(1000);
 		}
 
-		selenium.saveScreenShotAndSource();
-		selenium.clickAt("link=Image Gallery Permissions Test Page",
-			RuntimeVariables.replace(""));
+		selenium.clickAt("link=Media Gallery Permissions Test Page",
+			RuntimeVariables.replace("Media Gallery Permissions Test Page"));
 		selenium.waitForPageToLoad("30000");
-		selenium.saveScreenShotAndSource();
-		selenium.clickAt("link=Portlet2 Temporary2 Folder2",
-			RuntimeVariables.replace(""));
+		loadRequiredJavaScriptModules();
+		assertTrue(selenium.isVisible(
+				"//a[@title='Media Gallery Temporary Folder - ']"));
+		selenium.clickAt("//a[@title='Media Gallery Temporary Folder - ']",
+			RuntimeVariables.replace("Media Gallery Temporary Folder"));
 		selenium.waitForPageToLoad("30000");
-		selenium.saveScreenShotAndSource();
+		loadRequiredJavaScriptModules();
 		assertEquals(RuntimeVariables.replace("Add Subfolder"),
-			selenium.getText("//div[2]/ul/li[1]/a"));
-		selenium.clickAt("//div[2]/ul/li[1]/a", RuntimeVariables.replace(""));
+			selenium.getText(
+				"//div[@class='lfr-component lfr-menu-list lfr-menu-expanded align-right null']/ul/li/a"));
+		selenium.clickAt("//div[@class='lfr-component lfr-menu-list lfr-menu-expanded align-right null']/ul/li/a",
+			RuntimeVariables.replace("Add Subfolder"));
 		selenium.waitForPageToLoad("30000");
-		selenium.saveScreenShotAndSource();
-		selenium.type("_31_name",
-			RuntimeVariables.replace("Portlet1 Permissions1 Subfolder1"));
-		selenium.saveScreenShotAndSource();
-		selenium.clickAt("//input[@value='Save']", RuntimeVariables.replace(""));
+		loadRequiredJavaScriptModules();
+		selenium.type("//input[@id='_31_name']",
+			RuntimeVariables.replace("Portlet Permissions Subfolder Test"));
+		selenium.clickAt("//input[@value='Save']",
+			RuntimeVariables.replace("Save"));
 		selenium.waitForPageToLoad("30000");
-		selenium.saveScreenShotAndSource();
-		assertTrue(selenium.isTextPresent(
-				"Your request completed successfully."));
+		loadRequiredJavaScriptModules();
 		assertEquals(RuntimeVariables.replace(
-				"Portlet1 Permissions1 Subfolder1"),
-			selenium.getText("//a/strong"));
+				"Your request completed successfully."),
+			selenium.getText("//div[@class='portlet-msg-success']"));
+		assertEquals(RuntimeVariables.replace(
+				"Portlet Permissions Subfolder Test"),
+			selenium.getText(
+				"//a[@title='Portlet Permissions Subfolder Test - ']"));
 	}
 }

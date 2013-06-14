@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -15,16 +15,16 @@
 --%>
 
 <%
-String collapsed = GetterUtil.getString(SessionClicks.get(request, _LIFERAY_JS_CONSOLE_COLLPASED_SESSION_CLICKS_KEY, null), "false");
+String collapsed = HtmlUtil.escapeJS(GetterUtil.getString(SessionClicks.get(request, _LIFERAY_JS_CONSOLE_COLLAPSED_SESSION_CLICKS_KEY, null), "false"));
 %>
 
 <div id="liferayJSConsole"></div>
 
 <aui:script>
 	AUI().use(
-		'aui-io',
 		'console',
 		'console-filters',
+		'liferay-store',
 		function(A) {
 			var maxHeight = '300px';
 			var autoHeight = 'auto';
@@ -43,14 +43,7 @@ String collapsed = GetterUtil.getString(SessionClicks.get(request, _LIFERAY_JS_C
 
 							instance.set('height', height);
 
-							A.io.request(
-								'<%= themeDisplay.getPathMain() %>/portal/session_click',
-								{
-									data: {
-										<%= _LIFERAY_JS_CONSOLE_COLLPASED_SESSION_CLICKS_KEY %>: String(event.newVal)
-									}
-								}
-							);
+							Liferay.Store('<%= _LIFERAY_JS_CONSOLE_COLLAPSED_SESSION_CLICKS_KEY %>', String(event.newVal));
 						}
 					},
 					collapsed: <%= collapsed %>,
@@ -59,11 +52,11 @@ String collapsed = GetterUtil.getString(SessionClicks.get(request, _LIFERAY_JS_C
 					newestOnTop: false,
 					plugins: [A.Plugin.ConsoleFilters],
 					strings: {
-						clear: '<liferay-ui:message key="clear" />',
-						collapse: '<liferay-ui:message key="collapse" />',
-						expand: '<liferay-ui:message key="expand" />',
-						pause: '<liferay-ui:message key="pause" />',
-						title: '<liferay-ui:message key="console" />'
+						clear: '<%= UnicodeLanguageUtil.get(pageContext, "clear") %>',
+						collapse: '<%= UnicodeLanguageUtil.get(pageContext, "collapse") %>',
+						expand: '<%= UnicodeLanguageUtil.get(pageContext, "expand") %>',
+						pause: '<%= UnicodeLanguageUtil.get(pageContext, "pause") %>',
+						title: '<%= UnicodeLanguageUtil.get(pageContext, "console") %>'
 					},
 					style: 'block',
 					width: '100%'
@@ -76,5 +69,5 @@ String collapsed = GetterUtil.getString(SessionClicks.get(request, _LIFERAY_JS_C
 </aui:script>
 
 <%!
-private static final String _LIFERAY_JS_CONSOLE_COLLPASED_SESSION_CLICKS_KEY = "liferay_js_console_collapsed";
+private static final String _LIFERAY_JS_CONSOLE_COLLAPSED_SESSION_CLICKS_KEY = "liferay_js_console_collapsed";
 %>

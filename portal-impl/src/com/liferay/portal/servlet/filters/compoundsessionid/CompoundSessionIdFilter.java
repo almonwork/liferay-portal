@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -33,6 +33,12 @@ import javax.servlet.http.HttpServletResponse;
 public class CompoundSessionIdFilter
 	extends BasePortalFilter implements WrapHttpServletRequestFilter {
 
+	public HttpServletRequest getWrappedHttpServletRequest(
+		HttpServletRequest request, HttpServletResponse response) {
+
+		return new CompoundSessionIdServletRequest(request);
+	}
+
 	@Override
 	public void init(FilterConfig filterConfig) {
 		super.init(filterConfig);
@@ -48,12 +54,6 @@ public class CompoundSessionIdFilter
 	@Override
 	public boolean isFilterEnabled() {
 		return _filterEnabled;
-	}
-
-	public HttpServletRequest getWrappedHttpServletRequest(
-		HttpServletRequest request, HttpServletResponse response) {
-
-		return new CompoundSessionIdServletRequest(request);
 	}
 
 	private static boolean _filterEnabled;

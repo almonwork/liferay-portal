@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,6 +14,8 @@
 
 package com.liferay.portlet.flags.service;
 
+import com.liferay.portal.service.ServiceWrapper;
+
 /**
  * <p>
  * This class is a wrapper for {@link FlagsEntryService}.
@@ -23,9 +25,28 @@ package com.liferay.portlet.flags.service;
  * @see       FlagsEntryService
  * @generated
  */
-public class FlagsEntryServiceWrapper implements FlagsEntryService {
+public class FlagsEntryServiceWrapper implements FlagsEntryService,
+	ServiceWrapper<FlagsEntryService> {
 	public FlagsEntryServiceWrapper(FlagsEntryService flagsEntryService) {
 		_flagsEntryService = flagsEntryService;
+	}
+
+	/**
+	* Returns the Spring bean ID for this bean.
+	*
+	* @return the Spring bean ID for this bean
+	*/
+	public java.lang.String getBeanIdentifier() {
+		return _flagsEntryService.getBeanIdentifier();
+	}
+
+	/**
+	* Sets the Spring bean ID for this bean.
+	*
+	* @param beanIdentifier the Spring bean ID for this bean
+	*/
+	public void setBeanIdentifier(java.lang.String beanIdentifier) {
+		_flagsEntryService.setBeanIdentifier(beanIdentifier);
 	}
 
 	public void addEntry(java.lang.String className, long classPK,
@@ -37,11 +58,25 @@ public class FlagsEntryServiceWrapper implements FlagsEntryService {
 			reportedUserId, contentTitle, contentURL, reason, serviceContext);
 	}
 
+	/**
+	 * @deprecated Renamed to {@link #getWrappedService}
+	 */
 	public FlagsEntryService getWrappedFlagsEntryService() {
 		return _flagsEntryService;
 	}
 
+	/**
+	 * @deprecated Renamed to {@link #setWrappedService}
+	 */
 	public void setWrappedFlagsEntryService(FlagsEntryService flagsEntryService) {
+		_flagsEntryService = flagsEntryService;
+	}
+
+	public FlagsEntryService getWrappedService() {
+		return _flagsEntryService;
+	}
+
+	public void setWrappedService(FlagsEntryService flagsEntryService) {
 		_flagsEntryService = flagsEntryService;
 	}
 

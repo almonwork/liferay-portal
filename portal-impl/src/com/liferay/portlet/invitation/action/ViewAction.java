@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -118,31 +118,21 @@ public class ViewAction extends PortletAction {
 		subject = StringUtil.replace(
 			subject,
 			new String[] {
-				"[$FROM_ADDRESS$]",
-				"[$FROM_NAME$]",
-				"[$PAGE_URL$]",
+				"[$FROM_ADDRESS$]", "[$FROM_NAME$]", "[$PAGE_URL$]",
 				"[$PORTAL_URL$]"
 			},
 			new String[] {
-				fromAddress,
-				fromName,
-				layoutFullURL,
-				portalURL
+				fromAddress, fromName, layoutFullURL, portalURL
 			});
 
 		body = StringUtil.replace(
 			body,
 			new String[] {
-				"[$FROM_ADDRESS$]",
-				"[$FROM_NAME$]",
-				"[$PAGE_URL$]",
+				"[$FROM_ADDRESS$]", "[$FROM_NAME$]", "[$PAGE_URL$]",
 				"[$PORTAL_URL$]"
 			},
 			new String[] {
-				fromAddress,
-				fromName,
-				layoutFullURL,
-				portalURL
+				fromAddress, fromName, layoutFullURL, portalURL
 			});
 
 		for (String emailAddress : validEmailAddresses) {

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -92,14 +92,6 @@ public class ExpandoRowUtil {
 		return getPersistence()
 				   .findWithDynamicQuery(dynamicQuery, start, end,
 			orderByComparator);
-	}
-
-	/**
-	 * @see com.liferay.portal.service.persistence.BasePersistence#remove(com.liferay.portal.model.BaseModel)
-	 */
-	public static ExpandoRow remove(ExpandoRow expandoRow)
-		throws SystemException {
-		return getPersistence().remove(expandoRow);
 	}
 
 	/**
@@ -426,12 +418,14 @@ public class ExpandoRowUtil {
 	*
 	* @param tableId the table ID
 	* @param classPK the class p k
+	* @return the expando row that was removed
 	* @throws SystemException if a system exception occurred
 	*/
-	public static void removeByT_C(long tableId, long classPK)
+	public static com.liferay.portlet.expando.model.ExpandoRow removeByT_C(
+		long tableId, long classPK)
 		throws com.liferay.portal.kernel.exception.SystemException,
 			com.liferay.portlet.expando.NoSuchRowException {
-		getPersistence().removeByT_C(tableId, classPK);
+		return getPersistence().removeByT_C(tableId, classPK);
 	}
 
 	/**
@@ -491,10 +485,10 @@ public class ExpandoRowUtil {
 		return _persistence;
 	}
 
+	/**
+	 * @deprecated
+	 */
 	public void setPersistence(ExpandoRowPersistence persistence) {
-		_persistence = persistence;
-
-		ReferenceRegistry.registerReference(ExpandoRowUtil.class, "_persistence");
 	}
 
 	private static ExpandoRowPersistence _persistence;

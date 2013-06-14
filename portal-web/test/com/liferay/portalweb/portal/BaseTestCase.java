@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -17,6 +17,7 @@ package com.liferay.portalweb.portal;
 import com.liferay.portal.util.InitUtil;
 import com.liferay.portalweb.portal.util.LiferaySeleneseTestCase;
 import com.liferay.portalweb.portal.util.SeleniumUtil;
+import com.liferay.portalweb.portal.util.TestPropsValues;
 
 /**
  * @author Brian Wing Shun Chan
@@ -34,6 +35,58 @@ public class BaseTestCase extends LiferaySeleneseTestCase {
 
 	@Override
 	public void tearDown() throws Exception {
+	}
+
+	protected void loadRequiredJavaScriptModules() {
+		Class<?> clazz = getClass();
+
+		String className = clazz.getName();
+
+		if (className.contains(".sampledata523.")) {
+			return;
+		}
+
+		if (className.contains(".sampledata525.")) {
+			return;
+		}
+
+		if (className.contains(".sampledata527.")) {
+			return;
+		}
+
+		if (className.contains(".sampledata528.")) {
+			return;
+		}
+
+		if (className.contains(".sampledata529.")) {
+			return;
+		}
+
+		String location = selenium.getLocation();
+
+		if (location.contains("/blogs/rss")) {
+			return;
+		}
+
+		if (location.contains("/documents/")) {
+			return;
+		}
+
+		if (location.contains("/journal/rss/")) {
+			return;
+		}
+
+		if (location.contains(TestPropsValues.PORTAL_URL) ||
+			location.contains("www.able.com") ||
+			location.contains("www.baker.com") ||
+			location.contains("www.charlie.com") ||
+			location.contains("www.dog.com") ||
+			location.contains("www.easy.com") ||
+			location.contains("www.fox.com")) {
+
+			selenium.getEval("window.Liferay.fire(\'initDockbar\');");
+		}
+
 	}
 
 }

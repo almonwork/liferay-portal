@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -21,21 +21,23 @@ String toolbarItem = ParamUtil.getString(request, "toolbarItem", "view-all");
 %>
 
 <div class="lfr-portlet-toolbar">
-	<portlet:renderURL var="viewEntriesURL">
+	<portlet:renderURL var="viewStructuresURL">
 		<portlet:param name="struts_action" value="/dynamic_data_mapping/view" />
 	</portlet:renderURL>
 
 	<span class="lfr-toolbar-button view-button <%= toolbarItem.equals("view-all") ? "current" : StringPool.BLANK %>">
-		<a href="<%= viewEntriesURL %>"><liferay-ui:message key="view-all" /></a>
+		<a href="<%= viewStructuresURL %>"><liferay-ui:message key="view-all" /></a>
 	</span>
 
-	<c:if test="<%= DDMPermission.contains(permissionChecker, scopeGroupId, ActionKeys.ADD_STRUCTURE) %>">
-		<portlet:renderURL var="addEntryURL">
+	<c:if test="<%= DDMPermission.contains(permissionChecker, scopeGroupId, ddmResource, ActionKeys.ADD_STRUCTURE) %>">
+		<portlet:renderURL var="addStructureURL">
 			<portlet:param name="struts_action" value="/dynamic_data_mapping/edit_structure" />
-			<portlet:param name="redirect" value="<%= currentURL %>" />
-			<portlet:param name="backURL" value="<%= currentURL %>" />
+			<portlet:param name="redirect" value="<%= viewStructuresURL %>" />
+			<portlet:param name="backURL" value="<%= viewStructuresURL %>" />
 		</portlet:renderURL>
 
-		<span class="lfr-toolbar-button add-button <%= toolbarItem.equals("add") ? "current" : StringPool.BLANK %>"><a href="<%= addEntryURL %>"><liferay-ui:message key="add" /></a></span>
+		<span class="lfr-toolbar-button add-button <%= toolbarItem.equals("add") ? "current" : StringPool.BLANK %>">
+			<a href="<%= addStructureURL %>"><liferay-ui:message key="add" /></a>
+		</span>
 	</c:if>
 </div>

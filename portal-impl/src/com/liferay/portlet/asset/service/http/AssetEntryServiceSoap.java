@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -49,8 +49,8 @@ import java.rmi.RemoteException;
  *
  * <p>
  * You can see a list of services at
- * http://localhost:8080/tunnel-web/secure/axis. Set the property
- * <b>tunnel.servlet.hosts.allowed</b> in portal.properties to configure
+ * http://localhost:8080/api/secure/axis. Set the property
+ * <b>axis.servlet.hosts.allowed</b> in portal.properties to configure
  * security.
  * </p>
  *
@@ -155,10 +155,13 @@ public class AssetEntryServiceSoap {
 		}
 	}
 
-	public static void incrementViewCounter(java.lang.String className,
-		long classPK) throws RemoteException {
+	public static com.liferay.portlet.asset.model.AssetEntrySoap incrementViewCounter(
+		java.lang.String className, long classPK) throws RemoteException {
 		try {
-			AssetEntryServiceUtil.incrementViewCounter(className, classPK);
+			com.liferay.portlet.asset.model.AssetEntry returnValue = AssetEntryServiceUtil.incrementViewCounter(className,
+					classPK);
+
+			return com.liferay.portlet.asset.model.AssetEntrySoap.toSoapModel(returnValue);
 		}
 		catch (Exception e) {
 			_log.error(e, e);
@@ -200,9 +203,14 @@ public class AssetEntryServiceSoap {
 		}
 	}
 
+	/**
+	* @deprecated {@link #updateEntry(long, String, long, String, long, long[],
+	String[], boolean, Date, Date, Date, String, String, String,
+	String, String, String, int, int, Integer, boolean)}
+	*/
 	public static com.liferay.portlet.asset.model.AssetEntrySoap updateEntry(
 		long groupId, java.lang.String className, long classPK,
-		java.lang.String classUuid, long[] categoryIds,
+		java.lang.String classUuid, long classTypeId, long[] categoryIds,
 		java.lang.String[] tagNames, boolean visible, java.util.Date startDate,
 		java.util.Date endDate, java.util.Date publishDate,
 		java.util.Date expirationDate, java.lang.String mimeType,
@@ -212,8 +220,34 @@ public class AssetEntryServiceSoap {
 		java.lang.Integer priority, boolean sync) throws RemoteException {
 		try {
 			com.liferay.portlet.asset.model.AssetEntry returnValue = AssetEntryServiceUtil.updateEntry(groupId,
-					className, classPK, classUuid, categoryIds, tagNames,
-					visible, startDate, endDate, publishDate, expirationDate,
+					className, classPK, classUuid, classTypeId, categoryIds,
+					tagNames, visible, startDate, endDate, publishDate,
+					expirationDate, mimeType, title, description, summary, url,
+					layoutUuid, height, width, priority, sync);
+
+			return com.liferay.portlet.asset.model.AssetEntrySoap.toSoapModel(returnValue);
+		}
+		catch (Exception e) {
+			_log.error(e, e);
+
+			throw new RemoteException(e.getMessage());
+		}
+	}
+
+	public static com.liferay.portlet.asset.model.AssetEntrySoap updateEntry(
+		long groupId, java.lang.String className, long classPK,
+		java.lang.String classUuid, long classTypeId, long[] categoryIds,
+		java.lang.String[] tagNames, boolean visible, java.util.Date startDate,
+		java.util.Date endDate, java.util.Date expirationDate,
+		java.lang.String mimeType, java.lang.String title,
+		java.lang.String description, java.lang.String summary,
+		java.lang.String url, java.lang.String layoutUuid, int height,
+		int width, java.lang.Integer priority, boolean sync)
+		throws RemoteException {
+		try {
+			com.liferay.portlet.asset.model.AssetEntry returnValue = AssetEntryServiceUtil.updateEntry(groupId,
+					className, classPK, classUuid, classTypeId, categoryIds,
+					tagNames, visible, startDate, endDate, expirationDate,
 					mimeType, title, description, summary, url, layoutUuid,
 					height, width, priority, sync);
 

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -17,6 +17,7 @@ package com.liferay.portal.model.impl;
 import com.liferay.portal.kernel.bean.AutoEscapeBeanHandler;
 import com.liferay.portal.kernel.json.JSON;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.ProxyUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.model.CacheModel;
@@ -30,13 +31,13 @@ import com.liferay.portlet.expando.util.ExpandoBridgeFactoryUtil;
 
 import java.io.Serializable;
 
-import java.lang.reflect.Proxy;
-
 import java.sql.Types;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * The base model implementation for the Image service. Represents a row in the &quot;Image&quot; database table, with each column mapped to a property of this class.
@@ -81,6 +82,10 @@ public class ImageModelImpl extends BaseModelImpl<Image> implements ImageModel {
 	public static final boolean FINDER_CACHE_ENABLED = GetterUtil.getBoolean(com.liferay.portal.util.PropsUtil.get(
 				"value.object.finder.cache.enabled.com.liferay.portal.model.Image"),
 			true);
+	public static final boolean COLUMN_BITMASK_ENABLED = GetterUtil.getBoolean(com.liferay.portal.util.PropsUtil.get(
+				"value.object.column.bitmask.enabled.com.liferay.portal.model.Image"),
+			true);
+	public static long SIZE_COLUMN_BITMASK = 1L;
 
 	/**
 	 * Converts the soap model instance into a normal model instance.
@@ -118,14 +123,6 @@ public class ImageModelImpl extends BaseModelImpl<Image> implements ImageModel {
 		return models;
 	}
 
-	public Class<?> getModelClass() {
-		return Image.class;
-	}
-
-	public String getModelClassName() {
-		return Image.class.getName();
-	}
-
 	public static final long LOCK_EXPIRATION_TIME = GetterUtil.getLong(com.liferay.portal.util.PropsUtil.get(
 				"lock.expiration.time.com.liferay.portal.model.Image"));
 
@@ -148,12 +145,82 @@ public class ImageModelImpl extends BaseModelImpl<Image> implements ImageModel {
 		setPrimaryKey(((Long)primaryKeyObj).longValue());
 	}
 
+	public Class<?> getModelClass() {
+		return Image.class;
+	}
+
+	public String getModelClassName() {
+		return Image.class.getName();
+	}
+
+	@Override
+	public Map<String, Object> getModelAttributes() {
+		Map<String, Object> attributes = new HashMap<String, Object>();
+
+		attributes.put("imageId", getImageId());
+		attributes.put("modifiedDate", getModifiedDate());
+		attributes.put("text", getText());
+		attributes.put("type", getType());
+		attributes.put("height", getHeight());
+		attributes.put("width", getWidth());
+		attributes.put("size", getSize());
+
+		return attributes;
+	}
+
+	@Override
+	public void setModelAttributes(Map<String, Object> attributes) {
+		Long imageId = (Long)attributes.get("imageId");
+
+		if (imageId != null) {
+			setImageId(imageId);
+		}
+
+		Date modifiedDate = (Date)attributes.get("modifiedDate");
+
+		if (modifiedDate != null) {
+			setModifiedDate(modifiedDate);
+		}
+
+		String text = (String)attributes.get("text");
+
+		if (text != null) {
+			setText(text);
+		}
+
+		String type = (String)attributes.get("type");
+
+		if (type != null) {
+			setType(type);
+		}
+
+		Integer height = (Integer)attributes.get("height");
+
+		if (height != null) {
+			setHeight(height);
+		}
+
+		Integer width = (Integer)attributes.get("width");
+
+		if (width != null) {
+			setWidth(width);
+		}
+
+		Integer size = (Integer)attributes.get("size");
+
+		if (size != null) {
+			setSize(size);
+		}
+	}
+
 	@JSON
 	public long getImageId() {
 		return _imageId;
 	}
 
 	public void setImageId(long imageId) {
+		_columnBitmask = -1L;
+
 		_imageId = imageId;
 	}
 
@@ -218,38 +285,47 @@ public class ImageModelImpl extends BaseModelImpl<Image> implements ImageModel {
 	}
 
 	public void setSize(int size) {
+		_columnBitmask |= SIZE_COLUMN_BITMASK;
+
+		if (!_setOriginalSize) {
+			_setOriginalSize = true;
+
+			_originalSize = _size;
+		}
+
 		_size = size;
+	}
+
+	public int getOriginalSize() {
+		return _originalSize;
+	}
+
+	public long getColumnBitmask() {
+		return _columnBitmask;
 	}
 
 	@Override
 	public Image toEscapedModel() {
-		if (isEscapedModel()) {
-			return (Image)this;
+		if (_escapedModelProxy == null) {
+			_escapedModelProxy = (Image)ProxyUtil.newProxyInstance(_classLoader,
+					_escapedModelProxyInterfaces,
+					new AutoEscapeBeanHandler(this));
 		}
-		else {
-			if (_escapedModelProxy == null) {
-				_escapedModelProxy = (Image)Proxy.newProxyInstance(_classLoader,
-						_escapedModelProxyInterfaces,
-						new AutoEscapeBeanHandler(this));
-			}
 
-			return _escapedModelProxy;
-		}
+		return _escapedModelProxy;
 	}
 
 	@Override
 	public ExpandoBridge getExpandoBridge() {
-		if (_expandoBridge == null) {
-			_expandoBridge = ExpandoBridgeFactoryUtil.getExpandoBridge(0,
-					Image.class.getName(), getPrimaryKey());
-		}
-
-		return _expandoBridge;
+		return ExpandoBridgeFactoryUtil.getExpandoBridge(0,
+			Image.class.getName(), getPrimaryKey());
 	}
 
 	@Override
 	public void setExpandoBridgeAttributes(ServiceContext serviceContext) {
-		getExpandoBridge().setAttributes(serviceContext);
+		ExpandoBridge expandoBridge = getExpandoBridge();
+
+		expandoBridge.setAttributes(serviceContext);
 	}
 
 	@Override
@@ -321,6 +397,13 @@ public class ImageModelImpl extends BaseModelImpl<Image> implements ImageModel {
 
 	@Override
 	public void resetOriginalValues() {
+		ImageModelImpl imageModelImpl = this;
+
+		imageModelImpl._originalSize = imageModelImpl._size;
+
+		imageModelImpl._setOriginalSize = false;
+
+		imageModelImpl._columnBitmask = 0;
 	}
 
 	@Override
@@ -438,6 +521,8 @@ public class ImageModelImpl extends BaseModelImpl<Image> implements ImageModel {
 	private int _height;
 	private int _width;
 	private int _size;
-	private transient ExpandoBridge _expandoBridge;
+	private int _originalSize;
+	private boolean _setOriginalSize;
+	private long _columnBitmask;
 	private Image _escapedModelProxy;
 }

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -59,10 +59,6 @@ public class MessageListenerWrapper implements MessageListener {
 		_listener.deliver(from, recipient, message);
 	}
 
-	public String getId() {
-		return _listener.getId();
-	}
-
 	@Override
 	public boolean equals(Object obj) {
 		if (obj == null) {
@@ -81,6 +77,10 @@ public class MessageListenerWrapper implements MessageListener {
 		String id = listener.getId();
 
 		return getId().equals(id);
+	}
+
+	public String getId() {
+		return _listener.getId();
 	}
 
 	@Override

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,14 +14,16 @@
 
 package com.liferay.portal.kernel.deploy.auto;
 
-import java.io.File;
+import com.liferay.portal.kernel.deploy.auto.context.AutoDeploymentContext;
 
 /**
  * @author Ivica Cardic
  * @author Brian Wing Shun Chan
+ * @author Miguel Pastor
  */
 public interface AutoDeployListener {
 
-	public void deploy(File file) throws AutoDeployException;
+	public void deploy(AutoDeploymentContext autoDeploymentContext)
+		throws AutoDeployException ;
 
 }

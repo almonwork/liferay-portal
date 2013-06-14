@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -33,8 +33,7 @@ import com.liferay.portal.util.PortalUtil;
 public class PluginSettingLocalServiceImpl
 	extends PluginSettingLocalServiceBaseImpl {
 
-	public void checkPermission(
-			long userId, String pluginId, String pluginType)
+	public void checkPermission(long userId, String pluginId, String pluginType)
 		throws PortalException {
 
 		if (!hasPermission(userId, pluginId, pluginType)) {
@@ -105,8 +104,7 @@ public class PluginSettingLocalServiceImpl
 		}
 		catch (Exception e) {
 			if (_log.isWarnEnabled()) {
-				_log.warn(
-					"Could not check permissions for " + pluginId, e);
+				_log.warn("Could not check permissions for " + pluginId, e);
 			}
 
 			return false;

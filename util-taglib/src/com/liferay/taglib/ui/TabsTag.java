@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -32,10 +32,73 @@ import javax.servlet.jsp.JspException;
 public class TabsTag extends IncludeTag {
 
 	@Override
+	public int doEndTag() throws JspException {
+		try {
+			HttpServletRequest request =
+				(HttpServletRequest)pageContext.getRequest();
+
+			include(getEndPage());
+
+			request.removeAttribute("liferay-ui:tabs:names");
+			request.removeAttribute("liferay-ui:tabs:values");
+			request.removeAttribute("liferay-ui:tabs:formName");
+			request.removeAttribute("liferay-ui:tabs:param");
+			request.removeAttribute("liferay-ui:tabs:value");
+			request.removeAttribute("liferay-ui:tabs:portletURL");
+			request.removeAttribute("liferay-ui:tabs:url");
+			request.removeAttribute("liferay-ui:tabs:url0");
+			request.removeAttribute("liferay-ui:tabs:url1");
+			request.removeAttribute("liferay-ui:tabs:url2");
+			request.removeAttribute("liferay-ui:tabs:url3");
+			request.removeAttribute("liferay-ui:tabs:url4");
+			request.removeAttribute("liferay-ui:tabs:url5");
+			request.removeAttribute("liferay-ui:tabs:url6");
+			request.removeAttribute("liferay-ui:tabs:url7");
+			request.removeAttribute("liferay-ui:tabs:url8");
+			request.removeAttribute("liferay-ui:tabs:url9");
+			request.removeAttribute("liferay-ui:tabs:backLabel");
+			request.removeAttribute("liferay-ui:tabs:backURL");
+			request.removeAttribute("liferay-ui:tabs:refresh");
+			request.removeAttribute("liferay-ui:tabs:onClick");
+
+			return EVAL_PAGE;
+		}
+		catch (Exception e) {
+			throw new JspException(e);
+		}
+		finally {
+			if (!ServerDetector.isResin()) {
+				_startPage = null;
+				_endPage = null;
+				_names = null;
+				_namesPos = 0;
+				_tabsValues = null;
+				_formName = StringPool.BLANK;
+				_param = "tabs1";
+				_value = null;
+				_portletURL = null;
+				_url = null;
+				_url0 = null;
+				_url1 = null;
+				_url2 = null;
+				_url3 = null;
+				_url4 = null;
+				_url5 = null;
+				_url6 = null;
+				_url7 = null;
+				_url8 = null;
+				_url9 = null;
+				_backLabel = null;
+				_backURL = null;
+				_refresh = true;
+				_onClick = null;
+			}
+		}
+	}
+
+	@Override
 	public int doStartTag() throws JspException {
 		try {
-			HttpServletRequest request = getServletRequest();
-
 			request.setAttribute("liferay-ui:tabs:names", _names);
 
 			if ((_tabsValues == null) || (_tabsValues.length < _names.length)) {
@@ -140,125 +203,85 @@ public class TabsTag extends IncludeTag {
 		}
 	}
 
-	@Override
-	public int doEndTag() throws JspException {
-		try {
-			HttpServletRequest request =
-				(HttpServletRequest)pageContext.getRequest();
-
-			include(getEndPage());
-
-			request.removeAttribute("liferay-ui:tabs:names");
-			request.removeAttribute("liferay-ui:tabs:values");
-			request.removeAttribute("liferay-ui:tabs:formName");
-			request.removeAttribute("liferay-ui:tabs:param");
-			request.removeAttribute("liferay-ui:tabs:value");
-			request.removeAttribute("liferay-ui:tabs:portletURL");
-			request.removeAttribute("liferay-ui:tabs:url");
-			request.removeAttribute("liferay-ui:tabs:url0");
-			request.removeAttribute("liferay-ui:tabs:url1");
-			request.removeAttribute("liferay-ui:tabs:url2");
-			request.removeAttribute("liferay-ui:tabs:url3");
-			request.removeAttribute("liferay-ui:tabs:url4");
-			request.removeAttribute("liferay-ui:tabs:url5");
-			request.removeAttribute("liferay-ui:tabs:url6");
-			request.removeAttribute("liferay-ui:tabs:url7");
-			request.removeAttribute("liferay-ui:tabs:url8");
-			request.removeAttribute("liferay-ui:tabs:url9");
-			request.removeAttribute("liferay-ui:tabs:backLabel");
-			request.removeAttribute("liferay-ui:tabs:backURL");
-			request.removeAttribute("liferay-ui:tabs:refresh");
-			request.removeAttribute("liferay-ui:tabs:onClick");
-
-			return EVAL_PAGE;
-		}
-		catch (Exception e) {
-			throw new JspException(e);
-		}
-		finally {
-			if (!ServerDetector.isResin()) {
-				_startPage = null;
-				_endPage = null;
-				_names = null;
-				_namesPos = 0;
-				_tabsValues = null;
-				_formName = StringPool.BLANK;
-				_param = "tabs1";
-				_value = null;
-				_portletURL = null;
-				_url = null;
-				_url0 = null;
-				_url1 = null;
-				_url2 = null;
-				_url3 = null;
-				_url4 = null;
-				_url5 = null;
-				_url6 = null;
-				_url7 = null;
-				_url8 = null;
-				_url9 = null;
-				_backLabel = null;
-				_backURL = null;
-				_refresh = true;
-				_onClick = null;
-			}
-		}
-	}
-
-	@Override
-	protected String getStartPage() {
-		if (Validator.isNull(_startPage)) {
-			return _START_PAGE;
-		}
-		else {
-			return _startPage;
-		}
-	}
-
-	public void setStartPage(String startPage) {
-		_startPage = startPage;
-	}
-
-	@Override
-	protected String getEndPage() {
-		if (Validator.isNull(_endPage)) {
-			return _END_PAGE;
-		}
-		else {
-			return _endPage;
-		}
-	}
-
-	public void setEndPage(String endPage) {
-		_endPage = endPage;
-	}
-
-	public void setNames(String names) {
-		_names = StringUtil.split(names);
-	}
-
-	public void setTabsValues(String tabsValues) {
-		_tabsValues = StringUtil.split(tabsValues);
-	}
-
-	public void setFormName(String formName) {
-		_formName = formName;
+	public String getOnClick() {
+		return _onClick;
 	}
 
 	public String getParam() {
 		return _param;
 	}
 
+	public String getSectionName() {
+		if (_names.length > _namesPos) {
+			return _names[_namesPos];
+		}
+		else {
+			return StringPool.BLANK;
+		}
+	}
+
+	public boolean getSectionSelected() {
+		if ((_names.length == 0) ||
+			((_names.length > _namesPos) &&
+			 _names[_namesPos].equals(_value))) {
+
+			return true;
+		}
+		else {
+			return false;
+		}
+	}
+
+	public void incrementSection() {
+		_namesPos++;
+	}
+
+	public boolean isRefresh() {
+		return _refresh;
+	}
+
+	public void setBackLabel(String backLabel) {
+		_backLabel = backLabel;
+	}
+
+	public void setBackURL(String backURL) {
+		_backURL = backURL;
+	}
+
+	public void setEndPage(String endPage) {
+		_endPage = endPage;
+	}
+
+	public void setFormName(String formName) {
+		_formName = formName;
+	}
+
+	public void setNames(String names) {
+		_names = StringUtil.split(names);
+	}
+
+	public void setOnClick(String onClick) {
+		_onClick = onClick;
+	}
+
 	public void setParam(String param) {
 		_param = param;
 	}
 
-	public void setValue(String value) {
-		_value = value;
-	}
-
 	public void setPortletURL(PortletURL portletURL) {
 		_portletURL = portletURL;
+	}
+
+	public void setRefresh(boolean refresh) {
+		_refresh = refresh;
+	}
+
+	public void setStartPage(String startPage) {
+		_startPage = startPage;
+	}
+
+	public void setTabsValues(String tabsValues) {
+		_tabsValues = StringUtil.split(tabsValues);
 	}
 
 	public void setUrl(String url) {
@@ -305,68 +328,46 @@ public class TabsTag extends IncludeTag {
 		_url9 = url9;
 	}
 
-	public void setBackLabel(String backLabel) {
-		_backLabel = backLabel;
+	public void setValue(String value) {
+		_value = value;
 	}
 
-	public void setBackURL(String backURL) {
-		_backURL = backURL;
-	}
-
-	public boolean isRefresh() {
-		return _refresh;
-	}
-
-	public void setRefresh(boolean refresh) {
-		_refresh = refresh;
-	}
-
-	public String getOnClick() {
-		return _onClick;
-	}
-
-	public void setOnClick(String onClick) {
-		_onClick = onClick;
-	}
-
-	public String getSectionName() {
-		if (_names.length > _namesPos) {
-			return _names[_namesPos];
+	@Override
+	protected String getEndPage() {
+		if (Validator.isNull(_endPage)) {
+			return _END_PAGE;
 		}
 		else {
-			return StringPool.BLANK;
+			return _endPage;
 		}
 	}
 
-	public boolean getSectionSelected() {
-		if ((_names.length == 0) ||
-			((_names.length > _namesPos) &&
-				(_names[_namesPos].equals(_value)))) {
-
-			return true;
+	@Override
+	protected String getStartPage() {
+		if (Validator.isNull(_startPage)) {
+			return _START_PAGE;
 		}
 		else {
-			return false;
+			return _startPage;
 		}
 	}
-
-	public void incrementSection() {
-		_namesPos++;
-	}
-
-	private static final String _START_PAGE = "/html/taglib/ui/tabs/start.jsp";
 
 	private static final String _END_PAGE = "/html/taglib/ui/tabs/end.jsp";
 
-	private String _startPage;
+	private static final String _START_PAGE = "/html/taglib/ui/tabs/start.jsp";
+
+	private String _backLabel;
+	private String _backURL;
 	private String _endPage;
+	private String _formName;
 	private String[] _names;
 	private int _namesPos;
-	private String[] _tabsValues;
-	private String _formName;
+	private String _onClick;
 	private String _param = "tabs1";
-	private String _value;
 	private PortletURL _portletURL;
+	private boolean _refresh = true;
+	private String _startPage;
+	private String[] _tabsValues;
 	private String _url;
 	private String _url0;
 	private String _url1;
@@ -378,9 +379,6 @@ public class TabsTag extends IncludeTag {
 	private String _url7;
 	private String _url8;
 	private String _url9;
-	private String _backLabel;
-	private String _backURL;
-	private boolean _refresh = true;
-	private String _onClick;
+	private String _value;
 
 }

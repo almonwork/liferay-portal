@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -26,10 +26,6 @@ public class QueryPos {
 
 	public static QueryPos getInstance(Query query) {
 		return new QueryPos(query);
-	}
-
-	public int getPos() {
-		return _pos;
 	}
 
 	public void add(boolean value) {
@@ -130,15 +126,19 @@ public class QueryPos {
 		_query.setTimestamp(_pos++, value);
 	}
 
+	public int getPos() {
+		return _pos;
+	}
+
+	protected void addNull() {
+		_query.setSerializable(_pos++, null);
+	}
+
 	private QueryPos(Query query) {
 		_query = query;
 	}
 
-	private void addNull() {
-		_query.setSerializable(_pos++, null);
-	}
-
-	private Query _query;
 	private int _pos;
+	private Query _query;
 
 }

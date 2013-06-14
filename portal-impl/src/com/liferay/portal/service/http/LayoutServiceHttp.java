@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -61,7 +61,7 @@ public class LayoutServiceHttp {
 		java.util.Map<java.util.Locale, java.lang.String> keywordsMap,
 		java.util.Map<java.util.Locale, java.lang.String> robotsMap,
 		java.lang.String type, boolean hidden, java.lang.String friendlyURL,
-		boolean locked, com.liferay.portal.service.ServiceContext serviceContext)
+		com.liferay.portal.service.ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException {
 		try {
@@ -71,7 +71,7 @@ public class LayoutServiceHttp {
 			MethodHandler methodHandler = new MethodHandler(methodKey, groupId,
 					privateLayout, parentLayoutId, localeNamesMap,
 					localeTitlesMap, descriptionMap, keywordsMap, robotsMap,
-					type, hidden, friendlyURL, locked, serviceContext);
+					type, hidden, friendlyURL, serviceContext);
 
 			Object returnObj = null;
 
@@ -103,7 +103,7 @@ public class LayoutServiceHttp {
 		HttpPrincipal httpPrincipal, long groupId, boolean privateLayout,
 		long parentLayoutId, java.lang.String name, java.lang.String title,
 		java.lang.String description, java.lang.String type, boolean hidden,
-		java.lang.String friendlyURL, boolean locked,
+		java.lang.String friendlyURL,
 		com.liferay.portal.service.ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException {
@@ -113,7 +113,7 @@ public class LayoutServiceHttp {
 
 			MethodHandler methodHandler = new MethodHandler(methodKey, groupId,
 					privateLayout, parentLayoutId, name, title, description,
-					type, hidden, friendlyURL, locked, serviceContext);
+					type, hidden, friendlyURL, serviceContext);
 
 			Object returnObj = null;
 
@@ -141,7 +141,8 @@ public class LayoutServiceHttp {
 		}
 	}
 
-	public static void deleteLayout(HttpPrincipal httpPrincipal, long plid,
+	public static void deleteLayout(HttpPrincipal httpPrincipal, long groupId,
+		boolean privateLayout, long layoutId,
 		com.liferay.portal.service.ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException {
@@ -149,8 +150,8 @@ public class LayoutServiceHttp {
 			MethodKey methodKey = new MethodKey(LayoutServiceUtil.class.getName(),
 					"deleteLayout", _deleteLayoutParameterTypes2);
 
-			MethodHandler methodHandler = new MethodHandler(methodKey, plid,
-					serviceContext);
+			MethodHandler methodHandler = new MethodHandler(methodKey, groupId,
+					privateLayout, layoutId, serviceContext);
 
 			try {
 				TunnelUtil.invoke(httpPrincipal, methodHandler);
@@ -174,8 +175,7 @@ public class LayoutServiceHttp {
 		}
 	}
 
-	public static void deleteLayout(HttpPrincipal httpPrincipal, long groupId,
-		boolean privateLayout, long layoutId,
+	public static void deleteLayout(HttpPrincipal httpPrincipal, long plid,
 		com.liferay.portal.service.ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException {
@@ -183,8 +183,8 @@ public class LayoutServiceHttp {
 			MethodKey methodKey = new MethodKey(LayoutServiceUtil.class.getName(),
 					"deleteLayout", _deleteLayoutParameterTypes3);
 
-			MethodHandler methodHandler = new MethodHandler(methodKey, groupId,
-					privateLayout, layoutId, serviceContext);
+			MethodHandler methodHandler = new MethodHandler(methodKey, plid,
+					serviceContext);
 
 			try {
 				TunnelUtil.invoke(httpPrincipal, methodHandler);
@@ -516,6 +516,81 @@ public class LayoutServiceHttp {
 		}
 	}
 
+	public static java.util.List<com.liferay.portal.model.Layout> getLayouts(
+		HttpPrincipal httpPrincipal, long groupId, boolean privateLayout)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException {
+		try {
+			MethodKey methodKey = new MethodKey(LayoutServiceUtil.class.getName(),
+					"getLayouts", _getLayoutsParameterTypes12);
+
+			MethodHandler methodHandler = new MethodHandler(methodKey, groupId,
+					privateLayout);
+
+			Object returnObj = null;
+
+			try {
+				returnObj = TunnelUtil.invoke(httpPrincipal, methodHandler);
+			}
+			catch (Exception e) {
+				if (e instanceof com.liferay.portal.kernel.exception.PortalException) {
+					throw (com.liferay.portal.kernel.exception.PortalException)e;
+				}
+
+				if (e instanceof com.liferay.portal.kernel.exception.SystemException) {
+					throw (com.liferay.portal.kernel.exception.SystemException)e;
+				}
+
+				throw new com.liferay.portal.kernel.exception.SystemException(e);
+			}
+
+			return (java.util.List<com.liferay.portal.model.Layout>)returnObj;
+		}
+		catch (com.liferay.portal.kernel.exception.SystemException se) {
+			_log.error(se, se);
+
+			throw se;
+		}
+	}
+
+	public static java.util.List<com.liferay.portal.model.Layout> getLayouts(
+		HttpPrincipal httpPrincipal, long groupId, boolean privateLayout,
+		long parentLayoutId)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException {
+		try {
+			MethodKey methodKey = new MethodKey(LayoutServiceUtil.class.getName(),
+					"getLayouts", _getLayoutsParameterTypes13);
+
+			MethodHandler methodHandler = new MethodHandler(methodKey, groupId,
+					privateLayout, parentLayoutId);
+
+			Object returnObj = null;
+
+			try {
+				returnObj = TunnelUtil.invoke(httpPrincipal, methodHandler);
+			}
+			catch (Exception e) {
+				if (e instanceof com.liferay.portal.kernel.exception.PortalException) {
+					throw (com.liferay.portal.kernel.exception.PortalException)e;
+				}
+
+				if (e instanceof com.liferay.portal.kernel.exception.SystemException) {
+					throw (com.liferay.portal.kernel.exception.SystemException)e;
+				}
+
+				throw new com.liferay.portal.kernel.exception.SystemException(e);
+			}
+
+			return (java.util.List<com.liferay.portal.model.Layout>)returnObj;
+		}
+		catch (com.liferay.portal.kernel.exception.SystemException se) {
+			_log.error(se, se);
+
+			throw se;
+		}
+	}
+
 	public static void importLayouts(HttpPrincipal httpPrincipal, long groupId,
 		boolean privateLayout,
 		java.util.Map<java.lang.String, java.lang.String[]> parameterMap,
@@ -524,7 +599,7 @@ public class LayoutServiceHttp {
 			com.liferay.portal.kernel.exception.SystemException {
 		try {
 			MethodKey methodKey = new MethodKey(LayoutServiceUtil.class.getName(),
-					"importLayouts", _importLayoutsParameterTypes12);
+					"importLayouts", _importLayoutsParameterTypes14);
 
 			MethodHandler methodHandler = new MethodHandler(methodKey, groupId,
 					privateLayout, parameterMap, bytes);
@@ -559,7 +634,7 @@ public class LayoutServiceHttp {
 			com.liferay.portal.kernel.exception.SystemException {
 		try {
 			MethodKey methodKey = new MethodKey(LayoutServiceUtil.class.getName(),
-					"importLayouts", _importLayoutsParameterTypes13);
+					"importLayouts", _importLayoutsParameterTypes15);
 
 			MethodHandler methodHandler = new MethodHandler(methodKey, groupId,
 					privateLayout, parameterMap, file);
@@ -594,7 +669,7 @@ public class LayoutServiceHttp {
 			com.liferay.portal.kernel.exception.SystemException {
 		try {
 			MethodKey methodKey = new MethodKey(LayoutServiceUtil.class.getName(),
-					"importLayouts", _importLayoutsParameterTypes14);
+					"importLayouts", _importLayoutsParameterTypes16);
 
 			MethodHandler methodHandler = new MethodHandler(methodKey, groupId,
 					privateLayout, parameterMap, is);
@@ -629,7 +704,7 @@ public class LayoutServiceHttp {
 			com.liferay.portal.kernel.exception.SystemException {
 		try {
 			MethodKey methodKey = new MethodKey(LayoutServiceUtil.class.getName(),
-					"importPortletInfo", _importPortletInfoParameterTypes15);
+					"importPortletInfo", _importPortletInfoParameterTypes17);
 
 			MethodHandler methodHandler = new MethodHandler(methodKey, plid,
 					groupId, portletId, parameterMap, file);
@@ -664,7 +739,7 @@ public class LayoutServiceHttp {
 			com.liferay.portal.kernel.exception.SystemException {
 		try {
 			MethodKey methodKey = new MethodKey(LayoutServiceUtil.class.getName(),
-					"importPortletInfo", _importPortletInfoParameterTypes16);
+					"importPortletInfo", _importPortletInfoParameterTypes18);
 
 			MethodHandler methodHandler = new MethodHandler(methodKey, plid,
 					groupId, portletId, parameterMap, is);
@@ -704,7 +779,7 @@ public class LayoutServiceHttp {
 		try {
 			MethodKey methodKey = new MethodKey(LayoutServiceUtil.class.getName(),
 					"schedulePublishToLive",
-					_schedulePublishToLiveParameterTypes17);
+					_schedulePublishToLiveParameterTypes19);
 
 			MethodHandler methodHandler = new MethodHandler(methodKey,
 					sourceGroupId, targetGroupId, privateLayout, layoutIdMap,
@@ -738,23 +813,25 @@ public class LayoutServiceHttp {
 		java.util.Map<java.lang.Long, java.lang.Boolean> layoutIdMap,
 		java.util.Map<java.lang.String, java.lang.String[]> parameterMap,
 		java.lang.String remoteAddress, int remotePort,
-		boolean secureConnection, long remoteGroupId,
-		boolean remotePrivateLayout, java.util.Date startDate,
-		java.util.Date endDate, java.lang.String groupName,
-		java.lang.String cronText, java.util.Date schedulerStartDate,
-		java.util.Date schedulerEndDate, java.lang.String description)
+		java.lang.String remotePathContext, boolean secureConnection,
+		long remoteGroupId, boolean remotePrivateLayout,
+		java.util.Date startDate, java.util.Date endDate,
+		java.lang.String groupName, java.lang.String cronText,
+		java.util.Date schedulerStartDate, java.util.Date schedulerEndDate,
+		java.lang.String description)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException {
 		try {
 			MethodKey methodKey = new MethodKey(LayoutServiceUtil.class.getName(),
 					"schedulePublishToRemote",
-					_schedulePublishToRemoteParameterTypes18);
+					_schedulePublishToRemoteParameterTypes20);
 
 			MethodHandler methodHandler = new MethodHandler(methodKey,
 					sourceGroupId, privateLayout, layoutIdMap, parameterMap,
-					remoteAddress, remotePort, secureConnection, remoteGroupId,
-					remotePrivateLayout, startDate, endDate, groupName,
-					cronText, schedulerStartDate, schedulerEndDate, description);
+					remoteAddress, remotePort, remotePathContext,
+					secureConnection, remoteGroupId, remotePrivateLayout,
+					startDate, endDate, groupName, cronText,
+					schedulerStartDate, schedulerEndDate, description);
 
 			try {
 				TunnelUtil.invoke(httpPrincipal, methodHandler);
@@ -785,7 +862,7 @@ public class LayoutServiceHttp {
 			com.liferay.portal.kernel.exception.SystemException {
 		try {
 			MethodKey methodKey = new MethodKey(LayoutServiceUtil.class.getName(),
-					"setLayouts", _setLayoutsParameterTypes19);
+					"setLayouts", _setLayoutsParameterTypes21);
 
 			MethodHandler methodHandler = new MethodHandler(methodKey, groupId,
 					privateLayout, parentLayoutId, layoutIds, serviceContext);
@@ -819,7 +896,7 @@ public class LayoutServiceHttp {
 		try {
 			MethodKey methodKey = new MethodKey(LayoutServiceUtil.class.getName(),
 					"unschedulePublishToLive",
-					_unschedulePublishToLiveParameterTypes20);
+					_unschedulePublishToLiveParameterTypes22);
 
 			MethodHandler methodHandler = new MethodHandler(methodKey, groupId,
 					jobName, groupName);
@@ -853,7 +930,7 @@ public class LayoutServiceHttp {
 		try {
 			MethodKey methodKey = new MethodKey(LayoutServiceUtil.class.getName(),
 					"unschedulePublishToRemote",
-					_unschedulePublishToRemoteParameterTypes21);
+					_unschedulePublishToRemoteParameterTypes23);
 
 			MethodHandler methodHandler = new MethodHandler(methodKey, groupId,
 					jobName, groupName);
@@ -889,18 +966,18 @@ public class LayoutServiceHttp {
 		java.util.Map<java.util.Locale, java.lang.String> keywordsMap,
 		java.util.Map<java.util.Locale, java.lang.String> robotsMap,
 		java.lang.String type, boolean hidden, java.lang.String friendlyURL,
-		java.lang.Boolean iconImage, byte[] iconBytes, boolean locked,
+		java.lang.Boolean iconImage, byte[] iconBytes,
 		com.liferay.portal.service.ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException {
 		try {
 			MethodKey methodKey = new MethodKey(LayoutServiceUtil.class.getName(),
-					"updateLayout", _updateLayoutParameterTypes22);
+					"updateLayout", _updateLayoutParameterTypes24);
 
 			MethodHandler methodHandler = new MethodHandler(methodKey, groupId,
 					privateLayout, layoutId, parentLayoutId, localeNamesMap,
 					localeTitlesMap, descriptionMap, keywordsMap, robotsMap,
-					type, hidden, friendlyURL, iconImage, iconBytes, locked,
+					type, hidden, friendlyURL, iconImage, iconBytes,
 					serviceContext);
 
 			Object returnObj = null;
@@ -936,7 +1013,7 @@ public class LayoutServiceHttp {
 			com.liferay.portal.kernel.exception.SystemException {
 		try {
 			MethodKey methodKey = new MethodKey(LayoutServiceUtil.class.getName(),
-					"updateLayout", _updateLayoutParameterTypes23);
+					"updateLayout", _updateLayoutParameterTypes25);
 
 			MethodHandler methodHandler = new MethodHandler(methodKey, groupId,
 					privateLayout, layoutId, typeSettings);
@@ -975,7 +1052,7 @@ public class LayoutServiceHttp {
 			com.liferay.portal.kernel.exception.SystemException {
 		try {
 			MethodKey methodKey = new MethodKey(LayoutServiceUtil.class.getName(),
-					"updateLookAndFeel", _updateLookAndFeelParameterTypes24);
+					"updateLookAndFeel", _updateLookAndFeelParameterTypes26);
 
 			MethodHandler methodHandler = new MethodHandler(methodKey, groupId,
 					privateLayout, layoutId, themeId, colorSchemeId, css,
@@ -1014,7 +1091,7 @@ public class LayoutServiceHttp {
 			com.liferay.portal.kernel.exception.SystemException {
 		try {
 			MethodKey methodKey = new MethodKey(LayoutServiceUtil.class.getName(),
-					"updateName", _updateNameParameterTypes25);
+					"updateName", _updateNameParameterTypes27);
 
 			MethodHandler methodHandler = new MethodHandler(methodKey, groupId,
 					privateLayout, layoutId, name, languageId);
@@ -1052,7 +1129,7 @@ public class LayoutServiceHttp {
 			com.liferay.portal.kernel.exception.SystemException {
 		try {
 			MethodKey methodKey = new MethodKey(LayoutServiceUtil.class.getName(),
-					"updateName", _updateNameParameterTypes26);
+					"updateName", _updateNameParameterTypes28);
 
 			MethodHandler methodHandler = new MethodHandler(methodKey, plid,
 					name, languageId);
@@ -1091,7 +1168,7 @@ public class LayoutServiceHttp {
 		try {
 			MethodKey methodKey = new MethodKey(LayoutServiceUtil.class.getName(),
 					"updateParentLayoutId",
-					_updateParentLayoutIdParameterTypes27);
+					_updateParentLayoutIdParameterTypes29);
 
 			MethodHandler methodHandler = new MethodHandler(methodKey, groupId,
 					privateLayout, layoutId, parentLayoutId);
@@ -1129,7 +1206,7 @@ public class LayoutServiceHttp {
 		try {
 			MethodKey methodKey = new MethodKey(LayoutServiceUtil.class.getName(),
 					"updateParentLayoutId",
-					_updateParentLayoutIdParameterTypes28);
+					_updateParentLayoutIdParameterTypes30);
 
 			MethodHandler methodHandler = new MethodHandler(methodKey, plid,
 					parentPlid);
@@ -1167,7 +1244,7 @@ public class LayoutServiceHttp {
 			com.liferay.portal.kernel.exception.SystemException {
 		try {
 			MethodKey methodKey = new MethodKey(LayoutServiceUtil.class.getName(),
-					"updatePriority", _updatePriorityParameterTypes29);
+					"updatePriority", _updatePriorityParameterTypes31);
 
 			MethodHandler methodHandler = new MethodHandler(methodKey, groupId,
 					privateLayout, layoutId, priority);
@@ -1204,7 +1281,7 @@ public class LayoutServiceHttp {
 			com.liferay.portal.kernel.exception.SystemException {
 		try {
 			MethodKey methodKey = new MethodKey(LayoutServiceUtil.class.getName(),
-					"updatePriority", _updatePriorityParameterTypes30);
+					"updatePriority", _updatePriorityParameterTypes32);
 
 			MethodHandler methodHandler = new MethodHandler(methodKey, plid,
 					priority);
@@ -1240,21 +1317,21 @@ public class LayoutServiceHttp {
 			long.class, boolean.class, long.class, java.util.Map.class,
 			java.util.Map.class, java.util.Map.class, java.util.Map.class,
 			java.util.Map.class, java.lang.String.class, boolean.class,
-			java.lang.String.class, boolean.class,
+			java.lang.String.class,
 			com.liferay.portal.service.ServiceContext.class
 		};
 	private static final Class<?>[] _addLayoutParameterTypes1 = new Class[] {
 			long.class, boolean.class, long.class, java.lang.String.class,
 			java.lang.String.class, java.lang.String.class,
 			java.lang.String.class, boolean.class, java.lang.String.class,
-			boolean.class, com.liferay.portal.service.ServiceContext.class
+			com.liferay.portal.service.ServiceContext.class
 		};
 	private static final Class<?>[] _deleteLayoutParameterTypes2 = new Class[] {
-			long.class, com.liferay.portal.service.ServiceContext.class
-		};
-	private static final Class<?>[] _deleteLayoutParameterTypes3 = new Class[] {
 			long.class, boolean.class, long.class,
 			com.liferay.portal.service.ServiceContext.class
+		};
+	private static final Class<?>[] _deleteLayoutParameterTypes3 = new Class[] {
+			long.class, com.liferay.portal.service.ServiceContext.class
 		};
 	private static final Class<?>[] _exportLayoutsParameterTypes4 = new Class[] {
 			long.class, boolean.class, long[].class, java.util.Map.class,
@@ -1286,79 +1363,84 @@ public class LayoutServiceHttp {
 			long.class, java.lang.String.class, java.lang.String.class,
 			java.lang.String.class
 		};
-	private static final Class<?>[] _importLayoutsParameterTypes12 = new Class[] {
-			long.class, boolean.class, java.util.Map.class, byte[].class
+	private static final Class<?>[] _getLayoutsParameterTypes12 = new Class[] {
+			long.class, boolean.class
 		};
-	private static final Class<?>[] _importLayoutsParameterTypes13 = new Class[] {
-			long.class, boolean.class, java.util.Map.class, java.io.File.class
+	private static final Class<?>[] _getLayoutsParameterTypes13 = new Class[] {
+			long.class, boolean.class, long.class
 		};
 	private static final Class<?>[] _importLayoutsParameterTypes14 = new Class[] {
+			long.class, boolean.class, java.util.Map.class, byte[].class
+		};
+	private static final Class<?>[] _importLayoutsParameterTypes15 = new Class[] {
+			long.class, boolean.class, java.util.Map.class, java.io.File.class
+		};
+	private static final Class<?>[] _importLayoutsParameterTypes16 = new Class[] {
 			long.class, boolean.class, java.util.Map.class,
 			java.io.InputStream.class
 		};
-	private static final Class<?>[] _importPortletInfoParameterTypes15 = new Class[] {
+	private static final Class<?>[] _importPortletInfoParameterTypes17 = new Class[] {
 			long.class, long.class, java.lang.String.class, java.util.Map.class,
 			java.io.File.class
 		};
-	private static final Class<?>[] _importPortletInfoParameterTypes16 = new Class[] {
+	private static final Class<?>[] _importPortletInfoParameterTypes18 = new Class[] {
 			long.class, long.class, java.lang.String.class, java.util.Map.class,
 			java.io.InputStream.class
 		};
-	private static final Class<?>[] _schedulePublishToLiveParameterTypes17 = new Class[] {
+	private static final Class<?>[] _schedulePublishToLiveParameterTypes19 = new Class[] {
 			long.class, long.class, boolean.class, java.util.Map.class,
 			java.util.Map.class, java.lang.String.class, java.util.Date.class,
 			java.util.Date.class, java.lang.String.class, java.lang.String.class,
 			java.util.Date.class, java.util.Date.class, java.lang.String.class
 		};
-	private static final Class<?>[] _schedulePublishToRemoteParameterTypes18 = new Class[] {
+	private static final Class<?>[] _schedulePublishToRemoteParameterTypes20 = new Class[] {
 			long.class, boolean.class, java.util.Map.class, java.util.Map.class,
-			java.lang.String.class, int.class, boolean.class, long.class,
-			boolean.class, java.util.Date.class, java.util.Date.class,
-			java.lang.String.class, java.lang.String.class, java.util.Date.class,
-			java.util.Date.class, java.lang.String.class
+			java.lang.String.class, int.class, java.lang.String.class,
+			boolean.class, long.class, boolean.class, java.util.Date.class,
+			java.util.Date.class, java.lang.String.class, java.lang.String.class,
+			java.util.Date.class, java.util.Date.class, java.lang.String.class
 		};
-	private static final Class<?>[] _setLayoutsParameterTypes19 = new Class[] {
+	private static final Class<?>[] _setLayoutsParameterTypes21 = new Class[] {
 			long.class, boolean.class, long.class, long[].class,
 			com.liferay.portal.service.ServiceContext.class
 		};
-	private static final Class<?>[] _unschedulePublishToLiveParameterTypes20 = new Class[] {
+	private static final Class<?>[] _unschedulePublishToLiveParameterTypes22 = new Class[] {
 			long.class, java.lang.String.class, java.lang.String.class
 		};
-	private static final Class<?>[] _unschedulePublishToRemoteParameterTypes21 = new Class[] {
+	private static final Class<?>[] _unschedulePublishToRemoteParameterTypes23 = new Class[] {
 			long.class, java.lang.String.class, java.lang.String.class
 		};
-	private static final Class<?>[] _updateLayoutParameterTypes22 = new Class[] {
+	private static final Class<?>[] _updateLayoutParameterTypes24 = new Class[] {
 			long.class, boolean.class, long.class, long.class,
 			java.util.Map.class, java.util.Map.class, java.util.Map.class,
 			java.util.Map.class, java.util.Map.class, java.lang.String.class,
 			boolean.class, java.lang.String.class, java.lang.Boolean.class,
-			byte[].class, boolean.class,
-			com.liferay.portal.service.ServiceContext.class
+			byte[].class, com.liferay.portal.service.ServiceContext.class
 		};
-	private static final Class<?>[] _updateLayoutParameterTypes23 = new Class[] {
+	private static final Class<?>[] _updateLayoutParameterTypes25 = new Class[] {
 			long.class, boolean.class, long.class, java.lang.String.class
 		};
-	private static final Class<?>[] _updateLookAndFeelParameterTypes24 = new Class[] {
+	private static final Class<?>[] _updateLookAndFeelParameterTypes26 = new Class[] {
 			long.class, boolean.class, long.class, java.lang.String.class,
 			java.lang.String.class, java.lang.String.class, boolean.class
 		};
-	private static final Class<?>[] _updateNameParameterTypes25 = new Class[] {
+	private static final Class<?>[] _updateNameParameterTypes27 = new Class[] {
 			long.class, boolean.class, long.class, java.lang.String.class,
 			java.lang.String.class
 		};
-	private static final Class<?>[] _updateNameParameterTypes26 = new Class[] {
+	private static final Class<?>[] _updateNameParameterTypes28 = new Class[] {
 			long.class, java.lang.String.class, java.lang.String.class
 		};
-	private static final Class<?>[] _updateParentLayoutIdParameterTypes27 = new Class[] {
+	private static final Class<?>[] _updateParentLayoutIdParameterTypes29 = new Class[] {
 			long.class, boolean.class, long.class, long.class
 		};
-	private static final Class<?>[] _updateParentLayoutIdParameterTypes28 = new Class[] {
+	private static final Class<?>[] _updateParentLayoutIdParameterTypes30 = new Class[] {
 			long.class, long.class
 		};
-	private static final Class<?>[] _updatePriorityParameterTypes29 = new Class[] {
+	private static final Class<?>[] _updatePriorityParameterTypes31 = new Class[] {
 			long.class, boolean.class, long.class, int.class
 		};
-	private static final Class<?>[] _updatePriorityParameterTypes30 = new Class[] {
+	private static final Class<?>[] _updatePriorityParameterTypes32 = new Class[] {
 			long.class, int.class
 		};
 }

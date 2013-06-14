@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,6 +14,10 @@
 
 package com.liferay.portal.model;
 
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * <p>
  * This class is a wrapper for {@link Repository}.
@@ -23,7 +27,7 @@ package com.liferay.portal.model;
  * @see       Repository
  * @generated
  */
-public class RepositoryWrapper implements Repository {
+public class RepositoryWrapper implements Repository, ModelWrapper<Repository> {
 	public RepositoryWrapper(Repository repository) {
 		_repository = repository;
 	}
@@ -34,6 +38,113 @@ public class RepositoryWrapper implements Repository {
 
 	public String getModelClassName() {
 		return Repository.class.getName();
+	}
+
+	public Map<String, Object> getModelAttributes() {
+		Map<String, Object> attributes = new HashMap<String, Object>();
+
+		attributes.put("uuid", getUuid());
+		attributes.put("repositoryId", getRepositoryId());
+		attributes.put("groupId", getGroupId());
+		attributes.put("companyId", getCompanyId());
+		attributes.put("userId", getUserId());
+		attributes.put("userName", getUserName());
+		attributes.put("createDate", getCreateDate());
+		attributes.put("modifiedDate", getModifiedDate());
+		attributes.put("classNameId", getClassNameId());
+		attributes.put("name", getName());
+		attributes.put("description", getDescription());
+		attributes.put("portletId", getPortletId());
+		attributes.put("typeSettings", getTypeSettings());
+		attributes.put("dlFolderId", getDlFolderId());
+
+		return attributes;
+	}
+
+	public void setModelAttributes(Map<String, Object> attributes) {
+		String uuid = (String)attributes.get("uuid");
+
+		if (uuid != null) {
+			setUuid(uuid);
+		}
+
+		Long repositoryId = (Long)attributes.get("repositoryId");
+
+		if (repositoryId != null) {
+			setRepositoryId(repositoryId);
+		}
+
+		Long groupId = (Long)attributes.get("groupId");
+
+		if (groupId != null) {
+			setGroupId(groupId);
+		}
+
+		Long companyId = (Long)attributes.get("companyId");
+
+		if (companyId != null) {
+			setCompanyId(companyId);
+		}
+
+		Long userId = (Long)attributes.get("userId");
+
+		if (userId != null) {
+			setUserId(userId);
+		}
+
+		String userName = (String)attributes.get("userName");
+
+		if (userName != null) {
+			setUserName(userName);
+		}
+
+		Date createDate = (Date)attributes.get("createDate");
+
+		if (createDate != null) {
+			setCreateDate(createDate);
+		}
+
+		Date modifiedDate = (Date)attributes.get("modifiedDate");
+
+		if (modifiedDate != null) {
+			setModifiedDate(modifiedDate);
+		}
+
+		Long classNameId = (Long)attributes.get("classNameId");
+
+		if (classNameId != null) {
+			setClassNameId(classNameId);
+		}
+
+		String name = (String)attributes.get("name");
+
+		if (name != null) {
+			setName(name);
+		}
+
+		String description = (String)attributes.get("description");
+
+		if (description != null) {
+			setDescription(description);
+		}
+
+		String portletId = (String)attributes.get("portletId");
+
+		if (portletId != null) {
+			setPortletId(portletId);
+		}
+
+		String typeSettings = (String)attributes.get("typeSettings");
+
+		if (typeSettings != null) {
+			setTypeSettings(typeSettings);
+		}
+
+		Long dlFolderId = (Long)attributes.get("dlFolderId");
+
+		if (dlFolderId != null) {
+			setDlFolderId(dlFolderId);
+		}
 	}
 
 	/**
@@ -52,6 +163,24 @@ public class RepositoryWrapper implements Repository {
 	*/
 	public void setPrimaryKey(long primaryKey) {
 		_repository.setPrimaryKey(primaryKey);
+	}
+
+	/**
+	* Returns the uuid of this repository.
+	*
+	* @return the uuid of this repository
+	*/
+	public java.lang.String getUuid() {
+		return _repository.getUuid();
+	}
+
+	/**
+	* Sets the uuid of this repository.
+	*
+	* @param uuid the uuid of this repository
+	*/
+	public void setUuid(java.lang.String uuid) {
+		_repository.setUuid(uuid);
 	}
 
 	/**
@@ -109,6 +238,62 @@ public class RepositoryWrapper implements Repository {
 	}
 
 	/**
+	* Returns the user ID of this repository.
+	*
+	* @return the user ID of this repository
+	*/
+	public long getUserId() {
+		return _repository.getUserId();
+	}
+
+	/**
+	* Sets the user ID of this repository.
+	*
+	* @param userId the user ID of this repository
+	*/
+	public void setUserId(long userId) {
+		_repository.setUserId(userId);
+	}
+
+	/**
+	* Returns the user uuid of this repository.
+	*
+	* @return the user uuid of this repository
+	* @throws SystemException if a system exception occurred
+	*/
+	public java.lang.String getUserUuid()
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return _repository.getUserUuid();
+	}
+
+	/**
+	* Sets the user uuid of this repository.
+	*
+	* @param userUuid the user uuid of this repository
+	*/
+	public void setUserUuid(java.lang.String userUuid) {
+		_repository.setUserUuid(userUuid);
+	}
+
+	/**
+	* Returns the user name of this repository.
+	*
+	* @return the user name of this repository
+	*/
+	public java.lang.String getUserName() {
+		return _repository.getUserName();
+	}
+
+	/**
+	* Sets the user name of this repository.
+	*
+	* @param userName the user name of this repository
+	*/
+	public void setUserName(java.lang.String userName) {
+		_repository.setUserName(userName);
+	}
+
+	/**
 	* Returns the create date of this repository.
 	*
 	* @return the create date of this repository
@@ -151,6 +336,10 @@ public class RepositoryWrapper implements Repository {
 	*/
 	public java.lang.String getClassName() {
 		return _repository.getClassName();
+	}
+
+	public void setClassName(java.lang.String className) {
+		_repository.setClassName(className);
 	}
 
 	/**
@@ -281,10 +470,6 @@ public class RepositoryWrapper implements Repository {
 		return _repository.isEscapedModel();
 	}
 
-	public void setEscapedModel(boolean escapedModel) {
-		_repository.setEscapedModel(escapedModel);
-	}
-
 	public java.io.Serializable getPrimaryKeyObj() {
 		return _repository.getPrimaryKeyObj();
 	}
@@ -333,6 +518,11 @@ public class RepositoryWrapper implements Repository {
 		return _repository.toXmlString();
 	}
 
+	public void persist()
+		throws com.liferay.portal.kernel.exception.SystemException {
+		_repository.persist();
+	}
+
 	public com.liferay.portal.kernel.util.UnicodeProperties getTypeSettingsProperties() {
 		return _repository.getTypeSettingsProperties();
 	}
@@ -342,7 +532,14 @@ public class RepositoryWrapper implements Repository {
 		_repository.setTypeSettingsProperties(typeSettingsProperties);
 	}
 
+	/**
+	 * @deprecated Renamed to {@link #getWrappedModel}
+	 */
 	public Repository getWrappedRepository() {
+		return _repository;
+	}
+
+	public Repository getWrappedModel() {
 		return _repository;
 	}
 

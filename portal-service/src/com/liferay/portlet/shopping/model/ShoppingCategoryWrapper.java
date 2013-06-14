@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,6 +14,12 @@
 
 package com.liferay.portlet.shopping.model;
 
+import com.liferay.portal.model.ModelWrapper;
+
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * <p>
  * This class is a wrapper for {@link ShoppingCategory}.
@@ -23,7 +29,8 @@ package com.liferay.portlet.shopping.model;
  * @see       ShoppingCategory
  * @generated
  */
-public class ShoppingCategoryWrapper implements ShoppingCategory {
+public class ShoppingCategoryWrapper implements ShoppingCategory,
+	ModelWrapper<ShoppingCategory> {
 	public ShoppingCategoryWrapper(ShoppingCategory shoppingCategory) {
 		_shoppingCategory = shoppingCategory;
 	}
@@ -34,6 +41,85 @@ public class ShoppingCategoryWrapper implements ShoppingCategory {
 
 	public String getModelClassName() {
 		return ShoppingCategory.class.getName();
+	}
+
+	public Map<String, Object> getModelAttributes() {
+		Map<String, Object> attributes = new HashMap<String, Object>();
+
+		attributes.put("categoryId", getCategoryId());
+		attributes.put("groupId", getGroupId());
+		attributes.put("companyId", getCompanyId());
+		attributes.put("userId", getUserId());
+		attributes.put("userName", getUserName());
+		attributes.put("createDate", getCreateDate());
+		attributes.put("modifiedDate", getModifiedDate());
+		attributes.put("parentCategoryId", getParentCategoryId());
+		attributes.put("name", getName());
+		attributes.put("description", getDescription());
+
+		return attributes;
+	}
+
+	public void setModelAttributes(Map<String, Object> attributes) {
+		Long categoryId = (Long)attributes.get("categoryId");
+
+		if (categoryId != null) {
+			setCategoryId(categoryId);
+		}
+
+		Long groupId = (Long)attributes.get("groupId");
+
+		if (groupId != null) {
+			setGroupId(groupId);
+		}
+
+		Long companyId = (Long)attributes.get("companyId");
+
+		if (companyId != null) {
+			setCompanyId(companyId);
+		}
+
+		Long userId = (Long)attributes.get("userId");
+
+		if (userId != null) {
+			setUserId(userId);
+		}
+
+		String userName = (String)attributes.get("userName");
+
+		if (userName != null) {
+			setUserName(userName);
+		}
+
+		Date createDate = (Date)attributes.get("createDate");
+
+		if (createDate != null) {
+			setCreateDate(createDate);
+		}
+
+		Date modifiedDate = (Date)attributes.get("modifiedDate");
+
+		if (modifiedDate != null) {
+			setModifiedDate(modifiedDate);
+		}
+
+		Long parentCategoryId = (Long)attributes.get("parentCategoryId");
+
+		if (parentCategoryId != null) {
+			setParentCategoryId(parentCategoryId);
+		}
+
+		String name = (String)attributes.get("name");
+
+		if (name != null) {
+			setName(name);
+		}
+
+		String description = (String)attributes.get("description");
+
+		if (description != null) {
+			setDescription(description);
+		}
 	}
 
 	/**
@@ -274,10 +360,6 @@ public class ShoppingCategoryWrapper implements ShoppingCategory {
 		return _shoppingCategory.isEscapedModel();
 	}
 
-	public void setEscapedModel(boolean escapedModel) {
-		_shoppingCategory.setEscapedModel(escapedModel);
-	}
-
 	public java.io.Serializable getPrimaryKeyObj() {
 		return _shoppingCategory.getPrimaryKeyObj();
 	}
@@ -336,7 +418,14 @@ public class ShoppingCategoryWrapper implements ShoppingCategory {
 		return _shoppingCategory.isRoot();
 	}
 
+	/**
+	 * @deprecated Renamed to {@link #getWrappedModel}
+	 */
 	public ShoppingCategory getWrappedShoppingCategory() {
+		return _shoppingCategory;
+	}
+
+	public ShoppingCategory getWrappedModel() {
 		return _shoppingCategory;
 	}
 

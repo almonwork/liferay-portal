@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -64,8 +64,7 @@ public class ShardParameterAdvice implements MethodInterceptor {
 		_shardAdvice = shardAdvice;
 	}
 
-	private static Log _log = LogFactoryUtil.getLog(
-		ShardParameterAdvice.class);
+	private static Log _log = LogFactoryUtil.getLog(ShardParameterAdvice.class);
 
 	private ShardAdvice _shardAdvice;
 

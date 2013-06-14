@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -24,6 +24,7 @@ import javax.servlet.jsp.PageContext;
  */
 public abstract class ConditionalTagSupport extends TagSupport {
 
+	@Override
 	@SuppressWarnings("unused")
 	public int doStartTag() throws JspTagException {
 		_result = condition();
@@ -40,6 +41,7 @@ public abstract class ConditionalTagSupport extends TagSupport {
 		}
 	}
 
+	@Override
 	public void release() {
 		super.release();
 

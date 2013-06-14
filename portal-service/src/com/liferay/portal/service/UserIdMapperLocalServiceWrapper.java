@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -23,7 +23,8 @@ package com.liferay.portal.service;
  * @see       UserIdMapperLocalService
  * @generated
  */
-public class UserIdMapperLocalServiceWrapper implements UserIdMapperLocalService {
+public class UserIdMapperLocalServiceWrapper implements UserIdMapperLocalService,
+	ServiceWrapper<UserIdMapperLocalService> {
 	public UserIdMapperLocalServiceWrapper(
 		UserIdMapperLocalService userIdMapperLocalService) {
 		_userIdMapperLocalService = userIdMapperLocalService;
@@ -57,25 +58,32 @@ public class UserIdMapperLocalServiceWrapper implements UserIdMapperLocalService
 	* Deletes the user ID mapper with the primary key from the database. Also notifies the appropriate model listeners.
 	*
 	* @param userIdMapperId the primary key of the user ID mapper
+	* @return the user ID mapper that was removed
 	* @throws PortalException if a user ID mapper with the primary key could not be found
 	* @throws SystemException if a system exception occurred
 	*/
-	public void deleteUserIdMapper(long userIdMapperId)
+	public com.liferay.portal.model.UserIdMapper deleteUserIdMapper(
+		long userIdMapperId)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException {
-		_userIdMapperLocalService.deleteUserIdMapper(userIdMapperId);
+		return _userIdMapperLocalService.deleteUserIdMapper(userIdMapperId);
 	}
 
 	/**
 	* Deletes the user ID mapper from the database. Also notifies the appropriate model listeners.
 	*
 	* @param userIdMapper the user ID mapper
+	* @return the user ID mapper that was removed
 	* @throws SystemException if a system exception occurred
 	*/
-	public void deleteUserIdMapper(
+	public com.liferay.portal.model.UserIdMapper deleteUserIdMapper(
 		com.liferay.portal.model.UserIdMapper userIdMapper)
 		throws com.liferay.portal.kernel.exception.SystemException {
-		_userIdMapperLocalService.deleteUserIdMapper(userIdMapper);
+		return _userIdMapperLocalService.deleteUserIdMapper(userIdMapper);
+	}
+
+	public com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery() {
+		return _userIdMapperLocalService.dynamicQuery();
 	}
 
 	/**
@@ -147,6 +155,12 @@ public class UserIdMapperLocalServiceWrapper implements UserIdMapperLocalService
 		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery)
 		throws com.liferay.portal.kernel.exception.SystemException {
 		return _userIdMapperLocalService.dynamicQueryCount(dynamicQuery);
+	}
+
+	public com.liferay.portal.model.UserIdMapper fetchUserIdMapper(
+		long userIdMapperId)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return _userIdMapperLocalService.fetchUserIdMapper(userIdMapperId);
 	}
 
 	/**
@@ -278,11 +292,26 @@ public class UserIdMapperLocalServiceWrapper implements UserIdMapperLocalService
 			description, externalUserId);
 	}
 
+	/**
+	 * @deprecated Renamed to {@link #getWrappedService}
+	 */
 	public UserIdMapperLocalService getWrappedUserIdMapperLocalService() {
 		return _userIdMapperLocalService;
 	}
 
+	/**
+	 * @deprecated Renamed to {@link #setWrappedService}
+	 */
 	public void setWrappedUserIdMapperLocalService(
+		UserIdMapperLocalService userIdMapperLocalService) {
+		_userIdMapperLocalService = userIdMapperLocalService;
+	}
+
+	public UserIdMapperLocalService getWrappedService() {
+		return _userIdMapperLocalService;
+	}
+
+	public void setWrappedService(
 		UserIdMapperLocalService userIdMapperLocalService) {
 		_userIdMapperLocalService = userIdMapperLocalService;
 	}

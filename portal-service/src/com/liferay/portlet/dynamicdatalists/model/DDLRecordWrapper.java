@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,6 +14,12 @@
 
 package com.liferay.portlet.dynamicdatalists.model;
 
+import com.liferay.portal.model.ModelWrapper;
+
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * <p>
  * This class is a wrapper for {@link DDLRecord}.
@@ -23,7 +29,7 @@ package com.liferay.portlet.dynamicdatalists.model;
  * @see       DDLRecord
  * @generated
  */
-public class DDLRecordWrapper implements DDLRecord {
+public class DDLRecordWrapper implements DDLRecord, ModelWrapper<DDLRecord> {
 	public DDLRecordWrapper(DDLRecord ddlRecord) {
 		_ddlRecord = ddlRecord;
 	}
@@ -34,6 +40,113 @@ public class DDLRecordWrapper implements DDLRecord {
 
 	public String getModelClassName() {
 		return DDLRecord.class.getName();
+	}
+
+	public Map<String, Object> getModelAttributes() {
+		Map<String, Object> attributes = new HashMap<String, Object>();
+
+		attributes.put("uuid", getUuid());
+		attributes.put("recordId", getRecordId());
+		attributes.put("groupId", getGroupId());
+		attributes.put("companyId", getCompanyId());
+		attributes.put("userId", getUserId());
+		attributes.put("userName", getUserName());
+		attributes.put("versionUserId", getVersionUserId());
+		attributes.put("versionUserName", getVersionUserName());
+		attributes.put("createDate", getCreateDate());
+		attributes.put("modifiedDate", getModifiedDate());
+		attributes.put("DDMStorageId", getDDMStorageId());
+		attributes.put("recordSetId", getRecordSetId());
+		attributes.put("version", getVersion());
+		attributes.put("displayIndex", getDisplayIndex());
+
+		return attributes;
+	}
+
+	public void setModelAttributes(Map<String, Object> attributes) {
+		String uuid = (String)attributes.get("uuid");
+
+		if (uuid != null) {
+			setUuid(uuid);
+		}
+
+		Long recordId = (Long)attributes.get("recordId");
+
+		if (recordId != null) {
+			setRecordId(recordId);
+		}
+
+		Long groupId = (Long)attributes.get("groupId");
+
+		if (groupId != null) {
+			setGroupId(groupId);
+		}
+
+		Long companyId = (Long)attributes.get("companyId");
+
+		if (companyId != null) {
+			setCompanyId(companyId);
+		}
+
+		Long userId = (Long)attributes.get("userId");
+
+		if (userId != null) {
+			setUserId(userId);
+		}
+
+		String userName = (String)attributes.get("userName");
+
+		if (userName != null) {
+			setUserName(userName);
+		}
+
+		Long versionUserId = (Long)attributes.get("versionUserId");
+
+		if (versionUserId != null) {
+			setVersionUserId(versionUserId);
+		}
+
+		String versionUserName = (String)attributes.get("versionUserName");
+
+		if (versionUserName != null) {
+			setVersionUserName(versionUserName);
+		}
+
+		Date createDate = (Date)attributes.get("createDate");
+
+		if (createDate != null) {
+			setCreateDate(createDate);
+		}
+
+		Date modifiedDate = (Date)attributes.get("modifiedDate");
+
+		if (modifiedDate != null) {
+			setModifiedDate(modifiedDate);
+		}
+
+		Long DDMStorageId = (Long)attributes.get("DDMStorageId");
+
+		if (DDMStorageId != null) {
+			setDDMStorageId(DDMStorageId);
+		}
+
+		Long recordSetId = (Long)attributes.get("recordSetId");
+
+		if (recordSetId != null) {
+			setRecordSetId(recordSetId);
+		}
+
+		String version = (String)attributes.get("version");
+
+		if (version != null) {
+			setVersion(version);
+		}
+
+		Integer displayIndex = (Integer)attributes.get("displayIndex");
+
+		if (displayIndex != null) {
+			setDisplayIndex(displayIndex);
+		}
 	}
 
 	/**
@@ -366,10 +479,6 @@ public class DDLRecordWrapper implements DDLRecord {
 		return _ddlRecord.isEscapedModel();
 	}
 
-	public void setEscapedModel(boolean escapedModel) {
-		_ddlRecord.setEscapedModel(escapedModel);
-	}
-
 	public java.io.Serializable getPrimaryKeyObj() {
 		return _ddlRecord.getPrimaryKeyObj();
 	}
@@ -426,7 +535,7 @@ public class DDLRecordWrapper implements DDLRecord {
 
 	public com.liferay.portlet.dynamicdatamapping.storage.Field getField(
 		java.lang.String fieldName)
-		throws com.liferay.portlet.dynamicdatamapping.StorageException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		return _ddlRecord.getField(fieldName);
 	}
 
@@ -437,7 +546,7 @@ public class DDLRecordWrapper implements DDLRecord {
 	}
 
 	public com.liferay.portlet.dynamicdatamapping.storage.Fields getFields()
-		throws com.liferay.portlet.dynamicdatamapping.StorageException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		return _ddlRecord.getFields();
 	}
 
@@ -447,7 +556,7 @@ public class DDLRecordWrapper implements DDLRecord {
 	}
 
 	public java.io.Serializable getFieldValue(java.lang.String fieldName)
-		throws com.liferay.portlet.dynamicdatamapping.StorageException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		return _ddlRecord.getFieldValue(fieldName);
 	}
 
@@ -482,7 +591,14 @@ public class DDLRecordWrapper implements DDLRecord {
 		return _ddlRecord.getStatus();
 	}
 
+	/**
+	 * @deprecated Renamed to {@link #getWrappedModel}
+	 */
 	public DDLRecord getWrappedDDLRecord() {
+		return _ddlRecord;
+	}
+
+	public DDLRecord getWrappedModel() {
 		return _ddlRecord;
 	}
 

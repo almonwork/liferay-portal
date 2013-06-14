@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -17,6 +17,7 @@ package com.liferay.portal.model.impl;
 import com.liferay.portal.kernel.bean.AutoEscapeBeanHandler;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.ProxyUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.model.CacheModel;
@@ -30,11 +31,11 @@ import com.liferay.portlet.expando.util.ExpandoBridgeFactoryUtil;
 
 import java.io.Serializable;
 
-import java.lang.reflect.Proxy;
-
 import java.sql.Types;
 
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * The base model implementation for the Lock service. Represents a row in the &quot;Lock_&quot; database table, with each column mapped to a property of this class.
@@ -69,7 +70,7 @@ public class LockModelImpl extends BaseModelImpl<Lock> implements LockModel {
 			{ "inheritable", Types.BOOLEAN },
 			{ "expirationDate", Types.TIMESTAMP }
 		};
-	public static final String TABLE_SQL_CREATE = "create table Lock_ (uuid_ VARCHAR(75) null,lockId LONG not null primary key,companyId LONG,userId LONG,userName VARCHAR(75) null,createDate DATE null,className VARCHAR(75) null,key_ VARCHAR(200) null,owner VARCHAR(300) null,inheritable BOOLEAN,expirationDate DATE null)";
+	public static final String TABLE_SQL_CREATE = "create table Lock_ (uuid_ VARCHAR(75) null,lockId LONG not null primary key,companyId LONG,userId LONG,userName VARCHAR(75) null,createDate DATE null,className VARCHAR(75) null,key_ VARCHAR(200) null,owner VARCHAR(255) null,inheritable BOOLEAN,expirationDate DATE null)";
 	public static final String TABLE_SQL_DROP = "drop table Lock_";
 	public static final String DATA_SOURCE = "liferayDataSource";
 	public static final String SESSION_FACTORY = "liferaySessionFactory";
@@ -80,15 +81,15 @@ public class LockModelImpl extends BaseModelImpl<Lock> implements LockModel {
 	public static final boolean FINDER_CACHE_ENABLED = GetterUtil.getBoolean(com.liferay.portal.util.PropsUtil.get(
 				"value.object.finder.cache.enabled.com.liferay.portal.model.Lock"),
 			true);
-
-	public Class<?> getModelClass() {
-		return Lock.class;
-	}
-
-	public String getModelClassName() {
-		return Lock.class.getName();
-	}
-
+	public static final boolean COLUMN_BITMASK_ENABLED = GetterUtil.getBoolean(com.liferay.portal.util.PropsUtil.get(
+				"value.object.column.bitmask.enabled.com.liferay.portal.model.Lock"),
+			true);
+	public static long CLASSNAME_COLUMN_BITMASK = 1L;
+	public static long COMPANYID_COLUMN_BITMASK = 2L;
+	public static long EXPIRATIONDATE_COLUMN_BITMASK = 4L;
+	public static long KEY_COLUMN_BITMASK = 8L;
+	public static long OWNER_COLUMN_BITMASK = 16L;
+	public static long UUID_COLUMN_BITMASK = 32L;
 	public static final long LOCK_EXPIRATION_TIME = GetterUtil.getLong(com.liferay.portal.util.PropsUtil.get(
 				"lock.expiration.time.com.liferay.portal.model.Lock"));
 
@@ -111,6 +112,102 @@ public class LockModelImpl extends BaseModelImpl<Lock> implements LockModel {
 		setPrimaryKey(((Long)primaryKeyObj).longValue());
 	}
 
+	public Class<?> getModelClass() {
+		return Lock.class;
+	}
+
+	public String getModelClassName() {
+		return Lock.class.getName();
+	}
+
+	@Override
+	public Map<String, Object> getModelAttributes() {
+		Map<String, Object> attributes = new HashMap<String, Object>();
+
+		attributes.put("uuid", getUuid());
+		attributes.put("lockId", getLockId());
+		attributes.put("companyId", getCompanyId());
+		attributes.put("userId", getUserId());
+		attributes.put("userName", getUserName());
+		attributes.put("createDate", getCreateDate());
+		attributes.put("className", getClassName());
+		attributes.put("key", getKey());
+		attributes.put("owner", getOwner());
+		attributes.put("inheritable", getInheritable());
+		attributes.put("expirationDate", getExpirationDate());
+
+		return attributes;
+	}
+
+	@Override
+	public void setModelAttributes(Map<String, Object> attributes) {
+		String uuid = (String)attributes.get("uuid");
+
+		if (uuid != null) {
+			setUuid(uuid);
+		}
+
+		Long lockId = (Long)attributes.get("lockId");
+
+		if (lockId != null) {
+			setLockId(lockId);
+		}
+
+		Long companyId = (Long)attributes.get("companyId");
+
+		if (companyId != null) {
+			setCompanyId(companyId);
+		}
+
+		Long userId = (Long)attributes.get("userId");
+
+		if (userId != null) {
+			setUserId(userId);
+		}
+
+		String userName = (String)attributes.get("userName");
+
+		if (userName != null) {
+			setUserName(userName);
+		}
+
+		Date createDate = (Date)attributes.get("createDate");
+
+		if (createDate != null) {
+			setCreateDate(createDate);
+		}
+
+		String className = (String)attributes.get("className");
+
+		if (className != null) {
+			setClassName(className);
+		}
+
+		String key = (String)attributes.get("key");
+
+		if (key != null) {
+			setKey(key);
+		}
+
+		String owner = (String)attributes.get("owner");
+
+		if (owner != null) {
+			setOwner(owner);
+		}
+
+		Boolean inheritable = (Boolean)attributes.get("inheritable");
+
+		if (inheritable != null) {
+			setInheritable(inheritable);
+		}
+
+		Date expirationDate = (Date)attributes.get("expirationDate");
+
+		if (expirationDate != null) {
+			setExpirationDate(expirationDate);
+		}
+	}
+
 	public String getUuid() {
 		if (_uuid == null) {
 			return StringPool.BLANK;
@@ -121,7 +218,15 @@ public class LockModelImpl extends BaseModelImpl<Lock> implements LockModel {
 	}
 
 	public void setUuid(String uuid) {
+		if (_originalUuid == null) {
+			_originalUuid = _uuid;
+		}
+
 		_uuid = uuid;
+	}
+
+	public String getOriginalUuid() {
+		return GetterUtil.getString(_originalUuid);
 	}
 
 	public long getLockId() {
@@ -137,7 +242,19 @@ public class LockModelImpl extends BaseModelImpl<Lock> implements LockModel {
 	}
 
 	public void setCompanyId(long companyId) {
+		_columnBitmask |= COMPANYID_COLUMN_BITMASK;
+
+		if (!_setOriginalCompanyId) {
+			_setOriginalCompanyId = true;
+
+			_originalCompanyId = _companyId;
+		}
+
 		_companyId = companyId;
+	}
+
+	public long getOriginalCompanyId() {
+		return _originalCompanyId;
 	}
 
 	public long getUserId() {
@@ -187,6 +304,8 @@ public class LockModelImpl extends BaseModelImpl<Lock> implements LockModel {
 	}
 
 	public void setClassName(String className) {
+		_columnBitmask |= CLASSNAME_COLUMN_BITMASK;
+
 		if (_originalClassName == null) {
 			_originalClassName = _className;
 		}
@@ -208,6 +327,8 @@ public class LockModelImpl extends BaseModelImpl<Lock> implements LockModel {
 	}
 
 	public void setKey(String key) {
+		_columnBitmask |= KEY_COLUMN_BITMASK;
+
 		if (_originalKey == null) {
 			_originalKey = _key;
 		}
@@ -229,7 +350,17 @@ public class LockModelImpl extends BaseModelImpl<Lock> implements LockModel {
 	}
 
 	public void setOwner(String owner) {
+		_columnBitmask |= OWNER_COLUMN_BITMASK;
+
+		if (_originalOwner == null) {
+			_originalOwner = _owner;
+		}
+
 		_owner = owner;
+	}
+
+	public String getOriginalOwner() {
+		return GetterUtil.getString(_originalOwner);
 	}
 
 	public boolean getInheritable() {
@@ -249,38 +380,45 @@ public class LockModelImpl extends BaseModelImpl<Lock> implements LockModel {
 	}
 
 	public void setExpirationDate(Date expirationDate) {
+		_columnBitmask |= EXPIRATIONDATE_COLUMN_BITMASK;
+
+		if (_originalExpirationDate == null) {
+			_originalExpirationDate = _expirationDate;
+		}
+
 		_expirationDate = expirationDate;
+	}
+
+	public Date getOriginalExpirationDate() {
+		return _originalExpirationDate;
+	}
+
+	public long getColumnBitmask() {
+		return _columnBitmask;
 	}
 
 	@Override
 	public Lock toEscapedModel() {
-		if (isEscapedModel()) {
-			return (Lock)this;
+		if (_escapedModelProxy == null) {
+			_escapedModelProxy = (Lock)ProxyUtil.newProxyInstance(_classLoader,
+					_escapedModelProxyInterfaces,
+					new AutoEscapeBeanHandler(this));
 		}
-		else {
-			if (_escapedModelProxy == null) {
-				_escapedModelProxy = (Lock)Proxy.newProxyInstance(_classLoader,
-						_escapedModelProxyInterfaces,
-						new AutoEscapeBeanHandler(this));
-			}
 
-			return _escapedModelProxy;
-		}
+		return _escapedModelProxy;
 	}
 
 	@Override
 	public ExpandoBridge getExpandoBridge() {
-		if (_expandoBridge == null) {
-			_expandoBridge = ExpandoBridgeFactoryUtil.getExpandoBridge(getCompanyId(),
-					Lock.class.getName(), getPrimaryKey());
-		}
-
-		return _expandoBridge;
+		return ExpandoBridgeFactoryUtil.getExpandoBridge(getCompanyId(),
+			Lock.class.getName(), getPrimaryKey());
 	}
 
 	@Override
 	public void setExpandoBridgeAttributes(ServiceContext serviceContext) {
-		getExpandoBridge().setAttributes(serviceContext);
+		ExpandoBridge expandoBridge = getExpandoBridge();
+
+		expandoBridge.setAttributes(serviceContext);
 	}
 
 	@Override
@@ -352,9 +490,21 @@ public class LockModelImpl extends BaseModelImpl<Lock> implements LockModel {
 	public void resetOriginalValues() {
 		LockModelImpl lockModelImpl = this;
 
+		lockModelImpl._originalUuid = lockModelImpl._uuid;
+
+		lockModelImpl._originalCompanyId = lockModelImpl._companyId;
+
+		lockModelImpl._setOriginalCompanyId = false;
+
 		lockModelImpl._originalClassName = lockModelImpl._className;
 
 		lockModelImpl._originalKey = lockModelImpl._key;
+
+		lockModelImpl._originalOwner = lockModelImpl._owner;
+
+		lockModelImpl._originalExpirationDate = lockModelImpl._expirationDate;
+
+		lockModelImpl._columnBitmask = 0;
 	}
 
 	@Override
@@ -523,8 +673,11 @@ public class LockModelImpl extends BaseModelImpl<Lock> implements LockModel {
 			Lock.class
 		};
 	private String _uuid;
+	private String _originalUuid;
 	private long _lockId;
 	private long _companyId;
+	private long _originalCompanyId;
+	private boolean _setOriginalCompanyId;
 	private long _userId;
 	private String _userUuid;
 	private String _userName;
@@ -534,8 +687,10 @@ public class LockModelImpl extends BaseModelImpl<Lock> implements LockModel {
 	private String _key;
 	private String _originalKey;
 	private String _owner;
+	private String _originalOwner;
 	private boolean _inheritable;
 	private Date _expirationDate;
-	private transient ExpandoBridge _expandoBridge;
+	private Date _originalExpirationDate;
+	private long _columnBitmask;
 	private Lock _escapedModelProxy;
 }

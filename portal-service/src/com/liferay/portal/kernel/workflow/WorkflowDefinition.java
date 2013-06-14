@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -22,18 +22,21 @@ import java.util.Map;
  * @author Micha Kiener
  * @author Shuyang Zhou
  * @author Brian Wing Shun Chan
+ * @author Eduardo Lundgren
  */
 public interface WorkflowDefinition {
+
+	public String getContent();
 
 	public InputStream getInputStream();
 
 	public String getName();
 
+	public Map<String, Object> getOptionalAttributes();
+
 	public String getTitle();
 
 	public String getTitle(String languageId);
-
-	public Map<String, Object> getOptionalAttributes();
 
 	public int getVersion();
 

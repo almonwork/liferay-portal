@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -38,7 +38,7 @@ if (Validator.isNotNull(portletResource)) {
 		portletResourceLabel = LanguageUtil.get(pageContext, "general");
 	}
 	else {
-		portletResourceLabel = PortalUtil.getPortletTitle(portlet, application, locale);
+		portletResourceLabel = PortalUtil.getPortletLongTitle(portlet, application, locale);
 	}
 }
 
@@ -57,19 +57,12 @@ portletURL.setParameter("tabs1", tabs1);
 portletURL.setParameter("tabs2", tabs2);
 portletURL.setParameter("roleId", String.valueOf(role.getRoleId()));
 
-PortletURL viewPermissionsURL = renderResponse.createRenderURL();
-
-viewPermissionsURL.setParameter("struts_action", "/roles_admin/edit_role_permissions");
-viewPermissionsURL.setParameter(Constants.CMD, Constants.VIEW);
-viewPermissionsURL.setParameter("tabs1", "roles");
-viewPermissionsURL.setParameter("roleId", String.valueOf(role.getRoleId()));
-
 PortletURL editPermissionsURL = renderResponse.createRenderURL();
 
 editPermissionsURL.setParameter("struts_action", "/roles_admin/edit_role_permissions");
 editPermissionsURL.setParameter(Constants.CMD, Constants.EDIT);
 editPermissionsURL.setParameter("tabs1", "roles");
-editPermissionsURL.setParameter("redirect", viewPermissionsURL.toString());
+editPermissionsURL.setParameter("redirect", backURL);
 editPermissionsURL.setParameter("roleId", String.valueOf(role.getRoleId()));
 %>
 
@@ -186,6 +179,16 @@ editPermissionsURL.setParameter("roleId", String.valueOf(role.getRoleId()));
 		var permissionsURL = field.value;
 
 		if (permissionsURL == '') {
+
+			<%
+			PortletURL viewPermissionsURL = renderResponse.createRenderURL();
+
+			viewPermissionsURL.setParameter("struts_action", "/roles_admin/edit_role_permissions");
+			viewPermissionsURL.setParameter(Constants.CMD, Constants.VIEW);
+			viewPermissionsURL.setParameter("tabs1", "roles");
+			viewPermissionsURL.setParameter("roleId", String.valueOf(role.getRoleId()));
+			%>
+
 			permissionsURL = '<%= viewPermissionsURL %>';
 		}
 
@@ -241,11 +244,11 @@ editPermissionsURL.setParameter("roleId", String.valueOf(role.getRoleId()));
 			var id = selectedGroupIds[i];
 			var name = selectedGroupNames[i];
 
-			groupsHTML += '<span class="permission-scope">' + name + '<a class="permission-scope-delete" href="javascript:<portlet:namespace />removeGroup(' + i + ', \'' + target + '\' );"><span>x</span></a></span>';
+			groupsHTML += '<span class="lfr-token"><span class="lfr-token-text">' + name + '</span><a class="aui-icon aui-icon-close lfr-token-close" href="javascript:<portlet:namespace />removeGroup(' + i + ', \'' + target + '\' );"></a></span>';
 		}
 
 		if (groupsHTML == '') {
-			groupsHTML = '<%= LanguageUtil.get(pageContext, "portal") %>';
+			groupsHTML = '<%= UnicodeLanguageUtil.get(pageContext, "portal") %>';
 		}
 
 		nameEl.innerHTML = groupsHTML;

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -16,8 +16,10 @@ package com.liferay.portlet.asset.model.impl;
 
 import com.liferay.portal.kernel.bean.AutoEscapeBeanHandler;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.ProxyUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
+import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.model.CacheModel;
 import com.liferay.portal.model.impl.BaseModelImpl;
 import com.liferay.portal.service.ServiceContext;
@@ -30,9 +32,10 @@ import com.liferay.portlet.expando.util.ExpandoBridgeFactoryUtil;
 
 import java.io.Serializable;
 
-import java.lang.reflect.Proxy;
-
 import java.sql.Types;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * The base model implementation for the AssetTagStats service. Represents a row in the &quot;AssetTagStats&quot; database table, with each column mapped to a property of this class.
@@ -74,15 +77,11 @@ public class AssetTagStatsModelImpl extends BaseModelImpl<AssetTagStats>
 	public static final boolean FINDER_CACHE_ENABLED = GetterUtil.getBoolean(com.liferay.portal.util.PropsUtil.get(
 				"value.object.finder.cache.enabled.com.liferay.portlet.asset.model.AssetTagStats"),
 			true);
-
-	public Class<?> getModelClass() {
-		return AssetTagStats.class;
-	}
-
-	public String getModelClassName() {
-		return AssetTagStats.class.getName();
-	}
-
+	public static final boolean COLUMN_BITMASK_ENABLED = GetterUtil.getBoolean(com.liferay.portal.util.PropsUtil.get(
+				"value.object.column.bitmask.enabled.com.liferay.portlet.asset.model.AssetTagStats"),
+			true);
+	public static long CLASSNAMEID_COLUMN_BITMASK = 1L;
+	public static long TAGID_COLUMN_BITMASK = 2L;
 	public static final long LOCK_EXPIRATION_TIME = GetterUtil.getLong(com.liferay.portal.util.PropsUtil.get(
 				"lock.expiration.time.com.liferay.portlet.asset.model.AssetTagStats"));
 
@@ -105,6 +104,53 @@ public class AssetTagStatsModelImpl extends BaseModelImpl<AssetTagStats>
 		setPrimaryKey(((Long)primaryKeyObj).longValue());
 	}
 
+	public Class<?> getModelClass() {
+		return AssetTagStats.class;
+	}
+
+	public String getModelClassName() {
+		return AssetTagStats.class.getName();
+	}
+
+	@Override
+	public Map<String, Object> getModelAttributes() {
+		Map<String, Object> attributes = new HashMap<String, Object>();
+
+		attributes.put("tagStatsId", getTagStatsId());
+		attributes.put("tagId", getTagId());
+		attributes.put("classNameId", getClassNameId());
+		attributes.put("assetCount", getAssetCount());
+
+		return attributes;
+	}
+
+	@Override
+	public void setModelAttributes(Map<String, Object> attributes) {
+		Long tagStatsId = (Long)attributes.get("tagStatsId");
+
+		if (tagStatsId != null) {
+			setTagStatsId(tagStatsId);
+		}
+
+		Long tagId = (Long)attributes.get("tagId");
+
+		if (tagId != null) {
+			setTagId(tagId);
+		}
+
+		Long classNameId = (Long)attributes.get("classNameId");
+
+		if (classNameId != null) {
+			setClassNameId(classNameId);
+		}
+
+		Integer assetCount = (Integer)attributes.get("assetCount");
+
+		if (assetCount != null) {
+			setAssetCount(assetCount);
+		}
+	}
+
 	public long getTagStatsId() {
 		return _tagStatsId;
 	}
@@ -118,6 +164,8 @@ public class AssetTagStatsModelImpl extends BaseModelImpl<AssetTagStats>
 	}
 
 	public void setTagId(long tagId) {
+		_columnBitmask |= TAGID_COLUMN_BITMASK;
+
 		if (!_setOriginalTagId) {
 			_setOriginalTagId = true;
 
@@ -139,11 +187,23 @@ public class AssetTagStatsModelImpl extends BaseModelImpl<AssetTagStats>
 		return PortalUtil.getClassName(getClassNameId());
 	}
 
+	public void setClassName(String className) {
+		long classNameId = 0;
+
+		if (Validator.isNotNull(className)) {
+			classNameId = PortalUtil.getClassNameId(className);
+		}
+
+		setClassNameId(classNameId);
+	}
+
 	public long getClassNameId() {
 		return _classNameId;
 	}
 
 	public void setClassNameId(long classNameId) {
+		_columnBitmask |= CLASSNAMEID_COLUMN_BITMASK;
+
 		if (!_setOriginalClassNameId) {
 			_setOriginalClassNameId = true;
 
@@ -162,38 +222,37 @@ public class AssetTagStatsModelImpl extends BaseModelImpl<AssetTagStats>
 	}
 
 	public void setAssetCount(int assetCount) {
+		_columnBitmask = -1L;
+
 		_assetCount = assetCount;
+	}
+
+	public long getColumnBitmask() {
+		return _columnBitmask;
 	}
 
 	@Override
 	public AssetTagStats toEscapedModel() {
-		if (isEscapedModel()) {
-			return (AssetTagStats)this;
+		if (_escapedModelProxy == null) {
+			_escapedModelProxy = (AssetTagStats)ProxyUtil.newProxyInstance(_classLoader,
+					_escapedModelProxyInterfaces,
+					new AutoEscapeBeanHandler(this));
 		}
-		else {
-			if (_escapedModelProxy == null) {
-				_escapedModelProxy = (AssetTagStats)Proxy.newProxyInstance(_classLoader,
-						_escapedModelProxyInterfaces,
-						new AutoEscapeBeanHandler(this));
-			}
 
-			return _escapedModelProxy;
-		}
+		return _escapedModelProxy;
 	}
 
 	@Override
 	public ExpandoBridge getExpandoBridge() {
-		if (_expandoBridge == null) {
-			_expandoBridge = ExpandoBridgeFactoryUtil.getExpandoBridge(0,
-					AssetTagStats.class.getName(), getPrimaryKey());
-		}
-
-		return _expandoBridge;
+		return ExpandoBridgeFactoryUtil.getExpandoBridge(0,
+			AssetTagStats.class.getName(), getPrimaryKey());
 	}
 
 	@Override
 	public void setExpandoBridgeAttributes(ServiceContext serviceContext) {
-		getExpandoBridge().setAttributes(serviceContext);
+		ExpandoBridge expandoBridge = getExpandoBridge();
+
+		expandoBridge.setAttributes(serviceContext);
 	}
 
 	@Override
@@ -273,6 +332,8 @@ public class AssetTagStatsModelImpl extends BaseModelImpl<AssetTagStats>
 		assetTagStatsModelImpl._originalClassNameId = assetTagStatsModelImpl._classNameId;
 
 		assetTagStatsModelImpl._setOriginalClassNameId = false;
+
+		assetTagStatsModelImpl._columnBitmask = 0;
 	}
 
 	@Override
@@ -348,6 +409,6 @@ public class AssetTagStatsModelImpl extends BaseModelImpl<AssetTagStats>
 	private long _originalClassNameId;
 	private boolean _setOriginalClassNameId;
 	private int _assetCount;
-	private transient ExpandoBridge _expandoBridge;
+	private long _columnBitmask;
 	private AssetTagStats _escapedModelProxy;
 }

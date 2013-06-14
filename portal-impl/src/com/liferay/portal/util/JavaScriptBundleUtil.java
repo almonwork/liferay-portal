@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,11 +14,12 @@
 
 package com.liferay.portal.util;
 
+import com.liferay.portal.kernel.cache.PortalCache;
 import com.liferay.portal.kernel.cache.SingleVMPoolUtil;
 import com.liferay.portal.kernel.configuration.Filter;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.PropsKeys;
-import com.liferay.util.UniqueList;
+import com.liferay.portal.kernel.util.UniqueList;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,16 +29,12 @@ import java.util.List;
  */
 public class JavaScriptBundleUtil {
 
-	public static final String CACHE_NAME =
-		JavaScriptBundleUtil.class.getName();
-
 	public static void clearCache() {
-		SingleVMPoolUtil.clear(CACHE_NAME);
+		_portalCache.removeAll();
 	}
 
 	public static String[] getFileNames(String bundleId) {
-		String[] fileNames = (String[])SingleVMPoolUtil.get(
-			CACHE_NAME, bundleId);
+		String[] fileNames = (String[])_portalCache.get(bundleId);
 
 		if (fileNames == null) {
 			List<String> fileNamesList = new ArrayList<String>();
@@ -53,10 +50,9 @@ public class JavaScriptBundleUtil {
 				}
 			}
 
-			fileNames = fileNamesList.toArray(
-				new String[fileNamesList.size()]);
+			fileNames = fileNamesList.toArray(new String[fileNamesList.size()]);
 
-			SingleVMPoolUtil.put(CACHE_NAME, bundleId, fileNames);
+			_portalCache.put(bundleId, fileNames);
 		}
 
 		return fileNames;
@@ -88,5 +84,11 @@ public class JavaScriptBundleUtil {
 
 		return dependencies;
 	}
+
+	private static final String _CACHE_NAME =
+		JavaScriptBundleUtil.class.getName();
+
+	private static PortalCache _portalCache = SingleVMPoolUtil.getCache(
+		_CACHE_NAME);
 
 }

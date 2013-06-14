@@ -23,7 +23,6 @@
 		<ant dir="portal-impl" target="clean" inheritAll="false" />
 
 		<ant dir="portal-web" target="clean" inheritAll="false" />
-		<ant dir="tunnel-web" target="clean" inheritAll="false" />
 
 		<ant dir="sql" target="clean" inheritAll="false" />
 
@@ -46,6 +45,13 @@
 				includes="${database.name}.*"
 			/>
 		</delete>
+
+		<if>
+			<equals arg1="${app.server.type}" arg2="glassfish" />
+			<then>
+				<delete dir="${app.server.instance.dir}/applications/liferay-portal" />
+			</then>
+		</if>
 
 		<if>
 			<equals arg1="${app.server.type}" arg2="tomcat" />
@@ -71,7 +77,7 @@
 		<delete includeemptydirs="true" failonerror="false">
 			<fileset
 				dir="${app.server.deploy.dir}"
-				includes="*-ext/**,*-hook/**,*-layouttpl/**,*-portlet/**,*-theme/**,*-web/**"
+				includes="*-ext/**,*-ext.war/**,*-hook/**,*-hook.war/**,*-layouttpl/**,*-layouttpl.war/**,*-portlet/**,*-portlet.war/**,*-theme/**,*-theme.war/**,*-web/**,*-web.war/**"
 			/>
 		</delete>
 
@@ -129,15 +135,19 @@
 	<target name="compile">
 		<ant dir="portal-service" target="compile" inheritAll="false" />
 
-		<ant dir="util-java" target="compile" inheritAll="false" />
 		<ant dir="util-bridges" target="compile" inheritAll="false" />
+		<ant dir="util-java" target="compile" inheritAll="false" />
+		<ant dir="util-taglib" target="compile" inheritAll="false" />
 
 		<ant dir="portal-impl" target="compile" inheritAll="false" />
 	</target>
 
 	<target name="deploy">
 		<if>
-			<equals arg1="${app.server.type}" arg2="glassfish" />
+			<or>
+				<equals arg1="${app.server.type}" arg2="glassfish" />
+				<equals arg1="${app.server.type}" arg2="websphere" />
+			</or>
 			<then>
 				<delete dir="${app.server.portal.dir}" />
 				<delete file="${app.server.portal.dir}" />
@@ -148,7 +158,7 @@
 			<and>
 				<equals arg1="${app.server.type}" arg2="tomcat" />
 				<not>
-					<available file="${app.server.tomcat.dir}/lib/catalina.jar" />
+					<available file="${app.server.tomcat.classes.global.dir}/catalina.jar" />
 				</not>
 			</and>
 			<then>
@@ -172,7 +182,6 @@ ${app.server.tomcat.dir}, then run "ant -buildfile build-dist.xml unzip-tomcat".
 		<ant dir="portal-impl" target="deploy" inheritAll="false" />
 
 		<ant dir="portal-web" target="deploy" inheritAll="false" />
-		<ant dir="tunnel-web" target="deploy" inheritAll="false" />
 
 		<copy todir="${liferay.home}/data/hsql">
 			<fileset dir="sql">
@@ -205,166 +214,24 @@ ${app.server.tomcat.dir}, then run "ant -buildfile build-dist.xml unzip-tomcat".
 		</copy>
 
 		<if>
-			<equals arg1="${app.server.type}" arg2="glassfish" />
-			<then>
-				<loadfile property="domain.xml.content" srcfile="${app.server.glassfish.instance.dir}/config/domain.xml" />
-
-				<antelope:stringutil string="${domain.xml.content}" property="domain.xml.content.index">
-					<indexof string="-Dfile.encoding=UTF-8" fromindex="0" />
-				</antelope:stringutil>
-
-				<if>
-					<equals arg1="${domain.xml.content.index}" arg2="-1" />
-					<then>
-						<replace file="${app.server.glassfish.instance.dir}/config/domain.xml">
-							<replacetoken><![CDATA[<jvm-options>-Xmx512m</jvm-options>]]></replacetoken>
-							<replacevalue><![CDATA[<jvm-options>-Dfile.encoding=UTF8</jvm-options>
-	<jvm-options>-Djava.net.preferIPv4Stack=true</jvm-options>
-	<jvm-options>-Duser.timezone=GMT</jvm-options>
-	<jvm-options>-Xmx1024m</jvm-options>
-	<jvm-options>-XX:MaxPermSize=256m</jvm-options>]]></replacevalue>
-						</replace>
-					</then>
-				</if>
-
-				<delete>
-					<fileset
-						dir="${app.server.dir}/modules"
-						includes="commons-codec-repackaged.jar"
-					/>
-				</delete>
-
-				<copy todir="${app.server.dir}/modules">
-					<fileset
-						dir="lib/portal"
-						includes="commons-codec.jar"
-					/>
-				</copy>
-
-				<tstamp>
-					<format property="tstamp.value" pattern="yyyyMMddkkmmssSSS" />
-				</tstamp>
-
-				<unjar
-					dest="${tstamp.value}"
-					src="${app.server.dir}/modules/jsf-impl.jar"
-				/>
-
-				<if>
-					<available file="${tstamp.value}/META-INF/services/javax.servlet.ServletContainerInitializer" />
-					<then>
-						<delete file="${tstamp.value}/META-INF/services/javax.servlet.ServletContainerInitializer" />
-
-						<zip
-							basedir="${tstamp.value}"
-							destfile="${app.server.dir}/modules/jsf-impl.jar"
-						/>
-					</then>
-				</if>
-
-				<delete dir="${tstamp.value}" />
-			</then>
-		</if>
-
-		<if>
-			<equals arg1="${app.server.type}" arg2="geronimo" />
-			<then>
-				<if>
-					<not>
-						<available file="${app.server.bin.dir}/setenv.bat" />
-					</not>
-					<then>
-						<copy
-							file="tools/servers/geronimo/bin/setenv.bat"
-							tofile="${app.server.bin.dir}/setenv.bat"
-						/>
-					</then>
-				</if>
-
-				<if>
-					<not>
-						<available file="${app.server.bin.dir}/setenv.sh" />
-					</not>
-					<then>
-						<copy
-							file="tools/servers/geronimo/bin/setenv.sh"
-							tofile="${app.server.bin.dir}/setenv.sh"
-						/>
-					</then>
-				</if>
-
-				<!--<copy todir="${app.server.lib.portal.dir}">
-					<fileset
-						dir="lib/development"
-						includes="saxpath.jar"
-					/>
-				</copy>
-
-				<delete>
-					<fileset
-						dir="${app.server.lib.portal.dir}"
-						includes="commons-logging.jar"
-					/>
-				</delete>-->
-			</then>
-		</if>
-
-		<if>
 			<equals arg1="${app.server.type}" arg2="jboss" />
 			<then>
-				<loadfile property="run.conf.content" srcfile="${app.server.bin.dir}/run.conf" />
-
-				<antelope:stringutil string="${run.conf.content}" property="run.conf.content.index">
-					<indexof string="-Dfile.encoding=UTF-8" fromindex="0" />
-				</antelope:stringutil>
-
 				<if>
-					<equals arg1="${run.conf.content.index}" arg2="-1" />
+					<not>
+						<available file="${app.server.lib.global.dir}/module.xml" />
+					</not>
 					<then>
-						<echo file="${app.server.bin.dir}/run.conf" append="true">
-JAVA_OPTS="$JAVA_OPTS -Dfile.encoding=UTF-8 -Djava.net.preferIPv4Stack=true -Djboss.vfs.forceVfsJar=true -Dorg.jboss.logging.Log4jService.catchSystemOut=false -Duser.timezone=GMT -Xmx1024m -XX:MaxPermSize=256m"</echo>
+						<copy
+							file="tools/servers/jboss/modules/module.xml"
+							tofile="${app.server.lib.global.dir}/module.xml"
+						/>
 					</then>
 				</if>
-
-				<loadfile property="run.conf.bat.content" srcfile="${app.server.bin.dir}/run.conf.bat" />
-
-				<antelope:stringutil string="${run.conf.bat.content}" property="run.conf.bat.content.index">
-					<indexof string="-Dfile.encoding=UTF-8" fromindex="0" />
-				</antelope:stringutil>
-
-				<if>
-					<equals arg1="${run.conf.bat.content.index}" arg2="-1" />
-					<then>
-						<replace file="${app.server.bin.dir}/run.conf.bat">
-							<replacetoken><![CDATA[:JAVA_OPTS_SET]]></replacetoken>
-							<replacevalue><![CDATA[set "JAVA_OPTS=%JAVA_OPTS% -Dfile.encoding=UTF-8 -Djava.net.preferIPv4Stack=true -Djboss.vfs.forceVfsJar=true -Dorg.jboss.logging.Log4jService.catchSystemOut=false -Duser.timezone=GMT -Xmx1024m -XX:MaxPermSize=256m"
-
-:JAVA_OPTS_SET]]></replacevalue>
-						</replace>
-					</then>
-				</if>
-
-				<replace file="${app.server.deploy.dir}/jbossweb.sar/server.xml">
-					<replacetoken><![CDATA[redirectPort="8443" />]]></replacetoken>
-					<replacevalue><![CDATA[redirectPort="8443" URIEncoding="UTF-8" />]]></replacevalue>
-				</replace>
-
-				<move
-					failonerror="false"
-					file="${app.server.dir}/common/lib/hibernate-validator.jar"
-					tofile="${app.server.dir}/common/lib/hibernate-validator.jar.bak"
-				/>
-
-				<move
-					failonerror="false"
-					file="${app.server.dir}/common/lib/slf4j-jboss-logging.jar"
-					tofile="${app.server.dir}/common/lib/slf4j-jboss-logging.jar.bak"
-				/>
 
 				<delete>
 					<fileset
 						dir="${app.server.lib.portal.dir}"
-						includes="jaxrpc.jar,log4j.jar,stax.jar,xercesImpl.jar,xml-apis.jar"
+						includes="eclipselink.jar"
 					/>
 				</delete>
 			</then>
@@ -375,55 +242,20 @@ JAVA_OPTS="$JAVA_OPTS -Dfile.encoding=UTF-8 -Djava.net.preferIPv4Stack=true -Djb
 			<then>
 				<if>
 					<not>
-						<available file="${app.server.bin.dir}/run.bat" />
+						<available file="${app.server.dir}/contexts/root.xml" />
 					</not>
 					<then>
 						<copy
-							file="tools/servers/jetty/bin/run.bat"
-							tofile="${app.server.bin.dir}/run.bat"
+							file="tools/servers/jetty/contexts/root.xml"
+							tofile="${app.server.dir}/contexts/root.xml"
 						/>
-					</then>
-				</if>
-
-				<if>
-					<not>
-						<available file="${app.server.bin.dir}/run.sh" />
-					</not>
-					<then>
-						<copy
-							file="tools/servers/jetty/bin/run.sh"
-							tofile="${app.server.bin.dir}/run.sh"
-						/>
-					</then>
-				</if>
-
-				<if>
-					<not>
-						<available file="${app.server.dir}/etc/start.config" />
-					</not>
-					<then>
-						<unjar src="${app.server.dir}/start.jar" dest="${app.server.dir}">
-							<patternset>
-								<include name="**/start.config" />
-							</patternset>
-							<mapper
-								type="glob"
-								from="org/mortbay/start/*"
-								to="etc/*"
-							/>
-						</unjar>
-
-						<echo file="${app.server.dir}/etc/start.config" append="true">
-jetty.logs=$(jetty.home)/logs
-
-$(jetty.home)/lib/liferay/*</echo>
 					</then>
 				</if>
 
 				<copy todir="${app.server.lib.global.dir}">
 					<fileset
 						dir="lib/development"
-						includes="activation.jar,jta.jar,persistence.jar"
+						includes="activation.jar,jta.jar,mail.jar,persistence.jar"
 					/>
 				</copy>
 			</then>
@@ -432,165 +264,22 @@ $(jetty.home)/lib/liferay/*</echo>
 		<if>
 			<equals arg1="${app.server.type}" arg2="jonas" />
 			<then>
-				<loadfile property="setenv.content" srcfile="${app.server.bin.dir}/setenv" />
-
-				<antelope:stringutil string="${setenv.content}" property="setenv.content.index">
-					<indexof string="-Dfile.encoding=UTF-8" fromindex="0" />
-				</antelope:stringutil>
-
-				<if>
-					<equals arg1="${setenv.content.index}" arg2="-1" />
-					<then>
-						<replace file="${app.server.bin.dir}/setenv">
-							<replacetoken><![CDATA[export JAVA_OPTS]]></replacetoken>
-							<replacevalue><![CDATA[JAVA_OPTS=-Dfile.encoding=UTF8 -Djava.net.preferIPv4Stack=true -Djonas.felix.configuration.file="$JONAS_ROOT/conf/felix-config.properties" -Duser.timezone=GMT -Xmx1024m -XX:MaxPermSize=256m
-export JAVA_OPTS]]></replacevalue>
-						</replace>
-					</then>
-				</if>
-
-				<loadfile property="setenv.bat.content" srcfile="${app.server.bin.dir}/setenv.bat" />
-
-				<antelope:stringutil string="${setenv.bat.content}" property="setenv.bat.content.index">
-					<indexof string="-Dfile.encoding=UTF-8" fromindex="0" />
-				</antelope:stringutil>
-
-				<if>
-					<equals arg1="${setenv.bat.content.index}" arg2="-1" />
-					<then>
-						<replace file="${app.server.bin.dir}/setenv.bat">
-							<replacetoken><![CDATA[set JONAS_CLASSPATH=%JONAS_BASE%\conf;%JONAS_CLASSPATH%]]></replacetoken>
-							<replacevalue><![CDATA[set JONAS_CLASSPATH=%JONAS_BASE%\conf;%JONAS_CLASSPATH%
-set JAVA_OPTS=-Dfile.encoding=UTF8 -Djava.net.preferIPv4Stack=true -Djonas.felix.configuration.file="%JONAS_ROOT%/conf/felix-config.properties" -Duser.timezone=GMT -Xmx1024m -XX:MaxPermSize=256m]]></replacevalue>
-						</replace>
-					</then>
-				</if>
-
-				<loadfile property="classloader-default-filtering.xml.content" srcfile="${app.server.dir}/conf/classloader-default-filtering.xml" />
-
-				<antelope:stringutil string="${classloader-default-filtering.xml.content}" property="classloader-default-filtering.xml.content.index">
-					<indexof string="net.sf.cglib.*" fromindex="0" />
-				</antelope:stringutil>
-
-				<if>
-					<equals arg1="${classloader-default-filtering.xml.content.index}" arg2="-1" />
-					<then>
-						<replace file="${app.server.dir}/conf/classloader-default-filtering.xml">
-							<replacetoken><![CDATA[<filter-name>org.apache.commons.digester.*</filter-name>]]></replacetoken>
-							<replacevalue><![CDATA[<filter-name>antlr.*</filter-name>
-	<filter-name>EDU.oswego.*</filter-name>
-	<filter-name>javassist.*</filter-name>
-	<filter-name>net.sf.cglib.*</filter-name>
-	<filter-name>net.sf.ehcache.*</filter-name>
-	<filter-name>org.apache.commons.*</filter-name>
-	<filter-name>org.dom4j.*</filter-name>
-	<filter-name>org.hibernate.*</filter-name>
-	<filter-name>org.jboss.*</filter-name>
-	<filter-name>org.objectweb.asm.*</filter-name>
-	<filter-name>org.objectweb.jotm.*</filter-name>
-	<filter-name>org.quartz.*</filter-name>
-	<filter-name>org.springframework.*</filter-name>]]></replacevalue>
-						</replace>
-					</then>
-				</if>
-
-				<if>
-					<not>
-						<available file="${app.server.dir}/conf/felix-config.properties" />
-					</not>
-					<then>
-						<unjar src="${app.server.dir}/lib/bootstrap/felix-launcher.jar" dest="${app.server.dir}/conf">
-							<patternset>
-								<include name="**/default-config.properties" />
-							</patternset>
-							<chainedmapper>
-								<flattenmapper />
-								<globmapper
-									from="default-config.properties"
-									to="felix-config.properties"
-								/>
-							</chainedmapper>
-						</unjar>
-
-						<replace file="${app.server.dir}/conf/felix-config.properties">
-							<replacetoken>org.osgi.framework.system.packages org.osgi.framework;</replacetoken>
-							<replacevalue>org.osgi.framework.system.packages com.sun.crypto.provider; com.sun.image.codec.jpeg; com.sun.jmx.interceptor; com.sun.jmx.mbeanserver; org.apache.xerces.parsers; org.apache.xerces.util; org.apache.xerces.xni; org.apache.xerces.xni.parser; org.osgi.framework;</replacevalue>
-						</replace>
-					</then>
-				</if>
-
-				<replace file="${app.server.dir}/conf/tomcat6-server.xml">
-					<replacetoken><![CDATA[redirectPort="8443" />]]></replacetoken>
-					<replacevalue><![CDATA[redirectPort="8443" URIEncoding="UTF-8" />]]></replacevalue>
-				</replace>
-
-				<replace file="${app.server.dir}/conf/tomcat6-server.xml">
-					<replacetoken><![CDATA[redirectPort="9043" />]]></replacetoken>
-					<replacevalue><![CDATA[redirectPort="9043" URIEncoding="UTF-8" />]]></replacevalue>
-				</replace>
+				<delete>
+					<fileset
+						dir="${app.server.lib.portal.dir}"
+						includes="equinox.jar,osgi.core.jar,xalan.jar,xercesImpl.jar,xml-apis.jar"
+					/>
+				</delete>
 			</then>
 		</if>
 
 		<if>
 			<equals arg1="${app.server.type}" arg2="resin" />
 			<then>
-				<if>
-					<not>
-						<available file="${app.server.bin.dir}/run.bat" />
-					</not>
-					<then>
-						<copy
-							file="tools/servers/resin/bin/run.bat"
-							tofile="${app.server.bin.dir}/run.bat"
-						/>
-					</then>
-				</if>
-
-				<if>
-					<not>
-						<available file="${app.server.bin.dir}/run.sh" />
-					</not>
-					<then>
-						<copy
-							file="tools/servers/resin/bin/run.sh"
-							tofile="${app.server.bin.dir}/run.sh"
-						/>
-					</then>
-				</if>
-
-				<loadfile property="resin.xml.content" srcfile="${app.server.dir}/conf/resin.xml" />
-
-				<antelope:stringutil string="${resin.xml.content}" property="resin.xml.content.index">
-					<indexof string="-Dfile.encoding=UTF-8" fromindex="0" />
-				</antelope:stringutil>
-
-				<if>
-					<equals arg1="${resin.xml.content.index}" arg2="-1" />
-					<then>
-						<replace file="${app.server.dir}/conf/resin.xml">
-							<replacetoken><![CDATA[</http>]]></replacetoken>
-							<replacevalue><![CDATA[</http>
-
-	<jvm-arg>-Dfile.encoding=UTF-8</jvm-arg>
-	<jvm-arg>-Djava.net.preferIPv4Stack=true</jvm-arg>
-	<jvm-arg>-Duser.timezone=GMT</jvm-arg>
-	<jvm-arg>-Xmx1024m</jvm-arg>
-	<jvm-arg>-XX:MaxPermSize=256m</jvm-arg>]]></replacevalue>
-						</replace>
-					</then>
-				</if>
-
 				<copy todir="${app.server.lib.global.dir}">
 					<fileset
 						dir="lib/development"
 						includes="saxpath.jar"
-					/>
-				</copy>
-
-				<copy todir="${app.server.dir}/lib">
-					<fileset
-						dir="lib/portal"
-						includes="log4j.jar,slf4j-api.jar,slf4j-log4j12.jar"
 					/>
 				</copy>
 			</then>
@@ -599,40 +288,6 @@ set JAVA_OPTS=-Dfile.encoding=UTF8 -Djava.net.preferIPv4Stack=true -Djonas.felix
 		<if>
 			<equals arg1="${app.server.type}" arg2="tomcat" />
 			<then>
-				<if>
-					<or>
-						<isset property="jdk.windows.version" />
-						<not>
-							<available file="${app.server.bin.dir}/setenv.bat" />
-						</not>
-					</or>
-					<then>
-						<copy
-							file="tools/servers/tomcat/bin/setenv.bat"
-							tofile="${app.server.bin.dir}/setenv.bat"
-						>
-							<filterset>
-								<filter token="java.version" value="${jdk.windows.version}" />
-							</filterset>
-						</copy>
-					</then>
-				</if>
-
-				<if>
-					<or>
-						<isset property="jdk.windows.version" />
-						<not>
-							<available file="${app.server.bin.dir}/setenv.sh" />
-						</not>
-					</or>
-					<then>
-						<copy
-							file="tools/servers/tomcat/bin/setenv.sh"
-							tofile="${app.server.bin.dir}/setenv.sh"
-						/>
-					</then>
-				</if>
-
 				<if>
 					<not>
 						<available file="${app.server.dir}/conf/Catalina/localhost/${app.server.tomcat.portal.context}.xml" />
@@ -643,46 +298,6 @@ set JAVA_OPTS=-Dfile.encoding=UTF8 -Djava.net.preferIPv4Stack=true -Djonas.felix
 							tofile="${app.server.dir}/conf/Catalina/localhost/${app.server.tomcat.portal.context}.xml"
 							overwrite="true"
 						/>
-					</then>
-				</if>
-
-				<loadfile property="catalina.properties.content" srcfile="${app.server.dir}/conf/catalina.properties" />
-
-				<antelope:stringutil string="${catalina.properties.content}" property="catalina.properties.content.index">
-					<indexof string=",${catalina.home}/lib/ext/*.jar" fromindex="0" />
-				</antelope:stringutil>
-
-				<if>
-					<equals arg1="${catalina.properties.content.index}" arg2="-1" />
-					<then>
-						<replace file="${app.server.dir}/conf/catalina.properties">
-							<replacetoken><![CDATA[common.loader=${catalina.base}/lib,${catalina.base}/lib/*.jar,${catalina.home}/lib,${catalina.home}/lib/*.jar]]></replacetoken>
-							<replacevalue><![CDATA[common.loader=${catalina.base}/lib,${catalina.base}/lib/*.jar,${catalina.home}/lib,${catalina.home}/lib/*.jar,${catalina.home}/lib/ext,${catalina.home}/lib/ext/*.jar]]></replacevalue>
-						</replace>
-					</then>
-				</if>
-
-				<replace file="${app.server.dir}/conf/server.xml">
-					<replacetoken><![CDATA[redirectPort="8443" />]]></replacetoken>
-					<replacevalue><![CDATA[redirectPort="8443" URIEncoding="UTF-8" />]]></replacevalue>
-				</replace>
-
-				<!--<replace file="${app.server.dir}/conf/server.xml">
-					<replacetoken><![CDATA[xmlValidation="false" xmlNamespaceAware="false">]]></replacetoken>
-					<replacevalue><![CDATA[xmlValidation="false" xmlNamespaceAware="false" deployXML="false">]]></replacevalue>
-				</replace>-->
-
-				<if>
-					<and>
-						<available file="${jdk.windows.home}/jre/bin/java.exe" />
-						<not>
-							<available file="${app.server.dir}/jre${jdk.windows.version}/win" />
-						</not>
-					</and>
-					<then>
-						<copy todir="${app.server.dir}/jre${jdk.windows.version}/win">
-							<fileset dir="${jdk.windows.home}/jre" />
-						</copy>
 					</then>
 				</if>
 
@@ -737,7 +352,10 @@ set JAVA_OPTS=-Dfile.encoding=UTF8 -Djava.net.preferIPv4Stack=true -Djonas.felix
 		<mkdir dir="${app.server.work.dir}" />
 
 		<if>
-			<equals arg1="${app.server.type}" arg2="glassfish" />
+			<or>
+				<equals arg1="${app.server.type}" arg2="glassfish" />
+				<equals arg1="${app.server.type}" arg2="websphere" />
+			</or>
 			<then>
 				<tstamp>
 					<format property="tstamp.value" pattern="yyyyMMddkkmmssSSS" />
@@ -751,6 +369,59 @@ set JAVA_OPTS=-Dfile.encoding=UTF8 -Djava.net.preferIPv4Stack=true -Djonas.felix
 				<delete dir="${app.server.portal.dir}" />
 
 				<move file="${tstamp.value}" tofile="${app.server.portal.dir}" />
+			</then>
+		</if>
+
+		<if>
+			<equals arg1="${app.server.type}" arg2="websphere" />
+			<then>
+				<exec dir="${app.server.websphere.bin.dir}" executable="cmd.exe">
+					<arg line="/c startServer.bat server1" />
+				</exec>
+
+				<echo>Installing liferay-portal.war.</echo>
+
+				<echo file="wsadmin.py">
+def isAppInstalled(appName):
+	appNames = AdminApp.list()
+
+	if len(appNames) > 0:
+		for curAppName in appNames.split('\n'):
+			curAppName = curAppName.rstrip()
+
+			if curAppName.find(appName) >= 0:
+				return 1
+
+	return 0
+
+if isAppInstalled('DefaultApplication'):
+	print AdminApp.uninstall('DefaultApplication')
+
+	print AdminConfig.save()
+
+appManager = AdminControl.queryNames('type=ApplicationManager,process=server1,*')
+
+if isAppInstalled('liferay-portal'):
+	print AdminControl.invoke(appManager, 'stopApplication', 'liferay-portal')
+
+	print AdminApp.update('liferay-portal', 'app', '[-contents ${app.server.websphere.instance.dir}/wsadmin-deploy/liferay-portal.war -contextroot / -operation update]')
+else:
+	print AdminApp.install('${app.server.websphere.instance.dir}/wsadmin-deploy/liferay-portal.war', '[-appname liferay-portal -contextroot /]')
+
+print AdminConfig.save()
+
+print AdminControl.invoke(appManager, 'startApplication', 'liferay-portal')
+				</echo>
+
+				<exec dir="${app.server.websphere.bin.dir}" executable="cmd.exe">
+					<arg line="/c wsadmin.bat -f ${basedir}\wsadmin.py" />
+				</exec>
+
+				<delete file="wsadmin.py" />
+
+				<exec dir="${app.server.websphere.bin.dir}" executable="cmd.exe">
+					<arg line="/c stopServer.bat server1" />
+				</exec>
 			</then>
 		</if>
 
@@ -770,6 +441,7 @@ set JAVA_OPTS=-Dfile.encoding=UTF8 -Djava.net.preferIPv4Stack=true -Djonas.felix
 	<target name="doc">
 		<antcall target="dtddoc" />
 		<antcall target="javadoc" />
+		<antcall target="javadoc-all" />
 		<ant dir="util-taglib" target="taglibdoc" inheritAll="false" />
 	</target>
 
@@ -803,7 +475,6 @@ set JAVA_OPTS=-Dfile.encoding=UTF8 -Djava.net.preferIPv4Stack=true -Djonas.felix
 		<ant dir="portal-impl" target="jar" inheritAll="false" />
 
 		<ant dir="portal-web" target="war" inheritAll="false" />
-		<ant dir="tunnel-web" target="war" inheritAll="false" />
 
 		<ant dir="support-tomcat" target="jar" inheritAll="false" />
 	</target>
@@ -934,6 +605,14 @@ Plugins: ${lp.plugins.dir}</echo>
 
 	<target name="test">
 		<ant antfile="build-test.xml" target="test" inheritAll="false" />
+	</target>
+
+	<target name="test-integration">
+		<ant antfile="build-test.xml" target="test-integration" inheritAll="false" />
+	</target>
+
+	<target name="test-unit">
+		<ant antfile="build-test.xml" target="test-unit" inheritAll="false" />
 	</target>
 
 	<target name="update-plugins-to-svn-revision">

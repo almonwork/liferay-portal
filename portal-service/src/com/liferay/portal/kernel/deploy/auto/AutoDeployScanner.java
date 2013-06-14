@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -32,6 +32,10 @@ public class AutoDeployScanner extends Thread {
 		setPriority(MIN_PRIORITY);
 	}
 
+	public void pause() {
+		_started = false;
+	}
+
 	@Override
 	public void run() {
 		try {
@@ -49,10 +53,6 @@ public class AutoDeployScanner extends Thread {
 
 			_autoDeployDir.scanDirectory();
 		}
-	}
-
-	public void pause() {
-		_started = false;
 	}
 
 	private AutoDeployDir _autoDeployDir;

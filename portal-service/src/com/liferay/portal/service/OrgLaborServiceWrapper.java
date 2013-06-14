@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -23,9 +23,28 @@ package com.liferay.portal.service;
  * @see       OrgLaborService
  * @generated
  */
-public class OrgLaborServiceWrapper implements OrgLaborService {
+public class OrgLaborServiceWrapper implements OrgLaborService,
+	ServiceWrapper<OrgLaborService> {
 	public OrgLaborServiceWrapper(OrgLaborService orgLaborService) {
 		_orgLaborService = orgLaborService;
+	}
+
+	/**
+	* Returns the Spring bean ID for this bean.
+	*
+	* @return the Spring bean ID for this bean
+	*/
+	public java.lang.String getBeanIdentifier() {
+		return _orgLaborService.getBeanIdentifier();
+	}
+
+	/**
+	* Sets the Spring bean ID for this bean.
+	*
+	* @param beanIdentifier the Spring bean ID for this bean
+	*/
+	public void setBeanIdentifier(java.lang.String beanIdentifier) {
+		_orgLaborService.setBeanIdentifier(beanIdentifier);
 	}
 
 	public com.liferay.portal.model.OrgLabor addOrgLabor(long organizationId,
@@ -69,11 +88,25 @@ public class OrgLaborServiceWrapper implements OrgLaborService {
 			thuOpen, thuClose, friOpen, friClose, satOpen, satClose);
 	}
 
+	/**
+	 * @deprecated Renamed to {@link #getWrappedService}
+	 */
 	public OrgLaborService getWrappedOrgLaborService() {
 		return _orgLaborService;
 	}
 
+	/**
+	 * @deprecated Renamed to {@link #setWrappedService}
+	 */
 	public void setWrappedOrgLaborService(OrgLaborService orgLaborService) {
+		_orgLaborService = orgLaborService;
+	}
+
+	public OrgLaborService getWrappedService() {
+		return _orgLaborService;
+	}
+
+	public void setWrappedService(OrgLaborService orgLaborService) {
 		_orgLaborService = orgLaborService;
 	}
 

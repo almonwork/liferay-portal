@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,6 +14,9 @@
 
 package com.liferay.portal.model;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * <p>
  * This class is a wrapper for {@link RepositoryEntry}.
@@ -23,7 +26,8 @@ package com.liferay.portal.model;
  * @see       RepositoryEntry
  * @generated
  */
-public class RepositoryEntryWrapper implements RepositoryEntry {
+public class RepositoryEntryWrapper implements RepositoryEntry,
+	ModelWrapper<RepositoryEntry> {
 	public RepositoryEntryWrapper(RepositoryEntry repositoryEntry) {
 		_repositoryEntry = repositoryEntry;
 	}
@@ -34,6 +38,50 @@ public class RepositoryEntryWrapper implements RepositoryEntry {
 
 	public String getModelClassName() {
 		return RepositoryEntry.class.getName();
+	}
+
+	public Map<String, Object> getModelAttributes() {
+		Map<String, Object> attributes = new HashMap<String, Object>();
+
+		attributes.put("uuid", getUuid());
+		attributes.put("repositoryEntryId", getRepositoryEntryId());
+		attributes.put("groupId", getGroupId());
+		attributes.put("repositoryId", getRepositoryId());
+		attributes.put("mappedId", getMappedId());
+
+		return attributes;
+	}
+
+	public void setModelAttributes(Map<String, Object> attributes) {
+		String uuid = (String)attributes.get("uuid");
+
+		if (uuid != null) {
+			setUuid(uuid);
+		}
+
+		Long repositoryEntryId = (Long)attributes.get("repositoryEntryId");
+
+		if (repositoryEntryId != null) {
+			setRepositoryEntryId(repositoryEntryId);
+		}
+
+		Long groupId = (Long)attributes.get("groupId");
+
+		if (groupId != null) {
+			setGroupId(groupId);
+		}
+
+		Long repositoryId = (Long)attributes.get("repositoryId");
+
+		if (repositoryId != null) {
+			setRepositoryId(repositoryId);
+		}
+
+		String mappedId = (String)attributes.get("mappedId");
+
+		if (mappedId != null) {
+			setMappedId(mappedId);
+		}
 	}
 
 	/**
@@ -164,10 +212,6 @@ public class RepositoryEntryWrapper implements RepositoryEntry {
 		return _repositoryEntry.isEscapedModel();
 	}
 
-	public void setEscapedModel(boolean escapedModel) {
-		_repositoryEntry.setEscapedModel(escapedModel);
-	}
-
 	public java.io.Serializable getPrimaryKeyObj() {
 		return _repositoryEntry.getPrimaryKeyObj();
 	}
@@ -217,7 +261,19 @@ public class RepositoryEntryWrapper implements RepositoryEntry {
 		return _repositoryEntry.toXmlString();
 	}
 
+	public void persist()
+		throws com.liferay.portal.kernel.exception.SystemException {
+		_repositoryEntry.persist();
+	}
+
+	/**
+	 * @deprecated Renamed to {@link #getWrappedModel}
+	 */
 	public RepositoryEntry getWrappedRepositoryEntry() {
+		return _repositoryEntry;
+	}
+
+	public RepositoryEntry getWrappedModel() {
 		return _repositoryEntry;
 	}
 

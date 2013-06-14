@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -22,87 +22,55 @@ import com.liferay.portalweb.portal.util.RuntimeVariables;
  */
 public class SearchUserTest extends BaseTestCase {
 	public void testSearchUser() throws Exception {
-		int label = 1;
+		selenium.open("/web/guest/home/");
+		loadRequiredJavaScriptModules();
 
-		while (label >= 1) {
-			switch (label) {
-			case 1:
-				selenium.open("/web/guest/home/");
-
-				for (int second = 0;; second++) {
-					if (second >= 60) {
-						fail("timeout");
-					}
-
-					try {
-						if (selenium.isElementPresent("link=Control Panel")) {
-							break;
-						}
-					}
-					catch (Exception e) {
-					}
-
-					Thread.sleep(1000);
-				}
-
-				selenium.saveScreenShotAndSource();
-				selenium.clickAt("link=Control Panel",
-					RuntimeVariables.replace(""));
-				selenium.waitForPageToLoad("30000");
-				selenium.saveScreenShotAndSource();
-
-				for (int second = 0;; second++) {
-					if (second >= 60) {
-						fail("timeout");
-					}
-
-					try {
-						if (selenium.isElementPresent("link=Users")) {
-							break;
-						}
-					}
-					catch (Exception e) {
-					}
-
-					Thread.sleep(1000);
-				}
-
-				selenium.saveScreenShotAndSource();
-				selenium.clickAt("link=Users", RuntimeVariables.replace(""));
-				selenium.waitForPageToLoad("30000");
-				selenium.saveScreenShotAndSource();
-
-				boolean BasicPresent = selenium.isVisible("link=\u00ab Basic");
-
-				if (!BasicPresent) {
-					label = 2;
-
-					continue;
-				}
-
-				selenium.click("link=\u00ab Basic");
-
-			case 2:
-				selenium.type("_125_keywords",
-					RuntimeVariables.replace("selenium"));
-				selenium.saveScreenShotAndSource();
-				selenium.clickAt("//input[@value='Search']",
-					RuntimeVariables.replace(""));
-				selenium.waitForPageToLoad("30000");
-				selenium.saveScreenShotAndSource();
-				assertTrue(selenium.isTextPresent("selenium01"));
-				selenium.type("_125_keywords",
-					RuntimeVariables.replace("selenium1"));
-				selenium.saveScreenShotAndSource();
-				selenium.clickAt("//input[@value='Search']",
-					RuntimeVariables.replace(""));
-				selenium.waitForPageToLoad("30000");
-				selenium.saveScreenShotAndSource();
-				assertFalse(selenium.isTextPresent("selenium01"));
-
-			case 100:
-				label = -1;
+		for (int second = 0;; second++) {
+			if (second >= 90) {
+				fail("timeout");
 			}
+
+			try {
+				if (selenium.isElementPresent("link=Control Panel")) {
+					break;
+				}
+			}
+			catch (Exception e) {
+			}
+
+			Thread.sleep(1000);
 		}
+
+		selenium.clickAt("link=Control Panel",
+			RuntimeVariables.replace("Control Panel"));
+		selenium.waitForPageToLoad("30000");
+		loadRequiredJavaScriptModules();
+		selenium.clickAt("link=Users and Organizations",
+			RuntimeVariables.replace("Users and Organizations"));
+		selenium.waitForPageToLoad("30000");
+		loadRequiredJavaScriptModules();
+		selenium.type("//input[@id='_125_keywords']",
+			RuntimeVariables.replace("selenium*"));
+		selenium.clickAt("//input[@value='Search']",
+			RuntimeVariables.replace("Search"));
+		selenium.waitForPageToLoad("30000");
+		loadRequiredJavaScriptModules();
+		assertEquals(RuntimeVariables.replace("selen01"),
+			selenium.getText("//td[2]/a"));
+		assertEquals(RuntimeVariables.replace("nium01"),
+			selenium.getText("//td[3]/a"));
+		assertEquals(RuntimeVariables.replace("selenium01"),
+			selenium.getText("//td[4]/a"));
+		selenium.type("//input[@id='_125_keywords']",
+			RuntimeVariables.replace("selenium1"));
+		selenium.clickAt("//input[@value='Search']",
+			RuntimeVariables.replace("Search"));
+		selenium.waitForPageToLoad("30000");
+		loadRequiredJavaScriptModules();
+		assertFalse(selenium.isTextPresent("selen01"));
+		assertFalse(selenium.isTextPresent("nium01"));
+		assertFalse(selenium.isTextPresent("selenium01"));
+		assertEquals(RuntimeVariables.replace("No users were found."),
+			selenium.getText("xpath=(//div[@class='portlet-msg-info'])[2]"));
 	}
 }

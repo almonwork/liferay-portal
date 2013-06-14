@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,6 +14,7 @@
 
 package com.liferay.portal.kernel.workflow.comparator;
 
+import com.liferay.portal.kernel.security.pacl.permission.PortalRuntimePermission;
 import com.liferay.portal.kernel.util.OrderByComparator;
 
 /**
@@ -84,8 +85,7 @@ public class WorkflowComparatorFactoryUtil {
 	}
 
 	public static OrderByComparator getLogUserIdComparator(boolean ascending) {
-		return getWorkflowComparatorFactory().getLogUserIdComparator(
-			ascending);
+		return getWorkflowComparatorFactory().getLogUserIdComparator(ascending);
 	}
 
 	public static OrderByComparator getTaskCompletionDateComparator() {
@@ -141,11 +141,16 @@ public class WorkflowComparatorFactoryUtil {
 	}
 
 	public static WorkflowComparatorFactory getWorkflowComparatorFactory() {
+		PortalRuntimePermission.checkGetBeanProperty(
+			WorkflowComparatorFactoryUtil.class);
+
 		return _workflowComparatorFactory;
 	}
 
 	public void setWorkflowComparatorFactory(
 		WorkflowComparatorFactory workflowComparatorFactory) {
+
+		PortalRuntimePermission.checkSetBeanProperty(getClass());
 
 		_workflowComparatorFactory = workflowComparatorFactory;
 	}

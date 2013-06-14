@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,7 +14,6 @@
 
 package com.liferay.portal.service.persistence;
 
-import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.model.LayoutSet;
 
 /**
@@ -413,9 +412,11 @@ public interface LayoutSetPersistence extends BasePersistence<LayoutSet> {
 	*
 	* @param groupId the group ID
 	* @param privateLayout the private layout
+	* @return the layout set that was removed
 	* @throws SystemException if a system exception occurred
 	*/
-	public void removeByG_P(long groupId, boolean privateLayout)
+	public com.liferay.portal.model.LayoutSet removeByG_P(long groupId,
+		boolean privateLayout)
 		throws com.liferay.portal.NoSuchLayoutSetException,
 			com.liferay.portal.kernel.exception.SystemException;
 
@@ -467,6 +468,4 @@ public interface LayoutSetPersistence extends BasePersistence<LayoutSet> {
 	*/
 	public int countAll()
 		throws com.liferay.portal.kernel.exception.SystemException;
-
-	public LayoutSet remove(LayoutSet layoutSet) throws SystemException;
 }

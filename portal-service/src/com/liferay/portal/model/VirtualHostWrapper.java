@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,6 +14,9 @@
 
 package com.liferay.portal.model;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * <p>
  * This class is a wrapper for {@link VirtualHost}.
@@ -23,7 +26,8 @@ package com.liferay.portal.model;
  * @see       VirtualHost
  * @generated
  */
-public class VirtualHostWrapper implements VirtualHost {
+public class VirtualHostWrapper implements VirtualHost,
+	ModelWrapper<VirtualHost> {
 	public VirtualHostWrapper(VirtualHost virtualHost) {
 		_virtualHost = virtualHost;
 	}
@@ -34,6 +38,43 @@ public class VirtualHostWrapper implements VirtualHost {
 
 	public String getModelClassName() {
 		return VirtualHost.class.getName();
+	}
+
+	public Map<String, Object> getModelAttributes() {
+		Map<String, Object> attributes = new HashMap<String, Object>();
+
+		attributes.put("virtualHostId", getVirtualHostId());
+		attributes.put("companyId", getCompanyId());
+		attributes.put("layoutSetId", getLayoutSetId());
+		attributes.put("hostname", getHostname());
+
+		return attributes;
+	}
+
+	public void setModelAttributes(Map<String, Object> attributes) {
+		Long virtualHostId = (Long)attributes.get("virtualHostId");
+
+		if (virtualHostId != null) {
+			setVirtualHostId(virtualHostId);
+		}
+
+		Long companyId = (Long)attributes.get("companyId");
+
+		if (companyId != null) {
+			setCompanyId(companyId);
+		}
+
+		Long layoutSetId = (Long)attributes.get("layoutSetId");
+
+		if (layoutSetId != null) {
+			setLayoutSetId(layoutSetId);
+		}
+
+		String hostname = (String)attributes.get("hostname");
+
+		if (hostname != null) {
+			setHostname(hostname);
+		}
 	}
 
 	/**
@@ -146,10 +187,6 @@ public class VirtualHostWrapper implements VirtualHost {
 		return _virtualHost.isEscapedModel();
 	}
 
-	public void setEscapedModel(boolean escapedModel) {
-		_virtualHost.setEscapedModel(escapedModel);
-	}
-
 	public java.io.Serializable getPrimaryKeyObj() {
 		return _virtualHost.getPrimaryKeyObj();
 	}
@@ -203,7 +240,14 @@ public class VirtualHostWrapper implements VirtualHost {
 		_virtualHost.persist();
 	}
 
+	/**
+	 * @deprecated Renamed to {@link #getWrappedModel}
+	 */
 	public VirtualHost getWrappedVirtualHost() {
+		return _virtualHost;
+	}
+
+	public VirtualHost getWrappedModel() {
 		return _virtualHost;
 	}
 

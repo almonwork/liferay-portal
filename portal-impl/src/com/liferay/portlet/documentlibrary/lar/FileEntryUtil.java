@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -33,6 +33,19 @@ import java.util.List;
  * @author Alexander Chow
  */
 public class FileEntryUtil extends LiferayBase {
+
+	public static FileEntry fetchByPrimaryKey(long fileEntryId)
+		throws SystemException {
+
+		DLFileEntry dlFileEntry = DLFileEntryUtil.fetchByPrimaryKey(
+			fileEntryId);
+
+		if (dlFileEntry == null) {
+			return null;
+		}
+
+		return new LiferayFileEntry(dlFileEntry);
+	}
 
 	public static FileEntry fetchByR_F_T(
 			long repositoryId, long folderId, String title)

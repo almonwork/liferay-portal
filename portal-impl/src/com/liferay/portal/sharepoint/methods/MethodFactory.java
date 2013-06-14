@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,8 +14,6 @@
 
 package com.liferay.portal.sharepoint.methods;
 
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.InstancePool;
 import com.liferay.portal.kernel.util.StringPool;
@@ -40,8 +38,11 @@ public class MethodFactory {
 	private MethodFactory() {
 		_methods = new HashMap<String, Object>();
 
-		Method method = (Method)InstancePool.get(
-			_CREATE_URL_DIRECTORIES_METHOD_IMPL);
+		Method method = (Method)InstancePool.get(_CHECKOUT_METHOD_IMPL);
+
+		_methods.put(method.getMethodName(), method);
+
+		method = (Method)InstancePool.get(_CREATE_URL_DIRECTORIES_METHOD_IMPL);
 
 		_methods.put(method.getMethodName(), method);
 
@@ -93,26 +94,19 @@ public class MethodFactory {
 
 		method = method.split(StringPool.COLON)[0];
 
-		if (_log.isDebugEnabled()) {
-			_log.debug("Get method " + method);
-		}
-
 		Method methodImpl = (Method)_methods.get(method);
 
 		if (methodImpl == null) {
 			throw new SharepointException(
 				"Method " + method + " is not implemented");
 		}
-		else {
-			if (_log.isDebugEnabled()) {
-				_log.debug(
-					"Method " + method + " is mapped to " +
-						methodImpl.getClass().getName());
-			}
-		}
 
 		return methodImpl;
 	}
+
+	private static final String _CHECKOUT_METHOD_IMPL = GetterUtil.getString(
+		PropsUtil.get(MethodFactory.class.getName() + ".CHECKOUT"),
+		CheckoutMethodImpl.class.getName());
 
 	private static final String _CREATE_URL_DIRECTORIES_METHOD_IMPL =
 		GetterUtil.getString(
@@ -171,8 +165,6 @@ public class MethodFactory {
 		GetterUtil.getString(
 			PropsUtil.get(MethodFactory.class.getName() + ".URL_TO_WEB_URL"),
 			UrlToWebUrlMethodImpl.class.getName());
-
-	private static Log _log = LogFactoryUtil.getLog(MethodFactory.class);
 
 	private static MethodFactory _instance = new MethodFactory();
 

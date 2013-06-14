@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,19 +14,26 @@
 
 package com.liferay.portlet.dynamicdatamapping.service.impl;
 
+import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.util.CharPool;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.xml.Document;
+import com.liferay.portal.kernel.xml.DocumentException;
 import com.liferay.portal.kernel.xml.Element;
+import com.liferay.portal.kernel.xml.Node;
 import com.liferay.portal.kernel.xml.SAXReaderUtil;
+import com.liferay.portal.kernel.xml.XPath;
 import com.liferay.portal.model.ResourceConstants;
 import com.liferay.portal.model.User;
 import com.liferay.portal.service.ServiceContext;
+import com.liferay.portal.util.PortalUtil;
 import com.liferay.portlet.dynamicdatamapping.RequiredStructureException;
 import com.liferay.portlet.dynamicdatamapping.StructureDuplicateElementException;
 import com.liferay.portlet.dynamicdatamapping.StructureDuplicateStructureKeyException;
@@ -34,7 +41,10 @@ import com.liferay.portlet.dynamicdatamapping.StructureNameException;
 import com.liferay.portlet.dynamicdatamapping.StructureXsdException;
 import com.liferay.portlet.dynamicdatamapping.model.DDMStructure;
 import com.liferay.portlet.dynamicdatamapping.model.DDMStructureConstants;
+import com.liferay.portlet.dynamicdatamapping.model.DDMTemplate;
+import com.liferay.portlet.dynamicdatamapping.model.DDMTemplateConstants;
 import com.liferay.portlet.dynamicdatamapping.service.base.DDMStructureLocalServiceBaseImpl;
+import com.liferay.portlet.dynamicdatamapping.util.DDMTemplateHelperUtil;
 import com.liferay.portlet.dynamicdatamapping.util.DDMXMLUtil;
 
 import java.util.ArrayList;
@@ -48,6 +58,7 @@ import java.util.Set;
 /**
  * @author Brian Wing Shun Chan
  * @author Bruno Basto
+ * @author Marcellus Tavares
  */
 public class DDMStructureLocalServiceImpl
 	extends DDMStructureLocalServiceBaseImpl {
@@ -55,7 +66,8 @@ public class DDMStructureLocalServiceImpl
 	public DDMStructure addStructure(
 			long userId, long groupId, long classNameId, String structureKey,
 			Map<Locale, String> nameMap, Map<Locale, String> descriptionMap,
-			String xsd, String storageType, ServiceContext serviceContext)
+			String xsd, String storageType, int type,
+			ServiceContext serviceContext)
 		throws PortalException, SystemException {
 
 		// Structure
@@ -94,17 +106,18 @@ public class DDMStructureLocalServiceImpl
 		structure.setDescriptionMap(descriptionMap);
 		structure.setXsd(xsd);
 		structure.setStorageType(storageType);
+		structure.setType(type);
 
 		ddmStructurePersistence.update(structure, false);
 
 		// Resources
 
-		if (serviceContext.getAddGroupPermissions() ||
-			serviceContext.getAddGuestPermissions()) {
+		if (serviceContext.isAddGroupPermissions() ||
+			serviceContext.isAddGuestPermissions()) {
 
 			addStructureResources(
-				structure, serviceContext.getAddGroupPermissions(),
-				serviceContext.getAddGuestPermissions());
+				structure, serviceContext.isAddGroupPermissions(),
+				serviceContext.isAddGuestPermissions());
 		}
 		else {
 			addStructureResources(
@@ -138,13 +151,37 @@ public class DDMStructureLocalServiceImpl
 			structure.getStructureId(), groupPermissions, guestPermissions);
 	}
 
+	public DDMStructure copyStructure(
+			long userId, long structureId, Map<Locale, String> nameMap,
+			Map<Locale, String> descriptionMap, ServiceContext serviceContext)
+		throws PortalException, SystemException {
+
+		DDMStructure structure = getStructure(structureId);
+
+		return addStructure(
+			userId, structure.getGroupId(), structure.getClassNameId(), null,
+			nameMap, descriptionMap, structure.getXsd(),
+			structure.getStorageType(), structure.getType(), serviceContext);
+	}
+
 	public void deleteStructure(DDMStructure structure)
 		throws PortalException, SystemException {
 
 		if (ddmStructureLinkPersistence.countByStructureId(
 				structure.getStructureId()) > 0) {
 
-			throw new RequiredStructureException();
+			throw new RequiredStructureException(
+				RequiredStructureException.REFERENCED_STRUCTURE_LINK);
+		}
+
+		long classNameId = PortalUtil.getClassNameId(DDMStructure.class);
+
+		if (ddmTemplatePersistence.countByG_C_C(
+				structure.getGroupId(), classNameId,
+				structure.getPrimaryKey()) > 0) {
+
+			throw new RequiredStructureException(
+				RequiredStructureException.REFERENCED_TEMPLATE);
 		}
 
 		// Structure
@@ -170,8 +207,8 @@ public class DDMStructureLocalServiceImpl
 	public void deleteStructure(long groupId, String structureKey)
 		throws PortalException, SystemException {
 
-		DDMStructure structure =
-			ddmStructurePersistence.findByG_S(groupId, structureKey);
+		DDMStructure structure = ddmStructurePersistence.findByG_S(
+			groupId, structureKey);
 
 		deleteStructure(structure);
 	}
@@ -213,6 +250,15 @@ public class DDMStructureLocalServiceImpl
 			classNameId, start, end);
 	}
 
+	public List<DDMStructure> getClassStructures(
+			long classNameId, OrderByComparator orderByComparator)
+		throws SystemException {
+
+		return ddmStructurePersistence.findByClassNameId(
+			classNameId, QueryUtil.ALL_POS, QueryUtil.ALL_POS,
+			orderByComparator);
+	}
+
 	public List<DDMStructure> getDLFileEntryTypeStructures(
 			long dlFileEntryTypeId)
 		throws SystemException {
@@ -239,64 +285,99 @@ public class DDMStructureLocalServiceImpl
 		return ddmStructurePersistence.findByG_N_D(groupId, name, description);
 	}
 
+	/**
+	 * @deprecated {@link #getStructures}
+	 */
 	public List<DDMStructure> getStructureEntries() throws SystemException {
+		return getStructures();
+	}
+
+	/**
+	 * @deprecated {@link #getStructures(long)}
+	 */
+	public List<DDMStructure> getStructureEntries(long groupId)
+		throws SystemException {
+
+		return getStructures(groupId);
+	}
+
+	/**
+	 * @deprecated {@link #getStructures(long, int, int)}
+	 */
+	public List<DDMStructure> getStructureEntries(
+			long groupId, int start, int end)
+		throws SystemException {
+
+		return getStructures(groupId, start, end);
+	}
+
+	public List<DDMStructure> getStructures() throws SystemException {
 		return ddmStructurePersistence.findAll();
 	}
 
-	public List<DDMStructure> getStructureEntries(long groupId)
+	public List<DDMStructure> getStructures(long groupId)
 		throws SystemException {
 
 		return ddmStructurePersistence.findByGroupId(groupId);
 	}
 
-	public List<DDMStructure> getStructureEntries(
-			long groupId, int start, int end)
+	public List<DDMStructure> getStructures(long groupId, int start, int end)
 		throws SystemException {
 
 		return ddmStructurePersistence.findByGroupId(groupId, start, end);
 	}
 
-	public int getStructureEntriesCount(long groupId) throws SystemException {
+	public List<DDMStructure> getStructures(long[] groupIds)
+		throws SystemException {
+
+		return ddmStructurePersistence.findByGroupId(groupIds);
+	}
+
+	public int getStructuresCount(long groupId) throws SystemException {
 		return ddmStructurePersistence.countByGroupId(groupId);
 	}
 
 	public List<DDMStructure> search(
-			long companyId, long groupId, long[] classNameIds, String keywords,
-			int start, int end, OrderByComparator orderByComparator)
+			long companyId, long[] groupIds, long[] classNameIds,
+			String keywords, int start, int end,
+			OrderByComparator orderByComparator)
 		throws SystemException {
 
 		return ddmStructureFinder.findByKeywords(
-			companyId, groupId, classNameIds, keywords, start, end,
+			companyId, groupIds, classNameIds, keywords, start, end,
 			orderByComparator);
 	}
 
 	public List<DDMStructure> search(
-			long companyId, long groupId, long[] classNameIds, String name,
-			String description, String storageType, boolean andOperator,
-			int start, int end, OrderByComparator orderByComparator)
+			long companyId, long[] groupIds, long[] classNameIds, String name,
+			String description, String storageType, int type,
+			boolean andOperator, int start, int end,
+			OrderByComparator orderByComparator)
 		throws SystemException {
 
-		return ddmStructureFinder.findByC_G_C_N_D_S(
-			companyId, groupId, classNameIds, name, description, storageType,
-			andOperator, start, end, orderByComparator);
+		return ddmStructureFinder.findByC_G_C_N_D_S_T(
+			companyId, groupIds, classNameIds, name, description, storageType,
+			type, andOperator, start, end, orderByComparator);
 	}
 
 	public int searchCount(
-			long companyId, long groupId, long[] classNameIds, String keywords)
+			long companyId, long[] groupIds, long[] classNameIds,
+			String keywords)
 		throws SystemException {
 
 		return ddmStructureFinder.countByKeywords(
-			companyId, groupId, classNameIds, keywords);
+			companyId, groupIds, classNameIds, keywords);
 	}
 
 	public int searchCount(
-			long companyId, long groupId, long[] classNameIds, String name,
-			String description, String storageType, boolean andOperator)
+			long companyId, long[] groupIds, long[] classNameIds, String name,
+			String description, String storageType, int type,
+			boolean andOperator)
 		throws SystemException {
 
-		return ddmStructureFinder.countByC_G_C_N_D_S(
-			companyId, groupId, classNameIds, name, description, storageType,
-			andOperator);
+		return ddmStructureFinder.countByC_G_C_N_D_S_T(
+			companyId, groupIds, classNameIds, name, description, storageType,
+			type, andOperator);
 	}
 
 	public DDMStructure updateStructure(
@@ -325,6 +406,46 @@ public class DDMStructureLocalServiceImpl
 			nameMap, descriptionMap, xsd, serviceContext, structure);
 	}
 
+	protected void appendNewStructureRequiredFields(
+		DDMStructure structure, Document templateDocument) {
+
+		String xsd = structure.getXsd();
+
+		Document structureDocument = null;
+
+		try {
+			structureDocument = SAXReaderUtil.read(xsd);
+		}
+		catch (DocumentException de) {
+			if (_log.isWarnEnabled()) {
+				_log.warn(de, de);
+			}
+
+			return;
+		}
+
+		Element templateElement = templateDocument.getRootElement();
+
+		XPath structureXPath = SAXReaderUtil.createXPath(
+			"//dynamic-element[.//meta-data/entry[@name=\"required\"]=" +
+				"\"true\"]");
+
+		List<Node> nodes = structureXPath.selectNodes(structureDocument);
+
+		for (Node node : nodes) {
+			Element element = (Element)node;
+
+			String name = element.attributeValue("name");
+
+			XPath templateXPath = SAXReaderUtil.createXPath(
+				"//dynamic-element[@name=\"" + name + "\"]");
+
+			if (!templateXPath.booleanValueOf(templateDocument)) {
+				templateElement.add(element.createCopy());
+			}
+		}
+	}
+
 	protected DDMStructure doUpdateStructure(
 			Map<Locale, String> nameMap, Map<Locale, String> descriptionMap,
 			String xsd, ServiceContext serviceContext, DDMStructure structure)
@@ -346,7 +467,102 @@ public class DDMStructureLocalServiceImpl
 
 		ddmStructurePersistence.update(structure, false);
 
+		syncStructureTemplatesFields(structure);
+
 		return structure;
+	}
+
+	protected void syncStructureTemplatesFields(DDMStructure structure)
+		throws PortalException, SystemException {
+
+		long classNameId = PortalUtil.getClassNameId(DDMStructure.class);
+
+		List<DDMTemplate> templates = ddmTemplateLocalService.getTemplates(
+			classNameId, structure.getStructureId(),
+			DDMTemplateConstants.TEMPLATE_TYPE_DETAIL);
+
+		for (DDMTemplate template : templates) {
+			String script = template.getScript();
+
+			Document templateDocument = null;
+
+			try {
+				templateDocument = SAXReaderUtil.read(script);
+			}
+			catch (DocumentException de) {
+				if (_log.isWarnEnabled()) {
+					_log.warn(de, de);
+				}
+
+				continue;
+			}
+
+			Element templateRootElement = templateDocument.getRootElement();
+
+			syncStructureTemplatesFields(template, templateRootElement);
+
+			appendNewStructureRequiredFields(structure, templateDocument);
+
+			try {
+				script = DDMXMLUtil.formatXML(templateDocument.asXML());
+			}
+			catch (Exception e) {
+				throw new StructureXsdException();
+			}
+
+			template.setScript(script);
+
+			ddmTemplatePersistence.update(template, false);
+		}
+	}
+
+	protected void syncStructureTemplatesFields(
+			DDMTemplate template, Element templateElement)
+		throws PortalException, SystemException {
+
+		DDMStructure structure = DDMTemplateHelperUtil.fetchStructure(template);
+
+		List<Element> dynamicElementElements = templateElement.elements(
+			"dynamic-element");
+
+		for (Element dynamicElementElement : dynamicElementElements) {
+			String dataType = dynamicElementElement.attributeValue("dataType");
+			String fieldName = dynamicElementElement.attributeValue("name");
+
+			if (Validator.isNull(dataType)) {
+				continue;
+			}
+
+			if (!structure.hasField(fieldName)) {
+				templateElement.remove(dynamicElementElement);
+
+				continue;
+			}
+
+			String mode = template.getMode();
+
+			if (mode.equals(DDMTemplateConstants.TEMPLATE_MODE_CREATE)) {
+				boolean fieldRequired = structure.getFieldRequired(fieldName);
+
+				List<Element> metadataElements = dynamicElementElement.elements(
+					"meta-data");
+
+				for (Element metadataElement : metadataElements) {
+					for (Element metadataEntryElement :
+							metadataElement.elements()) {
+
+						String attributeName =
+							metadataEntryElement.attributeValue("name");
+
+						if (fieldRequired && attributeName.equals("required")) {
+							metadataEntryElement.setText("true");
+						}
+					}
+				}
+			}
+
+			syncStructureTemplatesFields(template, dynamicElementElement);
+		}
 	}
 
 	protected void validate(List<Element> elements, Set<String> names)
@@ -363,7 +579,7 @@ public class DDMStructureLocalServiceImpl
 			String type = element.attributeValue("type", StringPool.BLANK);
 
 			if (Validator.isNull(name) ||
-				name.startsWith(DDMStructureConstants.RESERVED)) {
+				name.startsWith(DDMStructureConstants.XSD_NAME_RESERVED)) {
 
 				throw new StructureXsdException();
 			}
@@ -449,8 +665,8 @@ public class DDMStructureLocalServiceImpl
 
 				validate(elements, elNames);
 			}
-			catch (StructureDuplicateElementException fdsee) {
-				throw fdsee;
+			catch (StructureDuplicateElementException sdee) {
+				throw sdee;
 			}
 			catch (StructureXsdException sxe) {
 				throw sxe;
@@ -470,5 +686,8 @@ public class DDMStructureLocalServiceImpl
 			throw new StructureNameException();
 		}
 	}
+
+	private static Log _log = LogFactoryUtil.getLog(
+		DDMStructureLocalServiceImpl.class);
 
 }

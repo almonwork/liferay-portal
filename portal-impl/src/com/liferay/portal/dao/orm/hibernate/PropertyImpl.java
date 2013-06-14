@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -82,18 +82,6 @@ public class PropertyImpl extends ProjectionImpl implements Property {
 		return new CriterionImpl(_property.eqProperty(other));
 	}
 
-	public Property getProperty(String propertyName) {
-		return new PropertyImpl(_property.getProperty(propertyName));
-	}
-
-	public org.hibernate.criterion.Property getWrappedProperty() {
-		return _property;
-	}
-
-	public Projection group() {
-		return new ProjectionImpl(_property.group());
-	}
-
 	public Criterion ge(DynamicQuery subselect) {
 		DynamicQueryImpl dynamicQueryImpl = (DynamicQueryImpl)subselect;
 
@@ -128,6 +116,18 @@ public class PropertyImpl extends ProjectionImpl implements Property {
 
 		return new CriterionImpl(
 			_property.geSome(dynamicQueryImpl.getDetachedCriteria()));
+	}
+
+	public Property getProperty(String propertyName) {
+		return new PropertyImpl(_property.getProperty(propertyName));
+	}
+
+	public org.hibernate.criterion.Property getWrappedProperty() {
+		return _property;
+	}
+
+	public Projection group() {
+		return new ProjectionImpl(_property.group());
 	}
 
 	public Criterion gt(DynamicQuery subselect) {

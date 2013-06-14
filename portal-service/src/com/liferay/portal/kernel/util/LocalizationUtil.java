@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -15,7 +15,12 @@
 package com.liferay.portal.kernel.util;
 
 import com.liferay.portal.kernel.json.JSONObject;
+import com.liferay.portal.kernel.language.LanguageUtil;
+import com.liferay.portal.kernel.security.pacl.permission.PortalRuntimePermission;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
@@ -45,6 +50,8 @@ public class LocalizationUtil {
 	}
 
 	public static Localization getLocalization() {
+		PortalRuntimePermission.checkGetBeanProperty(LocalizationUtil.class);
+
 		return _localization;
 	}
 
@@ -77,6 +84,12 @@ public class LocalizationUtil {
 		return getLocalization().getLocalizationMap(xml);
 	}
 
+	public static Map<Locale, String> getLocalizationMap(
+		String[] languageIds, String[] values) {
+
+		return getLocalization().getLocalizationMap(languageIds, values);
+	}
+
 	public static String getLocalizationXmlFromPreferences(
 		PortletPreferences preferences, PortletRequest portletRequest,
 		String parameter) {
@@ -93,6 +106,29 @@ public class LocalizationUtil {
 
 		return getLocalization().getLocalizedParameter(
 			portletRequest, parameter);
+	}
+
+	public static List<Locale> getModifiedLocales(
+		Map<Locale, String> oldMap, Map<Locale, String> newMap) {
+
+		if ((newMap == null) || newMap.isEmpty()) {
+			return Collections.emptyList();
+		}
+
+		List<Locale> modifiedLocales = new ArrayList<Locale>();
+
+		Locale[] locales = LanguageUtil.getAvailableLocales();
+
+		for (Locale locale : locales) {
+			String oldValue = oldMap.get(locale);
+			String newValue = newMap.get(locale);
+
+			if (!oldValue.equals(newValue)) {
+				modifiedLocales.add(locale);
+			}
+		}
+
+		return modifiedLocales;
 	}
 
 	public static String getPreferencesKey(String key, String languageId) {
@@ -151,7 +187,7 @@ public class LocalizationUtil {
 			xml, key, requestedLanguageId, cdata, localized);
 	}
 
-	public static void setLocalizedPreferencesValues (
+	public static void setLocalizedPreferencesValues(
 			PortletRequest portletRequest, PortletPreferences preferences,
 			String parameter)
 		throws Exception {
@@ -176,6 +212,14 @@ public class LocalizationUtil {
 
 		getLocalization().setPreferencesValues(
 			preferences, key, languageId, values);
+	}
+
+	public static String updateLocalization(
+		Map<Locale, String> localizationMap, String xml, String key,
+		String defaultLanguageId) {
+
+		return getLocalization().updateLocalization(
+			localizationMap, xml, key, defaultLanguageId);
 	}
 
 	public static String updateLocalization(
@@ -217,6 +261,8 @@ public class LocalizationUtil {
 	}
 
 	public void setLocalization(Localization localization) {
+		PortalRuntimePermission.checkSetBeanProperty(getClass());
+
 		_localization = localization;
 	}
 

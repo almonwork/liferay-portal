@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -29,9 +29,10 @@ public class User_LoginTest extends BaseTestCase {
 			case 1:
 				selenium.setTimeout("180000");
 				selenium.open("/web/guest/home");
+				loadRequiredJavaScriptModules();
 
 				for (int second = 0;; second++) {
-					if (second >= 60) {
+					if (second >= 90) {
 						fail("timeout");
 					}
 
@@ -46,14 +47,13 @@ public class User_LoginTest extends BaseTestCase {
 					Thread.sleep(1000);
 				}
 
-				selenium.saveScreenShotAndSource();
 				selenium.clickAt("link=Sign In",
 					RuntimeVariables.replace("Sign In"));
 				selenium.waitForPageToLoad("30000");
-				selenium.saveScreenShotAndSource();
+				loadRequiredJavaScriptModules();
 
 				for (int second = 0;; second++) {
-					if (second >= 60) {
+					if (second >= 90) {
 						fail("timeout");
 					}
 
@@ -68,16 +68,13 @@ public class User_LoginTest extends BaseTestCase {
 					Thread.sleep(1000);
 				}
 
-				selenium.saveScreenShotAndSource();
 				selenium.type("//input[@id='_58_login']",
 					RuntimeVariables.replace("userea@liferay.com"));
-				selenium.saveScreenShotAndSource();
 				selenium.type("//input[@id='_58_password']",
 					RuntimeVariables.replace("test"));
-				selenium.saveScreenShotAndSource();
 
 				for (int second = 0;; second++) {
-					if (second >= 60) {
+					if (second >= 90) {
 						fail("timeout");
 					}
 
@@ -93,30 +90,7 @@ public class User_LoginTest extends BaseTestCase {
 					Thread.sleep(1000);
 				}
 
-				selenium.saveScreenShotAndSource();
 				selenium.click("//input[@id='_58_rememberMeCheckbox']");
-
-				for (int second = 0;; second++) {
-					if (second >= 60) {
-						fail("timeout");
-					}
-
-					try {
-						if (selenium.isVisible("//input[@value='Sign In']")) {
-							break;
-						}
-					}
-					catch (Exception e) {
-					}
-
-					Thread.sleep(1000);
-				}
-
-				selenium.saveScreenShotAndSource();
-				selenium.clickAt("//input[@value='Sign In']",
-					RuntimeVariables.replace("Sign In"));
-				selenium.waitForPageToLoad("30000");
-				selenium.saveScreenShotAndSource();
 
 				boolean rememberMeCheckboxChecked1 = selenium.isChecked(
 						"_58_rememberMeCheckbox");
@@ -127,14 +101,14 @@ public class User_LoginTest extends BaseTestCase {
 					continue;
 				}
 
-				selenium.clickAt("_58_rememberMeCheckbox",
-					RuntimeVariables.replace(""));
+				selenium.clickAt("//input[@id='_58_rememberMeCheckbox']",
+					RuntimeVariables.replace("Remember Me"));
 
 			case 2:
 				selenium.clickAt("//input[@value='Sign In']",
-					RuntimeVariables.replace(""));
+					RuntimeVariables.replace("Sign In"));
 				selenium.waitForPageToLoad("30000");
-				selenium.saveScreenShotAndSource();
+				loadRequiredJavaScriptModules();
 
 				boolean iAgreeVisible1 = selenium.isElementPresent(
 						"//span/input");
@@ -146,9 +120,9 @@ public class User_LoginTest extends BaseTestCase {
 				}
 
 				selenium.clickAt("//input[@value='I Agree']",
-					RuntimeVariables.replace(""));
+					RuntimeVariables.replace("I Agree"));
 				selenium.waitForPageToLoad("30000");
-				selenium.saveScreenShotAndSource();
+				loadRequiredJavaScriptModules();
 
 			case 3:
 
@@ -166,11 +140,10 @@ public class User_LoginTest extends BaseTestCase {
 					selenium.getText("//form/div[1]"));
 				selenium.type("reminderQueryAnswer",
 					RuntimeVariables.replace("test"));
-				selenium.saveScreenShotAndSource();
 				selenium.clickAt("//input[@value='Save']",
-					RuntimeVariables.replace(""));
+					RuntimeVariables.replace("Save"));
 				selenium.waitForPageToLoad("30000");
-				selenium.saveScreenShotAndSource();
+				loadRequiredJavaScriptModules();
 
 			case 4:
 			case 100:

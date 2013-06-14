@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -111,7 +111,8 @@ public class JournalWebDAVStorageImpl extends BaseWebDAVStorageImpl {
 					try {
 						JournalStructure journalStructure =
 							JournalStructureLocalServiceUtil.getStructure(
-								webDavRequest.getGroupId(), journalTypeId);
+								webDavRequest.getGroupId(), journalTypeId,
+								true);
 
 						return toResource(
 							webDavRequest, journalStructure, false);
@@ -124,7 +125,8 @@ public class JournalWebDAVStorageImpl extends BaseWebDAVStorageImpl {
 					try {
 						JournalTemplate journalTemplate =
 							JournalTemplateLocalServiceUtil.getTemplate(
-								webDavRequest.getGroupId(), journalTypeId);
+								webDavRequest.getGroupId(), journalTypeId,
+								true);
 
 						return toResource(
 							webDavRequest, journalTemplate, false);
@@ -192,8 +194,8 @@ public class JournalWebDAVStorageImpl extends BaseWebDAVStorageImpl {
 
 				JournalStructureServiceUtil.updateStructure(
 					structure.getGroupId(), structure.getStructureId(),
-					structure.getParentStructureId(), structure.getName(),
-					structure.getDescription(), xsd, serviceContext);
+					structure.getParentStructureId(), structure.getNameMap(),
+					structure.getDescriptionMap(), xsd, serviceContext);
 
 				return HttpServletResponse.SC_CREATED;
 			}
@@ -209,8 +211,8 @@ public class JournalWebDAVStorageImpl extends BaseWebDAVStorageImpl {
 
 				JournalTemplateServiceUtil.updateTemplate(
 					template.getGroupId(), template.getTemplateId(),
-					template.getStructureId(), template.getName(),
-					template.getDescription(), xsl, formatXsl,
+					template.getStructureId(), template.getNameMap(),
+					template.getDescriptionMap(), xsl, formatXsl,
 					template.getLangType(), template.isCacheable(),
 					template.isSmallImage(), template.getSmallImageURL(),
 					smallFile, serviceContext);
@@ -280,23 +282,6 @@ public class JournalWebDAVStorageImpl extends BaseWebDAVStorageImpl {
 	}
 
 	protected Resource toResource(
-		WebDAVRequest webDavRequest, String type, boolean appendPath) {
-
-		String parentPath = getRootPath() + webDavRequest.getPath();
-		String name = StringPool.BLANK;
-
-		if (appendPath) {
-			name = type;
-		}
-
-		Resource resource = new BaseResourceImpl(parentPath, name, type);
-
-		resource.setModel(type);
-
-		return resource;
-	}
-
-	protected Resource toResource(
 		WebDAVRequest webDavRequest, JournalStructure structure,
 		boolean appendPath) {
 
@@ -322,6 +307,23 @@ public class JournalWebDAVStorageImpl extends BaseWebDAVStorageImpl {
 		}
 
 		return new JournalTemplateResourceImpl(template, parentPath, name);
+	}
+
+	protected Resource toResource(
+		WebDAVRequest webDavRequest, String type, boolean appendPath) {
+
+		String parentPath = getRootPath() + webDavRequest.getPath();
+		String name = StringPool.BLANK;
+
+		if (appendPath) {
+			name = type;
+		}
+
+		Resource resource = new BaseResourceImpl(parentPath, name, type);
+
+		resource.setModel(type);
+
+		return resource;
 	}
 
 	//private static final String _TYPE_ARTICLES = "Articles";

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -21,22 +21,18 @@ import com.liferay.portal.kernel.bean.IdentifiableBean;
 import com.liferay.portal.kernel.dao.jdbc.SqlUpdate;
 import com.liferay.portal.kernel.dao.jdbc.SqlUpdateFactoryUtil;
 import com.liferay.portal.kernel.dao.orm.DynamicQuery;
+import com.liferay.portal.kernel.dao.orm.DynamicQueryFactoryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
-import com.liferay.portal.kernel.search.Indexer;
-import com.liferay.portal.kernel.search.IndexerRegistryUtil;
-import com.liferay.portal.kernel.search.SearchException;
+import com.liferay.portal.kernel.search.Indexable;
+import com.liferay.portal.kernel.search.IndexableType;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.model.PersistedModel;
+import com.liferay.portal.service.BaseLocalServiceImpl;
 import com.liferay.portal.service.PersistedModelLocalServiceRegistry;
 import com.liferay.portal.service.ResourceLocalService;
-import com.liferay.portal.service.ResourceService;
 import com.liferay.portal.service.UserLocalService;
 import com.liferay.portal.service.UserService;
-import com.liferay.portal.service.persistence.ResourceFinder;
-import com.liferay.portal.service.persistence.ResourcePersistence;
 import com.liferay.portal.service.persistence.UserFinder;
 import com.liferay.portal.service.persistence.UserPersistence;
 
@@ -47,11 +43,10 @@ import com.liferay.portlet.messageboards.service.MBCategoryLocalService;
 import com.liferay.portlet.messageboards.service.MBCategoryService;
 import com.liferay.portlet.messageboards.service.MBDiscussionLocalService;
 import com.liferay.portlet.messageboards.service.MBMailingListLocalService;
-import com.liferay.portlet.messageboards.service.MBMessageFlagLocalService;
-import com.liferay.portlet.messageboards.service.MBMessageFlagService;
 import com.liferay.portlet.messageboards.service.MBMessageLocalService;
 import com.liferay.portlet.messageboards.service.MBMessageService;
 import com.liferay.portlet.messageboards.service.MBStatsUserLocalService;
+import com.liferay.portlet.messageboards.service.MBThreadFlagLocalService;
 import com.liferay.portlet.messageboards.service.MBThreadLocalService;
 import com.liferay.portlet.messageboards.service.MBThreadService;
 import com.liferay.portlet.messageboards.service.persistence.MBBanPersistence;
@@ -60,10 +55,10 @@ import com.liferay.portlet.messageboards.service.persistence.MBCategoryPersisten
 import com.liferay.portlet.messageboards.service.persistence.MBDiscussionPersistence;
 import com.liferay.portlet.messageboards.service.persistence.MBMailingListPersistence;
 import com.liferay.portlet.messageboards.service.persistence.MBMessageFinder;
-import com.liferay.portlet.messageboards.service.persistence.MBMessageFlagPersistence;
 import com.liferay.portlet.messageboards.service.persistence.MBMessagePersistence;
 import com.liferay.portlet.messageboards.service.persistence.MBStatsUserPersistence;
 import com.liferay.portlet.messageboards.service.persistence.MBThreadFinder;
+import com.liferay.portlet.messageboards.service.persistence.MBThreadFlagPersistence;
 import com.liferay.portlet.messageboards.service.persistence.MBThreadPersistence;
 
 import java.io.Serializable;
@@ -85,7 +80,8 @@ import javax.sql.DataSource;
  * @generated
  */
 public abstract class MBDiscussionLocalServiceBaseImpl
-	implements MBDiscussionLocalService, IdentifiableBean {
+	extends BaseLocalServiceImpl implements MBDiscussionLocalService,
+		IdentifiableBean {
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
@@ -99,26 +95,12 @@ public abstract class MBDiscussionLocalServiceBaseImpl
 	 * @return the message boards discussion that was added
 	 * @throws SystemException if a system exception occurred
 	 */
+	@Indexable(type = IndexableType.REINDEX)
 	public MBDiscussion addMBDiscussion(MBDiscussion mbDiscussion)
 		throws SystemException {
 		mbDiscussion.setNew(true);
 
-		mbDiscussion = mbDiscussionPersistence.update(mbDiscussion, false);
-
-		Indexer indexer = IndexerRegistryUtil.getIndexer(getModelClassName());
-
-		if (indexer != null) {
-			try {
-				indexer.reindex(mbDiscussion);
-			}
-			catch (SearchException se) {
-				if (_log.isWarnEnabled()) {
-					_log.warn(se, se);
-				}
-			}
-		}
-
-		return mbDiscussion;
+		return mbDiscussionPersistence.update(mbDiscussion, false);
 	}
 
 	/**
@@ -135,49 +117,34 @@ public abstract class MBDiscussionLocalServiceBaseImpl
 	 * Deletes the message boards discussion with the primary key from the database. Also notifies the appropriate model listeners.
 	 *
 	 * @param discussionId the primary key of the message boards discussion
+	 * @return the message boards discussion that was removed
 	 * @throws PortalException if a message boards discussion with the primary key could not be found
 	 * @throws SystemException if a system exception occurred
 	 */
-	public void deleteMBDiscussion(long discussionId)
+	@Indexable(type = IndexableType.DELETE)
+	public MBDiscussion deleteMBDiscussion(long discussionId)
 		throws PortalException, SystemException {
-		MBDiscussion mbDiscussion = mbDiscussionPersistence.remove(discussionId);
-
-		Indexer indexer = IndexerRegistryUtil.getIndexer(getModelClassName());
-
-		if (indexer != null) {
-			try {
-				indexer.delete(mbDiscussion);
-			}
-			catch (SearchException se) {
-				if (_log.isWarnEnabled()) {
-					_log.warn(se, se);
-				}
-			}
-		}
+		return mbDiscussionPersistence.remove(discussionId);
 	}
 
 	/**
 	 * Deletes the message boards discussion from the database. Also notifies the appropriate model listeners.
 	 *
 	 * @param mbDiscussion the message boards discussion
+	 * @return the message boards discussion that was removed
 	 * @throws SystemException if a system exception occurred
 	 */
-	public void deleteMBDiscussion(MBDiscussion mbDiscussion)
+	@Indexable(type = IndexableType.DELETE)
+	public MBDiscussion deleteMBDiscussion(MBDiscussion mbDiscussion)
 		throws SystemException {
-		mbDiscussionPersistence.remove(mbDiscussion);
+		return mbDiscussionPersistence.remove(mbDiscussion);
+	}
 
-		Indexer indexer = IndexerRegistryUtil.getIndexer(getModelClassName());
+	public DynamicQuery dynamicQuery() {
+		Class<?> clazz = getClass();
 
-		if (indexer != null) {
-			try {
-				indexer.delete(mbDiscussion);
-			}
-			catch (SearchException se) {
-				if (_log.isWarnEnabled()) {
-					_log.warn(se, se);
-				}
-			}
-		}
+		return DynamicQueryFactoryUtil.forClass(MBDiscussion.class,
+			clazz.getClassLoader());
 	}
 
 	/**
@@ -246,6 +213,11 @@ public abstract class MBDiscussionLocalServiceBaseImpl
 		return mbDiscussionPersistence.countWithDynamicQuery(dynamicQuery);
 	}
 
+	public MBDiscussion fetchMBDiscussion(long discussionId)
+		throws SystemException {
+		return mbDiscussionPersistence.fetchByPrimaryKey(discussionId);
+	}
+
 	/**
 	 * Returns the message boards discussion with the primary key.
 	 *
@@ -298,6 +270,7 @@ public abstract class MBDiscussionLocalServiceBaseImpl
 	 * @return the message boards discussion that was updated
 	 * @throws SystemException if a system exception occurred
 	 */
+	@Indexable(type = IndexableType.REINDEX)
 	public MBDiscussion updateMBDiscussion(MBDiscussion mbDiscussion)
 		throws SystemException {
 		return updateMBDiscussion(mbDiscussion, true);
@@ -311,26 +284,12 @@ public abstract class MBDiscussionLocalServiceBaseImpl
 	 * @return the message boards discussion that was updated
 	 * @throws SystemException if a system exception occurred
 	 */
+	@Indexable(type = IndexableType.REINDEX)
 	public MBDiscussion updateMBDiscussion(MBDiscussion mbDiscussion,
 		boolean merge) throws SystemException {
 		mbDiscussion.setNew(false);
 
-		mbDiscussion = mbDiscussionPersistence.update(mbDiscussion, merge);
-
-		Indexer indexer = IndexerRegistryUtil.getIndexer(getModelClassName());
-
-		if (indexer != null) {
-			try {
-				indexer.reindex(mbDiscussion);
-			}
-			catch (SearchException se) {
-				if (_log.isWarnEnabled()) {
-					_log.warn(se, se);
-				}
-			}
-		}
-
-		return mbDiscussion;
+		return mbDiscussionPersistence.update(mbDiscussion, merge);
 	}
 
 	/**
@@ -612,63 +571,6 @@ public abstract class MBDiscussionLocalServiceBaseImpl
 	}
 
 	/**
-	 * Returns the message boards message flag local service.
-	 *
-	 * @return the message boards message flag local service
-	 */
-	public MBMessageFlagLocalService getMBMessageFlagLocalService() {
-		return mbMessageFlagLocalService;
-	}
-
-	/**
-	 * Sets the message boards message flag local service.
-	 *
-	 * @param mbMessageFlagLocalService the message boards message flag local service
-	 */
-	public void setMBMessageFlagLocalService(
-		MBMessageFlagLocalService mbMessageFlagLocalService) {
-		this.mbMessageFlagLocalService = mbMessageFlagLocalService;
-	}
-
-	/**
-	 * Returns the message boards message flag remote service.
-	 *
-	 * @return the message boards message flag remote service
-	 */
-	public MBMessageFlagService getMBMessageFlagService() {
-		return mbMessageFlagService;
-	}
-
-	/**
-	 * Sets the message boards message flag remote service.
-	 *
-	 * @param mbMessageFlagService the message boards message flag remote service
-	 */
-	public void setMBMessageFlagService(
-		MBMessageFlagService mbMessageFlagService) {
-		this.mbMessageFlagService = mbMessageFlagService;
-	}
-
-	/**
-	 * Returns the message boards message flag persistence.
-	 *
-	 * @return the message boards message flag persistence
-	 */
-	public MBMessageFlagPersistence getMBMessageFlagPersistence() {
-		return mbMessageFlagPersistence;
-	}
-
-	/**
-	 * Sets the message boards message flag persistence.
-	 *
-	 * @param mbMessageFlagPersistence the message boards message flag persistence
-	 */
-	public void setMBMessageFlagPersistence(
-		MBMessageFlagPersistence mbMessageFlagPersistence) {
-		this.mbMessageFlagPersistence = mbMessageFlagPersistence;
-	}
-
-	/**
 	 * Returns the message boards stats user local service.
 	 *
 	 * @return the message boards stats user local service
@@ -780,6 +682,44 @@ public abstract class MBDiscussionLocalServiceBaseImpl
 	}
 
 	/**
+	 * Returns the message boards thread flag local service.
+	 *
+	 * @return the message boards thread flag local service
+	 */
+	public MBThreadFlagLocalService getMBThreadFlagLocalService() {
+		return mbThreadFlagLocalService;
+	}
+
+	/**
+	 * Sets the message boards thread flag local service.
+	 *
+	 * @param mbThreadFlagLocalService the message boards thread flag local service
+	 */
+	public void setMBThreadFlagLocalService(
+		MBThreadFlagLocalService mbThreadFlagLocalService) {
+		this.mbThreadFlagLocalService = mbThreadFlagLocalService;
+	}
+
+	/**
+	 * Returns the message boards thread flag persistence.
+	 *
+	 * @return the message boards thread flag persistence
+	 */
+	public MBThreadFlagPersistence getMBThreadFlagPersistence() {
+		return mbThreadFlagPersistence;
+	}
+
+	/**
+	 * Sets the message boards thread flag persistence.
+	 *
+	 * @param mbThreadFlagPersistence the message boards thread flag persistence
+	 */
+	public void setMBThreadFlagPersistence(
+		MBThreadFlagPersistence mbThreadFlagPersistence) {
+		this.mbThreadFlagPersistence = mbThreadFlagPersistence;
+	}
+
+	/**
 	 * Returns the counter local service.
 	 *
 	 * @return the counter local service
@@ -814,60 +754,6 @@ public abstract class MBDiscussionLocalServiceBaseImpl
 	public void setResourceLocalService(
 		ResourceLocalService resourceLocalService) {
 		this.resourceLocalService = resourceLocalService;
-	}
-
-	/**
-	 * Returns the resource remote service.
-	 *
-	 * @return the resource remote service
-	 */
-	public ResourceService getResourceService() {
-		return resourceService;
-	}
-
-	/**
-	 * Sets the resource remote service.
-	 *
-	 * @param resourceService the resource remote service
-	 */
-	public void setResourceService(ResourceService resourceService) {
-		this.resourceService = resourceService;
-	}
-
-	/**
-	 * Returns the resource persistence.
-	 *
-	 * @return the resource persistence
-	 */
-	public ResourcePersistence getResourcePersistence() {
-		return resourcePersistence;
-	}
-
-	/**
-	 * Sets the resource persistence.
-	 *
-	 * @param resourcePersistence the resource persistence
-	 */
-	public void setResourcePersistence(ResourcePersistence resourcePersistence) {
-		this.resourcePersistence = resourcePersistence;
-	}
-
-	/**
-	 * Returns the resource finder.
-	 *
-	 * @return the resource finder
-	 */
-	public ResourceFinder getResourceFinder() {
-		return resourceFinder;
-	}
-
-	/**
-	 * Sets the resource finder.
-	 *
-	 * @param resourceFinder the resource finder
-	 */
-	public void setResourceFinder(ResourceFinder resourceFinder) {
-		this.resourceFinder = resourceFinder;
 	}
 
 	/**
@@ -1027,12 +913,6 @@ public abstract class MBDiscussionLocalServiceBaseImpl
 	protected MBMessagePersistence mbMessagePersistence;
 	@BeanReference(type = MBMessageFinder.class)
 	protected MBMessageFinder mbMessageFinder;
-	@BeanReference(type = MBMessageFlagLocalService.class)
-	protected MBMessageFlagLocalService mbMessageFlagLocalService;
-	@BeanReference(type = MBMessageFlagService.class)
-	protected MBMessageFlagService mbMessageFlagService;
-	@BeanReference(type = MBMessageFlagPersistence.class)
-	protected MBMessageFlagPersistence mbMessageFlagPersistence;
 	@BeanReference(type = MBStatsUserLocalService.class)
 	protected MBStatsUserLocalService mbStatsUserLocalService;
 	@BeanReference(type = MBStatsUserPersistence.class)
@@ -1045,16 +925,14 @@ public abstract class MBDiscussionLocalServiceBaseImpl
 	protected MBThreadPersistence mbThreadPersistence;
 	@BeanReference(type = MBThreadFinder.class)
 	protected MBThreadFinder mbThreadFinder;
+	@BeanReference(type = MBThreadFlagLocalService.class)
+	protected MBThreadFlagLocalService mbThreadFlagLocalService;
+	@BeanReference(type = MBThreadFlagPersistence.class)
+	protected MBThreadFlagPersistence mbThreadFlagPersistence;
 	@BeanReference(type = CounterLocalService.class)
 	protected CounterLocalService counterLocalService;
 	@BeanReference(type = ResourceLocalService.class)
 	protected ResourceLocalService resourceLocalService;
-	@BeanReference(type = ResourceService.class)
-	protected ResourceService resourceService;
-	@BeanReference(type = ResourcePersistence.class)
-	protected ResourcePersistence resourcePersistence;
-	@BeanReference(type = ResourceFinder.class)
-	protected ResourceFinder resourceFinder;
 	@BeanReference(type = UserLocalService.class)
 	protected UserLocalService userLocalService;
 	@BeanReference(type = UserService.class)
@@ -1065,6 +943,5 @@ public abstract class MBDiscussionLocalServiceBaseImpl
 	protected UserFinder userFinder;
 	@BeanReference(type = PersistedModelLocalServiceRegistry.class)
 	protected PersistedModelLocalServiceRegistry persistedModelLocalServiceRegistry;
-	private static Log _log = LogFactoryUtil.getLog(MBDiscussionLocalServiceBaseImpl.class);
 	private String _beanIdentifier;
 }

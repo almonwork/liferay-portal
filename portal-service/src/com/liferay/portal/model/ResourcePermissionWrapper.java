@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,6 +14,9 @@
 
 package com.liferay.portal.model;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * <p>
  * This class is a wrapper for {@link ResourcePermission}.
@@ -23,7 +26,8 @@ package com.liferay.portal.model;
  * @see       ResourcePermission
  * @generated
  */
-public class ResourcePermissionWrapper implements ResourcePermission {
+public class ResourcePermissionWrapper implements ResourcePermission,
+	ModelWrapper<ResourcePermission> {
 	public ResourcePermissionWrapper(ResourcePermission resourcePermission) {
 		_resourcePermission = resourcePermission;
 	}
@@ -34,6 +38,71 @@ public class ResourcePermissionWrapper implements ResourcePermission {
 
 	public String getModelClassName() {
 		return ResourcePermission.class.getName();
+	}
+
+	public Map<String, Object> getModelAttributes() {
+		Map<String, Object> attributes = new HashMap<String, Object>();
+
+		attributes.put("resourcePermissionId", getResourcePermissionId());
+		attributes.put("companyId", getCompanyId());
+		attributes.put("name", getName());
+		attributes.put("scope", getScope());
+		attributes.put("primKey", getPrimKey());
+		attributes.put("roleId", getRoleId());
+		attributes.put("ownerId", getOwnerId());
+		attributes.put("actionIds", getActionIds());
+
+		return attributes;
+	}
+
+	public void setModelAttributes(Map<String, Object> attributes) {
+		Long resourcePermissionId = (Long)attributes.get("resourcePermissionId");
+
+		if (resourcePermissionId != null) {
+			setResourcePermissionId(resourcePermissionId);
+		}
+
+		Long companyId = (Long)attributes.get("companyId");
+
+		if (companyId != null) {
+			setCompanyId(companyId);
+		}
+
+		String name = (String)attributes.get("name");
+
+		if (name != null) {
+			setName(name);
+		}
+
+		Integer scope = (Integer)attributes.get("scope");
+
+		if (scope != null) {
+			setScope(scope);
+		}
+
+		String primKey = (String)attributes.get("primKey");
+
+		if (primKey != null) {
+			setPrimKey(primKey);
+		}
+
+		Long roleId = (Long)attributes.get("roleId");
+
+		if (roleId != null) {
+			setRoleId(roleId);
+		}
+
+		Long ownerId = (Long)attributes.get("ownerId");
+
+		if (ownerId != null) {
+			setOwnerId(ownerId);
+		}
+
+		Long actionIds = (Long)attributes.get("actionIds");
+
+		if (actionIds != null) {
+			setActionIds(actionIds);
+		}
 	}
 
 	/**
@@ -218,10 +287,6 @@ public class ResourcePermissionWrapper implements ResourcePermission {
 		return _resourcePermission.isEscapedModel();
 	}
 
-	public void setEscapedModel(boolean escapedModel) {
-		_resourcePermission.setEscapedModel(escapedModel);
-	}
-
 	public java.io.Serializable getPrimaryKeyObj() {
 		return _resourcePermission.getPrimaryKeyObj();
 	}
@@ -276,7 +341,18 @@ public class ResourcePermissionWrapper implements ResourcePermission {
 		_resourcePermission.persist();
 	}
 
+	public boolean hasActionId(java.lang.String actionId) {
+		return _resourcePermission.hasActionId(actionId);
+	}
+
+	/**
+	 * @deprecated Renamed to {@link #getWrappedModel}
+	 */
 	public ResourcePermission getWrappedResourcePermission() {
+		return _resourcePermission;
+	}
+
+	public ResourcePermission getWrappedModel() {
 		return _resourcePermission;
 	}
 

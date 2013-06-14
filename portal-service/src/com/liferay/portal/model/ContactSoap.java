@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -37,8 +37,11 @@ public class ContactSoap implements Serializable {
 		soapModel.setUserName(model.getUserName());
 		soapModel.setCreateDate(model.getCreateDate());
 		soapModel.setModifiedDate(model.getModifiedDate());
+		soapModel.setClassNameId(model.getClassNameId());
+		soapModel.setClassPK(model.getClassPK());
 		soapModel.setAccountId(model.getAccountId());
 		soapModel.setParentContactId(model.getParentContactId());
+		soapModel.setEmailAddress(model.getEmailAddress());
 		soapModel.setFirstName(model.getFirstName());
 		soapModel.setMiddleName(model.getMiddleName());
 		soapModel.setLastName(model.getLastName());
@@ -161,6 +164,22 @@ public class ContactSoap implements Serializable {
 		_modifiedDate = modifiedDate;
 	}
 
+	public long getClassNameId() {
+		return _classNameId;
+	}
+
+	public void setClassNameId(long classNameId) {
+		_classNameId = classNameId;
+	}
+
+	public long getClassPK() {
+		return _classPK;
+	}
+
+	public void setClassPK(long classPK) {
+		_classPK = classPK;
+	}
+
 	public long getAccountId() {
 		return _accountId;
 	}
@@ -175,6 +194,14 @@ public class ContactSoap implements Serializable {
 
 	public void setParentContactId(long parentContactId) {
 		_parentContactId = parentContactId;
+	}
+
+	public String getEmailAddress() {
+		return _emailAddress;
+	}
+
+	public void setEmailAddress(String emailAddress) {
+		_emailAddress = emailAddress;
 	}
 
 	public String getFirstName() {
@@ -363,8 +390,11 @@ public class ContactSoap implements Serializable {
 	private String _userName;
 	private Date _createDate;
 	private Date _modifiedDate;
+	private long _classNameId;
+	private long _classPK;
 	private long _accountId;
 	private long _parentContactId;
+	private String _emailAddress;
 	private String _firstName;
 	private String _middleName;
 	private String _lastName;

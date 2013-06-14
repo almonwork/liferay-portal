@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -23,21 +23,22 @@ import com.liferay.portal.kernel.util.Validator;
  * @author Charles May
  * @author Shuyang Zhou
  */
-public class EntityColumn implements Cloneable {
+public class EntityColumn implements Cloneable, Comparable<EntityColumn> {
 
 	public EntityColumn(String name) {
 		this(
 			name, null, null, false, false, false, null, null, null, true, true,
-			null, null, null, null, true, true, false, false);
+			false, null, null, null, null, true, true, false, false);
 	}
 
 	public EntityColumn(
 		String name, String dbName, String type, boolean primary,
 		boolean accessor, boolean filterPrimary, String ejbName,
 		String mappingKey, String mappingTable, boolean caseSensitive,
-		boolean orderByAscending, String comparator, String arrayableOperator,
-		String idType, String idParam, boolean convertNull, boolean lazy,
-		boolean localized, boolean jsonEnabled) {
+		boolean orderByAscending, boolean orderColumn, String comparator,
+		String arrayableOperator, String idType, String idParam,
+		boolean convertNull, boolean lazy, boolean localized,
+		boolean jsonEnabled) {
 
 		_name = name;
 		_dbName = dbName;
@@ -52,6 +53,7 @@ public class EntityColumn implements Cloneable {
 		_mappingTable = mappingTable;
 		_caseSensitive = caseSensitive;
 		_orderByAscending = orderByAscending;
+		_orderColumn = orderColumn;
 		_comparator = comparator;
 		_arrayableOperator = arrayableOperator;
 		_idType = idType;
@@ -71,8 +73,8 @@ public class EntityColumn implements Cloneable {
 
 		this(
 			name, dbName, type, primary, accessor, filterPrimary, ejbName,
-			mappingKey, mappingTable, true, true, null, null, idType, idParam,
-			convertNull, lazy, localized, jsonEnabled);
+			mappingKey, mappingTable, true, true, false, null, null, idType,
+			idParam, convertNull, lazy, localized, jsonEnabled);
 	}
 
 	@Override
@@ -80,9 +82,13 @@ public class EntityColumn implements Cloneable {
 		return new EntityColumn(
 			getName(), getDBName(), getType(), isPrimary(), isAccessor(),
 			isFilterPrimary(), getEJBName(), getMappingKey(), getMappingTable(),
-			isCaseSensitive(), isOrderByAscending(), getComparator(),
-			getArrayableOperator(), getIdType(), getIdParam(), isConvertNull(),
-			isLazy(), isLocalized(), isJsonEnabled());
+			isCaseSensitive(), isOrderByAscending(), isOrderColumn(),
+			getComparator(), getArrayableOperator(), getIdType(), getIdParam(),
+			isConvertNull(), isLazy(), isLocalized(), isJsonEnabled());
+	}
+
+	public int compareTo(EntityColumn entityColumn) {
+		return _name.compareTo(entityColumn._name);
 	}
 
 	@Override
@@ -109,6 +115,10 @@ public class EntityColumn implements Cloneable {
 
 	public String getDBName() {
 		return _dbName;
+	}
+
+	public String getEJBName() {
+		return _ejbName;
 	}
 
 	public String getHumanCondition(boolean arrayable) {
@@ -139,10 +149,6 @@ public class EntityColumn implements Cloneable {
 
 	public String getHumanNames() {
 		return TextFormatter.formatPlural(getHumanName());
-	}
-
-	public String getEJBName() {
-		return _ejbName;
 	}
 
 	public String getIdParam() {
@@ -237,12 +243,12 @@ public class EntityColumn implements Cloneable {
 		return _convertNull;
 	}
 
-	public boolean isFetchFinderPath() {
-		return _fetchFinderPath;
-	}
-
 	public boolean isFilterPrimary() {
 		return _filterPrimary;
+	}
+
+	public boolean isFinderPath() {
+		return _finderPath;
 	}
 
 	public boolean isJsonEnabled() {
@@ -267,6 +273,10 @@ public class EntityColumn implements Cloneable {
 
 	public boolean isOrderByAscending() {
 		return _orderByAscending;
+	}
+
+	public boolean isOrderColumn() {
+		return _orderColumn;
 	}
 
 	public boolean isPrimary() {
@@ -338,8 +348,8 @@ public class EntityColumn implements Cloneable {
 		_dbName = dbName;
 	}
 
-	public void setFetchFinderPath(boolean fetchFinderPath) {
-		_fetchFinderPath = fetchFinderPath;
+	public void setFinderPath(boolean finderPath) {
+		_finderPath = finderPath;
 	}
 
 	public void setIdParam(String idParam) {
@@ -360,6 +370,10 @@ public class EntityColumn implements Cloneable {
 
 	public void setOrderByAscending(boolean orderByAscending) {
 		_orderByAscending = orderByAscending;
+	}
+
+	public void setOrderColumn(boolean orderColumn) {
+		_orderColumn = orderColumn;
 	}
 
 	protected String convertComparatorToHtml(String comparator) {
@@ -393,8 +407,8 @@ public class EntityColumn implements Cloneable {
 	private boolean _convertNull;
 	private String _dbName;
 	private String _ejbName;
-	private boolean _fetchFinderPath;
 	private boolean _filterPrimary;
+	private boolean _finderPath;
 	private String _humanName;
 	private String _idParam;
 	private String _idType;
@@ -406,6 +420,7 @@ public class EntityColumn implements Cloneable {
 	private String _methodName;
 	private String _name;
 	private boolean _orderByAscending;
+	private boolean _orderColumn;
 	private boolean _primary;
 	private String _type;
 

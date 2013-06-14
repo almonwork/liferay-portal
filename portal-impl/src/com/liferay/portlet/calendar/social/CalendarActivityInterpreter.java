@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -78,18 +78,23 @@ public class CalendarActivityInterpreter extends BaseSocialActivityInterpreter {
 		String titlePattern = null;
 
 		if (activityType == CalendarActivityKeys.ADD_EVENT) {
-			titlePattern = "activity-calendar-add-event";
+			if (Validator.isNull(groupName)) {
+				titlePattern = "activity-calendar-add-event";
+			}
+			else {
+				titlePattern = "activity-calendar-add-event-in";
+			}
 		}
 		else if (activityType == CalendarActivityKeys.UPDATE_EVENT) {
-			titlePattern = "activity-calendar-update-event";
+			if (Validator.isNull(groupName)) {
+				titlePattern = "activity-calendar-update-event";
+			}
+			else {
+				titlePattern = "activity-calendar-update-event-in";
+			}
 		}
 
-		if (Validator.isNotNull(groupName)) {
-			titlePattern += "-in";
-		}
-
-		String eventTitle = wrapLink(
-			link, HtmlUtil.escape(cleanContent(event.getTitle())));
+		String eventTitle = wrapLink(link, HtmlUtil.escape(event.getTitle()));
 
 		Object[] titleArguments = new Object[] {
 			groupName, creatorUserName, eventTitle

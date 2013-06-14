@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -72,8 +72,6 @@ portletURL.setParameter("modelResource", modelResource);
 	<liferay-ui:error exception="<%= ColumnTypeException.class %>" message="please-select-a-valid-type" />
 	<liferay-ui:error exception="<%= DuplicateColumnNameException.class %>" message="please-enter-a-unique-name" />
 	<liferay-ui:error exception="<%= ValueDataException.class %>" message="please-enter-a-valid-value" />
-
-	<aui:model-context bean="<%= column %>" model="<%= ExpandoColumn.class %>" />
 
 	<aui:fieldset>
 		<c:choose>
@@ -155,27 +153,27 @@ portletURL.setParameter("modelResource", modelResource);
 
 					<aui:field-wrapper label="default-value">
 						<liferay-ui:input-date
-							dayValue="<%= defaultValueDate.get(Calendar.DATE) %>"
 							dayParam="defaultValueDay"
+							dayValue="<%= defaultValueDate.get(Calendar.DATE) %>"
 							disabled="<%= false %>"
 							firstDayOfWeek="<%= defaultValueDate.getFirstDayOfWeek() - 1 %>"
 							monthParam="defaultValueMonth"
 							monthValue="<%= defaultValueDate.get(Calendar.MONTH) %>"
 							yearParam="defaultValueYear"
-							yearValue="<%= defaultValueDate.get(Calendar.YEAR) %>"
-							yearRangeStart="<%= defaultValueDate.get(Calendar.YEAR) - 100 %>"
 							yearRangeEnd="<%= defaultValueDate.get(Calendar.YEAR) + 100 %>"
+							yearRangeStart="<%= defaultValueDate.get(Calendar.YEAR) - 100 %>"
+							yearValue="<%= defaultValueDate.get(Calendar.YEAR) %>"
 						/>
 
 						<liferay-ui:input-time
-							hourParam="defaultValueHour"
-							hourValue="<%= defaultValueDate.get(Calendar.HOUR) %>"
-							minuteParam="defaultValueMinute"
-							minuteValue="<%= defaultValueDate.get(Calendar.MINUTE) %>"
-							minuteInterval="<%= 1 %>"
 							amPmParam="defaultValueAmPm"
 							amPmValue="<%= defaultValueDate.get(Calendar.AM_PM) %>"
 							disabled="<%= false %>"
+							hourParam="defaultValueHour"
+							hourValue="<%= defaultValueDate.get(Calendar.HOUR) %>"
+							minuteInterval="<%= 1 %>"
+							minuteParam="defaultValueMinute"
+							minuteValue="<%= defaultValueDate.get(Calendar.MINUTE) %>"
 						/>
 					</aui:field-wrapper>
 				</c:when>
@@ -192,6 +190,9 @@ portletURL.setParameter("modelResource", modelResource);
 				</c:when>
 				<c:when test="<%= type == ExpandoColumnConstants.LONG_ARRAY %>">
 					<aui:input cssClass="lfr-textarea-container" name="defaultValue" type="textarea" value="<%= StringUtil.merge((long[])defaultValue, StringPool.NEW_LINE) %>" />
+				</c:when>
+				<c:when test="<%= type == ExpandoColumnConstants.NUMBER_ARRAY %>">
+					<aui:input cssClass="lfr-textarea-container" name="defaultValue" type="textarea" value="<%= StringUtil.merge((Number[])defaultValue, StringPool.NEW_LINE) %>" />
 				</c:when>
 				<c:when test="<%= type == ExpandoColumnConstants.SHORT_ARRAY %>">
 					<aui:input cssClass="lfr-textarea-container" name="defaultValue" type="textarea" value="<%= StringUtil.merge((short[])defaultValue, StringPool.NEW_LINE) %>" />
@@ -224,7 +225,7 @@ portletURL.setParameter("modelResource", modelResource);
 
 			<aui:input name="PropertyName--index-type--" type="hidden" value="index-type" />
 
-			<aui:select helpMessage="custom-field-index-type-help" label="searchablility" name="Property--index-type--">
+			<aui:select helpMessage="custom-field-index-type-help" label="searchability" name="Property--index-type--">
 				<aui:option label="not-searchable" selected="<%= propertyIndexType == ExpandoColumnConstants.INDEX_TYPE_NONE %>" value="<%= ExpandoColumnConstants.INDEX_TYPE_NONE %>" />
 
 				<c:if test="<%= (type == ExpandoColumnConstants.STRING) || (type == ExpandoColumnConstants.STRING_ARRAY) %>">
@@ -234,7 +235,7 @@ portletURL.setParameter("modelResource", modelResource);
 				<aui:option label="as-keyword" selected="<%= propertyIndexType == ExpandoColumnConstants.INDEX_TYPE_KEYWORD %>" value="<%= ExpandoColumnConstants.INDEX_TYPE_KEYWORD %>" />
 			</aui:select>
 
-			<c:if test="<%= (type == ExpandoColumnConstants.DOUBLE_ARRAY) || (type == ExpandoColumnConstants.FLOAT_ARRAY) || (type == ExpandoColumnConstants.INTEGER_ARRAY) || (type == ExpandoColumnConstants.LONG_ARRAY) || (type == ExpandoColumnConstants.SHORT_ARRAY) || (type == ExpandoColumnConstants.STRING_ARRAY) %>">
+			<c:if test="<%= (type == ExpandoColumnConstants.DOUBLE_ARRAY) || (type == ExpandoColumnConstants.FLOAT_ARRAY) || (type == ExpandoColumnConstants.INTEGER_ARRAY) || (type == ExpandoColumnConstants.LONG_ARRAY) || (type == ExpandoColumnConstants.NUMBER_ARRAY) || (type == ExpandoColumnConstants.SHORT_ARRAY) || (type == ExpandoColumnConstants.STRING_ARRAY) %>">
 				<aui:input name="PropertyName--display-type--" type="hidden" value="display-type" />
 
 				<aui:select helpMessage="custom-field-display-type-help" label="display-type" name="Property--display-type--">

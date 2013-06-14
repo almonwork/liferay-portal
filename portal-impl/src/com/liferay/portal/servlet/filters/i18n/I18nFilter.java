@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -82,7 +82,7 @@ public class I18nFilter extends BasePortalFilter {
 
 		String requestURI = request.getRequestURI();
 
-		if ((Validator.isNotNull(contextPath)) &&
+		if (Validator.isNotNull(contextPath) &&
 			(requestURI.indexOf(contextPath) != -1)) {
 
 			requestURI = requestURI.substring(contextPath.length());
@@ -107,7 +107,7 @@ public class I18nFilter extends BasePortalFilter {
 			LocaleUtil.getDefault());
 
 		String guestLanguageId = CookieKeys.getCookie(
-			request, CookieKeys.GUEST_LANGUAGE_ID);
+			request, CookieKeys.GUEST_LANGUAGE_ID, false);
 
 		if (Validator.isNull(guestLanguageId)) {
 			guestLanguageId = defaultLanguageId;
@@ -129,20 +129,32 @@ public class I18nFilter extends BasePortalFilter {
 			return null;
 		}
 
-		String i18nPath = StringPool.SLASH + i18nLanguageId;
+		String i18nPathLanguageId = i18nLanguageId;
 
 		Locale locale = LocaleUtil.fromLanguageId(i18nLanguageId);
 
 		if (!LanguageUtil.isDuplicateLanguageCode(locale.getLanguage())) {
-			i18nPath = StringPool.SLASH + locale.getLanguage();
+			i18nPathLanguageId = locale.getLanguage();
 		}
 		else {
 			Locale priorityLocale = LanguageUtil.getLocale(
 				locale.getLanguage());
 
 			if (locale.equals(priorityLocale)) {
-				i18nPath = StringPool.SLASH + locale.getLanguage();
+				i18nPathLanguageId = locale.getLanguage();
 			}
+		}
+
+		Locale i18nPathLocale = LocaleUtil.fromLanguageId(i18nPathLanguageId);
+
+		if (!LanguageUtil.isAvailableLocale(i18nPathLocale)) {
+			return null;
+		}
+
+		String i18nPath = StringPool.SLASH.concat(i18nPathLanguageId);
+
+		if (requestURI.contains(i18nPath.concat(StringPool.SLASH))) {
+			return null;
 		}
 
 		String redirect = contextPath + i18nPath + requestURI;
@@ -238,9 +250,7 @@ public class I18nFilter extends BasePortalFilter {
 		response.sendRedirect(redirect);
 	}
 
-	private static Log _log = LogFactoryUtil.getLog(I18nFilter.class);
-
-	private static final String  _PRIVATE_GROUP_SERVLET_MAPPING =
+	private static final String _PRIVATE_GROUP_SERVLET_MAPPING =
 		PropsValues.LAYOUT_FRIENDLY_URL_PRIVATE_GROUP_SERVLET_MAPPING;
 
 	private static final String _PRIVATE_USER_SERVLET_MAPPING =
@@ -248,6 +258,8 @@ public class I18nFilter extends BasePortalFilter {
 
 	private static final String _PUBLIC_GROUP_SERVLET_MAPPING =
 		PropsValues.LAYOUT_FRIENDLY_URL_PUBLIC_SERVLET_MAPPING;
+
+	private static Log _log = LogFactoryUtil.getLog(I18nFilter.class);
 
 	private static Set<String> _languageIds = new HashSet<String>();
 

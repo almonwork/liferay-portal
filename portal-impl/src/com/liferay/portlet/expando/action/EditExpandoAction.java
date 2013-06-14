@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -87,7 +87,7 @@ public class EditExpandoAction extends PortletAction {
 			if (e instanceof NoSuchColumnException ||
 				e instanceof PrincipalException) {
 
-				SessionErrors.add(actionRequest, e.getClass().getName());
+				SessionErrors.add(actionRequest, e.getClass());
 
 				setForward(actionRequest, "portlet.expando.error");
 			}
@@ -96,7 +96,7 @@ public class EditExpandoAction extends PortletAction {
 					 e instanceof DuplicateColumnNameException ||
 					 e instanceof ValueDataException) {
 
-				SessionErrors.add(actionRequest, e.getClass().getName());
+				SessionErrors.add(actionRequest, e.getClass());
 			}
 			else {
 				throw e;
@@ -117,7 +117,7 @@ public class EditExpandoAction extends PortletAction {
 			if (e instanceof NoSuchColumnException ||
 				e instanceof PrincipalException) {
 
-				SessionErrors.add(renderRequest, e.getClass().getName());
+				SessionErrors.add(renderRequest, e.getClass());
 
 				return mapping.findForward("portlet.expando.error");
 			}
@@ -327,6 +327,20 @@ public class EditExpandoAction extends PortletAction {
 			String[] values = StringUtil.split(paramValue, delimiter);
 
 			value = GetterUtil.getLongValues(values);
+		}
+		else if (type == ExpandoColumnConstants.NUMBER) {
+			value = ParamUtil.getNumber(portletRequest, name);
+		}
+		else if (type == ExpandoColumnConstants.NUMBER_ARRAY) {
+			String paramValue = ParamUtil.getString(portletRequest, name);
+
+			if (paramValue.contains(StringPool.NEW_LINE)) {
+				delimiter = StringPool.NEW_LINE;
+			}
+
+			String[] values = StringUtil.split(paramValue, delimiter);
+
+			value = GetterUtil.getNumberValues(values);
 		}
 		else if (type == ExpandoColumnConstants.SHORT) {
 			value = ParamUtil.getShort(portletRequest, name);

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,6 +14,11 @@
 
 package com.liferay.counter.model;
 
+import com.liferay.portal.model.ModelWrapper;
+
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * <p>
  * This class is a wrapper for {@link Counter}.
@@ -23,7 +28,7 @@ package com.liferay.counter.model;
  * @see       Counter
  * @generated
  */
-public class CounterWrapper implements Counter {
+public class CounterWrapper implements Counter, ModelWrapper<Counter> {
 	public CounterWrapper(Counter counter) {
 		_counter = counter;
 	}
@@ -34,6 +39,29 @@ public class CounterWrapper implements Counter {
 
 	public String getModelClassName() {
 		return Counter.class.getName();
+	}
+
+	public Map<String, Object> getModelAttributes() {
+		Map<String, Object> attributes = new HashMap<String, Object>();
+
+		attributes.put("name", getName());
+		attributes.put("currentId", getCurrentId());
+
+		return attributes;
+	}
+
+	public void setModelAttributes(Map<String, Object> attributes) {
+		String name = (String)attributes.get("name");
+
+		if (name != null) {
+			setName(name);
+		}
+
+		Long currentId = (Long)attributes.get("currentId");
+
+		if (currentId != null) {
+			setCurrentId(currentId);
+		}
 	}
 
 	/**
@@ -110,10 +138,6 @@ public class CounterWrapper implements Counter {
 		return _counter.isEscapedModel();
 	}
 
-	public void setEscapedModel(boolean escapedModel) {
-		_counter.setEscapedModel(escapedModel);
-	}
-
 	public java.io.Serializable getPrimaryKeyObj() {
 		return _counter.getPrimaryKeyObj();
 	}
@@ -167,7 +191,14 @@ public class CounterWrapper implements Counter {
 		_counter.persist();
 	}
 
+	/**
+	 * @deprecated Renamed to {@link #getWrappedModel}
+	 */
 	public Counter getWrappedCounter() {
+		return _counter;
+	}
+
+	public Counter getWrappedModel() {
 		return _counter;
 	}
 

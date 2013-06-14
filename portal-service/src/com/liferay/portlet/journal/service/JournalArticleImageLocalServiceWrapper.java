@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,6 +14,8 @@
 
 package com.liferay.portlet.journal.service;
 
+import com.liferay.portal.service.ServiceWrapper;
+
 /**
  * <p>
  * This class is a wrapper for {@link JournalArticleImageLocalService}.
@@ -24,7 +26,8 @@ package com.liferay.portlet.journal.service;
  * @generated
  */
 public class JournalArticleImageLocalServiceWrapper
-	implements JournalArticleImageLocalService {
+	implements JournalArticleImageLocalService,
+		ServiceWrapper<JournalArticleImageLocalService> {
 	public JournalArticleImageLocalServiceWrapper(
 		JournalArticleImageLocalService journalArticleImageLocalService) {
 		_journalArticleImageLocalService = journalArticleImageLocalService;
@@ -58,25 +61,32 @@ public class JournalArticleImageLocalServiceWrapper
 	* Deletes the journal article image with the primary key from the database. Also notifies the appropriate model listeners.
 	*
 	* @param articleImageId the primary key of the journal article image
+	* @return the journal article image that was removed
 	* @throws PortalException if a journal article image with the primary key could not be found
 	* @throws SystemException if a system exception occurred
 	*/
-	public void deleteJournalArticleImage(long articleImageId)
+	public com.liferay.portlet.journal.model.JournalArticleImage deleteJournalArticleImage(
+		long articleImageId)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException {
-		_journalArticleImageLocalService.deleteJournalArticleImage(articleImageId);
+		return _journalArticleImageLocalService.deleteJournalArticleImage(articleImageId);
 	}
 
 	/**
 	* Deletes the journal article image from the database. Also notifies the appropriate model listeners.
 	*
 	* @param journalArticleImage the journal article image
+	* @return the journal article image that was removed
 	* @throws SystemException if a system exception occurred
 	*/
-	public void deleteJournalArticleImage(
+	public com.liferay.portlet.journal.model.JournalArticleImage deleteJournalArticleImage(
 		com.liferay.portlet.journal.model.JournalArticleImage journalArticleImage)
 		throws com.liferay.portal.kernel.exception.SystemException {
-		_journalArticleImageLocalService.deleteJournalArticleImage(journalArticleImage);
+		return _journalArticleImageLocalService.deleteJournalArticleImage(journalArticleImage);
+	}
+
+	public com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery() {
+		return _journalArticleImageLocalService.dynamicQuery();
 	}
 
 	/**
@@ -149,6 +159,12 @@ public class JournalArticleImageLocalServiceWrapper
 		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery)
 		throws com.liferay.portal.kernel.exception.SystemException {
 		return _journalArticleImageLocalService.dynamicQueryCount(dynamicQuery);
+	}
+
+	public com.liferay.portlet.journal.model.JournalArticleImage fetchJournalArticleImage(
+		long articleImageId)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return _journalArticleImageLocalService.fetchJournalArticleImage(articleImageId);
 	}
 
 	/**
@@ -260,15 +276,15 @@ public class JournalArticleImageLocalServiceWrapper
 			groupId, articleId, version, elInstanceId, elName, languageId);
 	}
 
-	public void deleteArticleImage(long articleImageId)
-		throws com.liferay.portal.kernel.exception.SystemException {
-		_journalArticleImageLocalService.deleteArticleImage(articleImageId);
-	}
-
 	public void deleteArticleImage(
 		com.liferay.portlet.journal.model.JournalArticleImage articleImage)
 		throws com.liferay.portal.kernel.exception.SystemException {
 		_journalArticleImageLocalService.deleteArticleImage(articleImage);
+	}
+
+	public void deleteArticleImage(long articleImageId)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		_journalArticleImageLocalService.deleteArticleImage(articleImageId);
 	}
 
 	public void deleteArticleImage(long groupId, java.lang.String articleId,
@@ -315,11 +331,26 @@ public class JournalArticleImageLocalServiceWrapper
 		return _journalArticleImageLocalService.getArticleImages(groupId);
 	}
 
+	/**
+	 * @deprecated Renamed to {@link #getWrappedService}
+	 */
 	public JournalArticleImageLocalService getWrappedJournalArticleImageLocalService() {
 		return _journalArticleImageLocalService;
 	}
 
+	/**
+	 * @deprecated Renamed to {@link #setWrappedService}
+	 */
 	public void setWrappedJournalArticleImageLocalService(
+		JournalArticleImageLocalService journalArticleImageLocalService) {
+		_journalArticleImageLocalService = journalArticleImageLocalService;
+	}
+
+	public JournalArticleImageLocalService getWrappedService() {
+		return _journalArticleImageLocalService;
+	}
+
+	public void setWrappedService(
 		JournalArticleImageLocalService journalArticleImageLocalService) {
 		_journalArticleImageLocalService = journalArticleImageLocalService;
 	}

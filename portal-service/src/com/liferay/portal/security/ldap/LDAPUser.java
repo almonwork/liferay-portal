@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -123,6 +123,10 @@ public class LDAPUser {
 		return _organizationIds;
 	}
 
+	public byte[] getPortraitBytes() {
+		return _portraitBytes;
+	}
+
 	public int getPrefixId() {
 		return _contact.getPrefixId();
 	}
@@ -215,6 +219,10 @@ public class LDAPUser {
 		return _updatePassword;
 	}
 
+	public boolean isUpdatePortrait() {
+		return _updatePortrait;
+	}
+
 	public void setAimSn(String aimSn) {
 		_contact.setAimSn(aimSn);
 	}
@@ -262,7 +270,7 @@ public class LDAPUser {
 	}
 
 	public void setFirstName(String firstName) {
-		_contact.setFirstName(firstName);
+		_user.setFirstName(firstName);
 	}
 
 	public void setGreeting(String greeting) {
@@ -290,7 +298,7 @@ public class LDAPUser {
 	}
 
 	public void setLastName(String lastName) {
-		_contact.setLastName(lastName);
+		_user.setLastName(lastName);
 	}
 
 	public void setLocale(Locale locale) {
@@ -298,7 +306,7 @@ public class LDAPUser {
 	}
 
 	public void setMiddleName(String middleName) {
-		_contact.setMiddleName(middleName);
+		_user.setMiddleName(middleName);
 	}
 
 	public void setMsnSn(String msnSn) {
@@ -319,6 +327,10 @@ public class LDAPUser {
 
 	public void setPasswordReset(boolean passwordReset) {
 		_passwordReset = passwordReset;
+	}
+
+	public void setPortraitBytes(byte[] portraitBytes) {
+		_portraitBytes = portraitBytes;
 	}
 
 	public void setPrefixId(int prefixId) {
@@ -373,6 +385,10 @@ public class LDAPUser {
 		_updatePassword = updatePassword;
 	}
 
+	public void setUpdatePortrait(boolean updatePortrait) {
+		_updatePortrait = updatePortrait;
+	}
+
 	public void setUser(User user) {
 		_user = user;
 	}
@@ -403,10 +419,12 @@ public class LDAPUser {
 	private long[] _groupIds;
 	private long[] _organizationIds;
 	private boolean _passwordReset;
+	private byte[] _portraitBytes;
 	private long[] _roleIds;
 	private boolean _sendEmail;
 	private ServiceContext _serviceContext;
 	private boolean _updatePassword;
+	private boolean _updatePortrait;
 	private User _user;
 	private Map<String, String> _userExpandoAttributes;
 	private long[] _userGroupIds;

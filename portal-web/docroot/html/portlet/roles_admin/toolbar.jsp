@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -30,12 +30,16 @@ String toolbarItem = ParamUtil.getString(request, "toolbarItem", "view-all");
 	</span>
 
 	<c:if test="<%= PortalPermissionUtil.contains(permissionChecker, ActionKeys.ADD_ROLE) %>">
+		<portlet:renderURL var="viewRolesURL">
+			<portlet:param name="struts_action" value="/roles_admin/view" />
+		</portlet:renderURL>
+
 		<liferay-portlet:renderURL varImpl="addRoleURL">
 			<portlet:param name="struts_action" value="/roles_admin/edit_role" />
-			<portlet:param name="redirect" value="<%= currentURL %>" />
+			<portlet:param name="redirect" value="<%= viewRolesURL %>" />
 		</liferay-portlet:renderURL>
 
-		<liferay-ui:icon-menu align="left" direction="down" extended="<%= false %>" icon='<%= themeDisplay.getPathThemeImages() + "/common/add.png" %>' message="add">
+		<liferay-ui:icon-menu align="left" cssClass='<%= "lfr-toolbar-button add-button " + (toolbarItem.equals("add") ? "current" : StringPool.BLANK) %>' direction="down" extended="<%= false %>" icon='<%= themeDisplay.getPathThemeImages() + "/common/add.png" %>' message="add">
 
 			<%
 			addRoleURL.setParameter("type", String.valueOf(RoleConstants.TYPE_REGULAR));

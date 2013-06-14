@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -26,11 +26,8 @@ public class EhcachePortalCacheClusterReplicatorFactory
 	extends CacheEventListenerFactory {
 
 	@Override
-	public CacheEventListener createCacheEventListener(Properties prprts) {
-		return _cacheEventListener;
+	public CacheEventListener createCacheEventListener(Properties properties) {
+		return new EhcachePortalCacheClusterReplicator(properties);
 	}
-
-	private static final CacheEventListener _cacheEventListener =
-		new EhcachePortalCacheClusterReplicator();
 
 }

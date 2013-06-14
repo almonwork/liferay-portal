@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -44,7 +44,7 @@ boolean allowTrackbacks = PropsValues.BLOGS_TRACKBACK_ENABLED && BeanParamUtil.g
 	<portlet:param name="struts_action" value="/blogs/edit_entry" />
 </portlet:actionURL>
 
-<aui:form action="<%= editEntryURL %>" enctype="multipart/form-data" method="post" name="fm" onSubmit='<%= "event.preventDefault();" %>'>
+<aui:form action="<%= editEntryURL %>" method="post" name="fm" onSubmit='<%= "event.preventDefault();" %>'>
 	<aui:input name="<%= Constants.CMD %>" type="hidden" />
 	<aui:input name="redirect" type="hidden" value="<%= redirect %>" />
 	<aui:input name="backURL" type="hidden" value="<%= backURL %>" />
@@ -54,6 +54,7 @@ boolean allowTrackbacks = PropsValues.BLOGS_TRACKBACK_ENABLED && BeanParamUtil.g
 	<aui:input name="preview" type="hidden" value="<%= false %>" />
 	<aui:input name="workflowAction" type="hidden" value="<%= WorkflowConstants.ACTION_PUBLISH %>" />
 
+	<liferay-ui:error exception="<%= EntryContentException.class %>" message="please-enter-valid-content" />
 	<liferay-ui:error exception="<%= EntryTitleException.class %>" message="please-enter-a-valid-title" />
 
 	<liferay-ui:asset-categories-error />
@@ -167,7 +168,7 @@ boolean allowTrackbacks = PropsValues.BLOGS_TRACKBACK_ENABLED && BeanParamUtil.g
 			<aui:fieldset>
 				<aui:input label="description" name="description" />
 
-				<aui:input inlineLabel="left" label="use-small-image" name="smallImage" />
+				<aui:input label="use-small-image" name="smallImage" />
 
 				<aui:input label="small-image-url" name="smallImageURL" />
 
@@ -232,7 +233,9 @@ boolean allowTrackbacks = PropsValues.BLOGS_TRACKBACK_ENABLED && BeanParamUtil.g
 
 			<aui:button name="saveButton" onClick='<%= renderResponse.getNamespace() + "saveEntry(true, false);" %>' type="submit" value="<%= saveButtonLabel %>" />
 
-			<aui:button name="previewButton" onClick='<%= renderResponse.getNamespace() + "previewEntry();" %>' value="preview" />
+			<c:if test="<%= (entry == null) || entry.isDraft() || preview %>">
+				<aui:button name="previewButton" onClick='<%= renderResponse.getNamespace() + "previewEntry();" %>' value="preview" />
+			</c:if>
 
 			<aui:button disabled="<%= pending %>" name="publishButton" onClick='<%= renderResponse.getNamespace() + "saveEntry(false, false);" %>' type="submit" value="<%= publishButtonLabel %>" />
 
@@ -266,6 +269,7 @@ boolean allowTrackbacks = PropsValues.BLOGS_TRACKBACK_ENABLED && BeanParamUtil.g
 	}
 
 	function <portlet:namespace />manageAttachments() {
+		document.<portlet:namespace />fm.encoding = "multipart/form-data";
 		document.<portlet:namespace />fm.<portlet:namespace />attachments.value = "true";
 	}
 
@@ -312,25 +316,35 @@ boolean allowTrackbacks = PropsValues.BLOGS_TRACKBACK_ENABLED && BeanParamUtil.g
 
 				var url = '<portlet:actionURL windowState="<%= LiferayWindowState.EXCLUSIVE.toString() %>"><portlet:param name="struts_action" value="/blogs/edit_entry" /><portlet:param name="ajax" value="true" /><portlet:param name="preview" value="false" /></portlet:actionURL>';
 
+				var data = {
+					<portlet:namespace />assetTagNames: document.<portlet:namespace />fm.<portlet:namespace />assetTagNames.value,
+					<portlet:namespace /><%= Constants.CMD %>: '<%= Constants.ADD %>',
+					<portlet:namespace />content: content,
+					<portlet:namespace />displayDateAmPm: document.<portlet:namespace />fm.<portlet:namespace />displayDateAmPm.value,
+					<portlet:namespace />displayDateDay: document.<portlet:namespace />fm.<portlet:namespace />displayDateDay.value,
+					<portlet:namespace />displayDateHour: document.<portlet:namespace />fm.<portlet:namespace />displayDateHour.value,
+					<portlet:namespace />displayDateMinute: document.<portlet:namespace />fm.<portlet:namespace />displayDateMinute.value,
+					<portlet:namespace />displayDateMonth: document.<portlet:namespace />fm.<portlet:namespace />displayDateMonth.value,
+					<portlet:namespace />displayDateYear: document.<portlet:namespace />fm.<portlet:namespace />displayDateYear.value,
+					<portlet:namespace />entryId: document.<portlet:namespace />fm.<portlet:namespace />entryId.value,
+					<portlet:namespace />redirect: document.<portlet:namespace />fm.<portlet:namespace />redirect.value,
+					<portlet:namespace />referringPortletResource: document.<portlet:namespace />fm.<portlet:namespace />referringPortletResource.value,
+					<portlet:namespace />title: title,
+					<portlet:namespace />workflowAction: <%= WorkflowConstants.ACTION_SAVE_DRAFT %>
+				};
+
+				var customAttributes = A.one(document.<portlet:namespace />fm).all('[name^=<portlet:namespace />ExpandoAttribute]');
+
+				customAttributes.each(
+					function(item, index, collection) {
+						data[item.attr('name')] = item.val();
+					}
+				);
+
 				A.io.request(
 					url,
 					{
-						data: {
-							<portlet:namespace />assetTagNames: document.<portlet:namespace />fm.<portlet:namespace />assetTagNames.value,
-							<portlet:namespace /><%= Constants.CMD %>: '<%= Constants.ADD %>',
-							<portlet:namespace />content: content,
-							<portlet:namespace />displayDateAmPm: document.<portlet:namespace />fm.<portlet:namespace />displayDateAmPm.value,
-							<portlet:namespace />displayDateDay: document.<portlet:namespace />fm.<portlet:namespace />displayDateDay.value,
-							<portlet:namespace />displayDateHour: document.<portlet:namespace />fm.<portlet:namespace />displayDateHour.value,
-							<portlet:namespace />displayDateMinute: document.<portlet:namespace />fm.<portlet:namespace />displayDateMinute.value,
-							<portlet:namespace />displayDateMonth: document.<portlet:namespace />fm.<portlet:namespace />displayDateMonth.value,
-							<portlet:namespace />displayDateYear: document.<portlet:namespace />fm.<portlet:namespace />displayDateYear.value,
-							<portlet:namespace />entryId: document.<portlet:namespace />fm.<portlet:namespace />entryId.value,
-							<portlet:namespace />redirect: document.<portlet:namespace />fm.<portlet:namespace />redirect.value,
-							<portlet:namespace />referringPortletResource: document.<portlet:namespace />fm.<portlet:namespace />referringPortletResource.value,
-							<portlet:namespace />title: title,
-							<portlet:namespace />workflowAction: <%= WorkflowConstants.ACTION_SAVE_DRAFT %>
-						},
+						data: data,
 						dataType: 'json',
 						on: {
 							failure: function() {
@@ -340,9 +354,7 @@ boolean allowTrackbacks = PropsValues.BLOGS_TRACKBACK_ENABLED && BeanParamUtil.g
 								}
 							},
 							start: function() {
-								if (publishButton) {
-									publishButton.attr('disabled', true);
-								}
+								Liferay.Util.toggleDisabled(publishButton, true);
 
 								if (saveStatus) {
 									saveStatus.set('className', 'save-status portlet-msg-info pending');
@@ -386,9 +398,7 @@ boolean allowTrackbacks = PropsValues.BLOGS_TRACKBACK_ENABLED && BeanParamUtil.g
 									saveStatus.hide();
 								}
 
-								if (publishButton) {
-									publishButton.attr('disabled', false);
-								}
+								Liferay.Util.toggleDisabled(publishButton, false);
 							}
 						}
 					}

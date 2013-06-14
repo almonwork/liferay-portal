@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -19,38 +19,78 @@
 <%
 FileEntry fileEntry = (FileEntry)request.getAttribute("view_entries.jsp-fileEntry");
 
+FileVersion latestFileVersion = fileEntry.getFileVersion();
+
+if ((user.getUserId() == fileEntry.getUserId()) || permissionChecker.isCompanyAdmin() || permissionChecker.isGroupAdmin(scopeGroupId) || DLFileEntryPermission.contains(permissionChecker, fileEntry, ActionKeys.UPDATE)) {
+	latestFileVersion = fileEntry.getLatestFileVersion();
+}
+
+DLFileShortcut fileShortcut = (DLFileShortcut)request.getAttribute("view_entries.jsp-fileShortcut");
+
 PortletURL tempRowURL = (PortletURL)request.getAttribute("view_entries.jsp-tempRowURL");
-
-String thumbnailSrc = themeDisplay.getPathThemeImages() + "/file_system/large/" + DLUtil.getGenericName(fileEntry.getExtension()) + ".png";
-
-if (PDFProcessor.hasImages(fileEntry, fileEntry.getVersion())) {
-	thumbnailSrc = themeDisplay.getPortalURL() + themeDisplay.getPathContext() + "/documents/" + themeDisplay.getScopeGroupId() + StringPool.SLASH + fileEntry.getFolderId() + StringPool.SLASH + HttpUtil.encodeURL(HtmlUtil.unescape(fileEntry.getTitle())) + "?version=" + fileEntry.getVersion() + "&documentThumbnail=1";
-}
-else if (VideoProcessor.hasVideo(fileEntry, fileEntry.getVersion())) {
-	thumbnailSrc = themeDisplay.getPortalURL() + themeDisplay.getPathContext() + "/documents/" + themeDisplay.getScopeGroupId() + StringPool.SLASH + fileEntry.getFolderId() + StringPool.SLASH + HttpUtil.encodeURL(HtmlUtil.unescape(fileEntry.getTitle())) + "?version=" + fileEntry.getVersion() + "&videoThumbnail=1";
-}
 
 boolean showCheckBox = DLFileEntryPermission.contains(permissionChecker, fileEntry, ActionKeys.DELETE) || DLFileEntryPermission.contains(permissionChecker, fileEntry, ActionKeys.UPDATE);
 %>
 
-<div class="document-display-style icon <%= showCheckBox ? "selectable" : StringPool.BLANK %>">
+<div class="document-display-style display-icon <%= showCheckBox ? "selectable" : StringPool.BLANK %>" data-draggable="<%= showCheckBox ? Boolean.TRUE.toString() : Boolean.FALSE.toString() %>" data-title="<%= StringUtil.shorten(fileEntry.getTitle(), 60) %>">
 	<c:if test="<%= showCheckBox %>">
-		<aui:input cssClass="overlay document-selector" label="" name="<%= RowChecker.ROW_IDS + StringPool.UNDERLINE + FileEntry.class.getName() %>" type="checkbox" value="<%= fileEntry.getFileEntryId() %>" />
+
+		<%
+		String rowCheckerName = FileEntry.class.getSimpleName();
+		long rowCheckerId = fileEntry.getFileEntryId();
+
+		if (fileShortcut != null) {
+			rowCheckerName = DLFileShortcut.class.getSimpleName();
+			rowCheckerId = fileShortcut.getFileShortcutId();
+		}
+		%>
+
+		<aui:input cssClass="overlay document-selector" label="" name="<%= RowChecker.ROW_IDS + rowCheckerName %>" type="checkbox" value="<%= rowCheckerId %>" />
 	</c:if>
+
+	<%
+	request.removeAttribute(WebKeys.SEARCH_CONTAINER_RESULT_ROW);
+	%>
 
 	<liferay-util:include page="/html/portlet/document_library/file_entry_action.jsp" />
 
 	<a class="document-link" data-folder="<%= Boolean.FALSE.toString() %>" href="<%= tempRowURL.toString() %>" title="<%= HtmlUtil.escapeAttribute(HtmlUtil.unescape(fileEntry.getTitle()) + " - " + HtmlUtil.unescape(fileEntry.getDescription())) %>">
-		<span class="document-thumbnail">
-			<img alt="" border="no" src="<%= thumbnailSrc %>" style="height: <%= PropsValues.DL_FILE_ENTRY_THUMBNAIL_HEIGHT %>; width: <%= PropsValues.DL_FILE_ENTRY_THUMBNAIL_WIDTH %>;" />
+
+		<%
+		String thumbnailDivStyle = DLUtil.getThumbnailStyle(false, 4);
+		%>
+
+		<div class="document-thumbnail" style="<%= thumbnailDivStyle %>">
+
+			<%
+			String thumbnailSrc = DLUtil.getThumbnailSrc(fileEntry, fileShortcut, themeDisplay);
+			String thumbnailStyle = DLUtil.getThumbnailStyle();
+			%>
+
+			<img alt="" border="no" src="<%= thumbnailSrc %>" style="<%= thumbnailStyle %>" />
+
+			<c:if test="<%= fileShortcut != null %>">
+				<img alt="<liferay-ui:message key="shortcut" />" class="shortcut-icon" src="<%= themeDisplay.getPathThemeImages() %>/file_system/large/overlay_link.png" />
+			</c:if>
 
 			<c:if test="<%= fileEntry.isCheckedOut() %>">
-				<img alt="<liferay-ui:message key="locked" />" class="locked-icon" src="<%= themeDisplay.getPathThemeImages() %>/file_system/large/overlay_lock.png">
+				<img alt="<liferay-ui:message key="locked" />" class="locked-icon" src="<%= themeDisplay.getPathThemeImages() %>/file_system/large/overlay_lock.png" />
 			</c:if>
-		</span>
+		</div>
 
-		<span class="document-title">
+		<span class="entry-title">
 			<%= StringUtil.shorten(fileEntry.getTitle(), 60) %>
+
+			<c:if test="<%= latestFileVersion.isDraft() || latestFileVersion.isPending() %>">
+
+				<%
+				String statusLabel = WorkflowConstants.toLabel(latestFileVersion.getStatus());
+				%>
+
+				<span class="workflow-status-<%= statusLabel %>">
+					(<liferay-ui:message key="<%= statusLabel %>" />)
+				</span>
+			</c:if>
 		</span>
 	</a>
 </div>

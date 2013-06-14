@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -66,10 +66,10 @@ public class LocalPluginPackageRepository {
 		PluginPackage latestPluginPackage = null;
 
 		for (PluginPackage pluginPackage : _pluginPackages.values()) {
-			if ((pluginPackage.getGroupId().equals(groupId)) &&
-				(pluginPackage.getArtifactId().equals(artifactId)) &&
+			if (pluginPackage.getGroupId().equals(groupId) &&
+				pluginPackage.getArtifactId().equals(artifactId) &&
 				((latestPluginPackage == null) ||
-					pluginPackage.isLaterVersionThan(latestPluginPackage))) {
+				 pluginPackage.isLaterVersionThan(latestPluginPackage))) {
 
 				latestPluginPackage = pluginPackage;
 			}
@@ -111,20 +111,6 @@ public class LocalPluginPackageRepository {
 			pluginPackages, new PluginPackageNameAndContextComparator());
 	}
 
-	public void removePluginPackage(PluginPackage pluginPackage)
-		throws PortalException {
-
-		_pluginPackages.remove(pluginPackage.getContext());
-
-		Indexer indexer = IndexerRegistryUtil.getIndexer(PluginPackage.class);
-
-		indexer.delete(pluginPackage);
-	}
-
-	public void removePluginPackage(String context) {
-		_pluginPackages.remove(context);
-	}
-
 	public void registerPluginPackageInstallation(PluginPackage pluginPackage) {
 		if (pluginPackage.getContext() != null) {
 			PluginPackage previousPluginPackage = _pluginPackages.get(
@@ -162,6 +148,20 @@ public class LocalPluginPackageRepository {
 		registerPluginPackageInstallation(pluginPackage);
 	}
 
+	public void removePluginPackage(PluginPackage pluginPackage)
+		throws PortalException {
+
+		_pluginPackages.remove(pluginPackage.getContext());
+
+		Indexer indexer = IndexerRegistryUtil.getIndexer(PluginPackage.class);
+
+		indexer.delete(pluginPackage);
+	}
+
+	public void removePluginPackage(String context) {
+		_pluginPackages.remove(context);
+	}
+
 	public void unregisterPluginPackageInstallation(String context) {
 		_pluginPackages.remove(context);
 		_pendingPackages.remove(context);
@@ -170,9 +170,9 @@ public class LocalPluginPackageRepository {
 	private static Log _log = LogFactoryUtil.getLog(
 		LocalPluginPackageRepository.class);
 
-	private Map<String, PluginPackage> _pluginPackages =
-		new HashMap<String, PluginPackage>();
 	private Map<String, PluginPackage> _pendingPackages =
+		new HashMap<String, PluginPackage>();
+	private Map<String, PluginPackage> _pluginPackages =
 		new HashMap<String, PluginPackage>();
 
 }

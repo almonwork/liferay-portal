@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,6 +14,12 @@
 
 package com.liferay.portlet.documentlibrary.model;
 
+import com.liferay.portal.model.ModelWrapper;
+
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * <p>
  * This class is a wrapper for {@link DLFileEntryType}.
@@ -23,7 +29,8 @@ package com.liferay.portlet.documentlibrary.model;
  * @see       DLFileEntryType
  * @generated
  */
-public class DLFileEntryTypeWrapper implements DLFileEntryType {
+public class DLFileEntryTypeWrapper implements DLFileEntryType,
+	ModelWrapper<DLFileEntryType> {
 	public DLFileEntryTypeWrapper(DLFileEntryType dlFileEntryType) {
 		_dlFileEntryType = dlFileEntryType;
 	}
@@ -34,6 +41,85 @@ public class DLFileEntryTypeWrapper implements DLFileEntryType {
 
 	public String getModelClassName() {
 		return DLFileEntryType.class.getName();
+	}
+
+	public Map<String, Object> getModelAttributes() {
+		Map<String, Object> attributes = new HashMap<String, Object>();
+
+		attributes.put("uuid", getUuid());
+		attributes.put("fileEntryTypeId", getFileEntryTypeId());
+		attributes.put("groupId", getGroupId());
+		attributes.put("companyId", getCompanyId());
+		attributes.put("userId", getUserId());
+		attributes.put("userName", getUserName());
+		attributes.put("createDate", getCreateDate());
+		attributes.put("modifiedDate", getModifiedDate());
+		attributes.put("name", getName());
+		attributes.put("description", getDescription());
+
+		return attributes;
+	}
+
+	public void setModelAttributes(Map<String, Object> attributes) {
+		String uuid = (String)attributes.get("uuid");
+
+		if (uuid != null) {
+			setUuid(uuid);
+		}
+
+		Long fileEntryTypeId = (Long)attributes.get("fileEntryTypeId");
+
+		if (fileEntryTypeId != null) {
+			setFileEntryTypeId(fileEntryTypeId);
+		}
+
+		Long groupId = (Long)attributes.get("groupId");
+
+		if (groupId != null) {
+			setGroupId(groupId);
+		}
+
+		Long companyId = (Long)attributes.get("companyId");
+
+		if (companyId != null) {
+			setCompanyId(companyId);
+		}
+
+		Long userId = (Long)attributes.get("userId");
+
+		if (userId != null) {
+			setUserId(userId);
+		}
+
+		String userName = (String)attributes.get("userName");
+
+		if (userName != null) {
+			setUserName(userName);
+		}
+
+		Date createDate = (Date)attributes.get("createDate");
+
+		if (createDate != null) {
+			setCreateDate(createDate);
+		}
+
+		Date modifiedDate = (Date)attributes.get("modifiedDate");
+
+		if (modifiedDate != null) {
+			setModifiedDate(modifiedDate);
+		}
+
+		String name = (String)attributes.get("name");
+
+		if (name != null) {
+			setName(name);
+		}
+
+		String description = (String)attributes.get("description");
+
+		if (description != null) {
+			setDescription(description);
+		}
 	}
 
 	/**
@@ -52,6 +138,24 @@ public class DLFileEntryTypeWrapper implements DLFileEntryType {
 	*/
 	public void setPrimaryKey(long primaryKey) {
 		_dlFileEntryType.setPrimaryKey(primaryKey);
+	}
+
+	/**
+	* Returns the uuid of this document library file entry type.
+	*
+	* @return the uuid of this document library file entry type
+	*/
+	public java.lang.String getUuid() {
+		return _dlFileEntryType.getUuid();
+	}
+
+	/**
+	* Sets the uuid of this document library file entry type.
+	*
+	* @param uuid the uuid of this document library file entry type
+	*/
+	public void setUuid(java.lang.String uuid) {
+		_dlFileEntryType.setUuid(uuid);
 	}
 
 	/**
@@ -256,10 +360,6 @@ public class DLFileEntryTypeWrapper implements DLFileEntryType {
 		return _dlFileEntryType.isEscapedModel();
 	}
 
-	public void setEscapedModel(boolean escapedModel) {
-		_dlFileEntryType.setEscapedModel(escapedModel);
-	}
-
 	public java.io.Serializable getPrimaryKeyObj() {
 		return _dlFileEntryType.getPrimaryKeyObj();
 	}
@@ -319,7 +419,14 @@ public class DLFileEntryTypeWrapper implements DLFileEntryType {
 		return _dlFileEntryType.getDDMStructures();
 	}
 
+	/**
+	 * @deprecated Renamed to {@link #getWrappedModel}
+	 */
 	public DLFileEntryType getWrappedDLFileEntryType() {
+		return _dlFileEntryType;
+	}
+
+	public DLFileEntryType getWrappedModel() {
 		return _dlFileEntryType;
 	}
 

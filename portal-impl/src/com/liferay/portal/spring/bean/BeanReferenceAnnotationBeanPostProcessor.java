@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -21,6 +21,7 @@ import com.liferay.portal.kernel.bean.IdentifiableBean;
 import com.liferay.portal.kernel.bean.PortalBeanLocatorUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.security.lang.PortalSecurityManagerThreadLocal;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -45,11 +46,23 @@ import org.springframework.util.ReflectionUtils;
 public class BeanReferenceAnnotationBeanPostProcessor
 	implements BeanFactoryAware, BeanPostProcessor {
 
+	public BeanReferenceAnnotationBeanPostProcessor() {
+		if (_log.isDebugEnabled()) {
+			_log.debug("Creating instance " + this.hashCode());
+		}
+	}
+
 	public void destroy() {
 		_beans.clear();
 	}
 
 	public Object postProcessAfterInitialization(Object bean, String beanName)
+		throws BeansException {
+
+		return bean;
+	}
+
+	public Object postProcessBeforeInitialization(Object bean, String beanName)
 		throws BeansException {
 
 		if (bean instanceof IdentifiableBean) {
@@ -66,13 +79,16 @@ public class BeanReferenceAnnotationBeanPostProcessor
 			}
 		}
 
-		return bean;
-	}
+		boolean enabled = PortalSecurityManagerThreadLocal.isEnabled();
 
-	public Object postProcessBeforeInitialization(Object bean, String beanName)
-		throws BeansException {
+		try {
+			PortalSecurityManagerThreadLocal.setEnabled(false);
 
-		_autoInject(bean, beanName, bean.getClass());
+			_autoInject(bean, beanName, bean.getClass());
+		}
+		finally {
+			PortalSecurityManagerThreadLocal.setEnabled(enabled);
+		}
 
 		return bean;
 	}
@@ -158,8 +174,7 @@ public class BeanReferenceAnnotationBeanPostProcessor
 			}
 			catch (Throwable t) {
 				throw new BeanCreationException(
-					targetBeanName, "Could not inject BeanReference fields",
-					t);
+					targetBeanName, "Could not inject BeanReference fields", t);
 			}
 		}
 

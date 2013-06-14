@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -30,9 +30,9 @@ import javax.servlet.jsp.JspException;
  */
 public class LogUtil {
 
-	public static final int STACK_TRACE_LENGTH = 20;
-
 	public static final boolean REMOVE_UNKNOWN_SOURCE = true;
+
+	public static final int STACK_TRACE_LENGTH = 20;
 
 	public static void debug(Log log, Properties props) {
 		if (log.isDebugEnabled()) {
@@ -42,25 +42,6 @@ public class LogUtil {
 			props.list(UnsyncPrintWriterPool.borrow(unsyncStringWriter));
 
 			log.debug(unsyncStringWriter.toString());
-		}
-	}
-
-	public static void log(Log log, Throwable t) {
-		if (t instanceof JspException) {
-			log(log, (JspException)t);
-		}
-		else if (t instanceof ServletException) {
-			log(log, (ServletException)t);
-		}
-		else {
-			Throwable cause = t.getCause();
-
-			if (cause != null) {
-				log(log, cause);
-			}
-			else {
-				_log(log, t);
-			}
 		}
 	}
 
@@ -97,6 +78,25 @@ public class LogUtil {
 		}
 		else {
 			_log(log, cause);
+		}
+	}
+
+	public static void log(Log log, Throwable t) {
+		if (t instanceof JspException) {
+			log(log, (JspException)t);
+		}
+		else if (t instanceof ServletException) {
+			log(log, (ServletException)t);
+		}
+		else {
+			Throwable cause = t.getCause();
+
+			if (cause != null) {
+				log(log, cause);
+			}
+			else {
+				_log(log, t);
+			}
 		}
 	}
 

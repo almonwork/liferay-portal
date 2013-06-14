@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -27,8 +27,7 @@ public class MonitoringProcessorManager
 	implements MonitoringProcessorManagerMBean {
 
 	public String getLevel(String namespace) {
-		Level level = _monitoringProcessor.getLevel(
-			namespace);
+		Level level = _monitoringProcessor.getLevel(namespace);
 
 		if (level == null) {
 			level = Level.OFF;

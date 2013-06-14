@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -16,13 +16,16 @@ package com.liferay.portlet.wiki.importers;
 
 /**
  * @author Jorge Ferrer
+ * @author Daniel Kocsis
  */
 public class WikiImporterKeys {
 
-	public static final String OPTIONS_FRONT_PAGE =
-		"OPTIONS_FRONT_PAGE";
+	public static final String OPTIONS_FRONT_PAGE = "OPTIONS_FRONT_PAGE";
 
 	public static final String OPTIONS_IMPORT_LATEST_VERSION =
 		"OPTIONS_IMPORT_LATEST_VERSION";
+
+	public static final String OPTIONS_STRICT_IMPORT_MODE =
+		"OPTIONS_STRICT_IMPORT_MODE";
 
 }

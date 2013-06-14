@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,7 +14,13 @@
 
 package com.liferay.portalweb.portlet.recentbloggers.entry.viewusernameandimage;
 
-import com.liferay.portalweb.portal.BaseTests;
+import com.liferay.portalweb.portal.BaseTestSuite;
+import com.liferay.portalweb.portal.util.TearDownPageTest;
+import com.liferay.portalweb.portlet.blogs.blogsentry.addblogsentry.TearDownBlogsEntryTest;
+import com.liferay.portalweb.portlet.blogs.portlet.addportletblogs.AddPageBlogsTest;
+import com.liferay.portalweb.portlet.blogs.portlet.addportletblogs.AddPortletBlogsTest;
+import com.liferay.portalweb.portlet.recentbloggers.portlet.addportletrb.AddPageRBTest;
+import com.liferay.portalweb.portlet.recentbloggers.portlet.addportletrb.AddPortletRBTest;
 
 import junit.framework.Test;
 import junit.framework.TestSuite;
@@ -22,23 +28,19 @@ import junit.framework.TestSuite;
 /**
  * @author Brian Wing Shun Chan
  */
-public class ViewUserNameAndImageTests extends BaseTests {
-
+public class ViewUserNameAndImageTests extends BaseTestSuite {
 	public static Test suite() {
 		TestSuite testSuite = new TestSuite();
-
 		testSuite.addTestSuite(AddPageBlogsTest.class);
 		testSuite.addTestSuite(AddPortletBlogsTest.class);
 		testSuite.addTestSuite(AddPageRBTest.class);
 		testSuite.addTestSuite(AddPortletRBTest.class);
 		testSuite.addTestSuite(AddEntryTest.class);
-		testSuite.addTestSuite(
-			ConfigurePortletDisplayStyleUserNameAndImageTest.class);
+		testSuite.addTestSuite(ConfigurePortletDisplayStyleUserNameAndImageTest.class);
 		testSuite.addTestSuite(ViewUserNameAndImageTest.class);
 		testSuite.addTestSuite(TearDownBlogsEntryTest.class);
 		testSuite.addTestSuite(TearDownPageTest.class);
 
 		return testSuite;
 	}
-
 }

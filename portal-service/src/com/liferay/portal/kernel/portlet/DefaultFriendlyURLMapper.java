@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -102,7 +102,7 @@ public class DefaultFriendlyURLMapper extends BaseFriendlyURLMapper {
 
 		String friendlyURLPath = router.parametersToUrl(routeParameters);
 
-		if (friendlyURLPath == null) {
+		if (Validator.isNull(friendlyURLPath)) {
 			return null;
 		}
 
@@ -140,7 +140,7 @@ public class DefaultFriendlyURLMapper extends BaseFriendlyURLMapper {
 
 		friendlyURLPath = friendlyURLPath.substring(getMapping().length() + 1);
 
-		if (friendlyURLPath.endsWith(StringPool.SLASH))	{
+		if (friendlyURLPath.endsWith(StringPool.SLASH)) {
 			friendlyURLPath = friendlyURLPath.substring(
 				0, friendlyURLPath.length() - 1);
 		}
@@ -158,7 +158,7 @@ public class DefaultFriendlyURLMapper extends BaseFriendlyURLMapper {
 
 		String portletId = getPortletId(routeParameters);
 
-		if (portletId == null) {
+		if (Validator.isNull(portletId)) {
 			return;
 		}
 
@@ -167,6 +167,60 @@ public class DefaultFriendlyURLMapper extends BaseFriendlyURLMapper {
 		addParameter(namespace, parameterMap, "p_p_id", portletId);
 
 		populateParams(parameterMap, namespace, routeParameters);
+	}
+
+	/**
+	 * Adds the parameters included in the path to the portlet URL.
+	 *
+	 * <p>
+	 * Portlet URLs track which parameters are included in the friendly URL
+	 * path. This method hides all the default ignored parameters, the
+	 * parameters included in the path by the router, and the reserved
+	 * parameters set to their defaults.
+	 * </p>
+	 *
+	 * @param liferayPortletURL the portlet URL to which to add the parameters
+	 *        included in the path
+	 * @param routeParameters the parameter map populated by the router
+	 * @see   com.liferay.portlet.PortletURLImpl#addParameterIncludedInPath(
+	 *        String)
+	 */
+	protected void addParametersIncludedInPath(
+		LiferayPortletURL liferayPortletURL,
+		Map<String, String> routeParameters) {
+
+		// Hide default ignored parameters
+
+		for (String name : defaultIgnoredParameters) {
+			liferayPortletURL.addParameterIncludedInPath(name);
+		}
+
+		// Hide application parameters removed by the router
+
+		Map<String, String[]> portletURLParameters =
+			liferayPortletURL.getParameterMap();
+
+		for (String name : portletURLParameters.keySet()) {
+			if (!routeParameters.containsKey(name)) {
+				liferayPortletURL.addParameterIncludedInPath(name);
+			}
+		}
+
+		// Hide reserved parameters removed by the router or set to the defaults
+
+		Map<String, String> reservedParameters =
+			liferayPortletURL.getReservedParameterMap();
+
+		for (Map.Entry<String, String> entry : reservedParameters.entrySet()) {
+			String key = entry.getKey();
+			String value = entry.getValue();
+
+			if (!routeParameters.containsKey(key) ||
+				value.equals(defaultReservedParameters.get(key))) {
+
+				liferayPortletURL.addParameterIncludedInPath(key);
+			}
+		}
 	}
 
 	/**
@@ -210,12 +264,25 @@ public class DefaultFriendlyURLMapper extends BaseFriendlyURLMapper {
 			routeParameters.put("p_p_id", portletId);
 
 			if (Validator.isNotNull(portletId)) {
-				String[] parts = portletId.split(
-					PortletConstants.INSTANCE_SEPARATOR);
+				int x = portletId.indexOf(PortletConstants.INSTANCE_SEPARATOR);
 
-				if (parts.length > 1) {
-					routeParameters.put("instanceId", parts[1]);
+				if (x != -1) {
+					x += PortletConstants.INSTANCE_SEPARATOR.length();
+
+					String instanceId = null;
+
+					int y = portletId.indexOf(portletId, x);
+
+					if (y != -1) {
+						instanceId = portletId.substring(x, y);
+					}
+					else {
+						instanceId = portletId.substring(x);
+					}
+
+					routeParameters.put("instanceId", instanceId);
 				}
+
 			}
 		}
 
@@ -293,60 +360,6 @@ public class DefaultFriendlyURLMapper extends BaseFriendlyURLMapper {
 
 			if (!parameterMap.containsKey(key)) {
 				addParameter(namespace, parameterMap, key, entry.getValue());
-			}
-		}
-	}
-
-	/**
-	 * Adds the parameters included in the path to the portlet URL.
-	 *
-	 * <p>
-	 * Portlet URLs track which parameters are included in the friendly URL
-	 * path. This method hides all the default ignored parameters, the
-	 * parameters included in the path by the router, and the reserved
-	 * parameters set to their defaults.
-	 * </p>
-	 *
-	 * @param liferayPortletURL the portlet URL to which to add the parameters
-	 *        included in the path
-	 * @param routeParameters the parameter map populated by the router
-	 * @see   com.liferay.portlet.PortletURLImpl#addParameterIncludedInPath(
-	 *        String)
-	 */
-	protected void addParametersIncludedInPath(
-		LiferayPortletURL liferayPortletURL,
-		Map<String, String> routeParameters) {
-
-		// Hide default ignored parameters
-
-		for (String name : defaultIgnoredParameters) {
-			liferayPortletURL.addParameterIncludedInPath(name);
-		}
-
-		// Hide application parameters removed by the router
-
-		Map<String, String[]> portletURLParameters =
-			liferayPortletURL.getParameterMap();
-
-		for (String name : portletURLParameters.keySet()) {
-			if (!routeParameters.containsKey(name)) {
-				liferayPortletURL.addParameterIncludedInPath(name);
-			}
-		}
-
-		// Hide reserved parameters removed by the router or set to the defaults
-
-		Map<String, String> reservedParameters =
-			liferayPortletURL.getReservedParameterMap();
-
-		for (Map.Entry<String, String> entry : reservedParameters.entrySet()) {
-			String key = entry.getKey();
-			String value = entry.getValue();
-
-			if (!routeParameters.containsKey(key) ||
-				value.equals(defaultReservedParameters.get(key))) {
-
-				liferayPortletURL.addParameterIncludedInPath(key);
 			}
 		}
 	}

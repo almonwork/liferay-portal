@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -21,6 +21,8 @@
 <%
 boolean viewTree = ParamUtil.getBoolean(request, "viewTree");
 boolean viewLayout = ParamUtil.getBoolean(request, "viewLayout");
+
+SitesUtil.addPortletBreadcrumbEntries(group, pagesName, redirectURL, request, renderResponse);
 %>
 
 <c:if test="<%= viewTree %>">

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -22,8 +22,11 @@ import com.liferay.portalweb.portal.util.RuntimeVariables;
  */
 public class Member_ViewEntryTest extends BaseTestCase {
 	public void testMember_ViewEntry() throws Exception {
+		selenium.open("/web/guest/home/");
+		loadRequiredJavaScriptModules();
+
 		for (int second = 0;; second++) {
-			if (second >= 60) {
+			if (second >= 90) {
 				fail("timeout");
 			}
 
@@ -38,18 +41,17 @@ public class Member_ViewEntryTest extends BaseTestCase {
 			Thread.sleep(1000);
 		}
 
-		selenium.saveScreenShotAndSource();
 		selenium.clickAt("link=Blogs Permissions Page",
-			RuntimeVariables.replace(""));
+			RuntimeVariables.replace("Blogs Permissions Page"));
 		selenium.waitForPageToLoad("30000");
-		selenium.saveScreenShotAndSource();
-		assertTrue(selenium.isElementPresent(
-				"link=Permissions Blogs Test Entry"));
+		loadRequiredJavaScriptModules();
+		assertTrue(selenium.isVisible("link=Permissions Blogs Test Entry"));
 		selenium.clickAt("link=Permissions Blogs Test Entry",
-			RuntimeVariables.replace(""));
+			RuntimeVariables.replace("Permissions Blogs Test Entry"));
 		selenium.waitForPageToLoad("30000");
-		selenium.saveScreenShotAndSource();
-		assertTrue(selenium.isTextPresent(
-				"This is a permissions blogs test entry"));
+		loadRequiredJavaScriptModules();
+		assertEquals(RuntimeVariables.replace(
+				"This is a permissions blogs test entry"),
+			selenium.getText("//div[@class='entry-body']"));
 	}
 }

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -16,25 +16,31 @@ package com.liferay.portlet.polls.action;
 
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.service.ServiceContext;
+import com.liferay.portal.service.ServiceContextFactory;
 import com.liferay.portlet.polls.service.PollsVoteServiceUtil;
 import com.liferay.portlet.polls.util.PollsUtil;
 
 import javax.portlet.ActionRequest;
+import javax.portlet.PortletConfig;
 
 /**
  * @author Brian Wing Shun Chan
+ * @author Mate Thurzo
  */
 public class ViewQuestionAction extends EditQuestionAction {
 
 	@Override
-	protected void updateQuestion(ActionRequest actionRequest)
+	protected void updateQuestion(
+			PortletConfig portletConfig, ActionRequest actionRequest)
 		throws Exception {
 
 		long questionId = ParamUtil.getLong(actionRequest, "questionId");
 		long choiceId = ParamUtil.getLong(actionRequest, "choiceId");
 
-		PollsVoteServiceUtil.addVote(
-			questionId, choiceId, new ServiceContext());
+		ServiceContext serviceContext = ServiceContextFactory.getInstance(
+			actionRequest);
+
+		PollsVoteServiceUtil.addVote(questionId, choiceId, serviceContext);
 
 		PollsUtil.saveVote(actionRequest, questionId);
 	}

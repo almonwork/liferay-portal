@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -36,16 +36,16 @@ public interface SharepointStorage {
 			SharepointRequest sharepointRequest)
 		throws Exception;
 
-	public Tree getDocumentTree(SharepointRequest sharepointRequest)
-		throws Exception;
-
 	public Tree getDocumentsTree(SharepointRequest sharepointRequest)
 		throws Exception;
 
-	public Tree getFolderTree(SharepointRequest sharepointRequest)
+	public Tree getDocumentTree(SharepointRequest sharepointRequest)
 		throws Exception;
 
 	public Tree getFoldersTree(SharepointRequest sharepointRequest)
+		throws Exception;
+
+	public Tree getFolderTree(SharepointRequest sharepointRequest)
 		throws Exception;
 
 	public void getParentFolderIds(

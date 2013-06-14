@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -27,30 +27,24 @@ JournalStructure structure= null;
 
 if (Validator.isNotNull(structureId)) {
 	try {
-		structure = JournalStructureLocalServiceUtil.getStructure(groupId, structureId);
+		structure = JournalStructureLocalServiceUtil.getStructure(groupId, structureId, true);
 	}
-	catch (NoSuchStructureException nsse1) {
-		try {
-			structure = JournalStructureLocalServiceUtil.getStructure(themeDisplay.getCompanyGroupId(), structureId);
-		}
-		catch (NoSuchStructureException nsse2) {
-			structureId = StringPool.BLANK;
+	catch (NoSuchStructureException nsse) {
+		structureId = StringPool.BLANK;
 
-			preferences.setValue("structure-id", structureId);
+		preferences.setValue("structure-id", structureId);
 
-			preferences.store();
-		}
+		preferences.store();
 	}
 }
 %>
 
-<liferay-portlet:renderURL portletConfiguration="true" varImpl="portletURL" />
+<liferay-portlet:actionURL portletConfiguration="true" var="configurationActionURL" />
+<liferay-portlet:renderURL portletConfiguration="true" var="configurationRenderURL" />
 
-<liferay-portlet:actionURL portletConfiguration="true" var="configurationURL" />
-
-<aui:form action="<%= configurationURL %>" method="post" name="fm1">
+<aui:form action="<%= configurationActionURL %>" method="post" name="fm1">
 	<aui:input name="<%= Constants.CMD %>" type="hidden" value="<%= Constants.UPDATE %>" />
-	<aui:input name="redirect" type="hidden" value='<%= portletURL.toString() + StringPool.AMPERSAND + renderResponse.getNamespace() + "cur=" + cur %>' />
+	<aui:input name="redirect" type="hidden" value='<%= configurationRenderURL + StringPool.AMPERSAND + renderResponse.getNamespace() + "cur=" + cur %>' />
 	<aui:input name="preferences--structureId--" type="hidden" value="<%= structureId %>" />
 
 	<liferay-ui:panel-container extended="<%= true %>" id="journalArticlesSettingsPanelContainer" persistState="<%= true %>">
@@ -65,7 +59,7 @@ if (Validator.isNotNull(structureId)) {
 					for (int i = 0; i < mySites.size(); i++) {
 						Group group = mySites.get(i);
 
-						String groupName = HtmlUtil.escape(group.getDescriptiveName());
+						String groupName = HtmlUtil.escape(group.getDescriptiveName(locale));
 
 						if (group.isUser()) {
 							groupName = LanguageUtil.get(pageContext, "my-site");
@@ -102,8 +96,8 @@ if (Validator.isNotNull(structureId)) {
 					String structureDescription = StringPool.BLANK;
 
 					if (structure != null) {
-						structureName = structure.getName();
-						structureDescription = structure.getDescription();
+						structureName = structure.getName(locale);
+						structureDescription = structure.getDescription(locale);
 					}
 					else {
 						structureName = LanguageUtil.get(pageContext, "any");
@@ -118,16 +112,7 @@ if (Validator.isNotNull(structureId)) {
 						</c:if>
 					</div>
 
-					<liferay-portlet:renderURL portletName="<%= PortletKeys.JOURNAL %>" windowState="<%= LiferayWindowState.POP_UP.toString() %>" var="selectStructureURL">
-						<portlet:param name="struts_action" value="/journal/select_structure" />
-						<portlet:param name="structureId" value="<%= structureId %>" />
-					</liferay-portlet:renderURL>
-
-					<%
-					String taglibOpenStructureWindow = "var folderWindow = window.open('" + selectStructureURL + "','structure', 'directories=no,height=640,location=no,menubar=no,resizable=yes,scrollbars=yes,status=no,toolbar=no,width=680'); void(''); folderWindow.focus();";
-					%>
-
-					<aui:button onClick="<%= taglibOpenStructureWindow %>" value="select" />
+					<aui:button onClick='<%= renderResponse.getNamespace() + "openStructureSelector();" %>' value="select" />
 
 					<aui:button name="removeStructureButton" onClick='<%= renderResponse.getNamespace() + "removeStructure();" %>' value="remove" />
 				</aui:field-wrapper>
@@ -140,17 +125,16 @@ if (Validator.isNotNull(structureId)) {
 					<aui:option label="maximized" selected='<%= pageUrl.equals("maximized") %>' />
 					<aui:option label="normal" selected='<%= pageUrl.equals("normal") %>' />
 					<aui:option label="pop-up" selected='<%= pageUrl.equals("popUp") %>' value="popUp" />
+					<aui:option label="view-in-context" selected='<%= pageUrl.equals("viewInContext") %>' value="viewInContext" />
 				</aui:select>
 
 				<aui:select label="display-per-page" name="preferences--pageDelta--">
 
 					<%
-					String[] pageDeltaValues = PropsUtil.getArray(PropsKeys.JOURNAL_ARTICLES_PAGE_DELTA_VALUES);
-
-					for (int i = 0; i < pageDeltaValues.length; i++) {
+					for (int pageDeltaValue : PropsValues.JOURNAL_ARTICLES_PAGE_DELTA_VALUES) {
 					%>
 
-						<aui:option label="<%= pageDeltaValues[i] %>" selected="<%= pageDelta == GetterUtil.getInteger(pageDeltaValues[i]) %>" />
+						<aui:option label="<%= pageDeltaValue %>" selected="<%= pageDelta == pageDeltaValue %>" />
 
 					<%
 					}
@@ -184,13 +168,30 @@ if (Validator.isNotNull(structureId)) {
 <aui:script>
 	Liferay.provide(
 		window,
+		'<portlet:namespace />openStructureSelector',
+		function() {
+			Liferay.Util.openWindow(
+				{
+					dialog: {
+						width: 680
+					},
+					id: '<portlet:namespace />structureSelector',
+					title: '<%= UnicodeLanguageUtil.get(pageContext, "structure") %>',
+					uri: '<liferay-portlet:renderURL portletName="<%= PortletKeys.JOURNAL %>" windowState="<%= LiferayWindowState.POP_UP.toString() %>"><portlet:param name="struts_action" value="/journal/select_structure" /><portlet:param name="structureId" value="<%= structureId %>" /></liferay-portlet:renderURL>'
+				}
+			);
+		}
+	);
+
+	Liferay.provide(
+		window,
 		'<portlet:namespace />removeStructure',
 		function() {
 			var A = AUI();
 
 			document.<portlet:namespace />fm1.<portlet:namespace />structureId.value = "";
 
-			A.one('#<portlet:namespace />structure').html('<liferay-ui:message key="any" />');
+			A.one('#<portlet:namespace />structure').html('<%= UnicodeLanguageUtil.get(pageContext, "any") %>');
 		},
 		['aui-base']
 	);
@@ -198,12 +199,16 @@ if (Validator.isNotNull(structureId)) {
 	Liferay.provide(
 		window,
 		'<%= PortalUtil.getPortletNamespace(PortletKeys.JOURNAL) %>selectStructure',
-		function(structureId, name) {
+		function(structureId, name, dialog) {
 			var A = AUI();
 
 			document.<portlet:namespace />fm1.<portlet:namespace />structureId.value = structureId;
 
 			A.one('#<portlet:namespace />structure').html(structureId + ' <em>(' + name + ')</em>');
+
+			if (dialog) {
+				dialog.close();
+			}
 		},
 		['aui-base']
 	);

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -22,8 +22,11 @@ import com.liferay.portalweb.portal.util.RuntimeVariables;
  */
 public class Portlet_EditCommentTest extends BaseTestCase {
 	public void testPortlet_EditComment() throws Exception {
+		selenium.open("/web/guest/home/");
+		loadRequiredJavaScriptModules();
+
 		for (int second = 0;; second++) {
-			if (second >= 60) {
+			if (second >= 90) {
 				fail("timeout");
 			}
 
@@ -38,24 +41,23 @@ public class Portlet_EditCommentTest extends BaseTestCase {
 			Thread.sleep(1000);
 		}
 
-		selenium.saveScreenShotAndSource();
 		selenium.clickAt("link=Blogs Permissions Page",
-			RuntimeVariables.replace(""));
+			RuntimeVariables.replace("Blogs Permissions Page"));
 		selenium.waitForPageToLoad("30000");
-		selenium.saveScreenShotAndSource();
-		selenium.clickAt("link=Portlet1 Temporary1 Entry1",
-			RuntimeVariables.replace(""));
+		loadRequiredJavaScriptModules();
+		selenium.clickAt("//div[@class='entry-title']/h2/a",
+			RuntimeVariables.replace("Blogs Entry Title Temporary"));
 		selenium.waitForPageToLoad("30000");
-		selenium.saveScreenShotAndSource();
-		selenium.clickAt("link=Edit", RuntimeVariables.replace(""));
+		loadRequiredJavaScriptModules();
 
 		for (int second = 0;; second++) {
-			if (second >= 60) {
+			if (second >= 90) {
 				fail("timeout");
 			}
 
 			try {
-				if (selenium.isElementPresent("_33_editReplyBody1")) {
+				if (selenium.isVisible(
+							"//li[@class='lfr-discussion-delete-reply']/span/a")) {
 					break;
 				}
 			}
@@ -65,20 +67,73 @@ public class Portlet_EditCommentTest extends BaseTestCase {
 			Thread.sleep(1000);
 		}
 
-		selenium.saveScreenShotAndSource();
-		selenium.type("_33_editReplyBody1",
-			RuntimeVariables.replace("This is a portlet comment! Edited!"));
-		selenium.saveScreenShotAndSource();
+		assertEquals(RuntimeVariables.replace("Edit"),
+			selenium.getText(
+				"//li[@class='lfr-discussion-delete-reply']/span/a"));
+		selenium.clickAt("//li[@class='lfr-discussion-delete-reply']/span/a",
+			RuntimeVariables.replace("Edit"));
+
+		for (int second = 0;; second++) {
+			if (second >= 90) {
+				fail("timeout");
+			}
+
+			try {
+				if (selenium.isVisible("//textarea[@name='_33_editReplyBody1']")) {
+					break;
+				}
+			}
+			catch (Exception e) {
+			}
+
+			Thread.sleep(1000);
+		}
+
+		for (int second = 0;; second++) {
+			if (second >= 90) {
+				fail("timeout");
+			}
+
+			try {
+				if (selenium.isVisible("//input[@value='Publish']")) {
+					break;
+				}
+			}
+			catch (Exception e) {
+			}
+
+			Thread.sleep(1000);
+		}
+
+		selenium.type("//textarea[@name='_33_editReplyBody1']",
+			RuntimeVariables.replace("Portlet Comment Edited"));
 		selenium.clickAt("//input[@value='Publish']",
-			RuntimeVariables.replace(""));
-		selenium.waitForPageToLoad("30000");
-		selenium.saveScreenShotAndSource();
-		assertTrue(selenium.isTextPresent(
-				"Your request completed successfully."));
+			RuntimeVariables.replace("Publish"));
+
+		for (int second = 0;; second++) {
+			if (second >= 90) {
+				fail("timeout");
+			}
+
+			try {
+				if (selenium.isVisible(
+							"//div[@class='lfr-message-response portlet-msg-success']")) {
+					break;
+				}
+			}
+			catch (Exception e) {
+			}
+
+			Thread.sleep(1000);
+		}
+
 		assertEquals(RuntimeVariables.replace(
-				"This is a portlet comment! Edited!"),
-			selenium.getText("//div/div/div[3]/div/div[1]"));
-		assertNotEquals(RuntimeVariables.replace("This is a portlet comment!"),
-			selenium.getText("//div/div/div[3]/div/div[1]"));
+				"Your request processed successfully."),
+			selenium.getText(
+				"//div[@class='lfr-message-response portlet-msg-success']"));
+		assertEquals(RuntimeVariables.replace("Portlet Comment Edited"),
+			selenium.getText("//div[@class='lfr-discussion-message']"));
+		assertNotEquals(RuntimeVariables.replace("Portlet Comment"),
+			selenium.getText("//div[@class='lfr-discussion-message']"));
 	}
 }

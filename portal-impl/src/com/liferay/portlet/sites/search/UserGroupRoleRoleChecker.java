@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -56,7 +56,7 @@ public class UserGroupRoleRoleChecker extends RowChecker {
 	private static Log _log = LogFactoryUtil.getLog(
 		UserGroupRoleRoleChecker.class);
 
-	private User _user;
 	private Group _group;
+	private User _user;
 
 }

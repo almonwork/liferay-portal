@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -82,7 +82,7 @@ public class PollsUtil {
 			Boolean hasVoted = (Boolean)session.getAttribute(
 				PollsQuestion.class.getName() + "." + questionId);
 
-			if ((hasVoted != null) && (hasVoted.booleanValue())) {
+			if ((hasVoted != null) && hasVoted.booleanValue()) {
 				return true;
 			}
 			else {
@@ -98,18 +98,18 @@ public class PollsUtil {
 		saveVote(request, questionId);
 	}
 
-	public static void saveVote(RenderRequest renderRequest, long questionId) {
-		HttpServletRequest request = PortalUtil.getHttpServletRequest(
-			renderRequest);
-
-		saveVote(request, questionId);
-	}
-
 	public static void saveVote(HttpServletRequest request, long questionId) {
 		HttpSession session = request.getSession();
 
 		session.setAttribute(
 			PollsQuestion.class.getName() + "." + questionId, Boolean.TRUE);
+	}
+
+	public static void saveVote(RenderRequest renderRequest, long questionId) {
+		HttpServletRequest request = PortalUtil.getHttpServletRequest(
+			renderRequest);
+
+		saveVote(request, questionId);
 	}
 
 }

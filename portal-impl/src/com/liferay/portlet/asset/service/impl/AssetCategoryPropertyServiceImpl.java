@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -16,8 +16,10 @@ package com.liferay.portlet.asset.service.impl;
 
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
+import com.liferay.portal.security.permission.ActionKeys;
 import com.liferay.portlet.asset.model.AssetCategoryProperty;
 import com.liferay.portlet.asset.service.base.AssetCategoryPropertyServiceBaseImpl;
+import com.liferay.portlet.asset.service.permission.AssetCategoryPermission;
 
 import java.util.List;
 
@@ -32,12 +34,23 @@ public class AssetCategoryPropertyServiceImpl
 			long entryId, String key, String value)
 		throws PortalException, SystemException {
 
+		AssetCategoryPermission.check(
+			getPermissionChecker(), entryId, ActionKeys.UPDATE);
+
 		return assetCategoryPropertyLocalService.addCategoryProperty(
 			getUserId(), entryId, key, value);
 	}
 
 	public void deleteCategoryProperty(long categoryPropertyId)
 		throws PortalException, SystemException {
+
+		AssetCategoryProperty assetCategoryProperty =
+			assetCategoryPropertyLocalService.getAssetCategoryProperty(
+				categoryPropertyId);
+
+		AssetCategoryPermission.check(
+			getPermissionChecker(), assetCategoryProperty.getCategoryId(),
+			ActionKeys.UPDATE);
 
 		assetCategoryPropertyLocalService.deleteCategoryProperty(
 			categoryPropertyId);
@@ -60,6 +73,14 @@ public class AssetCategoryPropertyServiceImpl
 	public AssetCategoryProperty updateCategoryProperty(
 			long categoryPropertyId, String key, String value)
 		throws PortalException, SystemException {
+
+		AssetCategoryProperty assetCategoryProperty =
+			assetCategoryPropertyLocalService.getAssetCategoryProperty(
+				categoryPropertyId);
+
+		AssetCategoryPermission.check(
+			getPermissionChecker(), assetCategoryProperty.getCategoryId(),
+			ActionKeys.UPDATE);
 
 		return assetCategoryPropertyLocalService.updateCategoryProperty(
 			categoryPropertyId, key, value);

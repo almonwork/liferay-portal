@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -158,6 +158,27 @@ public interface DLFileRankModel extends BaseModel<DLFileRank> {
 	 */
 	public void setFileEntryId(long fileEntryId);
 
+	/**
+	 * Returns the active of this document library file rank.
+	 *
+	 * @return the active of this document library file rank
+	 */
+	public boolean getActive();
+
+	/**
+	 * Returns <code>true</code> if this document library file rank is active.
+	 *
+	 * @return <code>true</code> if this document library file rank is active; <code>false</code> otherwise
+	 */
+	public boolean isActive();
+
+	/**
+	 * Sets whether this document library file rank is active.
+	 *
+	 * @param active the active of this document library file rank
+	 */
+	public void setActive(boolean active);
+
 	public boolean isNew();
 
 	public void setNew(boolean n);
@@ -167,8 +188,6 @@ public interface DLFileRankModel extends BaseModel<DLFileRank> {
 	public void setCachedModel(boolean cachedModel);
 
 	public boolean isEscapedModel();
-
-	public void setEscapedModel(boolean escapedModel);
 
 	public Serializable getPrimaryKeyObj();
 

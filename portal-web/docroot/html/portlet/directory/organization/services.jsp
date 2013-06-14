@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -54,7 +54,7 @@ Format timeFormat = FastDateFormatFactoryUtil.getSimpleDateFormat("HH:mm", local
 			<li>
 				<h4><%= LanguageUtil.get(pageContext,ListTypeServiceUtil.getListType(orgLabor.getTypeId()).getName()) %></h4>
 
-				<table class="org-labor-table" border="1">
+				<table border="1" class="org-labor-table">
 				<tr>
 					<td class="no-color"></td>
 
@@ -80,10 +80,14 @@ Format timeFormat = FastDateFormatFactoryUtil.getSimpleDateFormat("HH:mm", local
 					for (int j = 0; j < days.length; j++) {
 						int curOpen = openArray[j];
 
+						cal.set(Calendar.HOUR_OF_DAY, curOpen / 100);
+						cal.set(Calendar.MINUTE, curOpen % 100);
+						cal.set(Calendar.SECOND, 0);
+						cal.set(Calendar.MILLISECOND, 0);
 					%>
 
 						<td>
-							<%= curOpen != -1 ? timeFormat.format(curOpen) : "" %>
+							<%= curOpen != -1 ? timeFormat.format(cal.getTime()) : "" %>
 						</td>
 
 					<%
@@ -100,10 +104,15 @@ Format timeFormat = FastDateFormatFactoryUtil.getSimpleDateFormat("HH:mm", local
 					for (int j = 0; j < days.length; j++) {
 						String curParam = paramPrefixes[j];
 						int curClose = closeArray[j];
+
+						cal.set(Calendar.HOUR_OF_DAY, curClose / 100);
+						cal.set(Calendar.MINUTE, curClose % 100);
+						cal.set(Calendar.SECOND, 0);
+						cal.set(Calendar.MILLISECOND, 0);
 					%>
 
 						<td>
-							<%= curClose != -1 ? timeFormat.format(curClose) : "" %>
+							<%= curClose != -1 ? timeFormat.format(cal.getTime()) : "" %>
 						</td>
 
 					<%
@@ -114,6 +123,7 @@ Format timeFormat = FastDateFormatFactoryUtil.getSimpleDateFormat("HH:mm", local
 				</table>
 			</li>
 		</ul>
+
 	<%
 	}
 	%>

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -23,9 +23,13 @@ import com.liferay.portalweb.portal.util.RuntimeVariables;
 public class AddSecondEntryTest extends BaseTestCase {
 	public void testAddSecondEntry() throws Exception {
 		selenium.open("/web/guest/home/");
+		loadRequiredJavaScriptModules();
+		assertEquals(RuntimeVariables.replace("Go to"),
+			selenium.getText("//li[@id='_145_mySites']/a/span"));
+		selenium.mouseOver("//li[@id='_145_mySites']/a/span");
 
 		for (int second = 0;; second++) {
-			if (second >= 60) {
+			if (second >= 90) {
 				fail("timeout");
 			}
 
@@ -40,29 +44,29 @@ public class AddSecondEntryTest extends BaseTestCase {
 			Thread.sleep(1000);
 		}
 
-		selenium.saveScreenShotAndSource();
 		selenium.clickAt("link=Control Panel",
 			RuntimeVariables.replace("Control Panel"));
 		selenium.waitForPageToLoad("30000");
-		selenium.saveScreenShotAndSource();
+		loadRequiredJavaScriptModules();
 		selenium.clickAt("link=Bookmarks", RuntimeVariables.replace("Bookmarks"));
 		selenium.waitForPageToLoad("30000");
-		selenium.saveScreenShotAndSource();
+		loadRequiredJavaScriptModules();
 		selenium.clickAt("//a/strong", RuntimeVariables.replace("Test Folder"));
 		selenium.waitForPageToLoad("30000");
-		selenium.saveScreenShotAndSource();
+		loadRequiredJavaScriptModules();
 		selenium.clickAt("//a/strong",
 			RuntimeVariables.replace("Test Subfolder"));
 		selenium.waitForPageToLoad("30000");
-		selenium.saveScreenShotAndSource();
+		loadRequiredJavaScriptModules();
 
 		for (int second = 0;; second++) {
-			if (second >= 60) {
+			if (second >= 90) {
 				fail("timeout");
 			}
 
 			try {
-				if (selenium.isVisible("//div[3]/div/div[2]/ul/li[5]/a")) {
+				if (selenium.isVisible(
+							"//div[contains(@class,'lfr-component lfr-menu-list')]/ul/li[5]/a")) {
 					break;
 				}
 			}
@@ -72,28 +76,27 @@ public class AddSecondEntryTest extends BaseTestCase {
 			Thread.sleep(1000);
 		}
 
-		selenium.saveScreenShotAndSource();
-		selenium.clickAt("//div[3]/div/div[2]/ul/li[5]/a",
-			RuntimeVariables.replace("Add Bookmark"));
+		assertEquals(RuntimeVariables.replace("Add Bookmark"),
+			selenium.getText(
+				"//div[contains(@class,'lfr-component lfr-menu-list')]/ul/li[5]/a"));
+		selenium.click(RuntimeVariables.replace(
+				"//div[contains(@class,'lfr-component lfr-menu-list')]/ul/li[5]/a"));
 		selenium.waitForPageToLoad("30000");
-		selenium.saveScreenShotAndSource();
+		loadRequiredJavaScriptModules();
 		selenium.type("//input[@id='_28_name']",
 			RuntimeVariables.replace("Test Bookmark 2"));
-		selenium.saveScreenShotAndSource();
 		selenium.type("//input[@id='_28_url']",
 			RuntimeVariables.replace("http://www.digg.com"));
-		selenium.saveScreenShotAndSource();
 		selenium.type("//textarea[@id='_28_description']",
 			RuntimeVariables.replace(
 				"This is a test bookmark that will be deleted!"));
-		selenium.saveScreenShotAndSource();
 		selenium.clickAt("//input[@value='Save']",
 			RuntimeVariables.replace("Save"));
 		selenium.waitForPageToLoad("30000");
-		selenium.saveScreenShotAndSource();
+		loadRequiredJavaScriptModules();
 
 		for (int second = 0;; second++) {
-			if (second >= 60) {
+			if (second >= 90) {
 				fail("timeout");
 			}
 
@@ -108,7 +111,6 @@ public class AddSecondEntryTest extends BaseTestCase {
 			Thread.sleep(1000);
 		}
 
-		selenium.saveScreenShotAndSource();
 		assertEquals(RuntimeVariables.replace(
 				"Your request completed successfully."),
 			selenium.getText("//div[@class='portlet-msg-success']"));

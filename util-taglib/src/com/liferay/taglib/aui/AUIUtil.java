@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -33,7 +33,9 @@ public class AUIUtil {
 
 	public static final String INPUT_PREFIX = "aui-field-input";
 
-	public static final String LABEL_PREFIX = "aui-field-label";
+	public static final String LABEL_CHOICE_PREFIX = "aui-choice-label";
+
+	public static final String LABEL_FIELD_PREFIX = "aui-field-label";
 
 	public static String buildCss(
 		String prefix, String baseTypeCss, boolean inlineField,
@@ -106,7 +108,7 @@ public class AUIUtil {
 	}
 
 	public static String buildData(Map<String, Object> data) {
-		if ((data == null) || (data.isEmpty())) {
+		if ((data == null) || data.isEmpty()) {
 			return StringPool.BLANK;
 		}
 
@@ -126,15 +128,30 @@ public class AUIUtil {
 		return sb.toString();
 	}
 
+	/**
+	 * @deprecated {@link #buildLabel(String, boolean, String, boolean)}
+	 */
 	public static String buildLabel(
 		String inlineLabel, boolean showForLabel, String forLabel) {
 
+		return buildLabel(inlineLabel, showForLabel, forLabel, false);
+	}
+
+	public static String buildLabel(
+		String inlineLabel, boolean showForLabel, String forLabel,
+		boolean choiceField) {
+
 		StringBundler sb = new StringBundler(4);
 
-		sb.append("class=\"" + LABEL_PREFIX);
+		if (choiceField) {
+			sb.append("class=\"" + LABEL_CHOICE_PREFIX);
+		}
+		else {
+			sb.append("class=\"" + LABEL_FIELD_PREFIX);
 
-		if (Validator.isNotNull(inlineLabel) && !inlineLabel.equals("right")) {
-			sb.append("-inline-label");
+			if (Validator.isNotNull(inlineLabel)) {
+				sb.append("-inline-label");
+			}
 		}
 
 		sb.append("\"");

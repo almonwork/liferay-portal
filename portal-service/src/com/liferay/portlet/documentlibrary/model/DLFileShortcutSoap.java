@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -42,6 +42,7 @@ public class DLFileShortcutSoap implements Serializable {
 		soapModel.setRepositoryId(model.getRepositoryId());
 		soapModel.setFolderId(model.getFolderId());
 		soapModel.setToFileEntryId(model.getToFileEntryId());
+		soapModel.setActive(model.getActive());
 		soapModel.setStatus(model.getStatus());
 		soapModel.setStatusByUserId(model.getStatusByUserId());
 		soapModel.setStatusByUserName(model.getStatusByUserName());
@@ -186,6 +187,18 @@ public class DLFileShortcutSoap implements Serializable {
 		_toFileEntryId = toFileEntryId;
 	}
 
+	public boolean getActive() {
+		return _active;
+	}
+
+	public boolean isActive() {
+		return _active;
+	}
+
+	public void setActive(boolean active) {
+		_active = active;
+	}
+
 	public int getStatus() {
 		return _status;
 	}
@@ -229,6 +242,7 @@ public class DLFileShortcutSoap implements Serializable {
 	private long _repositoryId;
 	private long _folderId;
 	private long _toFileEntryId;
+	private boolean _active;
 	private int _status;
 	private long _statusByUserId;
 	private String _statusByUserName;

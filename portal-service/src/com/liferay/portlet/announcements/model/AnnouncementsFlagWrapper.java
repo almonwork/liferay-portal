@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,6 +14,12 @@
 
 package com.liferay.portlet.announcements.model;
 
+import com.liferay.portal.model.ModelWrapper;
+
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * <p>
  * This class is a wrapper for {@link AnnouncementsFlag}.
@@ -23,7 +29,8 @@ package com.liferay.portlet.announcements.model;
  * @see       AnnouncementsFlag
  * @generated
  */
-public class AnnouncementsFlagWrapper implements AnnouncementsFlag {
+public class AnnouncementsFlagWrapper implements AnnouncementsFlag,
+	ModelWrapper<AnnouncementsFlag> {
 	public AnnouncementsFlagWrapper(AnnouncementsFlag announcementsFlag) {
 		_announcementsFlag = announcementsFlag;
 	}
@@ -34,6 +41,50 @@ public class AnnouncementsFlagWrapper implements AnnouncementsFlag {
 
 	public String getModelClassName() {
 		return AnnouncementsFlag.class.getName();
+	}
+
+	public Map<String, Object> getModelAttributes() {
+		Map<String, Object> attributes = new HashMap<String, Object>();
+
+		attributes.put("flagId", getFlagId());
+		attributes.put("userId", getUserId());
+		attributes.put("createDate", getCreateDate());
+		attributes.put("entryId", getEntryId());
+		attributes.put("value", getValue());
+
+		return attributes;
+	}
+
+	public void setModelAttributes(Map<String, Object> attributes) {
+		Long flagId = (Long)attributes.get("flagId");
+
+		if (flagId != null) {
+			setFlagId(flagId);
+		}
+
+		Long userId = (Long)attributes.get("userId");
+
+		if (userId != null) {
+			setUserId(userId);
+		}
+
+		Date createDate = (Date)attributes.get("createDate");
+
+		if (createDate != null) {
+			setCreateDate(createDate);
+		}
+
+		Long entryId = (Long)attributes.get("entryId");
+
+		if (entryId != null) {
+			setEntryId(entryId);
+		}
+
+		Integer value = (Integer)attributes.get("value");
+
+		if (value != null) {
+			setValue(value);
+		}
 	}
 
 	/**
@@ -184,10 +235,6 @@ public class AnnouncementsFlagWrapper implements AnnouncementsFlag {
 		return _announcementsFlag.isEscapedModel();
 	}
 
-	public void setEscapedModel(boolean escapedModel) {
-		_announcementsFlag.setEscapedModel(escapedModel);
-	}
-
 	public java.io.Serializable getPrimaryKeyObj() {
 		return _announcementsFlag.getPrimaryKeyObj();
 	}
@@ -242,7 +289,14 @@ public class AnnouncementsFlagWrapper implements AnnouncementsFlag {
 		_announcementsFlag.persist();
 	}
 
+	/**
+	 * @deprecated Renamed to {@link #getWrappedModel}
+	 */
 	public AnnouncementsFlag getWrappedAnnouncementsFlag() {
+		return _announcementsFlag;
+	}
+
+	public AnnouncementsFlag getWrappedModel() {
 		return _announcementsFlag;
 	}
 

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,6 +14,8 @@
 
 package com.liferay.portlet.asset.service;
 
+import com.liferay.portal.service.ServiceWrapper;
+
 /**
  * <p>
  * This class is a wrapper for {@link AssetCategoryPropertyLocalService}.
@@ -24,7 +26,8 @@ package com.liferay.portlet.asset.service;
  * @generated
  */
 public class AssetCategoryPropertyLocalServiceWrapper
-	implements AssetCategoryPropertyLocalService {
+	implements AssetCategoryPropertyLocalService,
+		ServiceWrapper<AssetCategoryPropertyLocalService> {
 	public AssetCategoryPropertyLocalServiceWrapper(
 		AssetCategoryPropertyLocalService assetCategoryPropertyLocalService) {
 		_assetCategoryPropertyLocalService = assetCategoryPropertyLocalService;
@@ -58,25 +61,32 @@ public class AssetCategoryPropertyLocalServiceWrapper
 	* Deletes the asset category property with the primary key from the database. Also notifies the appropriate model listeners.
 	*
 	* @param categoryPropertyId the primary key of the asset category property
+	* @return the asset category property that was removed
 	* @throws PortalException if a asset category property with the primary key could not be found
 	* @throws SystemException if a system exception occurred
 	*/
-	public void deleteAssetCategoryProperty(long categoryPropertyId)
+	public com.liferay.portlet.asset.model.AssetCategoryProperty deleteAssetCategoryProperty(
+		long categoryPropertyId)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException {
-		_assetCategoryPropertyLocalService.deleteAssetCategoryProperty(categoryPropertyId);
+		return _assetCategoryPropertyLocalService.deleteAssetCategoryProperty(categoryPropertyId);
 	}
 
 	/**
 	* Deletes the asset category property from the database. Also notifies the appropriate model listeners.
 	*
 	* @param assetCategoryProperty the asset category property
+	* @return the asset category property that was removed
 	* @throws SystemException if a system exception occurred
 	*/
-	public void deleteAssetCategoryProperty(
+	public com.liferay.portlet.asset.model.AssetCategoryProperty deleteAssetCategoryProperty(
 		com.liferay.portlet.asset.model.AssetCategoryProperty assetCategoryProperty)
 		throws com.liferay.portal.kernel.exception.SystemException {
-		_assetCategoryPropertyLocalService.deleteAssetCategoryProperty(assetCategoryProperty);
+		return _assetCategoryPropertyLocalService.deleteAssetCategoryProperty(assetCategoryProperty);
+	}
+
+	public com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery() {
+		return _assetCategoryPropertyLocalService.dynamicQuery();
 	}
 
 	/**
@@ -149,6 +159,12 @@ public class AssetCategoryPropertyLocalServiceWrapper
 		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery)
 		throws com.liferay.portal.kernel.exception.SystemException {
 		return _assetCategoryPropertyLocalService.dynamicQueryCount(dynamicQuery);
+	}
+
+	public com.liferay.portlet.asset.model.AssetCategoryProperty fetchAssetCategoryProperty(
+		long categoryPropertyId)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return _assetCategoryPropertyLocalService.fetchAssetCategoryProperty(categoryPropertyId);
 	}
 
 	/**
@@ -317,11 +333,26 @@ public class AssetCategoryPropertyLocalServiceWrapper
 			key, value);
 	}
 
+	/**
+	 * @deprecated Renamed to {@link #getWrappedService}
+	 */
 	public AssetCategoryPropertyLocalService getWrappedAssetCategoryPropertyLocalService() {
 		return _assetCategoryPropertyLocalService;
 	}
 
+	/**
+	 * @deprecated Renamed to {@link #setWrappedService}
+	 */
 	public void setWrappedAssetCategoryPropertyLocalService(
+		AssetCategoryPropertyLocalService assetCategoryPropertyLocalService) {
+		_assetCategoryPropertyLocalService = assetCategoryPropertyLocalService;
+	}
+
+	public AssetCategoryPropertyLocalService getWrappedService() {
+		return _assetCategoryPropertyLocalService;
+	}
+
+	public void setWrappedService(
 		AssetCategoryPropertyLocalService assetCategoryPropertyLocalService) {
 		_assetCategoryPropertyLocalService = assetCategoryPropertyLocalService;
 	}

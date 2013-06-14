@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -64,9 +64,13 @@ else {
 
 <h3><liferay-ui:message key="addresses" /></h3>
 
+<div class="portlet-msg-info">
+	<liferay-ui:message key="street-1-and-city-are-required-fields.-postal-code-could-be-required-in-some-countries" />
+</div>
+
 <liferay-ui:error exception="<%= AddressCityException.class %>" message="please-enter-a-valid-city" />
 <liferay-ui:error exception="<%= AddressStreetException.class %>" message="please-enter-a-valid-street" />
-<liferay-ui:error exception="<%= AddressZipException.class %>" message="please-enter-a-valid-zip" />
+<liferay-ui:error exception="<%= AddressZipException.class %>" message="please-enter-a-valid-postal-code" />
 <liferay-ui:error exception="<%= NoSuchCountryException.class %>" message="please-select-a-country" />
 <liferay-ui:error key="<%= NoSuchListTypeException.class.getName() + className + ListTypeConstants.ADDRESS %>" message="please-select-a-type" />
 <liferay-ui:error exception="<%= NoSuchRegionException.class %>" message="please-select-a-region" />
@@ -90,11 +94,11 @@ else {
 				<aui:column columnWidth="50">
 					<aui:input name='<%= "addressId" + addressesIndex %>' type="hidden" value="<%= address.getAddressId() %>" />
 
-					<aui:input fieldParam='<%= "addressStreet1_" + addressesIndex %>' name="street1" />
+					<aui:input fieldParam='<%= "addressStreet1_" + addressesIndex %>' id='<%= "addressStreet1_" + addressesIndex %>' name="street1" />
 
-					<aui:input fieldParam='<%= "addressStreet2_" + addressesIndex %>' name="street2" />
+					<aui:input fieldParam='<%= "addressStreet2_" + addressesIndex %>' id='<%= "addressStreet2_" + addressesIndex %>' name="street2" />
 
-					<aui:input fieldParam='<%= "addressStreet3_" + addressesIndex %>' name="street3" />
+					<aui:input fieldParam='<%= "addressStreet3_" + addressesIndex %>' id='<%= "addressStreet3_" + addressesIndex %>' name="street3" />
 
 					<aui:select label="country" name='<%= "addressCountryId" + addressesIndex %>' />
 
@@ -102,15 +106,15 @@ else {
 				</aui:column>
 
 				<aui:column columnWidth="50">
-					<aui:select label="type" name='<%= "addressTypeId" + addressesIndex %>' listType="<%= className + ListTypeConstants.ADDRESS %>" />
+					<aui:select label="type" listType="<%= className + ListTypeConstants.ADDRESS %>" name='<%= "addressTypeId" + addressesIndex %>' />
 
-					<aui:input name="zip" fieldParam='<%= "addressZip" + addressesIndex %>' />
+					<aui:input fieldParam='<%= "addressZip" + addressesIndex %>' id='<%= "addressZip" + addressesIndex %>' label="postal-code" name="zip" />
 
-					<aui:input name="city" fieldParam='<%= "addressCity" + addressesIndex %>' />
+					<aui:input fieldParam='<%= "addressCity" + addressesIndex %>' id='<%= "addressCity" + addressesIndex %>' name="city" />
 
-					<aui:input checked="<%= address.isPrimary() %>" cssClass="primary-ctrl" id='<%= "addressPrimary" + addressesIndex %>' inlineLabel="left" label="primary" name="addressPrimary" type="radio" value="<%= addressesIndex %>" />
+					<aui:input checked="<%= address.isPrimary() %>" cssClass="primary-ctrl" id='<%= "addressPrimary" + addressesIndex %>' label="primary" name="addressPrimary" type="radio" value="<%= addressesIndex %>" />
 
-					<aui:input cssClass="mailing-ctrl" fieldParam='<%= "addressMailing" + addressesIndex %>' inlineLabel="left" name="mailing" />
+					<aui:input cssClass="mailing-ctrl" fieldParam='<%= "addressMailing" + addressesIndex %>' id='<%= "addressMailing" + addressesIndex %>' name="mailing" />
 				</aui:column>
 			</div>
 		</div>
@@ -121,7 +125,8 @@ else {
 					{
 						select: '<portlet:namespace />addressCountryId<%= addressesIndex %>',
 						selectData: Liferay.Address.getCountries,
-						selectDesc: 'name',
+						selectDesc: 'nameCurrentValue',
+						selectSort: '<%= true %>',
 						selectId: 'countryId',
 						selectVal: '<%= countryId %>'
 					},
@@ -167,7 +172,8 @@ else {
 									{
 										select: '<portlet:namespace />addressCountryId' + guid,
 										selectData: Liferay.Address.getCountries,
-										selectDesc: 'name',
+										selectDesc: 'nameCurrentValue',
+										selectSort: '<%= true %>',
 										selectId: 'countryId',
 										selectVal: ''
 									},

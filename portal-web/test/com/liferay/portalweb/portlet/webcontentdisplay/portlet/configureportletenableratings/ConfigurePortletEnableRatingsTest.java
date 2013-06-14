@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -23,15 +23,15 @@ import com.liferay.portalweb.portal.util.RuntimeVariables;
 public class ConfigurePortletEnableRatingsTest extends BaseTestCase {
 	public void testConfigurePortletEnableRatings() throws Exception {
 		selenium.open("/web/guest/home/");
+		loadRequiredJavaScriptModules();
 
 		for (int second = 0;; second++) {
-			if (second >= 60) {
+			if (second >= 90) {
 				fail("timeout");
 			}
 
 			try {
-				if (selenium.isElementPresent(
-							"link=Web Content Display Test Page")) {
+				if (selenium.isVisible("link=Web Content Display Test Page")) {
 					break;
 				}
 			}
@@ -41,15 +41,17 @@ public class ConfigurePortletEnableRatingsTest extends BaseTestCase {
 			Thread.sleep(1000);
 		}
 
-		selenium.saveScreenShotAndSource();
 		selenium.clickAt("link=Web Content Display Test Page",
-			RuntimeVariables.replace(""));
+			RuntimeVariables.replace("Web Content Display Test Page"));
 		selenium.waitForPageToLoad("30000");
-		selenium.saveScreenShotAndSource();
+		loadRequiredJavaScriptModules();
+		assertEquals(RuntimeVariables.replace("Options"),
+			selenium.getText("//strong/a"));
+		Thread.sleep(5000);
 		selenium.clickAt("//strong/a", RuntimeVariables.replace("Options"));
 
 		for (int second = 0;; second++) {
-			if (second >= 60) {
+			if (second >= 90) {
 				fail("timeout");
 			}
 
@@ -65,19 +67,19 @@ public class ConfigurePortletEnableRatingsTest extends BaseTestCase {
 			Thread.sleep(1000);
 		}
 
-		selenium.saveScreenShotAndSource();
 		assertEquals(RuntimeVariables.replace("Configuration"),
 			selenium.getText(
 				"//div[@class='lfr-component lfr-menu-list']/ul/li[2]/a"));
 		selenium.click("//div[@class='lfr-component lfr-menu-list']/ul/li[2]/a");
 
 		for (int second = 0;; second++) {
-			if (second >= 60) {
+			if (second >= 90) {
 				fail("timeout");
 			}
 
 			try {
-				if (selenium.isVisible("_86_enableRatingsCheckbox")) {
+				if (selenium.isVisible(
+							"//input[@id='_86_enableRatingsCheckbox']")) {
 					break;
 				}
 			}
@@ -87,29 +89,31 @@ public class ConfigurePortletEnableRatingsTest extends BaseTestCase {
 			Thread.sleep(1000);
 		}
 
-		selenium.saveScreenShotAndSource();
-		assertFalse(selenium.isChecked("_86_enableRatingsCheckbox"));
-		selenium.saveScreenShotAndSource();
-		selenium.clickAt("_86_enableRatingsCheckbox",
-			RuntimeVariables.replace(""));
-		selenium.clickAt("//input[@value='Save']", RuntimeVariables.replace(""));
+		assertFalse(selenium.isChecked(
+				"//input[@id='_86_enableRatingsCheckbox']"));
+		selenium.clickAt("//input[@id='_86_enableRatingsCheckbox']",
+			RuntimeVariables.replace("Enable Ratings"));
+		assertTrue(selenium.isChecked(
+				"//input[@id='_86_enableRatingsCheckbox']"));
+		selenium.clickAt("//input[@value='Save']",
+			RuntimeVariables.replace("Save"));
 		selenium.waitForPageToLoad("30000");
-		selenium.saveScreenShotAndSource();
+		loadRequiredJavaScriptModules();
 		assertEquals(RuntimeVariables.replace(
 				"You have successfully updated the setup."),
-			selenium.getText("//div[@id='p_p_id_86_']/div/div"));
-		assertTrue(selenium.isChecked("_86_enableRatingsCheckbox"));
-		selenium.saveScreenShotAndSource();
+			selenium.getText("//div[@class='portlet-msg-success']"));
+		assertTrue(selenium.isChecked(
+				"//input[@id='_86_enableRatingsCheckbox']"));
 		selenium.open("/web/guest/home/");
+		loadRequiredJavaScriptModules();
 
 		for (int second = 0;; second++) {
-			if (second >= 60) {
+			if (second >= 90) {
 				fail("timeout");
 			}
 
 			try {
-				if (selenium.isElementPresent(
-							"link=Web Content Display Test Page")) {
+				if (selenium.isVisible("link=Web Content Display Test Page")) {
 					break;
 				}
 			}
@@ -119,12 +123,15 @@ public class ConfigurePortletEnableRatingsTest extends BaseTestCase {
 			Thread.sleep(1000);
 		}
 
-		selenium.saveScreenShotAndSource();
 		selenium.clickAt("link=Web Content Display Test Page",
-			RuntimeVariables.replace(""));
+			RuntimeVariables.replace("Web Content Display Test Page"));
 		selenium.waitForPageToLoad("30000");
-		selenium.saveScreenShotAndSource();
-		assertTrue(selenium.isTextPresent("This is a test wcd web content."));
-		assertTrue(selenium.isTextPresent("Your Rating"));
+		loadRequiredJavaScriptModules();
+		assertEquals(RuntimeVariables.replace("WC WebContent Content"),
+			selenium.getText("//div[@class='journal-content-article']/p"));
+		assertEquals(RuntimeVariables.replace("Your Rating"),
+			selenium.getText("//div/div[4]/div/div[1]/div/div"));
+		assertEquals(RuntimeVariables.replace("Average (0 Votes)"),
+			selenium.getText("//div/div[4]/div/div[2]/div/div"));
 	}
 }

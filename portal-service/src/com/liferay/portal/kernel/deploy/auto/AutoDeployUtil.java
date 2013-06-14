@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,25 +14,34 @@
 
 package com.liferay.portal.kernel.deploy.auto;
 
+import com.liferay.portal.kernel.security.pacl.permission.PortalRuntimePermission;
+
 import java.util.HashMap;
 import java.util.Map;
 
 /**
  * @author Ivica Cardic
  * @author Brian Wing Shun Chan
+ * @author Raymond Augé
  */
 public class AutoDeployUtil {
 
 	public static AutoDeployDir getDir(String name) {
-		return _instance._getDir(name);
+		return getInstance()._getDir(name);
+	}
+
+	public static AutoDeployUtil getInstance() {
+		PortalRuntimePermission.checkGetBeanProperty(AutoDeployUtil.class);
+
+		return _instance;
 	}
 
 	public static void registerDir(AutoDeployDir autoDeployDir) {
-		_instance._registerDir(autoDeployDir);
+		getInstance()._registerDir(autoDeployDir);
 	}
 
 	public static void unregisterDir(String name) {
-		_instance._unregisterDir(name);
+		getInstance()._unregisterDir(name);
 	}
 
 	private AutoDeployUtil() {

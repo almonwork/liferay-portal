@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -18,6 +18,7 @@ import com.liferay.portal.kernel.portlet.DefaultConfigurationAction;
 import com.liferay.portal.kernel.servlet.SessionErrors;
 import com.liferay.portal.kernel.servlet.SessionMessages;
 import com.liferay.portal.kernel.util.Constants;
+import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
@@ -30,7 +31,9 @@ import com.liferay.portal.theme.ThemeDisplay;
 import com.liferay.portal.util.PortalUtil;
 import com.liferay.portal.util.WebKeys;
 import com.liferay.portlet.PortletPreferencesFactoryUtil;
+import com.liferay.portlet.asset.AssetRendererFactoryRegistryUtil;
 import com.liferay.portlet.asset.AssetTagException;
+import com.liferay.portlet.asset.model.AssetRendererFactory;
 import com.liferay.portlet.asset.service.AssetTagLocalServiceUtil;
 import com.liferay.portlet.assetpublisher.util.AssetPublisherUtil;
 
@@ -88,6 +91,9 @@ public class ConfigurationActionImpl extends DefaultConfigurationAction {
 				else if (cmd.equals("remove-selection")) {
 					removeSelection(actionRequest, preferences);
 				}
+				else if (cmd.equals("select-scope")) {
+					setScopes(actionRequest, preferences);
+				}
 				else if (cmd.equals("selection-style")) {
 					setSelectionStyle(actionRequest, preferences);
 				}
@@ -97,7 +103,14 @@ public class ConfigurationActionImpl extends DefaultConfigurationAction {
 
 					SessionMessages.add(
 						actionRequest,
-						portletConfig.getPortletName() + ".doConfigure");
+						portletConfig.getPortletName() +
+							SessionMessages.KEY_SUFFIX_REFRESH_PORTLET,
+						portletResource);
+
+					SessionMessages.add(
+						actionRequest,
+						portletConfig.getPortletName() +
+							SessionMessages.KEY_SUFFIX_UPDATED_CONFIGURATION);
 				}
 
 				String redirect = PortalUtil.escapeRedirect(
@@ -109,12 +122,77 @@ public class ConfigurationActionImpl extends DefaultConfigurationAction {
 			}
 			catch (Exception e) {
 				if (e instanceof AssetTagException) {
-					SessionErrors.add(actionRequest, e.getClass().getName(), e);
+					SessionErrors.add(actionRequest, e.getClass(), e);
 				}
 				else {
 					throw e;
 				}
 			}
+		}
+	}
+
+	protected String[] getClassTypeIds(
+		ActionRequest actionRequest, String[] classNameIds) throws Exception {
+
+		String anyAssetTypeString = getParameter(actionRequest, "anyAssetType");
+
+		boolean anyAssetType = GetterUtil.getBoolean(anyAssetTypeString);
+
+		if (anyAssetType) {
+			return null;
+		}
+
+		long defaultAssetTypeId = GetterUtil.getLong(anyAssetTypeString);
+
+		if ((defaultAssetTypeId == 0) && (classNameIds.length == 1)) {
+			defaultAssetTypeId = GetterUtil.getLong(classNameIds[0]);
+		}
+
+		if (defaultAssetTypeId <= 0 ) {
+			return null;
+		}
+
+		ThemeDisplay themeDisplay = (ThemeDisplay)actionRequest.getAttribute(
+			WebKeys.THEME_DISPLAY);
+
+		String className = PortalUtil.getClassName(defaultAssetTypeId);
+
+		AssetRendererFactory assetRendererFactory =
+			AssetRendererFactoryRegistryUtil.getAssetRendererFactoryByClassName(
+				className);
+
+		long[] groupIds = {
+			themeDisplay.getCompanyGroupId(), themeDisplay.getScopeGroupId()
+		};
+
+		if (assetRendererFactory.getClassTypes(
+				groupIds, themeDisplay.getLocale()) == null) {
+
+			return null;
+		}
+
+		String assetClassName = AssetPublisherUtil.getClassName(
+			assetRendererFactory);
+
+		String anyAssetClassTypeString = getParameter(
+			actionRequest, "anyClassType" + assetClassName);
+
+		boolean anyAssetClassType = GetterUtil.getBoolean(
+			anyAssetClassTypeString);
+
+		if (anyAssetClassType) {
+			return null;
+		}
+
+		long defaultAssetClassTypeId = GetterUtil.getLong(
+			anyAssetClassTypeString);
+
+		if (defaultAssetClassTypeId > 0) {
+			return new String[] {String.valueOf(defaultAssetClassTypeId)};
+		}
+		else {
+			return StringUtil.split(
+				getParameter(actionRequest, "classTypeIds" + assetClassName));
 		}
 	}
 
@@ -194,6 +272,18 @@ public class ConfigurationActionImpl extends DefaultConfigurationAction {
 		preferences.setValues("assetEntryXml", newEntries);
 	}
 
+	protected void setScopes(
+			ActionRequest actionRequest, PortletPreferences preferences)
+		throws Exception {
+
+		String defaultScope = getParameter(actionRequest, "defaultScope");
+		String[] scopeIds = StringUtil.split(
+			getParameter(actionRequest, "scopeIds"));
+
+		preferences.setValue("defaultScope", defaultScope);
+		preferences.setValues("scopeIds", scopeIds);
+	}
+
 	protected void setSelectionStyle(
 			ActionRequest actionRequest, PortletPreferences preferences)
 		throws Exception {
@@ -206,7 +296,13 @@ public class ConfigurationActionImpl extends DefaultConfigurationAction {
 		if (selectionStyle.equals("manual") ||
 			selectionStyle.equals("view-count")) {
 
-			preferences.setValue("showQueryLogic", String.valueOf(false));
+			preferences.setValue("enableRss", String.valueOf(false));
+			preferences.setValue("showQueryLogic", Boolean.FALSE.toString());
+
+			preferences.reset("rssDelta");
+			preferences.reset("rssDisplayStyle");
+			preferences.reset("rssFormat");
+			preferences.reset("rssName");
 		}
 
 		if (!selectionStyle.equals("view-count") &&
@@ -252,8 +348,8 @@ public class ConfigurationActionImpl extends DefaultConfigurationAction {
 		}
 
 		layout = LayoutServiceUtil.updateLayout(
-			layout.getGroupId(), layout.isPrivateLayout(),
-			layout.getLayoutId(), layout.getTypeSettings());
+			layout.getGroupId(), layout.isPrivateLayout(), layout.getLayoutId(),
+			layout.getTypeSettings());
 	}
 
 	protected void updateDisplaySettings(ActionRequest actionRequest)
@@ -261,13 +357,13 @@ public class ConfigurationActionImpl extends DefaultConfigurationAction {
 
 		String[] classNameIds = StringUtil.split(
 			getParameter(actionRequest, "classNameIds"));
-
+		String[] classTypeIds = getClassTypeIds(actionRequest, classNameIds);
 		String[] extensions = actionRequest.getParameterValues("extensions");
-
 		String[] scopeIds = StringUtil.split(
 			getParameter(actionRequest, "scopeIds"));
 
 		setPreference(actionRequest, "classNameIds", classNameIds);
+		setPreference(actionRequest, "classTypeIds", classTypeIds);
 		setPreference(actionRequest, "extensions", extensions);
 		setPreference(actionRequest, "scopeIds", scopeIds);
 	}

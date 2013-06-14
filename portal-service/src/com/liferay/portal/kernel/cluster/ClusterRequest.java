@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -29,12 +29,13 @@ import java.util.Set;
  */
 public class ClusterRequest implements Serializable {
 
-	public static ClusterRequest createClusterNotifyRequest(
+	public static ClusterRequest createClusterRequest(
+		ClusterMessageType clusterMessageType,
 		ClusterNode originatingClusterNode) {
 
 		ClusterRequest clusterRequest = new ClusterRequest();
 
-		clusterRequest.setClusterMessageType(ClusterMessageType.NOTIFY);
+		clusterRequest.setClusterMessageType(clusterMessageType);
 		clusterRequest.setMulticast(true);
 		clusterRequest.setOriginatingClusterNode(originatingClusterNode);
 		clusterRequest.setSkipLocal(true);
@@ -200,16 +201,28 @@ public class ClusterRequest implements Serializable {
 
 	@Override
 	public String toString() {
-		StringBundler sb = new StringBundler(15);
+		StringBundler sb = new StringBundler(13);
 
 		sb.append("{clusterMessageType=");
 		sb.append(_clusterMessageType);
-		sb.append(", methodHandler=");
-		sb.append(_methodHandler);
+
+		boolean clusterMessageTypeNotifyOrUpdate = false;
+
+		if (_clusterMessageType.equals(ClusterMessageType.NOTIFY) ||
+			_clusterMessageType.equals(ClusterMessageType.UPDATE)) {
+
+			clusterMessageTypeNotifyOrUpdate = true;
+		}
+
+		if (!clusterMessageTypeNotifyOrUpdate) {
+			sb.append(", methodHandler=");
+			sb.append(_methodHandler);
+		}
+
 		sb.append(", multicast=");
 		sb.append(_multicast);
 
-		if (_clusterMessageType.equals(ClusterMessageType.NOTIFY)) {
+		if (clusterMessageTypeNotifyOrUpdate) {
 			sb.append(", originatingClusterNode=");
 			sb.append(_originatingClusterNode);
 		}

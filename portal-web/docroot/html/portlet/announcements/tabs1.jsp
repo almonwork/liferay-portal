@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -26,7 +26,7 @@ tabs1URL.setParameter("tabs1", tabs1);
 
 String tabs1Names = "entries";
 
-if (PortletPermissionUtil.contains(permissionChecker, layout, PortletKeys.ANNOUNCEMENTS, ActionKeys.ADD_ENTRY)) {
+if (AnnouncementsEntryPermission.contains(permissionChecker, layout, portletName, ActionKeys.ADD_ENTRY)) {
 	tabs1Names += ",manage-entries";
 }
 %>

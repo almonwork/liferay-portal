@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -43,6 +43,10 @@ public class ContextPathUtil {
 		}
 		else {
 			contextPath = (String)servletContext.getAttribute(WebKeys.CTX_PATH);
+
+			if (contextPath == null) {
+				contextPath = servletContext.getServletContextName();
+			}
 		}
 
 		return getContextPath(contextPath);
@@ -51,8 +55,13 @@ public class ContextPathUtil {
 	public static String getContextPath(String contextPath) {
 		contextPath = GetterUtil.getString(contextPath);
 
-		if (contextPath.equals(StringPool.SLASH)) {
+		if ((contextPath.length() == 0) ||
+			contextPath.equals(StringPool.SLASH)) {
+
 			contextPath = StringPool.BLANK;
+		}
+		else if (!contextPath.startsWith(StringPool.SLASH)) {
+			contextPath = StringPool.SLASH.concat(contextPath);
 		}
 
 		return contextPath;

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -92,14 +92,6 @@ public class ShoppingOrderUtil {
 		return getPersistence()
 				   .findWithDynamicQuery(dynamicQuery, start, end,
 			orderByComparator);
-	}
-
-	/**
-	 * @see com.liferay.portal.service.persistence.BasePersistence#remove(com.liferay.portal.model.BaseModel)
-	 */
-	public static ShoppingOrder remove(ShoppingOrder shoppingOrder)
-		throws SystemException {
-		return getPersistence().remove(shoppingOrder);
 	}
 
 	/**
@@ -769,24 +761,28 @@ public class ShoppingOrderUtil {
 	* Removes the shopping order where number = &#63; from the database.
 	*
 	* @param number the number
+	* @return the shopping order that was removed
 	* @throws SystemException if a system exception occurred
 	*/
-	public static void removeByNumber(java.lang.String number)
+	public static com.liferay.portlet.shopping.model.ShoppingOrder removeByNumber(
+		java.lang.String number)
 		throws com.liferay.portal.kernel.exception.SystemException,
 			com.liferay.portlet.shopping.NoSuchOrderException {
-		getPersistence().removeByNumber(number);
+		return getPersistence().removeByNumber(number);
 	}
 
 	/**
 	* Removes the shopping order where ppTxnId = &#63; from the database.
 	*
 	* @param ppTxnId the pp txn ID
+	* @return the shopping order that was removed
 	* @throws SystemException if a system exception occurred
 	*/
-	public static void removeByPPTxnId(java.lang.String ppTxnId)
+	public static com.liferay.portlet.shopping.model.ShoppingOrder removeByPPTxnId(
+		java.lang.String ppTxnId)
 		throws com.liferay.portal.kernel.exception.SystemException,
 			com.liferay.portlet.shopping.NoSuchOrderException {
-		getPersistence().removeByPPTxnId(ppTxnId);
+		return getPersistence().removeByPPTxnId(ppTxnId);
 	}
 
 	/**
@@ -914,11 +910,10 @@ public class ShoppingOrderUtil {
 		return _persistence;
 	}
 
+	/**
+	 * @deprecated
+	 */
 	public void setPersistence(ShoppingOrderPersistence persistence) {
-		_persistence = persistence;
-
-		ReferenceRegistry.registerReference(ShoppingOrderUtil.class,
-			"_persistence");
 	}
 
 	private static ShoppingOrderPersistence _persistence;

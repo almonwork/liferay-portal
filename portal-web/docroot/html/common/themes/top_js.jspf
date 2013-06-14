@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -92,10 +92,37 @@
 			Data: {
 				isCustomizationView: function() {
 					return <%= (layoutTypePortlet.isCustomizable() && LayoutPermissionUtil.contains(permissionChecker, layout, ActionKeys.CUSTOMIZE)) %>;
-				}
+				},
+
+				notices: [
+					null
+
+					<c:if test="<%= permissionChecker.isOmniadmin() && PortalUtil.isUpdateAvailable() %>">
+						,{
+							content: '<a class="update-available" href="<%= themeDisplay.getURLUpdateManager() %>"><liferay-ui:message key="updates-are-available-for-liferay" /></a>',
+							toggleText: false
+						}
+					</c:if>
+
+					<c:if test="<%= ShutdownUtil.isInProcess() %>">
+						,{
+							node: '#lfrShutdownMessage',
+							toggleText: false
+						}
+					</c:if>
+				]
 			},
 
 			ThemeDisplay: {
+				getCDNDynamicResourcesHost: function() {
+					return "<%= themeDisplay.getCDNDynamicResourcesHost() %>";
+				},
+				getCDNBaseURL: function() {
+					return "<%= themeDisplay.getCDNBaseURL() %>";
+				},
+				getCDNHost: function() {
+					return "<%= themeDisplay.getCDNHost() %>";
+				},
 				getCompanyId: function() {
 					return "<%= themeDisplay.getCompanyId() %>";
 				},
@@ -136,6 +163,9 @@
 
 				getScopeGroupId: function() {
 					return "<%= themeDisplay.getScopeGroupId() %>";
+				},
+				getScopeGroupIdOrLiveGroupId: function() {
+					return "<%= themeDisplay.getScopeGroupIdOrLiveGroupId() %>";
 				},
 				getParentGroupId: function() {
 					return "<%= themeDisplay.getParentGroupId() %>";
@@ -185,11 +215,21 @@
 				getPathThemeRoot: function() {
 					return "<%= themeDisplay.getPathThemeRoot() %>";
 				},
+				getURLControlPanel: function() {
+					return "<%= themeDisplay.getURLControlPanel() %>";
+				},
 				getURLHome: function() {
 					return "<%= themeDisplay.getURLHome() %>";
 				},
 				getSessionId: function() {
-					return "<%= session.getId() %>";
+					<c:choose>
+						<c:when test="<%= PropsValues.SESSION_ENABLE_URL_WITH_SESSION_ID %>">
+							return "<%= session.getId() %>";
+						</c:when>
+						<c:otherwise>
+							return "";
+						</c:otherwise>
+					</c:choose>
 				},
 				getPortletSetupShowBordersDefault: function() {
 					return <%= GetterUtil.getString(themeDisplay.getThemeSetting("portlet-setup-show-borders-default"), StringUtil.valueOf(PropsValues.THEME_PORTLET_DECORATE_DEFAULT)) %>;
@@ -212,7 +252,7 @@
 
 		String alloyBaseURL = PortalUtil.getPortalURL(request) + alloyRootPath;
 
-		String alloyComboPath = PortalUtil.getStaticResourceURL(request, themeDisplay.getCDNHost() + themeDisplay.getPathContext() + "/combo/", "minifierType=", javaScriptLastModified);
+		String alloyComboPath = PortalUtil.getStaticResourceURL(request, themeDisplay.getCDNDynamicResourcesHost() + themeDisplay.getPathContext() + "/combo/", "minifierType=", javaScriptLastModified);
 		%>
 
 		Liferay.AUI = {
@@ -263,6 +303,8 @@
 			useBrowserConsole: false
 		};
 
+		Liferay.authToken = '<%= AuthTokenUtil.getToken(request) %>';
+
 		<%
 		String currentURL = PortalUtil.getCurrentURL(request);
 		%>
@@ -276,10 +318,10 @@
 	<c:when test="<%= themeDisplay.isThemeJsFastLoad() %>">
 		<c:choose>
 			<c:when test="<%= themeDisplay.isThemeJsBarebone() %>">
-				<script src="<%= HtmlUtil.escape(PortalUtil.getStaticResourceURL(request, themeDisplay.getPathJavaScript() + "/barebone.jsp", "minifierBundleId=" + HttpUtil.encodeURL("javascript.barebone.files"), javaScriptLastModified)) %>" type="text/javascript"></script>
+				<script src="<%= HtmlUtil.escape(PortalUtil.getStaticResourceURL(request, themeDisplay.getCDNDynamicResourcesHost() + themeDisplay.getPathJavaScript() + "/barebone.jsp", "minifierBundleId=javascript.barebone.files", javaScriptLastModified)) %>" type="text/javascript"></script>
 			</c:when>
 			<c:otherwise>
-				<script src="<%= HtmlUtil.escape(PortalUtil.getStaticResourceURL(request, themeDisplay.getPathJavaScript() + "/everything.jsp", "minifierBundleId=" + HttpUtil.encodeURL("javascript.everything.files"), javaScriptLastModified)) %>" type="text/javascript"></script>
+				<script src="<%= HtmlUtil.escape(PortalUtil.getStaticResourceURL(request, themeDisplay.getCDNDynamicResourcesHost() + themeDisplay.getPathJavaScript() + "/everything.jsp", "minifierBundleId=javascript.everything.files", javaScriptLastModified)) %>" type="text/javascript"></script>
 			</c:otherwise>
 		</c:choose>
 	</c:when>
@@ -298,7 +340,7 @@
 		for (String javaScriptFile : javaScriptFiles) {
 		%>
 
-			<script src="<%= themeDisplay.getPathJavaScript() %>/<%= javaScriptFile %>?t=<%= javaScriptLastModified %>" type="text/javascript"></script>
+			<script src="<%= themeDisplay.getCDNHost() + themeDisplay.getPathJavaScript() %>/<%= javaScriptFile %>?t=<%= javaScriptLastModified %>" type="text/javascript"></script>
 
 		<%
 		}
@@ -306,10 +348,6 @@
 
 	</c:otherwise>
 </c:choose>
-
-<c:if test="<%= themeDisplay.isIncludeServiceJs() %>">
-	<script src="<%= HtmlUtil.escape(PortalUtil.getStaticResourceURL(request, themeDisplay.getPathJavaScript() + "/liferay/service.js", javaScriptLastModified)) %>" type="text/javascript"></script>
-</c:if>
 
 <script type="text/javascript">
 	// <![CDATA[
@@ -333,5 +371,51 @@
 				Liferay.Portlet.list = ['<%= ListUtil.toString(allPortlets, Portlet.PORTLET_ID_ACCESSOR, "','") %>'];
 			</c:if>
 		</c:if>
+
+		<%
+		Group group = null;
+
+		if (layout != null) {
+			group = layout.getGroup();
+		}
+		%>
+
+		<c:if test="<%= themeDisplay.isSignedIn() %>">
+			<c:choose>
+				<c:when test="<%= (group != null) && group.isControlPanel() && !LayoutPermissionUtil.contains(permissionChecker, layout, ActionKeys.UPDATE) && !(layoutTypePortlet.isCustomizable() && layoutTypePortlet.isCustomizedView() && LayoutPermissionUtil.contains(permissionChecker, layout, ActionKeys.CUSTOMIZE)) %>">
+					Liferay._editControlsState = 'visible';
+				</c:when>
+				<c:otherwise>
+					Liferay._editControlsState = '<%= HtmlUtil.escapeJS(GetterUtil.getString(SessionClicks.get(request, "liferay_toggle_controls", null), "visible")) %>';
+				</c:otherwise>
+			</c:choose>
+		</c:if>
 	// ]]>
 </script>
+
+<%-- Google Analytics --%>
+
+<%
+UnicodeProperties groupTypeSettings = group.getTypeSettingsProperties();
+
+String googleAnalyticsId = groupTypeSettings.getProperty("googleAnalyticsId");
+%>
+
+<c:if test="<%= Validator.isNotNull(googleAnalyticsId) %>">
+	<script type="text/javascript">
+		var _gaq = _gaq || [];
+
+		_gaq.push(['_setAccount', '<%= googleAnalyticsId %>']);
+		_gaq.push(['_trackPageview']);
+
+		(function() {
+			var ga = document.createElement('script');
+
+			ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+
+			ga.setAttribute('async', 'true');
+
+			document.documentElement.firstChild.appendChild(ga);
+		})();
+	</script>
+</c:if>

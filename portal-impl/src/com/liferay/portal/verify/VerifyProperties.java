@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -16,8 +16,17 @@ package com.liferay.portal.verify;
 
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.util.PropsKeys;
+import com.liferay.portal.kernel.util.StringPool;
+import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.SystemProperties;
+import com.liferay.portal.kernel.util.UnicodeProperties;
+import com.liferay.portal.security.ldap.LDAPSettingsUtil;
+import com.liferay.portal.service.CompanyLocalServiceUtil;
+import com.liferay.portal.util.PortalInstances;
+import com.liferay.portal.util.PrefsPropsUtil;
 import com.liferay.portal.util.PropsUtil;
+import com.liferay.portlet.documentlibrary.store.StoreFactory;
 
 /**
  * @author Brian Wing Shun Chan
@@ -59,6 +68,44 @@ public class VerifyProperties extends VerifyProcess {
 		for (String key : _OBSOLETE_PORTAL_KEYS) {
 			verifyObsoletePortalProperty(key);
 		}
+
+		// Document library
+
+		StoreFactory.checkProperties();
+
+		// LDAP
+
+		verifyLDAPProperties();
+	}
+
+	protected void verifyLDAPProperties() throws Exception {
+		long[] companyIds = PortalInstances.getCompanyIdsBySQL();
+
+		for (long companyId : companyIds) {
+			UnicodeProperties properties = new UnicodeProperties();
+
+			long[] ldapServerIds = StringUtil.split(
+				PrefsPropsUtil.getString(companyId, "ldap.server.ids"), 0L);
+
+			for (long ldapServerId : ldapServerIds) {
+				String postfix = LDAPSettingsUtil.getPropertyPostfix(
+					ldapServerId);
+
+				for (String key : _LDAP_KEYS) {
+					String value = PrefsPropsUtil.getString(
+						companyId, key + postfix, null);
+
+					if (value == null) {
+						properties.put(key + postfix, StringPool.BLANK);
+					}
+				}
+			}
+
+			if (!properties.isEmpty()) {
+				CompanyLocalServiceUtil.updatePreferences(
+					companyId, properties);
+			}
+		}
 	}
 
 	protected void verifyMigratedSystemProperty(String oldKey, String newKey)
@@ -71,6 +118,22 @@ public class VerifyProperties extends VerifyProcess {
 				"System property \"" + oldKey +
 					"\" was migrated to the portal property \"" + newKey +
 						"\"");
+		}
+	}
+
+	protected void verifyObsoletePortalProperty(String key) throws Exception {
+		String value = PropsUtil.get(key);
+
+		if (value != null) {
+			_log.error("Portal property \"" + key + "\" is obsolete");
+		}
+	}
+
+	protected void verifyObsoleteSystemProperty(String key) throws Exception {
+		String value = SystemProperties.get(key);
+
+		if (value != null) {
+			_log.error("System property \"" + key + "\" is obsolete");
 		}
 	}
 
@@ -98,21 +161,10 @@ public class VerifyProperties extends VerifyProcess {
 		}
 	}
 
-	protected void verifyObsoletePortalProperty(String key) throws Exception {
-		String value = PropsUtil.get(key);
-
-		if (value != null) {
-			_log.error("Portal property \"" + key + "\" is obsolete");
-		}
-	}
-
-	protected void verifyObsoleteSystemProperty(String key) throws Exception {
-		String value = SystemProperties.get(key);
-
-		if (value != null) {
-			_log.error("System property \"" + key + "\" is obsolete");
-		}
-	}
+	private static final String[] _LDAP_KEYS = {
+		PropsKeys.LDAP_CONTACT_CUSTOM_MAPPINGS, PropsKeys.LDAP_CONTACT_MAPPINGS,
+		PropsKeys.LDAP_USER_CUSTOM_MAPPINGS
+	};
 
 	private static final String[][] _MIGRATED_SYSTEM_KEYS = new String[][] {
 		new String[] {
@@ -160,6 +212,10 @@ public class VerifyProperties extends VerifyProcess {
 			"com.liferay.portal.util.HttpImpl.timeout"
 		},
 		new String[] {
+			"com.liferay.util.format.PhoneNumberFormat",
+			"phone.number.format.impl"
+		},
+		new String[] {
 			"com.liferay.util.servlet.UploadServletRequest.max.size",
 			"com.liferay.portal.upload.UploadServletRequestImpl.max.size"
 		},
@@ -180,46 +236,43 @@ public class VerifyProperties extends VerifyProcess {
 	};
 
 	private static final String[] _OBSOLETE_PORTAL_KEYS = new String[] {
-		"auth.max.failures.limit",
-		"cas.validate.url",
-		"commons.pool.enabled",
-		"jbi.workflow.url",
-		"lucene.analyzer",
+		"auth.max.failures.limit", "cas.validate.url",
+		"cluster.executor.heartbeat.interval", "commons.pool.enabled",
+		"jbi.workflow.url", "lucene.analyzer",
+		"lucene.store.jdbc.auto.clean.up",
+		"lucene.store.jdbc.auto.clean.up.enabled",
+		"lucene.store.jdbc.auto.clean.up.interval",
+		"lucene.store.jdbc.dialect.db2", "lucene.store.jdbc.dialect.derby",
+		"lucene.store.jdbc.dialect.hsqldb", "lucene.store.jdbc.dialect.jtds",
+		"lucene.store.jdbc.dialect.microsoft",
+		"lucene.store.jdbc.dialect.mysql", "lucene.store.jdbc.dialect.oracle",
+		"lucene.store.jdbc.dialect.postgresql",
 		"message.boards.thread.locking.enabled",
-		"shard.available.names",
-		"webdav.storage.class",
-		"webdav.storage.show.edit.url",
-		"webdav.storage.show.view.url",
-		"webdav.storage.tokens",
-		"xss.allow"
+		"portal.security.manager.enable", "shard.available.names",
+		"webdav.storage.class", "webdav.storage.show.edit.url",
+		"webdav.storage.show.view.url", "webdav.storage.tokens", "xss.allow"
 	};
 
 	private static final String[] _OBSOLETE_SYSTEM_KEYS = new String[] {
-		"com.liferay.util.Http.proxy.host",
-		"com.liferay.util.Http.proxy.port",
+		"com.liferay.util.Http.proxy.host", "com.liferay.util.Http.proxy.port",
 		"com.liferay.util.XSSUtil.regexp.pattern"
 	};
 
 	private static final String[][] _RENAMED_PORTAL_KEYS = new String[][] {
 		new String[] {
-			"amazon.license.0",
-			"amazon.access.key.id"
+			"amazon.license.0", "amazon.access.key.id"
 		},
 		new String[] {
-			"amazon.license.1",
-			"amazon.access.key.id"
+			"amazon.license.1", "amazon.access.key.id"
 		},
 		new String[] {
-			"amazon.license.2",
-			"amazon.access.key.id"
+			"amazon.license.2", "amazon.access.key.id"
 		},
 		new String[] {
-			"amazon.license.3",
-			"amazon.access.key.id"
+			"amazon.license.3", "amazon.access.key.id"
 		},
 		new String[] {
-			"cdn.host",
-			"cdn.host.http"
+			"cdn.host", "cdn.host.http"
 		},
 		new String[] {
 			"com.liferay.portal.servlet.filters.compression.CompressionFilter",
@@ -230,24 +283,20 @@ public class VerifyProperties extends VerifyProcess {
 			"default.guest.public.layout.friendly.url"
 		},
 		new String[] {
-			"default.guest.layout.column",
-			"default.guest.public.layout.column"
+			"default.guest.layout.column", "default.guest.public.layout.column"
 		},
 		new String[] {
-			"default.guest.layout.name",
-			"default.guest.public.layout.name"
+			"default.guest.layout.name", "default.guest.public.layout.name"
 		},
 		new String[] {
 			"default.guest.layout.template.id",
 			"default.guest.public.layout.template.id"
 		},
 		new String[] {
-			"default.user.layout.column",
-			"default.user.public.layout.column"
+			"default.user.layout.column", "default.user.public.layout.column"
 		},
 		new String[] {
-			"default.user.layout.name",
-			"default.user.public.layout.name"
+			"default.user.layout.name", "default.user.public.layout.name"
 		},
 		new String[] {
 			"default.user.layout.template.id",
@@ -258,8 +307,7 @@ public class VerifyProperties extends VerifyProcess {
 			"default.user.private.layouts.lar"
 		},
 		new String[] {
-			"default.user.public.layout.lar",
-			"default.user.public.layouts.lar"
+			"default.user.public.layout.lar", "default.user.public.layouts.lar"
 		},
 		new String[] {
 			"dl.hook.cmis.credentials.password",
@@ -270,44 +318,35 @@ public class VerifyProperties extends VerifyProcess {
 			"dl.store.cmis.credentials.username"
 		},
 		new String[] {
-			"dl.hook.cmis.repository.url",
-			"dl.store.cmis.repository.url"
+			"dl.hook.cmis.repository.url", "dl.store.cmis.repository.url"
 		},
 		new String[] {
-			"dl.hook.cmis.system.root.dir",
-			"dl.store.cmis.system.root.dir"
+			"dl.hook.cmis.system.root.dir", "dl.store.cmis.system.root.dir"
 		},
 		new String[] {
-			"dl.hook.file.system.root.dir",
-			"dl.store.file.system.root.dir"
+			"dl.hook.file.system.root.dir", "dl.store.file.system.root.dir"
 		},
 		new String[] {
-			"dl.hook.impl",
-			"dl.store.impl"
+			"dl.hook.impl", "dl.store.impl"
 		},
 		new String[] {
-			"dl.hook.jcr.fetch.delay",
-			"dl.store.jcr.fetch.delay"
+			"dl.hook.jcr.fetch.delay", "dl.store.jcr.fetch.delay"
 		},
 		new String[] {
-			"dl.hook.jcr.fetch.max.failures",
-			"dl.store.jcr.fetch.max.failures"
+			"dl.hook.jcr.fetch.max.failures", "dl.store.jcr.fetch.max.failures"
 		},
 		new String[] {
 			"dl.hook.jcr.move.version.labels",
 			"dl.store.jcr.move.version.labels"
 		},
 		new String[] {
-			"dl.hook.s3.access.key",
-			"dl.store.s3.access.key"
+			"dl.hook.s3.access.key", "dl.store.s3.access.key"
 		},
 		new String[] {
-			"dl.hook.s3.bucket.name",
-			"dl.store.s3.bucket.name"
+			"dl.hook.s3.bucket.name", "dl.store.s3.bucket.name"
 		},
 		new String[] {
-			"dl.hook.s3.secret.key",
-			"dl.store.s3.secret.key"
+			"dl.hook.s3.secret.key", "dl.store.s3.secret.key"
 		},
 		new String[] {
 			"editor.wysiwyg.portal-web.docroot.html.portlet.calendar." +
@@ -340,20 +379,13 @@ public class VerifyProperties extends VerifyProcess {
 				"configuration.jsp"
 		},
 		new String[] {
-			"lucene.store.jdbc.auto.clean.up",
-			"lucene.store.jdbc.auto.clean.up.enabled"
+			"referer.url.domains.allowed", "redirect.url.domains.allowed"
 		},
 		new String[] {
-			"referer.url.domains.allowed",
-			"redirect.url.domains.allowed"
+			"referer.url.ips.allowed", "redirect.url.ips.allowed"
 		},
 		new String[] {
-			"referer.url.ips.allowed",
-			"redirect.url.ips.allowed"
-		},
-		new String[] {
-			"referer.url.security.mode",
-			"redirect.url.security.mode"
+			"referer.url.security.mode", "redirect.url.security.mode"
 		},
 		new String[] {
 			"tags.asset.increment.view.counter.enabled",

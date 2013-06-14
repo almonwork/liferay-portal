@@ -1,9 +1,6 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
-<head profile="http://selenium-ide.openqa.org/profiles/test-case">
-<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-<link rel="selenium.base" href="" />
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <title>AddAnnouncementsEntryTest</title>
 </head>
 <body>
@@ -47,6 +44,16 @@
 	<td>Open</td>
 </tr>
 <tr>
+	<td>waitForVisible</td>
+	<td>link=Announcements Entry Page</td>
+	<td></td>
+</tr>
+<tr>
+	<td>clickAtAndWait</td>
+	<td>link=Announcements Entry Page</td>
+	<td></td>
+</tr>
+<tr>
 	<td>clickAtAndWait</td>
 	<td>link=Manage Entries</td>
 	<td></td>
@@ -72,6 +79,21 @@
 	<td>Announcements Entry Content</td>
 </tr>
 <tr>
+	<td>select</td>
+	<td>//select[@id='_84_displayDateMonth']</td>
+	<td>November</td>
+</tr>
+<tr>
+	<td>select</td>
+	<td>//select[@id='_84_displayDateDay']</td>
+	<td>1</td>
+</tr>
+<tr>
+	<td>select</td>
+	<td>//select[@id='_84_displayDateYear']</td>
+	<td>2011</td>
+</tr>
+<tr>
 	<td>clickAtAndWait</td>
 	<td>//input[@value='Save']</td>
 	<td></td>
@@ -94,14 +116,13 @@
 <tr>
 	<td>clickAtAndWait</td>
 	<td>//div/h3/a</td>
-	<td></td>
+	<td>Announcements Entry Name</td>
 </tr>
 <tr>
 	<td>assertElementPresent</td>
 	<td>//img[@alt='Liferay']</td>
-	<td>Liferay Logo</td>
+	<td>Liferay logo</td>
 </tr>
-
 </tbody></table>
 </body>
 </html>

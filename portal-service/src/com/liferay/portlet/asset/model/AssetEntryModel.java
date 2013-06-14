@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -186,6 +186,8 @@ public interface AssetEntryModel extends AttachedModel, BaseModel<AssetEntry>,
 	 */
 	public String getClassName();
 
+	public void setClassName(String className);
+
 	/**
 	 * Returns the class name ID of this asset entry.
 	 *
@@ -228,6 +230,20 @@ public interface AssetEntryModel extends AttachedModel, BaseModel<AssetEntry>,
 	 * @param classUuid the class uuid of this asset entry
 	 */
 	public void setClassUuid(String classUuid);
+
+	/**
+	 * Returns the class type ID of this asset entry.
+	 *
+	 * @return the class type ID of this asset entry
+	 */
+	public long getClassTypeId();
+
+	/**
+	 * Sets the class type ID of this asset entry.
+	 *
+	 * @param classTypeId the class type ID of this asset entry
+	 */
+	public void setClassTypeId(long classTypeId);
 
 	/**
 	 * Returns the visible of this asset entry.
@@ -334,6 +350,7 @@ public interface AssetEntryModel extends AttachedModel, BaseModel<AssetEntry>,
 	 * @param locale the locale of the language
 	 * @return the localized title of this asset entry
 	 */
+	@AutoEscape
 	public String getTitle(Locale locale);
 
 	/**
@@ -343,6 +360,7 @@ public interface AssetEntryModel extends AttachedModel, BaseModel<AssetEntry>,
 	 * @param useDefault whether to use the default language if no localization exists for the requested language
 	 * @return the localized title of this asset entry. If <code>useDefault</code> is <code>false</code> and no localization exists for the requested language, an empty string will be returned.
 	 */
+	@AutoEscape
 	public String getTitle(Locale locale, boolean useDefault);
 
 	/**
@@ -351,6 +369,7 @@ public interface AssetEntryModel extends AttachedModel, BaseModel<AssetEntry>,
 	 * @param languageId the ID of the language
 	 * @return the localized title of this asset entry
 	 */
+	@AutoEscape
 	public String getTitle(String languageId);
 
 	/**
@@ -360,7 +379,14 @@ public interface AssetEntryModel extends AttachedModel, BaseModel<AssetEntry>,
 	 * @param useDefault whether to use the default language if no localization exists for the requested language
 	 * @return the localized title of this asset entry
 	 */
+	@AutoEscape
 	public String getTitle(String languageId, boolean useDefault);
+
+	@AutoEscape
+	public String getTitleCurrentLanguageId();
+
+	@AutoEscape
+	public String getTitleCurrentValue();
 
 	/**
 	 * Returns a map of the locales and localized titles of this asset entry.
@@ -393,6 +419,8 @@ public interface AssetEntryModel extends AttachedModel, BaseModel<AssetEntry>,
 	 */
 	public void setTitle(String title, Locale locale, Locale defaultLocale);
 
+	public void setTitleCurrentLanguageId(String languageId);
+
 	/**
 	 * Sets the localized titles of this asset entry from the map of locales and localized titles.
 	 *
@@ -413,8 +441,58 @@ public interface AssetEntryModel extends AttachedModel, BaseModel<AssetEntry>,
 	 *
 	 * @return the description of this asset entry
 	 */
-	@AutoEscape
 	public String getDescription();
+
+	/**
+	 * Returns the localized description of this asset entry in the language. Uses the default language if no localization exists for the requested language.
+	 *
+	 * @param locale the locale of the language
+	 * @return the localized description of this asset entry
+	 */
+	@AutoEscape
+	public String getDescription(Locale locale);
+
+	/**
+	 * Returns the localized description of this asset entry in the language, optionally using the default language if no localization exists for the requested language.
+	 *
+	 * @param locale the local of the language
+	 * @param useDefault whether to use the default language if no localization exists for the requested language
+	 * @return the localized description of this asset entry. If <code>useDefault</code> is <code>false</code> and no localization exists for the requested language, an empty string will be returned.
+	 */
+	@AutoEscape
+	public String getDescription(Locale locale, boolean useDefault);
+
+	/**
+	 * Returns the localized description of this asset entry in the language. Uses the default language if no localization exists for the requested language.
+	 *
+	 * @param languageId the ID of the language
+	 * @return the localized description of this asset entry
+	 */
+	@AutoEscape
+	public String getDescription(String languageId);
+
+	/**
+	 * Returns the localized description of this asset entry in the language, optionally using the default language if no localization exists for the requested language.
+	 *
+	 * @param languageId the ID of the language
+	 * @param useDefault whether to use the default language if no localization exists for the requested language
+	 * @return the localized description of this asset entry
+	 */
+	@AutoEscape
+	public String getDescription(String languageId, boolean useDefault);
+
+	@AutoEscape
+	public String getDescriptionCurrentLanguageId();
+
+	@AutoEscape
+	public String getDescriptionCurrentValue();
+
+	/**
+	 * Returns a map of the locales and localized descriptions of this asset entry.
+	 *
+	 * @return the locales and localized descriptions of this asset entry
+	 */
+	public Map<Locale, String> getDescriptionMap();
 
 	/**
 	 * Sets the description of this asset entry.
@@ -424,12 +502,98 @@ public interface AssetEntryModel extends AttachedModel, BaseModel<AssetEntry>,
 	public void setDescription(String description);
 
 	/**
+	 * Sets the localized description of this asset entry in the language.
+	 *
+	 * @param description the localized description of this asset entry
+	 * @param locale the locale of the language
+	 */
+	public void setDescription(String description, Locale locale);
+
+	/**
+	 * Sets the localized description of this asset entry in the language, and sets the default locale.
+	 *
+	 * @param description the localized description of this asset entry
+	 * @param locale the locale of the language
+	 * @param defaultLocale the default locale
+	 */
+	public void setDescription(String description, Locale locale,
+		Locale defaultLocale);
+
+	public void setDescriptionCurrentLanguageId(String languageId);
+
+	/**
+	 * Sets the localized descriptions of this asset entry from the map of locales and localized descriptions.
+	 *
+	 * @param descriptionMap the locales and localized descriptions of this asset entry
+	 */
+	public void setDescriptionMap(Map<Locale, String> descriptionMap);
+
+	/**
+	 * Sets the localized descriptions of this asset entry from the map of locales and localized descriptions, and sets the default locale.
+	 *
+	 * @param descriptionMap the locales and localized descriptions of this asset entry
+	 * @param defaultLocale the default locale
+	 */
+	public void setDescriptionMap(Map<Locale, String> descriptionMap,
+		Locale defaultLocale);
+
+	/**
 	 * Returns the summary of this asset entry.
 	 *
 	 * @return the summary of this asset entry
 	 */
-	@AutoEscape
 	public String getSummary();
+
+	/**
+	 * Returns the localized summary of this asset entry in the language. Uses the default language if no localization exists for the requested language.
+	 *
+	 * @param locale the locale of the language
+	 * @return the localized summary of this asset entry
+	 */
+	@AutoEscape
+	public String getSummary(Locale locale);
+
+	/**
+	 * Returns the localized summary of this asset entry in the language, optionally using the default language if no localization exists for the requested language.
+	 *
+	 * @param locale the local of the language
+	 * @param useDefault whether to use the default language if no localization exists for the requested language
+	 * @return the localized summary of this asset entry. If <code>useDefault</code> is <code>false</code> and no localization exists for the requested language, an empty string will be returned.
+	 */
+	@AutoEscape
+	public String getSummary(Locale locale, boolean useDefault);
+
+	/**
+	 * Returns the localized summary of this asset entry in the language. Uses the default language if no localization exists for the requested language.
+	 *
+	 * @param languageId the ID of the language
+	 * @return the localized summary of this asset entry
+	 */
+	@AutoEscape
+	public String getSummary(String languageId);
+
+	/**
+	 * Returns the localized summary of this asset entry in the language, optionally using the default language if no localization exists for the requested language.
+	 *
+	 * @param languageId the ID of the language
+	 * @param useDefault whether to use the default language if no localization exists for the requested language
+	 * @return the localized summary of this asset entry
+	 */
+	@AutoEscape
+	public String getSummary(String languageId, boolean useDefault);
+
+	@AutoEscape
+	public String getSummaryCurrentLanguageId();
+
+	@AutoEscape
+	public String getSummaryCurrentValue();
+
+	/**
+	 * Returns a map of the locales and localized summaries of this asset entry.
+	 *
+	 * @return the locales and localized summaries of this asset entry
+	 */
+	public Map<Locale, String> getSummaryMap();
 
 	/**
 	 * Sets the summary of this asset entry.
@@ -437,6 +601,41 @@ public interface AssetEntryModel extends AttachedModel, BaseModel<AssetEntry>,
 	 * @param summary the summary of this asset entry
 	 */
 	public void setSummary(String summary);
+
+	/**
+	 * Sets the localized summary of this asset entry in the language.
+	 *
+	 * @param summary the localized summary of this asset entry
+	 * @param locale the locale of the language
+	 */
+	public void setSummary(String summary, Locale locale);
+
+	/**
+	 * Sets the localized summary of this asset entry in the language, and sets the default locale.
+	 *
+	 * @param summary the localized summary of this asset entry
+	 * @param locale the locale of the language
+	 * @param defaultLocale the default locale
+	 */
+	public void setSummary(String summary, Locale locale, Locale defaultLocale);
+
+	public void setSummaryCurrentLanguageId(String languageId);
+
+	/**
+	 * Sets the localized summaries of this asset entry from the map of locales and localized summaries.
+	 *
+	 * @param summaryMap the locales and localized summaries of this asset entry
+	 */
+	public void setSummaryMap(Map<Locale, String> summaryMap);
+
+	/**
+	 * Sets the localized summaries of this asset entry from the map of locales and localized summaries, and sets the default locale.
+	 *
+	 * @param summaryMap the locales and localized summaries of this asset entry
+	 * @param defaultLocale the default locale
+	 */
+	public void setSummaryMap(Map<Locale, String> summaryMap,
+		Locale defaultLocale);
 
 	/**
 	 * Returns the url of this asset entry.
@@ -533,8 +732,6 @@ public interface AssetEntryModel extends AttachedModel, BaseModel<AssetEntry>,
 	public void setCachedModel(boolean cachedModel);
 
 	public boolean isEscapedModel();
-
-	public void setEscapedModel(boolean escapedModel);
 
 	public Serializable getPrimaryKeyObj();
 

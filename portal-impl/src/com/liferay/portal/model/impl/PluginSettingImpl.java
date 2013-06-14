@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -48,16 +48,6 @@ public class PluginSettingImpl extends PluginSettingBaseImpl {
 	}
 
 	/**
-	 * Sets a string of ordered comma delimited plugin IDs.
-	 */
-	@Override
-	public void setRoles(String roles) {
-		_rolesArray = StringUtil.split(roles);
-
-		super.setRoles(roles);
-	}
-
-	/**
 	 * Returns an array of required roles of the plugin.
 	 *
 	 * @return an array of required roles of the plugin
@@ -67,34 +57,9 @@ public class PluginSettingImpl extends PluginSettingBaseImpl {
 	}
 
 	/**
-	 * Sets an array of required roles of the plugin.
-	 */
-	public void setRolesArray(String[] rolesArray) {
-		_rolesArray = rolesArray;
-
-		super.setRoles(StringUtil.merge(rolesArray));
-	}
-
-	/**
-	 * Returns <code>true</code> if the plugin has a role with the specified
-	 * name.
-	 *
-	 * @return <code>true</code> if the plugin has a role with the specified
-	 *         name
-	 */
-	public boolean hasRoleWithName(String roleName) {
-		for (int i = 0; i < _rolesArray.length; i++) {
-			if (_rolesArray[i].equalsIgnoreCase(roleName)) {
-				return true;
-			}
-		}
-
-		return false;
-	}
-
-	/**
 	 * Returns <code>true</code> if the user has permission to use this plugin
 	 *
+	 * @param  userId the primary key of the user
 	 * @return <code>true</code> if the user has permission to use this plugin
 	 */
 	public boolean hasPermission(long userId) {
@@ -128,6 +93,43 @@ public class PluginSettingImpl extends PluginSettingBaseImpl {
 		}
 
 		return false;
+	}
+
+	/**
+	 * Returns <code>true</code> if the plugin has a role with the specified
+	 * name.
+	 *
+	 * @param  roleName the role name
+	 * @return <code>true</code> if the plugin has a role with the specified
+	 *         name
+	 */
+	public boolean hasRoleWithName(String roleName) {
+		for (int i = 0; i < _rolesArray.length; i++) {
+			if (_rolesArray[i].equalsIgnoreCase(roleName)) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	/**
+	 * Sets a string of ordered comma delimited plugin IDs.
+	 */
+	@Override
+	public void setRoles(String roles) {
+		_rolesArray = StringUtil.split(roles);
+
+		super.setRoles(roles);
+	}
+
+	/**
+	 * Sets an array of required roles of the plugin.
+	 */
+	public void setRolesArray(String[] rolesArray) {
+		_rolesArray = rolesArray;
+
+		super.setRoles(StringUtil.merge(rolesArray));
 	}
 
 	/**

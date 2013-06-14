@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -84,12 +84,12 @@ public class ListWrapper<E> implements List<E> {
 		return _list.listIterator(index);
 	}
 
-	public boolean remove(Object o) {
-		return _list.remove(o);
-	}
-
 	public E remove(int index) {
 		return _list.remove(index);
+	}
+
+	public boolean remove(Object o) {
+		return _list.remove(o);
 	}
 
 	public boolean removeAll(Collection<?> c) {

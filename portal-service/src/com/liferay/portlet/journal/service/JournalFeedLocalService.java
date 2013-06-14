@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -19,6 +19,7 @@ import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.transaction.Isolation;
 import com.liferay.portal.kernel.transaction.Propagation;
 import com.liferay.portal.kernel.transaction.Transactional;
+import com.liferay.portal.service.BaseLocalService;
 import com.liferay.portal.service.PersistedModelLocalService;
 
 /**
@@ -36,7 +37,8 @@ import com.liferay.portal.service.PersistedModelLocalService;
  */
 @Transactional(isolation = Isolation.PORTAL, rollbackFor =  {
 	PortalException.class, SystemException.class})
-public interface JournalFeedLocalService extends PersistedModelLocalService {
+public interface JournalFeedLocalService extends BaseLocalService,
+	PersistedModelLocalService {
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
@@ -67,10 +69,12 @@ public interface JournalFeedLocalService extends PersistedModelLocalService {
 	* Deletes the journal feed with the primary key from the database. Also notifies the appropriate model listeners.
 	*
 	* @param id the primary key of the journal feed
+	* @return the journal feed that was removed
 	* @throws PortalException if a journal feed with the primary key could not be found
 	* @throws SystemException if a system exception occurred
 	*/
-	public void deleteJournalFeed(long id)
+	public com.liferay.portlet.journal.model.JournalFeed deleteJournalFeed(
+		long id)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException;
 
@@ -78,11 +82,14 @@ public interface JournalFeedLocalService extends PersistedModelLocalService {
 	* Deletes the journal feed from the database. Also notifies the appropriate model listeners.
 	*
 	* @param journalFeed the journal feed
+	* @return the journal feed that was removed
 	* @throws SystemException if a system exception occurred
 	*/
-	public void deleteJournalFeed(
+	public com.liferay.portlet.journal.model.JournalFeed deleteJournalFeed(
 		com.liferay.portlet.journal.model.JournalFeed journalFeed)
 		throws com.liferay.portal.kernel.exception.SystemException;
+
+	public com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery();
 
 	/**
 	* Performs a dynamic query on the database and returns the matching rows.
@@ -145,6 +152,10 @@ public interface JournalFeedLocalService extends PersistedModelLocalService {
 	public long dynamicQueryCount(
 		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery)
 		throws com.liferay.portal.kernel.exception.SystemException;
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public com.liferay.portlet.journal.model.JournalFeed fetchJournalFeed(
+		long id) throws com.liferay.portal.kernel.exception.SystemException;
 
 	/**
 	* Returns the journal feed with the primary key.
@@ -257,14 +268,20 @@ public interface JournalFeedLocalService extends PersistedModelLocalService {
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException;
 
-	public void addFeedResources(long feedId, boolean addGroupPermissions,
-		boolean addGuestPermissions)
+	public void addFeedResources(
+		com.liferay.portlet.journal.model.JournalFeed feed,
+		boolean addGroupPermissions, boolean addGuestPermissions)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException;
 
 	public void addFeedResources(
 		com.liferay.portlet.journal.model.JournalFeed feed,
-		boolean addGroupPermissions, boolean addGuestPermissions)
+		java.lang.String[] groupPermissions, java.lang.String[] guestPermissions)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException;
+
+	public void addFeedResources(long feedId, boolean addGroupPermissions,
+		boolean addGuestPermissions)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException;
 
@@ -273,9 +290,7 @@ public interface JournalFeedLocalService extends PersistedModelLocalService {
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException;
 
-	public void addFeedResources(
-		com.liferay.portlet.journal.model.JournalFeed feed,
-		java.lang.String[] groupPermissions, java.lang.String[] guestPermissions)
+	public void deleteFeed(com.liferay.portlet.journal.model.JournalFeed feed)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException;
 
@@ -284,10 +299,6 @@ public interface JournalFeedLocalService extends PersistedModelLocalService {
 			com.liferay.portal.kernel.exception.SystemException;
 
 	public void deleteFeed(long groupId, java.lang.String feedId)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException;
-
-	public void deleteFeed(com.liferay.portlet.journal.model.JournalFeed feed)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException;
 

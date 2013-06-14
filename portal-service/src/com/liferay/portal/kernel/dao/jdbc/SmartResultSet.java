@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -180,9 +180,9 @@ public class SmartResultSet {
 		return _rs.previous();
 	}
 
-	private final ResultSet _rs;
-	private final ResultSetMetaData _metaData;
 	private final int _columnCount;
 	private final Map<String, Integer> _columnIndexCache;
+	private final ResultSetMetaData _metaData;
+	private final ResultSet _rs;
 
 }

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -23,14 +23,15 @@ import com.liferay.portalweb.portal.util.RuntimeVariables;
 public class ViewFolderImageMyImagesTest extends BaseTestCase {
 	public void testViewFolderImageMyImages() throws Exception {
 		selenium.open("/web/guest/home/");
+		loadRequiredJavaScriptModules();
 
 		for (int second = 0;; second++) {
-			if (second >= 60) {
+			if (second >= 90) {
 				fail("timeout");
 			}
 
 			try {
-				if (selenium.isElementPresent("link=Image Gallery Test Page")) {
+				if (selenium.isVisible("link=Image Gallery Test Page")) {
 					break;
 				}
 			}
@@ -40,23 +41,24 @@ public class ViewFolderImageMyImagesTest extends BaseTestCase {
 			Thread.sleep(1000);
 		}
 
-		selenium.saveScreenShotAndSource();
 		selenium.clickAt("link=Image Gallery Test Page",
-			RuntimeVariables.replace(""));
+			RuntimeVariables.replace("Image Gallery Test Page"));
 		selenium.waitForPageToLoad("30000");
-		selenium.saveScreenShotAndSource();
-		selenium.clickAt("link=My Images", RuntimeVariables.replace(""));
+		loadRequiredJavaScriptModules();
+		selenium.clickAt("link=Mine", RuntimeVariables.replace("Mine"));
 		selenium.waitForPageToLoad("30000");
-		selenium.saveScreenShotAndSource();
+		loadRequiredJavaScriptModules();
+		assertEquals(RuntimeVariables.replace("Mine"),
+			selenium.getText("//div/h1/span"));
 
 		for (int second = 0;; second++) {
-			if (second >= 60) {
+			if (second >= 90) {
 				fail("timeout");
 			}
 
 			try {
-				if (selenium.isElementPresent(
-							"//img[@alt='Test1 Image1 - This is Test1 Image1.']")) {
+				if (selenium.isVisible(
+							"//img[@alt='MG Folder Image Title - MG Folder Image Description']")) {
 					break;
 				}
 			}
@@ -66,10 +68,9 @@ public class ViewFolderImageMyImagesTest extends BaseTestCase {
 			Thread.sleep(1000);
 		}
 
-		selenium.saveScreenShotAndSource();
-		assertTrue(selenium.isElementPresent(
-				"//img[@alt='Test1 Image1 - This is Test1 Image1.']"));
-		assertEquals(RuntimeVariables.replace("Test1 Image1"),
+		assertTrue(selenium.isVisible(
+				"//img[@alt='MG Folder Image Title - MG Folder Image Description']"));
+		assertEquals(RuntimeVariables.replace("MG Folder Image Title"),
 			selenium.getText("//span[@class='image-title']"));
 	}
 }

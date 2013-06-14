@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -23,9 +23,10 @@ import com.liferay.portalweb.portal.util.RuntimeVariables;
 public class ViewPortletSiteMapTest extends BaseTestCase {
 	public void testViewPortletSiteMap() throws Exception {
 		selenium.open("/web/guest/home/");
+		loadRequiredJavaScriptModules();
 
 		for (int second = 0;; second++) {
-			if (second >= 60) {
+			if (second >= 90) {
 				fail("timeout");
 			}
 
@@ -40,26 +41,27 @@ public class ViewPortletSiteMapTest extends BaseTestCase {
 			Thread.sleep(1000);
 		}
 
-		selenium.saveScreenShotAndSource();
-		selenium.clickAt("link=Site Map Test Page", RuntimeVariables.replace(""));
+		selenium.clickAt("link=Site Map Test Page",
+			RuntimeVariables.replace("Site Map Test Page"));
 		selenium.waitForPageToLoad("30000");
-		selenium.saveScreenShotAndSource();
+		loadRequiredJavaScriptModules();
 		assertEquals(RuntimeVariables.replace("Welcome"),
-			selenium.getText("//section/div/div/div/ul/li[1]/a"));
-		selenium.clickAt("//section/div/div/div/ul/li[1]/a",
-			RuntimeVariables.replace(""));
+			selenium.getText("xPath=(//div[@class='portlet-body']/ul/li/a)[1]"));
+		selenium.clickAt("xPath=(//div[@class='portlet-body']/ul/li/a)[1]",
+			RuntimeVariables.replace("Welcome"));
 		selenium.waitForPageToLoad("30000");
-		selenium.saveScreenShotAndSource();
+		loadRequiredJavaScriptModules();
 		assertEquals(RuntimeVariables.replace("Sign In"),
-			selenium.getText("//h1/span[2]"));
+			selenium.getText("xPath=(//h1[@class='portlet-title'])[1]"));
 		assertEquals(RuntimeVariables.replace("Hello World"),
-			selenium.getText("//div[2]/div/div/section/header/h1/span[2]"));
-		assertTrue(selenium.isVisible("//section"));
-		assertTrue(selenium.isVisible("//div[2]/div/div/section"));
+			selenium.getText("xPath=(//h1[@class='portlet-title'])[2]"));
+		assertTrue(selenium.isVisible("xPath=(//section[@class='portlet'])[1]"));
+		assertTrue(selenium.isVisible("xPath=(//section[@class='portlet'])[2]"));
 		selenium.open("/web/guest/home/");
+		loadRequiredJavaScriptModules();
 
 		for (int second = 0;; second++) {
-			if (second >= 60) {
+			if (second >= 90) {
 				fail("timeout");
 			}
 
@@ -74,23 +76,24 @@ public class ViewPortletSiteMapTest extends BaseTestCase {
 			Thread.sleep(1000);
 		}
 
-		selenium.saveScreenShotAndSource();
-		selenium.clickAt("link=Site Map Test Page", RuntimeVariables.replace(""));
+		selenium.clickAt("link=Site Map Test Page",
+			RuntimeVariables.replace("Site Map Test Page"));
 		selenium.waitForPageToLoad("30000");
-		selenium.saveScreenShotAndSource();
+		loadRequiredJavaScriptModules();
 		assertEquals(RuntimeVariables.replace("Site Map Test Page"),
-			selenium.getText("//section/div/div/div/ul/li[2]/a"));
-		selenium.clickAt("//section/div/div/div/ul/li[2]/a",
-			RuntimeVariables.replace(""));
+			selenium.getText("xPath=(//div[@class='portlet-body']/ul/li/a)[2]"));
+		selenium.clickAt("xPath=(//div[@class='portlet-body']/ul/li/a)[2]",
+			RuntimeVariables.replace("Site Map Test Page"));
 		selenium.waitForPageToLoad("30000");
-		selenium.saveScreenShotAndSource();
+		loadRequiredJavaScriptModules();
 		assertEquals(RuntimeVariables.replace("Site Map"),
-			selenium.getText("//h1/span[2]"));
-		assertTrue(selenium.isVisible("//section"));
+			selenium.getText("//h1[@class='portlet-title']"));
+		assertTrue(selenium.isVisible("//section[@class='portlet']"));
 		selenium.open("/web/guest/home/");
+		loadRequiredJavaScriptModules();
 
 		for (int second = 0;; second++) {
-			if (second >= 60) {
+			if (second >= 90) {
 				fail("timeout");
 			}
 
@@ -105,15 +108,16 @@ public class ViewPortletSiteMapTest extends BaseTestCase {
 			Thread.sleep(1000);
 		}
 
-		selenium.saveScreenShotAndSource();
-		selenium.clickAt("link=Site Map Test Page", RuntimeVariables.replace(""));
+		selenium.clickAt("link=Site Map Test Page",
+			RuntimeVariables.replace("Site Map Test Page"));
 		selenium.waitForPageToLoad("30000");
-		selenium.saveScreenShotAndSource();
-		assertEquals(RuntimeVariables.replace("Child Test Page"),
-			selenium.getText("//div/ul/li[2]/ul/li/a"));
-		selenium.clickAt("//div/ul/li[2]/ul/li/a", RuntimeVariables.replace(""));
+		loadRequiredJavaScriptModules();
+		assertEquals(RuntimeVariables.replace("Site Map Test Child Page"),
+			selenium.getText("//div[@class='portlet-body']/ul/li/ul/li/a"));
+		selenium.clickAt("//div[@class='portlet-body']/ul/li/ul/li/a",
+			RuntimeVariables.replace("Site Map Test Child Page"));
 		selenium.waitForPageToLoad("30000");
-		selenium.saveScreenShotAndSource();
-		assertFalse(selenium.isElementPresent("//section"));
+		loadRequiredJavaScriptModules();
+		assertFalse(selenium.isElementPresent("//section[@class='portlet']"));
 	}
 }

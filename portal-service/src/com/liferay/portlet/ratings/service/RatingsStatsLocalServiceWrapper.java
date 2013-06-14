@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,6 +14,8 @@
 
 package com.liferay.portlet.ratings.service;
 
+import com.liferay.portal.service.ServiceWrapper;
+
 /**
  * <p>
  * This class is a wrapper for {@link RatingsStatsLocalService}.
@@ -23,7 +25,8 @@ package com.liferay.portlet.ratings.service;
  * @see       RatingsStatsLocalService
  * @generated
  */
-public class RatingsStatsLocalServiceWrapper implements RatingsStatsLocalService {
+public class RatingsStatsLocalServiceWrapper implements RatingsStatsLocalService,
+	ServiceWrapper<RatingsStatsLocalService> {
 	public RatingsStatsLocalServiceWrapper(
 		RatingsStatsLocalService ratingsStatsLocalService) {
 		_ratingsStatsLocalService = ratingsStatsLocalService;
@@ -57,25 +60,32 @@ public class RatingsStatsLocalServiceWrapper implements RatingsStatsLocalService
 	* Deletes the ratings stats with the primary key from the database. Also notifies the appropriate model listeners.
 	*
 	* @param statsId the primary key of the ratings stats
+	* @return the ratings stats that was removed
 	* @throws PortalException if a ratings stats with the primary key could not be found
 	* @throws SystemException if a system exception occurred
 	*/
-	public void deleteRatingsStats(long statsId)
+	public com.liferay.portlet.ratings.model.RatingsStats deleteRatingsStats(
+		long statsId)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException {
-		_ratingsStatsLocalService.deleteRatingsStats(statsId);
+		return _ratingsStatsLocalService.deleteRatingsStats(statsId);
 	}
 
 	/**
 	* Deletes the ratings stats from the database. Also notifies the appropriate model listeners.
 	*
 	* @param ratingsStats the ratings stats
+	* @return the ratings stats that was removed
 	* @throws SystemException if a system exception occurred
 	*/
-	public void deleteRatingsStats(
+	public com.liferay.portlet.ratings.model.RatingsStats deleteRatingsStats(
 		com.liferay.portlet.ratings.model.RatingsStats ratingsStats)
 		throws com.liferay.portal.kernel.exception.SystemException {
-		_ratingsStatsLocalService.deleteRatingsStats(ratingsStats);
+		return _ratingsStatsLocalService.deleteRatingsStats(ratingsStats);
+	}
+
+	public com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery() {
+		return _ratingsStatsLocalService.dynamicQuery();
 	}
 
 	/**
@@ -147,6 +157,12 @@ public class RatingsStatsLocalServiceWrapper implements RatingsStatsLocalService
 		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery)
 		throws com.liferay.portal.kernel.exception.SystemException {
 		return _ratingsStatsLocalService.dynamicQueryCount(dynamicQuery);
+	}
+
+	public com.liferay.portlet.ratings.model.RatingsStats fetchRatingsStats(
+		long statsId)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return _ratingsStatsLocalService.fetchRatingsStats(statsId);
 	}
 
 	/**
@@ -275,11 +291,26 @@ public class RatingsStatsLocalServiceWrapper implements RatingsStatsLocalService
 		return _ratingsStatsLocalService.getStats(className, classPK);
 	}
 
+	/**
+	 * @deprecated Renamed to {@link #getWrappedService}
+	 */
 	public RatingsStatsLocalService getWrappedRatingsStatsLocalService() {
 		return _ratingsStatsLocalService;
 	}
 
+	/**
+	 * @deprecated Renamed to {@link #setWrappedService}
+	 */
 	public void setWrappedRatingsStatsLocalService(
+		RatingsStatsLocalService ratingsStatsLocalService) {
+		_ratingsStatsLocalService = ratingsStatsLocalService;
+	}
+
+	public RatingsStatsLocalService getWrappedService() {
+		return _ratingsStatsLocalService;
+	}
+
+	public void setWrappedService(
 		RatingsStatsLocalService ratingsStatsLocalService) {
 		_ratingsStatsLocalService = ratingsStatsLocalService;
 	}

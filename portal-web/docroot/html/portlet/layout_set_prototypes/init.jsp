@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -16,8 +16,10 @@
 
 <%@ include file="/html/portlet/init.jsp" %>
 
-<%@ page import="com.liferay.portal.NoSuchLayoutSetPrototypeException" %>
-<%@ page import="com.liferay.portal.service.LayoutSetPrototypeLocalServiceUtil" %>
-<%@ page import="com.liferay.portal.service.permission.LayoutSetPrototypePermissionUtil" %>
-<%@ page import="com.liferay.portal.service.permission.PortalPermissionUtil" %>
-<%@ page import="com.liferay.portal.util.CustomJspRegistryUtil" %>
+<%@ page import="com.liferay.portal.NoSuchLayoutSetPrototypeException" %><%@
+page import="com.liferay.portal.RequiredLayoutSetPrototypeException" %><%@
+page import="com.liferay.portal.service.LayoutSetPrototypeLocalServiceUtil" %><%@
+page import="com.liferay.portal.service.permission.PortalPermissionUtil" %><%@
+page import="com.liferay.portal.util.CustomJspRegistryUtil" %>
+
+<%@ include file="/html/portlet/layout_set_prototypes/init-ext.jsp" %>

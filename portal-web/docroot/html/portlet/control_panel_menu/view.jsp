@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -67,13 +67,18 @@
 				List<Group> manageableSites = null;
 
 				if (Validator.isNotNull(controlPanelCategory)) {
-					long groupId = GetterUtil.getLong(HttpUtil.getParameter(PortalUtil.getCurrentURL(request), "doAsGroupId", false));
-
-					Group group = GroupServiceUtil.getGroup(groupId);
-
 					manageableSites = new ArrayList<Group>();
 
-					manageableSites.add(group);
+					if (curGroup.isUser()) {
+						manageableSites.add(user.getGroup());
+					}
+					else {
+						long groupId = GetterUtil.getLong(HttpUtil.getParameter(PortalUtil.getCurrentURL(request), "doAsGroupId", false));
+
+						Group group = GroupLocalServiceUtil.getGroup(groupId);
+
+						manageableSites.add(group);
+					}
 				}
 				else {
 					manageableSites = GroupServiceUtil.getManageableSites(categoryPortlets, PropsValues.CONTROL_PANEL_NAVIGATION_MAX_SITES);
@@ -112,14 +117,11 @@
 
 				String curGroupName = null;
 
-				if (curGroup.isCompany()) {
-					curGroupName = LanguageUtil.get(pageContext, "global");
-				}
-				else if (curGroup.isUser() && (curGroup.getClassPK() == user.getUserId())) {
-					curGroupName = LanguageUtil.format(pageContext, "x-personal-site", curLiveGroup.getDescriptiveName());
+				if (curGroup.isUser() && (curGroup.getClassPK() == user.getUserId())) {
+					curGroupName = LanguageUtil.format(pageContext, "x-personal-site", curLiveGroup.getDescriptiveName(locale));
 				}
 				else {
-					curGroupName = curLiveGroup.getDescriptiveName();
+					curGroupName = curLiveGroup.getDescriptiveName(locale);
 				}
 
 				if (category.equals(PortletCategoryKeys.CONTENT)) {
@@ -156,14 +158,14 @@
 							}
 							%>
 
-							<liferay-ui:icon-menu align="left" direction="down" icon="<%= icon %>" id="groupSelector" message="<%= HtmlUtil.escape(StringUtil.shorten(curGroupName, 25)) %>">
+							<liferay-ui:icon-menu align="left" direction="down" icon="<%= icon %>" id="groupSelector" localizeMessage="<%= false %>" message="<%= HtmlUtil.escape(StringUtil.shorten(curGroupName, 25)) %>">
 
 								<%
 								for (int i = 0; i < manageableSites.size(); i++) {
 									Group group = manageableSites.get(i);
 
 									String image = "site_icon";
-									String message = HtmlUtil.escape(group.getDescriptiveName());
+									String message = group.getDescriptiveName(locale);
 
 									if (group.isCompany()) {
 										image = "folder";
@@ -173,7 +175,7 @@
 									}
 									else if (group.isUser()) {
 										image = "user_icon";
-										message = LanguageUtil.format(pageContext, "x-personal-site", group.getDescriptiveName());
+										message = LanguageUtil.format(pageContext, "x-personal-site", group.getDescriptiveName(locale));
 									}
 
 									String url = null;
@@ -185,7 +187,8 @@
 
 									<liferay-ui:icon
 										image="<%= image %>"
-										message="<%= message %>"
+										localizeMessage="<%= false %>"
+										message="<%= HtmlUtil.escape(message) %>"
 										url="<%= url %>"
 									/>
 
@@ -194,6 +197,10 @@
 								%>
 
 							</liferay-ui:icon-menu>
+
+							<c:if test="<%= curLiveGroup.isCompany() %>">
+								<liferay-ui:staging cssClass="manage-pages-branch-menu" extended="<%= true %>" groupId="<%= curLiveGroup.getGroupId() %>" icon="/common/tool.png" showManageBranches="<%= false %>" />
+							</c:if>
 						</c:when>
 						<c:otherwise>
 
@@ -274,7 +281,7 @@
 					%>
 
 							<li class="<%= ppid.equals(portletId) ? "selected-portlet" : "" %>">
-								<a href="<liferay-portlet:renderURL windowState="<%= WindowState.MAXIMIZED.toString() %>" portletName="<%= portlet.getRootPortletId() %>" />">
+								<a href="<liferay-portlet:renderURL doAsGroupId="<%= themeDisplay.getScopeGroupId() %>" portletName="<%= portlet.getRootPortletId() %>" windowState="<%= WindowState.MAXIMIZED.toString() %>" />" id="<portlet:namespace />portlet_<%= portletId %>">
 									<c:choose>
 										<c:when test="<%= Validator.isNull(portlet.getIcon()) %>">
 											<liferay-ui:icon src='<%= themeDisplay.getPathContext() + "/html/icons/default.png" %>' />

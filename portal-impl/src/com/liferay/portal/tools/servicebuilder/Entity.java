@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -21,8 +21,12 @@ import com.liferay.portal.kernel.util.TextFormatter;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.security.permission.ResourceActionsUtil;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
 /**
  * @author Brian Wing Shun Chan
@@ -73,7 +77,7 @@ public class Entity {
 
 	public Entity(String name) {
 		this(
-			null, null, null, name,  null,null, null, false, false, false, true,
+			null, null, null, name, null, null, null, false, false, false, true,
 			null, null, null, null, null, true, false, null, null, null, null,
 			null, null, null, null, null);
 	}
@@ -119,6 +123,21 @@ public class Entity {
 		_finderList = finderList;
 		_referenceList = referenceList;
 		_txRequiredList = txRequiredList;
+
+		if (_finderList != null) {
+			Set<EntityColumn> finderColumns = new HashSet<EntityColumn>();
+
+			for (EntityFinder entityFinder : _finderList) {
+				finderColumns.addAll(entityFinder.getColumns());
+			}
+
+			_finderColumnsList = new ArrayList<EntityColumn>(finderColumns);
+
+			Collections.sort(_finderColumnsList);
+		}
+		else {
+			_finderColumnsList = Collections.emptyList();
+		}
 
 		if ((_blobList != null) && !_blobList.isEmpty()) {
 			for (EntityColumn col : _blobList) {
@@ -211,6 +230,10 @@ public class Entity {
 		return _finderClass;
 	}
 
+	public List<EntityColumn> getFinderColumnsList() {
+		return _finderColumnsList;
+	}
+
 	public List<EntityFinder> getFinderList() {
 		return _finderList;
 	}
@@ -247,17 +270,6 @@ public class Entity {
 		return _persistenceClass;
 	}
 
-	public String getPKDBName() {
-		if (hasCompoundPK()) {
-			return getVarName() + "PK";
-		}
-		else {
-			EntityColumn col = _getPKColumn();
-
-			return col.getDBName();
-		}
-	}
-
 	public String getPKClassName() {
 		if (hasCompoundPK()) {
 			return _name + "PK";
@@ -266,6 +278,17 @@ public class Entity {
 			EntityColumn col = _getPKColumn();
 
 			return col.getType();
+		}
+	}
+
+	public String getPKDBName() {
+		if (hasCompoundPK()) {
+			return getVarName() + "PK";
+		}
+		else {
+			EntityColumn col = _getPKColumn();
+
+			return col.getDBName();
 		}
 	}
 
@@ -389,20 +412,6 @@ public class Entity {
 		}
 	}
 
-	public boolean hasFinderClass() {
-		if (Validator.isNull(_finderClass)) {
-			return false;
-		}
-		else {
-			return true;
-		}
-	}
-
-	@Override
-	public int hashCode() {
-		return _name.hashCode();
-	}
-
 	public boolean hasEagerBlobColumn() {
 		if ((_blobList == null) || _blobList.isEmpty()) {
 			return false;
@@ -415,6 +424,20 @@ public class Entity {
 		}
 
 		return false;
+	}
+
+	public boolean hasFinderClass() {
+		if (Validator.isNull(_finderClass)) {
+			return false;
+		}
+		else {
+			return true;
+		}
+	}
+
+	@Override
+	public int hashCode() {
+		return _name.hashCode();
 	}
 
 	public boolean hasLazyBlobColumn() {
@@ -446,7 +469,7 @@ public class Entity {
 	}
 
 	public boolean hasPrimitivePK() {
-		return 	hasPrimitivePK(true);
+		return hasPrimitivePK(true);
 	}
 
 	public boolean hasPrimitivePK(boolean includeWrappers) {
@@ -614,6 +637,15 @@ public class Entity {
 		return true;
 	}
 
+	public boolean isPermissionedModel() {
+		if (hasColumn("resourceBlockId")) {
+			return true;
+		}
+		else {
+			return false;
+		}
+	}
+
 	public boolean isPortalReference() {
 		return _portalReference;
 	}
@@ -670,6 +702,7 @@ public class Entity {
 	private List<EntityColumn> _columnList;
 	private String _dataSource;
 	private String _finderClass;
+	private List<EntityColumn> _finderColumnsList;
 	private List<EntityFinder> _finderList;
 	private String _humanName;
 	private boolean _jsonEnabled;

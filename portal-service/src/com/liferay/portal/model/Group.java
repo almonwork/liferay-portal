@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -37,9 +37,17 @@ public interface Group extends GroupModel, PersistedModel {
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException;
 
+	public java.lang.String getDescriptiveName(java.util.Locale locale)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException;
+
 	public com.liferay.portal.model.Group getLiveGroup();
 
 	public long getOrganizationId();
+
+	public com.liferay.portal.model.Group getParentGroup()
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException;
 
 	public java.lang.String getPathFriendlyURL(boolean privateLayout,
 		com.liferay.portal.theme.ThemeDisplay themeDisplay);
@@ -89,6 +97,8 @@ public interface Group extends GroupModel, PersistedModel {
 
 	public boolean isRegularSite();
 
+	public boolean isRoot();
+
 	public boolean isStaged();
 
 	public boolean isStagedPortlet(java.lang.String portletId);
@@ -100,6 +110,8 @@ public interface Group extends GroupModel, PersistedModel {
 	public boolean isUser();
 
 	public boolean isUserGroup();
+
+	public boolean isUserPersonalSite();
 
 	public void setTypeSettings(java.lang.String typeSettings);
 

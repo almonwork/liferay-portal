@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -23,14 +23,15 @@ import com.liferay.portalweb.portal.util.RuntimeVariables;
 public class AssertImportLARTest extends BaseTestCase {
 	public void testAssertImportLAR() throws Exception {
 		selenium.open("/web/guest/home/");
+		loadRequiredJavaScriptModules();
 
 		for (int second = 0;; second++) {
-			if (second >= 60) {
+			if (second >= 90) {
 				fail("timeout");
 			}
 
 			try {
-				if (selenium.isElementPresent("link=Site Map Test Page")) {
+				if (selenium.isVisible("link=Site Map Test Page")) {
 					break;
 				}
 			}
@@ -40,15 +41,15 @@ public class AssertImportLARTest extends BaseTestCase {
 			Thread.sleep(1000);
 		}
 
-		selenium.saveScreenShotAndSource();
-		selenium.clickAt("link=Site Map Test Page", RuntimeVariables.replace(""));
+		selenium.clickAt("link=Site Map Test Page",
+			RuntimeVariables.replace("Site Map Test Page"));
 		selenium.waitForPageToLoad("30000");
-		selenium.saveScreenShotAndSource();
+		loadRequiredJavaScriptModules();
 		assertEquals(RuntimeVariables.replace("Welcome"),
 			selenium.getText("//section/div/div/div/ul/li[1]/a"));
 		assertEquals(RuntimeVariables.replace("Site Map Test Page"),
 			selenium.getText("//section/div/div/div/ul/li[2]/a"));
-		assertEquals(RuntimeVariables.replace("Child Test Page"),
+		assertEquals(RuntimeVariables.replace("Site Map Test Child Page"),
 			selenium.getText("//div/ul/li[2]/ul/li/a"));
 	}
 }

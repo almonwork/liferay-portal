@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -28,7 +28,7 @@ String toLanguageId = (String)request.getAttribute("edit_article.jsp-toLanguageI
 
 <liferay-ui:error-marker key="errorSection" value="abstract" />
 
-<aui:model-context bean="<%= article %>" model="<%= JournalArticle.class %>" />
+<aui:model-context bean="<%= article %>" defaultLanguageId="<%= defaultLanguageId %>" model="<%= JournalArticle.class %>" />
 
 <h3><liferay-ui:message key="abstract" /></h3>
 
@@ -54,7 +54,7 @@ String toLanguageId = (String)request.getAttribute("edit_article.jsp-toLanguageI
 	<aui:input label="summary" languageId="<%= Validator.isNotNull(toLanguageId) ? toLanguageId : defaultLanguageId %>" name="description" />
 
 	<c:if test="<%= Validator.isNull(toLanguageId) %>">
-		<aui:input inlineLabel="left" label="use-small-image" name="smallImage" />
+		<aui:input label="use-small-image" name="smallImage" />
 
 		<aui:input label="small-image-url" name="smallImageURL" />
 

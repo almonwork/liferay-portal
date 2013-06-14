@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -16,38 +16,34 @@
 
 <%@ include file="/html/portlet/init.jsp" %>
 
-<%@ page import="com.liferay.portal.service.SubscriptionLocalServiceUtil" %>
-<%@ page import="com.liferay.portal.kernel.search.Document" %>
-<%@ page import="com.liferay.portal.kernel.search.Field" %>
-<%@ page import="com.liferay.portal.kernel.search.Hits" %>
-<%@ page import="com.liferay.portal.kernel.search.Indexer" %>
-<%@ page import="com.liferay.portal.kernel.search.IndexerRegistryUtil" %>
-<%@ page import="com.liferay.portal.kernel.search.SearchContext" %>
-<%@ page import="com.liferay.portal.kernel.search.SearchContextFactory" %>
-<%@ page import="com.liferay.portlet.asset.model.AssetCategory" %>
-<%@ page import="com.liferay.portlet.asset.model.AssetEntry" %>
-<%@ page import="com.liferay.portlet.asset.model.AssetTag" %>
-<%@ page import="com.liferay.portlet.asset.model.AssetVocabulary" %>
-<%@ page import="com.liferay.portlet.asset.service.AssetCategoryLocalServiceUtil" %>
-<%@ page import="com.liferay.portlet.asset.service.AssetEntryLocalServiceUtil" %>
-<%@ page import="com.liferay.portlet.asset.service.AssetEntryServiceUtil" %>
-<%@ page import="com.liferay.portlet.asset.service.AssetTagLocalServiceUtil" %>
-<%@ page import="com.liferay.portlet.asset.service.AssetVocabularyLocalServiceUtil" %>
-<%@ page import="com.liferay.portlet.asset.service.persistence.AssetEntryQuery" %>
-<%@ page import="com.liferay.portlet.asset.util.AssetUtil" %>
-<%@ page import="com.liferay.portlet.blogs.EntrySmallImageNameException" %>
-<%@ page import="com.liferay.portlet.blogs.EntrySmallImageSizeException" %>
-<%@ page import="com.liferay.portlet.blogs.EntryTitleException" %>
-<%@ page import="com.liferay.portlet.blogs.NoSuchEntryException" %>
-<%@ page import="com.liferay.portlet.blogs.model.BlogsEntry" %>
-<%@ page import="com.liferay.portlet.blogs.model.impl.BlogsEntryImpl" %>
-<%@ page import="com.liferay.portlet.blogs.service.BlogsEntryLocalServiceUtil" %>
-<%@ page import="com.liferay.portlet.blogs.service.BlogsEntryServiceUtil" %>
-<%@ page import="com.liferay.portlet.blogs.service.permission.BlogsEntryPermission" %>
-<%@ page import="com.liferay.portlet.blogs.service.permission.BlogsPermission" %>
-<%@ page import="com.liferay.portlet.blogs.util.BlogsUtil" %>
-<%@ page import="com.liferay.portlet.messageboards.service.MBMessageLocalServiceUtil" %>
-<%@ page import="com.liferay.util.RSSUtil" %>
+<%@ page import="com.liferay.portal.kernel.search.Document" %><%@
+page import="com.liferay.portal.kernel.search.Hits" %><%@
+page import="com.liferay.portal.kernel.search.Indexer" %><%@
+page import="com.liferay.portal.kernel.search.IndexerRegistryUtil" %><%@
+page import="com.liferay.portal.kernel.search.SearchContext" %><%@
+page import="com.liferay.portal.kernel.search.SearchContextFactory" %><%@
+page import="com.liferay.portal.service.SubscriptionLocalServiceUtil" %><%@
+page import="com.liferay.portlet.asset.model.AssetEntry" %><%@
+page import="com.liferay.portlet.asset.model.AssetTag" %><%@
+page import="com.liferay.portlet.asset.service.AssetEntryLocalServiceUtil" %><%@
+page import="com.liferay.portlet.asset.service.AssetEntryServiceUtil" %><%@
+page import="com.liferay.portlet.asset.service.AssetTagLocalServiceUtil" %><%@
+page import="com.liferay.portlet.asset.service.persistence.AssetEntryQuery" %><%@
+page import="com.liferay.portlet.asset.util.AssetUtil" %><%@
+page import="com.liferay.portlet.blogs.EntryContentException" %><%@
+page import="com.liferay.portlet.blogs.EntrySmallImageNameException" %><%@
+page import="com.liferay.portlet.blogs.EntrySmallImageSizeException" %><%@
+page import="com.liferay.portlet.blogs.EntryTitleException" %><%@
+page import="com.liferay.portlet.blogs.NoSuchEntryException" %><%@
+page import="com.liferay.portlet.blogs.model.BlogsEntry" %><%@
+page import="com.liferay.portlet.blogs.model.impl.BlogsEntryImpl" %><%@
+page import="com.liferay.portlet.blogs.service.BlogsEntryLocalServiceUtil" %><%@
+page import="com.liferay.portlet.blogs.service.BlogsEntryServiceUtil" %><%@
+page import="com.liferay.portlet.blogs.service.permission.BlogsEntryPermission" %><%@
+page import="com.liferay.portlet.blogs.service.permission.BlogsPermission" %><%@
+page import="com.liferay.portlet.blogs.util.BlogsUtil" %><%@
+page import="com.liferay.portlet.messageboards.service.MBMessageLocalServiceUtil" %><%@
+page import="com.liferay.util.RSSUtil" %>
 
 <%
 PortletPreferences preferences = renderRequest.getPreferences();
@@ -58,7 +54,7 @@ if (Validator.isNotNull(portletResource)) {
 	preferences = PortletPreferencesFactoryUtil.getPortletSetup(request, portletResource);
 }
 
-int pageDelta = GetterUtil.getInteger(preferences.getValue("pageDelta", StringPool.BLANK), 5);
+int pageDelta = GetterUtil.getInteger(preferences.getValue("pageDelta", StringPool.BLANK), SearchContainer.DEFAULT_DELTA);
 String pageDisplayStyle = preferences.getValue("pageDisplayStyle", RSSUtil.DISPLAY_STYLE_FULL_CONTENT);
 int pageAbstractLength = PropsValues.BLOGS_PAGE_ABSTRACT_LENGTH;
 boolean enableFlags = GetterUtil.getBoolean(preferences.getValue("enableFlags", null), true);
@@ -69,6 +65,7 @@ boolean enableCommentRatings = GetterUtil.getBoolean(preferences.getValue("enabl
 boolean enableSocialBookmarks = GetterUtil.getBoolean(preferences.getValue("enableSocialBookmarks", null), true);
 String socialBookmarksDisplayStyle = preferences.getValue("socialBookmarksDisplayStyle", "horizontal");
 String socialBookmarksDisplayPosition = preferences.getValue("socialBookmarksDisplayPosition", "bottom");
+String socialBookmarksTypes = preferences.getValue("socialBookmarksTypes", PropsUtil.get(PropsKeys.SOCIAL_BOOKMARK_TYPES));
 
 int rssDelta = GetterUtil.getInteger(preferences.getValue("rssDelta", StringPool.BLANK), SearchContainer.DEFAULT_DELTA);
 String rssDisplayStyle = preferences.getValue("rssDisplayStyle", RSSUtil.DISPLAY_STYLE_FULL_CONTENT);

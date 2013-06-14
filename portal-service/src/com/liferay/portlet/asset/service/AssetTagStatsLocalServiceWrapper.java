@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,6 +14,8 @@
 
 package com.liferay.portlet.asset.service;
 
+import com.liferay.portal.service.ServiceWrapper;
+
 /**
  * <p>
  * This class is a wrapper for {@link AssetTagStatsLocalService}.
@@ -24,7 +26,8 @@ package com.liferay.portlet.asset.service;
  * @generated
  */
 public class AssetTagStatsLocalServiceWrapper
-	implements AssetTagStatsLocalService {
+	implements AssetTagStatsLocalService,
+		ServiceWrapper<AssetTagStatsLocalService> {
 	public AssetTagStatsLocalServiceWrapper(
 		AssetTagStatsLocalService assetTagStatsLocalService) {
 		_assetTagStatsLocalService = assetTagStatsLocalService;
@@ -58,25 +61,32 @@ public class AssetTagStatsLocalServiceWrapper
 	* Deletes the asset tag stats with the primary key from the database. Also notifies the appropriate model listeners.
 	*
 	* @param tagStatsId the primary key of the asset tag stats
+	* @return the asset tag stats that was removed
 	* @throws PortalException if a asset tag stats with the primary key could not be found
 	* @throws SystemException if a system exception occurred
 	*/
-	public void deleteAssetTagStats(long tagStatsId)
+	public com.liferay.portlet.asset.model.AssetTagStats deleteAssetTagStats(
+		long tagStatsId)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException {
-		_assetTagStatsLocalService.deleteAssetTagStats(tagStatsId);
+		return _assetTagStatsLocalService.deleteAssetTagStats(tagStatsId);
 	}
 
 	/**
 	* Deletes the asset tag stats from the database. Also notifies the appropriate model listeners.
 	*
 	* @param assetTagStats the asset tag stats
+	* @return the asset tag stats that was removed
 	* @throws SystemException if a system exception occurred
 	*/
-	public void deleteAssetTagStats(
+	public com.liferay.portlet.asset.model.AssetTagStats deleteAssetTagStats(
 		com.liferay.portlet.asset.model.AssetTagStats assetTagStats)
 		throws com.liferay.portal.kernel.exception.SystemException {
-		_assetTagStatsLocalService.deleteAssetTagStats(assetTagStats);
+		return _assetTagStatsLocalService.deleteAssetTagStats(assetTagStats);
+	}
+
+	public com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery() {
+		return _assetTagStatsLocalService.dynamicQuery();
 	}
 
 	/**
@@ -148,6 +158,12 @@ public class AssetTagStatsLocalServiceWrapper
 		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery)
 		throws com.liferay.portal.kernel.exception.SystemException {
 		return _assetTagStatsLocalService.dynamicQueryCount(dynamicQuery);
+	}
+
+	public com.liferay.portlet.asset.model.AssetTagStats fetchAssetTagStats(
+		long tagStatsId)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return _assetTagStatsLocalService.fetchAssetTagStats(tagStatsId);
 	}
 
 	/**
@@ -248,40 +264,122 @@ public class AssetTagStatsLocalServiceWrapper
 		_assetTagStatsLocalService.setBeanIdentifier(beanIdentifier);
 	}
 
+	/**
+	* Adds an asset tag statistics instance.
+	*
+	* @param tagId the primary key of the tag
+	* @param classNameId the asset entry's class name ID
+	* @return the asset tag statistics instance
+	* @throws SystemException if a system exception occurred
+	*/
 	public com.liferay.portlet.asset.model.AssetTagStats addTagStats(
 		long tagId, long classNameId)
 		throws com.liferay.portal.kernel.exception.SystemException {
 		return _assetTagStatsLocalService.addTagStats(tagId, classNameId);
 	}
 
+	/**
+	* Deletes the asset tag statistics instance.
+	*
+	* @param tagStats the asset tag statistics instance
+	* @throws SystemException if a system exception occurred
+	*/
 	public void deleteTagStats(
 		com.liferay.portlet.asset.model.AssetTagStats tagStats)
 		throws com.liferay.portal.kernel.exception.SystemException {
 		_assetTagStatsLocalService.deleteTagStats(tagStats);
 	}
 
+	/**
+	* Deletes the asset tag statistics instance matching the tag statistics ID.
+	*
+	* @param tagStatsId the primary key of the asset tag statistics instance
+	* @throws PortalException if the assetTagStats with the primary key could
+	not be found
+	* @throws SystemException if a system exception occurred
+	*/
 	public void deleteTagStats(long tagStatsId)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException {
 		_assetTagStatsLocalService.deleteTagStats(tagStatsId);
 	}
 
+	/**
+	* Deletes all asset tag statistics instances associated with the asset
+	* entry matching the class name ID.
+	*
+	* @param classNameId the asset entry's class name ID
+	* @throws SystemException if a system exception occurred
+	*/
 	public void deleteTagStatsByClassNameId(long classNameId)
 		throws com.liferay.portal.kernel.exception.SystemException {
 		_assetTagStatsLocalService.deleteTagStatsByClassNameId(classNameId);
 	}
 
+	/**
+	* Deletes all asset tag statistics instances associated with the tag.
+	*
+	* @param tagId the primary key of the tag
+	* @throws SystemException if a system exception occurred
+	*/
 	public void deleteTagStatsByTagId(long tagId)
 		throws com.liferay.portal.kernel.exception.SystemException {
 		_assetTagStatsLocalService.deleteTagStatsByTagId(tagId);
 	}
 
+	/**
+	* Returns a range of all the asset tag statistics instances associated with
+	* the asset entry matching the class name ID.
+	*
+	* <p>
+	* Useful when paginating results. Returns a maximum of <code>end -
+	* start</code> instances. <code>start</code> and <code>end</code> are not
+	* primary keys, they are indexes in the result set. Thus, <code>0</code>
+	* refers to the first result in the set. Setting both <code>start</code>
+	* and <code>end</code> to {@link
+	* com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full
+	* result set.
+	* </p>
+	*
+	* @param classNameId the asset entry's class name ID
+	* @param start the lower bound of the range of results
+	* @param end the upper bound of the range of results (not inclusive)
+	* @return the range of asset tag statistics associated with the asset entry
+	matching the class name ID
+	* @throws SystemException if a system exception occurred
+	*/
+	public java.util.List<com.liferay.portlet.asset.model.AssetTagStats> getTagStats(
+		long classNameId, int start, int end)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return _assetTagStatsLocalService.getTagStats(classNameId, start, end);
+	}
+
+	/**
+	* Returns the asset tag statistics instance with the tag and asset entry
+	* matching the class name ID
+	*
+	* @param tagId the primary key of the tag
+	* @param classNameId the asset entry's class name ID
+	* @return Returns the asset tag statistics instance with the tag and asset
+	entry  matching the class name ID
+	* @throws SystemException if a system exception occurred
+	*/
 	public com.liferay.portlet.asset.model.AssetTagStats getTagStats(
 		long tagId, long classNameId)
 		throws com.liferay.portal.kernel.exception.SystemException {
 		return _assetTagStatsLocalService.getTagStats(tagId, classNameId);
 	}
 
+	/**
+	* Updates the asset tag statistics instance.
+	*
+	* @param tagId the primary key of the tag
+	* @param classNameId the asset entry's class name ID
+	* @return the updated asset tag statistics instance
+	* @throws PortalException if an asset tag with the tag ID could not be
+	found
+	* @throws SystemException if a system exception occurred
+	*/
 	public com.liferay.portlet.asset.model.AssetTagStats updateTagStats(
 		long tagId, long classNameId)
 		throws com.liferay.portal.kernel.exception.PortalException,
@@ -289,11 +387,26 @@ public class AssetTagStatsLocalServiceWrapper
 		return _assetTagStatsLocalService.updateTagStats(tagId, classNameId);
 	}
 
+	/**
+	 * @deprecated Renamed to {@link #getWrappedService}
+	 */
 	public AssetTagStatsLocalService getWrappedAssetTagStatsLocalService() {
 		return _assetTagStatsLocalService;
 	}
 
+	/**
+	 * @deprecated Renamed to {@link #setWrappedService}
+	 */
 	public void setWrappedAssetTagStatsLocalService(
+		AssetTagStatsLocalService assetTagStatsLocalService) {
+		_assetTagStatsLocalService = assetTagStatsLocalService;
+	}
+
+	public AssetTagStatsLocalService getWrappedService() {
+		return _assetTagStatsLocalService;
+	}
+
+	public void setWrappedService(
 		AssetTagStatsLocalService assetTagStatsLocalService) {
 		_assetTagStatsLocalService = assetTagStatsLocalService;
 	}

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -24,36 +24,36 @@ import java.io.InputStream;
  */
 public interface Resource {
 
- 	public String getHREF();
+	public String getClassName();
+
+	public InputStream getContentAsStream() throws WebDAVException ;
+
+	public String getContentType();
+
+	public String getCreateDate();
 
 	public String getDisplayName();
 
+	public String getHREF();
+
 	public Lock getLock();
+
+	public Object getModel();
+
+	public String getModifiedDate();
+
+	public long getPrimaryKey();
+
+	public long getSize();
 
 	public boolean isCollection();
 
 	public boolean isLocked();
 
- 	public String getCreateDate();
-
- 	public String getModifiedDate();
-
- 	public long getSize();
-
-	public Object getModel();
+	public void setClassName(String className);
 
 	public void setModel(Object model);
 
- 	public String getClassName();
-
- 	public void setClassName(String className);
-
- 	public long getPrimaryKey();
-
- 	public void setPrimaryKey(long primaryKey);
-
-	public String getContentType();
-
-	public InputStream getContentAsStream() throws WebDAVException ;
+	public void setPrimaryKey(long primaryKey);
 
 }

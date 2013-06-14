@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -15,7 +15,6 @@
 package com.liferay.portal.service;
 
 import com.liferay.portal.kernel.bean.PortalBeanLocatorUtil;
-import com.liferay.portal.kernel.util.MethodCache;
 import com.liferay.portal.kernel.util.ReferenceRegistry;
 
 /**
@@ -66,25 +65,32 @@ public class LayoutSetLocalServiceUtil {
 	* Deletes the layout set with the primary key from the database. Also notifies the appropriate model listeners.
 	*
 	* @param layoutSetId the primary key of the layout set
+	* @return the layout set that was removed
 	* @throws PortalException if a layout set with the primary key could not be found
 	* @throws SystemException if a system exception occurred
 	*/
-	public static void deleteLayoutSet(long layoutSetId)
+	public static com.liferay.portal.model.LayoutSet deleteLayoutSet(
+		long layoutSetId)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException {
-		getService().deleteLayoutSet(layoutSetId);
+		return getService().deleteLayoutSet(layoutSetId);
 	}
 
 	/**
 	* Deletes the layout set from the database. Also notifies the appropriate model listeners.
 	*
 	* @param layoutSet the layout set
+	* @return the layout set that was removed
 	* @throws SystemException if a system exception occurred
 	*/
-	public static void deleteLayoutSet(
+	public static com.liferay.portal.model.LayoutSet deleteLayoutSet(
 		com.liferay.portal.model.LayoutSet layoutSet)
 		throws com.liferay.portal.kernel.exception.SystemException {
-		getService().deleteLayoutSet(layoutSet);
+		return getService().deleteLayoutSet(layoutSet);
+	}
+
+	public static com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery() {
+		return getService().dynamicQuery();
 	}
 
 	/**
@@ -156,6 +162,12 @@ public class LayoutSetLocalServiceUtil {
 		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery)
 		throws com.liferay.portal.kernel.exception.SystemException {
 		return getService().dynamicQueryCount(dynamicQuery);
+	}
+
+	public static com.liferay.portal.model.LayoutSet fetchLayoutSet(
+		long layoutSetId)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getService().fetchLayoutSet(layoutSetId);
 	}
 
 	/**
@@ -268,6 +280,12 @@ public class LayoutSetLocalServiceUtil {
 		getService().deleteLayoutSet(groupId, privateLayout, serviceContext);
 	}
 
+	public static com.liferay.portal.model.LayoutSet fetchLayoutSet(
+		java.lang.String virtualHostname)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getService().fetchLayoutSet(virtualHostname);
+	}
+
 	public static com.liferay.portal.model.LayoutSet getLayoutSet(
 		long groupId, boolean privateLayout)
 		throws com.liferay.portal.kernel.exception.PortalException,
@@ -289,27 +307,81 @@ public class LayoutSetLocalServiceUtil {
 				   .getLayoutSetsByLayoutSetPrototypeUuid(layoutSetPrototypeUuid);
 	}
 
-	public static void updateLogo(long groupId, boolean privateLayout,
-		boolean logo, java.io.File file)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
-		getService().updateLogo(groupId, privateLayout, logo, file);
-	}
-
-	public static void updateLogo(long groupId, boolean privateLayout,
-		boolean logo, java.io.InputStream is)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
-		getService().updateLogo(groupId, privateLayout, logo, is);
-	}
-
-	public static void updateLookAndFeel(long groupId,
-		java.lang.String themeId, java.lang.String colorSchemeId,
-		java.lang.String css, boolean wapTheme)
+	/**
+	* Updates the state of the layout set prototype link.
+	*
+	* <p>
+	* This method can disable the layout set prototype's link by setting
+	* <code>layoutSetPrototypeLinkEnabled</code> to <code>false</code>.
+	* However, this method can only enable the layout set prototype's link if
+	* the layout set prototype's current uuid is not <code>null</code>. Setting
+	* the <code>layoutSetPrototypeLinkEnabled</code> to <code>true</code> when
+	* the layout set prototype's current uuid is <code>null</code> will have no
+	* effect.
+	* </p>
+	*
+	* @param groupId the primary key of the group
+	* @param privateLayout whether the layout set is private to the group
+	* @param layoutSetPrototypeLinkEnabled whether the layout set
+	prototype is link enabled
+	* @throws PortalException if a portal exception occurred
+	* @throws SystemException if a system exception occurred
+	* @deprecated As of 6.1, replaced by {@link
+	#updateLayoutSetPrototypeLinkEnabled(long, boolean, boolean,
+	String)}
+	*/
+	public static void updateLayoutSetPrototypeLinkEnabled(long groupId,
+		boolean privateLayout, boolean layoutSetPrototypeLinkEnabled)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException {
 		getService()
-			.updateLookAndFeel(groupId, themeId, colorSchemeId, css, wapTheme);
+			.updateLayoutSetPrototypeLinkEnabled(groupId, privateLayout,
+			layoutSetPrototypeLinkEnabled);
+	}
+
+	/**
+	* Updates the state of the layout set prototype link.
+	*
+	* @param groupId the primary key of the group
+	* @param privateLayout whether the layout set is private to the group
+	* @param layoutSetPrototypeLinkEnabled whether the layout set prototype is
+	link enabled
+	* @param layoutSetPrototypeUuid the uuid of the layout set prototype to
+	link with
+	* @throws PortalException if a portal exception occurred
+	* @throws SystemException if a system exception occurred
+	*/
+	public static void updateLayoutSetPrototypeLinkEnabled(long groupId,
+		boolean privateLayout, boolean layoutSetPrototypeLinkEnabled,
+		java.lang.String layoutSetPrototypeUuid)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException {
+		getService()
+			.updateLayoutSetPrototypeLinkEnabled(groupId, privateLayout,
+			layoutSetPrototypeLinkEnabled, layoutSetPrototypeUuid);
+	}
+
+	public static com.liferay.portal.model.LayoutSet updateLogo(long groupId,
+		boolean privateLayout, boolean logo, java.io.File file)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException {
+		return getService().updateLogo(groupId, privateLayout, logo, file);
+	}
+
+	public static com.liferay.portal.model.LayoutSet updateLogo(long groupId,
+		boolean privateLayout, boolean logo, java.io.InputStream is)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException {
+		return getService().updateLogo(groupId, privateLayout, logo, is);
+	}
+
+	public static com.liferay.portal.model.LayoutSet updateLogo(long groupId,
+		boolean privateLayout, boolean logo, java.io.InputStream is,
+		boolean cleanUpStream)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException {
+		return getService()
+				   .updateLogo(groupId, privateLayout, logo, is, cleanUpStream);
 	}
 
 	public static com.liferay.portal.model.LayoutSet updateLookAndFeel(
@@ -320,6 +392,15 @@ public class LayoutSetLocalServiceUtil {
 		return getService()
 				   .updateLookAndFeel(groupId, privateLayout, themeId,
 			colorSchemeId, css, wapTheme);
+	}
+
+	public static void updateLookAndFeel(long groupId,
+		java.lang.String themeId, java.lang.String colorSchemeId,
+		java.lang.String css, boolean wapTheme)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException {
+		getService()
+			.updateLookAndFeel(groupId, themeId, colorSchemeId, css, wapTheme);
 	}
 
 	public static com.liferay.portal.model.LayoutSet updatePageCount(
@@ -350,20 +431,15 @@ public class LayoutSetLocalServiceUtil {
 
 			ReferenceRegistry.registerReference(LayoutSetLocalServiceUtil.class,
 				"_service");
-			MethodCache.remove(LayoutSetLocalService.class);
 		}
 
 		return _service;
 	}
 
+	/**
+	 * @deprecated
+	 */
 	public void setService(LayoutSetLocalService service) {
-		MethodCache.remove(LayoutSetLocalService.class);
-
-		_service = service;
-
-		ReferenceRegistry.registerReference(LayoutSetLocalServiceUtil.class,
-			"_service");
-		MethodCache.remove(LayoutSetLocalService.class);
 	}
 
 	private static LayoutSetLocalService _service;

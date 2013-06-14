@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -15,7 +15,6 @@
 package com.liferay.portlet.bookmarks.service;
 
 import com.liferay.portal.kernel.bean.PortalBeanLocatorUtil;
-import com.liferay.portal.kernel.util.MethodCache;
 import com.liferay.portal.kernel.util.ReferenceRegistry;
 
 /**
@@ -66,25 +65,32 @@ public class BookmarksFolderLocalServiceUtil {
 	* Deletes the bookmarks folder with the primary key from the database. Also notifies the appropriate model listeners.
 	*
 	* @param folderId the primary key of the bookmarks folder
+	* @return the bookmarks folder that was removed
 	* @throws PortalException if a bookmarks folder with the primary key could not be found
 	* @throws SystemException if a system exception occurred
 	*/
-	public static void deleteBookmarksFolder(long folderId)
+	public static com.liferay.portlet.bookmarks.model.BookmarksFolder deleteBookmarksFolder(
+		long folderId)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException {
-		getService().deleteBookmarksFolder(folderId);
+		return getService().deleteBookmarksFolder(folderId);
 	}
 
 	/**
 	* Deletes the bookmarks folder from the database. Also notifies the appropriate model listeners.
 	*
 	* @param bookmarksFolder the bookmarks folder
+	* @return the bookmarks folder that was removed
 	* @throws SystemException if a system exception occurred
 	*/
-	public static void deleteBookmarksFolder(
+	public static com.liferay.portlet.bookmarks.model.BookmarksFolder deleteBookmarksFolder(
 		com.liferay.portlet.bookmarks.model.BookmarksFolder bookmarksFolder)
 		throws com.liferay.portal.kernel.exception.SystemException {
-		getService().deleteBookmarksFolder(bookmarksFolder);
+		return getService().deleteBookmarksFolder(bookmarksFolder);
+	}
+
+	public static com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery() {
+		return getService().dynamicQuery();
 	}
 
 	/**
@@ -156,6 +162,12 @@ public class BookmarksFolderLocalServiceUtil {
 		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery)
 		throws com.liferay.portal.kernel.exception.SystemException {
 		return getService().dynamicQueryCount(dynamicQuery);
+	}
+
+	public static com.liferay.portlet.bookmarks.model.BookmarksFolder fetchBookmarksFolder(
+		long folderId)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getService().fetchBookmarksFolder(folderId);
 	}
 
 	/**
@@ -282,41 +294,6 @@ public class BookmarksFolderLocalServiceUtil {
 			serviceContext);
 	}
 
-	public static void addFolderResources(
-		com.liferay.portlet.bookmarks.model.BookmarksFolder folder,
-		boolean addGroupPermissions, boolean addGuestPermissions)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
-		getService()
-			.addFolderResources(folder, addGroupPermissions, addGuestPermissions);
-	}
-
-	public static void addFolderResources(
-		com.liferay.portlet.bookmarks.model.BookmarksFolder folder,
-		java.lang.String[] groupPermissions, java.lang.String[] guestPermissions)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
-		getService()
-			.addFolderResources(folder, groupPermissions, guestPermissions);
-	}
-
-	public static void addFolderResources(long folderId,
-		boolean addGroupPermissions, boolean addGuestPermissions)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
-		getService()
-			.addFolderResources(folderId, addGroupPermissions,
-			addGuestPermissions);
-	}
-
-	public static void addFolderResources(long folderId,
-		java.lang.String[] groupPermissions, java.lang.String[] guestPermissions)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
-		getService()
-			.addFolderResources(folderId, groupPermissions, guestPermissions);
-	}
-
 	public static void deleteFolder(
 		com.liferay.portlet.bookmarks.model.BookmarksFolder folder)
 		throws com.liferay.portal.kernel.exception.PortalException,
@@ -400,20 +377,15 @@ public class BookmarksFolderLocalServiceUtil {
 
 			ReferenceRegistry.registerReference(BookmarksFolderLocalServiceUtil.class,
 				"_service");
-			MethodCache.remove(BookmarksFolderLocalService.class);
 		}
 
 		return _service;
 	}
 
+	/**
+	 * @deprecated
+	 */
 	public void setService(BookmarksFolderLocalService service) {
-		MethodCache.remove(BookmarksFolderLocalService.class);
-
-		_service = service;
-
-		ReferenceRegistry.registerReference(BookmarksFolderLocalServiceUtil.class,
-			"_service");
-		MethodCache.remove(BookmarksFolderLocalService.class);
 	}
 
 	private static BookmarksFolderLocalService _service;

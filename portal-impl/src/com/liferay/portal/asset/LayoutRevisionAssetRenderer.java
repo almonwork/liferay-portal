@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -15,10 +15,18 @@
 package com.liferay.portal.asset;
 
 import com.liferay.portal.kernel.language.LanguageUtil;
+import com.liferay.portal.kernel.portlet.LiferayPortletRequest;
+import com.liferay.portal.kernel.portlet.LiferayPortletResponse;
 import com.liferay.portal.kernel.util.StringBundler;
+import com.liferay.portal.kernel.util.StringPool;
+import com.liferay.portal.model.Layout;
+import com.liferay.portal.model.LayoutBranch;
 import com.liferay.portal.model.LayoutRevision;
 import com.liferay.portal.model.LayoutSetBranch;
+import com.liferay.portal.service.LayoutLocalServiceUtil;
 import com.liferay.portal.service.LayoutSetBranchLocalServiceUtil;
+import com.liferay.portal.theme.ThemeDisplay;
+import com.liferay.portal.util.PortalUtil;
 import com.liferay.portal.util.WebKeys;
 import com.liferay.portlet.asset.model.BaseAssetRenderer;
 
@@ -36,6 +44,8 @@ public class LayoutRevisionAssetRenderer extends BaseAssetRenderer {
 		_layoutRevision = layoutRevision;
 
 		try {
+			_layoutBranch = layoutRevision.getLayoutBranch();
+
 			_layoutSetBranch =
 				LayoutSetBranchLocalServiceUtil.getLayoutSetBranch(
 					_layoutRevision.getLayoutSetBranchId());
@@ -43,6 +53,10 @@ public class LayoutRevisionAssetRenderer extends BaseAssetRenderer {
 		catch (Exception e) {
 			throw new IllegalStateException(e);
 		}
+	}
+
+	public String getAssetRendererFactoryClassName() {
+		return LayoutRevisionAssetRendererFactory.CLASS_NAME;
 	}
 
 	public long getClassPK() {
@@ -54,16 +68,20 @@ public class LayoutRevisionAssetRenderer extends BaseAssetRenderer {
 	}
 
 	public String getSummary(Locale locale) {
-		StringBundler sb = new StringBundler(12);
+		StringBundler sb = new StringBundler(16);
 
 		sb.append("<strong>");
-		sb.append(LanguageUtil.get(locale, "layout"));
+		sb.append(LanguageUtil.get(locale, "page"));
 		sb.append(":</strong> ");
 		sb.append(_layoutRevision.getHTMLTitle(locale));
 		sb.append("<br /><strong>");
-		sb.append(LanguageUtil.get(locale, "branch"));
+		sb.append(LanguageUtil.get(locale, "site-pages-variation"));
 		sb.append(":</strong> ");
-		sb.append(_layoutSetBranch.getName());
+		sb.append(LanguageUtil.get(locale, _layoutSetBranch.getName()));
+		sb.append("<br /><strong>");
+		sb.append(LanguageUtil.get(locale, "page-variation"));
+		sb.append(":</strong> ");
+		sb.append(LanguageUtil.get(locale, _layoutBranch.getName()));
 		sb.append("<br /><strong>");
 		sb.append(LanguageUtil.get(locale, "revision-id"));
 		sb.append(":</strong> ");
@@ -73,22 +91,53 @@ public class LayoutRevisionAssetRenderer extends BaseAssetRenderer {
 	}
 
 	public String getTitle(Locale locale) {
-		StringBundler sb = new StringBundler(4);
+		return _layoutRevision.getHTMLTitle(locale);
+	}
 
-		sb.append(_layoutRevision.getHTMLTitle(locale));
-		sb.append(" [");
-		sb.append(_layoutSetBranch.getName());
-		sb.append("]");
+	@Override
+	public String getURLViewInContext(
+		LiferayPortletRequest liferayPortletRequest,
+		LiferayPortletResponse liferayPortletResponse,
+		String noSuchEntryRedirect) {
 
-		return sb.toString();
+		try {
+			ThemeDisplay themeDisplay =
+				(ThemeDisplay)liferayPortletRequest.getAttribute(
+					WebKeys.THEME_DISPLAY);
+
+			Layout layout = LayoutLocalServiceUtil.getLayout(
+				_layoutRevision.getPlid());
+
+			StringBundler sb = new StringBundler(5);
+
+			sb.append(PortalUtil.getLayoutFriendlyURL(layout, themeDisplay));
+			sb.append("?layoutSetBranchId=");
+			sb.append(_layoutRevision.getLayoutSetBranchId());
+			sb.append("&layoutRevisionId=");
+			sb.append(_layoutRevision.getLayoutRevisionId());
+
+			return sb.toString();
+		}
+		catch (Exception e) {
+			return StringPool.BLANK;
+		}
 	}
 
 	public long getUserId() {
 		return _layoutRevision.getUserId();
 	}
 
+	public String getUserName() {
+		return _layoutRevision.getUserName();
+	}
+
 	public String getUuid() {
 		return null;
+	}
+
+	@Override
+	public boolean isPreviewInContext() {
+		return true;
 	}
 
 	public String render(
@@ -107,6 +156,7 @@ public class LayoutRevisionAssetRenderer extends BaseAssetRenderer {
 		}
 	}
 
+	private LayoutBranch _layoutBranch;
 	private LayoutRevision _layoutRevision;
 	private LayoutSetBranch _layoutSetBranch;
 

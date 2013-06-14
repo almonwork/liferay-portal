@@ -24,13 +24,18 @@
 	<td>Asset Publisher Test Page</td>
 </tr>
 <tr>
+	<td>waitForElementPresent</td>
+	<td>//nav[@class='site-breadcrumbs aui-helper-hidden lfr-hudcrumbs']</td>
+	<td>AUI Help Hidden LFR Hudcrumbs</td>
+</tr>
+<tr>
 	<td>assertText</td>
-	<td>//strong/a</td>
+	<td>//span[@title='Options']/ul/li/strong/a</td>
 	<td>Options</td>
 </tr>
 <tr>
 	<td>clickAt</td>
-	<td>//strong/a</td>
+	<td>//span[@title='Options']/ul/li/strong/a</td>
 	<td>Options</td>
 </tr>
 <tr>
@@ -64,6 +69,16 @@
 	<td>Archive/Restore Setup</td>
 </tr>
 <tr>
+	<td>waitForElementPresent</td>
+	<td>//script[contains(@src,'liferay/navigation_interaction.js')]</td>
+	<td>Navigation Interaction</td>
+</tr>
+<tr>
+	<td>selectFrame</td>
+	<td>//iframe[contains(@id,'configurationIframeDialog')]</td>
+	<td>iFrame</td>
+</tr>
+<tr>
 	<td>assertText</td>
 	<td>//tr[3]/td[1]</td>
 	<td>Archive Name</td>
@@ -75,12 +90,12 @@
 </tr>
 <tr>
 	<td>assertText</td>
-	<td>//span[@title='Actions']/ul/li/strong/a</td>
+	<td>//span[@title='Actions']/ul/li/strong</td>
 	<td>Actions</td>
 </tr>
 <tr>
 	<td>clickAt</td>
-	<td>//span[@title='Actions']/ul/li/strong/a</td>
+	<td>//span[@title='Actions']/ul/li/strong</td>
 	<td>Actions</td>
 </tr>
 <tr>
@@ -104,12 +119,17 @@
 	<td>You have successfully updated the setup.</td>
 </tr>
 <tr>
+	<td>selectFrame</td>
+	<td>relative=top</td>
+	<td>top</td>
+</tr>
+<tr>
 	<td>open</td>
 	<td>/web/guest/home/</td>
 	<td></td>
 </tr>
 <tr>
-	<td>waitForElementPresent</td>
+	<td>waitForVisible</td>
 	<td>link=Asset Publisher Test Page</td>
 	<td>Asset Publisher Test Page</td>
 </tr>
@@ -119,13 +139,18 @@
 	<td>Asset Publisher Test Page</td>
 </tr>
 <tr>
+	<td>waitForElementPresent</td>
+	<td>//nav[@class='site-breadcrumbs aui-helper-hidden lfr-hudcrumbs']</td>
+	<td>AUI Help Hidden LFR Hudcrumbs</td>
+</tr>
+<tr>
 	<td>assertText</td>
-	<td>//strong/a</td>
+	<td>//span[@title='Options']/ul/li/strong/a</td>
 	<td>Options</td>
 </tr>
 <tr>
 	<td>clickAt</td>
-	<td>//strong/a</td>
+	<td>//span[@title='Options']/ul/li/strong/a</td>
 	<td>Options</td>
 </tr>
 <tr>
@@ -155,7 +180,7 @@
 </tr>
 <tr>
 	<td>assertText</td>
-	<td>//div[@class='lfr-panel-title']/span</td>
+	<td>xPath=(//div[@class='lfr-panel-title'])[1]/span</td>
 	<td>Selection</td>
 </tr>
 <tr>
@@ -163,7 +188,6 @@
 	<td>xPath=(//div[@class='lfr-panel-title'])[2]/span</td>
 	<td>Display Settings</td>
 </tr>
-
 </tbody></table>
 </body>
 </html>

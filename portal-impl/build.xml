@@ -7,6 +7,8 @@
 
 	<property name="deploy.dir" value="${app.server.lib.portal.dir}" />
 	<property name="jar.file" value="${ant.project.name}" />
+	<property name="manifest.bundle.name" value="Liferay Portal Impl" />
+	<property name="manifest.bundle.symbolic.name" value="com.liferay.portal.impl;singleton:=true" />
 	<property name="service.file" value="service.xml" />
 
 	<target name="build-alloy-taglib">
@@ -73,23 +75,23 @@ svn://svn.liferay.com/repos/public/alloy/trunk/sandbox/taglibs.
 			classname="org.antlr.Tool"
 			classpathref="antlr.classpath"
 			fork="true"
-			maxmemory="512m"
+			maxmemory="1024m"
 			newenvironment="true"
 		>
 			<arg value="-o" />
 			<arg path="src/com/liferay/portal/parsers/creole/parser" />
 			<arg path="src/com/liferay/portal/parsers/creole/grammar/Creole10.g" />
 		</java>
-        
-        <replace file="src/com/liferay/portal/parsers/creole/parser/Creole10Lexer.java">		  
-			<replacetoken>public class Creole10Lexer</replacetoken>									   
+
+        <replace file="src/com/liferay/portal/parsers/creole/parser/Creole10Lexer.java">
+			<replacetoken>public class Creole10Lexer</replacetoken>
 			<replacevalue><![CDATA[@SuppressWarnings("all")
 public class Creole10Lexer]]></replacevalue>
-        </replace>        
+        </replace>
 
-		<replace file="src/com/liferay/portal/parsers/creole/parser/Creole10Parser.java">		  
+		<replace file="src/com/liferay/portal/parsers/creole/parser/Creole10Parser.java">
 			<replacetoken>public class Creole10Parser</replacetoken>
-			<replacevalue><![CDATA[@SuppressWarnings("all") 
+			<replacevalue><![CDATA[@SuppressWarnings("all")
 public class Creole10Parser]]></replacevalue>
         </replace>
 
@@ -157,6 +159,43 @@ public class Creole10Parser]]></replacevalue>
 		</java>
 	</target>
 
+	<target name="build-json-java">
+		<tstamp>
+			<format property="tstamp.value" pattern="yyyyMMddkkmmssSSS" />
+		</tstamp>
+
+		<get
+			dest="json-java.zip"
+			src="https://github.com/douglascrockford/JSON-java/zipball/master"
+		/>
+
+		<unzip
+			dest="${tstamp.value}/org/json"
+			src="json-java.zip"
+		>
+			<patternset
+				includes="**/*.java"
+			/>
+			<flattenmapper />
+		</unzip>
+
+		<delete file="json-java.zip" />
+
+		<antcall target="compile-java">
+			<param name="javac.classpathref" value="project.classpath" />
+			<param name="javac.destdir" value="${tstamp.value}" />
+			<param name="javac.srcdir" value="${tstamp.value}" />
+		</antcall>
+
+		<zip destfile="${project.dir}/lib/portal/json-java.jar">
+			<zipfileset
+				dir="${tstamp.value}"
+			/>
+		</zip>
+
+		<delete dir="${tstamp.value}" />
+	</target>
+
 	<target name="build-lang">
 		<antcall target="build-lang-cmd">
 			<param name="lang.dir" value="src/content" />
@@ -175,8 +214,10 @@ public class Creole10Parser]]></replacevalue>
 			<jvmarg value="-Dfile.encoding=UTF-8" />
 			<jvmarg value="-Duser.country=US" />
 			<jvmarg value="-Duser.language=en" />
-			<arg value="${lang.dir}" />
-			<arg value="${lang.file}" />
+			<arg value="lang.dir=${lang.dir}" />
+			<arg value="lang.file=${lang.file}" />
+			<arg value="lang.plugin=false" />
+			<arg value="lang.translate=true" />
 		</java>
 
 		<copy file="${lang.dir}/${lang.file}.properties" tofile="${lang.dir}/${lang.file}_en.properties" />
@@ -231,7 +272,7 @@ public class Creole10Parser]]></replacevalue>
 				<available file="${jdk.src.dir}/src/j2se/src/share/classes/com/sun/tools/doclets/internal/toolkit/util/SourceToHTMLConverter.java" />
 			</not>
 			<then>
-				<fail message="The JDK source code is either incompatible or extracted incorrectly." />
+				<fail>The JDK source code is either incompatible or extracted incorrectly.</fail>
 			</then>
 		</if>
 
@@ -296,18 +337,32 @@ public class Creole10Parser]]></replacevalue>
 			<format property="tstamp.value" pattern="yyyyMMddkkmmssSSS" />
 		</tstamp>
 
-		<mkdir dir="${tstamp.value}/haml" />
+		<mkdir dir="${tstamp.value}/compass" />
 
 		<get
-			dest="${tstamp.value}/haml/haml-3.0.25.gem"
-			src="http://rubygems.org/downloads/haml-3.0.25.gem"
+			dest="${tstamp.value}/compass/compass-0.11.5.gem"
+			src="http://rubygems.org/downloads/compass-0.11.5.gem"
 		/>
 
 		<java
 			fork="true"
 			jar="${project.dir}/lib/portal/jruby.jar"
 		>
-			<arg line="-S gem install -i ./${tstamp.value}/output ${tstamp.value}/haml/haml-3.0.25.gem" />
+			<arg line="-S gem install -i ./${tstamp.value}/output ${tstamp.value}/compass/compass-0.11.5.gem --no-rdoc --no-ri" />
+		</java>
+
+		<mkdir dir="${tstamp.value}/sass" />
+
+		<get
+			dest="${tstamp.value}/sass/sass-3.1.7.gem"
+			src="http://rubygems.org/downloads/sass-3.1.7.gem"
+		/>
+
+		<java
+			fork="true"
+			jar="${project.dir}/lib/portal/jruby.jar"
+		>
+			<arg line="-S gem install -i ./${tstamp.value}/output ${tstamp.value}/sass/sass-3.1.7.gem --no-rdoc --no-ri" />
 		</java>
 
 		<jar
@@ -327,7 +382,14 @@ public class Creole10Parser]]></replacevalue>
 			<format property="tstamp.value" pattern="yyyyMMddkkmmssSSS" />
 		</tstamp>
 
-		<unzip src="${project.dir}/lib/development/selenium-server.jar" dest="${tstamp.value}" />
+		<unzip
+			dest="${tstamp.value}"
+			src="${project.dir}/lib/development/selenium-server.jar"
+		>
+			<patternset
+				excludes="org/json/**"
+			/>
+		</unzip>
 
 		<copy file="${project.dir}/tools/selenium/user-extensions.js" todir="${tstamp.value}/core/scripts" overwrite="true" />
 
@@ -336,11 +398,168 @@ public class Creole10Parser]]></replacevalue>
 		<delete dir="${tstamp.value}" />
 	</target>
 
+	<target name="build-selenium-server-2">
+		<tstamp>
+			<format property="tstamp.value" pattern="yyyyMMddkkmmssSSS" />
+		</tstamp>
+
+		<unzip
+			dest="${tstamp.value}"
+			src="${project.dir}/lib/development/selenium-server-2.jar"
+		/>
+
+		<delete includeemptydirs="true">
+
+			<!-- bcprov.jar -->
+
+			<fileset
+				dir="${tstamp.value}"
+				includes="org/bouncycastle/**"
+			/>
+
+			<!-- bsh.jar -->
+
+			<fileset
+				dir="${tstamp.value}"
+				includes="bsh/**"
+			/>
+
+			<!-- commons-codec.jar -->
+
+			<fileset
+				dir="${tstamp.value}"
+				includes="org/apache/commons/codec/**"
+			/>
+
+			<!-- commons-collections.jar -->
+
+			<fileset
+				dir="${tstamp.value}"
+				includes="org/apache/commons/collections/**"
+			/>
+
+			<!-- commons-io.jar -->
+
+			<fileset
+				dir="${tstamp.value}"
+				includes="org/apache/commons/io/**"
+			/>
+
+			<!-- commons-lang.jar -->
+
+			<fileset
+				dir="${tstamp.value}"
+				includes="org/apache/commons/lang/**"
+			/>
+
+			<!-- commons-logging.jar -->
+
+			<fileset
+				dir="${tstamp.value}"
+				includes="org/apache/commons/logging/**"
+			/>
+
+			<!-- ecj.jar -->
+
+			<fileset
+				dir="${tstamp.value}"
+				includes="org/eclipse/jdt/**"
+			/>
+
+			<!-- hamcrest*.jar -->
+
+			<fileset
+				dir="${tstamp.value}"
+				includes="org/hamcrest/**"
+			/>
+
+			<!-- junit.jar -->
+
+			<fileset
+				dir="${tstamp.value}"
+				includes="junit/**,org/junit/**"
+			/>
+
+			<!-- jasper.jar -->
+
+			<fileset
+				dir="${tstamp.value}"
+				includes="org/apache/jasper/**"
+			/>
+
+			<!-- json-java.jar -->
+
+			<fileset
+				dir="${tstamp.value}"
+				includes="org/json/**"
+			/>
+
+			<!-- nekohtml.jar -->
+
+			<fileset
+				dir="${tstamp.value}"
+				includes="org/cyberneko/**"
+			/>
+
+			<!-- serializer.jar -->
+
+			<fileset
+				dir="${tstamp.value}"
+				includes="org/apache/xml/serializer/**"
+			/>
+
+			<!-- servlet-api.jar -->
+
+			<fileset
+				dir="${tstamp.value}"
+				includes="javax/servlet/**"
+			/>
+
+			<!-- slf4j-*.jar -->
+
+			<fileset
+				dir="${tstamp.value}"
+				includes="org/slf4j/**"
+			/>
+
+			<!-- xalan.jar -->
+
+			<fileset
+				dir="${tstamp.value}"
+				includes="java_cup/**,org/apache/bcel/**,org/apache/regexp/**,org/apache/xalan/**,org/apache/xml/**,org/apache/xpath/**,trax/**"
+			/>
+
+			<!-- xerces.jar -->
+
+			<fileset
+				dir="${tstamp.value}"
+				includes="org/apache/html/**,org/apache/wml/**,org/apache/xerces/**,org/apache/xml/serialize/**"
+			/>
+
+			<!-- xml-apis.jar -->
+
+			<fileset
+				dir="${tstamp.value}"
+				includes="javax/xml/**,org/apache/xmlcommons/**,org/xml/sax/**,org/w3c/dom/**"
+			/>
+		</delete>
+
+		<zip basedir="${tstamp.value}" destfile="${project.dir}/lib/development/selenium-server-2.jar.new" />
+
+		<delete dir="${tstamp.value}" />
+	</target>
+
 	<target name="build-service">
 		<java
 			classname="com.liferay.portal.tools.servicebuilder.ServiceBuilder"
 			classpathref="project.classpath"
+			fork="true"
+			newenvironment="true"
 		>
+			<jvmarg value="-Xms512m" />
+			<jvmarg value="-Xmx1024m" />
+			<jvmarg value="-Xss2048k" />
+			<jvmarg value="-XX:MaxPermSize=512m" />
 			<arg value="-Dexternal-properties=com/liferay/portal/tools/dependencies/portal-tools.properties" />
 			<arg value="-Dorg.apache.commons.logging.Log=org.apache.commons.logging.impl.Log4JLogger" />
 			<arg value="service.input.file=${service.file}" />
@@ -350,8 +569,7 @@ public class Creole10Parser]]></replacevalue>
 			<arg value="service.spring.file=${basedir}/src/META-INF/portal-spring.xml" />
 			<arg value="service.api.dir=${basedir}/../portal-service/src" />
 			<arg value="service.impl.dir=${basedir}/src" />
-			<arg value="service.json.file=${basedir}/../portal-web/docroot/html/js/liferay/service.js" />
-			<arg value="service.remoting.file=${basedir}/../tunnel-web/docroot/WEB-INF/remoting-servlet.xml" />
+			<arg value="service.remoting.file=${basedir}/../portal-web/docroot/WEB-INF/remoting-servlet.xml" />
 			<arg value="service.sql.dir=${basedir}/../sql" />
 			<arg value="service.sql.file=portal-tables.sql" />
 			<arg value="service.sql.indexes.file=indexes.sql" />
@@ -359,7 +577,8 @@ public class Creole10Parser]]></replacevalue>
 			<arg value="service.sql.sequences.file=sequences.sql" />
 			<arg value="service.bean.locator.util=com.liferay.portal.kernel.bean.PortalBeanLocatorUtil" />
 			<arg value="service.props.util=com.liferay.portal.util.PropsUtil" />
-			<arg value="service.test.dir=${basedir}/test" />
+			<arg value="service.target.entity.name=${service.target.entity.name}" />
+			<arg value="service.test.dir=${basedir}/test/integration" />
 		</java>
 
 		<delete file="ServiceBuilder.temp" />
@@ -439,12 +658,6 @@ public class Creole10Parser]]></replacevalue>
 		</antcall>
 	</target>
 
-	<target name="build-service-portlet-imagegallery">
-		<antcall target="build-service">
-			<param name="service.file" value="${basedir}/src/com/liferay/portlet/imagegallery/service.xml" />
-		</antcall>
-	</target>
-
 	<target name="build-service-portlet-journal">
 		<antcall target="build-service">
 			<param name="service.file" value="${basedir}/src/com/liferay/portlet/journal/service.xml" />
@@ -454,6 +667,12 @@ public class Creole10Parser]]></replacevalue>
 	<target name="build-service-portlet-messageboards">
 		<antcall target="build-service">
 			<param name="service.file" value="${basedir}/src/com/liferay/portlet/messageboards/service.xml" />
+		</antcall>
+	</target>
+
+	<target name="build-service-portlet-mobiledevicerules">
+		<antcall target="build-service">
+			<param name="service.file" value="${basedir}/src/com/liferay/portlet/mobiledevicerules/service.xml" />
 		</antcall>
 	</target>
 
@@ -487,9 +706,9 @@ public class Creole10Parser]]></replacevalue>
 		</antcall>
 	</target>
 
-	<target name="build-service-portlet-test">
+	<target name="build-service-portlet-trash">
 		<antcall target="build-service">
-			<param name="service.file" value="${basedir}/src/com/liferay/portlet/test/service.xml" />
+			<param name="service.file" value="${basedir}/src/com/liferay/portlet/trash/service.xml" />
 		</antcall>
 	</target>
 
@@ -510,14 +729,15 @@ public class Creole10Parser]]></replacevalue>
 		<antcall target="build-service-portlet-dynamicdatamapping" />
 		<antcall target="build-service-portlet-expando" />
 		<antcall target="build-service-portlet-flags" />
-		<antcall target="build-service-portlet-imagegallery" />
 		<antcall target="build-service-portlet-journal" />
 		<antcall target="build-service-portlet-messageboards" />
+		<antcall target="build-service-portlet-mobiledevicerules" />
 		<antcall target="build-service-portlet-polls" />
 		<antcall target="build-service-portlet-ratings" />
 		<antcall target="build-service-portlet-shopping" />
 		<antcall target="build-service-portlet-social" />
 		<antcall target="build-service-portlet-softwarecatalog" />
+		<antcall target="build-service-portlet-trash" />
 		<antcall target="build-service-portlet-wiki" />
 	</target>
 
@@ -637,7 +857,7 @@ public class Creole10Parser]]></replacevalue>
 			<jvmarg value="-Dexternal-properties=com/liferay/portal/tools/dependencies/portal-tools.properties" />
 			<jvmarg value="-Dorg.apache.commons.logging.Log=org.apache.commons.logging.impl.Log4JLogger" />
 			<arg value="wsdd.output.path=src/" />
-			<arg value="wsdd.server.config.file=${basedir}/../tunnel-web/docroot/WEB-INF/server-config.wsdd" />
+			<arg value="wsdd.server.config.file=${basedir}/../portal-web/docroot/WEB-INF/server-config.wsdd" />
 			<arg value="wsdd.service.namespace=Portlet" />
 			<arg value="wsdd.input.file=${service.file}" />
 		</java>
@@ -709,12 +929,6 @@ public class Creole10Parser]]></replacevalue>
 		</antcall>
 	</target>
 
-	<target name="build-wsdd-portlet-imagegallery">
-		<antcall target="build-wsdd">
-			<param name="service.file" value="${basedir}/src/com/liferay/portlet/imagegallery/service.xml" />
-		</antcall>
-	</target>
-
 	<target name="build-wsdd-portlet-journal">
 		<antcall target="build-wsdd">
 			<param name="service.file" value="${basedir}/src/com/liferay/portlet/journal/service.xml" />
@@ -724,6 +938,12 @@ public class Creole10Parser]]></replacevalue>
 	<target name="build-wsdd-portlet-messageboards">
 		<antcall target="build-wsdd">
 			<param name="service.file" value="${basedir}/src/com/liferay/portlet/messageboards/service.xml" />
+		</antcall>
+	</target>
+
+	<target name="build-wsdd-portlet-mobiledevicerules">
+		<antcall target="build-wsdd">
+			<param name="service.file" value="${basedir}/src/com/liferay/portlet/mobiledevicerules/service.xml" />
 		</antcall>
 	</target>
 
@@ -745,15 +965,21 @@ public class Creole10Parser]]></replacevalue>
 		</antcall>
 	</target>
 
+	<target name="build-wsdd-portlet-social">
+		<antcall target="build-wsdd">
+			<param name="service.file" value="${basedir}/src/com/liferay/portlet/social/service.xml" />
+		</antcall>
+	</target>
+
 	<target name="build-wsdd-portlet-softwarecatalog">
 		<antcall target="build-wsdd">
 			<param name="service.file" value="${basedir}/src/com/liferay/portlet/softwarecatalog/service.xml" />
 		</antcall>
 	</target>
 
-	<target name="build-wsdd-portlet-test">
+	<target name="build-wsdd-portlet-trash">
 		<antcall target="build-wsdd">
-			<param name="service.file" value="${basedir}/src/com/liferay/portlet/test/service.xml" />
+			<param name="service.file" value="${basedir}/src/com/liferay/portlet/trash/service.xml" />
 		</antcall>
 	</target>
 
@@ -774,13 +1000,15 @@ public class Creole10Parser]]></replacevalue>
 		<antcall target="build-wsdd-portlet-dynamicdatamapping" />
 		<antcall target="build-wsdd-portlet-expando" />
 		<antcall target="build-wsdd-portlet-flags" />
-		<antcall target="build-wsdd-portlet-imagegallery" />
 		<antcall target="build-wsdd-portlet-journal" />
 		<antcall target="build-wsdd-portlet-messageboards" />
+		<antcall target="build-wsdd-portlet-mobiledevicerules" />
 		<antcall target="build-wsdd-portlet-polls" />
 		<antcall target="build-wsdd-portlet-ratings" />
 		<antcall target="build-wsdd-portlet-shopping" />
+		<antcall target="build-wsdd-portlet-social" />
 		<antcall target="build-wsdd-portlet-softwarecatalog" />
+		<antcall target="build-wsdd-portlet-trash" />
 		<antcall target="build-wsdd-portlet-wiki" />
 	</target>
 
@@ -789,60 +1017,11 @@ public class Creole10Parser]]></replacevalue>
 		<antcall target="build-wsdd-portlets" />
 	</target>
 
-	<target name="build-yui">
-		<tstamp>
-			<format property="tstamp.value" pattern="yyyyMMddkkmmssSSS" />
-		</tstamp>
-
-		<unzip src="${project.dir}/tools/rhino1_6R7.zip" dest="${tstamp.value}" />
-		<unzip src="${project.dir}/tools/yuicompressor-2.4.2.zip" dest="${tstamp.value}" />
-
-		<move todir="${tstamp.value}/rhino1_6R7/src/org">
-			<fileset dir="${tstamp.value}/yuicompressor-2.4.2/src/org" includes="**/*.java" />
-		</move>
-
-		<move file="${tstamp.value}/rhino1_6R7/deprecatedsrc/org/mozilla" todir="${tstamp.value}/rhino1_6R7/deprecatedsrc/com/liferay" />
-		<move file="${tstamp.value}/rhino1_6R7/src/org/mozilla" todir="${tstamp.value}/rhino1_6R7/src/com/liferay" />
-		<move file="${tstamp.value}/rhino1_6R7/toolsrc/org/mozilla" todir="${tstamp.value}/rhino1_6R7/toolsrc/com/liferay" />
-		<move file="${tstamp.value}/rhino1_6R7/xmlimplsrc/org/mozilla" todir="${tstamp.value}/rhino1_6R7/xmlimplsrc/com/liferay" />
-		<move file="${tstamp.value}/yuicompressor-2.4.2/src/com/yahoo" todir="${tstamp.value}/yuicompressor-2.4.2/src/com/liferay" />
-
-		<replace dir="${tstamp.value}" includes="**/build.xml,**/*.java,**/*.properties">
-			<replacefilter token="com.yahoo" value="com.liferay.yahoo" />
-			<replacefilter token="org.mozilla" value="com.liferay.mozilla" />
-			<replacefilter token="org/mozilla" value="com/liferay/mozilla" />
-		</replace>
-
-		<replace dir="${tstamp.value}/rhino1_6R7" includes="**/build.xml">
-			<replacetoken><![CDATA[includes="org/]]></replacetoken>
-			<replacevalue><![CDATA[includes="com/]]></replacevalue>
-		</replace>
-
-		<replace dir="${tstamp.value}/rhino1_6R7" includes="**/build.xml">
-			<replacetoken><![CDATA[excludes="org/]]></replacetoken>
-			<replacevalue><![CDATA[excludes="com/]]></replacevalue>
-		</replace>
-
-		<replace file="${tstamp.value}/yuicompressor-2.4.2/build.xml">
-			<replacetoken><![CDATA[<unjar src="${lib.dir}/jargs-1.0.jar" dest="${build.dir}/jar"/>]]></replacetoken>
-			<replacevalue></replacevalue>
-		</replace>
-
-		<replace file="${tstamp.value}/yuicompressor-2.4.2/build.xml">
-			<replacetoken><![CDATA[<unjar src="${lib.dir}/rhino-1.6R7.jar" dest="${build.dir}/jar"/>]]></replacetoken>
-			<replacevalue></replacevalue>
-		</replace>
-
-		<ant dir="${tstamp.value}/rhino1_6R7" target="jar" inheritAll="false" />
-
-		<copy file="${tstamp.value}/rhino1_6R7/build/rhino1_6R7/js.jar" tofile="${tstamp.value}/yuicompressor-2.4.2/lib/rhino-1.6R7.jar" />
-
-		<ant dir="${tstamp.value}/yuicompressor-2.4.2" target="build.jar" inheritAll="false" />
-
-		<move file="${tstamp.value}/rhino1_6R7/build/rhino1_6R7/js.jar" tofile="${project.dir}/lib/portal/liferay-rhino.jar.new" />
-		<move file="${tstamp.value}/yuicompressor-2.4.2/build/yuicompressor-2.4.2.jar" tofile="${project.dir}/lib/portal/liferay-yuicompressor.jar.new" />
-
-		<delete dir="${tstamp.value}" />
+	<target name="build-yui-compressor">
+		<jarjar jarfile="${project.dir}/lib/portal/liferay-yui-compressor.jar.new">
+			<rule pattern="org.mozilla.**" result="com.yahoo.platform.yui.mozilla.@1" />
+			<zipfileset src="${project.dir}/tools/yuicompressor-2.4.7.jar" />
+		</jarjar>
 	</target>
 
 	<target name="clean">
@@ -939,7 +1118,7 @@ public class Creole10Parser]]></replacevalue>
 		</if>
 
 		<copy todir="${portal-impl.classes.dir}">
-			<fileset dir="src" excludes="**/*.java" />
+			<fileset dir="src" excludes="**/*.java,**/META-INF/javadocs-all*.xml" />
 		</copy>
 	</target>
 
@@ -1029,7 +1208,8 @@ public class Creole10Parser]]></replacevalue>
 			fork="true"
 			newenvironment="true"
 		>
-			<jvmarg value="-Xmx256m" />
+			<jvmarg value="-Xmx512m" />
+			<jvmarg value="-Xss2048k" />
 			<jvmarg value="-Dsource.formatter.excludes=${source.formatter.excludes}" />
 		</java>
 

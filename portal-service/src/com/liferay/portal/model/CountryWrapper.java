@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,6 +14,9 @@
 
 package com.liferay.portal.model;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * <p>
  * This class is a wrapper for {@link Country}.
@@ -23,7 +26,7 @@ package com.liferay.portal.model;
  * @see       Country
  * @generated
  */
-public class CountryWrapper implements Country {
+public class CountryWrapper implements Country, ModelWrapper<Country> {
 	public CountryWrapper(Country country) {
 		_country = country;
 	}
@@ -34,6 +37,71 @@ public class CountryWrapper implements Country {
 
 	public String getModelClassName() {
 		return Country.class.getName();
+	}
+
+	public Map<String, Object> getModelAttributes() {
+		Map<String, Object> attributes = new HashMap<String, Object>();
+
+		attributes.put("countryId", getCountryId());
+		attributes.put("name", getName());
+		attributes.put("a2", getA2());
+		attributes.put("a3", getA3());
+		attributes.put("number", getNumber());
+		attributes.put("idd", getIdd());
+		attributes.put("zipRequired", getZipRequired());
+		attributes.put("active", getActive());
+
+		return attributes;
+	}
+
+	public void setModelAttributes(Map<String, Object> attributes) {
+		Long countryId = (Long)attributes.get("countryId");
+
+		if (countryId != null) {
+			setCountryId(countryId);
+		}
+
+		String name = (String)attributes.get("name");
+
+		if (name != null) {
+			setName(name);
+		}
+
+		String a2 = (String)attributes.get("a2");
+
+		if (a2 != null) {
+			setA2(a2);
+		}
+
+		String a3 = (String)attributes.get("a3");
+
+		if (a3 != null) {
+			setA3(a3);
+		}
+
+		String number = (String)attributes.get("number");
+
+		if (number != null) {
+			setNumber(number);
+		}
+
+		String idd = (String)attributes.get("idd");
+
+		if (idd != null) {
+			setIdd(idd);
+		}
+
+		Boolean zipRequired = (Boolean)attributes.get("zipRequired");
+
+		if (zipRequired != null) {
+			setZipRequired(zipRequired);
+		}
+
+		Boolean active = (Boolean)attributes.get("active");
+
+		if (active != null) {
+			setActive(active);
+		}
 	}
 
 	/**
@@ -163,6 +231,33 @@ public class CountryWrapper implements Country {
 	}
 
 	/**
+	* Returns the zip required of this country.
+	*
+	* @return the zip required of this country
+	*/
+	public boolean getZipRequired() {
+		return _country.getZipRequired();
+	}
+
+	/**
+	* Returns <code>true</code> if this country is zip required.
+	*
+	* @return <code>true</code> if this country is zip required; <code>false</code> otherwise
+	*/
+	public boolean isZipRequired() {
+		return _country.isZipRequired();
+	}
+
+	/**
+	* Sets whether this country is zip required.
+	*
+	* @param zipRequired the zip required of this country
+	*/
+	public void setZipRequired(boolean zipRequired) {
+		_country.setZipRequired(zipRequired);
+	}
+
+	/**
 	* Returns the active of this country.
 	*
 	* @return the active of this country
@@ -207,10 +302,6 @@ public class CountryWrapper implements Country {
 
 	public boolean isEscapedModel() {
 		return _country.isEscapedModel();
-	}
-
-	public void setEscapedModel(boolean escapedModel) {
-		_country.setEscapedModel(escapedModel);
 	}
 
 	public java.io.Serializable getPrimaryKeyObj() {
@@ -261,7 +352,30 @@ public class CountryWrapper implements Country {
 		return _country.toXmlString();
 	}
 
+	public java.lang.String getName(java.util.Locale locale) {
+		return _country.getName(locale);
+	}
+
+	public java.lang.String getNameCurrentLanguageId() {
+		return _country.getNameCurrentLanguageId();
+	}
+
+	public java.lang.String getNameCurrentValue() {
+		return _country.getNameCurrentValue();
+	}
+
+	public void setNameCurrentLanguageId(java.lang.String languageId) {
+		_country.setNameCurrentLanguageId(languageId);
+	}
+
+	/**
+	 * @deprecated Renamed to {@link #getWrappedModel}
+	 */
 	public Country getWrappedCountry() {
+		return _country;
+	}
+
+	public Country getWrappedModel() {
 		return _country;
 	}
 

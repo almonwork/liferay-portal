@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,7 +14,6 @@
 
 package com.liferay.portal.service.persistence;
 
-import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.model.Portlet;
 
 /**
@@ -297,9 +296,11 @@ public interface PortletPersistence extends BasePersistence<Portlet> {
 	*
 	* @param companyId the company ID
 	* @param portletId the portlet ID
+	* @return the portlet that was removed
 	* @throws SystemException if a system exception occurred
 	*/
-	public void removeByC_P(long companyId, java.lang.String portletId)
+	public com.liferay.portal.model.Portlet removeByC_P(long companyId,
+		java.lang.String portletId)
 		throws com.liferay.portal.NoSuchPortletException,
 			com.liferay.portal.kernel.exception.SystemException;
 
@@ -340,6 +341,4 @@ public interface PortletPersistence extends BasePersistence<Portlet> {
 	*/
 	public int countAll()
 		throws com.liferay.portal.kernel.exception.SystemException;
-
-	public Portlet remove(Portlet portlet) throws SystemException;
 }

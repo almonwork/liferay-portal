@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,16 +14,33 @@
 
 package com.liferay.portlet.documentlibrary.util;
 
+import com.liferay.portal.kernel.lar.PortletDataContext;
 import com.liferay.portal.kernel.repository.model.FileEntry;
+import com.liferay.portal.kernel.repository.model.FileVersion;
+import com.liferay.portal.kernel.xml.Element;
 
 /**
  * @author Mika Koivisto
  */
 public interface DLProcessorRegistry {
 
+	public void cleanUp(FileEntry fileEntry);
+
+	public void cleanUp(FileVersion fileVersion);
+
+	public void exportGeneratedFiles(
+			PortletDataContext portletDataContext, FileEntry fileEntry,
+			Element fileEntryElement)
+		throws Exception;
+
+	public void importGeneratedFiles(
+			PortletDataContext portletDataContext, FileEntry fileEntry,
+			FileEntry importedFileEntry, Element fileEntryElement)
+		throws Exception;
+
 	public void register(DLProcessor dlProcessor);
 
-	public void trigger(FileEntry fileEntry);
+	public void trigger(FileEntry fileEntry, FileVersion fileVersion);
 
 	public void unregister(DLProcessor dlProcessor);
 

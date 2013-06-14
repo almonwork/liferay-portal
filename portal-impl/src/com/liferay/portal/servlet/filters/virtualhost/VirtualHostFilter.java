@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -61,6 +61,29 @@ public class VirtualHostFilter extends BasePortalFilter {
 		super.init(filterConfig);
 
 		_servletContext = filterConfig.getServletContext();
+
+		_slashedKeywords =
+			new String[PropsValues.LAYOUT_FRIENDLY_URL_KEYWORDS.length];
+
+		for (int i = 0; i < PropsValues.LAYOUT_FRIENDLY_URL_KEYWORDS.length;
+				i++) {
+
+			String keyword = PropsValues.LAYOUT_FRIENDLY_URL_KEYWORDS[i];
+
+			if (keyword.contains(StringPool.PERIOD) ||
+				keyword.equals("_vti_") || keyword.equals("api") ||
+				keyword.equals("display_chart") ||
+				keyword.equals("sharepoint") ||
+				keyword.equals("software_catalog")) {
+
+				keyword = StringPool.SLASH + keyword;
+			}
+			else {
+				keyword = StringPool.SLASH + keyword + StringPool.SLASH;
+			}
+
+			_slashedKeywords[i] = keyword.toLowerCase();
+		}
 	}
 
 	@Override
@@ -81,38 +104,17 @@ public class VirtualHostFilter extends BasePortalFilter {
 		friendlyURL = friendlyURL.toLowerCase();
 
 		if (PortalInstances.isVirtualHostsIgnorePath(friendlyURL) ||
-			friendlyURL.startsWith(
-				_PRIVATE_GROUP_SERVLET_MAPPING + StringPool.SLASH) ||
-			friendlyURL.startsWith(
-				_PUBLIC_GROUP_SERVLET_MAPPING + StringPool.SLASH) ||
-			friendlyURL.startsWith(
-				_PRIVATE_USER_SERVLET_MAPPING + StringPool.SLASH) ||
-			friendlyURL.startsWith(_PATH_C) ||
-			friendlyURL.startsWith(_PATH_COMBO) ||
-			friendlyURL.startsWith(_PATH_DELEGATE) ||
-			friendlyURL.startsWith(_PATH_DISPLAY_CHART) ||
-			friendlyURL.startsWith(_PATH_DTD) ||
-			friendlyURL.startsWith(_PATH_ELOQUA) ||
-			friendlyURL.startsWith(_PATH_FACEBOOK) ||
-			friendlyURL.startsWith(_PATH_GOOGLE_GADGET) ||
-			friendlyURL.startsWith(_PATH_HTML) ||
-			friendlyURL.startsWith(_PATH_IMAGE) ||
-			friendlyURL.startsWith(_PATH_LANGUAGE) ||
-			friendlyURL.startsWith(_PATH_LUCENE) ||
-			friendlyURL.startsWith(_PATH_NETVIBES) ||
-			friendlyURL.startsWith(_PATH_PBHS) ||
-			friendlyURL.startsWith(_PATH_POLLER) ||
-			friendlyURL.startsWith(_PATH_REST) ||
-			friendlyURL.startsWith(_PATH_ROBOTS_TXT) ||
-			friendlyURL.startsWith(_PATH_SHAREPOINT) ||
-			friendlyURL.startsWith(_PATH_SITEMAP_XML) ||
-			friendlyURL.startsWith(_PATH_SOFTWARE_CATALOG) ||
-			friendlyURL.startsWith(_PATH_VTI) ||
-			friendlyURL.startsWith(_PATH_WAP) ||
-			friendlyURL.startsWith(_PATH_WIDGET) ||
-			friendlyURL.startsWith(_PATH_XMLRPC)) {
+			friendlyURL.startsWith(_PRIVATE_GROUP_SERVLET_MAPPING_SLASH) ||
+			friendlyURL.startsWith(_PRIVATE_USER_SERVLET_MAPPING_SLASH) ||
+			friendlyURL.startsWith(_PUBLIC_GROUP_SERVLET_MAPPING_SLASH)) {
 
 			return false;
+		}
+
+		for (String keyword : _slashedKeywords) {
+			if (friendlyURL.startsWith(keyword)) {
+				return false;
+			}
 		}
 
 		int code = LayoutImpl.validateFriendlyURL(friendlyURL);
@@ -156,10 +158,16 @@ public class VirtualHostFilter extends BasePortalFilter {
 
 		String friendlyURL = originalFriendlyURL;
 
-		if ((Validator.isNotNull(contextPath)) &&
+		if (Validator.isNotNull(contextPath) &&
 			(friendlyURL.indexOf(contextPath) != -1)) {
 
 			friendlyURL = friendlyURL.substring(contextPath.length());
+		}
+
+		int pos = friendlyURL.indexOf(StringPool.SEMICOLON);
+
+		if (pos != -1) {
+			friendlyURL = friendlyURL.substring(0, pos);
 		}
 
 		friendlyURL = StringUtil.replace(
@@ -170,21 +178,22 @@ public class VirtualHostFilter extends BasePortalFilter {
 		Set<String> languageIds = I18nServlet.getLanguageIds();
 
 		for (String languageId : languageIds) {
-			if (friendlyURL.startsWith(languageId)) {
-				int pos = friendlyURL.indexOf(CharPool.SLASH, 1);
+			if (StringUtil.startsWith(friendlyURL, languageId)) {
+				pos = friendlyURL.indexOf(CharPool.SLASH, 1);
 
 				if (((pos != -1) && (pos != languageId.length())) ||
-					((pos == -1) && !friendlyURL.equals(languageId))) {
+					((pos == -1) &&
+					 !friendlyURL.equalsIgnoreCase(languageId))) {
 
 					continue;
 				}
 
 				if (pos == -1) {
-					i18nLanguageId = friendlyURL;
+					i18nLanguageId = languageId;
 					friendlyURL = StringPool.SLASH;
 				}
 				else {
-					i18nLanguageId = friendlyURL.substring(0, pos);
+					i18nLanguageId = languageId.substring(0, pos);
 					friendlyURL = friendlyURL.substring(pos);
 				}
 
@@ -225,147 +234,108 @@ public class VirtualHostFilter extends BasePortalFilter {
 			_log.debug("Layout set " + layoutSet);
 		}
 
-		if (layoutSet != null) {
-			try {
-				LastPath lastPath = new LastPath(
-					contextPath, friendlyURL, request.getParameterMap());
+		if (layoutSet == null) {
+			processFilter(
+				VirtualHostFilter.class, request, response, filterChain);
 
-				request.setAttribute(WebKeys.LAST_PATH, lastPath);
-
-				StringBundler forwardURL = new StringBundler(6);
-
-				if (i18nLanguageId != null) {
-					forwardURL.append(i18nLanguageId);
-				}
-
-				if (originalFriendlyURL.startsWith(
-						PropsValues.WIDGET_SERVLET_MAPPING)) {
-
-					forwardURL.append(PropsValues.WIDGET_SERVLET_MAPPING);
-
-					friendlyURL = StringUtil.replaceFirst(
-						friendlyURL, PropsValues.WIDGET_SERVLET_MAPPING,
-						StringPool.BLANK);
-				}
-
-				long plid = PortalUtil.getPlidFromFriendlyURL(
-					companyId, friendlyURL);
-
-				if (plid <= 0) {
-					StringBundler prefix = new StringBundler(2);
-
-					Group group = GroupLocalServiceUtil.getGroup(
-						layoutSet.getGroupId());
-
-					if (layoutSet.isPrivateLayout()) {
-						if (group.isUser()) {
-							prefix.append(_PRIVATE_USER_SERVLET_MAPPING);
-						}
-						else {
-							prefix.append(_PRIVATE_GROUP_SERVLET_MAPPING);
-						}
-					}
-					else {
-						prefix.append(_PUBLIC_GROUP_SERVLET_MAPPING);
-					}
-
-					prefix.append(group.getFriendlyURL());
-
-					String homeURL = PortalUtil.getRelativeHomeURL(request);
-
-					if (group.isGuest() &&
-						friendlyURL.equals(StringPool.SLASH) &&
-						Validator.isNotNull(homeURL)) {
-
-						friendlyURL = homeURL;
-					}
-					else {
-						forwardURL.append(prefix);
-					}
-				}
-
-				forwardURL.append(friendlyURL);
-
-				if (_log.isDebugEnabled()) {
-					_log.debug("Forward to " + forwardURL);
-				}
-
-				RequestDispatcher requestDispatcher =
-					_servletContext.getRequestDispatcher(forwardURL.toString());
-
-				requestDispatcher.forward(request, response);
-
-				return;
-			}
-			catch (Exception e) {
-				_log.error(e, e);
-			}
+			return;
 		}
 
-		processFilter(VirtualHostFilter.class, request, response, filterChain);
+		try {
+			LastPath lastPath = new LastPath(
+				contextPath, friendlyURL, request.getParameterMap());
+
+			request.setAttribute(WebKeys.LAST_PATH, lastPath);
+
+			StringBundler forwardURL = new StringBundler(5);
+
+			if (i18nLanguageId != null) {
+				forwardURL.append(i18nLanguageId);
+			}
+
+			if (originalFriendlyURL.startsWith(
+					PropsValues.WIDGET_SERVLET_MAPPING)) {
+
+				forwardURL.append(PropsValues.WIDGET_SERVLET_MAPPING);
+
+				friendlyURL = StringUtil.replaceFirst(
+					friendlyURL, PropsValues.WIDGET_SERVLET_MAPPING,
+					StringPool.BLANK);
+			}
+
+			long plid = PortalUtil.getPlidFromFriendlyURL(
+				companyId, friendlyURL);
+
+			if (plid <= 0) {
+				Group group = GroupLocalServiceUtil.getGroup(
+					layoutSet.getGroupId());
+
+				if (group.isGuest() && friendlyURL.equals(StringPool.SLASH)) {
+					String homeURL = PortalUtil.getRelativeHomeURL(request);
+
+					if (Validator.isNotNull(homeURL)) {
+						friendlyURL = homeURL;
+					}
+				}
+				else {
+					if (layoutSet.isPrivateLayout()) {
+						if (group.isUser()) {
+							forwardURL.append(_PRIVATE_USER_SERVLET_MAPPING);
+						}
+						else {
+							forwardURL.append(_PRIVATE_GROUP_SERVLET_MAPPING);
+						}
+					}
+					else {
+						forwardURL.append(_PUBLIC_GROUP_SERVLET_MAPPING);
+					}
+
+					forwardURL.append(group.getFriendlyURL());
+				}
+			}
+
+			forwardURL.append(friendlyURL);
+
+			if (_log.isDebugEnabled()) {
+				_log.debug("Forward to " + forwardURL);
+			}
+
+			RequestDispatcher requestDispatcher =
+				_servletContext.getRequestDispatcher(forwardURL.toString());
+
+			requestDispatcher.forward(request, response);
+		}
+		catch (Exception e) {
+			_log.error(e, e);
+
+			processFilter(
+				VirtualHostFilter.class, request, response, filterChain);
+		}
 	}
 
-	private static final String _PATH_C = "/c/";
-
-	private static final String _PATH_COMBO = "/combo/";
-
-	private static final String _PATH_DELEGATE = "/delegate/";
-
-	private static final String _PATH_DISPLAY_CHART = "/display_chart";
-
 	private static final String _PATH_DOCUMENTS = "/documents/";
-
-	private static final String _PATH_DTD = "/dtd/";
-
-	private static final String _PATH_ELOQUA = "/elqNow/";
-
-	private static final String _PATH_FACEBOOK = "/facebook/";
-
-	private static final String _PATH_GOOGLE_GADGET = "/google_gadget/";
-
-	private static final String _PATH_HTML = "/html/";
-
-	private static final String _PATH_IMAGE = "/image/";
-
-	private static final String _PATH_LANGUAGE = "/language/";
-
-	private static final String _PATH_LUCENE = "/lucene/";
-
-	private static final String _PATH_NETVIBES = "/netvibes/";
-
-	private static final String _PATH_PBHS = "/pbhs/";
-
-	private static final String _PATH_POLLER = "/poller/";
-
-	private static final String _PATH_REST = "/rest/";
-
-	private static final String _PATH_ROBOTS_TXT = "/robots.txt";
-
-	private static final String _PATH_SHAREPOINT = "/sharepoint/";
-
-	private static final String _PATH_SITEMAP_XML = "/sitemap.xml";
-
-	private static final String _PATH_SOFTWARE_CATALOG = "/software_catalog";
-
-	private static final String _PATH_VTI = "/_vti_";
-
-	private static final String _PATH_WAP = "/wap/";
-
-	private static final String _PATH_WIDGET = "/widget/";
-
-	private static final String _PATH_XMLRPC = "/xmlrpc/";
 
 	private static final String _PRIVATE_GROUP_SERVLET_MAPPING =
 		PropsValues.LAYOUT_FRIENDLY_URL_PRIVATE_GROUP_SERVLET_MAPPING;
 
+	private static final String _PRIVATE_GROUP_SERVLET_MAPPING_SLASH =
+		_PRIVATE_GROUP_SERVLET_MAPPING + StringPool.SLASH;
+
 	private static final String _PRIVATE_USER_SERVLET_MAPPING =
 		PropsValues.LAYOUT_FRIENDLY_URL_PRIVATE_USER_SERVLET_MAPPING;
+
+	private static final String _PRIVATE_USER_SERVLET_MAPPING_SLASH =
+		_PRIVATE_USER_SERVLET_MAPPING + StringPool.SLASH;
 
 	private static final String _PUBLIC_GROUP_SERVLET_MAPPING =
 		PropsValues.LAYOUT_FRIENDLY_URL_PUBLIC_SERVLET_MAPPING;
 
+	private static final String _PUBLIC_GROUP_SERVLET_MAPPING_SLASH =
+		_PUBLIC_GROUP_SERVLET_MAPPING + StringPool.SLASH;
+
 	private static Log _log = LogFactoryUtil.getLog(VirtualHostFilter.class);
 
 	private ServletContext _servletContext;
+	private String[] _slashedKeywords;
 
 }

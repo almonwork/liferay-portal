@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -97,10 +97,10 @@ public class JSPWikiEngine implements WikiEngine {
 				}
 
 				if (title.endsWith("]]")) {
-					title = title.substring(title.length() - 2, title.length());
+					title = title.substring(0, title.length() - 2);
 				}
-				else if (title.startsWith("[")) {
-					title = title.substring(title.length() - 1, title.length());
+				else if (title.endsWith("]")) {
+					title = title.substring(0, title.length() - 1);
 				}
 
 				Boolean existsObj = links.get(title);
@@ -115,7 +115,7 @@ public class JSPWikiEngine implements WikiEngine {
 						existsObj = Boolean.FALSE;
 					}
 
-					links.put(title.toLowerCase(), existsObj);
+					links.put(title, existsObj);
 				}
 			}
 
@@ -158,9 +158,7 @@ public class JSPWikiEngine implements WikiEngine {
 		return _decodeJSPWikiContent(engine.textToHTML(wikiContext, content));
 	}
 
-	protected LiferayJSPWikiEngine getEngine(long nodeId)
-		throws WikiException {
-
+	protected LiferayJSPWikiEngine getEngine(long nodeId) throws WikiException {
 		LiferayJSPWikiEngine engine = _engines.get(nodeId);
 
 		if (engine != null) {
@@ -242,7 +240,7 @@ public class JSPWikiEngine implements WikiEngine {
 				int pos = linkValues.indexOf(CharPool.PIPE);
 
 				if (pos != -1) {
-					name = linkValues.substring(pos + 1, linkValues.length());
+					name = linkValues.substring(pos + 1);
 					url = linkValues.substring(0, pos);
 				}
 

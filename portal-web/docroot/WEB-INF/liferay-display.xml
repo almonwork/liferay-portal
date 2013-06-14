@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<!DOCTYPE display PUBLIC "-//Liferay//DTD Display 6.0.0//EN" "http://www.liferay.com/dtd/liferay-display_6_0_0.dtd">
+<!DOCTYPE display PUBLIC "-//Liferay//DTD Display 6.1.0//EN" "http://www.liferay.com/dtd/liferay-display_6_1_0.dtd">
 
 <display>
 	<category name="category.cms">
@@ -20,7 +20,7 @@
 		<portlet id="122" />
 		<portlet id="141" />
 		<portlet id="148" />
-        <portlet id="175" />
+		<portlet id="175" />
 	</category>
 	<category name="category.collaboration">
 		<portlet id="8" />
@@ -40,9 +40,7 @@
 		<portlet id="108" />
 		<portlet id="143" />
 	</category>
-	<category name="category.entertainment">
-		<portlet id="37" />
-	</category>
+	<category name="category.entertainment" />
 	<category name="category.finance">
 		<portlet id="16" />
 		<portlet id="61" />
@@ -55,6 +53,7 @@
 		<portlet id="104" />
 		<portlet id="111" />
 		<portlet id="125" />
+		<portlet id="127" />
 		<portlet id="128" />
 		<portlet id="129" />
 		<portlet id="130" />
@@ -73,7 +72,6 @@
 		<portlet id="152" />
 		<portlet id="153" />
 		<portlet id="154" />
-		<portlet id="155" />
 		<portlet id="157" />
 		<portlet id="158" />
 		<portlet id="161" />
@@ -83,6 +81,12 @@
 		<portlet id="167" />
 		<portlet id="173" />
 		<portlet id="174" />
+		<portlet id="176" />
+		<portlet id="177" />
+		<portlet id="178" />
+		<portlet id="179" />
+		<portlet id="182" />
+		<portlet id="183" />
 	</category>
 	<category name="category.news">
 		<portlet id="39" />
@@ -102,7 +106,8 @@
 	<category name="category.social">
 		<portlet id="116" />
 		<portlet id="121" />
-		<portlet id="159" />
+		<portlet id="180" />
+		<portlet id="181" />
 	</category>
 	<category name="category.tools">
 		<portlet id="2" />

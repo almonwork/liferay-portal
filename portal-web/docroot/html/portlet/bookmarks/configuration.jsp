@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -46,7 +46,11 @@ String redirect = ParamUtil.getString(request, "redirect");
 
 					<aui:button name="openFolderSelectorButton" onClick='<%= renderResponse.getNamespace() + "openFolderSelector();" %>' value="select" />
 
-					<aui:button disabled="<%= rootFolderId <= 0 %>" name="removeFolderButton" onClick='<%= renderResponse.getNamespace() + "removeFolder();" %>' value="remove" />
+					<%
+					String taglibRemoveFolder = "Liferay.Util.removeFolderSelection('rootFolderId', 'rootFolderName', '" + renderResponse.getNamespace() + "');";
+					%>
+
+					<aui:button disabled="<%= rootFolderId <= 0 %>" name="removeFolderButton" onClick="<%= taglibRemoveFolder %>" value="remove" />
 				</aui:field-wrapper>
 
 				<aui:input label="show-search" name="preferences--showFoldersSearch--" type="checkbox" value="<%= showFoldersSearch %>" />
@@ -58,7 +62,7 @@ String redirect = ParamUtil.getString(request, "redirect");
 				<aui:field-wrapper label="show-columns">
 
 					<%
-					Set availableFolderColumns = SetUtil.fromArray(StringUtil.split(allFolderColumns));
+					Set<String> availableFolderColumns = SetUtil.fromArray(StringUtil.split(allFolderColumns));
 
 					// Left list
 
@@ -76,11 +80,7 @@ String redirect = ParamUtil.getString(request, "redirect");
 
 					Arrays.sort(folderColumns);
 
-					Iterator itr = availableFolderColumns.iterator();
-
-					while (itr.hasNext()) {
-						String folderColumn = (String)itr.next();
-
+					for (String folderColumn : availableFolderColumns) {
 						if (Arrays.binarySearch(folderColumns, folderColumn) < 0) {
 							rightList.add(new KeyValuePair(folderColumn, LanguageUtil.get(pageContext, folderColumn)));
 						}
@@ -90,13 +90,13 @@ String redirect = ParamUtil.getString(request, "redirect");
 					%>
 
 					<liferay-ui:input-move-boxes
-						leftTitle="current"
-						rightTitle="available"
 						leftBoxName="currentFolderColumns"
-						rightBoxName="availableFolderColumns"
-						leftReorder="true"
 						leftList="<%= leftList %>"
+						leftReorder="true"
+						leftTitle="current"
+						rightBoxName="availableFolderColumns"
 						rightList="<%= rightList %>"
+						rightTitle="available"
 					/>
 				</aui:field-wrapper>
 			</aui:fieldset>
@@ -111,7 +111,7 @@ String redirect = ParamUtil.getString(request, "redirect");
 				<aui:field-wrapper label="show-columns">
 
 					<%
-					Set availableEntryColumns = SetUtil.fromArray(StringUtil.split(allEntryColumns));
+					Set<String> availableEntryColumns = SetUtil.fromArray(StringUtil.split(allEntryColumns));
 
 					// Left list
 
@@ -129,11 +129,7 @@ String redirect = ParamUtil.getString(request, "redirect");
 
 					Arrays.sort(entryColumns);
 
-					Iterator itr = availableEntryColumns.iterator();
-
-					while (itr.hasNext()) {
-						String entryColumn = (String)itr.next();
-
+					for (String entryColumn : availableEntryColumns) {
 						if (Arrays.binarySearch(entryColumns, entryColumn) < 0) {
 							rightList.add(new KeyValuePair(entryColumn, LanguageUtil.get(pageContext, entryColumn)));
 						}
@@ -143,13 +139,13 @@ String redirect = ParamUtil.getString(request, "redirect");
 					%>
 
 					<liferay-ui:input-move-boxes
-						leftTitle="current"
-						rightTitle="available"
 						leftBoxName="currentEntryColumns"
-						rightBoxName="availableEntryColumns"
-						leftReorder="true"
 						leftList="<%= leftList %>"
+						leftReorder="true"
+						leftTitle="current"
+						rightBoxName="availableEntryColumns"
 						rightList="<%= rightList %>"
+						rightTitle="available"
 					/>
 				</aui:field-wrapper>
 			</aui:fieldset>
@@ -168,22 +164,15 @@ String redirect = ParamUtil.getString(request, "redirect");
 		folderWindow.focus();
 	}
 
-	function <portlet:namespace />removeFolder() {
-		document.<portlet:namespace />fm.<portlet:namespace />rootFolderId.value = "<%= BookmarksFolderConstants.DEFAULT_PARENT_FOLDER_ID %>";
-
-		var nameEl = document.getElementById("<portlet:namespace />rootFolderName");
-
-		nameEl.href = "";
-		nameEl.innerHTML = "";
-	}
-
 	function <%= PortalUtil.getPortletNamespace(portletResource) %>selectFolder(rootFolderId, rootFolderName) {
-		document.<portlet:namespace />fm.<portlet:namespace />rootFolderId.value = rootFolderId;
+		var folderData = {
+			idString: 'rootFolderId',
+			idValue: rootFolderId,
+			nameString: 'rootFolderName',
+			nameValue: rootFolderName
+		};
 
-		var nameEl = document.getElementById("<portlet:namespace />rootFolderName");
-
-		nameEl.href = "<liferay-portlet:renderURL portletName="<%= portletResource %>"><portlet:param name="struts_action" value='<%= strutsAction + "/view" %>' /></liferay-portlet:renderURL>&<portlet:namespace />folderId=" + rootFolderId;
-		nameEl.innerHTML = rootFolderName + "&nbsp;";
+		Liferay.Util.selectFolder(folderData, '<liferay-portlet:renderURL portletName="<%= portletResource %>"><portlet:param name="struts_action" value='<%= strutsAction + "/view" %>' /></liferay-portlet:renderURL>', '<portlet:namespace />');
 	}
 
 	Liferay.provide(

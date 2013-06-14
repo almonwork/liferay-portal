@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,8 +14,12 @@
 
 package com.liferay.portal.velocity;
 
+import com.liferay.portal.kernel.io.ReaderInputStream;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.template.TemplateManager;
+import com.liferay.portal.kernel.template.TemplateResource;
+import com.liferay.portal.kernel.template.TemplateResourceLoaderUtil;
 import com.liferay.portal.util.PropsValues;
 
 import java.io.IOException;
@@ -28,24 +32,9 @@ import org.apache.velocity.runtime.resource.loader.ResourceLoader;
 
 /**
  * @author Brian Wing Shun Chan
+ * @author Shuyang Zhou
  */
 public class LiferayResourceLoader extends ResourceLoader {
-
-	public static void setListeners(String[] listeners) {
-		_listeners = new VelocityResourceListener[listeners.length];
-
-		for (int i = 0; i < listeners.length; i++) {
-			try {
-				_listeners[i] = (VelocityResourceListener)Class.forName(
-					listeners[i]).newInstance();
-			}
-			catch (Exception ex) {
-				_log.error(ex);
-
-				_listeners[i] = null;
-			}
-		}
-	}
 
 	@Override
 	public long getLastModified(Resource resource) {
@@ -60,28 +49,18 @@ public class LiferayResourceLoader extends ResourceLoader {
 	public InputStream getResourceStream(String source)
 		throws ResourceNotFoundException {
 
-		if (_log.isDebugEnabled()) {
-			_log.debug("Get resource for " + source);
-		}
-
-		InputStream is = null;
-
-		for (int i = 0; (is == null) && (i < _listeners.length); i++) {
-			if (_listeners[i] != null) {
-				is = _listeners[i].getResourceStream(source);
-			}
-		}
+		InputStream is = doGetResourceStream(source);
 
 		if (is == null) {
 			if (_log.isDebugEnabled()) {
-				_log.debug("Could not find " + source);
+				_log.debug("Unable to find " + source);
 			}
 
 			throw new ResourceNotFoundException(source);
 		}
 
 		if (_log.isDebugEnabled()) {
-			_log.debug("Successfully got " + source);
+			_log.debug("Successfully found " + source);
 		}
 
 		return is;
@@ -90,8 +69,7 @@ public class LiferayResourceLoader extends ResourceLoader {
 	@Override
 	public void init(ExtendedProperties props) {
 		setModificationCheckInterval(
-			PropsValues.
-				VELOCITY_ENGINE_RESOURCE_MANAGER_MODIFICATION_CHECK_INTERVAL);
+			PropsValues.VELOCITY_ENGINE_RESOURCE_MODIFICATION_CHECK_INTERVAL);
 	}
 
 	@Override
@@ -108,24 +86,15 @@ public class LiferayResourceLoader extends ResourceLoader {
 		InputStream is = null;
 
 		try {
-			is = getResourceStream(resourceName);
+			is = doGetResourceStream(resourceName);
+
+			if (is != null) {
+				is.close();
+			}
+		}
+		catch (IOException ioe) {
 		}
 		catch (ResourceNotFoundException rnfe) {
-			if (_log.isDebugEnabled()) {
-				_log.debug(
-					"Could not load resource " + resourceName + " from " +
-						getClass(),
-					rnfe);
-			}
-		}
-		finally {
-			try {
-				if (is != null) {
-					is.close();
-				}
-			}
-			catch (IOException ioe) {
-			}
 		}
 
 		if (is != null) {
@@ -136,10 +105,26 @@ public class LiferayResourceLoader extends ResourceLoader {
 		}
 	}
 
+	protected InputStream doGetResourceStream(String source)
+		throws ResourceNotFoundException {
+
+		if (_log.isDebugEnabled()) {
+			_log.debug("Get resource for " + source);
+		}
+
+		try {
+			TemplateResource templateResource =
+				TemplateResourceLoaderUtil.getTemplateResource(
+					TemplateManager.VELOCITY, source);
+
+			return new ReaderInputStream(templateResource.getReader());
+		}
+		catch (Exception e) {
+			return null;
+		}
+	}
+
 	private static Log _log = LogFactoryUtil.getLog(
 		LiferayResourceLoader.class);
-
-	private static VelocityResourceListener[] _listeners =
-		new VelocityResourceListener[0];
 
 }

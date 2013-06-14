@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -23,15 +23,15 @@ import com.liferay.portalweb.portal.util.RuntimeVariables;
 public class AddWCWebContentTemplateWCDTest extends BaseTestCase {
 	public void testAddWCWebContentTemplateWCD() throws Exception {
 		selenium.open("/web/guest/home/");
+		loadRequiredJavaScriptModules();
 
 		for (int second = 0;; second++) {
-			if (second >= 60) {
+			if (second >= 90) {
 				fail("timeout");
 			}
 
 			try {
-				if (selenium.isElementPresent(
-							"link=Web Content Display Test Page")) {
+				if (selenium.isVisible("link=Web Content Display Test Page")) {
 					break;
 				}
 			}
@@ -41,34 +41,24 @@ public class AddWCWebContentTemplateWCDTest extends BaseTestCase {
 			Thread.sleep(1000);
 		}
 
-		selenium.saveScreenShotAndSource();
 		selenium.clickAt("link=Web Content Display Test Page",
 			RuntimeVariables.replace("Web Content Display Test Page"));
 		selenium.waitForPageToLoad("30000");
-		selenium.saveScreenShotAndSource();
+		loadRequiredJavaScriptModules();
 		selenium.clickAt("//img[@alt='Add Web Content']",
 			RuntimeVariables.replace("Add Web Content"));
 		selenium.waitForPageToLoad("30000");
-		selenium.saveScreenShotAndSource();
-		selenium.type("//input[@id='_15_title']",
-			RuntimeVariables.replace("Web Content Name"));
-		selenium.saveScreenShotAndSource();
-		selenium.click("//fieldset/div/div/span/span/input");
-		assertTrue(selenium.getConfirmation()
-						   .matches("^Selecting a template will change the structure, available input fields, and available templates[\\s\\S] Do you want to proceed[\\s\\S]$"));
-		selenium.saveScreenShotAndSource();
-		selenium.waitForPopUp("template", RuntimeVariables.replace("30000"));
-		selenium.selectWindow("template");
-		selenium.saveScreenShotAndSource();
-		Thread.sleep(5000);
+		loadRequiredJavaScriptModules();
+		selenium.clickAt("//a[@id='_15_selectTemplateLink']",
+			RuntimeVariables.replace("Select Template"));
 
 		for (int second = 0;; second++) {
-			if (second >= 60) {
+			if (second >= 90) {
 				fail("timeout");
 			}
 
 			try {
-				if (selenium.isElementPresent("//td[1]/a")) {
+				if (selenium.isVisible("//td[2]/a")) {
 					break;
 				}
 			}
@@ -78,26 +68,67 @@ public class AddWCWebContentTemplateWCDTest extends BaseTestCase {
 			Thread.sleep(1000);
 		}
 
-		selenium.saveScreenShotAndSource();
-		selenium.click("//td[1]/a");
-		selenium.selectWindow("null");
-		selenium.saveScreenShotAndSource();
-		Thread.sleep(5000);
+		assertEquals(RuntimeVariables.replace(
+				"Web Content Localized Template Name"),
+			selenium.getText("//td[2]/a"));
+		selenium.clickAt("//td[2]/a",
+			RuntimeVariables.replace("Web Content Localized Template Name"));
+
+		for (int second = 0;; second++) {
+			if (second >= 90) {
+				fail("timeout");
+			}
+
+			try {
+				if ("Selecting a template will change the structure, available input fields, and available templates? Do you want to proceed?".equals(
+							selenium.getConfirmation())) {
+					break;
+				}
+			}
+			catch (Exception e) {
+			}
+
+			Thread.sleep(1000);
+		}
+
+		for (int second = 0;; second++) {
+			if (second >= 90) {
+				fail("timeout");
+			}
+
+			try {
+				if (RuntimeVariables.replace(
+							"Web Content Localized Structure Name")
+										.equals(selenium.getText(
+								"//span[@class='structure-name-label']"))) {
+					break;
+				}
+			}
+			catch (Exception e) {
+			}
+
+			Thread.sleep(1000);
+		}
+
+		assertEquals(RuntimeVariables.replace(
+				"Web Content Localized Structure Name"),
+			selenium.getText("//span[@class='structure-name-label']"));
+		assertEquals(RuntimeVariables.replace(
+				"Web Content Localized Template Name"),
+			selenium.getText("//span[@class='template-name-label']"));
+		selenium.type("//input[@id='_15_title_en_US']",
+			RuntimeVariables.replace("Hello World Localized Article"));
 		selenium.type("//input[@id='page-name']",
-			RuntimeVariables.replace("Web Content Page Name"));
-		selenium.saveScreenShotAndSource();
+			RuntimeVariables.replace("Hello World Page Name"));
 		selenium.type("//input[@id='page-description']",
-			RuntimeVariables.replace("Web Content Page Description"));
-		selenium.saveScreenShotAndSource();
-		assertTrue(selenium.isPartialText("//fieldset/div/div/div/div/span",
-				"Test Localized Structure"));
+			RuntimeVariables.replace("Hello World Page Description"));
 		selenium.clickAt("//input[@value='Publish']",
 			RuntimeVariables.replace("Publish"));
 		selenium.waitForPageToLoad("30000");
-		selenium.saveScreenShotAndSource();
-		assertEquals(RuntimeVariables.replace("Web Content Page Name"),
-			selenium.getText("//td[1]"));
-		assertEquals(RuntimeVariables.replace("Web Content Page Description"),
-			selenium.getText("//td[2]"));
+		loadRequiredJavaScriptModules();
+		assertEquals(RuntimeVariables.replace("Hello World Page Name"),
+			selenium.getText("//td[@class='page-name']"));
+		assertEquals(RuntimeVariables.replace("Hello World Page Description"),
+			selenium.getText("//td[@class='page-description']"));
 	}
 }

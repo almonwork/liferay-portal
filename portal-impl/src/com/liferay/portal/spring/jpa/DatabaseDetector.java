@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -73,7 +73,7 @@ public class DatabaseDetector {
 					sb.append("production. Hypersonic is an embedded ");
 					sb.append("database useful for development and demo'ing ");
 					sb.append("purposes. The database settings can be ");
-					sb.append("changed in portal.properties.");
+					sb.append("changed in portal-ext.properties.");
 
 					_log.warn(sb.toString());
 				}

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,19 +14,18 @@
 
 package com.liferay.portal.convert;
 
+import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.search.Indexer;
-import com.liferay.portal.kernel.util.PortalClassLoaderUtil;
+import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.PropsKeys;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.portal.model.CompanyConstants;
-import com.liferay.portal.model.GroupConstants;
-import com.liferay.portal.service.ServiceContext;
+import com.liferay.portal.security.pacl.PACLClassLoaderUtil;
 import com.liferay.portal.util.MaintenanceUtil;
-import com.liferay.portal.util.PortletKeys;
 import com.liferay.portal.util.PropsValues;
 import com.liferay.portlet.documentlibrary.DuplicateDirectoryException;
 import com.liferay.portlet.documentlibrary.model.DLFileEntry;
@@ -39,6 +38,7 @@ import com.liferay.portlet.documentlibrary.store.JCRStore;
 import com.liferay.portlet.documentlibrary.store.S3Store;
 import com.liferay.portlet.documentlibrary.store.Store;
 import com.liferay.portlet.documentlibrary.store.StoreFactory;
+import com.liferay.portlet.documentlibrary.util.comparator.FileVersionVersionComparator;
 import com.liferay.portlet.messageboards.model.MBMessage;
 import com.liferay.portlet.messageboards.service.MBMessageLocalServiceUtil;
 import com.liferay.portlet.wiki.model.WikiPage;
@@ -94,7 +94,7 @@ public class ConvertDocumentLibrary extends ConvertProcess {
 
 		String targetStoreClassName = values[0];
 
-		ClassLoader classLoader = PortalClassLoaderUtil.getClassLoader();
+		ClassLoader classLoader = PACLClassLoaderUtil.getPortalClassLoader();
 
 		_targetStore = (Store)classLoader.loadClass(
 			targetStoreClassName).newInstance();
@@ -111,12 +111,23 @@ public class ConvertDocumentLibrary extends ConvertProcess {
 		PropsValues.DL_STORE_IMPL = targetStoreClassName;
 	}
 
+	protected List<DLFileVersion> getDLFileVersions(DLFileEntry dlFileEntry)
+		throws SystemException {
+
+		List<DLFileVersion> dlFileVersions = dlFileEntry.getFileVersions(
+			WorkflowConstants.STATUS_ANY);
+
+		return ListUtil.sort(
+			dlFileVersions, new FileVersionVersionComparator(true));
+	}
+
 	protected void migrateDL() throws Exception {
 		int count = DLFileEntryLocalServiceUtil.getFileEntriesCount();
-		int pages = count / Indexer.DEFAULT_INTERVAL;
 
 		MaintenanceUtil.appendStatus(
-			"Migrating " + count + " document library files");
+			"Migrating " + count + " documents and media files");
+
+		int pages = count / Indexer.DEFAULT_INTERVAL;
 
 		for (int i = 0; i <= pages; i++) {
 			int start = (i * Indexer.DEFAULT_INTERVAL);
@@ -125,35 +136,27 @@ public class ConvertDocumentLibrary extends ConvertProcess {
 			List<DLFileEntry> dlFileEntries =
 				DLFileEntryLocalServiceUtil.getFileEntries(start, end);
 
-			String portletId = PortletKeys.DOCUMENT_LIBRARY;
-
 			for (DLFileEntry dlFileEntry : dlFileEntries) {
 				long companyId = dlFileEntry.getCompanyId();
-				long groupId = dlFileEntry.getGroupId();
 				long repositoryId = dlFileEntry.getDataRepositoryId();
 
-				migrateDLFileEntry(
-					companyId, portletId, groupId, repositoryId, dlFileEntry);
+				migrateDLFileEntry(companyId, repositoryId, dlFileEntry);
 			}
 		}
 	}
 
 	protected void migrateDLFileEntry(
-			long companyId, String portletId, long groupId, long repositoryId,
-			DLFileEntry fileEntry)
+			long companyId, long repositoryId, DLFileEntry fileEntry)
 		throws Exception {
 
 		String fileName = fileEntry.getName();
 
-		List<DLFileVersion> dlFileVersions = fileEntry.getFileVersions(
-			WorkflowConstants.STATUS_ANY);
+		List<DLFileVersion> dlFileVersions = getDLFileVersions(fileEntry);
 
 		if (dlFileVersions.isEmpty()) {
-			String versionNumber = Store.DEFAULT_VERSION;
+			String versionNumber = Store.VERSION_DEFAULT;
 
-			migrateFile(
-				companyId, portletId, groupId, repositoryId, fileName,
-				versionNumber);
+			migrateFile(companyId, repositoryId, fileName, versionNumber);
 
 			return;
 		}
@@ -161,29 +164,24 @@ public class ConvertDocumentLibrary extends ConvertProcess {
 		for (DLFileVersion dlFileVersion : dlFileVersions) {
 			String versionNumber = dlFileVersion.getVersion();
 
-			migrateFile(
-				companyId, portletId, groupId, repositoryId, fileName,
-				versionNumber);
+			migrateFile(companyId, repositoryId, fileName, versionNumber);
 		}
 	}
 
 	protected void migrateFile(
-		long companyId, String portletId, long groupId, long repositoryId,
-		String fileName, String versionNumber) {
+		long companyId, long repositoryId, String fileName,
+		String versionNumber) {
 
 		try {
 			InputStream is = _sourceStore.getFileAsStream(
 				companyId, repositoryId, fileName, versionNumber);
 
-			if (versionNumber.equals(Store.DEFAULT_VERSION)) {
-				_targetStore.addFile(
-					companyId, portletId, groupId, repositoryId, fileName,
-					_serviceContext, is);
+			if (versionNumber.equals(Store.VERSION_DEFAULT)) {
+				_targetStore.addFile(companyId, repositoryId, fileName, is);
 			}
 			else {
 				_targetStore.updateFile(
-					companyId, portletId, groupId, repositoryId, fileName,
-					versionNumber, fileName, _serviceContext, is);
+					companyId, repositoryId, fileName, versionNumber, is);
 			}
 		}
 		catch (Exception e) {
@@ -195,10 +193,8 @@ public class ConvertDocumentLibrary extends ConvertProcess {
 			long companyId, String dirName, String[] fileNames)
 		throws Exception {
 
-		String portletId = CompanyConstants.SYSTEM_STRING;
-		long groupId = GroupConstants.DEFAULT_PARENT_GROUP_ID;
 		long repositoryId = CompanyConstants.SYSTEM;
-		String versionNumber = Store.DEFAULT_VERSION;
+		String versionNumber = Store.VERSION_DEFAULT;
 
 		try {
 			_targetStore.addDirectory(companyId, repositoryId, dirName);
@@ -211,25 +207,24 @@ public class ConvertDocumentLibrary extends ConvertProcess {
 				fileName = fileName.substring(1);
 			}
 
-			migrateFile(
-				companyId, portletId, groupId, repositoryId, fileName,
-				versionNumber);
+			migrateFile(companyId, repositoryId, fileName, versionNumber);
 		}
 	}
 
 	protected void migrateMB() throws Exception {
 		int count = MBMessageLocalServiceUtil.getMBMessagesCount();
-		int pages = count / Indexer.DEFAULT_INTERVAL;
 
 		MaintenanceUtil.appendStatus(
 			"Migrating message boards attachments in " + count + " messages");
+
+		int pages = count / Indexer.DEFAULT_INTERVAL;
 
 		for (int i = 0; i <= pages; i++) {
 			int start = (i * Indexer.DEFAULT_INTERVAL);
 			int end = start + Indexer.DEFAULT_INTERVAL;
 
-			List<MBMessage> messages =
-				MBMessageLocalServiceUtil.getMBMessages(start, end);
+			List<MBMessage> messages = MBMessageLocalServiceUtil.getMBMessages(
+				start, end);
 
 			for (MBMessage message : messages) {
 				migrateFiles(
@@ -247,17 +242,18 @@ public class ConvertDocumentLibrary extends ConvertProcess {
 
 	protected void migrateWiki() throws Exception {
 		int count = WikiPageLocalServiceUtil.getWikiPagesCount();
-		int pages = count / Indexer.DEFAULT_INTERVAL;
 
 		MaintenanceUtil.appendStatus(
 			"Migrating wiki page attachments in " + count + " pages");
+
+		int pages = count / Indexer.DEFAULT_INTERVAL;
 
 		for (int i = 0; i <= pages; i++) {
 			int start = (i * Indexer.DEFAULT_INTERVAL);
 			int end = start + Indexer.DEFAULT_INTERVAL;
 
-			List<WikiPage> wikiPages =
-				WikiPageLocalServiceUtil.getWikiPages(start, end);
+			List<WikiPage> wikiPages = WikiPageLocalServiceUtil.getWikiPages(
+				start, end);
 
 			for (WikiPage wikiPage : wikiPages) {
 				if (!wikiPage.isHead()) {
@@ -280,7 +276,6 @@ public class ConvertDocumentLibrary extends ConvertProcess {
 	private static Log _log = LogFactoryUtil.getLog(
 		ConvertDocumentLibrary.class);
 
-	private ServiceContext _serviceContext = new ServiceContext();
 	private Store _sourceStore;
 	private Store _targetStore;
 

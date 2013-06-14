@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,7 +14,6 @@
 
 package com.liferay.portlet.documentlibrary.service.persistence;
 
-import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.service.persistence.BasePersistence;
 
 import com.liferay.portlet.documentlibrary.model.DLSync;
@@ -110,7 +109,7 @@ public interface DLSyncPersistence extends BasePersistence<DLSync> {
 	* @throws SystemException if a system exception occurred
 	*/
 	public com.liferay.portlet.documentlibrary.model.DLSync findByFileId(
-		java.lang.String fileId)
+		long fileId)
 		throws com.liferay.portal.kernel.exception.SystemException,
 			com.liferay.portlet.documentlibrary.NoSuchSyncException;
 
@@ -122,8 +121,7 @@ public interface DLSyncPersistence extends BasePersistence<DLSync> {
 	* @throws SystemException if a system exception occurred
 	*/
 	public com.liferay.portlet.documentlibrary.model.DLSync fetchByFileId(
-		java.lang.String fileId)
-		throws com.liferay.portal.kernel.exception.SystemException;
+		long fileId) throws com.liferay.portal.kernel.exception.SystemException;
 
 	/**
 	* Returns the d l sync where fileId = &#63; or returns <code>null</code> if it could not be found, optionally using the finder cache.
@@ -134,7 +132,7 @@ public interface DLSyncPersistence extends BasePersistence<DLSync> {
 	* @throws SystemException if a system exception occurred
 	*/
 	public com.liferay.portlet.documentlibrary.model.DLSync fetchByFileId(
-		java.lang.String fileId, boolean retrieveFromCache)
+		long fileId, boolean retrieveFromCache)
 		throws com.liferay.portal.kernel.exception.SystemException;
 
 	/**
@@ -304,9 +302,11 @@ public interface DLSyncPersistence extends BasePersistence<DLSync> {
 	* Removes the d l sync where fileId = &#63; from the database.
 	*
 	* @param fileId the file ID
+	* @return the d l sync that was removed
 	* @throws SystemException if a system exception occurred
 	*/
-	public void removeByFileId(java.lang.String fileId)
+	public com.liferay.portlet.documentlibrary.model.DLSync removeByFileId(
+		long fileId)
 		throws com.liferay.portal.kernel.exception.SystemException,
 			com.liferay.portlet.documentlibrary.NoSuchSyncException;
 
@@ -337,7 +337,7 @@ public interface DLSyncPersistence extends BasePersistence<DLSync> {
 	* @return the number of matching d l syncs
 	* @throws SystemException if a system exception occurred
 	*/
-	public int countByFileId(java.lang.String fileId)
+	public int countByFileId(long fileId)
 		throws com.liferay.portal.kernel.exception.SystemException;
 
 	/**
@@ -361,6 +361,4 @@ public interface DLSyncPersistence extends BasePersistence<DLSync> {
 	*/
 	public int countAll()
 		throws com.liferay.portal.kernel.exception.SystemException;
-
-	public DLSync remove(DLSync dlSync) throws SystemException;
 }

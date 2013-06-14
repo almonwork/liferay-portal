@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -30,48 +30,6 @@ import javax.servlet.jsp.tagext.BodyTag;
  */
 public class PanelFloatingContainerTag
 	extends BaseBodyTagSupport implements BodyTag {
-
-	@Override
-	public int doStartTag() {
-		HttpServletRequest request =
-			(HttpServletRequest)pageContext.getRequest();
-
-		if (Validator.isNull(_id)) {
-			_id = PwdGenerator.getPassword(PwdGenerator.KEY3, 4);
-		}
-
-		request.setAttribute(
-			"liferay-ui:panel-floating-container:id", _id);
-		request.setAttribute(
-			"liferay-ui:panel-floating-container:trigger", _trigger);
-		request.setAttribute(
-			"liferay-ui:panel-floating-container:accordion",
-			String.valueOf(_accordion));
-		request.setAttribute(
-			"liferay-ui:panel-floating-container:persistState",
-			String.valueOf(_persistState));
-		request.setAttribute(
-			"liferay-ui:panel-floating-container:paging",
-			String.valueOf(_paging));
-		request.setAttribute(
-			"liferay-ui:panel-floating-container:pagingElements",
-			_pagingElements);
-		request.setAttribute(
-			"liferay-ui:panel-floating-container:resultsPerPage",
-			String.valueOf(_resultsPerPage));
-		request.setAttribute(
-			"liferay-ui:panel-floating-container:width",
-			String.valueOf(_width));
-		request.setAttribute(
-			"liferay-ui:panel-floating-container:extended", _extended);
-		request.setAttribute(
-			"liferay-ui:panel-floating-container:cssClass", _cssClass);
-		request.setAttribute(
-			"liferay-ui:panel-container:panelCount" + _id,
-			new IntegerWrapper());
-
-		return EVAL_BODY_BUFFERED;
-	}
 
 	@Override
 	public int doAfterBody() {
@@ -141,21 +99,97 @@ public class PanelFloatingContainerTag
 		}
 	}
 
+	@Override
+	public int doStartTag() {
+		HttpServletRequest request =
+			(HttpServletRequest)pageContext.getRequest();
+
+		if (Validator.isNull(_id)) {
+			_id = PwdGenerator.getPassword(PwdGenerator.KEY3, 4);
+		}
+
+		request.setAttribute("liferay-ui:panel-floating-container:id", _id);
+		request.setAttribute(
+			"liferay-ui:panel-floating-container:trigger", _trigger);
+		request.setAttribute(
+			"liferay-ui:panel-floating-container:accordion",
+			String.valueOf(_accordion));
+		request.setAttribute(
+			"liferay-ui:panel-floating-container:persistState",
+			String.valueOf(_persistState));
+		request.setAttribute(
+			"liferay-ui:panel-floating-container:paging",
+			String.valueOf(_paging));
+		request.setAttribute(
+			"liferay-ui:panel-floating-container:pagingElements",
+			_pagingElements);
+		request.setAttribute(
+			"liferay-ui:panel-floating-container:resultsPerPage",
+			String.valueOf(_resultsPerPage));
+		request.setAttribute(
+			"liferay-ui:panel-floating-container:width",
+			String.valueOf(_width));
+		request.setAttribute(
+			"liferay-ui:panel-floating-container:extended", _extended);
+		request.setAttribute(
+			"liferay-ui:panel-floating-container:cssClass", _cssClass);
+		request.setAttribute(
+			"liferay-ui:panel-container:panelCount" + _id,
+			new IntegerWrapper());
+
+		return EVAL_BODY_BUFFERED;
+	}
+
 	public String getId() {
 		return _id;
 	}
 
-	protected String getStartPage() {
-		if (Validator.isNull(_startPage)) {
-			return _START_PAGE;
-		}
-		else {
-			return _startPage;
-		}
+	public void setAccordion(boolean accordion) {
+		_accordion = accordion;
+	}
+
+	public void setCssClass(String cssClass) {
+		_cssClass = cssClass;
+	}
+
+	public void setEndPage(String endPage) {
+		_endPage = endPage;
+	}
+
+	public void setExtended(Boolean extended) {
+		_extended = extended;
+	}
+
+	public void setId(String id) {
+		_id = id;
+	}
+
+	public void setPaging(boolean paging) {
+		_paging = paging;
+	}
+
+	public void setPagingElements(String pagingElements) {
+		_pagingElements = pagingElements;
+	}
+
+	public void setPersistState(boolean persistState) {
+		_persistState = persistState;
+	}
+
+	public void setResultsPerPage(int resultsPerPage) {
+		_resultsPerPage = resultsPerPage;
 	}
 
 	public void setStartPage(String startPage) {
 		_startPage = startPage;
+	}
+
+	public void setTrigger(String trigger) {
+		_trigger = trigger;
+	}
+
+	public void setWidth(int width) {
+		_width = width;
 	}
 
 	protected String getEndPage() {
@@ -167,67 +201,32 @@ public class PanelFloatingContainerTag
 		}
 	}
 
-	public void setEndPage(String endPage) {
-		_endPage = endPage;
+	protected String getStartPage() {
+		if (Validator.isNull(_startPage)) {
+			return _START_PAGE;
+		}
+		else {
+			return _startPage;
+		}
 	}
-
-	public void setId(String id) {
-		_id = id;
-	}
-
-	public void setTrigger(String trigger) {
-		_trigger = trigger;
-	}
-
-	public void setAccordion(boolean accordion) {
-		_accordion = accordion;
-	}
-
-	public void setPersistState(boolean persistState) {
-		_persistState = persistState;
-	}
-
-	public void setPaging(boolean paging) {
-		_paging = paging;
-	}
-
-	public void setPagingElements(String pagingElements) {
-		_pagingElements = pagingElements;
-	}
-
-	public void setResultsPerPage(int resultsPerPage) {
-		_resultsPerPage = resultsPerPage;
-	}
-
-	public void setWidth(int width) {
-		_width = width;
-	}
-
-	public void setExtended(Boolean extended) {
-		_extended = extended;
-	}
-
-	public void setCssClass(String cssClass) {
-		_cssClass = cssClass;
-	}
-
-	private static final String _START_PAGE =
-		"/html/taglib/ui/panel_floating_container/start.jsp";
 
 	private static final String _END_PAGE =
 		"/html/taglib/ui/panel_floating_container/end.jsp";
 
-	private String _startPage;
-	private String _endPage;
-	private String _id;
-	private String _trigger;
+	private static final String _START_PAGE =
+		"/html/taglib/ui/panel_floating_container/start.jsp";
+
 	private boolean _accordion;
-	private boolean _persistState;
+	private String _cssClass = StringPool.BLANK;
+	private String _endPage;
+	private Boolean _extended;
+	private String _id;
 	private boolean _paging;
 	private String _pagingElements = "ul";
+	private boolean _persistState;
 	private int _resultsPerPage = 1;
+	private String _startPage;
+	private String _trigger;
 	private int _width = 300;
-	private Boolean _extended;
- 	private String _cssClass = StringPool.BLANK;
 
 }

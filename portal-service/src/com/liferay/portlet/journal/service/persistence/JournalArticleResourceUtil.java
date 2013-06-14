@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -92,15 +92,6 @@ public class JournalArticleResourceUtil {
 		return getPersistence()
 				   .findWithDynamicQuery(dynamicQuery, start, end,
 			orderByComparator);
-	}
-
-	/**
-	 * @see com.liferay.portal.service.persistence.BasePersistence#remove(com.liferay.portal.model.BaseModel)
-	 */
-	public static JournalArticleResource remove(
-		JournalArticleResource journalArticleResource)
-		throws SystemException {
-		return getPersistence().remove(journalArticleResource);
 	}
 
 	/**
@@ -597,12 +588,14 @@ public class JournalArticleResourceUtil {
 	*
 	* @param uuid the uuid
 	* @param groupId the group ID
+	* @return the journal article resource that was removed
 	* @throws SystemException if a system exception occurred
 	*/
-	public static void removeByUUID_G(java.lang.String uuid, long groupId)
+	public static com.liferay.portlet.journal.model.JournalArticleResource removeByUUID_G(
+		java.lang.String uuid, long groupId)
 		throws com.liferay.portal.kernel.exception.SystemException,
 			com.liferay.portlet.journal.NoSuchArticleResourceException {
-		getPersistence().removeByUUID_G(uuid, groupId);
+		return getPersistence().removeByUUID_G(uuid, groupId);
 	}
 
 	/**
@@ -621,12 +614,14 @@ public class JournalArticleResourceUtil {
 	*
 	* @param groupId the group ID
 	* @param articleId the article ID
+	* @return the journal article resource that was removed
 	* @throws SystemException if a system exception occurred
 	*/
-	public static void removeByG_A(long groupId, java.lang.String articleId)
+	public static com.liferay.portlet.journal.model.JournalArticleResource removeByG_A(
+		long groupId, java.lang.String articleId)
 		throws com.liferay.portal.kernel.exception.SystemException,
 			com.liferay.portlet.journal.NoSuchArticleResourceException {
-		getPersistence().removeByG_A(groupId, articleId);
+		return getPersistence().removeByG_A(groupId, articleId);
 	}
 
 	/**
@@ -711,11 +706,10 @@ public class JournalArticleResourceUtil {
 		return _persistence;
 	}
 
+	/**
+	 * @deprecated
+	 */
 	public void setPersistence(JournalArticleResourcePersistence persistence) {
-		_persistence = persistence;
-
-		ReferenceRegistry.registerReference(JournalArticleResourceUtil.class,
-			"_persistence");
 	}
 
 	private static JournalArticleResourcePersistence _persistence;

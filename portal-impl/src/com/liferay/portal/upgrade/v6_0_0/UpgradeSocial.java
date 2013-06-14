@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -82,14 +82,12 @@ public class UpgradeSocial extends UpgradeProcess {
 	}
 
 	protected Object[] getGroup(long groupId) throws Exception {
-		Object[] group = null;
-
 		Connection con = null;
 		PreparedStatement ps = null;
 		ResultSet rs = null;
 
 		try {
-			con = DataAccess.getConnection();
+			con = DataAccess.getUpgradeOptimizedConnection();
 
 			ps = con.prepareStatement(_GET_GROUP);
 
@@ -97,29 +95,27 @@ public class UpgradeSocial extends UpgradeProcess {
 
 			rs = ps.executeQuery();
 
-			while (rs.next()) {
+			if (rs.next()) {
 				long classNameId = rs.getLong("classNameId");
 				long classPK = rs.getLong("classPK");
 
-				group = new Object[] {classNameId, classPK};
+				return new Object[] {classNameId, classPK};
 			}
+
+			return null;
 		}
 		finally {
 			DataAccess.cleanUp(con, ps, rs);
 		}
-
-		return group;
 	}
 
 	protected Object[] getLayout(long plid) throws Exception {
-		Object[] layout = null;
-
 		Connection con = null;
 		PreparedStatement ps = null;
 		ResultSet rs = null;
 
 		try {
-			con = DataAccess.getConnection();
+			con = DataAccess.getUpgradeOptimizedConnection();
 
 			ps = con.prepareStatement(_GET_LAYOUT);
 
@@ -127,17 +123,17 @@ public class UpgradeSocial extends UpgradeProcess {
 
 			rs = ps.executeQuery();
 
-			while (rs.next()) {
+			if (rs.next()) {
 				long groupId = rs.getLong("groupId");
 
-				layout = new Object[] {groupId};
+				return new Object[] {groupId};
 			}
+
+			return null;
 		}
 		finally {
 			DataAccess.cleanUp(con, ps, rs);
 		}
-
-		return layout;
 	}
 
 	protected void updateGroupId() throws Exception {
@@ -146,7 +142,7 @@ public class UpgradeSocial extends UpgradeProcess {
 		ResultSet rs = null;
 
 		try {
-			con = DataAccess.getConnection();
+			con = DataAccess.getUpgradeOptimizedConnection();
 
 			ps = con.prepareStatement(
 				"select distinct(groupId) from SocialActivity where groupId " +

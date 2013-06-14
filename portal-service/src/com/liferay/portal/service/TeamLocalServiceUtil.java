@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -15,7 +15,6 @@
 package com.liferay.portal.service;
 
 import com.liferay.portal.kernel.bean.PortalBeanLocatorUtil;
-import com.liferay.portal.kernel.util.MethodCache;
 import com.liferay.portal.kernel.util.ReferenceRegistry;
 
 /**
@@ -65,26 +64,33 @@ public class TeamLocalServiceUtil {
 	* Deletes the team with the primary key from the database. Also notifies the appropriate model listeners.
 	*
 	* @param teamId the primary key of the team
+	* @return the team that was removed
 	* @throws PortalException if a team with the primary key could not be found
 	* @throws SystemException if a system exception occurred
 	*/
-	public static void deleteTeam(long teamId)
+	public static com.liferay.portal.model.Team deleteTeam(long teamId)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException {
-		getService().deleteTeam(teamId);
+		return getService().deleteTeam(teamId);
 	}
 
 	/**
 	* Deletes the team from the database. Also notifies the appropriate model listeners.
 	*
 	* @param team the team
+	* @return the team that was removed
 	* @throws PortalException
 	* @throws SystemException if a system exception occurred
 	*/
-	public static void deleteTeam(com.liferay.portal.model.Team team)
+	public static com.liferay.portal.model.Team deleteTeam(
+		com.liferay.portal.model.Team team)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException {
-		getService().deleteTeam(team);
+		return getService().deleteTeam(team);
+	}
+
+	public static com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery() {
+		return getService().dynamicQuery();
 	}
 
 	/**
@@ -156,6 +162,11 @@ public class TeamLocalServiceUtil {
 		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery)
 		throws com.liferay.portal.kernel.exception.SystemException {
 		return getService().dynamicQueryCount(dynamicQuery);
+	}
+
+	public static com.liferay.portal.model.Team fetchTeam(long teamId)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getService().fetchTeam(teamId);
 	}
 
 	/**
@@ -324,20 +335,15 @@ public class TeamLocalServiceUtil {
 
 			ReferenceRegistry.registerReference(TeamLocalServiceUtil.class,
 				"_service");
-			MethodCache.remove(TeamLocalService.class);
 		}
 
 		return _service;
 	}
 
+	/**
+	 * @deprecated
+	 */
 	public void setService(TeamLocalService service) {
-		MethodCache.remove(TeamLocalService.class);
-
-		_service = service;
-
-		ReferenceRegistry.registerReference(TeamLocalServiceUtil.class,
-			"_service");
-		MethodCache.remove(TeamLocalService.class);
 	}
 
 	private static TeamLocalService _service;

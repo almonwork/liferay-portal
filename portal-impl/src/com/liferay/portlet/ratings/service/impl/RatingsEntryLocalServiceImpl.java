@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -18,14 +18,19 @@ import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.model.User;
-import com.liferay.portal.security.permission.ActionKeys;
 import com.liferay.portal.service.ServiceContext;
 import com.liferay.portal.util.PortalUtil;
+import com.liferay.portal.util.PropsValues;
+import com.liferay.portlet.asset.model.AssetEntry;
 import com.liferay.portlet.blogs.model.BlogsEntry;
 import com.liferay.portlet.blogs.model.BlogsStatsUser;
+import com.liferay.portlet.messageboards.model.MBDiscussion;
+import com.liferay.portlet.messageboards.model.MBMessage;
+import com.liferay.portlet.ratings.EntryScoreException;
 import com.liferay.portlet.ratings.model.RatingsEntry;
 import com.liferay.portlet.ratings.model.RatingsStats;
 import com.liferay.portlet.ratings.service.base.RatingsEntryLocalServiceBaseImpl;
+import com.liferay.portlet.social.model.SocialActivityConstants;
 
 import java.util.Date;
 import java.util.List;
@@ -73,12 +78,15 @@ public class RatingsEntryLocalServiceImpl
 		stats.setAverageScore(averageScore);
 
 		ratingsStatsPersistence.update(stats, false);
+	}
 
-		// Social
+	public RatingsEntry fetchEntry(long userId, String className, long classPK)
+		throws SystemException {
 
-		socialEquityLogLocalService.deactivateEquityLogs(
-			userId, className, classPK, ActionKeys.ADD_VOTE,
-			StringPool.BLANK);
+		long classNameId = PortalUtil.getClassNameId(className);
+
+		return ratingsEntryPersistence.fetchByU_C_C(
+			userId, classNameId, classPK);
 	}
 
 	public List<RatingsEntry> getEntries(
@@ -137,6 +145,8 @@ public class RatingsEntryLocalServiceImpl
 		long classNameId = PortalUtil.getClassNameId(className);
 		double oldScore = 0;
 		Date now = new Date();
+
+		validate(className, score);
 
 		RatingsEntry entry = ratingsEntryPersistence.fetchByU_C_C(
 			userId, classNameId, classPK);
@@ -227,10 +237,34 @@ public class RatingsEntryLocalServiceImpl
 
 		// Social
 
-		socialEquityLogLocalService.addEquityLogs(
-			userId, className, classPK, ActionKeys.ADD_VOTE, StringPool.BLANK);
+		AssetEntry assetEntry = assetEntryLocalService.fetchEntry(
+			className, classPK);
+
+		if (assetEntry != null) {
+			socialActivityLocalService.addActivity(
+				userId, assetEntry.getGroupId(), className, classPK,
+				SocialActivityConstants.TYPE_ADD_VOTE, StringPool.BLANK, 0);
+		}
 
 		return entry;
+	}
+
+	protected void validate(String className, double score)
+		throws PortalException {
+
+		double maxScore = PropsValues.RATINGS_DEFAULT_NUMBER_OF_STARS;
+		double minScore = 0;
+
+		if (className.equals(MBDiscussion.class.getName()) ||
+			className.equals(MBMessage.class.getName())) {
+
+			maxScore = 1;
+			minScore = -1;
+		}
+
+		if ((score < minScore) || (score > maxScore)) {
+			throw new EntryScoreException();
+		}
 	}
 
 }

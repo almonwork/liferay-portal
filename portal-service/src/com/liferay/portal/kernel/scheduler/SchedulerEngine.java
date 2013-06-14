@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -32,6 +32,8 @@ import java.util.List;
  */
 public interface SchedulerEngine {
 
+	public static final String AUDIT_ACTION = "AUDIT_ACTION";
+
 	public static final String CONTEXT_PATH = "CONTEXT_PATH";
 
 	public static final String DESCRIPTION = "DESCRIPTION";
@@ -49,8 +51,12 @@ public interface SchedulerEngine {
 
 	public static final String FINAL_FIRE_TIME = "FINAL_FIRE_TIME";
 
+	public static final String GROUP_NAME = "GROUP_NAME";
+
 	public static final int GROUP_NAME_MAX_LENGTH = GetterUtil.getInteger(
 		PropsUtil.get(PropsKeys.SCHEDULER_GROUP_NAME_MAX_LENGTH));
+
+	public static final String JOB_NAME = "JOB_NAME";
 
 	public static final int JOB_NAME_MAX_LENGTH = GetterUtil.getInteger(
 		PropsUtil.get(PropsKeys.SCHEDULER_JOB_NAME_MAX_LENGTH));
@@ -61,9 +67,14 @@ public interface SchedulerEngine {
 
 	public static final String MESSAGE = "MESSAGE";
 
+	public static final String MESSAGE_LISTENER_CLASS_NAME =
+		"MESSAGE_LISTENER_CLASS_NAME";
+
 	public static final String MESSAGE_LISTENER_UUID = "MESSAGE_LISTENER_UUID";
 
 	public static final String NEXT_FIRE_TIME = "NEXT_FIRE_TIME";
+
+	public static final String PORTLET_ID = "PORTLET_ID";
 
 	public static final String PREVIOUS_FIRE_TIME = "PREVIOUS_FIRE_TIME";
 

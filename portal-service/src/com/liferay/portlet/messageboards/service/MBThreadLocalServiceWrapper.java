@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,6 +14,8 @@
 
 package com.liferay.portlet.messageboards.service;
 
+import com.liferay.portal.service.ServiceWrapper;
+
 /**
  * <p>
  * This class is a wrapper for {@link MBThreadLocalService}.
@@ -23,7 +25,8 @@ package com.liferay.portlet.messageboards.service;
  * @see       MBThreadLocalService
  * @generated
  */
-public class MBThreadLocalServiceWrapper implements MBThreadLocalService {
+public class MBThreadLocalServiceWrapper implements MBThreadLocalService,
+	ServiceWrapper<MBThreadLocalService> {
 	public MBThreadLocalServiceWrapper(
 		MBThreadLocalService mbThreadLocalService) {
 		_mbThreadLocalService = mbThreadLocalService;
@@ -57,25 +60,32 @@ public class MBThreadLocalServiceWrapper implements MBThreadLocalService {
 	* Deletes the message boards thread with the primary key from the database. Also notifies the appropriate model listeners.
 	*
 	* @param threadId the primary key of the message boards thread
+	* @return the message boards thread that was removed
 	* @throws PortalException if a message boards thread with the primary key could not be found
 	* @throws SystemException if a system exception occurred
 	*/
-	public void deleteMBThread(long threadId)
+	public com.liferay.portlet.messageboards.model.MBThread deleteMBThread(
+		long threadId)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException {
-		_mbThreadLocalService.deleteMBThread(threadId);
+		return _mbThreadLocalService.deleteMBThread(threadId);
 	}
 
 	/**
 	* Deletes the message boards thread from the database. Also notifies the appropriate model listeners.
 	*
 	* @param mbThread the message boards thread
+	* @return the message boards thread that was removed
 	* @throws SystemException if a system exception occurred
 	*/
-	public void deleteMBThread(
+	public com.liferay.portlet.messageboards.model.MBThread deleteMBThread(
 		com.liferay.portlet.messageboards.model.MBThread mbThread)
 		throws com.liferay.portal.kernel.exception.SystemException {
-		_mbThreadLocalService.deleteMBThread(mbThread);
+		return _mbThreadLocalService.deleteMBThread(mbThread);
+	}
+
+	public com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery() {
+		return _mbThreadLocalService.dynamicQuery();
 	}
 
 	/**
@@ -147,6 +157,12 @@ public class MBThreadLocalServiceWrapper implements MBThreadLocalService {
 		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery)
 		throws com.liferay.portal.kernel.exception.SystemException {
 		return _mbThreadLocalService.dynamicQueryCount(dynamicQuery);
+	}
+
+	public com.liferay.portlet.messageboards.model.MBThread fetchMBThread(
+		long threadId)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return _mbThreadLocalService.fetchMBThread(threadId);
 	}
 
 	/**
@@ -245,6 +261,14 @@ public class MBThreadLocalServiceWrapper implements MBThreadLocalService {
 		_mbThreadLocalService.setBeanIdentifier(beanIdentifier);
 	}
 
+	public com.liferay.portlet.messageboards.model.MBThread addThread(
+		long categoryId,
+		com.liferay.portlet.messageboards.model.MBMessage message)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException {
+		return _mbThreadLocalService.addThread(categoryId, message);
+	}
+
 	public void deleteThread(long threadId)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException {
@@ -262,6 +286,12 @@ public class MBThreadLocalServiceWrapper implements MBThreadLocalService {
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException {
 		_mbThreadLocalService.deleteThreads(groupId, categoryId);
+	}
+
+	public com.liferay.portlet.messageboards.model.MBThread fetchThread(
+		long threadId)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return _mbThreadLocalService.fetchThread(threadId);
 	}
 
 	public int getCategoryThreadsCount(long groupId, long categoryId, int status)
@@ -327,6 +357,11 @@ public class MBThreadLocalServiceWrapper implements MBThreadLocalService {
 			status, subscribed, includeAnonymous);
 	}
 
+	public java.util.List<com.liferay.portlet.messageboards.model.MBThread> getNoAssetThreads()
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return _mbThreadLocalService.getNoAssetThreads();
+	}
+
 	public java.util.List<com.liferay.portlet.messageboards.model.MBThread> getPriorityThreads(
 		long categoryId, double priority)
 		throws com.liferay.portal.kernel.exception.PortalException,
@@ -361,6 +396,18 @@ public class MBThreadLocalServiceWrapper implements MBThreadLocalService {
 		return _mbThreadLocalService.getThreadsCount(groupId, categoryId, status);
 	}
 
+	public boolean hasAnswerMessage(long threadId)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return _mbThreadLocalService.hasAnswerMessage(threadId);
+	}
+
+	public com.liferay.portlet.messageboards.model.MBThread incrementViewCounter(
+		long threadId, int increment)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException {
+		return _mbThreadLocalService.incrementViewCounter(threadId, increment);
+	}
+
 	public com.liferay.portlet.messageboards.model.MBThread moveThread(
 		long groupId, long categoryId, long threadId)
 		throws com.liferay.portal.kernel.exception.PortalException,
@@ -377,6 +424,15 @@ public class MBThreadLocalServiceWrapper implements MBThreadLocalService {
 			serviceContext);
 	}
 
+	public void updateQuestion(long threadId, boolean question)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException {
+		_mbThreadLocalService.updateQuestion(threadId, question);
+	}
+
+	/**
+	* @deprecated {@link #incrementViewCounter(long, int)}
+	*/
 	public com.liferay.portlet.messageboards.model.MBThread updateThread(
 		long threadId, int viewCount)
 		throws com.liferay.portal.kernel.exception.PortalException,
@@ -384,12 +440,26 @@ public class MBThreadLocalServiceWrapper implements MBThreadLocalService {
 		return _mbThreadLocalService.updateThread(threadId, viewCount);
 	}
 
+	/**
+	 * @deprecated Renamed to {@link #getWrappedService}
+	 */
 	public MBThreadLocalService getWrappedMBThreadLocalService() {
 		return _mbThreadLocalService;
 	}
 
+	/**
+	 * @deprecated Renamed to {@link #setWrappedService}
+	 */
 	public void setWrappedMBThreadLocalService(
 		MBThreadLocalService mbThreadLocalService) {
+		_mbThreadLocalService = mbThreadLocalService;
+	}
+
+	public MBThreadLocalService getWrappedService() {
+		return _mbThreadLocalService;
+	}
+
+	public void setWrappedService(MBThreadLocalService mbThreadLocalService) {
 		_mbThreadLocalService = mbThreadLocalService;
 	}
 

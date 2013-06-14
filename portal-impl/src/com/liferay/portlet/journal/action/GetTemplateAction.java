@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -63,11 +63,12 @@ public class GetTemplateAction extends Action {
 
 			String languageId = LanguageUtil.getLanguageId(request);
 
-			boolean transform = ParamUtil.get(request, "transform", true);
+			boolean transform = ParamUtil.getBoolean(
+				request, "transform", true);
 
 			JournalTemplate template =
 				JournalTemplateLocalServiceUtil.getTemplate(
-					groupId, templateId);
+					groupId, templateId, true);
 
 			String script = JournalUtil.getTemplateScript(
 				template, tokens, languageId, transform);

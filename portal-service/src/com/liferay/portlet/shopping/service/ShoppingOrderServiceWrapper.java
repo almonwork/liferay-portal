@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,6 +14,8 @@
 
 package com.liferay.portlet.shopping.service;
 
+import com.liferay.portal.service.ServiceWrapper;
+
 /**
  * <p>
  * This class is a wrapper for {@link ShoppingOrderService}.
@@ -23,20 +25,41 @@ package com.liferay.portlet.shopping.service;
  * @see       ShoppingOrderService
  * @generated
  */
-public class ShoppingOrderServiceWrapper implements ShoppingOrderService {
+public class ShoppingOrderServiceWrapper implements ShoppingOrderService,
+	ServiceWrapper<ShoppingOrderService> {
 	public ShoppingOrderServiceWrapper(
 		ShoppingOrderService shoppingOrderService) {
 		_shoppingOrderService = shoppingOrderService;
 	}
 
+	/**
+	* Returns the Spring bean ID for this bean.
+	*
+	* @return the Spring bean ID for this bean
+	*/
+	public java.lang.String getBeanIdentifier() {
+		return _shoppingOrderService.getBeanIdentifier();
+	}
+
+	/**
+	* Sets the Spring bean ID for this bean.
+	*
+	* @param beanIdentifier the Spring bean ID for this bean
+	*/
+	public void setBeanIdentifier(java.lang.String beanIdentifier) {
+		_shoppingOrderService.setBeanIdentifier(beanIdentifier);
+	}
+
 	public void completeOrder(long groupId, java.lang.String number,
 		java.lang.String ppTxnId, java.lang.String ppPaymentStatus,
 		double ppPaymentGross, java.lang.String ppReceiverEmail,
-		java.lang.String ppPayerEmail)
+		java.lang.String ppPayerEmail,
+		com.liferay.portal.service.ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException {
 		_shoppingOrderService.completeOrder(groupId, number, ppTxnId,
-			ppPaymentStatus, ppPaymentGross, ppReceiverEmail, ppPayerEmail);
+			ppPaymentStatus, ppPaymentGross, ppReceiverEmail, ppPayerEmail,
+			serviceContext);
 	}
 
 	public void deleteOrder(long groupId, long orderId)
@@ -52,10 +75,13 @@ public class ShoppingOrderServiceWrapper implements ShoppingOrderService {
 		return _shoppingOrderService.getOrder(groupId, orderId);
 	}
 
-	public void sendEmail(long groupId, long orderId, java.lang.String emailType)
+	public void sendEmail(long groupId, long orderId,
+		java.lang.String emailType,
+		com.liferay.portal.service.ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException {
-		_shoppingOrderService.sendEmail(groupId, orderId, emailType);
+		_shoppingOrderService.sendEmail(groupId, orderId, emailType,
+			serviceContext);
 	}
 
 	public com.liferay.portlet.shopping.model.ShoppingOrder updateOrder(
@@ -95,12 +121,26 @@ public class ShoppingOrderServiceWrapper implements ShoppingOrderService {
 			ccNumber, ccExpMonth, ccExpYear, ccVerNumber, comments);
 	}
 
+	/**
+	 * @deprecated Renamed to {@link #getWrappedService}
+	 */
 	public ShoppingOrderService getWrappedShoppingOrderService() {
 		return _shoppingOrderService;
 	}
 
+	/**
+	 * @deprecated Renamed to {@link #setWrappedService}
+	 */
 	public void setWrappedShoppingOrderService(
 		ShoppingOrderService shoppingOrderService) {
+		_shoppingOrderService = shoppingOrderService;
+	}
+
+	public ShoppingOrderService getWrappedService() {
+		return _shoppingOrderService;
+	}
+
+	public void setWrappedService(ShoppingOrderService shoppingOrderService) {
 		_shoppingOrderService = shoppingOrderService;
 	}
 

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -39,10 +39,13 @@ public class DDMTemplateSoap implements Serializable {
 		soapModel.setUserName(model.getUserName());
 		soapModel.setCreateDate(model.getCreateDate());
 		soapModel.setModifiedDate(model.getModifiedDate());
-		soapModel.setStructureId(model.getStructureId());
+		soapModel.setClassNameId(model.getClassNameId());
+		soapModel.setClassPK(model.getClassPK());
+		soapModel.setTemplateKey(model.getTemplateKey());
 		soapModel.setName(model.getName());
 		soapModel.setDescription(model.getDescription());
 		soapModel.setType(model.getType());
+		soapModel.setMode(model.getMode());
 		soapModel.setLanguage(model.getLanguage());
 		soapModel.setScript(model.getScript());
 
@@ -161,12 +164,28 @@ public class DDMTemplateSoap implements Serializable {
 		_modifiedDate = modifiedDate;
 	}
 
-	public long getStructureId() {
-		return _structureId;
+	public long getClassNameId() {
+		return _classNameId;
 	}
 
-	public void setStructureId(long structureId) {
-		_structureId = structureId;
+	public void setClassNameId(long classNameId) {
+		_classNameId = classNameId;
+	}
+
+	public long getClassPK() {
+		return _classPK;
+	}
+
+	public void setClassPK(long classPK) {
+		_classPK = classPK;
+	}
+
+	public String getTemplateKey() {
+		return _templateKey;
+	}
+
+	public void setTemplateKey(String templateKey) {
+		_templateKey = templateKey;
 	}
 
 	public String getName() {
@@ -193,6 +212,14 @@ public class DDMTemplateSoap implements Serializable {
 		_type = type;
 	}
 
+	public String getMode() {
+		return _mode;
+	}
+
+	public void setMode(String mode) {
+		_mode = mode;
+	}
+
 	public String getLanguage() {
 		return _language;
 	}
@@ -217,10 +244,13 @@ public class DDMTemplateSoap implements Serializable {
 	private String _userName;
 	private Date _createDate;
 	private Date _modifiedDate;
-	private long _structureId;
+	private long _classNameId;
+	private long _classPK;
+	private String _templateKey;
 	private String _name;
 	private String _description;
 	private String _type;
+	private String _mode;
 	private String _language;
 	private String _script;
 }

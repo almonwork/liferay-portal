@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -19,6 +19,7 @@ import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.PropsKeys;
+import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Tuple;
 import com.liferay.portal.kernel.util.Validator;
@@ -27,13 +28,13 @@ import com.liferay.portal.kernel.xml.Element;
 import com.liferay.portal.kernel.xml.SAXReader;
 import com.liferay.portal.service.ClassNameLocalServiceUtil;
 import com.liferay.portal.util.PropsUtil;
+import com.liferay.util.PwdGenerator;
 
 import java.io.InputStream;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -65,6 +66,11 @@ public class ModelHintsImpl implements ModelHints {
 		catch (Exception e) {
 			_log.error(e, e);
 		}
+	}
+
+	public String buildCustomValidatorName(String validatorName) {
+		return validatorName.concat(StringPool.UNDERLINE).concat(
+			PwdGenerator.getPassword(PwdGenerator.KEY3, 4));
 	}
 
 	public Map<String, String> getDefaultHints(String model) {
@@ -170,6 +176,14 @@ public class ModelHintsImpl implements ModelHints {
 		}
 	}
 
+	public boolean isCustomValidator(String validatorName) {
+		if (validatorName.equals("custom")) {
+			return true;
+		}
+
+		return false;
+	}
+
 	public boolean isLocalized(String model, String field) {
 		Map<String, Object> fields = (Map<String, Object>)_modelFields.get(
 			model);
@@ -197,6 +211,7 @@ public class ModelHintsImpl implements ModelHints {
 			if (_log.isWarnEnabled()) {
 				_log.warn("Cannot load " + source);
 			}
+
 			return;
 		}
 		else {
@@ -205,16 +220,14 @@ public class ModelHintsImpl implements ModelHints {
 			}
 		}
 
-		Document doc = _saxReader.read(is);
+		Document document = _saxReader.read(is);
 
-		Element root = doc.getRootElement();
+		Element rootElement = document.getRootElement();
 
-		Iterator<Element> itr1 = root.elements("hint-collection").iterator();
+		List<Element> rootElements = rootElement.elements("hint-collection");
 
-		while (itr1.hasNext()) {
-			Element hintCollection = itr1.next();
-
-			String name = hintCollection.attributeValue("name");
+		for (Element hintCollectionElement : rootElements) {
+			String name = hintCollectionElement.attributeValue("name");
 
 			Map<String, String> hints = _hintCollections.get(name);
 
@@ -224,24 +237,20 @@ public class ModelHintsImpl implements ModelHints {
 				_hintCollections.put(name, hints);
 			}
 
-			Iterator<Element> itr2 = hintCollection.elements("hint").iterator();
+			List<Element> hintElements = hintCollectionElement.elements("hint");
 
-			while (itr2.hasNext()) {
-				Element hint = itr2.next();
-
-				String hintName = hint.attributeValue("name");
-				String hintValue = hint.getText();
+			for (Element hintElement : hintElements) {
+				String hintName = hintElement.attributeValue("name");
+				String hintValue = hintElement.getText();
 
 				hints.put(hintName, hintValue);
 			}
 		}
 
-		itr1 = root.elements("model").iterator();
+		rootElements = rootElement.elements("model");
 
-		while (itr1.hasNext()) {
-			Element model = itr1.next();
-
-			String name = model.attributeValue("name");
+		for (Element modelElement : rootElements) {
+			String name = modelElement.attributeValue("name");
 
 			if (classLoader != ModelHintsImpl.class.getClassLoader()) {
 				ClassNameLocalServiceUtil.getClassName(name);
@@ -251,17 +260,15 @@ public class ModelHintsImpl implements ModelHints {
 
 			_defaultHints.put(name, defaultHints);
 
-			Element defaultHintsEl = model.element("default-hints");
+			Element defaultHintsElement = modelElement.element("default-hints");
 
-			if (defaultHintsEl != null) {
-				Iterator<Element> itr2 = defaultHintsEl.elements(
-					"hint").iterator();
+			if (defaultHintsElement != null) {
+				List<Element> hintElements = defaultHintsElement.elements(
+					"hint");
 
-				while (itr2.hasNext()) {
-					Element hint = itr2.next();
-
-					String hintName = hint.attributeValue("name");
-					String hintValue = hint.getText();
+				for (Element hintElement : hintElements) {
+					String hintName = hintElement.attributeValue("name");
+					String hintValue = hintElement.getText();
 
 					defaultHints.put(hintName, hintValue);
 				}
@@ -278,51 +285,45 @@ public class ModelHintsImpl implements ModelHints {
 
 			_models.add(name);
 
-			Iterator<Element> itr2 = model.elements("field").iterator();
+			List<Element> modelElements = modelElement.elements("field");
 
-			while (itr2.hasNext()) {
-				Element field = itr2.next();
-
-				String fieldName = field.attributeValue("name");
-				String fieldType = field.attributeValue("type");
+			for (Element fieldElement : modelElements) {
+				String fieldName = fieldElement.attributeValue("name");
+				String fieldType = fieldElement.attributeValue("type");
 				boolean fieldLocalized = GetterUtil.getBoolean(
-					field.attributeValue("localized"));
+					fieldElement.attributeValue("localized"));
 
 				Map<String, String> fieldHints = new HashMap<String, String>();
 
 				fieldHints.putAll(defaultHints);
 
-				Iterator<Element> itr3 = field.elements(
-					"hint-collection").iterator();
+				List<Element> fieldElements = fieldElement.elements(
+					"hint-collection");
 
-				while (itr3.hasNext()) {
-					Element hintCollection = itr3.next();
-
+				for (Element hintCollectionElement : fieldElements) {
 					Map<String, String> hints = _hintCollections.get(
-						hintCollection.attributeValue("name"));
+						hintCollectionElement.attributeValue("name"));
 
 					fieldHints.putAll(hints);
 				}
 
-				itr3 = field.elements("hint").iterator();
+				fieldElements = fieldElement.elements("hint");
 
-				while (itr3.hasNext()) {
-					Element hint = itr3.next();
-
-					String hintName = hint.attributeValue("name");
-					String hintValue = hint.getText();
+				for (Element hintElement : fieldElements) {
+					String hintName = hintElement.attributeValue("name");
+					String hintValue = hintElement.getText();
 
 					fieldHints.put(hintName, hintValue);
 				}
 
 				Tuple fieldSanitize = null;
 
-				Element sanitize = field.element("sanitize");
+				Element sanitizeElement = fieldElement.element("sanitize");
 
-				if (sanitize != null) {
-					String contentType = sanitize.attributeValue(
+				if (sanitizeElement != null) {
+					String contentType = sanitizeElement.attributeValue(
 						"content-type");
-					String modes = sanitize.attributeValue("modes");
+					String modes = sanitizeElement.attributeValue("modes");
 
 					fieldSanitize = new Tuple(fieldName, contentType, modes);
 				}
@@ -330,30 +331,34 @@ public class ModelHintsImpl implements ModelHints {
 				Map<String, Tuple> fieldValidators =
 					new TreeMap<String, Tuple>();
 
-				itr3 = field.elements("validator").iterator();
+				fieldElements = fieldElement.elements("validator");
 
-				while (itr3.hasNext()) {
-					Element validator = itr3.next();
-
-					String validatorName = validator.attributeValue("name");
+				for (Element validatorElement : fieldElements) {
+					String validatorName = validatorElement.attributeValue(
+						"name");
 
 					if (Validator.isNull(validatorName)) {
 						continue;
 					}
 
 					String validatorErrorMessage = GetterUtil.getString(
-						validator.attributeValue("error-message"));
+						validatorElement.attributeValue("error-message"));
 					String validatorValue = GetterUtil.getString(
-						validator.getText());
+						validatorElement.getText());
+					boolean customValidator = isCustomValidator(validatorName);
+
+					if (customValidator) {
+						validatorName = buildCustomValidatorName(validatorName);
+					}
 
 					Tuple fieldValidator = new Tuple(
 						fieldName, validatorName, validatorErrorMessage,
-						validatorValue);
+						validatorValue, customValidator);
 
 					fieldValidators.put(validatorName, fieldValidator);
 				}
 
-				fields.put(fieldName + _ELEMENTS_SUFFIX, field);
+				fields.put(fieldName + _ELEMENTS_SUFFIX, fieldElement);
 				fields.put(fieldName + _TYPE_SUFFIX, fieldType);
 				fields.put(fieldName + _LOCALIZATION_SUFFIX, fieldLocalized);
 				fields.put(fieldName + _HINTS_SUFFIX, fieldHints);

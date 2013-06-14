@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,7 +14,6 @@
 
 package com.liferay.portlet.shopping.service.persistence;
 
-import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.service.persistence.BasePersistence;
 
 import com.liferay.portlet.shopping.model.ShoppingOrder;
@@ -591,9 +590,11 @@ public interface ShoppingOrderPersistence extends BasePersistence<ShoppingOrder>
 	* Removes the shopping order where number = &#63; from the database.
 	*
 	* @param number the number
+	* @return the shopping order that was removed
 	* @throws SystemException if a system exception occurred
 	*/
-	public void removeByNumber(java.lang.String number)
+	public com.liferay.portlet.shopping.model.ShoppingOrder removeByNumber(
+		java.lang.String number)
 		throws com.liferay.portal.kernel.exception.SystemException,
 			com.liferay.portlet.shopping.NoSuchOrderException;
 
@@ -601,9 +602,11 @@ public interface ShoppingOrderPersistence extends BasePersistence<ShoppingOrder>
 	* Removes the shopping order where ppTxnId = &#63; from the database.
 	*
 	* @param ppTxnId the pp txn ID
+	* @return the shopping order that was removed
 	* @throws SystemException if a system exception occurred
 	*/
-	public void removeByPPTxnId(java.lang.String ppTxnId)
+	public com.liferay.portlet.shopping.model.ShoppingOrder removeByPPTxnId(
+		java.lang.String ppTxnId)
 		throws com.liferay.portal.kernel.exception.SystemException,
 			com.liferay.portlet.shopping.NoSuchOrderException;
 
@@ -701,7 +704,4 @@ public interface ShoppingOrderPersistence extends BasePersistence<ShoppingOrder>
 	*/
 	public int countAll()
 		throws com.liferay.portal.kernel.exception.SystemException;
-
-	public ShoppingOrder remove(ShoppingOrder shoppingOrder)
-		throws SystemException;
 }

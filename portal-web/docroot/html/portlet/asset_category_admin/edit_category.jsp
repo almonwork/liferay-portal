@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -88,20 +88,27 @@ else {
 
 				<aui:input name="description" />
 
-				<aui:select inputCssClass="vocabulary-select-list" label="to-vocabulary" name="vocabularyId">
+				<c:choose>
+					<c:when test="<%= parentCategoryId == 0 %>">
+						<aui:select inputCssClass="vocabulary-select-list" label="to-vocabulary" name="vocabularyId">
 
-					<%
-					for (AssetVocabulary vocabulary : vocabularies) {
-						vocabulary.setEscapedModel(true);
-					%>
+							<%
+							for (AssetVocabulary vocabulary : vocabularies) {
+								vocabulary = vocabulary.toEscapedModel();
+							%>
 
-						<aui:option label="<%= vocabulary.getTitle(locale) %>" selected="<%= vocabulary.getVocabularyId() == vocabularyId %>" value="<%= vocabulary.getVocabularyId() %>" />
+								<aui:option label="<%= vocabulary.getTitle(locale) %>" selected="<%= vocabulary.getVocabularyId() == vocabularyId %>" value="<%= vocabulary.getVocabularyId() %>" />
 
-					<%
-					}
-					%>
+							<%
+							}
+							%>
 
-				</aui:select>
+						</aui:select>
+					</c:when>
+					<c:otherwise>
+						<aui:input name="vocabularyId" type="hidden" value="<%= vocabularyId %>" />
+					</c:otherwise>
+				</c:choose>
 
 				<liferay-ui:panel-container extended="<%= false %>" id="assetCategoryPanelContainer" persistState="<%= true %>">
 					<c:if test="<%= category == null %>">
@@ -126,9 +133,9 @@ else {
 
 								<div class="lfr-form-row lfr-form-row-inline">
 									<div class="row-fields">
-										<aui:input fieldParam='<%= "key" + categoryPropertiesIndex %>' name="key" />
+										<aui:input fieldParam='<%= "key" + categoryPropertiesIndex %>' id='<%= "key" + categoryPropertiesIndex %>' name="key" />
 
-										<aui:input fieldParam='<%= "value" + categoryPropertiesIndex %>' name="value" />
+										<aui:input fieldParam='<%= "value" + categoryPropertiesIndex %>' id='<%= "value" + categoryPropertiesIndex %>' name="value" />
 									</div>
 								</div>
 
@@ -172,12 +179,12 @@ else {
 <aui:script use="liferay-auto-fields">
 	var autoFields = new Liferay.AutoFields(
 		{
-			contentBox: 'fieldset#categoryProperties',
+			contentBox: 'fieldset#<portlet:namespace />categoryProperties',
 			fieldIndexes: '<portlet:namespace />categoryPropertiesIndexes'
 		}
 	).render();
 
-	var categoryPropertiesTrigger = A.one('fieldset#categoryProperties');
+	var categoryPropertiesTrigger = A.one('fieldset#<portlet:namespace />categoryProperties');
 
 	if (categoryPropertiesTrigger) {
 		categoryPropertiesTrigger.setData('autoFieldsInstance', autoFields);

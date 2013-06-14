@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -18,7 +18,9 @@ import com.liferay.portal.kernel.bean.AutoEscapeBeanHandler;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.json.JSON;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.ProxyUtil;
 import com.liferay.portal.kernel.util.StringBundler;
+import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.model.CacheModel;
 import com.liferay.portal.model.impl.BaseModelImpl;
 import com.liferay.portal.service.ServiceContext;
@@ -32,13 +34,13 @@ import com.liferay.portlet.polls.model.PollsVoteSoap;
 
 import java.io.Serializable;
 
-import java.lang.reflect.Proxy;
-
 import java.sql.Types;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * The base model implementation for the PollsVote service. Represents a row in the &quot;PollsVote&quot; database table, with each column mapped to a property of this class.
@@ -64,12 +66,16 @@ public class PollsVoteModelImpl extends BaseModelImpl<PollsVote>
 	public static final String TABLE_NAME = "PollsVote";
 	public static final Object[][] TABLE_COLUMNS = {
 			{ "voteId", Types.BIGINT },
+			{ "companyId", Types.BIGINT },
 			{ "userId", Types.BIGINT },
+			{ "userName", Types.VARCHAR },
+			{ "createDate", Types.TIMESTAMP },
+			{ "modifiedDate", Types.TIMESTAMP },
 			{ "questionId", Types.BIGINT },
 			{ "choiceId", Types.BIGINT },
 			{ "voteDate", Types.TIMESTAMP }
 		};
-	public static final String TABLE_SQL_CREATE = "create table PollsVote (voteId LONG not null primary key,userId LONG,questionId LONG,choiceId LONG,voteDate DATE null)";
+	public static final String TABLE_SQL_CREATE = "create table PollsVote (voteId LONG not null primary key,companyId LONG,userId LONG,userName VARCHAR(75) null,createDate DATE null,modifiedDate DATE null,questionId LONG,choiceId LONG,voteDate DATE null)";
 	public static final String TABLE_SQL_DROP = "drop table PollsVote";
 	public static final String DATA_SOURCE = "liferayDataSource";
 	public static final String SESSION_FACTORY = "liferaySessionFactory";
@@ -80,6 +86,12 @@ public class PollsVoteModelImpl extends BaseModelImpl<PollsVote>
 	public static final boolean FINDER_CACHE_ENABLED = GetterUtil.getBoolean(com.liferay.portal.util.PropsUtil.get(
 				"value.object.finder.cache.enabled.com.liferay.portlet.polls.model.PollsVote"),
 			true);
+	public static final boolean COLUMN_BITMASK_ENABLED = GetterUtil.getBoolean(com.liferay.portal.util.PropsUtil.get(
+				"value.object.column.bitmask.enabled.com.liferay.portlet.polls.model.PollsVote"),
+			true);
+	public static long CHOICEID_COLUMN_BITMASK = 1L;
+	public static long QUESTIONID_COLUMN_BITMASK = 2L;
+	public static long USERID_COLUMN_BITMASK = 4L;
 
 	/**
 	 * Converts the soap model instance into a normal model instance.
@@ -91,7 +103,11 @@ public class PollsVoteModelImpl extends BaseModelImpl<PollsVote>
 		PollsVote model = new PollsVoteImpl();
 
 		model.setVoteId(soapModel.getVoteId());
+		model.setCompanyId(soapModel.getCompanyId());
 		model.setUserId(soapModel.getUserId());
+		model.setUserName(soapModel.getUserName());
+		model.setCreateDate(soapModel.getCreateDate());
+		model.setModifiedDate(soapModel.getModifiedDate());
 		model.setQuestionId(soapModel.getQuestionId());
 		model.setChoiceId(soapModel.getChoiceId());
 		model.setVoteDate(soapModel.getVoteDate());
@@ -113,14 +129,6 @@ public class PollsVoteModelImpl extends BaseModelImpl<PollsVote>
 		}
 
 		return models;
-	}
-
-	public Class<?> getModelClass() {
-		return PollsVote.class;
-	}
-
-	public String getModelClassName() {
-		return PollsVote.class.getName();
 	}
 
 	public static final long LOCK_EXPIRATION_TIME = GetterUtil.getLong(com.liferay.portal.util.PropsUtil.get(
@@ -145,6 +153,88 @@ public class PollsVoteModelImpl extends BaseModelImpl<PollsVote>
 		setPrimaryKey(((Long)primaryKeyObj).longValue());
 	}
 
+	public Class<?> getModelClass() {
+		return PollsVote.class;
+	}
+
+	public String getModelClassName() {
+		return PollsVote.class.getName();
+	}
+
+	@Override
+	public Map<String, Object> getModelAttributes() {
+		Map<String, Object> attributes = new HashMap<String, Object>();
+
+		attributes.put("voteId", getVoteId());
+		attributes.put("companyId", getCompanyId());
+		attributes.put("userId", getUserId());
+		attributes.put("userName", getUserName());
+		attributes.put("createDate", getCreateDate());
+		attributes.put("modifiedDate", getModifiedDate());
+		attributes.put("questionId", getQuestionId());
+		attributes.put("choiceId", getChoiceId());
+		attributes.put("voteDate", getVoteDate());
+
+		return attributes;
+	}
+
+	@Override
+	public void setModelAttributes(Map<String, Object> attributes) {
+		Long voteId = (Long)attributes.get("voteId");
+
+		if (voteId != null) {
+			setVoteId(voteId);
+		}
+
+		Long companyId = (Long)attributes.get("companyId");
+
+		if (companyId != null) {
+			setCompanyId(companyId);
+		}
+
+		Long userId = (Long)attributes.get("userId");
+
+		if (userId != null) {
+			setUserId(userId);
+		}
+
+		String userName = (String)attributes.get("userName");
+
+		if (userName != null) {
+			setUserName(userName);
+		}
+
+		Date createDate = (Date)attributes.get("createDate");
+
+		if (createDate != null) {
+			setCreateDate(createDate);
+		}
+
+		Date modifiedDate = (Date)attributes.get("modifiedDate");
+
+		if (modifiedDate != null) {
+			setModifiedDate(modifiedDate);
+		}
+
+		Long questionId = (Long)attributes.get("questionId");
+
+		if (questionId != null) {
+			setQuestionId(questionId);
+		}
+
+		Long choiceId = (Long)attributes.get("choiceId");
+
+		if (choiceId != null) {
+			setChoiceId(choiceId);
+		}
+
+		Date voteDate = (Date)attributes.get("voteDate");
+
+		if (voteDate != null) {
+			setVoteDate(voteDate);
+		}
+	}
+
 	@JSON
 	public long getVoteId() {
 		return _voteId;
@@ -155,11 +245,22 @@ public class PollsVoteModelImpl extends BaseModelImpl<PollsVote>
 	}
 
 	@JSON
+	public long getCompanyId() {
+		return _companyId;
+	}
+
+	public void setCompanyId(long companyId) {
+		_companyId = companyId;
+	}
+
+	@JSON
 	public long getUserId() {
 		return _userId;
 	}
 
 	public void setUserId(long userId) {
+		_columnBitmask |= USERID_COLUMN_BITMASK;
+
 		if (!_setOriginalUserId) {
 			_setOriginalUserId = true;
 
@@ -182,11 +283,45 @@ public class PollsVoteModelImpl extends BaseModelImpl<PollsVote>
 	}
 
 	@JSON
+	public String getUserName() {
+		if (_userName == null) {
+			return StringPool.BLANK;
+		}
+		else {
+			return _userName;
+		}
+	}
+
+	public void setUserName(String userName) {
+		_userName = userName;
+	}
+
+	@JSON
+	public Date getCreateDate() {
+		return _createDate;
+	}
+
+	public void setCreateDate(Date createDate) {
+		_createDate = createDate;
+	}
+
+	@JSON
+	public Date getModifiedDate() {
+		return _modifiedDate;
+	}
+
+	public void setModifiedDate(Date modifiedDate) {
+		_modifiedDate = modifiedDate;
+	}
+
+	@JSON
 	public long getQuestionId() {
 		return _questionId;
 	}
 
 	public void setQuestionId(long questionId) {
+		_columnBitmask |= QUESTIONID_COLUMN_BITMASK;
+
 		if (!_setOriginalQuestionId) {
 			_setOriginalQuestionId = true;
 
@@ -206,7 +341,19 @@ public class PollsVoteModelImpl extends BaseModelImpl<PollsVote>
 	}
 
 	public void setChoiceId(long choiceId) {
+		_columnBitmask |= CHOICEID_COLUMN_BITMASK;
+
+		if (!_setOriginalChoiceId) {
+			_setOriginalChoiceId = true;
+
+			_originalChoiceId = _choiceId;
+		}
+
 		_choiceId = choiceId;
+	}
+
+	public long getOriginalChoiceId() {
+		return _originalChoiceId;
 	}
 
 	@JSON
@@ -218,35 +365,32 @@ public class PollsVoteModelImpl extends BaseModelImpl<PollsVote>
 		_voteDate = voteDate;
 	}
 
+	public long getColumnBitmask() {
+		return _columnBitmask;
+	}
+
 	@Override
 	public PollsVote toEscapedModel() {
-		if (isEscapedModel()) {
-			return (PollsVote)this;
+		if (_escapedModelProxy == null) {
+			_escapedModelProxy = (PollsVote)ProxyUtil.newProxyInstance(_classLoader,
+					_escapedModelProxyInterfaces,
+					new AutoEscapeBeanHandler(this));
 		}
-		else {
-			if (_escapedModelProxy == null) {
-				_escapedModelProxy = (PollsVote)Proxy.newProxyInstance(_classLoader,
-						_escapedModelProxyInterfaces,
-						new AutoEscapeBeanHandler(this));
-			}
 
-			return _escapedModelProxy;
-		}
+		return _escapedModelProxy;
 	}
 
 	@Override
 	public ExpandoBridge getExpandoBridge() {
-		if (_expandoBridge == null) {
-			_expandoBridge = ExpandoBridgeFactoryUtil.getExpandoBridge(0,
-					PollsVote.class.getName(), getPrimaryKey());
-		}
-
-		return _expandoBridge;
+		return ExpandoBridgeFactoryUtil.getExpandoBridge(getCompanyId(),
+			PollsVote.class.getName(), getPrimaryKey());
 	}
 
 	@Override
 	public void setExpandoBridgeAttributes(ServiceContext serviceContext) {
-		getExpandoBridge().setAttributes(serviceContext);
+		ExpandoBridge expandoBridge = getExpandoBridge();
+
+		expandoBridge.setAttributes(serviceContext);
 	}
 
 	@Override
@@ -254,7 +398,11 @@ public class PollsVoteModelImpl extends BaseModelImpl<PollsVote>
 		PollsVoteImpl pollsVoteImpl = new PollsVoteImpl();
 
 		pollsVoteImpl.setVoteId(getVoteId());
+		pollsVoteImpl.setCompanyId(getCompanyId());
 		pollsVoteImpl.setUserId(getUserId());
+		pollsVoteImpl.setUserName(getUserName());
+		pollsVoteImpl.setCreateDate(getCreateDate());
+		pollsVoteImpl.setModifiedDate(getModifiedDate());
 		pollsVoteImpl.setQuestionId(getQuestionId());
 		pollsVoteImpl.setChoiceId(getChoiceId());
 		pollsVoteImpl.setVoteDate(getVoteDate());
@@ -319,6 +467,12 @@ public class PollsVoteModelImpl extends BaseModelImpl<PollsVote>
 		pollsVoteModelImpl._originalQuestionId = pollsVoteModelImpl._questionId;
 
 		pollsVoteModelImpl._setOriginalQuestionId = false;
+
+		pollsVoteModelImpl._originalChoiceId = pollsVoteModelImpl._choiceId;
+
+		pollsVoteModelImpl._setOriginalChoiceId = false;
+
+		pollsVoteModelImpl._columnBitmask = 0;
 	}
 
 	@Override
@@ -327,7 +481,35 @@ public class PollsVoteModelImpl extends BaseModelImpl<PollsVote>
 
 		pollsVoteCacheModel.voteId = getVoteId();
 
+		pollsVoteCacheModel.companyId = getCompanyId();
+
 		pollsVoteCacheModel.userId = getUserId();
+
+		pollsVoteCacheModel.userName = getUserName();
+
+		String userName = pollsVoteCacheModel.userName;
+
+		if ((userName != null) && (userName.length() == 0)) {
+			pollsVoteCacheModel.userName = null;
+		}
+
+		Date createDate = getCreateDate();
+
+		if (createDate != null) {
+			pollsVoteCacheModel.createDate = createDate.getTime();
+		}
+		else {
+			pollsVoteCacheModel.createDate = Long.MIN_VALUE;
+		}
+
+		Date modifiedDate = getModifiedDate();
+
+		if (modifiedDate != null) {
+			pollsVoteCacheModel.modifiedDate = modifiedDate.getTime();
+		}
+		else {
+			pollsVoteCacheModel.modifiedDate = Long.MIN_VALUE;
+		}
 
 		pollsVoteCacheModel.questionId = getQuestionId();
 
@@ -347,12 +529,20 @@ public class PollsVoteModelImpl extends BaseModelImpl<PollsVote>
 
 	@Override
 	public String toString() {
-		StringBundler sb = new StringBundler(11);
+		StringBundler sb = new StringBundler(19);
 
 		sb.append("{voteId=");
 		sb.append(getVoteId());
+		sb.append(", companyId=");
+		sb.append(getCompanyId());
 		sb.append(", userId=");
 		sb.append(getUserId());
+		sb.append(", userName=");
+		sb.append(getUserName());
+		sb.append(", createDate=");
+		sb.append(getCreateDate());
+		sb.append(", modifiedDate=");
+		sb.append(getModifiedDate());
 		sb.append(", questionId=");
 		sb.append(getQuestionId());
 		sb.append(", choiceId=");
@@ -365,7 +555,7 @@ public class PollsVoteModelImpl extends BaseModelImpl<PollsVote>
 	}
 
 	public String toXmlString() {
-		StringBundler sb = new StringBundler(19);
+		StringBundler sb = new StringBundler(31);
 
 		sb.append("<model><model-name>");
 		sb.append("com.liferay.portlet.polls.model.PollsVote");
@@ -376,8 +566,24 @@ public class PollsVoteModelImpl extends BaseModelImpl<PollsVote>
 		sb.append(getVoteId());
 		sb.append("]]></column-value></column>");
 		sb.append(
+			"<column><column-name>companyId</column-name><column-value><![CDATA[");
+		sb.append(getCompanyId());
+		sb.append("]]></column-value></column>");
+		sb.append(
 			"<column><column-name>userId</column-name><column-value><![CDATA[");
 		sb.append(getUserId());
+		sb.append("]]></column-value></column>");
+		sb.append(
+			"<column><column-name>userName</column-name><column-value><![CDATA[");
+		sb.append(getUserName());
+		sb.append("]]></column-value></column>");
+		sb.append(
+			"<column><column-name>createDate</column-name><column-value><![CDATA[");
+		sb.append(getCreateDate());
+		sb.append("]]></column-value></column>");
+		sb.append(
+			"<column><column-name>modifiedDate</column-name><column-value><![CDATA[");
+		sb.append(getModifiedDate());
 		sb.append("]]></column-value></column>");
 		sb.append(
 			"<column><column-name>questionId</column-name><column-value><![CDATA[");
@@ -402,15 +608,21 @@ public class PollsVoteModelImpl extends BaseModelImpl<PollsVote>
 			PollsVote.class
 		};
 	private long _voteId;
+	private long _companyId;
 	private long _userId;
 	private String _userUuid;
 	private long _originalUserId;
 	private boolean _setOriginalUserId;
+	private String _userName;
+	private Date _createDate;
+	private Date _modifiedDate;
 	private long _questionId;
 	private long _originalQuestionId;
 	private boolean _setOriginalQuestionId;
 	private long _choiceId;
+	private long _originalChoiceId;
+	private boolean _setOriginalChoiceId;
 	private Date _voteDate;
-	private transient ExpandoBridge _expandoBridge;
+	private long _columnBitmask;
 	private PollsVote _escapedModelProxy;
 }

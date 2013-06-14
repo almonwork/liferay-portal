@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -24,11 +24,9 @@
 	<%
 	RepositoryReport repositoryReport = (RepositoryReport)SessionMessages.get(renderRequest, WebKeys.PLUGIN_REPOSITORY_REPORT);
 
-	Iterator itr = repositoryReport.getRepositoryURLs().iterator();
+	Set<String> repositoryURLs = repositoryReport.getRepositoryURLs();
 
-	while (itr.hasNext()) {
-		String repositoryURL = (String)itr.next();
-
+	for (String repositoryURL : repositoryURLs) {
 		String status = repositoryReport.getState(repositoryURL);
 	%>
 

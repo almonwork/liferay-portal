@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -45,6 +45,13 @@ public class DLFileVersionLocalServiceImpl
 		return dlFileVersionPersistence.findByF_V(fileEntryId, version);
 	}
 
+	public DLFileVersion getFileVersionByUuidAndGroupId(
+			String uuid, long groupId)
+		throws SystemException {
+
+		return dlFileVersionPersistence.fetchByUUID_G(uuid, groupId);
+	}
+
 	public List<DLFileVersion> getFileVersions(long fileEntryId, int status)
 		throws SystemException {
 
@@ -54,6 +61,12 @@ public class DLFileVersionLocalServiceImpl
 		else {
 			return dlFileVersionPersistence.findByF_S(fileEntryId, status);
 		}
+	}
+
+	public int getFileVersionsCount(long fileEntryId, int status)
+		throws SystemException {
+
+		return dlFileVersionPersistence.countByF_S(fileEntryId, status);
 	}
 
 	public DLFileVersion getLatestFileVersion(

@@ -24,6 +24,16 @@
 	<td>Blogs Test Page1</td>
 </tr>
 <tr>
+	<td>pause</td>
+	<td>5000</td>
+	<td></td>
+</tr>
+<tr>
+	<td>waitForText</td>
+	<td>//span[@class='portlet-title-text']</td>
+	<td>Blogs</td>
+</tr>
+<tr>
 	<td>assertText</td>
 	<td>//span[@class='portlet-title-text']</td>
 	<td>Blogs</td>
@@ -39,14 +49,29 @@
 	<td></td>
 </tr>
 <tr>
+	<td>waitForVisible</td>
+	<td>//input[@id='_33_keywords']</td>
+	<td>Search Field</td>
+</tr>
+<tr>
 	<td>type</td>
 	<td>//input[@id='_33_keywords']</td>
 	<td>Entry4</td>
 </tr>
 <tr>
+	<td>waitForVisible</td>
+	<td>//input[@value='Search']</td>
+	<td>Search</td>
+</tr>
+<tr>
 	<td>clickAndWait</td>
 	<td>//input[@value='Search']</td>
 	<td>Search</td>
+</tr>
+<tr>
+	<td>waitForVisible</td>
+	<td>//div[@class='portlet-msg-info']</td>
+	<td>Portlet Info</td>
 </tr>
 <tr>
 	<td>assertText</td>
@@ -79,9 +104,24 @@
 	<td>Blogs Test Page2</td>
 </tr>
 <tr>
+	<td>pause</td>
+	<td>5000</td>
+	<td></td>
+</tr>
+<tr>
+	<td>waitForText</td>
+	<td>//span[@class='portlet-title-text']</td>
+	<td>Blogs (Blogs Test Page2)</td>
+</tr>
+<tr>
 	<td>assertText</td>
 	<td>//span[@class='portlet-title-text']</td>
 	<td>Blogs (Blogs Test Page2)</td>
+</tr>
+<tr>
+	<td>waitForVisible</td>
+	<td>//input[@id='_33_keywords']</td>
+	<td>Search Field</td>
 </tr>
 <tr>
 	<td>type</td>
@@ -89,9 +129,19 @@
 	<td>Entry4</td>
 </tr>
 <tr>
-	<td>clickAndWait</td>
+	<td>waitForVisible</td>
 	<td>//input[@value='Search']</td>
 	<td>Search</td>
+</tr>
+<tr>
+	<td>clickAtAndWait</td>
+	<td>//input[@value='Search']</td>
+	<td>Search</td>
+</tr>
+<tr>
+	<td>waitForText</td>
+	<td>//td[2]/a</td>
+	<td>Blogs Entry4 Title</td>
 </tr>
 <tr>
 	<td>assertText</td>
@@ -144,9 +194,24 @@
 	<td>Blogs Test Page3</td>
 </tr>
 <tr>
+	<td>pause</td>
+	<td>5000</td>
+	<td></td>
+</tr>
+<tr>
+	<td>waitForText</td>
+	<td>//span[@class='portlet-title-text']</td>
+	<td>Blogs (Blogs Test Page2)</td>
+</tr>
+<tr>
 	<td>assertText</td>
 	<td>//span[@class='portlet-title-text']</td>
 	<td>Blogs (Blogs Test Page2)</td>
+</tr>
+<tr>
+	<td>waitForVisible</td>
+	<td>//input[@id='_33_keywords']</td>
+	<td>Search Field</td>
 </tr>
 <tr>
 	<td>type</td>
@@ -154,9 +219,19 @@
 	<td>Entry4</td>
 </tr>
 <tr>
+	<td>waitForVisible</td>
+	<td>//input[@value='Search']</td>
+	<td>Search</td>
+</tr>
+<tr>
 	<td>clickAndWait</td>
 	<td>//input[@value='Search']</td>
 	<td>Search</td>
+</tr>
+<tr>
+	<td>waitForText</td>
+	<td>//td[2]/a</td>
+	<td>Blogs Entry4 Title</td>
 </tr>
 <tr>
 	<td>assertText</td>
@@ -209,14 +284,19 @@
 	<td>Control Panel</td>
 </tr>
 <tr>
+	<td>waitForVisible</td>
+	<td>link=Blogs</td>
+	<td>Blogs</td>
+</tr>
+<tr>
 	<td>clickAtAndWait</td>
 	<td>link=Blogs</td>
 	<td>Blogs</td>
 </tr>
 <tr>
 	<td>assertText</td>
-	<td>//div[2]/span/a</td>
-	<td>Default</td>
+	<td>//div/span/ul/li/strong/a/span</td>
+	<td>Scope: Default</td>
 </tr>
 <tr>
 	<td>assertText</td>
@@ -235,13 +315,23 @@
 </tr>
 <tr>
 	<td>type</td>
-	<td>//input[@id='_33_keywords']</td>
+	<td>//input[@id='_161_keywords']</td>
 	<td>Entry4</td>
+</tr>
+<tr>
+	<td>waitForVisible</td>
+	<td>//input[@value='Search']</td>
+	<td>Search</td>
 </tr>
 <tr>
 	<td>clickAndWait</td>
 	<td>//input[@value='Search']</td>
 	<td>Search</td>
+</tr>
+<tr>
+	<td>waitForVisible</td>
+	<td>//div[@class='portlet-msg-info']</td>
+	<td>Portlet Info</td>
 </tr>
 <tr>
 	<td>assertText</td>
@@ -274,49 +364,74 @@
 	<td>Control Panel</td>
 </tr>
 <tr>
+	<td>waitForVisible</td>
+	<td>link=Blogs</td>
+	<td>Blogs</td>
+</tr>
+<tr>
 	<td>clickAtAndWait</td>
 	<td>link=Blogs</td>
 	<td>Blogs</td>
 </tr>
 <tr>
 	<td>assertText</td>
-	<td>//div[2]/span/a</td>
-	<td>Default</td>
+	<td>//div/span/ul/li/strong/a/span</td>
+	<td>Scope: Default</td>
 </tr>
 <tr>
 	<td>clickAt</td>
-	<td>//div[2]/span/a</td>
-	<td>Default</td>
+	<td>//div/span/ul/li/strong/a/span</td>
+	<td>Scope: Default</td>
 </tr>
 <tr>
 	<td>waitForVisible</td>
-	<td>//li[2]/a</td>
+	<td>//div[@class='lfr-component lfr-menu-list']/ul/li[2]/a</td>
 	<td>Blogs Test Page2</td>
 </tr>
 <tr>
 	<td>assertText</td>
-	<td>//li[2]/a</td>
+	<td>//div[@class='lfr-component lfr-menu-list']/ul/li[2]/a</td>
 	<td>Blogs Test Page2</td>
 </tr>
 <tr>
-	<td>clickAtAndWait</td>
-	<td>//li[2]/a</td>
+	<td>clickAndWait</td>
+	<td>//div[@class='lfr-component lfr-menu-list']/ul/li[2]/a</td>
 	<td>Blogs Test Page2</td>
+</tr>
+<tr>
+	<td>waitForText</td>
+	<td>//div/span/ul/li/strong/a/span</td>
+	<td>Scope: Blogs Test Page2</td>
 </tr>
 <tr>
 	<td>assertText</td>
-	<td>//div[2]/span/a</td>
-	<td>Blogs Test Page2</td>
+	<td>//div/span/ul/li/strong/a/span</td>
+	<td>Scope: Blogs Test Page2</td>
+</tr>
+<tr>
+	<td>waitForVisible</td>
+	<td>//input[@id='_161_keywords']</td>
+	<td>Search Field</td>
 </tr>
 <tr>
 	<td>type</td>
-	<td>//input[@id='_33_keywords']</td>
+	<td>//input[@id='_161_keywords']</td>
 	<td>Entry4</td>
+</tr>
+<tr>
+	<td>waitForVisible</td>
+	<td>//input[@value='Search']</td>
+	<td>Search</td>
 </tr>
 <tr>
 	<td>clickAndWait</td>
 	<td>//input[@value='Search']</td>
 	<td>Search</td>
+</tr>
+<tr>
+	<td>waitForText</td>
+	<td>//td[2]/a</td>
+	<td>Blogs Entry4 Title</td>
 </tr>
 <tr>
 	<td>assertText</td>
@@ -353,7 +468,6 @@
 	<td>//div[@class='entry-author']</td>
 	<td>By Joe Bloggs</td>
 </tr>
-
 </tbody></table>
 </body>
 </html>

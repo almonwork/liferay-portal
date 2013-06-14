@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -27,9 +27,12 @@ import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.LocalizationUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.SetUtil;
+import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
+import com.liferay.portal.security.auth.PrincipalException;
+import com.liferay.portal.security.pacl.PACLClassLoaderUtil;
 import com.liferay.portal.service.ServiceContext;
 import com.liferay.portal.service.ServiceContextUtil;
 import com.liferay.portal.struts.JSONAction;
@@ -48,6 +51,8 @@ import java.util.regex.Pattern;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
+import jodd.util.Wildcard;
 
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionMapping;
@@ -79,6 +84,10 @@ public class JSONServiceAction extends JSONAction {
 
 		String className = ParamUtil.getString(request, "serviceClassName");
 		String methodName = ParamUtil.getString(request, "serviceMethodName");
+
+		checkMethodGuestAccess(
+			request, methodName, PropsValues.JSON_SERVICE_PUBLIC_METHODS);
+
 		String[] serviceParameters = getStringArrayFromJSON(
 			request, "serviceParameters");
 		String[] serviceParameterTypes = getStringArrayFromJSON(
@@ -88,9 +97,8 @@ public class JSONServiceAction extends JSONAction {
 			return null;
 		}
 
-		Thread currentThread = Thread.currentThread();
-
-		ClassLoader contextClassLoader = currentThread.getContextClassLoader();
+		ClassLoader contextClassLoader =
+			PACLClassLoaderUtil.getContextClassLoader();
 
 		Class<?> clazz = contextClassLoader.loadClass(className);
 
@@ -137,6 +145,25 @@ public class JSONServiceAction extends JSONAction {
 		}
 
 		return null;
+	}
+
+	protected void checkMethodGuestAccess(
+			HttpServletRequest request, String methodName,
+			String[] publicMethods)
+		throws PrincipalException {
+
+		if ((methodName != null) && (publicMethods.length > 0)) {
+			if (Wildcard.matchOne(methodName, publicMethods) != -1) {
+				return;
+			}
+		}
+
+		String remoteUser = request.getRemoteUser();
+
+		if (remoteUser == null) {
+			throw new PrincipalException(
+				"Please sign in to invoke this method");
+		}
 	}
 
 	protected Object getArgValue(
@@ -290,8 +317,7 @@ public class JSONServiceAction extends JSONAction {
 			if ((values != null) && (values.length > 0)) {
 				String[] values0 = StringUtil.split(values[0]);
 
-				int[][] doubleArray =
-					new int[values.length][values0.length];
+				int[][] doubleArray = new int[values.length][values0.length];
 
 				for (int i = 0; i < values.length; i++) {
 					String[] curValues = StringUtil.split(values[i]);
@@ -313,8 +339,7 @@ public class JSONServiceAction extends JSONAction {
 			if ((values != null) && (values.length > 0)) {
 				String[] values0 = StringUtil.split(values[0]);
 
-				long[][] doubleArray =
-					new long[values.length][values0.length];
+				long[][] doubleArray = new long[values.length][values0.length];
 
 				for (int i = 0; i < values.length; i++) {
 					String[] curValues = StringUtil.split(values[i]);
@@ -373,19 +398,16 @@ public class JSONServiceAction extends JSONAction {
 			}
 		}
 		else if (typeNameOrClassDescriptor.equals(
-			"java.util.Map<java.util.Locale, java.lang.String>")) {
+					"java.util.Map<java.util.Locale, java.lang.String>")) {
 
 			JSONObject jsonObject = JSONFactoryUtil.createJSONObject(value);
 
 			return LocalizationUtil.deserialize(jsonObject);
 		}
+		else if (typeNameOrClassDescriptor.startsWith("java.util.Map")) {
+			return JSONFactoryUtil.looseDeserializeSafe(value);
+		}
 		else {
-			try {
-				return JSONFactoryUtil.looseDeserialize(value);
-			}
-			catch (Exception e) {
-			}
-
 			_log.error(
 				"Unsupported parameter type for class " + clazz + ", method " +
 					methodName + ", parameter " + parameter + ", and type " +
@@ -400,11 +422,23 @@ public class JSONServiceAction extends JSONAction {
 			String[] parameterTypes)
 		throws Exception {
 
-		String parameterNames = StringUtil.merge(parameters);
+		StringBundler sb = new StringBundler(5);
 
-		String key =
-			clazz.getName() + "_METHOD_NAME_" + methodName + "_PARAMETERS_" +
-				parameterNames;
+		sb.append(clazz.getName());
+		sb.append("_METHOD_NAME_");
+		sb.append(methodName);
+		sb.append("_PARAMETERS_");
+
+		String parameterTypesNames = StringUtil.merge(parameterTypes);
+
+		if (Validator.isNull(parameterTypesNames)) {
+			sb.append(parameters.length);
+		}
+		else {
+			sb.append(parameterTypesNames);
+		}
+
+		String key = sb.toString();
 
 		Object[] methodAndParameterTypes = _methodCache.get(key);
 
@@ -445,10 +479,12 @@ public class JSONServiceAction extends JSONAction {
 						}
 					}
 					else if (method != null) {
+						String parametersString = StringUtil.merge(parameters);
+
 						_log.error(
 							"Obscure method name for class " + clazz +
 								", method " + methodName + ", and parameters " +
-									parameterNames);
+									parametersString);
 
 						return null;
 					}
@@ -470,9 +506,11 @@ public class JSONServiceAction extends JSONAction {
 			return methodAndParameterTypes;
 		}
 		else {
+			String parametersString = StringUtil.merge(parameters);
+
 			_log.error(
 				"No method found for class " + clazz + ", method " +
-					methodName + ", and parameters " + parameterNames);
+					methodName + ", and parameters " + parametersString);
 
 			return null;
 		}
@@ -578,7 +616,7 @@ public class JSONServiceAction extends JSONAction {
 		}
 	}
 
-	private static final String _REROUTE_PATH = "/json";
+	private static final String _REROUTE_PATH = "/api/json";
 
 	private static Log _log = LogFactoryUtil.getLog(JSONServiceAction.class);
 

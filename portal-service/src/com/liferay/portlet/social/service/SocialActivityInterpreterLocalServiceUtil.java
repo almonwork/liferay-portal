@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -15,7 +15,6 @@
 package com.liferay.portlet.social.service;
 
 import com.liferay.portal.kernel.bean.PortalBeanLocatorUtil;
-import com.liferay.portal.kernel.util.MethodCache;
 import com.liferay.portal.kernel.util.ReferenceRegistry;
 
 /**
@@ -56,16 +55,43 @@ public class SocialActivityInterpreterLocalServiceUtil {
 		getService().setBeanIdentifier(beanIdentifier);
 	}
 
+	/**
+	* Adds the activity interpreter to the list of available interpreters.
+	*
+	* @param activityInterpreter the activity interpreter
+	*/
 	public static void addActivityInterpreter(
 		com.liferay.portlet.social.model.SocialActivityInterpreter activityInterpreter) {
 		getService().addActivityInterpreter(activityInterpreter);
 	}
 
+	/**
+	* Removes the activity interpreter from the list of available interpreters.
+	*
+	* @param activityInterpreter the activity interpreter
+	*/
 	public static void deleteActivityInterpreter(
 		com.liferay.portlet.social.model.SocialActivityInterpreter activityInterpreter) {
 		getService().deleteActivityInterpreter(activityInterpreter);
 	}
 
+	/**
+	* Creates a human readable activity feed entry for the activity using an
+	* available compatible activity interpreter.
+	*
+	* <p>
+	* This method finds the appropriate interpreter for the activity by going
+	* through the available interpreters and asking them if they can handle the
+	* asset type of the activity.
+	* </p>
+	*
+	* @param activity the activity to be translated to human readable form
+	* @param themeDisplay the theme display needed by interpreters to create
+	links and get localized text fragments
+	* @return the activity feed that is a human readable form of the activity
+	record or <code>null</code> if a compatible interpreter is not
+	found
+	*/
 	public static com.liferay.portlet.social.model.SocialActivityFeedEntry interpret(
 		com.liferay.portlet.social.model.SocialActivity activity,
 		com.liferay.portal.theme.ThemeDisplay themeDisplay) {
@@ -78,20 +104,15 @@ public class SocialActivityInterpreterLocalServiceUtil {
 
 			ReferenceRegistry.registerReference(SocialActivityInterpreterLocalServiceUtil.class,
 				"_service");
-			MethodCache.remove(SocialActivityInterpreterLocalService.class);
 		}
 
 		return _service;
 	}
 
+	/**
+	 * @deprecated
+	 */
 	public void setService(SocialActivityInterpreterLocalService service) {
-		MethodCache.remove(SocialActivityInterpreterLocalService.class);
-
-		_service = service;
-
-		ReferenceRegistry.registerReference(SocialActivityInterpreterLocalServiceUtil.class,
-			"_service");
-		MethodCache.remove(SocialActivityInterpreterLocalService.class);
 	}
 
 	private static SocialActivityInterpreterLocalService _service;

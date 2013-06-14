@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -15,54 +15,94 @@
 package com.liferay.portal.jsonwebservice;
 
 import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.jsonwebservice.JSONWebService;
-import com.liferay.portal.kernel.jsonwebservice.JSONWebServiceActionsManager;
+import com.liferay.portal.kernel.jsonwebservice.JSONWebServiceActionsManagerUtil;
 import com.liferay.portal.kernel.jsonwebservice.JSONWebServiceMode;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.util.CharPool;
+import com.liferay.portal.kernel.util.SetUtil;
+import com.liferay.portal.kernel.util.StreamUtil;
 import com.liferay.portal.kernel.util.StringBundler;
+import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
+import com.liferay.portal.security.pacl.PACLClassLoaderUtil;
 import com.liferay.portal.util.PortalUtil;
+import com.liferay.portal.util.PropsValues;
 
 import java.io.File;
 import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 
 import java.net.URL;
+import java.net.URLDecoder;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
-import jodd.io.findfile.FindClass;
+import jodd.io.findfile.ClassFinder;
 import jodd.io.findfile.FindFile;
-import jodd.io.findfile.WildcardFindFile;
+import jodd.io.findfile.RegExpFindFile;
 
 import jodd.util.ClassLoaderUtil;
 
 import org.apache.commons.lang.time.StopWatch;
 
+import org.objectweb.asm.ClassReader;
+
 /**
  * @author Igor Spasic
  */
-public class JSONWebServiceConfigurator extends FindClass {
+public class JSONWebServiceConfigurator extends ClassFinder {
 
-	public JSONWebServiceConfigurator() {
+	public JSONWebServiceConfigurator(String servletContextPath) {
 		setIncludedJars(
-			"*portal-impl.jar", "*portal-service.jar", "*_wl_cls_gen.jar",
-			"*-portlet-service.jar");
+			"*_wl_cls_gen.jar", "*-hook-service*.jar", "*-portlet-service*.jar",
+			"*-web-service*.jar", "*portal-impl.jar", "*portal-service.jar");
+
+		_servletContextPath = servletContextPath;
 	}
 
-	public void configure(ClassLoader classLoader) throws PortalException {
+	public void clean() {
+		int count =
+			JSONWebServiceActionsManagerUtil.unregisterJSONWebServiceActions(
+				_servletContextPath);
+
+		_registeredActionsCount -= count;
+
+		if (_log.isDebugEnabled()) {
+			if (count != 0) {
+				_log.debug(
+					"Removed " + count +
+						" existing JSON Web Service actions that belonged to " +
+							_servletContextPath);
+			}
+		}
+	}
+
+	public void configure(ClassLoader classLoader)
+		throws PortalException, SystemException {
+
 		File[] classPathFiles = null;
 
 		if (classLoader != null) {
 			URL servicePropertiesURL = classLoader.getResource(
 				"service.properties");
 
-			String servicePropertiesPath = servicePropertiesURL.getPath();
+			String servicePropertiesPath = null;
+
+			try {
+				servicePropertiesPath = URLDecoder.decode(
+					servicePropertiesURL.getPath(), StringPool.UTF8);
+			}
+			catch (UnsupportedEncodingException uee) {
+				throw new SystemException(uee);
+			}
 
 			File classPathFile = null;
 
@@ -84,22 +124,27 @@ public class JSONWebServiceConfigurator extends FindClass {
 				classPathFile = servicePropertiesFile.getParentFile();
 
 				libDir = new File(classPathFile.getParent(), "lib");
-
 			}
 
 			classPathFiles = new File[2];
 
 			classPathFiles[0] = classPathFile;
 
-			FindFile findFile = new WildcardFindFile(
-				libDir, "*-portlet-service.jar");
+			FindFile findFile = new RegExpFindFile(
+				".*-(hook|portlet|web)-service.*\\.jar");
+
+			findFile.searchPath(libDir);
 
 			classPathFiles[1] = findFile.nextFile();
+
+			if (classPathFiles[1] == null) {
+				File classesDir = new File(libDir.getParent(), "classes");
+
+				classPathFiles[1] = classesDir;
+			}
 		}
 		else {
-			Thread currentThread = Thread.currentThread();
-
-			classLoader = currentThread.getContextClassLoader();
+			classLoader = PACLClassLoaderUtil.getContextClassLoader();
 
 			File portalImplJarFile = new File(
 				PortalUtil.getPortalLibDir(), "portal-impl.jar");
@@ -120,10 +165,52 @@ public class JSONWebServiceConfigurator extends FindClass {
 
 		_classLoader = classLoader;
 
-		configure(classPathFiles);
+		_configure(classPathFiles);
 	}
 
-	public void configure(File... classPathFiles) throws PortalException {
+	@Override
+	protected void onEntry(EntryData entryData) throws Exception {
+		String className = entryData.getName();
+
+		if (className.endsWith("Service") ||
+			className.endsWith("ServiceImpl")) {
+
+			InputStream inputStream = entryData.openInputStream();
+
+			if (!isTypeSignatureInUse(
+					inputStream, _jsonWebServiceAnnotationBytes)) {
+
+				return;
+			}
+
+			if (!entryData.isArchive()) {
+				StreamUtil.cleanUp(inputStream);
+
+				ClassReader classReader = new ClassReader(
+					entryData.openInputStream());
+
+				JSONWebServiceClassVisitor jsonWebServiceClassVisitor =
+					new JSONWebServiceClassVisitor();
+
+				try {
+					classReader.accept(jsonWebServiceClassVisitor, 0);
+				}
+				catch (Exception e) {
+					return;
+				}
+
+				if (!className.equals(
+						jsonWebServiceClassVisitor.getClassName())) {
+
+					return;
+				}
+			}
+
+			_onJSONWebServiceClass(className);
+		}
+	}
+
+	private void _configure(File... classPathFiles) throws PortalException {
 		StopWatch stopWatch = null;
 
 		if (_log.isDebugEnabled()) {
@@ -143,39 +230,8 @@ public class JSONWebServiceConfigurator extends FindClass {
 
 		if (_log.isDebugEnabled()) {
 			_log.debug(
-				"Configuring " + _registeredActionsCount +
-					" actions in " + stopWatch.getTime() + " ms");
-		}
-	}
-
-	public void setCheckBytecodeSignature(boolean checkBytecodeSignature) {
-		_checkBytecodeSignature = checkBytecodeSignature;
-	}
-
-	public void setJSONWebServiceActionsManager(
-		JSONWebServiceActionsManager jsonWebServiceActionsManager) {
-
-		_jsonWebServiceActionsManager = jsonWebServiceActionsManager;
-	}
-
-	@Override
-	protected void onEntry(FindClass.EntryData entryData) throws Exception {
-		String className = entryData.getName();
-
-		if (className.endsWith("Service") ||
-			className.endsWith("ServiceImpl")) {
-
-			if (_checkBytecodeSignature) {
-				InputStream inputStream = entryData.openInputStream();
-
-				if (!isTypeSignatureInUse(
-						inputStream, _jsonWebServiceAnnotationBytes)) {
-
-					return;
-				}
-			}
-
-			_onJSONWebServiceClass(className);
+				"Configured " + _registeredActionsCount + " actions in " +
+					stopWatch.getTime() + " ms");
 		}
 	}
 
@@ -323,6 +379,10 @@ public class JSONWebServiceConfigurator extends FindClass {
 		String httpMethod = _jsonWebServiceMappingResolver.resolveHttpMethod(
 			method);
 
+		if (_invalidHttpMethods.contains(httpMethod)) {
+			return;
+		}
+
 		Class<?> utilClass = _loadUtilClass(implementationClass);
 
 		try {
@@ -333,8 +393,9 @@ public class JSONWebServiceConfigurator extends FindClass {
 			return;
 		}
 
-		_jsonWebServiceActionsManager.registerJSONWebServiceAction(
-			method.getDeclaringClass(), method, path, httpMethod);
+		JSONWebServiceActionsManagerUtil.registerJSONWebServiceAction(
+			_servletContextPath, method.getDeclaringClass(), method, path,
+			httpMethod);
 
 		_registeredActionsCount++;
 	}
@@ -342,14 +403,15 @@ public class JSONWebServiceConfigurator extends FindClass {
 	private static Log _log = LogFactoryUtil.getLog(
 		JSONWebServiceConfigurator.class);
 
-	private boolean _checkBytecodeSignature = true;
 	private ClassLoader _classLoader;
-	private JSONWebServiceActionsManager _jsonWebServiceActionsManager;
-	private byte[] _jsonWebServiceAnnotationBytes =
-		getTypeSignatureBytes(JSONWebService.class);
+	private Set<String> _invalidHttpMethods = SetUtil.fromArray(
+		PropsValues.JSONWS_WEB_SERVICE_INVALID_HTTP_METHODS);
+	private byte[] _jsonWebServiceAnnotationBytes = getTypeSignatureBytes(
+		JSONWebService.class);
 	private JSONWebServiceMappingResolver _jsonWebServiceMappingResolver =
 		new JSONWebServiceMappingResolver();
 	private int _registeredActionsCount;
+	private String _servletContextPath;
 	private Map<Class<?>, Class<?>> _utilClasses =
 		new HashMap<Class<?>, Class<?>>();
 

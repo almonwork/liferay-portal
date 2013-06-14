@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -31,6 +31,7 @@ import javax.servlet.http.HttpServletRequest;
 
 /**
  * @author Brian Wing Shun Chan
+ * @author Hugo Huijser
  */
 public interface Http {
 
@@ -89,6 +90,8 @@ public interface Http {
 	public String getParameter(String url, String name, boolean escaped);
 
 	public Map<String, String[]> getParameterMap(String queryString);
+
+	public String getPath(String url);
 
 	public String getProtocol(ActionRequest actionRequest);
 
@@ -166,8 +169,10 @@ public interface Http {
 	 * represent a file or some JNDI resource. In that case, the default Java
 	 * implementation is used.
 	 *
+	 * @param  url the URL
 	 * @return A string representation of the resource referenced by the URL
 	 *         object
+	 * @throws IOException if an IO exception occurred
 	 */
 	public String URLtoString(URL url) throws IOException;
 
@@ -293,7 +298,7 @@ public interface Http {
 
 			if (_body != null) {
 				throw new IllegalArgumentException (
-					"Part file cannot be added because a body has already " +
+					"File part cannot be added because a body has already " +
 						"been set");
 			}
 

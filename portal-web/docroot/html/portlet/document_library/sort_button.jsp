@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -16,135 +16,93 @@
 
 <%@ include file="/html/portlet/document_library/init.jsp" %>
 
+<%
+long folderId = GetterUtil.getLong((String)request.getAttribute("view.jsp-folderId"));
+
+String orderByCol = ParamUtil.getString(request, "orderByCol");
+String orderByType = ParamUtil.getString(request, "orderByType");
+
+String reverseOrderByType = "asc";
+
+if (orderByType.equals("asc")) {
+	reverseOrderByType = "desc";
+}
+%>
+
 <liferay-ui:icon-menu align="left" direction="down" icon="" message="sort-by" showExpanded="<%= false %>" showWhenSingleIcon="<%= false %>">
 
 	<%
-	String orderByCol = ParamUtil.getString(request, "orderByCol");
-	String orderByType = ParamUtil.getString(request, "orderByType");
-	%>
-
-	<portlet:resourceURL var="sortByTitle">
-		<portlet:param name="struts_action" value="/document_library/view" />
-		<portlet:param name="viewEntries" value="<%= Boolean.TRUE.toString() %>" />
-		<portlet:param name="viewSortButton" value="<%= Boolean.TRUE.toString() %>" />
-		<portlet:param name="orderByCol" value="title" />
-		<portlet:param name="orderByType" value='<%= (orderByCol.equals("title") && orderByType.equals("asc")) ? "desc" : "asc" %>' />
-	</portlet:resourceURL>
-
-	<%
-	String taglibUrl = "javascript:" + liferayPortletResponse.getNamespace() + "sortEntries('" + sortByTitle.toString() + "')";
+	String taglibURL = "javascript:" + liferayPortletResponse.getNamespace() + "sortEntries('" + folderId + "', 'title','" + reverseOrderByType + "')";
 	%>
 
 	<liferay-ui:icon
-		image="folder"
 		message="title"
-		url="<%= taglibUrl %>"
+		url="<%= taglibURL %>"
 	/>
 
-	<portlet:resourceURL var="sortByCreationDate">
-		<portlet:param name="struts_action" value="/document_library/view" />
-		<portlet:param name="viewEntries" value="<%= Boolean.TRUE.toString() %>" />
-		<portlet:param name="viewSortButton" value="<%= Boolean.TRUE.toString() %>" />
-		<portlet:param name="orderByCol" value="creationDate" />
-		<portlet:param name="orderByType" value='<%= (orderByCol.equals("creationDate") && orderByType.equals("asc")) ? "desc" : "asc" %>' />
-	</portlet:resourceURL>
-
 	<%
-	taglibUrl = "javascript:" + liferayPortletResponse.getNamespace() + "sortEntries('" + sortByCreationDate.toString() + "')";
+	taglibURL = "javascript:" + liferayPortletResponse.getNamespace() + "sortEntries('" + folderId + "', 'creationDate','" + reverseOrderByType + "')";
 	%>
 
 	<liferay-ui:icon
-		image="folder"
 		message="create-date"
-		url="<%= taglibUrl %>"
+		url="<%= taglibURL %>"
 	/>
 
-	<portlet:resourceURL var="sortByModifiedDate">
-		<portlet:param name="struts_action" value="/document_library/view" />
-		<portlet:param name="viewEntries" value="<%= Boolean.TRUE.toString() %>" />
-		<portlet:param name="viewSortButton" value="<%= Boolean.TRUE.toString() %>" />
-		<portlet:param name="orderByCol" value="modifiedDate" />
-		<portlet:param name="orderByType" value='<%= (orderByCol.equals("modifiedDate") && orderByType.equals("asc")) ? "desc" : "asc" %>' />
-	</portlet:resourceURL>
-
 	<%
-	taglibUrl = "javascript:" + liferayPortletResponse.getNamespace() + "sortEntries('" + sortByModifiedDate.toString() + "')";
+	taglibURL = "javascript:" + liferayPortletResponse.getNamespace() + "sortEntries('" + folderId + "', 'modifiedDate','" + reverseOrderByType + "')";
 	%>
 
 	<liferay-ui:icon
-		image="folder"
 		message="modified-date"
-		url="<%= taglibUrl %>"
+		url="<%= taglibURL %>"
 	/>
 
-	<portlet:resourceURL var="sortByReadCount">
-		<portlet:param name="struts_action" value="/document_library/view" />
-		<portlet:param name="viewEntries" value="<%= Boolean.TRUE.toString() %>" />
-		<portlet:param name="viewSortButton" value="<%= Boolean.TRUE.toString() %>" />
-		<portlet:param name="orderByCol" value="readCount" />
-		<portlet:param name="orderByType" value='<%= (orderByCol.equals("readCount") && orderByType.equals("asc")) ? "desc" : "asc" %>' />
-	</portlet:resourceURL>
-
 	<%
-	taglibUrl = "javascript:" + liferayPortletResponse.getNamespace() + "sortEntries('" + sortByReadCount.toString() + "')";
+	taglibURL = "javascript:" + liferayPortletResponse.getNamespace() + "sortEntries('" + folderId + "', 'downloads','" + reverseOrderByType + "')";
 	%>
 
 	<liferay-ui:icon
-		image="folder"
+		message="downloads"
+		url="<%= taglibURL %>"
+	/>
+
+	<%
+	taglibURL = "javascript:" + liferayPortletResponse.getNamespace() + "sortEntries('" + folderId + "', 'readCount','" + reverseOrderByType + "')";
+	%>
+
+	<liferay-ui:icon
 		message="read-count"
-		url="<%= taglibUrl %>"
+		url="<%= taglibURL %>"
 	/>
 
-	<portlet:resourceURL var="sortBySize">
-		<portlet:param name="struts_action" value="/document_library/view" />
-		<portlet:param name="viewEntries" value="<%= Boolean.TRUE.toString() %>" />
-		<portlet:param name="viewSortButton" value="<%= Boolean.TRUE.toString() %>" />
-		<portlet:param name="orderByCol" value="size" />
-		<portlet:param name="orderByType" value='<%= (orderByCol.equals("size") && orderByType.equals("asc")) ? "desc" : "asc" %>' />
-	</portlet:resourceURL>
-
 	<%
-	taglibUrl = "javascript:" + liferayPortletResponse.getNamespace() + "sortEntries('" + sortBySize.toString() + "')";
+	taglibURL = "javascript:" + liferayPortletResponse.getNamespace() + "sortEntries('" + folderId + "', 'size','" + reverseOrderByType + "')";
 	%>
 
 	<liferay-ui:icon
-		image="folder"
 		message="size"
-		url="<%= taglibUrl %>"
+		url="<%= taglibURL %>"
 	/>
 </liferay-ui:icon-menu>
 
-<aui:script use="aui-base">
-	var entriesContainer = A.one('#<portlet:namespace />documentContainer');
-
+<aui:script>
 	Liferay.provide(
 		window,
 		'<portlet:namespace />sortEntries',
-		function(url) {
-			entriesContainer.plug(A.LoadingMask);
-
-			entriesContainer.loadingmask.toggle();
-
-			A.io.request(
-				url,
+		function(folderId, orderByCol, reverseOrderByType) {
+			Liferay.fire(
+				'<portlet:namespace />dataRequest',
 				{
-					after: {
-						success: function(event, id, obj) {
-							entriesContainer.unplug(A.LoadingMask);
-
-							var responseData = this.get('responseData');
-
-							var content = A.Node.create(responseData);
-
-							var sortButtonContainer = A.one('#<portlet:namespace />sortButtonContainer');
-							var sortButton = content.one('#<portlet:namespace />sortButton')
-
-							sortButtonContainer.setContent(sortButton);
-
-							var entries = content.one('#<portlet:namespace />entries');
-
-							entriesContainer.setContent(entries);
-						}
+					requestParams: {
+						'<portlet:namespace />folderId': folderId,
+						'<portlet:namespace />struts_action': '/document_library/view',
+						'<portlet:namespace />viewEntries': <%= Boolean.FALSE.toString() %>,
+						'<portlet:namespace />viewEntriesPage': <%= Boolean.TRUE.toString() %>,
+						'<portlet:namespace />viewFolders': <%= Boolean.FALSE.toString() %>,
+						'<portlet:namespace />orderByCol': orderByCol,
+						'<portlet:namespace />orderByType': reverseOrderByType,
+						'<portlet:namespace />saveOrderBy': <%= Boolean.TRUE.toString() %>
 					}
 				}
 			);

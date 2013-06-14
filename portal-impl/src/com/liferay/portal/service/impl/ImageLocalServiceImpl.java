@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -16,23 +16,21 @@ package com.liferay.portal.service.impl;
 
 import com.liferay.portal.ImageTypeException;
 import com.liferay.portal.NoSuchImageException;
-import com.liferay.portal.image.DatabaseHook;
 import com.liferay.portal.image.HookFactory;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.image.Hook;
 import com.liferay.portal.kernel.image.ImageBag;
-import com.liferay.portal.kernel.image.ImageProcessorUtil;
+import com.liferay.portal.kernel.image.ImageToolUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
-import com.liferay.portal.kernel.servlet.ImageServletTokenUtil;
 import com.liferay.portal.kernel.util.FileUtil;
 import com.liferay.portal.kernel.util.PropsKeys;
 import com.liferay.portal.model.Image;
 import com.liferay.portal.model.impl.ImageImpl;
 import com.liferay.portal.service.base.ImageLocalServiceBaseImpl;
 import com.liferay.portal.util.PropsUtil;
-import com.liferay.portal.util.PropsValues;
+import com.liferay.portal.webserver.WebServerServletTokenUtil;
 
 import java.awt.image.RenderedImage;
 
@@ -51,8 +49,11 @@ import java.util.List;
  */
 public class ImageLocalServiceImpl extends ImageLocalServiceBaseImpl {
 
+	@Override
 	public void afterPropertiesSet() {
-		ClassLoader classLoader = getClass().getClassLoader();
+		super.afterPropertiesSet();
+
+		ClassLoader classLoader = getClassLoader();
 
 		try {
 			InputStream is = classLoader.getResourceAsStream(
@@ -64,9 +65,9 @@ public class ImageLocalServiceImpl extends ImageLocalServiceBaseImpl {
 
 			_defaultSpacer = getImage(is);
 		}
-		catch (Exception ioe) {
+		catch (Exception e) {
 			_log.error(
-				"Unable to configure the default spacer: " + ioe.getMessage());
+				"Unable to configure the default spacer: " + e.getMessage());
 		}
 
 		try {
@@ -79,10 +80,10 @@ public class ImageLocalServiceImpl extends ImageLocalServiceBaseImpl {
 
 			_defaultCompanyLogo = getImage(is);
 		}
-		catch (Exception ioe) {
+		catch (Exception e) {
 			_log.error(
 				"Unable to configure the default company logo: " +
-					ioe.getMessage());
+					e.getMessage());
 		}
 
 		try {
@@ -95,10 +96,10 @@ public class ImageLocalServiceImpl extends ImageLocalServiceBaseImpl {
 
 			_defaultOrganizationLogo = getImage(is);
 		}
-		catch (Exception ioe) {
+		catch (Exception e) {
 			_log.error(
 				"Unable to configure the default organization logo: " +
-					ioe.getMessage());
+					e.getMessage());
 		}
 
 		try {
@@ -111,10 +112,10 @@ public class ImageLocalServiceImpl extends ImageLocalServiceBaseImpl {
 
 			_defaultUserFemalePortrait = getImage(is);
 		}
-		catch (Exception ioe) {
+		catch (Exception e) {
 			_log.error(
 				"Unable to configure the default user female portrait: " +
-					ioe.getMessage());
+					e.getMessage());
 		}
 
 		try {
@@ -127,31 +128,34 @@ public class ImageLocalServiceImpl extends ImageLocalServiceBaseImpl {
 
 			_defaultUserMalePortrait = getImage(is);
 		}
-		catch (Exception ioe) {
+		catch (Exception e) {
 			_log.error(
 				"Unable to configure the default user male portrait: " +
-					ioe.getMessage());
+					e.getMessage());
 		}
 	}
 
 	@Override
-	public void deleteImage(long imageId)
+	public Image deleteImage(long imageId)
 		throws PortalException, SystemException {
 
 		if (imageId <= 0) {
-			return;
+			return null;
 		}
 
-		if (PropsValues.IMAGE_HOOK_IMPL.equals(DatabaseHook.class.getName()) &&
+		/*if (PropsValues.IMAGE_HOOK_IMPL.equals(
+				DatabaseHook.class.getName()) &&
 			(imagePersistence.getListeners().length == 0)) {
 
 			runSQL("delete from Image where imageId = " + imageId);
 
 			imagePersistence.clearCache();
 		}
-		else {
+		else {*/
+			Image image = null;
+
 			try {
-				Image image = getImage(imageId);
+				image = getImage(imageId);
 
 				imagePersistence.remove(imageId);
 
@@ -161,7 +165,9 @@ public class ImageLocalServiceImpl extends ImageLocalServiceBaseImpl {
 			}
 			catch (NoSuchImageException nsie) {
 			}
-		}
+
+			return image;
+		//}
 	}
 
 	public Image getCompanyLogo(long imageId) {
@@ -194,23 +200,6 @@ public class ImageLocalServiceImpl extends ImageLocalServiceBaseImpl {
 		return _defaultUserMalePortrait;
 	}
 
-	@Override
-	public Image getImage(long imageId) {
-		try {
-			if (imageId > 0) {
-				return imagePersistence.findByPrimaryKey(imageId);
-			}
-		}
-		catch (Exception e) {
-			if (_log.isWarnEnabled()) {
-				_log.warn(
-					"Unable to get image " + imageId + ": " + e.getMessage());
-			}
-		}
-
-		return null;
-	}
-
 	public Image getImage(byte[] bytes)
 		throws PortalException, SystemException {
 
@@ -232,6 +221,29 @@ public class ImageLocalServiceImpl extends ImageLocalServiceBaseImpl {
 		return getImage(is, null);
 	}
 
+	public Image getImage(InputStream is, boolean cleanUpStream)
+		throws PortalException, SystemException {
+
+		return getImage(is, null, cleanUpStream);
+	}
+
+	@Override
+	public Image getImage(long imageId) {
+		try {
+			if (imageId > 0) {
+				return imagePersistence.findByPrimaryKey(imageId);
+			}
+		}
+		catch (Exception e) {
+			if (_log.isWarnEnabled()) {
+				_log.warn(
+					"Unable to get image " + imageId + ": " + e.getMessage());
+			}
+		}
+
+		return null;
+	}
+
 	public Image getImageOrDefault(long imageId) {
 		Image image = getImage(imageId);
 
@@ -244,11 +256,6 @@ public class ImageLocalServiceImpl extends ImageLocalServiceBaseImpl {
 
 	public List<Image> getImages() throws SystemException {
 		return imagePersistence.findAll();
-	}
-
-	@Override
-	public List<Image> getImages(int start, int end) throws SystemException {
-		return imagePersistence.findAll(start, end);
 	}
 
 	public List<Image> getImagesBySize(int size) throws SystemException {
@@ -270,26 +277,6 @@ public class ImageLocalServiceImpl extends ImageLocalServiceBaseImpl {
 		throws PortalException, SystemException {
 
 		Image image = getImage(bytes);
-
-		return updateImage(
-			imageId, image.getTextObj(), image.getType(), image.getHeight(),
-			image.getWidth(), image.getSize());
-	}
-
-	public Image updateImage(long imageId, File file)
-		throws PortalException, SystemException {
-
-		Image image = getImage(file);
-
-		return updateImage(
-			imageId, image.getTextObj(), image.getType(), image.getHeight(),
-			image.getWidth(), image.getSize());
-	}
-
-	public Image updateImage(long imageId, InputStream is)
-		throws PortalException, SystemException {
-
-		Image image = getImage(is);
 
 		return updateImage(
 			imageId, image.getTextObj(), image.getType(), image.getHeight(),
@@ -319,24 +306,62 @@ public class ImageLocalServiceImpl extends ImageLocalServiceBaseImpl {
 
 		imagePersistence.update(image, false);
 
-		ImageServletTokenUtil.resetToken(imageId);
+		WebServerServletTokenUtil.resetToken(imageId);
 
 		return image;
+	}
+
+	public Image updateImage(long imageId, File file)
+		throws PortalException, SystemException {
+
+		Image image = getImage(file);
+
+		return updateImage(
+			imageId, image.getTextObj(), image.getType(), image.getHeight(),
+			image.getWidth(), image.getSize());
+	}
+
+	public Image updateImage(long imageId, InputStream is)
+		throws PortalException, SystemException {
+
+		Image image = getImage(is);
+
+		return updateImage(
+			imageId, image.getTextObj(), image.getType(), image.getHeight(),
+			image.getWidth(), image.getSize());
+	}
+
+	public Image updateImage(
+			long imageId, InputStream is, boolean cleanUpStream)
+		throws PortalException, SystemException {
+
+		Image image = getImage(is, cleanUpStream);
+
+		return updateImage(
+			imageId, image.getTextObj(), image.getType(), image.getHeight(),
+			image.getWidth(), image.getSize());
 	}
 
 	protected Image getImage(InputStream is, byte[] bytes)
 		throws PortalException, SystemException {
 
+		return getImage(is, bytes, true);
+	}
+
+	protected Image getImage(
+			InputStream is, byte[] bytes, boolean cleanUpStream)
+		throws PortalException, SystemException {
+
 		try {
 			if (is != null) {
-				bytes = FileUtil.getBytes(is);
+				bytes = FileUtil.getBytes(is, -1, cleanUpStream);
 			}
 
 			if (bytes == null) {
 				return null;
 			}
 
-			ImageBag imageBag = ImageProcessorUtil.read(bytes);
+			ImageBag imageBag = ImageToolUtil.read(bytes);
 
 			RenderedImage renderedImage = imageBag.getRenderedImage();
 			String type = imageBag.getType();
@@ -362,26 +387,14 @@ public class ImageLocalServiceImpl extends ImageLocalServiceBaseImpl {
 		catch (IOException ioe) {
 			throw new SystemException(ioe);
 		}
-		finally {
-			if (is != null) {
-				try {
-					is.close();
-				}
-				catch (IOException ioe) {
-					if (_log.isWarnEnabled()) {
-						_log.warn(ioe);
-					}
-				}
-			}
-		}
 	}
 
 	private static Log _log = LogFactoryUtil.getLog(
 		ImageLocalServiceImpl.class);
 
-	private Image _defaultSpacer;
 	private Image _defaultCompanyLogo;
 	private Image _defaultOrganizationLogo;
+	private Image _defaultSpacer;
 	private Image _defaultUserFemalePortrait;
 	private Image _defaultUserMalePortrait;
 

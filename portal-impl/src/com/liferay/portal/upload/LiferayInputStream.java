@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -20,6 +20,8 @@ import com.liferay.portal.kernel.io.unsync.UnsyncByteArrayOutputStream;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.ProgressTracker;
+import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.util.PropsUtil;
 import com.liferay.util.servlet.ServletInputStreamWrapper;
 
@@ -46,38 +48,6 @@ public class LiferayInputStream extends ServletInputStreamWrapper {
 		_totalSize = request.getContentLength();
 	}
 
-	@Override
-	public int read(byte[] b, int off, int len) throws IOException {
-		int bytesRead = super.read(b, off, len);
-
-		if (bytesRead > 0) {
-			_totalRead += bytesRead;
-		}
-		else {
-			return bytesRead;
-		}
-
-		int percent = (_totalRead * 100) / _totalSize;
-
-		if (_log.isDebugEnabled()) {
-			_log.debug(bytesRead + "/" + _totalRead + "=" + percent);
-		}
-
-		if ((_totalSize > 0) && (_totalSize < THRESHOLD_SIZE)) {
-			_cachedBytes.write(b, off, bytesRead);
-		}
-
-		Integer curPercent = (Integer)_session.getAttribute(
-			LiferayFileUpload.PERCENT);
-
-		if ((curPercent == null) || (percent - curPercent.intValue() >= 1)) {
-			_session.setAttribute(
-				LiferayFileUpload.PERCENT, new Integer(percent));
-		}
-
-		return bytesRead;
-	}
-
 	public ServletInputStream getCachedInputStream() {
 		if (_totalSize < THRESHOLD_SIZE) {
 			return this;
@@ -89,12 +59,56 @@ public class LiferayInputStream extends ServletInputStreamWrapper {
 		}
 	}
 
+	@Override
+	public int read(byte[] b, int off, int len) throws IOException {
+		int bytesRead = super.read(b, off, len);
+
+		if (bytesRead > 0) {
+			_totalRead += bytesRead;
+		}
+		else {
+			return bytesRead;
+		}
+
+		int percent = (int)((_totalRead * 100L) / _totalSize);
+
+		if (_log.isDebugEnabled()) {
+			_log.debug(bytesRead + "/" + _totalRead + "=" + percent);
+		}
+
+		if ((_totalSize > 0) && (_totalSize < THRESHOLD_SIZE)) {
+			_cachedBytes.write(b, off, bytesRead);
+		}
+
+		ProgressTracker progressTracker =
+			(ProgressTracker)_session.getAttribute(LiferayFileUpload.PERCENT);
+
+		Integer curPercent = null;
+
+		if (progressTracker != null) {
+			curPercent = progressTracker.getPercent();
+		}
+
+		if ((curPercent == null) || (percent - curPercent.intValue() >= 1)) {
+			if (progressTracker == null) {
+				progressTracker = new ProgressTracker(
+					_session, StringPool.BLANK);
+
+				progressTracker.initialize();
+			}
+
+			progressTracker.setPercent(percent);
+		}
+
+		return bytesRead;
+	}
+
 	private static Log _log = LogFactoryUtil.getLog(LiferayInputStream.class);
 
+	private UnsyncByteArrayOutputStream _cachedBytes =
+		new UnsyncByteArrayOutputStream();
 	private HttpSession _session;
 	private int _totalRead;
 	private int _totalSize;
-	private UnsyncByteArrayOutputStream _cachedBytes =
-		new UnsyncByteArrayOutputStream();
 
 }

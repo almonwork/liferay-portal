@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -17,11 +17,10 @@ package com.liferay.portlet.journal.model.impl;
 import com.liferay.portal.kernel.bean.AutoEscapeBeanHandler;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.json.JSON;
-import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
-import com.liferay.portal.kernel.util.HtmlUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.LocalizationUtil;
+import com.liferay.portal.kernel.util.ProxyUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.Validator;
@@ -39,12 +38,11 @@ import com.liferay.portlet.journal.model.JournalArticleSoap;
 
 import java.io.Serializable;
 
-import java.lang.reflect.Proxy;
-
 import java.sql.Types;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -81,6 +79,7 @@ public class JournalArticleModelImpl extends BaseModelImpl<JournalArticle>
 			{ "userName", Types.VARCHAR },
 			{ "createDate", Types.TIMESTAMP },
 			{ "modifiedDate", Types.TIMESTAMP },
+			{ "folderId", Types.BIGINT },
 			{ "classNameId", Types.BIGINT },
 			{ "classPK", Types.BIGINT },
 			{ "articleId", Types.VARCHAR },
@@ -105,7 +104,7 @@ public class JournalArticleModelImpl extends BaseModelImpl<JournalArticle>
 			{ "statusByUserName", Types.VARCHAR },
 			{ "statusDate", Types.TIMESTAMP }
 		};
-	public static final String TABLE_SQL_CREATE = "create table JournalArticle (uuid_ VARCHAR(75) null,id_ LONG not null primary key,resourcePrimKey LONG,groupId LONG,companyId LONG,userId LONG,userName VARCHAR(75) null,createDate DATE null,modifiedDate DATE null,classNameId LONG,classPK LONG,articleId VARCHAR(75) null,version DOUBLE,title STRING null,urlTitle VARCHAR(150) null,description STRING null,content TEXT null,type_ VARCHAR(75) null,structureId VARCHAR(75) null,templateId VARCHAR(75) null,layoutUuid VARCHAR(75) null,displayDate DATE null,expirationDate DATE null,reviewDate DATE null,indexable BOOLEAN,smallImage BOOLEAN,smallImageId LONG,smallImageURL STRING null,status INTEGER,statusByUserId LONG,statusByUserName VARCHAR(75) null,statusDate DATE null)";
+	public static final String TABLE_SQL_CREATE = "create table JournalArticle (uuid_ VARCHAR(75) null,id_ LONG not null primary key,resourcePrimKey LONG,groupId LONG,companyId LONG,userId LONG,userName VARCHAR(75) null,createDate DATE null,modifiedDate DATE null,folderId LONG,classNameId LONG,classPK LONG,articleId VARCHAR(75) null,version DOUBLE,title STRING null,urlTitle VARCHAR(150) null,description STRING null,content TEXT null,type_ VARCHAR(75) null,structureId VARCHAR(75) null,templateId VARCHAR(75) null,layoutUuid VARCHAR(75) null,displayDate DATE null,expirationDate DATE null,reviewDate DATE null,indexable BOOLEAN,smallImage BOOLEAN,smallImageId LONG,smallImageURL STRING null,status INTEGER,statusByUserId LONG,statusByUserName VARCHAR(75) null,statusDate DATE null)";
 	public static final String TABLE_SQL_DROP = "drop table JournalArticle";
 	public static final String ORDER_BY_JPQL = " ORDER BY journalArticle.articleId ASC, journalArticle.version DESC";
 	public static final String ORDER_BY_SQL = " ORDER BY JournalArticle.articleId ASC, JournalArticle.version DESC";
@@ -118,6 +117,25 @@ public class JournalArticleModelImpl extends BaseModelImpl<JournalArticle>
 	public static final boolean FINDER_CACHE_ENABLED = GetterUtil.getBoolean(com.liferay.portal.util.PropsUtil.get(
 				"value.object.finder.cache.enabled.com.liferay.portlet.journal.model.JournalArticle"),
 			true);
+	public static final boolean COLUMN_BITMASK_ENABLED = GetterUtil.getBoolean(com.liferay.portal.util.PropsUtil.get(
+				"value.object.column.bitmask.enabled.com.liferay.portlet.journal.model.JournalArticle"),
+			true);
+	public static long ARTICLEID_COLUMN_BITMASK = 1L;
+	public static long CLASSNAMEID_COLUMN_BITMASK = 2L;
+	public static long CLASSPK_COLUMN_BITMASK = 4L;
+	public static long COMPANYID_COLUMN_BITMASK = 8L;
+	public static long FOLDERID_COLUMN_BITMASK = 16L;
+	public static long GROUPID_COLUMN_BITMASK = 32L;
+	public static long LAYOUTUUID_COLUMN_BITMASK = 64L;
+	public static long RESOURCEPRIMKEY_COLUMN_BITMASK = 128L;
+	public static long SMALLIMAGEID_COLUMN_BITMASK = 256L;
+	public static long STATUS_COLUMN_BITMASK = 512L;
+	public static long STRUCTUREID_COLUMN_BITMASK = 1024L;
+	public static long TEMPLATEID_COLUMN_BITMASK = 2048L;
+	public static long URLTITLE_COLUMN_BITMASK = 4096L;
+	public static long USERID_COLUMN_BITMASK = 8192L;
+	public static long UUID_COLUMN_BITMASK = 16384L;
+	public static long VERSION_COLUMN_BITMASK = 32768L;
 
 	/**
 	 * Converts the soap model instance into a normal model instance.
@@ -137,6 +155,7 @@ public class JournalArticleModelImpl extends BaseModelImpl<JournalArticle>
 		model.setUserName(soapModel.getUserName());
 		model.setCreateDate(soapModel.getCreateDate());
 		model.setModifiedDate(soapModel.getModifiedDate());
+		model.setFolderId(soapModel.getFolderId());
 		model.setClassNameId(soapModel.getClassNameId());
 		model.setClassPK(soapModel.getClassPK());
 		model.setArticleId(soapModel.getArticleId());
@@ -180,14 +199,6 @@ public class JournalArticleModelImpl extends BaseModelImpl<JournalArticle>
 		return models;
 	}
 
-	public Class<?> getModelClass() {
-		return JournalArticle.class;
-	}
-
-	public String getModelClassName() {
-		return JournalArticle.class.getName();
-	}
-
 	public static final long LOCK_EXPIRATION_TIME = GetterUtil.getLong(com.liferay.portal.util.PropsUtil.get(
 				"lock.expiration.time.com.liferay.portlet.journal.model.JournalArticle"));
 
@@ -208,6 +219,256 @@ public class JournalArticleModelImpl extends BaseModelImpl<JournalArticle>
 
 	public void setPrimaryKeyObj(Serializable primaryKeyObj) {
 		setPrimaryKey(((Long)primaryKeyObj).longValue());
+	}
+
+	public Class<?> getModelClass() {
+		return JournalArticle.class;
+	}
+
+	public String getModelClassName() {
+		return JournalArticle.class.getName();
+	}
+
+	@Override
+	public Map<String, Object> getModelAttributes() {
+		Map<String, Object> attributes = new HashMap<String, Object>();
+
+		attributes.put("uuid", getUuid());
+		attributes.put("id", getId());
+		attributes.put("resourcePrimKey", getResourcePrimKey());
+		attributes.put("groupId", getGroupId());
+		attributes.put("companyId", getCompanyId());
+		attributes.put("userId", getUserId());
+		attributes.put("userName", getUserName());
+		attributes.put("createDate", getCreateDate());
+		attributes.put("modifiedDate", getModifiedDate());
+		attributes.put("folderId", getFolderId());
+		attributes.put("classNameId", getClassNameId());
+		attributes.put("classPK", getClassPK());
+		attributes.put("articleId", getArticleId());
+		attributes.put("version", getVersion());
+		attributes.put("title", getTitle());
+		attributes.put("urlTitle", getUrlTitle());
+		attributes.put("description", getDescription());
+		attributes.put("content", getContent());
+		attributes.put("type", getType());
+		attributes.put("structureId", getStructureId());
+		attributes.put("templateId", getTemplateId());
+		attributes.put("layoutUuid", getLayoutUuid());
+		attributes.put("displayDate", getDisplayDate());
+		attributes.put("expirationDate", getExpirationDate());
+		attributes.put("reviewDate", getReviewDate());
+		attributes.put("indexable", getIndexable());
+		attributes.put("smallImage", getSmallImage());
+		attributes.put("smallImageId", getSmallImageId());
+		attributes.put("smallImageURL", getSmallImageURL());
+		attributes.put("status", getStatus());
+		attributes.put("statusByUserId", getStatusByUserId());
+		attributes.put("statusByUserName", getStatusByUserName());
+		attributes.put("statusDate", getStatusDate());
+
+		return attributes;
+	}
+
+	@Override
+	public void setModelAttributes(Map<String, Object> attributes) {
+		String uuid = (String)attributes.get("uuid");
+
+		if (uuid != null) {
+			setUuid(uuid);
+		}
+
+		Long id = (Long)attributes.get("id");
+
+		if (id != null) {
+			setId(id);
+		}
+
+		Long resourcePrimKey = (Long)attributes.get("resourcePrimKey");
+
+		if (resourcePrimKey != null) {
+			setResourcePrimKey(resourcePrimKey);
+		}
+
+		Long groupId = (Long)attributes.get("groupId");
+
+		if (groupId != null) {
+			setGroupId(groupId);
+		}
+
+		Long companyId = (Long)attributes.get("companyId");
+
+		if (companyId != null) {
+			setCompanyId(companyId);
+		}
+
+		Long userId = (Long)attributes.get("userId");
+
+		if (userId != null) {
+			setUserId(userId);
+		}
+
+		String userName = (String)attributes.get("userName");
+
+		if (userName != null) {
+			setUserName(userName);
+		}
+
+		Date createDate = (Date)attributes.get("createDate");
+
+		if (createDate != null) {
+			setCreateDate(createDate);
+		}
+
+		Date modifiedDate = (Date)attributes.get("modifiedDate");
+
+		if (modifiedDate != null) {
+			setModifiedDate(modifiedDate);
+		}
+
+		Long folderId = (Long)attributes.get("folderId");
+
+		if (folderId != null) {
+			setFolderId(folderId);
+		}
+
+		Long classNameId = (Long)attributes.get("classNameId");
+
+		if (classNameId != null) {
+			setClassNameId(classNameId);
+		}
+
+		Long classPK = (Long)attributes.get("classPK");
+
+		if (classPK != null) {
+			setClassPK(classPK);
+		}
+
+		String articleId = (String)attributes.get("articleId");
+
+		if (articleId != null) {
+			setArticleId(articleId);
+		}
+
+		Double version = (Double)attributes.get("version");
+
+		if (version != null) {
+			setVersion(version);
+		}
+
+		String title = (String)attributes.get("title");
+
+		if (title != null) {
+			setTitle(title);
+		}
+
+		String urlTitle = (String)attributes.get("urlTitle");
+
+		if (urlTitle != null) {
+			setUrlTitle(urlTitle);
+		}
+
+		String description = (String)attributes.get("description");
+
+		if (description != null) {
+			setDescription(description);
+		}
+
+		String content = (String)attributes.get("content");
+
+		if (content != null) {
+			setContent(content);
+		}
+
+		String type = (String)attributes.get("type");
+
+		if (type != null) {
+			setType(type);
+		}
+
+		String structureId = (String)attributes.get("structureId");
+
+		if (structureId != null) {
+			setStructureId(structureId);
+		}
+
+		String templateId = (String)attributes.get("templateId");
+
+		if (templateId != null) {
+			setTemplateId(templateId);
+		}
+
+		String layoutUuid = (String)attributes.get("layoutUuid");
+
+		if (layoutUuid != null) {
+			setLayoutUuid(layoutUuid);
+		}
+
+		Date displayDate = (Date)attributes.get("displayDate");
+
+		if (displayDate != null) {
+			setDisplayDate(displayDate);
+		}
+
+		Date expirationDate = (Date)attributes.get("expirationDate");
+
+		if (expirationDate != null) {
+			setExpirationDate(expirationDate);
+		}
+
+		Date reviewDate = (Date)attributes.get("reviewDate");
+
+		if (reviewDate != null) {
+			setReviewDate(reviewDate);
+		}
+
+		Boolean indexable = (Boolean)attributes.get("indexable");
+
+		if (indexable != null) {
+			setIndexable(indexable);
+		}
+
+		Boolean smallImage = (Boolean)attributes.get("smallImage");
+
+		if (smallImage != null) {
+			setSmallImage(smallImage);
+		}
+
+		Long smallImageId = (Long)attributes.get("smallImageId");
+
+		if (smallImageId != null) {
+			setSmallImageId(smallImageId);
+		}
+
+		String smallImageURL = (String)attributes.get("smallImageURL");
+
+		if (smallImageURL != null) {
+			setSmallImageURL(smallImageURL);
+		}
+
+		Integer status = (Integer)attributes.get("status");
+
+		if (status != null) {
+			setStatus(status);
+		}
+
+		Long statusByUserId = (Long)attributes.get("statusByUserId");
+
+		if (statusByUserId != null) {
+			setStatusByUserId(statusByUserId);
+		}
+
+		String statusByUserName = (String)attributes.get("statusByUserName");
+
+		if (statusByUserName != null) {
+			setStatusByUserName(statusByUserName);
+		}
+
+		Date statusDate = (Date)attributes.get("statusDate");
+
+		if (statusDate != null) {
+			setStatusDate(statusDate);
+		}
 	}
 
 	@JSON
@@ -247,11 +508,23 @@ public class JournalArticleModelImpl extends BaseModelImpl<JournalArticle>
 	}
 
 	public void setResourcePrimKey(long resourcePrimKey) {
+		_columnBitmask |= RESOURCEPRIMKEY_COLUMN_BITMASK;
+
+		if (!_setOriginalResourcePrimKey) {
+			_setOriginalResourcePrimKey = true;
+
+			_originalResourcePrimKey = _resourcePrimKey;
+		}
+
 		_resourcePrimKey = resourcePrimKey;
 	}
 
 	public boolean isResourceMain() {
 		return true;
+	}
+
+	public long getOriginalResourcePrimKey() {
+		return _originalResourcePrimKey;
 	}
 
 	@JSON
@@ -260,6 +533,8 @@ public class JournalArticleModelImpl extends BaseModelImpl<JournalArticle>
 	}
 
 	public void setGroupId(long groupId) {
+		_columnBitmask |= GROUPID_COLUMN_BITMASK;
+
 		if (!_setOriginalGroupId) {
 			_setOriginalGroupId = true;
 
@@ -279,7 +554,19 @@ public class JournalArticleModelImpl extends BaseModelImpl<JournalArticle>
 	}
 
 	public void setCompanyId(long companyId) {
+		_columnBitmask |= COMPANYID_COLUMN_BITMASK;
+
+		if (!_setOriginalCompanyId) {
+			_setOriginalCompanyId = true;
+
+			_originalCompanyId = _companyId;
+		}
+
 		_companyId = companyId;
+	}
+
+	public long getOriginalCompanyId() {
+		return _originalCompanyId;
 	}
 
 	@JSON
@@ -288,6 +575,14 @@ public class JournalArticleModelImpl extends BaseModelImpl<JournalArticle>
 	}
 
 	public void setUserId(long userId) {
+		_columnBitmask |= USERID_COLUMN_BITMASK;
+
+		if (!_setOriginalUserId) {
+			_setOriginalUserId = true;
+
+			_originalUserId = _userId;
+		}
+
 		_userId = userId;
 	}
 
@@ -297,6 +592,10 @@ public class JournalArticleModelImpl extends BaseModelImpl<JournalArticle>
 
 	public void setUserUuid(String userUuid) {
 		_userUuid = userUuid;
+	}
+
+	public long getOriginalUserId() {
+		return _originalUserId;
 	}
 
 	@JSON
@@ -331,6 +630,27 @@ public class JournalArticleModelImpl extends BaseModelImpl<JournalArticle>
 		_modifiedDate = modifiedDate;
 	}
 
+	@JSON
+	public long getFolderId() {
+		return _folderId;
+	}
+
+	public void setFolderId(long folderId) {
+		_columnBitmask |= FOLDERID_COLUMN_BITMASK;
+
+		if (!_setOriginalFolderId) {
+			_setOriginalFolderId = true;
+
+			_originalFolderId = _folderId;
+		}
+
+		_folderId = folderId;
+	}
+
+	public long getOriginalFolderId() {
+		return _originalFolderId;
+	}
+
 	public String getClassName() {
 		if (getClassNameId() <= 0) {
 			return StringPool.BLANK;
@@ -339,12 +659,24 @@ public class JournalArticleModelImpl extends BaseModelImpl<JournalArticle>
 		return PortalUtil.getClassName(getClassNameId());
 	}
 
+	public void setClassName(String className) {
+		long classNameId = 0;
+
+		if (Validator.isNotNull(className)) {
+			classNameId = PortalUtil.getClassNameId(className);
+		}
+
+		setClassNameId(classNameId);
+	}
+
 	@JSON
 	public long getClassNameId() {
 		return _classNameId;
 	}
 
 	public void setClassNameId(long classNameId) {
+		_columnBitmask |= CLASSNAMEID_COLUMN_BITMASK;
+
 		if (!_setOriginalClassNameId) {
 			_setOriginalClassNameId = true;
 
@@ -364,6 +696,8 @@ public class JournalArticleModelImpl extends BaseModelImpl<JournalArticle>
 	}
 
 	public void setClassPK(long classPK) {
+		_columnBitmask |= CLASSPK_COLUMN_BITMASK;
+
 		if (!_setOriginalClassPK) {
 			_setOriginalClassPK = true;
 
@@ -388,6 +722,8 @@ public class JournalArticleModelImpl extends BaseModelImpl<JournalArticle>
 	}
 
 	public void setArticleId(String articleId) {
+		_columnBitmask = -1L;
+
 		if (_originalArticleId == null) {
 			_originalArticleId = _articleId;
 		}
@@ -405,6 +741,8 @@ public class JournalArticleModelImpl extends BaseModelImpl<JournalArticle>
 	}
 
 	public void setVersion(double version) {
+		_columnBitmask = -1L;
+
 		if (!_setOriginalVersion) {
 			_setOriginalVersion = true;
 
@@ -441,26 +779,23 @@ public class JournalArticleModelImpl extends BaseModelImpl<JournalArticle>
 	}
 
 	public String getTitle(String languageId) {
-		String value = LocalizationUtil.getLocalization(getTitle(), languageId);
-
-		if (isEscapedModel()) {
-			return HtmlUtil.escape(value);
-		}
-		else {
-			return value;
-		}
+		return LocalizationUtil.getLocalization(getTitle(), languageId);
 	}
 
 	public String getTitle(String languageId, boolean useDefault) {
-		String value = LocalizationUtil.getLocalization(getTitle(), languageId,
-				useDefault);
+		return LocalizationUtil.getLocalization(getTitle(), languageId,
+			useDefault);
+	}
 
-		if (isEscapedModel()) {
-			return HtmlUtil.escape(value);
-		}
-		else {
-			return value;
-		}
+	public String getTitleCurrentLanguageId() {
+		return _titleCurrentLanguageId;
+	}
+
+	@JSON
+	public String getTitleCurrentValue() {
+		Locale locale = getLocale(_titleCurrentLanguageId);
+
+		return getTitle(locale);
 	}
 
 	public Map<Locale, String> getTitleMap() {
@@ -489,6 +824,10 @@ public class JournalArticleModelImpl extends BaseModelImpl<JournalArticle>
 		}
 	}
 
+	public void setTitleCurrentLanguageId(String languageId) {
+		_titleCurrentLanguageId = languageId;
+	}
+
 	public void setTitleMap(Map<Locale, String> titleMap) {
 		setTitleMap(titleMap, LocaleUtil.getDefault());
 	}
@@ -498,13 +837,8 @@ public class JournalArticleModelImpl extends BaseModelImpl<JournalArticle>
 			return;
 		}
 
-		Locale[] locales = LanguageUtil.getAvailableLocales();
-
-		for (Locale locale : locales) {
-			String title = titleMap.get(locale);
-
-			setTitle(title, locale, defaultLocale);
-		}
+		setTitle(LocalizationUtil.updateLocalization(titleMap, getTitle(),
+				"Title", LocaleUtil.toLanguageId(defaultLocale)));
 	}
 
 	@JSON
@@ -518,7 +852,17 @@ public class JournalArticleModelImpl extends BaseModelImpl<JournalArticle>
 	}
 
 	public void setUrlTitle(String urlTitle) {
+		_columnBitmask |= URLTITLE_COLUMN_BITMASK;
+
+		if (_originalUrlTitle == null) {
+			_originalUrlTitle = _urlTitle;
+		}
+
 		_urlTitle = urlTitle;
+	}
+
+	public String getOriginalUrlTitle() {
+		return GetterUtil.getString(_originalUrlTitle);
 	}
 
 	@JSON
@@ -544,27 +888,23 @@ public class JournalArticleModelImpl extends BaseModelImpl<JournalArticle>
 	}
 
 	public String getDescription(String languageId) {
-		String value = LocalizationUtil.getLocalization(getDescription(),
-				languageId);
-
-		if (isEscapedModel()) {
-			return HtmlUtil.escape(value);
-		}
-		else {
-			return value;
-		}
+		return LocalizationUtil.getLocalization(getDescription(), languageId);
 	}
 
 	public String getDescription(String languageId, boolean useDefault) {
-		String value = LocalizationUtil.getLocalization(getDescription(),
-				languageId, useDefault);
+		return LocalizationUtil.getLocalization(getDescription(), languageId,
+			useDefault);
+	}
 
-		if (isEscapedModel()) {
-			return HtmlUtil.escape(value);
-		}
-		else {
-			return value;
-		}
+	public String getDescriptionCurrentLanguageId() {
+		return _descriptionCurrentLanguageId;
+	}
+
+	@JSON
+	public String getDescriptionCurrentValue() {
+		Locale locale = getLocale(_descriptionCurrentLanguageId);
+
+		return getDescription(locale);
 	}
 
 	public Map<Locale, String> getDescriptionMap() {
@@ -595,6 +935,10 @@ public class JournalArticleModelImpl extends BaseModelImpl<JournalArticle>
 		}
 	}
 
+	public void setDescriptionCurrentLanguageId(String languageId) {
+		_descriptionCurrentLanguageId = languageId;
+	}
+
 	public void setDescriptionMap(Map<Locale, String> descriptionMap) {
 		setDescriptionMap(descriptionMap, LocaleUtil.getDefault());
 	}
@@ -605,13 +949,9 @@ public class JournalArticleModelImpl extends BaseModelImpl<JournalArticle>
 			return;
 		}
 
-		Locale[] locales = LanguageUtil.getAvailableLocales();
-
-		for (Locale locale : locales) {
-			String description = descriptionMap.get(locale);
-
-			setDescription(description, locale, defaultLocale);
-		}
+		setDescription(LocalizationUtil.updateLocalization(descriptionMap,
+				getDescription(), "Description",
+				LocaleUtil.toLanguageId(defaultLocale)));
 	}
 
 	@JSON
@@ -653,6 +993,8 @@ public class JournalArticleModelImpl extends BaseModelImpl<JournalArticle>
 	}
 
 	public void setStructureId(String structureId) {
+		_columnBitmask |= STRUCTUREID_COLUMN_BITMASK;
+
 		if (_originalStructureId == null) {
 			_originalStructureId = _structureId;
 		}
@@ -675,7 +1017,17 @@ public class JournalArticleModelImpl extends BaseModelImpl<JournalArticle>
 	}
 
 	public void setTemplateId(String templateId) {
+		_columnBitmask |= TEMPLATEID_COLUMN_BITMASK;
+
+		if (_originalTemplateId == null) {
+			_originalTemplateId = _templateId;
+		}
+
 		_templateId = templateId;
+	}
+
+	public String getOriginalTemplateId() {
+		return GetterUtil.getString(_originalTemplateId);
 	}
 
 	@JSON
@@ -689,7 +1041,17 @@ public class JournalArticleModelImpl extends BaseModelImpl<JournalArticle>
 	}
 
 	public void setLayoutUuid(String layoutUuid) {
+		_columnBitmask |= LAYOUTUUID_COLUMN_BITMASK;
+
+		if (_originalLayoutUuid == null) {
+			_originalLayoutUuid = _layoutUuid;
+		}
+
 		_layoutUuid = layoutUuid;
+	}
+
+	public String getOriginalLayoutUuid() {
+		return GetterUtil.getString(_originalLayoutUuid);
 	}
 
 	@JSON
@@ -751,7 +1113,19 @@ public class JournalArticleModelImpl extends BaseModelImpl<JournalArticle>
 	}
 
 	public void setSmallImageId(long smallImageId) {
+		_columnBitmask |= SMALLIMAGEID_COLUMN_BITMASK;
+
+		if (!_setOriginalSmallImageId) {
+			_setOriginalSmallImageId = true;
+
+			_originalSmallImageId = _smallImageId;
+		}
+
 		_smallImageId = smallImageId;
+	}
+
+	public long getOriginalSmallImageId() {
+		return _originalSmallImageId;
 	}
 
 	@JSON
@@ -774,7 +1148,19 @@ public class JournalArticleModelImpl extends BaseModelImpl<JournalArticle>
 	}
 
 	public void setStatus(int status) {
+		_columnBitmask |= STATUS_COLUMN_BITMASK;
+
+		if (!_setOriginalStatus) {
+			_setOriginalStatus = true;
+
+			_originalStatus = _status;
+		}
+
 		_status = status;
+	}
+
+	public int getOriginalStatus() {
+		return _originalStatus;
 	}
 
 	@JSON
@@ -852,6 +1238,15 @@ public class JournalArticleModelImpl extends BaseModelImpl<JournalArticle>
 		}
 	}
 
+	public boolean isInTrash() {
+		if (getStatus() == WorkflowConstants.STATUS_IN_TRASH) {
+			return true;
+		}
+		else {
+			return false;
+		}
+	}
+
 	public boolean isPending() {
 		if (getStatus() == WorkflowConstants.STATUS_PENDING) {
 			return true;
@@ -861,35 +1256,32 @@ public class JournalArticleModelImpl extends BaseModelImpl<JournalArticle>
 		}
 	}
 
+	public long getColumnBitmask() {
+		return _columnBitmask;
+	}
+
 	@Override
 	public JournalArticle toEscapedModel() {
-		if (isEscapedModel()) {
-			return (JournalArticle)this;
+		if (_escapedModelProxy == null) {
+			_escapedModelProxy = (JournalArticle)ProxyUtil.newProxyInstance(_classLoader,
+					_escapedModelProxyInterfaces,
+					new AutoEscapeBeanHandler(this));
 		}
-		else {
-			if (_escapedModelProxy == null) {
-				_escapedModelProxy = (JournalArticle)Proxy.newProxyInstance(_classLoader,
-						_escapedModelProxyInterfaces,
-						new AutoEscapeBeanHandler(this));
-			}
 
-			return _escapedModelProxy;
-		}
+		return _escapedModelProxy;
 	}
 
 	@Override
 	public ExpandoBridge getExpandoBridge() {
-		if (_expandoBridge == null) {
-			_expandoBridge = ExpandoBridgeFactoryUtil.getExpandoBridge(getCompanyId(),
-					JournalArticle.class.getName(), getPrimaryKey());
-		}
-
-		return _expandoBridge;
+		return ExpandoBridgeFactoryUtil.getExpandoBridge(getCompanyId(),
+			JournalArticle.class.getName(), getPrimaryKey());
 	}
 
 	@Override
 	public void setExpandoBridgeAttributes(ServiceContext serviceContext) {
-		getExpandoBridge().setAttributes(serviceContext);
+		ExpandoBridge expandoBridge = getExpandoBridge();
+
+		expandoBridge.setAttributes(serviceContext);
 	}
 
 	@Override
@@ -905,6 +1297,7 @@ public class JournalArticleModelImpl extends BaseModelImpl<JournalArticle>
 		journalArticleImpl.setUserName(getUserName());
 		journalArticleImpl.setCreateDate(getCreateDate());
 		journalArticleImpl.setModifiedDate(getModifiedDate());
+		journalArticleImpl.setFolderId(getFolderId());
 		journalArticleImpl.setClassNameId(getClassNameId());
 		journalArticleImpl.setClassPK(getClassPK());
 		journalArticleImpl.setArticleId(getArticleId());
@@ -998,9 +1391,25 @@ public class JournalArticleModelImpl extends BaseModelImpl<JournalArticle>
 
 		journalArticleModelImpl._originalUuid = journalArticleModelImpl._uuid;
 
+		journalArticleModelImpl._originalResourcePrimKey = journalArticleModelImpl._resourcePrimKey;
+
+		journalArticleModelImpl._setOriginalResourcePrimKey = false;
+
 		journalArticleModelImpl._originalGroupId = journalArticleModelImpl._groupId;
 
 		journalArticleModelImpl._setOriginalGroupId = false;
+
+		journalArticleModelImpl._originalCompanyId = journalArticleModelImpl._companyId;
+
+		journalArticleModelImpl._setOriginalCompanyId = false;
+
+		journalArticleModelImpl._originalUserId = journalArticleModelImpl._userId;
+
+		journalArticleModelImpl._setOriginalUserId = false;
+
+		journalArticleModelImpl._originalFolderId = journalArticleModelImpl._folderId;
+
+		journalArticleModelImpl._setOriginalFolderId = false;
 
 		journalArticleModelImpl._originalClassNameId = journalArticleModelImpl._classNameId;
 
@@ -1016,7 +1425,23 @@ public class JournalArticleModelImpl extends BaseModelImpl<JournalArticle>
 
 		journalArticleModelImpl._setOriginalVersion = false;
 
+		journalArticleModelImpl._originalUrlTitle = journalArticleModelImpl._urlTitle;
+
 		journalArticleModelImpl._originalStructureId = journalArticleModelImpl._structureId;
+
+		journalArticleModelImpl._originalTemplateId = journalArticleModelImpl._templateId;
+
+		journalArticleModelImpl._originalLayoutUuid = journalArticleModelImpl._layoutUuid;
+
+		journalArticleModelImpl._originalSmallImageId = journalArticleModelImpl._smallImageId;
+
+		journalArticleModelImpl._setOriginalSmallImageId = false;
+
+		journalArticleModelImpl._originalStatus = journalArticleModelImpl._status;
+
+		journalArticleModelImpl._setOriginalStatus = false;
+
+		journalArticleModelImpl._columnBitmask = 0;
 	}
 
 	@Override
@@ -1066,6 +1491,8 @@ public class JournalArticleModelImpl extends BaseModelImpl<JournalArticle>
 		else {
 			journalArticleCacheModel.modifiedDate = Long.MIN_VALUE;
 		}
+
+		journalArticleCacheModel.folderId = getFolderId();
 
 		journalArticleCacheModel.classNameId = getClassNameId();
 
@@ -1212,7 +1639,7 @@ public class JournalArticleModelImpl extends BaseModelImpl<JournalArticle>
 
 	@Override
 	public String toString() {
-		StringBundler sb = new StringBundler(65);
+		StringBundler sb = new StringBundler(67);
 
 		sb.append("{uuid=");
 		sb.append(getUuid());
@@ -1232,6 +1659,8 @@ public class JournalArticleModelImpl extends BaseModelImpl<JournalArticle>
 		sb.append(getCreateDate());
 		sb.append(", modifiedDate=");
 		sb.append(getModifiedDate());
+		sb.append(", folderId=");
+		sb.append(getFolderId());
 		sb.append(", classNameId=");
 		sb.append(getClassNameId());
 		sb.append(", classPK=");
@@ -1284,7 +1713,7 @@ public class JournalArticleModelImpl extends BaseModelImpl<JournalArticle>
 	}
 
 	public String toXmlString() {
-		StringBundler sb = new StringBundler(100);
+		StringBundler sb = new StringBundler(103);
 
 		sb.append("<model><model-name>");
 		sb.append("com.liferay.portlet.journal.model.JournalArticle");
@@ -1325,6 +1754,10 @@ public class JournalArticleModelImpl extends BaseModelImpl<JournalArticle>
 		sb.append(
 			"<column><column-name>modifiedDate</column-name><column-value><![CDATA[");
 		sb.append(getModifiedDate());
+		sb.append("]]></column-value></column>");
+		sb.append(
+			"<column><column-name>folderId</column-name><column-value><![CDATA[");
+		sb.append(getFolderId());
 		sb.append("]]></column-value></column>");
 		sb.append(
 			"<column><column-name>classNameId</column-name><column-value><![CDATA[");
@@ -1432,15 +1865,24 @@ public class JournalArticleModelImpl extends BaseModelImpl<JournalArticle>
 	private String _originalUuid;
 	private long _id;
 	private long _resourcePrimKey;
+	private long _originalResourcePrimKey;
+	private boolean _setOriginalResourcePrimKey;
 	private long _groupId;
 	private long _originalGroupId;
 	private boolean _setOriginalGroupId;
 	private long _companyId;
+	private long _originalCompanyId;
+	private boolean _setOriginalCompanyId;
 	private long _userId;
 	private String _userUuid;
+	private long _originalUserId;
+	private boolean _setOriginalUserId;
 	private String _userName;
 	private Date _createDate;
 	private Date _modifiedDate;
+	private long _folderId;
+	private long _originalFolderId;
+	private boolean _setOriginalFolderId;
 	private long _classNameId;
 	private long _originalClassNameId;
 	private boolean _setOriginalClassNameId;
@@ -1453,26 +1895,35 @@ public class JournalArticleModelImpl extends BaseModelImpl<JournalArticle>
 	private double _originalVersion;
 	private boolean _setOriginalVersion;
 	private String _title;
+	private String _titleCurrentLanguageId;
 	private String _urlTitle;
+	private String _originalUrlTitle;
 	private String _description;
+	private String _descriptionCurrentLanguageId;
 	private String _content;
 	private String _type;
 	private String _structureId;
 	private String _originalStructureId;
 	private String _templateId;
+	private String _originalTemplateId;
 	private String _layoutUuid;
+	private String _originalLayoutUuid;
 	private Date _displayDate;
 	private Date _expirationDate;
 	private Date _reviewDate;
 	private boolean _indexable;
 	private boolean _smallImage;
 	private long _smallImageId;
+	private long _originalSmallImageId;
+	private boolean _setOriginalSmallImageId;
 	private String _smallImageURL;
 	private int _status;
+	private int _originalStatus;
+	private boolean _setOriginalStatus;
 	private long _statusByUserId;
 	private String _statusByUserUuid;
 	private String _statusByUserName;
 	private Date _statusDate;
-	private transient ExpandoBridge _expandoBridge;
+	private long _columnBitmask;
 	private JournalArticle _escapedModelProxy;
 }

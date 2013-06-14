@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -46,12 +46,12 @@ public class StrictXMLDescriptor implements XMLDescriptor {
 		return false;
 	}
 
-	public String[] getRootChildrenOrder() {
-		return _ROOT_ORDERED_CHILDREN;
-	}
-
 	public String[] getChildrenOrder(Element parentElement) {
 		return new String[0];
+	}
+
+	public String[] getRootChildrenOrder() {
+		return _ROOT_ORDERED_CHILDREN;
 	}
 
 	private int _compare(Object obj1, Object obj2) {

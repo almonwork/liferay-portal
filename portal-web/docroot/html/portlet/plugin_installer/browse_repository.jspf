@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -46,10 +46,9 @@ try {
 			<aui:option label="all" value="" />
 
 			<%
-			Iterator itr = PluginPackageUtil.getAvailableTags().iterator();
+			Collection<String> pluginPackageTags = PluginPackageUtil.getAvailableTags();
 
-			while (itr.hasNext()) {
-				String curTag = (String)itr.next();
+			for (String curTag : pluginPackageTags) {
 			%>
 
 				<aui:option label="<%= curTag %>" selected="<%= tag.equals(curTag) %>" />

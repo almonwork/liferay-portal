@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -15,7 +15,6 @@
 package com.liferay.portal.service;
 
 import com.liferay.portal.kernel.bean.PortalBeanLocatorUtil;
-import com.liferay.portal.kernel.util.MethodCache;
 import com.liferay.portal.kernel.util.ReferenceRegistry;
 
 /**
@@ -66,25 +65,32 @@ public class PasswordTrackerLocalServiceUtil {
 	* Deletes the password tracker with the primary key from the database. Also notifies the appropriate model listeners.
 	*
 	* @param passwordTrackerId the primary key of the password tracker
+	* @return the password tracker that was removed
 	* @throws PortalException if a password tracker with the primary key could not be found
 	* @throws SystemException if a system exception occurred
 	*/
-	public static void deletePasswordTracker(long passwordTrackerId)
+	public static com.liferay.portal.model.PasswordTracker deletePasswordTracker(
+		long passwordTrackerId)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException {
-		getService().deletePasswordTracker(passwordTrackerId);
+		return getService().deletePasswordTracker(passwordTrackerId);
 	}
 
 	/**
 	* Deletes the password tracker from the database. Also notifies the appropriate model listeners.
 	*
 	* @param passwordTracker the password tracker
+	* @return the password tracker that was removed
 	* @throws SystemException if a system exception occurred
 	*/
-	public static void deletePasswordTracker(
+	public static com.liferay.portal.model.PasswordTracker deletePasswordTracker(
 		com.liferay.portal.model.PasswordTracker passwordTracker)
 		throws com.liferay.portal.kernel.exception.SystemException {
-		getService().deletePasswordTracker(passwordTracker);
+		return getService().deletePasswordTracker(passwordTracker);
+	}
+
+	public static com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery() {
+		return getService().dynamicQuery();
 	}
 
 	/**
@@ -156,6 +162,12 @@ public class PasswordTrackerLocalServiceUtil {
 		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery)
 		throws com.liferay.portal.kernel.exception.SystemException {
 		return getService().dynamicQueryCount(dynamicQuery);
+	}
+
+	public static com.liferay.portal.model.PasswordTracker fetchPasswordTracker(
+		long passwordTrackerId)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getService().fetchPasswordTracker(passwordTrackerId);
 	}
 
 	/**
@@ -285,20 +297,15 @@ public class PasswordTrackerLocalServiceUtil {
 
 			ReferenceRegistry.registerReference(PasswordTrackerLocalServiceUtil.class,
 				"_service");
-			MethodCache.remove(PasswordTrackerLocalService.class);
 		}
 
 		return _service;
 	}
 
+	/**
+	 * @deprecated
+	 */
 	public void setService(PasswordTrackerLocalService service) {
-		MethodCache.remove(PasswordTrackerLocalService.class);
-
-		_service = service;
-
-		ReferenceRegistry.registerReference(PasswordTrackerLocalServiceUtil.class,
-			"_service");
-		MethodCache.remove(PasswordTrackerLocalService.class);
 	}
 
 	private static PasswordTrackerLocalService _service;

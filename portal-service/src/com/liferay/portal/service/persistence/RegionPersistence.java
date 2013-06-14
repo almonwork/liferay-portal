@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,7 +14,6 @@
 
 package com.liferay.portal.service.persistence;
 
-import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.model.Region;
 
 /**
@@ -306,6 +305,45 @@ public interface RegionPersistence extends BasePersistence<Region> {
 			com.liferay.portal.kernel.exception.SystemException;
 
 	/**
+	* Returns the region where countryId = &#63; and regionCode = &#63; or throws a {@link com.liferay.portal.NoSuchRegionException} if it could not be found.
+	*
+	* @param countryId the country ID
+	* @param regionCode the region code
+	* @return the matching region
+	* @throws com.liferay.portal.NoSuchRegionException if a matching region could not be found
+	* @throws SystemException if a system exception occurred
+	*/
+	public com.liferay.portal.model.Region findByC_R(long countryId,
+		java.lang.String regionCode)
+		throws com.liferay.portal.NoSuchRegionException,
+			com.liferay.portal.kernel.exception.SystemException;
+
+	/**
+	* Returns the region where countryId = &#63; and regionCode = &#63; or returns <code>null</code> if it could not be found. Uses the finder cache.
+	*
+	* @param countryId the country ID
+	* @param regionCode the region code
+	* @return the matching region, or <code>null</code> if a matching region could not be found
+	* @throws SystemException if a system exception occurred
+	*/
+	public com.liferay.portal.model.Region fetchByC_R(long countryId,
+		java.lang.String regionCode)
+		throws com.liferay.portal.kernel.exception.SystemException;
+
+	/**
+	* Returns the region where countryId = &#63; and regionCode = &#63; or returns <code>null</code> if it could not be found, optionally using the finder cache.
+	*
+	* @param countryId the country ID
+	* @param regionCode the region code
+	* @param retrieveFromCache whether to use the finder cache
+	* @return the matching region, or <code>null</code> if a matching region could not be found
+	* @throws SystemException if a system exception occurred
+	*/
+	public com.liferay.portal.model.Region fetchByC_R(long countryId,
+		java.lang.String regionCode, boolean retrieveFromCache)
+		throws com.liferay.portal.kernel.exception.SystemException;
+
+	/**
 	* Returns all the regions where countryId = &#63; and active = &#63;.
 	*
 	* @param countryId the country ID
@@ -477,6 +515,19 @@ public interface RegionPersistence extends BasePersistence<Region> {
 		throws com.liferay.portal.kernel.exception.SystemException;
 
 	/**
+	* Removes the region where countryId = &#63; and regionCode = &#63; from the database.
+	*
+	* @param countryId the country ID
+	* @param regionCode the region code
+	* @return the region that was removed
+	* @throws SystemException if a system exception occurred
+	*/
+	public com.liferay.portal.model.Region removeByC_R(long countryId,
+		java.lang.String regionCode)
+		throws com.liferay.portal.NoSuchRegionException,
+			com.liferay.portal.kernel.exception.SystemException;
+
+	/**
 	* Removes all the regions where countryId = &#63; and active = &#63; from the database.
 	*
 	* @param countryId the country ID
@@ -515,6 +566,17 @@ public interface RegionPersistence extends BasePersistence<Region> {
 		throws com.liferay.portal.kernel.exception.SystemException;
 
 	/**
+	* Returns the number of regions where countryId = &#63; and regionCode = &#63;.
+	*
+	* @param countryId the country ID
+	* @param regionCode the region code
+	* @return the number of matching regions
+	* @throws SystemException if a system exception occurred
+	*/
+	public int countByC_R(long countryId, java.lang.String regionCode)
+		throws com.liferay.portal.kernel.exception.SystemException;
+
+	/**
 	* Returns the number of regions where countryId = &#63; and active = &#63;.
 	*
 	* @param countryId the country ID
@@ -533,6 +595,4 @@ public interface RegionPersistence extends BasePersistence<Region> {
 	*/
 	public int countAll()
 		throws com.liferay.portal.kernel.exception.SystemException;
-
-	public Region remove(Region region) throws SystemException;
 }

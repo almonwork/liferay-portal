@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -35,8 +35,8 @@ import com.liferay.portal.kernel.transaction.Transactional;
  */
 @Transactional(isolation = Isolation.PORTAL, rollbackFor =  {
 	PortalException.class, SystemException.class})
-public interface MembershipRequestLocalService
-	extends PersistedModelLocalService {
+public interface MembershipRequestLocalService extends BaseLocalService,
+	PersistedModelLocalService {
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
@@ -67,10 +67,12 @@ public interface MembershipRequestLocalService
 	* Deletes the membership request with the primary key from the database. Also notifies the appropriate model listeners.
 	*
 	* @param membershipRequestId the primary key of the membership request
+	* @return the membership request that was removed
 	* @throws PortalException if a membership request with the primary key could not be found
 	* @throws SystemException if a system exception occurred
 	*/
-	public void deleteMembershipRequest(long membershipRequestId)
+	public com.liferay.portal.model.MembershipRequest deleteMembershipRequest(
+		long membershipRequestId)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException;
 
@@ -78,11 +80,14 @@ public interface MembershipRequestLocalService
 	* Deletes the membership request from the database. Also notifies the appropriate model listeners.
 	*
 	* @param membershipRequest the membership request
+	* @return the membership request that was removed
 	* @throws SystemException if a system exception occurred
 	*/
-	public void deleteMembershipRequest(
+	public com.liferay.portal.model.MembershipRequest deleteMembershipRequest(
 		com.liferay.portal.model.MembershipRequest membershipRequest)
 		throws com.liferay.portal.kernel.exception.SystemException;
+
+	public com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery();
 
 	/**
 	* Performs a dynamic query on the database and returns the matching rows.
@@ -144,6 +149,11 @@ public interface MembershipRequestLocalService
 	*/
 	public long dynamicQueryCount(
 		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery)
+		throws com.liferay.portal.kernel.exception.SystemException;
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public com.liferay.portal.model.MembershipRequest fetchMembershipRequest(
+		long membershipRequestId)
 		throws com.liferay.portal.kernel.exception.SystemException;
 
 	/**
@@ -232,7 +242,8 @@ public interface MembershipRequestLocalService
 	public void setBeanIdentifier(java.lang.String beanIdentifier);
 
 	public com.liferay.portal.model.MembershipRequest addMembershipRequest(
-		long userId, long groupId, java.lang.String comments)
+		long userId, long groupId, java.lang.String comments,
+		com.liferay.portal.service.ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException;
 
@@ -264,7 +275,8 @@ public interface MembershipRequestLocalService
 		throws com.liferay.portal.kernel.exception.SystemException;
 
 	public void updateStatus(long replierUserId, long membershipRequestId,
-		java.lang.String replyComments, int statusId, boolean addUserToGroup)
+		java.lang.String replyComments, int statusId, boolean addUserToGroup,
+		com.liferay.portal.service.ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException;
 }

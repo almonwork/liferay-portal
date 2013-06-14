@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -20,6 +20,8 @@ import com.liferay.portal.model.CacheModel;
 
 import com.liferay.portlet.expando.model.ExpandoValue;
 
+import java.io.Serializable;
+
 /**
  * The cache model class for representing ExpandoValue in entity cache.
  *
@@ -27,7 +29,8 @@ import com.liferay.portlet.expando.model.ExpandoValue;
  * @see ExpandoValue
  * @generated
  */
-public class ExpandoValueCacheModel implements CacheModel<ExpandoValue> {
+public class ExpandoValueCacheModel implements CacheModel<ExpandoValue>,
+	Serializable {
 	@Override
 	public String toString() {
 		StringBundler sb = new StringBundler(17);

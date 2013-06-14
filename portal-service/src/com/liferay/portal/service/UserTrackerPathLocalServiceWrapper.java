@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -24,7 +24,8 @@ package com.liferay.portal.service;
  * @generated
  */
 public class UserTrackerPathLocalServiceWrapper
-	implements UserTrackerPathLocalService {
+	implements UserTrackerPathLocalService,
+		ServiceWrapper<UserTrackerPathLocalService> {
 	public UserTrackerPathLocalServiceWrapper(
 		UserTrackerPathLocalService userTrackerPathLocalService) {
 		_userTrackerPathLocalService = userTrackerPathLocalService;
@@ -58,25 +59,32 @@ public class UserTrackerPathLocalServiceWrapper
 	* Deletes the user tracker path with the primary key from the database. Also notifies the appropriate model listeners.
 	*
 	* @param userTrackerPathId the primary key of the user tracker path
+	* @return the user tracker path that was removed
 	* @throws PortalException if a user tracker path with the primary key could not be found
 	* @throws SystemException if a system exception occurred
 	*/
-	public void deleteUserTrackerPath(long userTrackerPathId)
+	public com.liferay.portal.model.UserTrackerPath deleteUserTrackerPath(
+		long userTrackerPathId)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException {
-		_userTrackerPathLocalService.deleteUserTrackerPath(userTrackerPathId);
+		return _userTrackerPathLocalService.deleteUserTrackerPath(userTrackerPathId);
 	}
 
 	/**
 	* Deletes the user tracker path from the database. Also notifies the appropriate model listeners.
 	*
 	* @param userTrackerPath the user tracker path
+	* @return the user tracker path that was removed
 	* @throws SystemException if a system exception occurred
 	*/
-	public void deleteUserTrackerPath(
+	public com.liferay.portal.model.UserTrackerPath deleteUserTrackerPath(
 		com.liferay.portal.model.UserTrackerPath userTrackerPath)
 		throws com.liferay.portal.kernel.exception.SystemException {
-		_userTrackerPathLocalService.deleteUserTrackerPath(userTrackerPath);
+		return _userTrackerPathLocalService.deleteUserTrackerPath(userTrackerPath);
+	}
+
+	public com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery() {
+		return _userTrackerPathLocalService.dynamicQuery();
 	}
 
 	/**
@@ -149,6 +157,12 @@ public class UserTrackerPathLocalServiceWrapper
 		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery)
 		throws com.liferay.portal.kernel.exception.SystemException {
 		return _userTrackerPathLocalService.dynamicQueryCount(dynamicQuery);
+	}
+
+	public com.liferay.portal.model.UserTrackerPath fetchUserTrackerPath(
+		long userTrackerPathId)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return _userTrackerPathLocalService.fetchUserTrackerPath(userTrackerPathId);
 	}
 
 	/**
@@ -255,11 +269,26 @@ public class UserTrackerPathLocalServiceWrapper
 			start, end);
 	}
 
+	/**
+	 * @deprecated Renamed to {@link #getWrappedService}
+	 */
 	public UserTrackerPathLocalService getWrappedUserTrackerPathLocalService() {
 		return _userTrackerPathLocalService;
 	}
 
+	/**
+	 * @deprecated Renamed to {@link #setWrappedService}
+	 */
 	public void setWrappedUserTrackerPathLocalService(
+		UserTrackerPathLocalService userTrackerPathLocalService) {
+		_userTrackerPathLocalService = userTrackerPathLocalService;
+	}
+
+	public UserTrackerPathLocalService getWrappedService() {
+		return _userTrackerPathLocalService;
+	}
+
+	public void setWrappedService(
 		UserTrackerPathLocalService userTrackerPathLocalService) {
 		_userTrackerPathLocalService = userTrackerPathLocalService;
 	}

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -23,9 +23,10 @@ import com.liferay.portalweb.portal.util.RuntimeVariables;
 public class AddGadgetTest extends BaseTestCase {
 	public void testAddGadget() throws Exception {
 		selenium.open("/web/guest/home/");
+		loadRequiredJavaScriptModules();
 
 		for (int second = 0;; second++) {
-			if (second >= 60) {
+			if (second >= 90) {
 				fail("timeout");
 			}
 
@@ -40,18 +41,18 @@ public class AddGadgetTest extends BaseTestCase {
 			Thread.sleep(1000);
 		}
 
-		selenium.saveScreenShotAndSource();
 		selenium.click(RuntimeVariables.replace("link=Control Panel"));
 		selenium.waitForPageToLoad("30000");
-		selenium.saveScreenShotAndSource();
+		loadRequiredJavaScriptModules();
 
 		for (int second = 0;; second++) {
-			if (second >= 60) {
+			if (second >= 90) {
 				fail("timeout");
 			}
 
 			try {
-				if (selenium.isElementPresent("link=OpenSocial")) {
+				if (selenium.isElementPresent(
+							"link=OpenSocial Gadget Publisher")) {
 					break;
 				}
 			}
@@ -61,18 +62,19 @@ public class AddGadgetTest extends BaseTestCase {
 			Thread.sleep(1000);
 		}
 
-		selenium.saveScreenShotAndSource();
-		selenium.clickAt("link=OpenSocial", RuntimeVariables.replace(""));
+		selenium.clickAt("link=OpenSocial Gadget Publisher",
+			RuntimeVariables.replace("OpenSocial Gadget Publisher"));
 		selenium.waitForPageToLoad("30000");
-		selenium.saveScreenShotAndSource();
+		loadRequiredJavaScriptModules();
 
 		for (int second = 0;; second++) {
-			if (second >= 60) {
+			if (second >= 90) {
 				fail("timeout");
 			}
 
 			try {
-				if (selenium.isElementPresent("//input[@value='Add Gadget']")) {
+				if (selenium.isElementPresent(
+							"//input[@value='Publish Gadget']")) {
 					break;
 				}
 			}
@@ -82,19 +84,19 @@ public class AddGadgetTest extends BaseTestCase {
 			Thread.sleep(1000);
 		}
 
-		selenium.saveScreenShotAndSource();
-		selenium.clickAt("//input[@value='Add Gadget']",
-			RuntimeVariables.replace(""));
+		selenium.clickAt("//input[@value='Publish Gadget']",
+			RuntimeVariables.replace("Publish Gadget"));
 		selenium.waitForPageToLoad("30000");
-		selenium.saveScreenShotAndSource();
+		loadRequiredJavaScriptModules();
 
 		for (int second = 0;; second++) {
-			if (second >= 60) {
+			if (second >= 90) {
 				fail("timeout");
 			}
 
 			try {
-				if (selenium.isElementPresent("_1_WAR_opensocialportlet_url")) {
+				if (selenium.isElementPresent(
+							"//input[@id='_1_WAR_opensocialportlet_url']")) {
 					break;
 				}
 			}
@@ -104,14 +106,20 @@ public class AddGadgetTest extends BaseTestCase {
 			Thread.sleep(1000);
 		}
 
-		selenium.saveScreenShotAndSource();
-		selenium.type("_1_WAR_opensocialportlet_url",
+		selenium.type("//input[@id='_1_WAR_opensocialportlet_url']",
 			RuntimeVariables.replace(
 				"http://opensocial-resources.googlecode.com/svn/samples/tutorial/tags/api-0.8/helloworld.xml"));
-		selenium.saveScreenShotAndSource();
-		selenium.clickAt("//input[@value=\"Save\"]",
-			RuntimeVariables.replace(""));
+		selenium.clickAt("//input[@value='Save']",
+			RuntimeVariables.replace("Save"));
 		selenium.waitForPageToLoad("30000");
-		selenium.saveScreenShotAndSource();
+		loadRequiredJavaScriptModules();
+		assertEquals(RuntimeVariables.replace(
+				"Your request completed successfully."),
+			selenium.getText("//div[@class='portlet-msg-success']"));
+		assertEquals(RuntimeVariables.replace("Hello World!"),
+			selenium.getText("//tr[3]/td"));
+		assertEquals(RuntimeVariables.replace(
+				"http://opensocial-resources.googlecode.com/svn/samples/tutorial/tags/api-0.8/helloworld.xml"),
+			selenium.getText("//td[2]/a"));
 	}
 }

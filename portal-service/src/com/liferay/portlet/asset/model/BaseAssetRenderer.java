@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -18,6 +18,9 @@ import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.portlet.LiferayPortletRequest;
 import com.liferay.portal.kernel.portlet.LiferayPortletResponse;
+import com.liferay.portal.kernel.util.HttpUtil;
+import com.liferay.portal.kernel.util.StringBundler;
+import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.model.Group;
 import com.liferay.portal.model.GroupConstants;
@@ -25,6 +28,7 @@ import com.liferay.portal.security.permission.PermissionChecker;
 import com.liferay.portal.service.GroupLocalServiceUtil;
 import com.liferay.portal.service.LayoutLocalServiceUtil;
 import com.liferay.portal.theme.ThemeDisplay;
+import com.liferay.portlet.asset.AssetRendererFactoryRegistryUtil;
 
 import javax.portlet.PortletRequest;
 import javax.portlet.PortletURL;
@@ -38,8 +42,20 @@ import javax.servlet.http.HttpServletRequest;
  */
 public abstract class BaseAssetRenderer implements AssetRenderer {
 
+	public AssetRendererFactory getAssetRendererFactory() {
+		if (_assetRendererFactory != null) {
+			return _assetRendererFactory;
+		}
+
+		_assetRendererFactory =
+			AssetRendererFactoryRegistryUtil.getAssetRendererFactoryByClassName(
+				getAssetRendererFactoryClassName());
+
+		return _assetRendererFactory;
+	}
+
 	public String[] getAvailableLocales() {
-		return _EMPTY_ARRAY;
+		return _AVAILABLE_LOCALES;
 	}
 
 	public String getDiscussionPath() {
@@ -51,6 +67,10 @@ public abstract class BaseAssetRenderer implements AssetRenderer {
 			WebKeys.THEME_DISPLAY);
 
 		return getIconPath(themeDisplay);
+	}
+
+	public String getURLDownload(ThemeDisplay themeDisplay) {
+		return null;
 	}
 
 	public PortletURL getURLEdit(
@@ -112,7 +132,15 @@ public abstract class BaseAssetRenderer implements AssetRenderer {
 		return false;
 	}
 
+	public boolean isDisplayable() {
+		return true;
+	}
+
 	public boolean isLocalizable() {
+		return false;
+	}
+
+	public boolean isPreviewInContext() {
 		return false;
 	}
 
@@ -151,6 +179,34 @@ public abstract class BaseAssetRenderer implements AssetRenderer {
 		return themeDisplay.getPathThemeImages() + "/common/page.png";
 	}
 
-	private static final String[] _EMPTY_ARRAY = new String[0];
+	protected String getURLViewInContext(
+		LiferayPortletRequest liferayPortletRequest, String noSuchEntryRedirect,
+		String path, String primaryKeyParameterName,
+		long primaryKeyParameterValue) {
+
+		ThemeDisplay themeDisplay =
+			(ThemeDisplay)liferayPortletRequest.getAttribute(
+				WebKeys.THEME_DISPLAY);
+
+		StringBundler sb = new StringBundler(11);
+
+		sb.append(themeDisplay.getPortalURL());
+		sb.append(themeDisplay.getPathMain());
+		sb.append(path);
+		sb.append("?p_l_id=");
+		sb.append(themeDisplay.getPlid());
+		sb.append("&noSuchEntryRedirect=");
+		sb.append(HttpUtil.encodeURL(noSuchEntryRedirect));
+		sb.append(StringPool.AMPERSAND);
+		sb.append(primaryKeyParameterName);
+		sb.append(StringPool.EQUAL);
+		sb.append(primaryKeyParameterValue);
+
+		return sb.toString();
+	}
+
+	private static final String[] _AVAILABLE_LOCALES = new String[0];
+
+	private AssetRendererFactory _assetRendererFactory;
 
 }

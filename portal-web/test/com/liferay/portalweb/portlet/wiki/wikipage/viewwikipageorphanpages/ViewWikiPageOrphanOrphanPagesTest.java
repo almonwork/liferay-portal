@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -23,14 +23,15 @@ import com.liferay.portalweb.portal.util.RuntimeVariables;
 public class ViewWikiPageOrphanOrphanPagesTest extends BaseTestCase {
 	public void testViewWikiPageOrphanOrphanPages() throws Exception {
 		selenium.open("/web/guest/home/");
+		loadRequiredJavaScriptModules();
 
 		for (int second = 0;; second++) {
-			if (second >= 60) {
+			if (second >= 90) {
 				fail("timeout");
 			}
 
 			try {
-				if (selenium.isElementPresent("link=Wiki Test Page")) {
+				if (selenium.isVisible("link=Wiki Test Page")) {
 					break;
 				}
 			}
@@ -40,13 +41,15 @@ public class ViewWikiPageOrphanOrphanPagesTest extends BaseTestCase {
 			Thread.sleep(1000);
 		}
 
-		selenium.saveScreenShotAndSource();
-		selenium.clickAt("link=Wiki Test Page", RuntimeVariables.replace(""));
+		selenium.clickAt("link=Wiki Test Page",
+			RuntimeVariables.replace("Wiki Test Page"));
 		selenium.waitForPageToLoad("30000");
-		selenium.saveScreenShotAndSource();
-		selenium.clickAt("link=Orphan Pages", RuntimeVariables.replace(""));
+		loadRequiredJavaScriptModules();
+		selenium.clickAt("link=Orphan Pages",
+			RuntimeVariables.replace("Orphan Pages"));
 		selenium.waitForPageToLoad("30000");
-		selenium.saveScreenShotAndSource();
-		assertTrue(selenium.isElementPresent("link=Wiki2 Page2 Test2"));
+		loadRequiredJavaScriptModules();
+		assertEquals(RuntimeVariables.replace("Wiki Page2 Title"),
+			selenium.getText("//tr[5]/td[1]/a"));
 	}
 }

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,7 +14,6 @@
 
 package com.liferay.portal.service.persistence;
 
-import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.model.BrowserTracker;
 
 /**
@@ -181,9 +180,10 @@ public interface BrowserTrackerPersistence extends BasePersistence<BrowserTracke
 	* Removes the browser tracker where userId = &#63; from the database.
 	*
 	* @param userId the user ID
+	* @return the browser tracker that was removed
 	* @throws SystemException if a system exception occurred
 	*/
-	public void removeByUserId(long userId)
+	public com.liferay.portal.model.BrowserTracker removeByUserId(long userId)
 		throws com.liferay.portal.NoSuchBrowserTrackerException,
 			com.liferay.portal.kernel.exception.SystemException;
 
@@ -213,7 +213,4 @@ public interface BrowserTrackerPersistence extends BasePersistence<BrowserTracke
 	*/
 	public int countAll()
 		throws com.liferay.portal.kernel.exception.SystemException;
-
-	public BrowserTracker remove(BrowserTracker browserTracker)
-		throws SystemException;
 }

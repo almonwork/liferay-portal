@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -37,6 +37,7 @@ public class ReleaseSoap implements Serializable {
 		soapModel.setBuildNumber(model.getBuildNumber());
 		soapModel.setBuildDate(model.getBuildDate());
 		soapModel.setVerified(model.getVerified());
+		soapModel.setState(model.getState());
 		soapModel.setTestString(model.getTestString());
 
 		return soapModel;
@@ -150,6 +151,14 @@ public class ReleaseSoap implements Serializable {
 		_verified = verified;
 	}
 
+	public int getState() {
+		return _state;
+	}
+
+	public void setState(int state) {
+		_state = state;
+	}
+
 	public String getTestString() {
 		return _testString;
 	}
@@ -165,5 +174,6 @@ public class ReleaseSoap implements Serializable {
 	private int _buildNumber;
 	private Date _buildDate;
 	private boolean _verified;
+	private int _state;
 	private String _testString;
 }

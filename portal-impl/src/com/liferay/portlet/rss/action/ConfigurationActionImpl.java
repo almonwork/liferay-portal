@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -23,7 +23,7 @@ import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portlet.PortletPreferencesFactoryUtil;
 
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 import javax.portlet.ActionRequest;
@@ -49,43 +49,51 @@ public class ConfigurationActionImpl extends DefaultConfigurationAction {
 			updateSubscriptions(actionRequest);
 
 			super.processAction(portletConfig, actionRequest, actionResponse);
+
+			return;
 		}
-		else {
-			String portletResource = ParamUtil.getString(
-				actionRequest, "portletResource");
 
-			PortletPreferences preferences =
-				PortletPreferencesFactoryUtil.getPortletSetup(
-					actionRequest, portletResource);
+		String portletResource = ParamUtil.getString(
+			actionRequest, "portletResource");
 
-			if (cmd.equals("remove-footer-article")) {
-				removeFooterArticle(actionRequest, preferences);
+		PortletPreferences preferences =
+			PortletPreferencesFactoryUtil.getPortletSetup(
+				actionRequest, portletResource);
+
+		if (cmd.equals("remove-footer-article")) {
+			removeFooterArticle(actionRequest, preferences);
+		}
+		else if (cmd.equals("remove-header-article")) {
+			removeHeaderArticle(actionRequest, preferences);
+		}
+		else if (cmd.equals("set-footer-article")) {
+			setFooterArticle(actionRequest, preferences);
+		}
+		else if (cmd.equals("set-header-article")) {
+			setHeaderArticle(actionRequest, preferences);
+		}
+
+		if (SessionErrors.isEmpty(actionRequest)) {
+			try {
+				preferences.store();
 			}
-			else if (cmd.equals("remove-header-article")) {
-				removeHeaderArticle(actionRequest, preferences);
-			}
-			else if (cmd.equals("set-footer-article")) {
-				setFooterArticle(actionRequest, preferences);
-			}
-			else if (cmd.equals("set-header-article")) {
-				setHeaderArticle(actionRequest, preferences);
+			catch (ValidatorException ve) {
+				SessionErrors.add(
+					actionRequest, ValidatorException.class.getName(), ve);
+
+				return;
 			}
 
-			if (SessionErrors.isEmpty(actionRequest)) {
-				try {
-					preferences.store();
-				}
-				catch (ValidatorException ve) {
-					SessionErrors.add(
-						actionRequest, ValidatorException.class.getName(), ve);
+			SessionMessages.add(
+				actionRequest,
+				portletConfig.getPortletName() +
+					SessionMessages.KEY_SUFFIX_REFRESH_PORTLET,
+				portletResource);
 
-					return;
-				}
-
-				SessionMessages.add(
-					actionRequest,
-					portletConfig.getPortletName() + ".doConfigure");
-			}
+			SessionMessages.add(
+				actionRequest,
+				portletConfig.getPortletName() +
+					SessionMessages.KEY_SUFFIX_UPDATED_CONFIGURATION);
 		}
 	}
 
@@ -135,7 +143,7 @@ public class ConfigurationActionImpl extends DefaultConfigurationAction {
 		int[] subscriptionIndexes = StringUtil.split(
 			ParamUtil.getString(actionRequest, "subscriptionIndexes"), 0);
 
-		Map<String, String> subscriptions = new HashMap<String, String>();
+		Map<String, String> subscriptions = new LinkedHashMap<String, String>();
 
 		for (int subscriptionIndex : subscriptionIndexes) {
 			String url = ParamUtil.getString(

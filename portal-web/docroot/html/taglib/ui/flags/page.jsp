@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -49,12 +49,12 @@ long reportedUserId = GetterUtil.getLong((String)request.getAttribute("liferay-u
 					function() {
 						var popup = new A.Dialog(
 							{
-								centered: true,
+								align: Liferay.Util.Window.ALIGN_CENTER,
 								destroyOnClose: true,
 								draggable: true,
 								modal: true,
 								stack: true,
-								title: '<liferay-ui:message key="report-inappropriate-content" />',
+								title: '<%= UnicodeLanguageUtil.get(pageContext, "report-inappropriate-content") %>',
 								width: 435
 							}
 						).render();
@@ -90,10 +90,10 @@ long reportedUserId = GetterUtil.getLong((String)request.getAttribute("liferay-u
 					function(event) {
 						var popup = new A.Dialog(
 							{
+								align: Liferay.Util.Window.ALIGN_CENTER,
 								bodyContent: A.one('#<%= randomNamespace %>signIn').html(),
-								centered: true,
 								destroyOnClose: true,
-								title: '<liferay-ui:message key="report-inappropriate-content" />',
+								title: '<%= UnicodeLanguageUtil.get(pageContext, "report-inappropriate-content") %>',
 								modal: true,
 								width: 500
 							}

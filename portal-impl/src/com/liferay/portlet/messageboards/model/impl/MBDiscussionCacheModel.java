@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -19,6 +19,8 @@ import com.liferay.portal.model.CacheModel;
 
 import com.liferay.portlet.messageboards.model.MBDiscussion;
 
+import java.io.Serializable;
+
 /**
  * The cache model class for representing MBDiscussion in entity cache.
  *
@@ -26,7 +28,8 @@ import com.liferay.portlet.messageboards.model.MBDiscussion;
  * @see MBDiscussion
  * @generated
  */
-public class MBDiscussionCacheModel implements CacheModel<MBDiscussion> {
+public class MBDiscussionCacheModel implements CacheModel<MBDiscussion>,
+	Serializable {
 	@Override
 	public String toString() {
 		StringBundler sb = new StringBundler(9);

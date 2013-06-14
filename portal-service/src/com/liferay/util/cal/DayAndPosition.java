@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -59,30 +59,57 @@ import java.util.Calendar;
 public class DayAndPosition implements Cloneable, Serializable {
 
 	/**
-	 * Field day
-	 */
-	private int day;
-
-	/**
-	 * Field position
-	 */
-	private int position;
-
-	/**
 	 * Field NO_WEEKDAY
 	 */
 	public static final int NO_WEEKDAY = 0;
 
 	/**
-	 * Constructor DayAndPosition
+	 * Returns <code>true</code> if the day is a valid day of the week.
+	 *
+	 * @param  d the day of the week in terms of {@link java.util.Calendar} or
+	 *         {@link #NO_WEEKDAY}
+	 * @return <code>true</code> if the day is a valid day of the week;
+	 *         <code>false</code> otherwise
 	 */
-	public DayAndPosition() {
-		day = NO_WEEKDAY;
-		position = 0;
+	public static boolean isValidDayOfWeek(int d) {
+		switch (d) {
+
+			case NO_WEEKDAY :
+			case Calendar.SUNDAY :
+			case Calendar.MONDAY :
+			case Calendar.TUESDAY :
+			case Calendar.WEDNESDAY :
+			case Calendar.THURSDAY :
+			case Calendar.FRIDAY :
+			case Calendar.SATURDAY :
+				return true;
+
+			default :
+				return false;
+		}
 	}
 
 	/**
-	 * Constructor DayAndPosition
+	 * Returns <code>true</code> if the day position is valid.
+	 *
+	 * @param  p the day position
+	 * @return <code>true</code> if the day position is valid;
+	 *         <code>false</code> otherwise
+	 */
+	public static boolean isValidDayPosition(int p) {
+		return ((p >= -53) && (p <= 53));
+	}
+
+	/**
+	 * Constructs a DayAndPosition
+	 */
+	public DayAndPosition() {
+		_day = NO_WEEKDAY;
+		_position = 0;
+	}
+
+	/**
+	 * Constructs a DayAndPosition with the day of the week and day position.
 	 */
 	public DayAndPosition(int d, int p) {
 		if (!isValidDayOfWeek(d)) {
@@ -93,54 +120,36 @@ public class DayAndPosition implements Cloneable, Serializable {
 			throw new IllegalArgumentException("Invalid day position");
 		}
 
-		day = d;
-		position = p;
+		_day = d;
+		_position = p;
 	}
 
 	/**
-	 * Method getDayOfWeek
+	 * Returns a clone of this DayAndPosition.
 	 *
-	 * @return int
+	 * @return a clone of this DayAndPosition
 	 */
-	public int getDayOfWeek() {
-		return day;
-	}
+	@Override
+	public Object clone() {
+		try {
+			DayAndPosition other = (DayAndPosition)super.clone();
 
-	/**
-	 * Method setDayOfWeek
-	 */
-	public void setDayOfWeek(int d) {
-		if (!isValidDayOfWeek(d)) {
-			throw new IllegalArgumentException("Invalid day of week");
+			other._day = _day;
+			other._position = _position;
+
+			return other;
 		}
-
-		day = d;
-	}
-
-	/**
-	 * Method getDayPosition
-	 *
-	 * @return int
-	 */
-	public int getDayPosition() {
-		return position;
-	}
-
-	/**
-	 * Method setDayPosition
-	 */
-	public void setDayPosition(int p) {
-		if (!isValidDayPosition(p)) {
-			throw new IllegalArgumentException();
+		catch (CloneNotSupportedException cnse) {
+			throw new InternalError();
 		}
-
-		position = p;
 	}
 
 	/**
-	 * Method equals
+	 * Returns <code>true</code> if the object equals this DayAndPosition.
 	 *
-	 * @return boolean
+	 * @param  obj the other object
+	 * @return <code>true</code> if the object equals this DayAndPosition,
+	 *         <code>false</code> otherwise
 	 */
 	@Override
 	public boolean equals(Object obj) {
@@ -162,72 +171,69 @@ public class DayAndPosition implements Cloneable, Serializable {
 			   && (getDayPosition() == that.getDayPosition());
 	}
 
+	/**
+	 * Returns the day of the week.
+	 *
+	 * @return the day of the week
+	 */
+	public int getDayOfWeek() {
+		return _day;
+	}
+
+	/**
+	 * Returns the day position.
+	 *
+	 * @return the day position
+	 */
+	public int getDayPosition() {
+		return _position;
+	}
+
+	/**
+	 * Returns the hash code of this DayAndPosition.
+	 *
+	 * @return the hash code of this DayAndPosition
+	 */
 	@Override
 	public int hashCode() {
 		HashCode hashCode = HashCodeFactoryUtil.getHashCode();
 
-		hashCode.append(day);
-		hashCode.append(position);
+		hashCode.append(_day);
+		hashCode.append(_position);
 
 		return hashCode.toHashCode();
 	}
 
 	/**
-	 * Method isValidDayOfWeek
+	 * Sets the day of the week
 	 *
-	 * @return boolean
+	 * @param d the day of the week
 	 */
-	public static boolean isValidDayOfWeek(int d) {
-		switch (d) {
-
-			case NO_WEEKDAY :
-			case Calendar.SUNDAY :
-			case Calendar.MONDAY :
-			case Calendar.TUESDAY :
-			case Calendar.WEDNESDAY :
-			case Calendar.THURSDAY :
-			case Calendar.FRIDAY :
-			case Calendar.SATURDAY :
-				return true;
-
-			default :
-				return false;
+	public void setDayOfWeek(int d) {
+		if (!isValidDayOfWeek(d)) {
+			throw new IllegalArgumentException("Invalid day of week");
 		}
+
+		_day = d;
 	}
 
 	/**
-	 * Method isValidDayPosition
+	 * Sets the day position
 	 *
-	 * @return boolean
+	 * @param p the day position
 	 */
-	public static boolean isValidDayPosition(int p) {
-		return ((p >= -53) && (p <= 53));
+	public void setDayPosition(int p) {
+		if (!isValidDayPosition(p)) {
+			throw new IllegalArgumentException();
+		}
+
+		_position = p;
 	}
 
 	/**
-	 * Method clone
+	 * Returns a string representation of the DayAndPosition
 	 *
-	 * @return Object
-	 */
-	@Override
-	public Object clone() {
-		try {
-			DayAndPosition other = (DayAndPosition)super.clone();
-
-			other.day = day;
-			other.position = position;
-
-			return other;
-		}
-		catch (CloneNotSupportedException e) {
-			throw new InternalError();
-		}
-	}
-
-	/**
-	 * Method toString
-	 *
-	 * @return String
+	 * @return a string representation of the DayAndPosition
 	 */
 	@Override
 	public String toString() {
@@ -235,12 +241,22 @@ public class DayAndPosition implements Cloneable, Serializable {
 
 		sb.append(getClass().getName());
 		sb.append("[day=");
-		sb.append(day);
+		sb.append(_day);
 		sb.append(",position=");
-		sb.append(position);
+		sb.append(_position);
 		sb.append("]");
 
 		return sb.toString();
 	}
+
+	/**
+	 * Field day
+	 */
+	private int _day;
+
+	/**
+	 * Field position
+	 */
+	private int _position;
 
 }

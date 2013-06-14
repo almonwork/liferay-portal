@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -94,8 +94,6 @@ public abstract class AbstractSchedulingConfigurator
 		_schedulerEntries = schedulerEntries;
 	}
 
-	protected abstract ClassLoader getOperatingClassloader();
-
 	protected void destroySchedulerEntry(SchedulerEntry schedulerEntry)
 		throws Exception {
 
@@ -104,6 +102,8 @@ public abstract class AbstractSchedulingConfigurator
 		_schedulerEngine.unschedule(
 			trigger.getJobName(), trigger.getGroupName());
 	}
+
+	protected abstract ClassLoader getOperatingClassloader();
 
 	protected void initSchedulerEntry(
 			String destinationName, SchedulerEntry schedulerEntry)

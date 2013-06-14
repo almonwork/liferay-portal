@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -53,19 +53,19 @@
 		<%
 		PortletPreferences portletSetup = PortletPreferencesFactoryUtil.getLayoutPortletSetup(layout, portletDisplay.getId());
 
-		boolean widgetShowAddAppLink = GetterUtil.getBoolean(portletSetup.getValue("lfr-widget-show-add-app-link", null), PropsValues.THEME_PORTLET_SHARING_DEFAULT);
+		boolean widgetShowAddAppLink = GetterUtil.getBoolean(portletSetup.getValue("lfrWidgetShowAddAppLink", null), PropsValues.THEME_PORTLET_SHARING_DEFAULT);
 
-		String facebookAPIKey = portletSetup.getValue("lfr-facebook-api-key", StringPool.BLANK);
-		String facebookCanvasPageURL = portletSetup.getValue("lfr-facebook-canvas-page-url", StringPool.BLANK);
-		boolean facebookShowAddAppLink = GetterUtil.getBoolean(portletSetup.getValue("lfr-facebook-show-add-app-link", null), true);
+		String facebookAPIKey = portletSetup.getValue("lfrFacebookApiKey", StringPool.BLANK);
+		String facebookCanvasPageURL = portletSetup.getValue("lfrFacebookCanvasPageUrl", StringPool.BLANK);
+		boolean facebookShowAddAppLink = GetterUtil.getBoolean(portletSetup.getValue("lfrFacebookShowAddAppLink", null), true);
 
 		if (Validator.isNull(facebookCanvasPageURL) || Validator.isNull(facebookAPIKey)) {
 			facebookShowAddAppLink = false;
 		}
 
-		boolean iGoogleShowAddAppLink = GetterUtil.getBoolean(portletSetup.getValue("lfr-igoogle-show-add-app-link", StringPool.BLANK));
-		boolean netvibesShowAddAppLinks = GetterUtil.getBoolean(portletSetup.getValue("lfr-netvibes-show-add-app-link", StringPool.BLANK));
-		boolean appShowShareWithFriendsLink = GetterUtil.getBoolean(portletSetup.getValue("lfr-app-show-share-with-friends-link", StringPool.BLANK));
+		boolean iGoogleShowAddAppLink = GetterUtil.getBoolean(portletSetup.getValue("lfrIgoogleShowAddAppLink", StringPool.BLANK));
+		boolean netvibesShowAddAppLinks = GetterUtil.getBoolean(portletSetup.getValue("lfrNetvibesShowAddAppLink", StringPool.BLANK));
+		boolean appShowShareWithFriendsLink = GetterUtil.getBoolean(portletSetup.getValue("lfrAppShowShareWithFriendsLink", StringPool.BLANK));
 		%>
 
 		<c:if test="<%= widgetShowAddAppLink || facebookShowAddAppLink || iGoogleShowAddAppLink || netvibesShowAddAppLinks || appShowShareWithFriendsLink %>">
@@ -77,7 +77,7 @@
 
 				<liferay-ui:icon
 					cssClass='<%= portletDisplay.getNamespace() + "expose-as-widget" %>'
-					image="../dock/add_content"
+					image="../common/add"
 					label="<%= true %>"
 					message="add-to-any-website"
 					url="<%= widgetHREF %>"
@@ -102,7 +102,7 @@
 
 				<liferay-ui:icon
 					cssClass='<%= portletDisplay.getNamespace() + "expose-as-widget" %>'
-					image="../dock/add_content"
+					image="../common/add"
 					label="<%= true %>"
 					message="add-to-igoogle"
 					url="<%= googleGadgetHREF %>"
@@ -116,7 +116,7 @@
 				%>
 
 				<liferay-ui:icon
-					image="../dock/add_content"
+					image="../common/add"
 					label="<%= true %>"
 					message="add-to-netvibes"
 					method="get"

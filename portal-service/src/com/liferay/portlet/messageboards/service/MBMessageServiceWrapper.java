@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,6 +14,8 @@
 
 package com.liferay.portlet.messageboards.service;
 
+import com.liferay.portal.service.ServiceWrapper;
+
 /**
  * <p>
  * This class is a wrapper for {@link MBMessageService}.
@@ -23,9 +25,28 @@ package com.liferay.portlet.messageboards.service;
  * @see       MBMessageService
  * @generated
  */
-public class MBMessageServiceWrapper implements MBMessageService {
+public class MBMessageServiceWrapper implements MBMessageService,
+	ServiceWrapper<MBMessageService> {
 	public MBMessageServiceWrapper(MBMessageService mbMessageService) {
 		_mbMessageService = mbMessageService;
+	}
+
+	/**
+	* Returns the Spring bean ID for this bean.
+	*
+	* @return the Spring bean ID for this bean
+	*/
+	public java.lang.String getBeanIdentifier() {
+		return _mbMessageService.getBeanIdentifier();
+	}
+
+	/**
+	* Sets the Spring bean ID for this bean.
+	*
+	* @param beanIdentifier the Spring bean ID for this bean
+	*/
+	public void setBeanIdentifier(java.lang.String beanIdentifier) {
+		_mbMessageService.setBeanIdentifier(beanIdentifier);
 	}
 
 	public com.liferay.portlet.messageboards.model.MBMessage addDiscussionMessage(
@@ -45,26 +66,27 @@ public class MBMessageServiceWrapper implements MBMessageService {
 		long groupId, long categoryId, long threadId, long parentMessageId,
 		java.lang.String subject, java.lang.String body,
 		java.lang.String format,
-		java.util.List<com.liferay.portal.kernel.util.ObjectValuePair<java.lang.String, byte[]>> files,
+		java.util.List<com.liferay.portal.kernel.util.ObjectValuePair<java.lang.String, java.io.InputStream>> inputStreamOVPs,
 		boolean anonymous, double priority, boolean allowPingbacks,
 		com.liferay.portal.service.ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException {
 		return _mbMessageService.addMessage(groupId, categoryId, threadId,
-			parentMessageId, subject, body, format, files, anonymous, priority,
-			allowPingbacks, serviceContext);
+			parentMessageId, subject, body, format, inputStreamOVPs, anonymous,
+			priority, allowPingbacks, serviceContext);
 	}
 
 	public com.liferay.portlet.messageboards.model.MBMessage addMessage(
 		long groupId, long categoryId, java.lang.String subject,
 		java.lang.String body, java.lang.String format,
-		java.util.List<com.liferay.portal.kernel.util.ObjectValuePair<java.lang.String, byte[]>> files,
+		java.util.List<com.liferay.portal.kernel.util.ObjectValuePair<java.lang.String, java.io.InputStream>> inputStreamOVPs,
 		boolean anonymous, double priority, boolean allowPingbacks,
 		com.liferay.portal.service.ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException {
 		return _mbMessageService.addMessage(groupId, categoryId, subject, body,
-			format, files, anonymous, priority, allowPingbacks, serviceContext);
+			format, inputStreamOVPs, anonymous, priority, allowPingbacks,
+			serviceContext);
 	}
 
 	public void deleteDiscussionMessage(long groupId,
@@ -163,6 +185,13 @@ public class MBMessageServiceWrapper implements MBMessageService {
 			threadView, includePrevAndNext);
 	}
 
+	public int getThreadAnswersCount(long groupId, long categoryId,
+		long threadId)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return _mbMessageService.getThreadAnswersCount(groupId, categoryId,
+			threadId);
+	}
+
 	public java.util.List<com.liferay.portlet.messageboards.model.MBMessage> getThreadMessages(
 		long groupId, long categoryId, long threadId, int status, int start,
 		int end) throws com.liferay.portal.kernel.exception.SystemException {
@@ -200,6 +229,12 @@ public class MBMessageServiceWrapper implements MBMessageService {
 		_mbMessageService.unsubscribeMessage(messageId);
 	}
 
+	public void updateAnswer(long messageId, boolean answer, boolean cascade)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException {
+		_mbMessageService.updateAnswer(messageId, answer, cascade);
+	}
+
 	public com.liferay.portlet.messageboards.model.MBMessage updateDiscussionMessage(
 		java.lang.String className, long classPK,
 		java.lang.String permissionClassName, long permissionClassPK,
@@ -215,21 +250,36 @@ public class MBMessageServiceWrapper implements MBMessageService {
 
 	public com.liferay.portlet.messageboards.model.MBMessage updateMessage(
 		long messageId, java.lang.String subject, java.lang.String body,
-		java.util.List<com.liferay.portal.kernel.util.ObjectValuePair<java.lang.String, byte[]>> files,
+		java.util.List<com.liferay.portal.kernel.util.ObjectValuePair<java.lang.String, java.io.InputStream>> inputStreamOVPs,
 		java.util.List<java.lang.String> existingFiles, double priority,
 		boolean allowPingbacks,
 		com.liferay.portal.service.ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException {
-		return _mbMessageService.updateMessage(messageId, subject, body, files,
-			existingFiles, priority, allowPingbacks, serviceContext);
+		return _mbMessageService.updateMessage(messageId, subject, body,
+			inputStreamOVPs, existingFiles, priority, allowPingbacks,
+			serviceContext);
 	}
 
+	/**
+	 * @deprecated Renamed to {@link #getWrappedService}
+	 */
 	public MBMessageService getWrappedMBMessageService() {
 		return _mbMessageService;
 	}
 
+	/**
+	 * @deprecated Renamed to {@link #setWrappedService}
+	 */
 	public void setWrappedMBMessageService(MBMessageService mbMessageService) {
+		_mbMessageService = mbMessageService;
+	}
+
+	public MBMessageService getWrappedService() {
+		return _mbMessageService;
+	}
+
+	public void setWrappedService(MBMessageService mbMessageService) {
 		_mbMessageService = mbMessageService;
 	}
 

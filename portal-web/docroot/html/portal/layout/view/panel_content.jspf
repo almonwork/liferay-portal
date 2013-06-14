@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -15,17 +15,12 @@
 --%>
 
 <%
-if (!denyAccess && (themeDisplay.isStateExclusive() || themeDisplay.isStatePopUp() || layoutTypePortlet.hasStateMax() || Validator.isNotNull(controlPanelCategory))) {
+if (!denyAccess && (themeDisplay.isStatePopUp() || (layoutTypePortlet.hasStateMax() && (portlet != null)) || Validator.isNotNull(controlPanelCategory))) {
 	String velocityTemplateId = null;
 
 	String content = null;
 
-	if (themeDisplay.isStateExclusive()) {
-		velocityTemplateId = theme.getThemeId() + LayoutTemplateConstants.STANDARD_SEPARATOR + "exclusive";
-
-		content = LayoutTemplateLocalServiceUtil.getContent("exclusive", true, theme.getThemeId());
-	}
-	else if (themeDisplay.isStatePopUp()) {
+	if (themeDisplay.isStatePopUp()) {
 		velocityTemplateId = theme.getThemeId() + LayoutTemplateConstants.STANDARD_SEPARATOR + "pop_up";
 
 		content = LayoutTemplateLocalServiceUtil.getContent("pop_up", true, theme.getThemeId());
@@ -33,7 +28,7 @@ if (!denyAccess && (themeDisplay.isStateExclusive() || themeDisplay.isStatePopUp
 	else if (layoutTypePortlet.hasStateMax()) {
 		String portletTitle = PortalUtil.getPortletTitle(portlet, application, locale);
 
-		PortletURL portletURL = new PortletURLImpl(request, ppid, plid, PortletRequest.ACTION_PHASE);
+		PortletURL portletURL = new PortletURLImpl(request, ppid, plid, PortletRequest.RENDER_PHASE);
 
 		portletURL.setWindowState(WindowState.MAXIMIZED);
 		portletURL.setPortletMode(PortletMode.VIEW);
@@ -51,18 +46,18 @@ if (!denyAccess && (themeDisplay.isStateExclusive() || themeDisplay.isStatePopUp
 
 		content = LayoutTemplateLocalServiceUtil.getContent("max", true, theme.getThemeId());
 
-		Set<String> runtimePortletIds = (Set<String>)request.getAttribute(WebKeys.RUNTIME_PORTLET_IDS);
+		Set<String> runtimePortletIds = RuntimeTag.getRuntimePortletIDs(request);
 
 		if (runtimePortletIds == null) {
 			runtimePortletIds = new HashSet<String>();
 		}
 
 		runtimePortletIds.add(ppid);
-
-		request.setAttribute(WebKeys.RUNTIME_PORTLET_IDS, runtimePortletIds);
 	}
 
-	RuntimePortletUtil.processTemplate(application, request, response, pageContext, out, ppid, velocityTemplateId, content);
+	if (Validator.isNotNull(velocityTemplateId) && Validator.isNotNull(content)) {
+		RuntimePageUtil.processTemplate(pageContext, ppid, new StringTemplateResource(velocityTemplateId, content));
+	}
 }
 else {
 	String description = StringPool.BLANK;

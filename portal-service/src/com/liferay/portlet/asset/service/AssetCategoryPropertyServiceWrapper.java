@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,6 +14,8 @@
 
 package com.liferay.portlet.asset.service;
 
+import com.liferay.portal.service.ServiceWrapper;
+
 /**
  * <p>
  * This class is a wrapper for {@link AssetCategoryPropertyService}.
@@ -24,10 +26,29 @@ package com.liferay.portlet.asset.service;
  * @generated
  */
 public class AssetCategoryPropertyServiceWrapper
-	implements AssetCategoryPropertyService {
+	implements AssetCategoryPropertyService,
+		ServiceWrapper<AssetCategoryPropertyService> {
 	public AssetCategoryPropertyServiceWrapper(
 		AssetCategoryPropertyService assetCategoryPropertyService) {
 		_assetCategoryPropertyService = assetCategoryPropertyService;
+	}
+
+	/**
+	* Returns the Spring bean ID for this bean.
+	*
+	* @return the Spring bean ID for this bean
+	*/
+	public java.lang.String getBeanIdentifier() {
+		return _assetCategoryPropertyService.getBeanIdentifier();
+	}
+
+	/**
+	* Sets the Spring bean ID for this bean.
+	*
+	* @param beanIdentifier the Spring bean ID for this bean
+	*/
+	public void setBeanIdentifier(java.lang.String beanIdentifier) {
+		_assetCategoryPropertyService.setBeanIdentifier(beanIdentifier);
 	}
 
 	public com.liferay.portlet.asset.model.AssetCategoryProperty addCategoryProperty(
@@ -65,11 +86,26 @@ public class AssetCategoryPropertyServiceWrapper
 			key, value);
 	}
 
+	/**
+	 * @deprecated Renamed to {@link #getWrappedService}
+	 */
 	public AssetCategoryPropertyService getWrappedAssetCategoryPropertyService() {
 		return _assetCategoryPropertyService;
 	}
 
+	/**
+	 * @deprecated Renamed to {@link #setWrappedService}
+	 */
 	public void setWrappedAssetCategoryPropertyService(
+		AssetCategoryPropertyService assetCategoryPropertyService) {
+		_assetCategoryPropertyService = assetCategoryPropertyService;
+	}
+
+	public AssetCategoryPropertyService getWrappedService() {
+		return _assetCategoryPropertyService;
+	}
+
+	public void setWrappedService(
 		AssetCategoryPropertyService assetCategoryPropertyService) {
 		_assetCategoryPropertyService = assetCategoryPropertyService;
 	}

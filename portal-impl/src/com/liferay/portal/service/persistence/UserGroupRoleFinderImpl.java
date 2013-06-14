@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -31,7 +31,7 @@ import java.util.List;
 public class UserGroupRoleFinderImpl
 	extends BasePersistenceImpl<UserGroupRole> implements UserGroupRoleFinder {
 
-	public static String FIND_BY_USER_USER_GROUP_GROUP_ROLE =
+	public static final String FIND_BY_USER_USER_GROUP_GROUP_ROLE =
 		UserGroupRoleFinder.class.getName() + ".findByUserUserGroupGroupRole";
 
 	public List<UserGroupRole> findByUserUserGroupGroupRole(
@@ -54,7 +54,7 @@ public class UserGroupRoleFinderImpl
 			qPos.add(userId);
 			qPos.add(groupId);
 
-			return q.list();
+			return q.list(true);
 		}
 		catch (Exception e) {
 			throw new SystemException(e);

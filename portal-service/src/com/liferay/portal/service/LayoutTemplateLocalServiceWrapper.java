@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -24,7 +24,8 @@ package com.liferay.portal.service;
  * @generated
  */
 public class LayoutTemplateLocalServiceWrapper
-	implements LayoutTemplateLocalService {
+	implements LayoutTemplateLocalService,
+		ServiceWrapper<LayoutTemplateLocalService> {
 	public LayoutTemplateLocalServiceWrapper(
 		LayoutTemplateLocalService layoutTemplateLocalService) {
 		_layoutTemplateLocalService = layoutTemplateLocalService;
@@ -96,11 +97,11 @@ public class LayoutTemplateLocalServiceWrapper
 	public void readLayoutTemplate(java.lang.String servletContextName,
 		javax.servlet.ServletContext servletContext,
 		java.util.Set<com.liferay.portal.kernel.util.ObjectValuePair<java.lang.String, java.lang.Boolean>> layoutTemplateIds,
-		com.liferay.portal.kernel.xml.Element el, boolean standard,
+		com.liferay.portal.kernel.xml.Element element, boolean standard,
 		java.lang.String themeId,
 		com.liferay.portal.kernel.plugin.PluginPackage pluginPackage) {
 		_layoutTemplateLocalService.readLayoutTemplate(servletContextName,
-			servletContext, layoutTemplateIds, el, standard, themeId,
+			servletContext, layoutTemplateIds, element, standard, themeId,
 			pluginPackage);
 	}
 
@@ -114,11 +115,26 @@ public class LayoutTemplateLocalServiceWrapper
 		_layoutTemplateLocalService.uninstallLayoutTemplates(themeId);
 	}
 
+	/**
+	 * @deprecated Renamed to {@link #getWrappedService}
+	 */
 	public LayoutTemplateLocalService getWrappedLayoutTemplateLocalService() {
 		return _layoutTemplateLocalService;
 	}
 
+	/**
+	 * @deprecated Renamed to {@link #setWrappedService}
+	 */
 	public void setWrappedLayoutTemplateLocalService(
+		LayoutTemplateLocalService layoutTemplateLocalService) {
+		_layoutTemplateLocalService = layoutTemplateLocalService;
+	}
+
+	public LayoutTemplateLocalService getWrappedService() {
+		return _layoutTemplateLocalService;
+	}
+
+	public void setWrappedService(
 		LayoutTemplateLocalService layoutTemplateLocalService) {
 		_layoutTemplateLocalService = layoutTemplateLocalService;
 	}

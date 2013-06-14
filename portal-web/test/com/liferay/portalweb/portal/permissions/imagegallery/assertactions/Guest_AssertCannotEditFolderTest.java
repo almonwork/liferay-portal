@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -23,15 +23,16 @@ import com.liferay.portalweb.portal.util.RuntimeVariables;
 public class Guest_AssertCannotEditFolderTest extends BaseTestCase {
 	public void testGuest_AssertCannotEditFolder() throws Exception {
 		selenium.open("/web/guest/home/");
+		loadRequiredJavaScriptModules();
 
 		for (int second = 0;; second++) {
-			if (second >= 60) {
+			if (second >= 90) {
 				fail("timeout");
 			}
 
 			try {
 				if (selenium.isElementPresent(
-							"link=Image Gallery Permissions Test Page")) {
+							"link=Media Gallery Permissions Test Page")) {
 					break;
 				}
 			}
@@ -41,13 +42,20 @@ public class Guest_AssertCannotEditFolderTest extends BaseTestCase {
 			Thread.sleep(1000);
 		}
 
-		selenium.saveScreenShotAndSource();
-		selenium.clickAt("link=Image Gallery Permissions Test Page",
-			RuntimeVariables.replace(""));
+		selenium.clickAt("link=Media Gallery Permissions Test Page",
+			RuntimeVariables.replace("Media Gallery Permissions Test Page"));
 		selenium.waitForPageToLoad("30000");
-		selenium.saveScreenShotAndSource();
-		assertFalse(selenium.isElementPresent("//tr[4]/td[4]/ul/li/strong/a"));
+		loadRequiredJavaScriptModules();
+		assertEquals(RuntimeVariables.replace(
+				"Media Gallery Permissions Test Folder"),
+			selenium.getText(
+				"//a[@title='Media Gallery Permissions Test Folder - ']"));
+		selenium.clickAt("//a[@title='Media Gallery Permissions Test Folder - ']",
+			RuntimeVariables.replace("Media Gallery Permissions Test Folder"));
+		selenium.waitForPageToLoad("30000");
+		loadRequiredJavaScriptModules();
 		assertFalse(selenium.isElementPresent("link=Edit"));
+		assertFalse(selenium.isElementPresent("link=Move"));
 		assertFalse(selenium.isElementPresent("link=Permissions"));
 		assertFalse(selenium.isElementPresent("link=Delete"));
 	}

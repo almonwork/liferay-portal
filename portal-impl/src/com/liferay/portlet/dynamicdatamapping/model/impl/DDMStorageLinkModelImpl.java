@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -16,8 +16,10 @@ package com.liferay.portlet.dynamicdatamapping.model.impl;
 
 import com.liferay.portal.kernel.bean.AutoEscapeBeanHandler;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.ProxyUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
+import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.model.CacheModel;
 import com.liferay.portal.model.impl.BaseModelImpl;
 import com.liferay.portal.service.ServiceContext;
@@ -30,9 +32,10 @@ import com.liferay.portlet.expando.util.ExpandoBridgeFactoryUtil;
 
 import java.io.Serializable;
 
-import java.lang.reflect.Proxy;
-
 import java.sql.Types;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * The base model implementation for the DDMStorageLink service. Represents a row in the &quot;DDMStorageLink&quot; database table, with each column mapped to a property of this class.
@@ -73,15 +76,12 @@ public class DDMStorageLinkModelImpl extends BaseModelImpl<DDMStorageLink>
 	public static final boolean FINDER_CACHE_ENABLED = GetterUtil.getBoolean(com.liferay.portal.util.PropsUtil.get(
 				"value.object.finder.cache.enabled.com.liferay.portlet.dynamicdatamapping.model.DDMStorageLink"),
 			true);
-
-	public Class<?> getModelClass() {
-		return DDMStorageLink.class;
-	}
-
-	public String getModelClassName() {
-		return DDMStorageLink.class.getName();
-	}
-
+	public static final boolean COLUMN_BITMASK_ENABLED = GetterUtil.getBoolean(com.liferay.portal.util.PropsUtil.get(
+				"value.object.column.bitmask.enabled.com.liferay.portlet.dynamicdatamapping.model.DDMStorageLink"),
+			true);
+	public static long CLASSPK_COLUMN_BITMASK = 1L;
+	public static long STRUCTUREID_COLUMN_BITMASK = 2L;
+	public static long UUID_COLUMN_BITMASK = 4L;
 	public static final long LOCK_EXPIRATION_TIME = GetterUtil.getLong(com.liferay.portal.util.PropsUtil.get(
 				"lock.expiration.time.com.liferay.portlet.dynamicdatamapping.model.DDMStorageLink"));
 
@@ -104,6 +104,60 @@ public class DDMStorageLinkModelImpl extends BaseModelImpl<DDMStorageLink>
 		setPrimaryKey(((Long)primaryKeyObj).longValue());
 	}
 
+	public Class<?> getModelClass() {
+		return DDMStorageLink.class;
+	}
+
+	public String getModelClassName() {
+		return DDMStorageLink.class.getName();
+	}
+
+	@Override
+	public Map<String, Object> getModelAttributes() {
+		Map<String, Object> attributes = new HashMap<String, Object>();
+
+		attributes.put("uuid", getUuid());
+		attributes.put("storageLinkId", getStorageLinkId());
+		attributes.put("classNameId", getClassNameId());
+		attributes.put("classPK", getClassPK());
+		attributes.put("structureId", getStructureId());
+
+		return attributes;
+	}
+
+	@Override
+	public void setModelAttributes(Map<String, Object> attributes) {
+		String uuid = (String)attributes.get("uuid");
+
+		if (uuid != null) {
+			setUuid(uuid);
+		}
+
+		Long storageLinkId = (Long)attributes.get("storageLinkId");
+
+		if (storageLinkId != null) {
+			setStorageLinkId(storageLinkId);
+		}
+
+		Long classNameId = (Long)attributes.get("classNameId");
+
+		if (classNameId != null) {
+			setClassNameId(classNameId);
+		}
+
+		Long classPK = (Long)attributes.get("classPK");
+
+		if (classPK != null) {
+			setClassPK(classPK);
+		}
+
+		Long structureId = (Long)attributes.get("structureId");
+
+		if (structureId != null) {
+			setStructureId(structureId);
+		}
+	}
+
 	public String getUuid() {
 		if (_uuid == null) {
 			return StringPool.BLANK;
@@ -114,7 +168,15 @@ public class DDMStorageLinkModelImpl extends BaseModelImpl<DDMStorageLink>
 	}
 
 	public void setUuid(String uuid) {
+		if (_originalUuid == null) {
+			_originalUuid = _uuid;
+		}
+
 		_uuid = uuid;
+	}
+
+	public String getOriginalUuid() {
+		return GetterUtil.getString(_originalUuid);
 	}
 
 	public long getStorageLinkId() {
@@ -133,6 +195,16 @@ public class DDMStorageLinkModelImpl extends BaseModelImpl<DDMStorageLink>
 		return PortalUtil.getClassName(getClassNameId());
 	}
 
+	public void setClassName(String className) {
+		long classNameId = 0;
+
+		if (Validator.isNotNull(className)) {
+			classNameId = PortalUtil.getClassNameId(className);
+		}
+
+		setClassNameId(classNameId);
+	}
+
 	public long getClassNameId() {
 		return _classNameId;
 	}
@@ -146,6 +218,8 @@ public class DDMStorageLinkModelImpl extends BaseModelImpl<DDMStorageLink>
 	}
 
 	public void setClassPK(long classPK) {
+		_columnBitmask |= CLASSPK_COLUMN_BITMASK;
+
 		if (!_setOriginalClassPK) {
 			_setOriginalClassPK = true;
 
@@ -164,38 +238,47 @@ public class DDMStorageLinkModelImpl extends BaseModelImpl<DDMStorageLink>
 	}
 
 	public void setStructureId(long structureId) {
+		_columnBitmask |= STRUCTUREID_COLUMN_BITMASK;
+
+		if (!_setOriginalStructureId) {
+			_setOriginalStructureId = true;
+
+			_originalStructureId = _structureId;
+		}
+
 		_structureId = structureId;
+	}
+
+	public long getOriginalStructureId() {
+		return _originalStructureId;
+	}
+
+	public long getColumnBitmask() {
+		return _columnBitmask;
 	}
 
 	@Override
 	public DDMStorageLink toEscapedModel() {
-		if (isEscapedModel()) {
-			return (DDMStorageLink)this;
+		if (_escapedModelProxy == null) {
+			_escapedModelProxy = (DDMStorageLink)ProxyUtil.newProxyInstance(_classLoader,
+					_escapedModelProxyInterfaces,
+					new AutoEscapeBeanHandler(this));
 		}
-		else {
-			if (_escapedModelProxy == null) {
-				_escapedModelProxy = (DDMStorageLink)Proxy.newProxyInstance(_classLoader,
-						_escapedModelProxyInterfaces,
-						new AutoEscapeBeanHandler(this));
-			}
 
-			return _escapedModelProxy;
-		}
+		return _escapedModelProxy;
 	}
 
 	@Override
 	public ExpandoBridge getExpandoBridge() {
-		if (_expandoBridge == null) {
-			_expandoBridge = ExpandoBridgeFactoryUtil.getExpandoBridge(0,
-					DDMStorageLink.class.getName(), getPrimaryKey());
-		}
-
-		return _expandoBridge;
+		return ExpandoBridgeFactoryUtil.getExpandoBridge(0,
+			DDMStorageLink.class.getName(), getPrimaryKey());
 	}
 
 	@Override
 	public void setExpandoBridgeAttributes(ServiceContext serviceContext) {
-		getExpandoBridge().setAttributes(serviceContext);
+		ExpandoBridge expandoBridge = getExpandoBridge();
+
+		expandoBridge.setAttributes(serviceContext);
 	}
 
 	@Override
@@ -261,9 +344,17 @@ public class DDMStorageLinkModelImpl extends BaseModelImpl<DDMStorageLink>
 	public void resetOriginalValues() {
 		DDMStorageLinkModelImpl ddmStorageLinkModelImpl = this;
 
+		ddmStorageLinkModelImpl._originalUuid = ddmStorageLinkModelImpl._uuid;
+
 		ddmStorageLinkModelImpl._originalClassPK = ddmStorageLinkModelImpl._classPK;
 
 		ddmStorageLinkModelImpl._setOriginalClassPK = false;
+
+		ddmStorageLinkModelImpl._originalStructureId = ddmStorageLinkModelImpl._structureId;
+
+		ddmStorageLinkModelImpl._setOriginalStructureId = false;
+
+		ddmStorageLinkModelImpl._columnBitmask = 0;
 	}
 
 	@Override
@@ -346,12 +437,15 @@ public class DDMStorageLinkModelImpl extends BaseModelImpl<DDMStorageLink>
 			DDMStorageLink.class
 		};
 	private String _uuid;
+	private String _originalUuid;
 	private long _storageLinkId;
 	private long _classNameId;
 	private long _classPK;
 	private long _originalClassPK;
 	private boolean _setOriginalClassPK;
 	private long _structureId;
-	private transient ExpandoBridge _expandoBridge;
+	private long _originalStructureId;
+	private boolean _setOriginalStructureId;
+	private long _columnBitmask;
 	private DDMStorageLink _escapedModelProxy;
 }

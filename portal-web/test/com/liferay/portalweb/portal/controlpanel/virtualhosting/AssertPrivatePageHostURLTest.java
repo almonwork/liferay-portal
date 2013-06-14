@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -28,6 +28,7 @@ public class AssertPrivatePageHostURLTest extends BaseTestCase {
 			switch (label) {
 			case 1:
 				selenium.open("http://www.baker.com:8080/");
+				loadRequiredJavaScriptModules();
 
 				boolean LoggedOut = selenium.isElementPresent("_58_login");
 
@@ -39,16 +40,14 @@ public class AssertPrivatePageHostURLTest extends BaseTestCase {
 
 				selenium.type("//input[@id='_58_login']",
 					RuntimeVariables.replace("test@liferay.com"));
-				selenium.saveScreenShotAndSource();
 				selenium.type("//input[@id='_58_password']",
 					RuntimeVariables.replace("test"));
-				selenium.saveScreenShotAndSource();
 				selenium.clickAt("//input[@id='_58_rememberMeCheckbox']",
 					RuntimeVariables.replace("Remember Me Checkbox"));
 				selenium.clickAt("//input[@value='Sign In']",
 					RuntimeVariables.replace("Sign In"));
 				selenium.waitForPageToLoad("30000");
-				selenium.saveScreenShotAndSource();
+				loadRequiredJavaScriptModules();
 
 			case 2:
 				assertEquals(RuntimeVariables.replace(
@@ -60,7 +59,7 @@ public class AssertPrivatePageHostURLTest extends BaseTestCase {
 				selenium.clickAt("link=Private Page",
 					RuntimeVariables.replace("Private Page"));
 				selenium.waitForPageToLoad("30000");
-				selenium.saveScreenShotAndSource();
+				loadRequiredJavaScriptModules();
 				assertEquals(RuntimeVariables.replace(
 						"http://www.baker.com:8080/private-page"),
 					selenium.getLocation());

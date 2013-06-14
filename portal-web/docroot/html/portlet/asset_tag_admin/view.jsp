@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -18,11 +18,11 @@
 
 <aui:form name="fm">
 
-<div class="tags-admin-container">
+<div class="tags-admin-container lfr-app-column-view">
 	<div class="lfr-header-row">
 		<div class="lfr-header-row-content">
 			<div class="toolbar">
-				<aui:input cssClass="select-tags aui-state-default" inline="<%= true %>" label="" name="checkAllTags" type="checkbox" title='<%= LanguageUtil.get(pageContext, "check-all-tags") %>' />
+				<aui:input cssClass="select-tags aui-state-default" inline="<%= true %>" label="" name="checkAllTags" title='<%= LanguageUtil.get(pageContext, "check-all-tags") %>' type="checkbox" />
 
 				<liferay-ui:icon-menu
 					align="left"

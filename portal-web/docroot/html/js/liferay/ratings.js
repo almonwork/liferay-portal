@@ -1,11 +1,15 @@
-AUI().add(
+AUI.add(
 	'liferay-ratings',
 	function(A) {
 		var Lang = A.Lang;
 
 		var EMPTY_FN = Lang.emptyFn;
 
+		var EVENT_INTERACTIONS_RENDER = ['focus', 'mousemove'];
+
 		var TPL_LABEL_SCORE = '{desc} ({totalEntries} {voteLabel})';
+
+		var buffer = [];
 
 		var Ratings = A.Component.create(
 			{
@@ -99,6 +103,7 @@ AUI().add(
 								data: {
 									className: instance.get('className'),
 									classPK: instance.get('classPK'),
+									p_auth: Liferay.authToken,
 									p_l_id: themeDisplay.getPlid(),
 									score: score
 								},
@@ -150,6 +155,28 @@ AUI().add(
 				register: function(config) {
 					var instance = this;
 
+					var containerId = config.containerId;
+
+					var container = containerId && document.getElementById(config.containerId);
+
+					if (container) {
+						buffer.push(
+							{
+								config: config,
+								container: A.one(container)
+							}
+						);
+
+						instance._registerTask();
+					}
+					else {
+						instance._registerRating(config);
+					}
+				},
+
+				_registerRating: function(config) {
+					var instance = this;
+
 					var ratings = Liferay.Ratings.StarRating;
 
 					if (config.type != 'stars') {
@@ -162,6 +189,27 @@ AUI().add(
 
 					return ratingInstance;
 				},
+
+				_registerTask: A.debounce(
+					function() {
+						A.Array.each(
+							buffer,
+							function(item, index, collection) {
+								var handle = item.container.on(
+									EVENT_INTERACTIONS_RENDER,
+									function(event) {
+										handle.detach();
+
+										Ratings._registerRating(item.config);
+									}
+								);
+							}
+						);
+
+						buffer.length = 0;
+					},
+					100
+				),
 
 				_INSTANCES: {},
 
@@ -325,6 +373,6 @@ AUI().add(
 	},
 	'',
 	{
-		requires: ['aui-io-request', 'aui-rating', 'substitute']
+		requires: ['aui-io-request', 'aui-rating']
 	}
 );

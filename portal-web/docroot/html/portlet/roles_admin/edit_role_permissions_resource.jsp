@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -40,7 +40,7 @@ if (role.getType() == RoleConstants.TYPE_REGULAR) {
 	headerNames.add(StringPool.BLANK);
 }
 
-SearchContainer searchContainer = new SearchContainer(renderRequest, null, null, SearchContainer.DEFAULT_CUR_PARAM, SearchContainer.DEFAULT_DELTA, renderResponse.createRenderURL(), headerNames, "there-are-no-actions-available-for-selection");
+SearchContainer searchContainer = new SearchContainer(renderRequest, null, null, SearchContainer.DEFAULT_CUR_PARAM, SearchContainer.DEFAULT_DELTA, renderResponse.createRenderURL(), headerNames, "there-are-no-actions");
 
 searchContainer.setRowChecker(new ResourceActionRowChecker(renderResponse));
 
@@ -111,7 +111,7 @@ for (int i = 0; i < results.size(); i++) {
 
 			groupIdsArray[j] = group.getGroupId();
 
-			groupNames.add(group.getDescriptiveName());
+			groupNames.add(group.getDescriptiveName(locale));
 		}
 
 		if (!groups.isEmpty()) {
@@ -136,4 +136,4 @@ for (int i = 0; i < results.size(); i++) {
 }
 %>
 
-<liferay-ui:search-iterator searchContainer="<%= searchContainer %>" paginate="<%= false %>" />
+<liferay-ui:search-iterator paginate="<%= false %>" searchContainer="<%= searchContainer %>" />

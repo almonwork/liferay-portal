@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -42,11 +42,12 @@ public class RememberMeAutoLogin implements AutoLogin {
 		try {
 			String[] credentials = null;
 
-			String autoUserId = CookieKeys.getCookie(request, CookieKeys.ID);
+			String autoUserId = CookieKeys.getCookie(
+				request, CookieKeys.ID, false);
 			String autoPassword = CookieKeys.getCookie(
-				request, CookieKeys.PASSWORD);
+				request, CookieKeys.PASSWORD, false);
 			String rememberMe = CookieKeys.getCookie(
-				request, CookieKeys.REMEMBER_ME);
+				request, CookieKeys.REMEMBER_ME, false);
 
 			// LEP-5188
 

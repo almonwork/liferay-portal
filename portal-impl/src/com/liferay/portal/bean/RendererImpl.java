@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -25,14 +25,16 @@ import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.io.unsync.UnsyncStringWriter;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.template.StringTemplateResource;
+import com.liferay.portal.kernel.template.Template;
+import com.liferay.portal.kernel.template.TemplateContextType;
+import com.liferay.portal.kernel.template.TemplateManager;
+import com.liferay.portal.kernel.template.TemplateManagerUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.PropsUtil;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
-import com.liferay.portal.kernel.velocity.VelocityContext;
-import com.liferay.portal.kernel.velocity.VelocityEngineUtil;
-import com.liferay.portal.kernel.velocity.VelocityVariablesUtil;
 import com.liferay.portal.util.PortalUtil;
 import com.liferay.portal.util.PrefsPropsUtil;
 import com.liferay.portlet.PortletPreferencesFactoryUtil;
@@ -87,7 +89,7 @@ public class RendererImpl implements Renderer {
 
 		long companyId = PortalUtil.getCompanyId(request);
 
-		String className = _normalizeClassName(bean.getClass().getName());
+		String className = normalizeClassName(bean.getClass().getName());
 
 		if (Validator.isNotNull(varientSuffix)) {
 			className = varientSuffix;
@@ -95,7 +97,7 @@ public class RendererImpl implements Renderer {
 
 		String velocityTemplateContent = null;
 
-		PortletPreferences preferences = _getPortletPreferences(request);
+		PortletPreferences preferences = getPortletPreferences(request);
 
 		if (preferences != null) {
 			velocityTemplateContent = preferences.getValue(
@@ -131,32 +133,24 @@ public class RendererImpl implements Renderer {
 		}
 
 		if (Validator.isNull(velocityTemplateContent)) {
-			_log.warn(
-				"No entity renderer template found for " + className);
+			_log.warn("No entity renderer template found for " + className);
 
 			return null;
 		}
 
-		VelocityContext velocityContext =
-			VelocityEngineUtil.getWrappedStandardToolsContext();
-
-		// Velocity variables
-
 		try {
-			VelocityVariablesUtil.insertVariables(velocityContext, request);
-		}
-		catch (Exception e) {
-			throw new RendererException(e);
-		}
+			Template template = TemplateManagerUtil.getTemplate(
+				TemplateManager.VELOCITY,
+				new StringTemplateResource(className, velocityTemplateContent),
+				TemplateContextType.STANDARD);
 
-		velocityContext.put(_BEAN, bean);
+			template.prepare(request);
 
-		try {
+			template.put(_BEAN, bean);
+
 			UnsyncStringWriter unsyncStringWriter = new UnsyncStringWriter();
 
-			VelocityEngineUtil.mergeTemplate(
-				className, velocityTemplateContent, velocityContext,
-				unsyncStringWriter);
+			template.processTemplate(unsyncStringWriter);
 
 			return unsyncStringWriter.toString();
 		}
@@ -243,7 +237,7 @@ public class RendererImpl implements Renderer {
 			return null;
 		}
 
-		className = _normalizeClassName(className);
+		className = normalizeClassName(className);
 
 		String[] beanNameParts = StringUtil.split(className, _MODEL);
 
@@ -289,7 +283,7 @@ public class RendererImpl implements Renderer {
 				try {
 					getMethod = serviceBean.getClass().getDeclaredMethod(
 						"get" + beanNameParts[1],
-						_mapToPrimitive(classPK.getClass()));
+						mapToPrimitive(classPK.getClass()));
 				}
 				catch (Exception e) {
 				}
@@ -354,7 +348,7 @@ public class RendererImpl implements Renderer {
 			varientSuffix);
 	}
 
-	protected PortletPreferences _getPortletPreferences(
+	protected PortletPreferences getPortletPreferences(
 		HttpServletRequest request) {
 
 		PortletPreferences preferences = PortalUtil.getPreferences(request);
@@ -376,7 +370,7 @@ public class RendererImpl implements Renderer {
 		return preferences;
 	}
 
-	protected Class<?> _mapToPrimitive(Class<?> clazz) {
+	protected Class<?> mapToPrimitive(Class<?> clazz) {
 		Class<?> mapping = clazz;
 
 		if (clazz == Integer.class) {
@@ -389,16 +383,14 @@ public class RendererImpl implements Renderer {
 		return mapping;
 	}
 
-	protected String _normalizeClassName(String className) {
+	protected String normalizeClassName(String className) {
 		className = StringUtil.replace(
 			className,
 			new String[] {
-				".impl.",
-				"Impl"
+				".impl.", "Impl"
 			},
 			new String[] {
-				StringPool.PERIOD,
-				StringPool.BLANK
+				StringPool.PERIOD, StringPool.BLANK
 			}
 		);
 

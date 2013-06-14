@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -17,10 +17,15 @@ package com.liferay.portal.upgrade.v6_0_3;
 import com.liferay.portal.kernel.dao.jdbc.DataAccess;
 import com.liferay.portal.kernel.upgrade.UpgradeProcess;
 import com.liferay.portal.kernel.util.FileUtil;
+import com.liferay.portal.util.PortalUtil;
+import com.liferay.portlet.documentlibrary.model.DLFileEntry;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author Sergio González
@@ -33,7 +38,7 @@ public class UpgradeDocumentLibrary extends UpgradeProcess {
 		updateFileVersions();
 	}
 
-	protected long getLatestFileVersionId(long folderId, String name)
+	protected List<Long> getFileVersionIds(long folderId, String name)
 		throws Exception {
 
 		Connection con = null;
@@ -41,7 +46,7 @@ public class UpgradeDocumentLibrary extends UpgradeProcess {
 		ResultSet rs = null;
 
 		try {
-			con = DataAccess.getConnection();
+			con = DataAccess.getUpgradeOptimizedConnection();
 
 			ps = con.prepareStatement(
 				"select fileVersionId from DLFileVersion where folderId = ? " +
@@ -52,11 +57,15 @@ public class UpgradeDocumentLibrary extends UpgradeProcess {
 
 			rs = ps.executeQuery();
 
-			if (rs.next()) {
-				return rs.getLong("fileVersionId");
+			List<Long> fileVersionIds = new ArrayList<Long>();
+
+			while (rs.next()) {
+				long fileVersionId = rs.getLong("fileVersionId");
+
+				fileVersionIds.add(fileVersionId);
 			}
 
-			return 0;
+			return fileVersionIds;
 		}
 		finally {
 			DataAccess.cleanUp(con, ps, rs);
@@ -68,8 +77,31 @@ public class UpgradeDocumentLibrary extends UpgradeProcess {
 		PreparedStatement ps = null;
 		ResultSet rs = null;
 
+		List<Long> tableIds = new ArrayList<Long>();
+
 		try {
-			con = DataAccess.getConnection();
+			long classNameId = PortalUtil.getClassNameId(DLFileEntry.class);
+
+			con = DataAccess.getUpgradeOptimizedConnection();
+
+			ps = con.prepareStatement(
+				"select tableId from ExpandoTable where classNameId = " +
+					classNameId);
+
+			rs = ps.executeQuery();
+
+			while (rs.next()) {
+				long tableId = rs.getLong("tableId");
+
+				tableIds.add(tableId);
+			}
+		}
+		finally {
+			DataAccess.cleanUp(con, ps, rs);
+		}
+
+		try {
+			con = DataAccess.getUpgradeOptimizedConnection();
 
 			ps = con.prepareStatement(
 				"select uuid_, fileEntryId, groupId, folderId, name, title " +
@@ -92,15 +124,25 @@ public class UpgradeDocumentLibrary extends UpgradeProcess {
 						"' where uuid_ = '" + uuid_ + "' and groupId = " +
 							groupId);
 
-				long fileVersionId = getLatestFileVersionId(folderId, name);
+				long latestFileVersionId = 0;
 
-				runSQL(
-					"update ExpandoRow set classPK = " + fileVersionId +
-						 " where classPK = " + fileEntryId);
+				List<Long> fileVersionIds = getFileVersionIds(folderId, name);
 
-				runSQL(
-					"update ExpandoValue set classPK = " + fileVersionId +
-						 " where classPK = " + fileEntryId);
+				if (!fileVersionIds.isEmpty()) {
+					latestFileVersionId = fileVersionIds.get(0);
+				}
+
+				for (long tableId : tableIds) {
+					runSQL(
+						"update ExpandoRow set classPK = " +
+							latestFileVersionId + " where tableId = " +
+								tableId + " and classPK = " + fileEntryId);
+
+					runSQL(
+						"update ExpandoValue set classPK = " +
+							latestFileVersionId + " where tableId = " +
+								tableId + " and classPK = " + fileEntryId);
+				}
 			}
 		}
 		finally {
@@ -117,11 +159,11 @@ public class UpgradeDocumentLibrary extends UpgradeProcess {
 		PreparedStatement ps = null;
 
 		try {
-			con = DataAccess.getConnection();
+			con = DataAccess.getUpgradeOptimizedConnection();
 
 			ps = con.prepareStatement(
 				"update DLFileVersion set extension = ?, title = ?, " +
-					"description = ?,  extraSettings = ? where fileVersionId " +
+					"description = ?, extraSettings = ? where fileVersionId " +
 						"= ?");
 
 			ps.setString(1, extension);
@@ -143,7 +185,7 @@ public class UpgradeDocumentLibrary extends UpgradeProcess {
 		ResultSet rs = null;
 
 		try {
-			con = DataAccess.getConnection();
+			con = DataAccess.getUpgradeOptimizedConnection();
 
 			ps = con.prepareStatement(
 				"select folderId, name, extension, title, description, " +
@@ -159,11 +201,13 @@ public class UpgradeDocumentLibrary extends UpgradeProcess {
 				String description = rs.getString("description");
 				String extraSettings = rs.getString("extraSettings");
 
-				long fileVersionId = getLatestFileVersionId(folderId, name);
+				List<Long> fileVersionIds = getFileVersionIds(folderId, name);
 
-				updateFileVersion(
-					fileVersionId, extension, title, description,
-					extraSettings);
+				for (long fileVersionId : fileVersionIds) {
+					updateFileVersion(
+						fileVersionId, extension, title, description,
+						extraSettings);
+				}
 			}
 		}
 		finally {

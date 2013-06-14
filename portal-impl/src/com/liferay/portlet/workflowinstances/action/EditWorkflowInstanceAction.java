@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -25,6 +25,8 @@ import com.liferay.portal.kernel.workflow.WorkflowHandler;
 import com.liferay.portal.kernel.workflow.WorkflowHandlerRegistryUtil;
 import com.liferay.portal.kernel.workflow.WorkflowInstance;
 import com.liferay.portal.kernel.workflow.WorkflowInstanceManagerUtil;
+import com.liferay.portal.model.Group;
+import com.liferay.portal.model.Layout;
 import com.liferay.portal.security.auth.PrincipalException;
 import com.liferay.portal.service.WorkflowInstanceLinkLocalServiceUtil;
 import com.liferay.portal.struts.PortletAction;
@@ -58,20 +60,26 @@ public class EditWorkflowInstanceAction extends PortletAction {
 		String cmd = ParamUtil.getString(actionRequest, Constants.CMD);
 
 		try {
+			String redirect = null;
+
 			if (cmd.equals(Constants.DELETE)) {
-				deleteInstance(actionRequest);
+				redirect = deleteInstance(actionRequest);
 			}
 			else if (cmd.equals(Constants.SIGNAL)) {
 				signalInstance(actionRequest);
 			}
 
-			sendRedirect(actionRequest, actionResponse);
+			if (redirect == null) {
+				redirect = ParamUtil.getString(actionRequest, "redirect");
+			}
+
+			sendRedirect(actionRequest, actionResponse, redirect);
 		}
 		catch (Exception e) {
 			if (e instanceof PrincipalException ||
 				e instanceof WorkflowException) {
 
-				SessionErrors.add(actionRequest, e.getClass().getName());
+				SessionErrors.add(actionRequest, e.getClass());
 
 				setForward(actionRequest, "portlet.workflow_instances.error");
 			}
@@ -93,7 +101,7 @@ public class EditWorkflowInstanceAction extends PortletAction {
 		catch (Exception e) {
 			if (e instanceof WorkflowException) {
 
-				SessionErrors.add(renderRequest, e.getClass().getName());
+				SessionErrors.add(renderRequest, e.getClass());
 
 				return mapping.findForward("portlet.workflow_instances.error");
 			}
@@ -108,7 +116,7 @@ public class EditWorkflowInstanceAction extends PortletAction {
 		return mapping.findForward(forward);
 	}
 
-	protected void deleteInstance(ActionRequest actionRequest)
+	protected String deleteInstance(ActionRequest actionRequest)
 		throws Exception {
 
 		ThemeDisplay themeDisplay = (ThemeDisplay)actionRequest.getAttribute(
@@ -126,9 +134,11 @@ public class EditWorkflowInstanceAction extends PortletAction {
 
 		long companyId = GetterUtil.getLong(
 			workflowContext.get(WorkflowConstants.CONTEXT_COMPANY_ID));
+		long userId = GetterUtil.getLong(
+			workflowContext.get(WorkflowConstants.CONTEXT_USER_ID));
 		long groupId = GetterUtil.getLong(
 			workflowContext.get(WorkflowConstants.CONTEXT_GROUP_ID));
-		String className =  GetterUtil.getString(
+		String className = GetterUtil.getString(
 			workflowContext.get(WorkflowConstants.CONTEXT_ENTRY_CLASS_NAME));
 		long classPK = GetterUtil.getLong(
 			workflowContext.get(WorkflowConstants.CONTEXT_ENTRY_CLASS_PK));
@@ -137,10 +147,28 @@ public class EditWorkflowInstanceAction extends PortletAction {
 			WorkflowHandlerRegistryUtil.getWorkflowHandler(className);
 
 		workflowHandler.updateStatus(
-				WorkflowConstants.STATUS_DRAFT, workflowContext);
+			WorkflowConstants.STATUS_DRAFT, workflowContext);
 
 		WorkflowInstanceLinkLocalServiceUtil.deleteWorkflowInstanceLink(
 			companyId, groupId, className, classPK);
+
+		Layout layout = themeDisplay.getLayout();
+
+		Group layoutGroup = layout.getGroup();
+
+		if (layoutGroup.isControlPanel() &&
+			(WorkflowInstanceManagerUtil.getWorkflowInstanceCount(
+				companyId, userId, null, null, null) == 0)) {
+
+			return themeDisplay.getURLControlPanel();
+		}
+
+		return null;
+	}
+
+	@Override
+	protected boolean isCheckMethodOnProcessAction() {
+		return _CHECK_METHOD_ON_PROCESS_ACTION;
 	}
 
 	protected void signalInstance(ActionRequest actionRequest)
@@ -158,11 +186,6 @@ public class EditWorkflowInstanceAction extends PortletAction {
 		WorkflowInstanceManagerUtil.signalWorkflowInstance(
 			themeDisplay.getCompanyId(), themeDisplay.getUserId(),
 			workflowInstanceId, transitionName, null);
-	}
-
-	@Override
-	protected boolean isCheckMethodOnProcessAction() {
-		return _CHECK_METHOD_ON_PROCESS_ACTION;
 	}
 
 	private static final boolean _CHECK_METHOD_ON_PROCESS_ACTION = false;

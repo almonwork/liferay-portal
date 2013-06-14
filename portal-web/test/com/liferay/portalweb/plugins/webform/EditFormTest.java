@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -23,9 +23,10 @@ import com.liferay.portalweb.portal.util.RuntimeVariables;
 public class EditFormTest extends BaseTestCase {
 	public void testEditForm() throws Exception {
 		selenium.open("/web/guest/home/");
+		loadRequiredJavaScriptModules();
 
 		for (int second = 0;; second++) {
-			if (second >= 60) {
+			if (second >= 90) {
 				fail("timeout");
 			}
 
@@ -40,17 +41,17 @@ public class EditFormTest extends BaseTestCase {
 			Thread.sleep(1000);
 		}
 
-		selenium.saveScreenShotAndSource();
-		selenium.clickAt("link=Web Form Test Page", RuntimeVariables.replace(""));
+		selenium.clickAt("link=Web Form Test Page",
+			RuntimeVariables.replace("Web Form Test Page"));
 		selenium.waitForPageToLoad("30000");
-		selenium.saveScreenShotAndSource();
+		loadRequiredJavaScriptModules();
 		assertEquals(RuntimeVariables.replace("Suggestions"),
 			selenium.getText("//legend/span"));
 		assertEquals(RuntimeVariables.replace(
 				"Your input is valuable to us. Please send us your suggestions."),
 			selenium.getText("//em"));
 		assertEquals(RuntimeVariables.replace("Name"),
-			selenium.getText("//label"));
+			selenium.getText("//div/span[1]/span/label"));
 		assertEquals(RuntimeVariables.replace("Rating"),
 			selenium.getText("//span[2]/span/label"));
 		assertEquals(RuntimeVariables.replace(
@@ -58,10 +59,13 @@ public class EditFormTest extends BaseTestCase {
 			selenium.getText("//select"));
 		assertEquals(RuntimeVariables.replace("Comments"),
 			selenium.getText("//span[3]/span/label"));
-		selenium.click("//strong/a");
+		Thread.sleep(5000);
+		assertEquals(RuntimeVariables.replace("Options"),
+			selenium.getText("//strong/a"));
+		selenium.clickAt("//strong/a", RuntimeVariables.replace("Options"));
 
 		for (int second = 0;; second++) {
-			if (second >= 60) {
+			if (second >= 90) {
 				fail("timeout");
 			}
 
@@ -77,17 +81,20 @@ public class EditFormTest extends BaseTestCase {
 			Thread.sleep(1000);
 		}
 
-		selenium.saveScreenShotAndSource();
-		selenium.click("//div[@class='lfr-component lfr-menu-list']/ul/li[2]/a");
+		assertEquals(RuntimeVariables.replace("Configuration"),
+			selenium.getText(
+				"//div[@class='lfr-component lfr-menu-list']/ul/li[2]/a"));
+		selenium.clickAt("//div[@class='lfr-component lfr-menu-list']/ul/li[2]/a",
+			RuntimeVariables.replace("Configuration"));
 		Thread.sleep(5000);
 
 		for (int second = 0;; second++) {
-			if (second >= 60) {
+			if (second >= 90) {
 				fail("timeout");
 			}
 
 			try {
-				if (selenium.isVisible("_86_title_en_US")) {
+				if (selenium.isVisible("//input[@id='_86_title_en_US']")) {
 					break;
 				}
 			}
@@ -97,32 +104,43 @@ public class EditFormTest extends BaseTestCase {
 			Thread.sleep(1000);
 		}
 
-		selenium.saveScreenShotAndSource();
-		selenium.type("_86_title_en_US", RuntimeVariables.replace("Feed Back"));
-		selenium.saveScreenShotAndSource();
-		selenium.type("_86_description_en_US",
+		selenium.type("//input[@id='_86_title_en_US']",
+			RuntimeVariables.replace("Feed Back"));
+		selenium.type("//textarea[@name='_86_description_en_US']",
 			RuntimeVariables.replace("Please let us know what you think!"));
-		selenium.saveScreenShotAndSource();
-		selenium.type("_86_fieldLabel1_en_US",
+		selenium.type("//input[@id='_86_fieldLabel1_en_US']",
 			RuntimeVariables.replace("Your Name"));
-		selenium.saveScreenShotAndSource();
-		selenium.type("_86_fieldLabel2_en_US",
+		selenium.type("//input[@id='_86_fieldLabel2_en_US']",
 			RuntimeVariables.replace("Rate Us!"));
-		selenium.saveScreenShotAndSource();
-		selenium.type("_86_fieldLabel3_en_US",
+		selenium.type("//input[@id='_86_fieldLabel3_en_US']",
 			RuntimeVariables.replace("Additional Comments"));
-		selenium.saveScreenShotAndSource();
-		selenium.clickAt("//div[2]/span[1]/span/input",
+		selenium.clickAt("//input[@value='Save']",
 			RuntimeVariables.replace("Save"));
-		selenium.waitForPageToLoad("30000");
-		selenium.saveScreenShotAndSource();
-		assertEquals(RuntimeVariables.replace(
-				"You have successfully updated the setup."),
-			selenium.getText("//div[@id='p_p_id_86_']/div/div"));
-		selenium.open("/web/guest/home/");
 
 		for (int second = 0;; second++) {
-			if (second >= 60) {
+			if (second >= 90) {
+				fail("timeout");
+			}
+
+			try {
+				if (selenium.isVisible("//div[@class='portlet-msg-success']")) {
+					break;
+				}
+			}
+			catch (Exception e) {
+			}
+
+			Thread.sleep(1000);
+		}
+
+		assertEquals(RuntimeVariables.replace(
+				"You have successfully updated the setup."),
+			selenium.getText("//div[@class='portlet-msg-success']"));
+		selenium.open("/web/guest/home/");
+		loadRequiredJavaScriptModules();
+
+		for (int second = 0;; second++) {
+			if (second >= 90) {
 				fail("timeout");
 			}
 
@@ -137,16 +155,16 @@ public class EditFormTest extends BaseTestCase {
 			Thread.sleep(1000);
 		}
 
-		selenium.saveScreenShotAndSource();
-		selenium.clickAt("link=Web Form Test Page", RuntimeVariables.replace(""));
+		selenium.clickAt("link=Web Form Test Page",
+			RuntimeVariables.replace("Web Form Test Page"));
 		selenium.waitForPageToLoad("30000");
-		selenium.saveScreenShotAndSource();
+		loadRequiredJavaScriptModules();
 		assertEquals(RuntimeVariables.replace("Feed Back"),
 			selenium.getText("//legend/span"));
 		assertEquals(RuntimeVariables.replace(
 				"Please let us know what you think!"), selenium.getText("//em"));
 		assertEquals(RuntimeVariables.replace("Your Name"),
-			selenium.getText("//label"));
+			selenium.getText("//div/span/span/label"));
 		assertEquals(RuntimeVariables.replace("Rate Us!"),
 			selenium.getText("//span[2]/span/label"));
 		assertEquals(RuntimeVariables.replace(

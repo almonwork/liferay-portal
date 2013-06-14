@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -18,9 +18,7 @@ import com.liferay.portal.kernel.dao.jdbc.DataAccess;
 import com.liferay.portal.kernel.upgrade.UpgradeProcess;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.uuid.PortalUUIDUtil;
-import com.liferay.portal.model.ResourceCode;
 import com.liferay.portal.model.ResourceConstants;
-import com.liferay.portal.service.ResourceCodeLocalServiceUtil;
 import com.liferay.portal.service.ResourceLocalServiceUtil;
 import com.liferay.portlet.asset.model.AssetCategory;
 import com.liferay.portlet.asset.model.AssetEntry;
@@ -48,7 +46,7 @@ public class UpgradeAsset extends UpgradeProcess {
 		PreparedStatement ps = null;
 
 		try {
-			con = DataAccess.getConnection();
+			con = DataAccess.getUpgradeOptimizedConnection();
 
 			StringBundler sb = new StringBundler(4);
 
@@ -94,7 +92,7 @@ public class UpgradeAsset extends UpgradeProcess {
 		PreparedStatement ps = null;
 
 		try {
-			con = DataAccess.getConnection();
+			con = DataAccess.getUpgradeOptimizedConnection();
 
 			StringBundler sb = new StringBundler(7);
 
@@ -152,7 +150,7 @@ public class UpgradeAsset extends UpgradeProcess {
 		PreparedStatement ps = null;
 
 		try {
-			con = DataAccess.getConnection();
+			con = DataAccess.getUpgradeOptimizedConnection();
 
 			StringBundler sb = new StringBundler(7);
 
@@ -197,7 +195,7 @@ public class UpgradeAsset extends UpgradeProcess {
 		PreparedStatement ps = null;
 
 		try {
-			con = DataAccess.getConnection();
+			con = DataAccess.getUpgradeOptimizedConnection();
 
 			StringBundler sb = new StringBundler(3);
 
@@ -235,7 +233,7 @@ public class UpgradeAsset extends UpgradeProcess {
 		PreparedStatement ps = null;
 
 		try {
-			con = DataAccess.getConnection();
+			con = DataAccess.getUpgradeOptimizedConnection();
 
 			StringBundler sb = new StringBundler(4);
 
@@ -275,7 +273,7 @@ public class UpgradeAsset extends UpgradeProcess {
 		ResultSet rs = null;
 
 		try {
-			con = DataAccess.getConnection();
+			con = DataAccess.getUpgradeOptimizedConnection();
 
 			ps = con.prepareStatement(
 				"select * from TagsAssets_TagsEntries where entryId = ?");
@@ -303,7 +301,7 @@ public class UpgradeAsset extends UpgradeProcess {
 		ResultSet rs = null;
 
 		try {
-			con = DataAccess.getConnection();
+			con = DataAccess.getUpgradeOptimizedConnection();
 
 			ps = con.prepareStatement(
 				"select * from TagsEntry where vocabularyId = ?");
@@ -357,7 +355,7 @@ public class UpgradeAsset extends UpgradeProcess {
 		ResultSet rs = null;
 
 		try {
-			con = DataAccess.getConnection();
+			con = DataAccess.getUpgradeOptimizedConnection();
 
 			ps = con.prepareStatement(
 				"select * from TagsProperty where entryId = ?");
@@ -392,7 +390,7 @@ public class UpgradeAsset extends UpgradeProcess {
 		updateAssetEntries();
 		updateAssetCategories();
 		updateAssetTags();
-		updateResourceCodes();
+		updateResources();
 	}
 
 	protected void updateAssetCategories() throws Exception {
@@ -401,7 +399,7 @@ public class UpgradeAsset extends UpgradeProcess {
 		ResultSet rs = null;
 
 		try {
-			con = DataAccess.getConnection();
+			con = DataAccess.getUpgradeOptimizedConnection();
 
 			ps = con.prepareStatement(
 				"select * from TagsVocabulary where folksonomy = ?");
@@ -439,7 +437,7 @@ public class UpgradeAsset extends UpgradeProcess {
 		ResultSet rs = null;
 
 		try {
-			con = DataAccess.getConnection();
+			con = DataAccess.getUpgradeOptimizedConnection();
 
 			ps = con.prepareStatement("select * from TagsAsset");
 
@@ -489,7 +487,7 @@ public class UpgradeAsset extends UpgradeProcess {
 		ResultSet rs = null;
 
 		try {
-			con = DataAccess.getConnection();
+			con = DataAccess.getUpgradeOptimizedConnection();
 
 			ps = con.prepareStatement(
 				"select TE.* from TagsEntry TE inner join TagsVocabulary TV " +
@@ -540,32 +538,10 @@ public class UpgradeAsset extends UpgradeProcess {
 	}
 
 	protected void updateCategoryResource(long companyId, long categoryId)
-		throws Exception{
+		throws Exception {
 
 		String oldName = "com.liferay.portlet.tags.model.TagsEntry";
-
-		ResourceCode oldResourceCode =
-			ResourceCodeLocalServiceUtil.getResourceCode(
-				companyId, oldName, ResourceConstants.SCOPE_INDIVIDUAL);
-
-		long oldCodeId = oldResourceCode.getCodeId();
-
 		String newName = AssetCategory.class.getName();
-
-		ResourceCode newResourceCode =
-			ResourceCodeLocalServiceUtil.getResourceCode(
-				companyId, newName, ResourceConstants.SCOPE_INDIVIDUAL);
-
-		long newCodeId = newResourceCode.getCodeId();
-
-		// Algorithm 1-5
-
-		runSQL(
-			"update Resource_ set codeId = " + newCodeId + " where " +
-				"codeId = " + oldCodeId + " and primKey = '" + categoryId +
-					"';");
-
-		// Algorithm 6
 
 		runSQL(
 			"update ResourcePermission set name = '" + newName + "' where " +
@@ -574,37 +550,28 @@ public class UpgradeAsset extends UpgradeProcess {
 						" and primKey = '" + categoryId + "';");
 	}
 
-	protected void updateResourceCodes() throws Exception {
-		updateResourceCodes(
+	protected void updateResources() throws Exception {
+		updateResources(
 			"com.liferay.portlet.tags", "com.liferay.portlet.asset"
 		);
 
-		updateResourceCodes(
-			"com.liferay.portlet.tags.model.TagsEntry",
-			AssetTag.class.getName()
+		updateResources(
+			"com.liferay.portlet.tags.model.TagsEntry", AssetTag.class.getName()
 		);
 
-		updateResourceCodes(
+		updateResources(
 			"com.liferay.portlet.tags.model.TagsAsset",
 			AssetEntry.class.getName()
 		);
 
-		updateResourceCodes(
+		updateResources(
 			"com.liferay.portlet.tags.model.TagsVocabulary",
 			AssetVocabulary.class.getName()
 		);
 	}
 
-	protected void updateResourceCodes(String oldCodeName, String newCodeName)
+	protected void updateResources(String oldCodeName, String newCodeName)
 		throws Exception {
-
-		// Algorithm 1-5
-
-		runSQL(
-			"update ResourceCode set name = '" + newCodeName + "' where" +
-				" name = '" + oldCodeName + "';");
-
-		// Algorithm 6
 
 		runSQL(
 			"update ResourceAction set name = '" + newCodeName + "' where" +

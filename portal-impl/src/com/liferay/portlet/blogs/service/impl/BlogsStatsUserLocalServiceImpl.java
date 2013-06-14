@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -31,6 +31,7 @@ import java.util.List;
 
 /**
  * @author Brian Wing Shun Chan
+ * @author Mate Thurzo
  */
 public class BlogsStatsUserLocalServiceImpl
 	extends BlogsStatsUserLocalServiceBaseImpl {
@@ -42,7 +43,7 @@ public class BlogsStatsUserLocalServiceImpl
 	}
 
 	public void deleteStatsUser(long statsUserId)
-		throws PortalException,	SystemException {
+		throws PortalException, SystemException {
 
 		BlogsStatsUser statsUsers = blogsStatsUserPersistence.findByPrimaryKey(
 			statsUserId);
@@ -50,9 +51,7 @@ public class BlogsStatsUserLocalServiceImpl
 		deleteStatsUser(statsUsers);
 	}
 
-	public void deleteStatsUserByGroupId(long groupId)
-		throws SystemException {
-
+	public void deleteStatsUserByGroupId(long groupId) throws SystemException {
 		List<BlogsStatsUser> statsUsers =
 			blogsStatsUserPersistence.findByGroupId(groupId);
 
@@ -174,8 +173,10 @@ public class BlogsStatsUserLocalServiceImpl
 	public void updateStatsUser(long groupId, long userId, Date displayDate)
 		throws PortalException, SystemException {
 
-		int entryCount = blogsEntryPersistence.countByG_U_S(
-			groupId, userId, WorkflowConstants.STATUS_APPROVED);
+		Date now = new Date();
+
+		int entryCount = blogsEntryPersistence.countByG_U_LtD_S(
+			groupId, userId, now, WorkflowConstants.STATUS_APPROVED);
 
 		if (entryCount == 0) {
 			try {
@@ -191,15 +192,15 @@ public class BlogsStatsUserLocalServiceImpl
 
 		statsUser.setEntryCount(entryCount);
 
-		BlogsEntry blogsEntry = blogsEntryPersistence.findByG_U_S_First(
-			groupId, userId, WorkflowConstants.STATUS_APPROVED,
+		BlogsEntry blogsEntry = blogsEntryPersistence.findByG_U_LtD_S_First(
+			groupId, userId, now, WorkflowConstants.STATUS_APPROVED,
 			new EntryDisplayDateComparator());
 
 		Date lastDisplayDate = blogsEntry.getDisplayDate();
 
 		Date lastPostDate = statsUser.getLastPostDate();
 
-		if (displayDate != null) {
+		if ((displayDate != null) && displayDate.before(now)) {
 			if (lastPostDate == null) {
 				statsUser.setLastPostDate(displayDate);
 			}
@@ -210,8 +211,13 @@ public class BlogsStatsUserLocalServiceImpl
 				statsUser.setLastPostDate(lastDisplayDate);
 			}
 		}
-		else if (lastDisplayDate.before(lastPostDate)) {
-			statsUser.setLastPostDate(lastDisplayDate);
+		else if (displayDate == null) {
+			if (lastPostDate == null) {
+				statsUser.setLastPostDate(lastDisplayDate);
+			}
+			else if (lastPostDate.before(lastDisplayDate)) {
+				statsUser.setLastPostDate(lastDisplayDate);
+			}
 		}
 
 		blogsStatsUserPersistence.update(statsUser, false);

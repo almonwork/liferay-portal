@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -59,13 +59,13 @@ Locale[] locales = LanguageUtil.getAvailableLocales();
 
 		<aui:input name="description" />
 
-		<aui:input inlineLabel="left" name="active" />
+		<aui:input name="active" />
 
 		<c:if test="<%= !layoutPrototype.isNew() %>">
 			<aui:field-wrapper label="configuration">
-				<liferay-portlet:actionURL var="viewURL" portletName="<%= PortletKeys.MY_SITES %>">
+				<liferay-portlet:actionURL portletName="<%= PortletKeys.SITE_REDIRECTOR %>" var="viewURL">
 					<portlet:param name="struts_action" value="/my_sites/view" />
-					<portlet:param name="groupId" value="<%= String.valueOf(layoutPrototype.getGroup().getGroupId()) %>" />
+					<portlet:param name="groupId" value="<%= String.valueOf(layoutPrototype.getGroupId()) %>" />
 					<portlet:param name="privateLayout" value="<%= Boolean.TRUE.toString() %>" />
 				</liferay-portlet:actionURL>
 

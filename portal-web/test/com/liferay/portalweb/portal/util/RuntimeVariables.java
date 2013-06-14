@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -59,6 +59,18 @@ public class RuntimeVariables {
 
 	private String _replace(String text) {
 
+		// Email Addresses
+
+		text = StringUtil.replace(
+			text, "liferay-mailinglist@googlegroups.com",
+			"mainlinglist@liferay.com");
+
+		text = StringUtil.replace(
+			text, "liferay.qa.server.trunk@gmail.com", "serverea@liferay.com");
+
+		text = StringUtil.replace(
+			text, "liferay.qa.testing.trunk@gmail.com", "userea@liferay.com");
+
 		// Portal URL
 
 		text = StringUtil.replace(
@@ -80,6 +92,11 @@ public class RuntimeVariables {
 		text = StringUtil.replace(
 			text, "//a[contains(@href, 'brochure_WAR_brochuretheme')]",
 			"//a[contains(@href, '" + ThemeIds.getThemeId() + "')]");
+
+		if (TestPropsValues.TEST_DATABASE_MINIMAL) {
+			text = StringUtil.replace(text, "Joe", "Test");
+			text = StringUtil.replace(text, "Bloggs", "Test");
+		}
 
 		if (Validator.isNotNull(TestPropsValues.CLUSTER_NODE_1)) {
 			text = StringUtil.replace(
@@ -112,9 +129,9 @@ public class RuntimeVariables {
 
 	private static RuntimeVariables _instance = new RuntimeVariables();
 
-	private String _sourceDir;
 	private ContextReplace _contextReplace;
 	private Map<String, String> _runtimeVariables =
 		new HashMap<String, String>();
+	private String _sourceDir;
 
 }

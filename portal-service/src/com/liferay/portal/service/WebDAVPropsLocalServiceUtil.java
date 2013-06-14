@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -15,7 +15,6 @@
 package com.liferay.portal.service;
 
 import com.liferay.portal.kernel.bean.PortalBeanLocatorUtil;
-import com.liferay.portal.kernel.util.MethodCache;
 import com.liferay.portal.kernel.util.ReferenceRegistry;
 
 /**
@@ -66,25 +65,32 @@ public class WebDAVPropsLocalServiceUtil {
 	* Deletes the web d a v props with the primary key from the database. Also notifies the appropriate model listeners.
 	*
 	* @param webDavPropsId the primary key of the web d a v props
+	* @return the web d a v props that was removed
 	* @throws PortalException if a web d a v props with the primary key could not be found
 	* @throws SystemException if a system exception occurred
 	*/
-	public static void deleteWebDAVProps(long webDavPropsId)
+	public static com.liferay.portal.model.WebDAVProps deleteWebDAVProps(
+		long webDavPropsId)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException {
-		getService().deleteWebDAVProps(webDavPropsId);
+		return getService().deleteWebDAVProps(webDavPropsId);
 	}
 
 	/**
 	* Deletes the web d a v props from the database. Also notifies the appropriate model listeners.
 	*
 	* @param webDAVProps the web d a v props
+	* @return the web d a v props that was removed
 	* @throws SystemException if a system exception occurred
 	*/
-	public static void deleteWebDAVProps(
+	public static com.liferay.portal.model.WebDAVProps deleteWebDAVProps(
 		com.liferay.portal.model.WebDAVProps webDAVProps)
 		throws com.liferay.portal.kernel.exception.SystemException {
-		getService().deleteWebDAVProps(webDAVProps);
+		return getService().deleteWebDAVProps(webDAVProps);
+	}
+
+	public static com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery() {
+		return getService().dynamicQuery();
 	}
 
 	/**
@@ -156,6 +162,12 @@ public class WebDAVPropsLocalServiceUtil {
 		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery)
 		throws com.liferay.portal.kernel.exception.SystemException {
 		return getService().dynamicQueryCount(dynamicQuery);
+	}
+
+	public static com.liferay.portal.model.WebDAVProps fetchWebDAVProps(
+		long webDavPropsId)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getService().fetchWebDAVProps(webDavPropsId);
 	}
 
 	/**
@@ -279,20 +291,15 @@ public class WebDAVPropsLocalServiceUtil {
 
 			ReferenceRegistry.registerReference(WebDAVPropsLocalServiceUtil.class,
 				"_service");
-			MethodCache.remove(WebDAVPropsLocalService.class);
 		}
 
 		return _service;
 	}
 
+	/**
+	 * @deprecated
+	 */
 	public void setService(WebDAVPropsLocalService service) {
-		MethodCache.remove(WebDAVPropsLocalService.class);
-
-		_service = service;
-
-		ReferenceRegistry.registerReference(WebDAVPropsLocalServiceUtil.class,
-			"_service");
-		MethodCache.remove(WebDAVPropsLocalService.class);
 	}
 
 	private static WebDAVPropsLocalService _service;

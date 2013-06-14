@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -115,15 +115,11 @@ public class ServerSummaryStatistics implements SummaryStatistics {
 		return minTime;
 	}
 
-	public long getMinTimeByCompany(long companyId)
-		throws MonitoringException {
-
+	public long getMinTimeByCompany(long companyId) throws MonitoringException {
 		return getRequestStatistics(companyId).getMinTime();
 	}
 
-	public long getMinTimeByCompany(String webId)
-		throws MonitoringException {
-
+	public long getMinTimeByCompany(String webId) throws MonitoringException {
 		return getRequestStatistics(webId).getMinTime();
 	}
 

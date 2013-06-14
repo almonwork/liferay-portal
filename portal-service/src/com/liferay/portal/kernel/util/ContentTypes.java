@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -21,10 +21,16 @@ public interface ContentTypes {
 
 	public static final String APPLICATION_ATOM_XML = "application/atom+xml";
 
+	public static final String APPLICATION_GZIP = "application/gzip";
+
+	public static final String APPLICATION_JSON = "application/json";
+
 	public static final String APPLICATION_MSWORD = "application/msword";
 
 	public static final String APPLICATION_OCTET_STREAM =
 		"application/octet-stream";
+
+	public static final String APPLICATION_PDF = "application/pdf";
 
 	public static final String APPLICATION_TEXT = "application/text";
 
@@ -34,8 +40,12 @@ public interface ContentTypes {
 	public static final String APPLICATION_VND_MS_POWERPOINT =
 		"application/vnd.ms-powerpoint";
 
+	public static final String APPLICATION_X_GZIP = "application/x-gzip";
+
 	public static final String APPLICATION_X_JAVA_SERIALIZED_OBJECT =
 		"application/x-java-serialized-object";
+
+	public static final String APPLICATION_X_PDF = "application/x-pdf";
 
 	public static final String APPLICATION_X_WWW_FORM_URLENCODED =
 		"application/x-www-form-urlencoded";

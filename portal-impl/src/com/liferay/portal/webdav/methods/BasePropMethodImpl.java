@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -35,8 +35,8 @@ import com.liferay.portal.service.WebDAVPropsLocalServiceUtil;
 import com.liferay.util.xml.DocUtil;
 
 import java.util.Arrays;
+import java.util.Date;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
@@ -59,6 +59,8 @@ public abstract class BasePropMethodImpl implements Method {
 	public static final QName GETCONTENTTYPE = createQName("getcontenttype");
 
 	public static final QName GETLASTMODIFIED = createQName("getlastmodified");
+
+	public static final QName ISREADONLY = createQName("isreadonly");
 
 	public static final QName LOCKDISCOVERY = createQName("lockdiscovery");
 
@@ -179,21 +181,29 @@ public abstract class BasePropMethodImpl implements Method {
 			}
 		}
 
+		if (props.contains(ISREADONLY)) {
+			props.remove(ISREADONLY);
+
+			Lock lock = resource.getLock();
+
+			if ((lock == null) || resource.isLocked()) {
+				DocUtil.add(
+					successPropElement, ISREADONLY, Boolean.FALSE.toString());
+			}
+			else {
+				DocUtil.add(
+					successPropElement, ISREADONLY, Boolean.TRUE.toString());
+			}
+
+			hasSuccess = true;
+		}
+
 		if (props.contains(LOCKDISCOVERY)) {
 			props.remove(LOCKDISCOVERY);
 
 			Lock lock = resource.getLock();
 
 			if (lock != null) {
-				long now = System.currentTimeMillis();
-
-				long timeRemaining =
-					(lock.getExpirationDate().getTime() - now) / Time.SECOND;
-
-				if (timeRemaining <= 0) {
-					timeRemaining = 1;
-				}
-
 				Element lockDiscoveryElement = DocUtil.add(
 					successPropElement, LOCKDISCOVERY);
 
@@ -217,9 +227,31 @@ public abstract class BasePropMethodImpl implements Method {
 
 				DocUtil.add(
 					activeLockElement, createQName("owner"), lock.getOwner());
-				DocUtil.add(
-					activeLockElement, createQName("timeout"),
-					"Second-" + timeRemaining);
+
+				long timeRemaining = 0;
+
+				Date expirationDate = lock.getExpirationDate();
+
+				if (expirationDate != null) {
+					long now = System.currentTimeMillis();
+
+					timeRemaining =
+						(expirationDate.getTime() - now) / Time.SECOND;
+
+					if (timeRemaining <= 0) {
+						timeRemaining = 1;
+					}
+				}
+
+				if (timeRemaining > 0) {
+					DocUtil.add(
+						activeLockElement, createQName("timeout"),
+						"Second-" + timeRemaining);
+				}
+				else {
+					DocUtil.add(
+						activeLockElement, createQName("timeout"), "Infinite");
+				}
 
 				if (webDavRequest.getUserId() == lock.getUserId()) {
 					Element lockTokenElement = DocUtil.add(
@@ -310,13 +342,12 @@ public abstract class BasePropMethodImpl implements Method {
 		addResponse(webDavRequest, resource, props, multistatusElement);
 
 		if (resource.isCollection() && (depth != 0)) {
-			Iterator<Resource> itr = storage.getResources(
-				webDavRequest).iterator();
+			List<Resource> storageResources = storage.getResources(
+				webDavRequest);
 
-			while (itr.hasNext()) {
-				resource = itr.next();
-
-				addResponse(webDavRequest, resource, props, multistatusElement);
+			for (Resource storageResource : storageResources) {
+				addResponse(
+					webDavRequest, storageResource, props, multistatusElement);
 			}
 		}
 	}
@@ -385,15 +416,14 @@ public abstract class BasePropMethodImpl implements Method {
 
 	private static final List<QName> _ALL_COLLECTION_PROPS = Arrays.asList(
 		new QName[] {
-			CREATIONDATE, DISPLAYNAME, GETLASTMODIFIED,
-			GETCONTENTTYPE, LOCKDISCOVERY, RESOURCETYPE
+			CREATIONDATE, DISPLAYNAME, GETLASTMODIFIED, GETCONTENTTYPE,
+			LOCKDISCOVERY, RESOURCETYPE
 		});
 
 	private static final List<QName> _ALL_SIMPLE_PROPS = Arrays.asList(
 		new QName[] {
-			CREATIONDATE, DISPLAYNAME, GETLASTMODIFIED,
-			GETCONTENTTYPE, GETCONTENTLENGTH, LOCKDISCOVERY,
-			RESOURCETYPE
+			CREATIONDATE, DISPLAYNAME, GETLASTMODIFIED, GETCONTENTTYPE,
+			GETCONTENTLENGTH, ISREADONLY, LOCKDISCOVERY, RESOURCETYPE
 		});
 
 	private static Log _log = LogFactoryUtil.getLog(BasePropMethodImpl.class);

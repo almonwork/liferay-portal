@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -15,7 +15,6 @@
 package com.liferay.portlet.messageboards.service;
 
 import com.liferay.portal.kernel.bean.PortalBeanLocatorUtil;
-import com.liferay.portal.kernel.util.MethodCache;
 import com.liferay.portal.kernel.util.ReferenceRegistry;
 
 /**
@@ -66,25 +65,32 @@ public class MBDiscussionLocalServiceUtil {
 	* Deletes the message boards discussion with the primary key from the database. Also notifies the appropriate model listeners.
 	*
 	* @param discussionId the primary key of the message boards discussion
+	* @return the message boards discussion that was removed
 	* @throws PortalException if a message boards discussion with the primary key could not be found
 	* @throws SystemException if a system exception occurred
 	*/
-	public static void deleteMBDiscussion(long discussionId)
+	public static com.liferay.portlet.messageboards.model.MBDiscussion deleteMBDiscussion(
+		long discussionId)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException {
-		getService().deleteMBDiscussion(discussionId);
+		return getService().deleteMBDiscussion(discussionId);
 	}
 
 	/**
 	* Deletes the message boards discussion from the database. Also notifies the appropriate model listeners.
 	*
 	* @param mbDiscussion the message boards discussion
+	* @return the message boards discussion that was removed
 	* @throws SystemException if a system exception occurred
 	*/
-	public static void deleteMBDiscussion(
+	public static com.liferay.portlet.messageboards.model.MBDiscussion deleteMBDiscussion(
 		com.liferay.portlet.messageboards.model.MBDiscussion mbDiscussion)
 		throws com.liferay.portal.kernel.exception.SystemException {
-		getService().deleteMBDiscussion(mbDiscussion);
+		return getService().deleteMBDiscussion(mbDiscussion);
+	}
+
+	public static com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery() {
+		return getService().dynamicQuery();
 	}
 
 	/**
@@ -156,6 +162,12 @@ public class MBDiscussionLocalServiceUtil {
 		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery)
 		throws com.liferay.portal.kernel.exception.SystemException {
 		return getService().dynamicQueryCount(dynamicQuery);
+	}
+
+	public static com.liferay.portlet.messageboards.model.MBDiscussion fetchMBDiscussion(
+		long discussionId)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getService().fetchMBDiscussion(discussionId);
 	}
 
 	/**
@@ -288,20 +300,15 @@ public class MBDiscussionLocalServiceUtil {
 
 			ReferenceRegistry.registerReference(MBDiscussionLocalServiceUtil.class,
 				"_service");
-			MethodCache.remove(MBDiscussionLocalService.class);
 		}
 
 		return _service;
 	}
 
+	/**
+	 * @deprecated
+	 */
 	public void setService(MBDiscussionLocalService service) {
-		MethodCache.remove(MBDiscussionLocalService.class);
-
-		_service = service;
-
-		ReferenceRegistry.registerReference(MBDiscussionLocalServiceUtil.class,
-			"_service");
-		MethodCache.remove(MBDiscussionLocalService.class);
 	}
 
 	private static MBDiscussionLocalService _service;

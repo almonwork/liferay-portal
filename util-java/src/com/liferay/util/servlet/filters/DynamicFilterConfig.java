@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -45,16 +45,12 @@ public class DynamicFilterConfig implements FilterConfig {
 		_servletContext = servletContext;
 	}
 
-	public String getFilterName() {
-		return _filterName;
-	}
-
-	public ServletContext getServletContext() {
-		return _servletContext;
-	}
-
 	public void addInitParameter(String name, String value) {
 		_parameters.put(name, value);
+	}
+
+	public String getFilterName() {
+		return _filterName;
 	}
 
 	public String getInitParameter(String name) {
@@ -65,9 +61,13 @@ public class DynamicFilterConfig implements FilterConfig {
 		return Collections.enumeration(_parameters.keySet());
 	}
 
+	public ServletContext getServletContext() {
+		return _servletContext;
+	}
+
 	private String _filterName;
-	private ServletContext _servletContext;
 	private Map<String, String> _parameters =
 		new LinkedHashMap<String, String>();
+	private ServletContext _servletContext;
 
 }

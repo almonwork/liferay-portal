@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -22,7 +22,6 @@ import java.util.List;
 
 import org.jgroups.Address;
 import org.jgroups.Message;
-import org.jgroups.View;
 
 /**
  * @author Shuyang Zhou
@@ -39,7 +38,7 @@ public class ClusterForwardReceiver extends BaseReceiver {
 
 	@Override
 	public void receive(Message message) {
-		if ((!_localTransportAddresses.contains(message.getSrc())) ||
+		if (!_localTransportAddresses.contains(message.getSrc()) ||
 			(message.getDest() != null)) {
 
 			_clusterForwardMessageListener.receive(
@@ -53,17 +52,10 @@ public class ClusterForwardReceiver extends BaseReceiver {
 		}
 	}
 
-	@Override
-	public void viewAccepted(View view) {
-		if (_log.isDebugEnabled()) {
-			_log.debug("Accepted view " + view);
-		}
-	}
-
 	private static Log _log = LogFactoryUtil.getLog(
 		ClusterForwardReceiver.class);
 
-	private List<org.jgroups.Address> _localTransportAddresses;
 	private ClusterForwardMessageListener _clusterForwardMessageListener;
+	private List<org.jgroups.Address> _localTransportAddresses;
 
 }

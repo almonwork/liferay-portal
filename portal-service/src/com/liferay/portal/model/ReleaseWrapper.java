@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,6 +14,10 @@
 
 package com.liferay.portal.model;
 
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * <p>
  * This class is a wrapper for {@link Release}.
@@ -23,7 +27,7 @@ package com.liferay.portal.model;
  * @see       Release
  * @generated
  */
-public class ReleaseWrapper implements Release {
+public class ReleaseWrapper implements Release, ModelWrapper<Release> {
 	public ReleaseWrapper(Release release) {
 		_release = release;
 	}
@@ -34,6 +38,78 @@ public class ReleaseWrapper implements Release {
 
 	public String getModelClassName() {
 		return Release.class.getName();
+	}
+
+	public Map<String, Object> getModelAttributes() {
+		Map<String, Object> attributes = new HashMap<String, Object>();
+
+		attributes.put("releaseId", getReleaseId());
+		attributes.put("createDate", getCreateDate());
+		attributes.put("modifiedDate", getModifiedDate());
+		attributes.put("servletContextName", getServletContextName());
+		attributes.put("buildNumber", getBuildNumber());
+		attributes.put("buildDate", getBuildDate());
+		attributes.put("verified", getVerified());
+		attributes.put("state", getState());
+		attributes.put("testString", getTestString());
+
+		return attributes;
+	}
+
+	public void setModelAttributes(Map<String, Object> attributes) {
+		Long releaseId = (Long)attributes.get("releaseId");
+
+		if (releaseId != null) {
+			setReleaseId(releaseId);
+		}
+
+		Date createDate = (Date)attributes.get("createDate");
+
+		if (createDate != null) {
+			setCreateDate(createDate);
+		}
+
+		Date modifiedDate = (Date)attributes.get("modifiedDate");
+
+		if (modifiedDate != null) {
+			setModifiedDate(modifiedDate);
+		}
+
+		String servletContextName = (String)attributes.get("servletContextName");
+
+		if (servletContextName != null) {
+			setServletContextName(servletContextName);
+		}
+
+		Integer buildNumber = (Integer)attributes.get("buildNumber");
+
+		if (buildNumber != null) {
+			setBuildNumber(buildNumber);
+		}
+
+		Date buildDate = (Date)attributes.get("buildDate");
+
+		if (buildDate != null) {
+			setBuildDate(buildDate);
+		}
+
+		Boolean verified = (Boolean)attributes.get("verified");
+
+		if (verified != null) {
+			setVerified(verified);
+		}
+
+		Integer state = (Integer)attributes.get("state");
+
+		if (state != null) {
+			setState(state);
+		}
+
+		String testString = (String)attributes.get("testString");
+
+		if (testString != null) {
+			setTestString(testString);
+		}
 	}
 
 	/**
@@ -190,6 +266,24 @@ public class ReleaseWrapper implements Release {
 	}
 
 	/**
+	* Returns the state of this release.
+	*
+	* @return the state of this release
+	*/
+	public int getState() {
+		return _release.getState();
+	}
+
+	/**
+	* Sets the state of this release.
+	*
+	* @param state the state of this release
+	*/
+	public void setState(int state) {
+		_release.setState(state);
+	}
+
+	/**
 	* Returns the test string of this release.
 	*
 	* @return the test string of this release
@@ -225,10 +319,6 @@ public class ReleaseWrapper implements Release {
 
 	public boolean isEscapedModel() {
 		return _release.isEscapedModel();
-	}
-
-	public void setEscapedModel(boolean escapedModel) {
-		_release.setEscapedModel(escapedModel);
 	}
 
 	public java.io.Serializable getPrimaryKeyObj() {
@@ -284,7 +374,14 @@ public class ReleaseWrapper implements Release {
 		_release.persist();
 	}
 
+	/**
+	 * @deprecated Renamed to {@link #getWrappedModel}
+	 */
 	public Release getWrappedRelease() {
+		return _release;
+	}
+
+	public Release getWrappedModel() {
 		return _release;
 	}
 

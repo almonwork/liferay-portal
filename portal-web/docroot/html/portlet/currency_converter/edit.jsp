@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -38,13 +38,9 @@ List rightList = new ArrayList();
 
 Arrays.sort(symbols);
 
-Iterator itr = allSymbols.entrySet().iterator();
-
-while (itr.hasNext()) {
-	Map.Entry entry = (Map.Entry)itr.next();
-
-	String symbol = (String)entry.getValue();
-	String currencyValue = (String)entry.getKey();
+for (Map.Entry<String, String> entry : allSymbols.entrySet()) {
+	String symbol = entry.getValue();
+	String currencyValue = entry.getKey();
 
 	if (Arrays.binarySearch(symbols, symbol) < 0) {
 		rightList.add(new KeyValuePair(symbol, LanguageUtil.get(pageContext, "currency." + currencyValue)));
@@ -55,13 +51,13 @@ rightList = ListUtil.sort(rightList, new KeyValuePairComparator(false, true));
 %>
 
 <liferay-ui:input-move-boxes
-	leftTitle="current"
-	rightTitle="available"
 	leftBoxName="current_actions"
-	rightBoxName="available_actions"
-	leftReorder="true"
 	leftList="<%= leftList %>"
+	leftReorder="true"
+	leftTitle="current"
+	rightBoxName="available_actions"
 	rightList="<%= rightList %>"
+	rightTitle="available"
 />
 
 <br />

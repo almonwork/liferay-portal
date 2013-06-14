@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -151,9 +151,7 @@ public class MBBanLocalServiceImpl extends MBBanLocalServiceBaseImpl {
 		return mbBanPersistence.countByGroupId(groupId);
 	}
 
-	public boolean hasBan(long groupId, long banUserId)
-		throws SystemException {
-
+	public boolean hasBan(long groupId, long banUserId) throws SystemException {
 		if (mbBanPersistence.fetchByG_B(groupId, banUserId) == null) {
 			return false;
 		}

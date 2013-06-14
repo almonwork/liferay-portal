@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -78,8 +78,7 @@ public class UpdateArticleFieldAction extends Action {
 			if ((x != -1) && (y != -1)) {
 				groupId = GetterUtil.getLong(containerId.substring(0, x));
 				articleId = containerId.substring(x + 1, y);
-				version = GetterUtil.getDouble(
-					containerId.substring(y, containerId.length()));
+				version = GetterUtil.getDouble(containerId.substring(y));
 			}
 		}
 
@@ -89,7 +88,7 @@ public class UpdateArticleFieldAction extends Action {
 		String fieldData = ParamUtil.getString(request, "fieldData");
 
 		if (fieldName.startsWith("journal-content-field-name-")) {
-			fieldName = fieldName.substring(27, fieldName.length());
+			fieldName = fieldName.substring(27);
 		}
 
 		JournalArticle article = JournalArticleLocalServiceUtil.getArticle(

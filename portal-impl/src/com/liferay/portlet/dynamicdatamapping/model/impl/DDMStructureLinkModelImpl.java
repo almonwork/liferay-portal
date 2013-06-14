@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -15,10 +15,11 @@
 package com.liferay.portlet.dynamicdatamapping.model.impl;
 
 import com.liferay.portal.kernel.bean.AutoEscapeBeanHandler;
-import com.liferay.portal.kernel.json.JSON;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.ProxyUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
+import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.model.CacheModel;
 import com.liferay.portal.model.impl.BaseModelImpl;
 import com.liferay.portal.service.ServiceContext;
@@ -26,18 +27,15 @@ import com.liferay.portal.util.PortalUtil;
 
 import com.liferay.portlet.dynamicdatamapping.model.DDMStructureLink;
 import com.liferay.portlet.dynamicdatamapping.model.DDMStructureLinkModel;
-import com.liferay.portlet.dynamicdatamapping.model.DDMStructureLinkSoap;
 import com.liferay.portlet.expando.model.ExpandoBridge;
 import com.liferay.portlet.expando.util.ExpandoBridgeFactoryUtil;
 
 import java.io.Serializable;
 
-import java.lang.reflect.Proxy;
-
 import java.sql.Types;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * The base model implementation for the DDMStructureLink service. Represents a row in the &quot;DDMStructureLink&quot; database table, with each column mapped to a property of this class.
@@ -52,7 +50,6 @@ import java.util.List;
  * @see com.liferay.portlet.dynamicdatamapping.model.DDMStructureLinkModel
  * @generated
  */
-@JSON(strict = true)
 public class DDMStructureLinkModelImpl extends BaseModelImpl<DDMStructureLink>
 	implements DDMStructureLinkModel {
 	/*
@@ -78,49 +75,12 @@ public class DDMStructureLinkModelImpl extends BaseModelImpl<DDMStructureLink>
 	public static final boolean FINDER_CACHE_ENABLED = GetterUtil.getBoolean(com.liferay.portal.util.PropsUtil.get(
 				"value.object.finder.cache.enabled.com.liferay.portlet.dynamicdatamapping.model.DDMStructureLink"),
 			true);
-
-	/**
-	 * Converts the soap model instance into a normal model instance.
-	 *
-	 * @param soapModel the soap model instance to convert
-	 * @return the normal model instance
-	 */
-	public static DDMStructureLink toModel(DDMStructureLinkSoap soapModel) {
-		DDMStructureLink model = new DDMStructureLinkImpl();
-
-		model.setStructureLinkId(soapModel.getStructureLinkId());
-		model.setClassNameId(soapModel.getClassNameId());
-		model.setClassPK(soapModel.getClassPK());
-		model.setStructureId(soapModel.getStructureId());
-
-		return model;
-	}
-
-	/**
-	 * Converts the soap model instances into normal model instances.
-	 *
-	 * @param soapModels the soap model instances to convert
-	 * @return the normal model instances
-	 */
-	public static List<DDMStructureLink> toModels(
-		DDMStructureLinkSoap[] soapModels) {
-		List<DDMStructureLink> models = new ArrayList<DDMStructureLink>(soapModels.length);
-
-		for (DDMStructureLinkSoap soapModel : soapModels) {
-			models.add(toModel(soapModel));
-		}
-
-		return models;
-	}
-
-	public Class<?> getModelClass() {
-		return DDMStructureLink.class;
-	}
-
-	public String getModelClassName() {
-		return DDMStructureLink.class.getName();
-	}
-
+	public static final boolean COLUMN_BITMASK_ENABLED = GetterUtil.getBoolean(com.liferay.portal.util.PropsUtil.get(
+				"value.object.column.bitmask.enabled.com.liferay.portlet.dynamicdatamapping.model.DDMStructureLink"),
+			true);
+	public static long CLASSNAMEID_COLUMN_BITMASK = 1L;
+	public static long CLASSPK_COLUMN_BITMASK = 2L;
+	public static long STRUCTUREID_COLUMN_BITMASK = 4L;
 	public static final long LOCK_EXPIRATION_TIME = GetterUtil.getLong(com.liferay.portal.util.PropsUtil.get(
 				"lock.expiration.time.com.liferay.portlet.dynamicdatamapping.model.DDMStructureLink"));
 
@@ -143,7 +103,53 @@ public class DDMStructureLinkModelImpl extends BaseModelImpl<DDMStructureLink>
 		setPrimaryKey(((Long)primaryKeyObj).longValue());
 	}
 
-	@JSON
+	public Class<?> getModelClass() {
+		return DDMStructureLink.class;
+	}
+
+	public String getModelClassName() {
+		return DDMStructureLink.class.getName();
+	}
+
+	@Override
+	public Map<String, Object> getModelAttributes() {
+		Map<String, Object> attributes = new HashMap<String, Object>();
+
+		attributes.put("structureLinkId", getStructureLinkId());
+		attributes.put("classNameId", getClassNameId());
+		attributes.put("classPK", getClassPK());
+		attributes.put("structureId", getStructureId());
+
+		return attributes;
+	}
+
+	@Override
+	public void setModelAttributes(Map<String, Object> attributes) {
+		Long structureLinkId = (Long)attributes.get("structureLinkId");
+
+		if (structureLinkId != null) {
+			setStructureLinkId(structureLinkId);
+		}
+
+		Long classNameId = (Long)attributes.get("classNameId");
+
+		if (classNameId != null) {
+			setClassNameId(classNameId);
+		}
+
+		Long classPK = (Long)attributes.get("classPK");
+
+		if (classPK != null) {
+			setClassPK(classPK);
+		}
+
+		Long structureId = (Long)attributes.get("structureId");
+
+		if (structureId != null) {
+			setStructureId(structureId);
+		}
+	}
+
 	public long getStructureLinkId() {
 		return _structureLinkId;
 	}
@@ -160,21 +166,43 @@ public class DDMStructureLinkModelImpl extends BaseModelImpl<DDMStructureLink>
 		return PortalUtil.getClassName(getClassNameId());
 	}
 
-	@JSON
+	public void setClassName(String className) {
+		long classNameId = 0;
+
+		if (Validator.isNotNull(className)) {
+			classNameId = PortalUtil.getClassNameId(className);
+		}
+
+		setClassNameId(classNameId);
+	}
+
 	public long getClassNameId() {
 		return _classNameId;
 	}
 
 	public void setClassNameId(long classNameId) {
+		_columnBitmask |= CLASSNAMEID_COLUMN_BITMASK;
+
+		if (!_setOriginalClassNameId) {
+			_setOriginalClassNameId = true;
+
+			_originalClassNameId = _classNameId;
+		}
+
 		_classNameId = classNameId;
 	}
 
-	@JSON
+	public long getOriginalClassNameId() {
+		return _originalClassNameId;
+	}
+
 	public long getClassPK() {
 		return _classPK;
 	}
 
 	public void setClassPK(long classPK) {
+		_columnBitmask |= CLASSPK_COLUMN_BITMASK;
+
 		if (!_setOriginalClassPK) {
 			_setOriginalClassPK = true;
 
@@ -188,44 +216,52 @@ public class DDMStructureLinkModelImpl extends BaseModelImpl<DDMStructureLink>
 		return _originalClassPK;
 	}
 
-	@JSON
 	public long getStructureId() {
 		return _structureId;
 	}
 
 	public void setStructureId(long structureId) {
+		_columnBitmask |= STRUCTUREID_COLUMN_BITMASK;
+
+		if (!_setOriginalStructureId) {
+			_setOriginalStructureId = true;
+
+			_originalStructureId = _structureId;
+		}
+
 		_structureId = structureId;
+	}
+
+	public long getOriginalStructureId() {
+		return _originalStructureId;
+	}
+
+	public long getColumnBitmask() {
+		return _columnBitmask;
 	}
 
 	@Override
 	public DDMStructureLink toEscapedModel() {
-		if (isEscapedModel()) {
-			return (DDMStructureLink)this;
+		if (_escapedModelProxy == null) {
+			_escapedModelProxy = (DDMStructureLink)ProxyUtil.newProxyInstance(_classLoader,
+					_escapedModelProxyInterfaces,
+					new AutoEscapeBeanHandler(this));
 		}
-		else {
-			if (_escapedModelProxy == null) {
-				_escapedModelProxy = (DDMStructureLink)Proxy.newProxyInstance(_classLoader,
-						_escapedModelProxyInterfaces,
-						new AutoEscapeBeanHandler(this));
-			}
 
-			return _escapedModelProxy;
-		}
+		return _escapedModelProxy;
 	}
 
 	@Override
 	public ExpandoBridge getExpandoBridge() {
-		if (_expandoBridge == null) {
-			_expandoBridge = ExpandoBridgeFactoryUtil.getExpandoBridge(0,
-					DDMStructureLink.class.getName(), getPrimaryKey());
-		}
-
-		return _expandoBridge;
+		return ExpandoBridgeFactoryUtil.getExpandoBridge(0,
+			DDMStructureLink.class.getName(), getPrimaryKey());
 	}
 
 	@Override
 	public void setExpandoBridgeAttributes(ServiceContext serviceContext) {
-		getExpandoBridge().setAttributes(serviceContext);
+		ExpandoBridge expandoBridge = getExpandoBridge();
+
+		expandoBridge.setAttributes(serviceContext);
 	}
 
 	@Override
@@ -290,9 +326,19 @@ public class DDMStructureLinkModelImpl extends BaseModelImpl<DDMStructureLink>
 	public void resetOriginalValues() {
 		DDMStructureLinkModelImpl ddmStructureLinkModelImpl = this;
 
+		ddmStructureLinkModelImpl._originalClassNameId = ddmStructureLinkModelImpl._classNameId;
+
+		ddmStructureLinkModelImpl._setOriginalClassNameId = false;
+
 		ddmStructureLinkModelImpl._originalClassPK = ddmStructureLinkModelImpl._classPK;
 
 		ddmStructureLinkModelImpl._setOriginalClassPK = false;
+
+		ddmStructureLinkModelImpl._originalStructureId = ddmStructureLinkModelImpl._structureId;
+
+		ddmStructureLinkModelImpl._setOriginalStructureId = false;
+
+		ddmStructureLinkModelImpl._columnBitmask = 0;
 	}
 
 	@Override
@@ -363,10 +409,14 @@ public class DDMStructureLinkModelImpl extends BaseModelImpl<DDMStructureLink>
 		};
 	private long _structureLinkId;
 	private long _classNameId;
+	private long _originalClassNameId;
+	private boolean _setOriginalClassNameId;
 	private long _classPK;
 	private long _originalClassPK;
 	private boolean _setOriginalClassPK;
 	private long _structureId;
-	private transient ExpandoBridge _expandoBridge;
+	private long _originalStructureId;
+	private boolean _setOriginalStructureId;
+	private long _columnBitmask;
 	private DDMStructureLink _escapedModelProxy;
 }

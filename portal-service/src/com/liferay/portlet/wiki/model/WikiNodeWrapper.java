@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,6 +14,12 @@
 
 package com.liferay.portlet.wiki.model;
 
+import com.liferay.portal.model.ModelWrapper;
+
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * <p>
  * This class is a wrapper for {@link WikiNode}.
@@ -23,7 +29,7 @@ package com.liferay.portlet.wiki.model;
  * @see       WikiNode
  * @generated
  */
-public class WikiNodeWrapper implements WikiNode {
+public class WikiNodeWrapper implements WikiNode, ModelWrapper<WikiNode> {
 	public WikiNodeWrapper(WikiNode wikiNode) {
 		_wikiNode = wikiNode;
 	}
@@ -34,6 +40,92 @@ public class WikiNodeWrapper implements WikiNode {
 
 	public String getModelClassName() {
 		return WikiNode.class.getName();
+	}
+
+	public Map<String, Object> getModelAttributes() {
+		Map<String, Object> attributes = new HashMap<String, Object>();
+
+		attributes.put("uuid", getUuid());
+		attributes.put("nodeId", getNodeId());
+		attributes.put("groupId", getGroupId());
+		attributes.put("companyId", getCompanyId());
+		attributes.put("userId", getUserId());
+		attributes.put("userName", getUserName());
+		attributes.put("createDate", getCreateDate());
+		attributes.put("modifiedDate", getModifiedDate());
+		attributes.put("name", getName());
+		attributes.put("description", getDescription());
+		attributes.put("lastPostDate", getLastPostDate());
+
+		return attributes;
+	}
+
+	public void setModelAttributes(Map<String, Object> attributes) {
+		String uuid = (String)attributes.get("uuid");
+
+		if (uuid != null) {
+			setUuid(uuid);
+		}
+
+		Long nodeId = (Long)attributes.get("nodeId");
+
+		if (nodeId != null) {
+			setNodeId(nodeId);
+		}
+
+		Long groupId = (Long)attributes.get("groupId");
+
+		if (groupId != null) {
+			setGroupId(groupId);
+		}
+
+		Long companyId = (Long)attributes.get("companyId");
+
+		if (companyId != null) {
+			setCompanyId(companyId);
+		}
+
+		Long userId = (Long)attributes.get("userId");
+
+		if (userId != null) {
+			setUserId(userId);
+		}
+
+		String userName = (String)attributes.get("userName");
+
+		if (userName != null) {
+			setUserName(userName);
+		}
+
+		Date createDate = (Date)attributes.get("createDate");
+
+		if (createDate != null) {
+			setCreateDate(createDate);
+		}
+
+		Date modifiedDate = (Date)attributes.get("modifiedDate");
+
+		if (modifiedDate != null) {
+			setModifiedDate(modifiedDate);
+		}
+
+		String name = (String)attributes.get("name");
+
+		if (name != null) {
+			setName(name);
+		}
+
+		String description = (String)attributes.get("description");
+
+		if (description != null) {
+			setDescription(description);
+		}
+
+		Date lastPostDate = (Date)attributes.get("lastPostDate");
+
+		if (lastPostDate != null) {
+			setLastPostDate(lastPostDate);
+		}
 	}
 
 	/**
@@ -292,10 +384,6 @@ public class WikiNodeWrapper implements WikiNode {
 		return _wikiNode.isEscapedModel();
 	}
 
-	public void setEscapedModel(boolean escapedModel) {
-		_wikiNode.setEscapedModel(escapedModel);
-	}
-
 	public java.io.Serializable getPrimaryKeyObj() {
 		return _wikiNode.getPrimaryKeyObj();
 	}
@@ -349,7 +437,14 @@ public class WikiNodeWrapper implements WikiNode {
 		_wikiNode.persist();
 	}
 
+	/**
+	 * @deprecated Renamed to {@link #getWrappedModel}
+	 */
 	public WikiNode getWrappedWikiNode() {
+		return _wikiNode;
+	}
+
+	public WikiNode getWrappedModel() {
 		return _wikiNode;
 	}
 

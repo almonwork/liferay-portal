@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -30,6 +30,7 @@ public class UnsyncStringReader extends Reader {
 
 	public UnsyncStringReader(String string) {
 		this.string = string;
+
 		stringLength = string.length();
 	}
 
@@ -43,6 +44,7 @@ public class UnsyncStringReader extends Reader {
 		if (string == null) {
 			throw new IOException("String is null");
 		}
+
 		markIndex = index;
 	}
 
@@ -70,9 +72,7 @@ public class UnsyncStringReader extends Reader {
 	}
 
 	@Override
-	public int read(char[] chars, int offset, int length)
-		throws IOException {
-
+	public int read(char[] chars, int offset, int length) throws IOException {
 		if (string == null) {
 			throw new IOException("String is null");
 		}
@@ -147,8 +147,8 @@ public class UnsyncStringReader extends Reader {
 	}
 
 	protected int index;
-	protected int stringLength;
 	protected int markIndex;
 	protected String string;
+	protected int stringLength;
 
 }

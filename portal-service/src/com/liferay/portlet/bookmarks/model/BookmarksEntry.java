@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,7 +14,7 @@
 
 package com.liferay.portlet.bookmarks.model;
 
-import com.liferay.portal.model.PersistedModel;
+import com.liferay.portal.model.PermissionedModel;
 
 /**
  * The extended model interface for the BookmarksEntry service. Represents a row in the &quot;BookmarksEntry&quot; database table, with each column mapped to a property of this class.
@@ -25,7 +25,7 @@ import com.liferay.portal.model.PersistedModel;
  * @see com.liferay.portlet.bookmarks.model.impl.BookmarksEntryModelImpl
  * @generated
  */
-public interface BookmarksEntry extends BookmarksEntryModel, PersistedModel {
+public interface BookmarksEntry extends BookmarksEntryModel, PermissionedModel {
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *

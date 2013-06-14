@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -81,7 +81,7 @@ String subtype = BeanParamUtil.getString(role, request, "subtype");
 
 		<c:choose>
 			<c:when test="<%= (role != null) && PortalUtil.isSystemRole(role.getName()) %>">
-				<aui:input type="hidden" name="name" value="<%= role.getName() %>" />
+				<aui:input name="name" type="hidden" value="<%= role.getName() %>" />
 			</c:when>
 			<c:otherwise>
 				<aui:input label='<%= (role != null) ? "new-name" : "name" %>' name="name" />

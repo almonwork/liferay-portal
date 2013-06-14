@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,6 +14,8 @@
 
 package com.liferay.portlet.shopping.service;
 
+import com.liferay.portal.service.ServiceWrapper;
+
 /**
  * <p>
  * This class is a wrapper for {@link ShoppingCouponLocalService}.
@@ -24,7 +26,8 @@ package com.liferay.portlet.shopping.service;
  * @generated
  */
 public class ShoppingCouponLocalServiceWrapper
-	implements ShoppingCouponLocalService {
+	implements ShoppingCouponLocalService,
+		ServiceWrapper<ShoppingCouponLocalService> {
 	public ShoppingCouponLocalServiceWrapper(
 		ShoppingCouponLocalService shoppingCouponLocalService) {
 		_shoppingCouponLocalService = shoppingCouponLocalService;
@@ -58,25 +61,32 @@ public class ShoppingCouponLocalServiceWrapper
 	* Deletes the shopping coupon with the primary key from the database. Also notifies the appropriate model listeners.
 	*
 	* @param couponId the primary key of the shopping coupon
+	* @return the shopping coupon that was removed
 	* @throws PortalException if a shopping coupon with the primary key could not be found
 	* @throws SystemException if a system exception occurred
 	*/
-	public void deleteShoppingCoupon(long couponId)
+	public com.liferay.portlet.shopping.model.ShoppingCoupon deleteShoppingCoupon(
+		long couponId)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException {
-		_shoppingCouponLocalService.deleteShoppingCoupon(couponId);
+		return _shoppingCouponLocalService.deleteShoppingCoupon(couponId);
 	}
 
 	/**
 	* Deletes the shopping coupon from the database. Also notifies the appropriate model listeners.
 	*
 	* @param shoppingCoupon the shopping coupon
+	* @return the shopping coupon that was removed
 	* @throws SystemException if a system exception occurred
 	*/
-	public void deleteShoppingCoupon(
+	public com.liferay.portlet.shopping.model.ShoppingCoupon deleteShoppingCoupon(
 		com.liferay.portlet.shopping.model.ShoppingCoupon shoppingCoupon)
 		throws com.liferay.portal.kernel.exception.SystemException {
-		_shoppingCouponLocalService.deleteShoppingCoupon(shoppingCoupon);
+		return _shoppingCouponLocalService.deleteShoppingCoupon(shoppingCoupon);
+	}
+
+	public com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery() {
+		return _shoppingCouponLocalService.dynamicQuery();
 	}
 
 	/**
@@ -148,6 +158,12 @@ public class ShoppingCouponLocalServiceWrapper
 		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery)
 		throws com.liferay.portal.kernel.exception.SystemException {
 		return _shoppingCouponLocalService.dynamicQueryCount(dynamicQuery);
+	}
+
+	public com.liferay.portlet.shopping.model.ShoppingCoupon fetchShoppingCoupon(
+		long couponId)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return _shoppingCouponLocalService.fetchShoppingCoupon(couponId);
 	}
 
 	/**
@@ -333,11 +349,26 @@ public class ShoppingCouponLocalServiceWrapper
 			serviceContext);
 	}
 
+	/**
+	 * @deprecated Renamed to {@link #getWrappedService}
+	 */
 	public ShoppingCouponLocalService getWrappedShoppingCouponLocalService() {
 		return _shoppingCouponLocalService;
 	}
 
+	/**
+	 * @deprecated Renamed to {@link #setWrappedService}
+	 */
 	public void setWrappedShoppingCouponLocalService(
+		ShoppingCouponLocalService shoppingCouponLocalService) {
+		_shoppingCouponLocalService = shoppingCouponLocalService;
+	}
+
+	public ShoppingCouponLocalService getWrappedService() {
+		return _shoppingCouponLocalService;
+	}
+
+	public void setWrappedService(
 		ShoppingCouponLocalService shoppingCouponLocalService) {
 		_shoppingCouponLocalService = shoppingCouponLocalService;
 	}

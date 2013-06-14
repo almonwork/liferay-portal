@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -13,6 +13,13 @@
  */
 
 package com.liferay.portlet.dynamicdatalists.service.http;
+
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
+
+import com.liferay.portlet.dynamicdatalists.service.DDLRecordServiceUtil;
+
+import java.rmi.RemoteException;
 
 /**
  * <p>
@@ -42,8 +49,8 @@ package com.liferay.portlet.dynamicdatalists.service.http;
  *
  * <p>
  * You can see a list of services at
- * http://localhost:8080/tunnel-web/secure/axis. Set the property
- * <b>tunnel.servlet.hosts.allowed</b> in portal.properties to configure
+ * http://localhost:8080/api/secure/axis. Set the property
+ * <b>axis.servlet.hosts.allowed</b> in portal.properties to configure
  * security.
  * </p>
  *
@@ -58,4 +65,19 @@ package com.liferay.portlet.dynamicdatalists.service.http;
  * @generated
  */
 public class DDLRecordServiceSoap {
+	public static com.liferay.portlet.dynamicdatalists.model.DDLRecordSoap getRecord(
+		long recordId) throws RemoteException {
+		try {
+			com.liferay.portlet.dynamicdatalists.model.DDLRecord returnValue = DDLRecordServiceUtil.getRecord(recordId);
+
+			return com.liferay.portlet.dynamicdatalists.model.DDLRecordSoap.toSoapModel(returnValue);
+		}
+		catch (Exception e) {
+			_log.error(e, e);
+
+			throw new RemoteException(e.getMessage());
+		}
+	}
+
+	private static Log _log = LogFactoryUtil.getLog(DDLRecordServiceSoap.class);
 }

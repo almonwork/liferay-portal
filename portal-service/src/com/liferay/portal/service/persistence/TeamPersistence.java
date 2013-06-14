@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,7 +14,6 @@
 
 package com.liferay.portal.service.persistence;
 
-import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.model.Team;
 
 /**
@@ -357,9 +356,11 @@ public interface TeamPersistence extends BasePersistence<Team> {
 	*
 	* @param groupId the group ID
 	* @param name the name
+	* @return the team that was removed
 	* @throws SystemException if a system exception occurred
 	*/
-	public void removeByG_N(long groupId, java.lang.String name)
+	public com.liferay.portal.model.Team removeByG_N(long groupId,
+		java.lang.String name)
 		throws com.liferay.portal.NoSuchTeamException,
 			com.liferay.portal.kernel.exception.SystemException;
 
@@ -790,6 +791,4 @@ public interface TeamPersistence extends BasePersistence<Team> {
 	public void setUserGroups(long pk,
 		java.util.List<com.liferay.portal.model.UserGroup> userGroups)
 		throws com.liferay.portal.kernel.exception.SystemException;
-
-	public Team remove(Team team) throws SystemException;
 }

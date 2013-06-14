@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -80,17 +80,16 @@ public class TeamLocalServiceImpl extends TeamLocalServiceBaseImpl {
 	}
 
 	@Override
-	public void deleteTeam(long teamId)
+	public Team deleteTeam(long teamId)
 		throws PortalException, SystemException {
 
 		Team team = teamPersistence.findByPrimaryKey(teamId);
 
-		deleteTeam(team);
+		return deleteTeam(team);
 	}
 
 	@Override
-	public void deleteTeam(Team team)
-		throws PortalException, SystemException {
+	public Team deleteTeam(Team team) throws PortalException, SystemException {
 
 		// Team
 
@@ -107,6 +106,8 @@ public class TeamLocalServiceImpl extends TeamLocalServiceBaseImpl {
 		Role role = team.getRole();
 
 		roleLocalService.deleteRole(role);
+
+		return team;
 	}
 
 	public void deleteTeams(long groupId)
@@ -121,13 +122,6 @@ public class TeamLocalServiceImpl extends TeamLocalServiceBaseImpl {
 
 	public List<Team> getGroupTeams(long groupId) throws SystemException {
 		return teamPersistence.findByGroupId(groupId);
-	}
-
-	@Override
-	public Team getTeam(long teamId)
-		throws PortalException, SystemException {
-
-		return teamPersistence.findByPrimaryKey(teamId);
 	}
 
 	public Team getTeam(long groupId, String name)
@@ -177,8 +171,7 @@ public class TeamLocalServiceImpl extends TeamLocalServiceBaseImpl {
 		return teamFinder.countByG_N_D(groupId, name, description, params);
 	}
 
-	public Team updateTeam(
-			long teamId, String name, String description)
+	public Team updateTeam(long teamId, String name, String description)
 		throws PortalException, SystemException {
 
 		Date now = new Date();
@@ -199,7 +192,7 @@ public class TeamLocalServiceImpl extends TeamLocalServiceBaseImpl {
 	protected void validate(long teamId, long groupId, String name)
 		throws PortalException, SystemException {
 
-		if ((Validator.isNull(name)) || (Validator.isNumber(name)) ||
+		if (Validator.isNull(name) || Validator.isNumber(name) ||
 			(name.indexOf(CharPool.COMMA) != -1) ||
 			(name.indexOf(CharPool.STAR) != -1)) {
 

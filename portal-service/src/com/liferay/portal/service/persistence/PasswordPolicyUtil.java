@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -91,14 +91,6 @@ public class PasswordPolicyUtil {
 		return getPersistence()
 				   .findWithDynamicQuery(dynamicQuery, start, end,
 			orderByComparator);
-	}
-
-	/**
-	 * @see com.liferay.portal.service.persistence.BasePersistence#remove(com.liferay.portal.model.BaseModel)
-	 */
-	public static PasswordPolicy remove(PasswordPolicy passwordPolicy)
-		throws SystemException {
-		return getPersistence().remove(passwordPolicy);
 	}
 
 	/**
@@ -342,12 +334,14 @@ public class PasswordPolicyUtil {
 	*
 	* @param companyId the company ID
 	* @param defaultPolicy the default policy
+	* @return the password policy that was removed
 	* @throws SystemException if a system exception occurred
 	*/
-	public static void removeByC_DP(long companyId, boolean defaultPolicy)
+	public static com.liferay.portal.model.PasswordPolicy removeByC_DP(
+		long companyId, boolean defaultPolicy)
 		throws com.liferay.portal.NoSuchPasswordPolicyException,
 			com.liferay.portal.kernel.exception.SystemException {
-		getPersistence().removeByC_DP(companyId, defaultPolicy);
+		return getPersistence().removeByC_DP(companyId, defaultPolicy);
 	}
 
 	/**
@@ -355,12 +349,14 @@ public class PasswordPolicyUtil {
 	*
 	* @param companyId the company ID
 	* @param name the name
+	* @return the password policy that was removed
 	* @throws SystemException if a system exception occurred
 	*/
-	public static void removeByC_N(long companyId, java.lang.String name)
+	public static com.liferay.portal.model.PasswordPolicy removeByC_N(
+		long companyId, java.lang.String name)
 		throws com.liferay.portal.NoSuchPasswordPolicyException,
 			com.liferay.portal.kernel.exception.SystemException {
-		getPersistence().removeByC_N(companyId, name);
+		return getPersistence().removeByC_N(companyId, name);
 	}
 
 	/**
@@ -421,11 +417,10 @@ public class PasswordPolicyUtil {
 		return _persistence;
 	}
 
+	/**
+	 * @deprecated
+	 */
 	public void setPersistence(PasswordPolicyPersistence persistence) {
-		_persistence = persistence;
-
-		ReferenceRegistry.registerReference(PasswordPolicyUtil.class,
-			"_persistence");
 	}
 
 	private static PasswordPolicyPersistence _persistence;

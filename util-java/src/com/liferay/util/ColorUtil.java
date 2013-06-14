@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -26,6 +26,13 @@ import java.awt.Color;
  */
 public class ColorUtil {
 
+	public static Color blend(Color color1, Color color2, double ratio) {
+		int[] rgb1 = {color1.getRed(), color1.getGreen(), color1.getBlue()};
+		int[] rgb2 = {color2.getRed(), color2.getGreen(), color2.getBlue()};
+
+		return blend(rgb1, rgb2, ratio);
+	}
+
 	public static Color blend(int[] color1, int[] color2, double ratio) {
 		Color blended = new Color(
 			(int)(((color2[0]-color1[0]) * ratio) + color1[0]),
@@ -33,13 +40,6 @@ public class ColorUtil {
 			(int)(((color2[2]-color1[2]) * ratio) + color1[2]));
 
 		return blended;
-	}
-
-	public static Color blend (Color color1, Color color2, double ratio) {
-		int[] rgb1 = {color1.getRed(), color1.getGreen(), color1.getBlue()};
-		int[] rgb2 = {color2.getRed(), color2.getGreen(), color2.getBlue()};
-
-		return blend(rgb1, rgb2, ratio);
 	}
 
 	public static Color darker(int[] color, double ratio) {
@@ -113,8 +113,8 @@ public class ColorUtil {
 					hexArray[i] = 15;
 				}
 				else {
-					hexArray[i] =
-						GetterUtil.getInteger(new Character(c[i]).toString());
+					hexArray[i] = GetterUtil.getInteger(
+						new Character(c[i]).toString());
 				}
 			}
 		}

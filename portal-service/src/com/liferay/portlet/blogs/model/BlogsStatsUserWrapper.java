@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,6 +14,12 @@
 
 package com.liferay.portlet.blogs.model;
 
+import com.liferay.portal.model.ModelWrapper;
+
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * <p>
  * This class is a wrapper for {@link BlogsStatsUser}.
@@ -23,7 +29,8 @@ package com.liferay.portlet.blogs.model;
  * @see       BlogsStatsUser
  * @generated
  */
-public class BlogsStatsUserWrapper implements BlogsStatsUser {
+public class BlogsStatsUserWrapper implements BlogsStatsUser,
+	ModelWrapper<BlogsStatsUser> {
 	public BlogsStatsUserWrapper(BlogsStatsUser blogsStatsUser) {
 		_blogsStatsUser = blogsStatsUser;
 	}
@@ -34,6 +41,80 @@ public class BlogsStatsUserWrapper implements BlogsStatsUser {
 
 	public String getModelClassName() {
 		return BlogsStatsUser.class.getName();
+	}
+
+	public Map<String, Object> getModelAttributes() {
+		Map<String, Object> attributes = new HashMap<String, Object>();
+
+		attributes.put("statsUserId", getStatsUserId());
+		attributes.put("groupId", getGroupId());
+		attributes.put("companyId", getCompanyId());
+		attributes.put("userId", getUserId());
+		attributes.put("entryCount", getEntryCount());
+		attributes.put("lastPostDate", getLastPostDate());
+		attributes.put("ratingsTotalEntries", getRatingsTotalEntries());
+		attributes.put("ratingsTotalScore", getRatingsTotalScore());
+		attributes.put("ratingsAverageScore", getRatingsAverageScore());
+
+		return attributes;
+	}
+
+	public void setModelAttributes(Map<String, Object> attributes) {
+		Long statsUserId = (Long)attributes.get("statsUserId");
+
+		if (statsUserId != null) {
+			setStatsUserId(statsUserId);
+		}
+
+		Long groupId = (Long)attributes.get("groupId");
+
+		if (groupId != null) {
+			setGroupId(groupId);
+		}
+
+		Long companyId = (Long)attributes.get("companyId");
+
+		if (companyId != null) {
+			setCompanyId(companyId);
+		}
+
+		Long userId = (Long)attributes.get("userId");
+
+		if (userId != null) {
+			setUserId(userId);
+		}
+
+		Integer entryCount = (Integer)attributes.get("entryCount");
+
+		if (entryCount != null) {
+			setEntryCount(entryCount);
+		}
+
+		Date lastPostDate = (Date)attributes.get("lastPostDate");
+
+		if (lastPostDate != null) {
+			setLastPostDate(lastPostDate);
+		}
+
+		Integer ratingsTotalEntries = (Integer)attributes.get(
+				"ratingsTotalEntries");
+
+		if (ratingsTotalEntries != null) {
+			setRatingsTotalEntries(ratingsTotalEntries);
+		}
+
+		Double ratingsTotalScore = (Double)attributes.get("ratingsTotalScore");
+
+		if (ratingsTotalScore != null) {
+			setRatingsTotalScore(ratingsTotalScore);
+		}
+
+		Double ratingsAverageScore = (Double)attributes.get(
+				"ratingsAverageScore");
+
+		if (ratingsAverageScore != null) {
+			setRatingsAverageScore(ratingsAverageScore);
+		}
 	}
 
 	/**
@@ -276,10 +357,6 @@ public class BlogsStatsUserWrapper implements BlogsStatsUser {
 		return _blogsStatsUser.isEscapedModel();
 	}
 
-	public void setEscapedModel(boolean escapedModel) {
-		_blogsStatsUser.setEscapedModel(escapedModel);
-	}
-
 	public java.io.Serializable getPrimaryKeyObj() {
 		return _blogsStatsUser.getPrimaryKeyObj();
 	}
@@ -334,7 +411,14 @@ public class BlogsStatsUserWrapper implements BlogsStatsUser {
 		_blogsStatsUser.persist();
 	}
 
+	/**
+	 * @deprecated Renamed to {@link #getWrappedModel}
+	 */
 	public BlogsStatsUser getWrappedBlogsStatsUser() {
+		return _blogsStatsUser;
+	}
+
+	public BlogsStatsUser getWrappedModel() {
 		return _blogsStatsUser;
 	}
 

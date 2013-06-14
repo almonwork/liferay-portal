@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -75,17 +75,6 @@ public abstract class BaseTranslator {
 		return sb.toString();
 	}
 
-	protected String runRegexps(String content) {
-		for (Map.Entry<String, String> entry : regexps.entrySet()) {
-			String regexp = entry.getKey();
-			String replacement = entry.getValue();
-
-			content = runRegexp(content, regexp, replacement);
-		}
-
-		return content;
-	}
-
 	protected String runRegexp(
 		String content, String regexp, String replacement) {
 
@@ -103,6 +92,17 @@ public abstract class BaseTranslator {
 		return sb.toString();
 	}
 
+	protected String runRegexps(String content) {
+		for (Map.Entry<String, String> entry : regexps.entrySet()) {
+			String regexp = entry.getKey();
+			String replacement = entry.getValue();
+
+			content = runRegexp(content, regexp, replacement);
+		}
+
+		return content;
+	}
+
 	protected String unprotectNowikiText(String content) {
 		for (Map.Entry<String, String> entry : _protectedMap.entrySet()) {
 			String hash = entry.getKey();
@@ -114,6 +114,9 @@ public abstract class BaseTranslator {
 		return content;
 	}
 
+	protected List<String> nowikiRegexps = new LinkedList<String>();
+	protected Map<String, String> regexps = new LinkedHashMap<String, String>();
+
 	private String _normalizeLineBreaks(String content) {
 		content = StringUtil.replace(
 			content,
@@ -122,10 +125,6 @@ public abstract class BaseTranslator {
 
 		return content;
 	}
-
-	protected Map<String, String> regexps =
-		new LinkedHashMap<String, String>();
-	protected List<String> nowikiRegexps = new LinkedList<String>();
 
 	private Map<String, String> _protectedMap =
 		new LinkedHashMap<String, String>();

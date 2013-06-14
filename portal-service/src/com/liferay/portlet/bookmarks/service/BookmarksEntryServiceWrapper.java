@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,6 +14,8 @@
 
 package com.liferay.portlet.bookmarks.service;
 
+import com.liferay.portal.service.ServiceWrapper;
+
 /**
  * <p>
  * This class is a wrapper for {@link BookmarksEntryService}.
@@ -23,10 +25,29 @@ package com.liferay.portlet.bookmarks.service;
  * @see       BookmarksEntryService
  * @generated
  */
-public class BookmarksEntryServiceWrapper implements BookmarksEntryService {
+public class BookmarksEntryServiceWrapper implements BookmarksEntryService,
+	ServiceWrapper<BookmarksEntryService> {
 	public BookmarksEntryServiceWrapper(
 		BookmarksEntryService bookmarksEntryService) {
 		_bookmarksEntryService = bookmarksEntryService;
+	}
+
+	/**
+	* Returns the Spring bean ID for this bean.
+	*
+	* @return the Spring bean ID for this bean
+	*/
+	public java.lang.String getBeanIdentifier() {
+		return _bookmarksEntryService.getBeanIdentifier();
+	}
+
+	/**
+	* Sets the Spring bean ID for this bean.
+	*
+	* @param beanIdentifier the Spring bean ID for this bean
+	*/
+	public void setBeanIdentifier(java.lang.String beanIdentifier) {
+		_bookmarksEntryService.setBeanIdentifier(beanIdentifier);
 	}
 
 	public com.liferay.portlet.bookmarks.model.BookmarksEntry addEntry(
@@ -117,12 +138,26 @@ public class BookmarksEntryServiceWrapper implements BookmarksEntryService {
 			name, url, description, serviceContext);
 	}
 
+	/**
+	 * @deprecated Renamed to {@link #getWrappedService}
+	 */
 	public BookmarksEntryService getWrappedBookmarksEntryService() {
 		return _bookmarksEntryService;
 	}
 
+	/**
+	 * @deprecated Renamed to {@link #setWrappedService}
+	 */
 	public void setWrappedBookmarksEntryService(
 		BookmarksEntryService bookmarksEntryService) {
+		_bookmarksEntryService = bookmarksEntryService;
+	}
+
+	public BookmarksEntryService getWrappedService() {
+		return _bookmarksEntryService;
+	}
+
+	public void setWrappedService(BookmarksEntryService bookmarksEntryService) {
 		_bookmarksEntryService = bookmarksEntryService;
 	}
 

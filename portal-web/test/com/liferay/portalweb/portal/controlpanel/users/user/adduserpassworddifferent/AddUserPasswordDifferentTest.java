@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -23,9 +23,10 @@ import com.liferay.portalweb.portal.util.RuntimeVariables;
 public class AddUserPasswordDifferentTest extends BaseTestCase {
 	public void testAddUserPasswordDifferent() throws Exception {
 		selenium.open("/web/guest/home/");
+		loadRequiredJavaScriptModules();
 
 		for (int second = 0;; second++) {
-			if (second >= 60) {
+			if (second >= 90) {
 				fail("timeout");
 			}
 
@@ -40,50 +41,31 @@ public class AddUserPasswordDifferentTest extends BaseTestCase {
 			Thread.sleep(1000);
 		}
 
-		selenium.saveScreenShotAndSource();
-		selenium.clickAt("link=Control Panel", RuntimeVariables.replace(""));
+		selenium.clickAt("link=Control Panel",
+			RuntimeVariables.replace("Control Panel"));
 		selenium.waitForPageToLoad("30000");
-		selenium.saveScreenShotAndSource();
-
-		for (int second = 0;; second++) {
-			if (second >= 60) {
-				fail("timeout");
-			}
-
-			try {
-				if (selenium.isElementPresent("link=Users")) {
-					break;
-				}
-			}
-			catch (Exception e) {
-			}
-
-			Thread.sleep(1000);
-		}
-
-		selenium.saveScreenShotAndSource();
-		selenium.clickAt("link=Users", RuntimeVariables.replace(""));
+		loadRequiredJavaScriptModules();
+		selenium.clickAt("link=Users and Organizations",
+			RuntimeVariables.replace("Users and Organizations"));
 		selenium.waitForPageToLoad("30000");
-		selenium.saveScreenShotAndSource();
-		selenium.type("_125_keywords", RuntimeVariables.replace("selen01"));
-		selenium.saveScreenShotAndSource();
+		loadRequiredJavaScriptModules();
+		selenium.type("//input[@id='_125_keywords']",
+			RuntimeVariables.replace("selen01"));
 		selenium.clickAt("//input[@value='Search']",
-			RuntimeVariables.replace(""));
+			RuntimeVariables.replace("Search"));
 		selenium.waitForPageToLoad("30000");
-		selenium.saveScreenShotAndSource();
+		loadRequiredJavaScriptModules();
 		selenium.clickAt("//td[2]/a", RuntimeVariables.replace("User Name"));
 		selenium.waitForPageToLoad("30000");
-		selenium.saveScreenShotAndSource();
-		selenium.clickAt("//a[@id='_125_passwordLink']",
-			RuntimeVariables.replace(""));
+		loadRequiredJavaScriptModules();
 
 		for (int second = 0;; second++) {
-			if (second >= 60) {
+			if (second >= 90) {
 				fail("timeout");
 			}
 
 			try {
-				if (selenium.isVisible("_125_password1")) {
+				if (selenium.isVisible("//a[@id='_125_passwordLink']")) {
 					break;
 				}
 			}
@@ -93,16 +75,35 @@ public class AddUserPasswordDifferentTest extends BaseTestCase {
 			Thread.sleep(1000);
 		}
 
-		selenium.saveScreenShotAndSource();
-		selenium.type("_125_password1", RuntimeVariables.replace("test1"));
-		selenium.saveScreenShotAndSource();
-		selenium.type("_125_password2", RuntimeVariables.replace("test2"));
-		selenium.saveScreenShotAndSource();
-		assertFalse(selenium.isTextPresent("Please enter the same value again."));
-		selenium.clickAt("//input[@value='Save']", RuntimeVariables.replace(""));
+		assertTrue(selenium.isPartialText("//a[@id='_125_passwordLink']",
+				"Password"));
+		selenium.clickAt("//a[@id='_125_passwordLink']",
+			RuntimeVariables.replace("Password"));
+
+		for (int second = 0;; second++) {
+			if (second >= 90) {
+				fail("timeout");
+			}
+
+			try {
+				if (selenium.isVisible("//input[@id='_125_password1']")) {
+					break;
+				}
+			}
+			catch (Exception e) {
+			}
+
+			Thread.sleep(1000);
+		}
+
+		selenium.type("//input[@id='_125_password1']",
+			RuntimeVariables.replace("test1"));
+		selenium.type("//input[@id='_125_password2']",
+			RuntimeVariables.replace("test2"));
+		selenium.clickAt("//input[@value='Save']",
+			RuntimeVariables.replace("Save"));
 		assertEquals(RuntimeVariables.replace(
 				"Please enter the same value again."),
-			selenium.getText(
-				"//div[@class='aui-form-validator-message equalTo']"));
+			selenium.getText("//label/div"));
 	}
 }

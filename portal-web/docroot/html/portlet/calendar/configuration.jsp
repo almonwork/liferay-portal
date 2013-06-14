@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -21,8 +21,8 @@ String tabs2 = ParamUtil.getString(request, "tabs2", "email-from");
 
 String redirect = ParamUtil.getString(request, "redirect");
 
-String emailFromName = ParamUtil.getString(request, "emailFromName", CalUtil.getEmailFromName(preferences));
-String emailFromAddress = ParamUtil.getString(request, "emailFromAddress", CalUtil.getEmailFromAddress(preferences));
+String emailFromName = ParamUtil.getString(request, "emailFromName", CalUtil.getEmailFromName(preferences, company.getCompanyId()));
+String emailFromAddress = ParamUtil.getString(request, "emailFromAddress", CalUtil.getEmailFromAddress(preferences, company.getCompanyId()));
 
 String emailEventReminderSubject = ParamUtil.getString(request, "emailEventReminderSubject", CalUtil.getEmailEventReminderSubject(preferences));
 String emailEventReminderBody = ParamUtil.getString(request, "emailEventReminderBody", CalUtil.getEmailEventReminderBody(preferences));
@@ -31,7 +31,7 @@ String editorParam = "emailEventReminderBody";
 String editorContent = emailEventReminderBody;
 %>
 
-<liferay-portlet:renderURL var="portletURL" portletConfiguration="true">
+<liferay-portlet:renderURL portletConfiguration="true" var="portletURL">
 	<portlet:param name="tabs2" value="<%= tabs2 %>" />
 	<portlet:param name="redirect" value="<%= redirect %>" />
 </liferay-portlet:renderURL>
@@ -144,7 +144,7 @@ String editorContent = emailEventReminderBody;
 					for (String tabs1Name : tabs1NamesArray) {
 					%>
 
-					<aui:option label="<%= tabs1Name %>" selected="<%= tabs1Default.equals(tabs1Name) %>" />
+						<aui:option label="<%= tabs1Name %>" selected="<%= tabs1Default.equals(tabs1Name) %>" />
 
 					<%
 					}
@@ -162,7 +162,9 @@ String editorContent = emailEventReminderBody;
 				<aui:input label="show-mini-month" name="preferences--summaryTabShowMiniMonth--" type="checkbox" value="<%= summaryTabShowMiniMonth %>" />
 
 				<aui:input label="show-todays-events" name="preferences--summaryTabShowTodaysEvents--" type="checkbox" value="<%= summaryTabShowTodaysEvents %>" />
+			</aui:fieldset>
 
+			<aui:fieldset label="events">
 				<aui:input name="preferences--enableRelatedAssets--" type="checkbox" value="<%= enableRelatedAssets %>" />
 
 				<c:if test="<%= PropsValues.CALENDAR_EVENT_RATINGS_ENABLED %>">

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -83,12 +83,12 @@ public class MBCategoryLocalServiceImpl extends MBCategoryLocalServiceBaseImpl {
 
 		// Resources
 
-		if (serviceContext.getAddGroupPermissions() ||
-			serviceContext.getAddGuestPermissions()) {
+		if (serviceContext.isAddGroupPermissions() ||
+			serviceContext.isAddGuestPermissions()) {
 
 			addCategoryResources(
-				category, serviceContext.getAddGroupPermissions(),
-				serviceContext.getAddGuestPermissions());
+				category, serviceContext.isAddGroupPermissions(),
+				serviceContext.isAddGuestPermissions());
 		}
 		else {
 			addCategoryResources(
@@ -206,7 +206,8 @@ public class MBCategoryLocalServiceImpl extends MBCategoryLocalServiceBaseImpl {
 
 		// Indexer
 
-		Indexer indexer = IndexerRegistryUtil.getIndexer(MBMessage.class);
+		Indexer indexer = IndexerRegistryUtil.nullSafeGetIndexer(
+			MBMessage.class);
 
 		indexer.delete(category);
 
@@ -375,7 +376,7 @@ public class MBCategoryLocalServiceImpl extends MBCategoryLocalServiceBaseImpl {
 			boolean inUseSSL, String inUserName, String inPassword,
 			int inReadInterval, String outEmailAddress, boolean outCustom,
 			String outServerName, int outServerPort, boolean outUseSSL,
-			String outUserName,	String outPassword, boolean allowAnonymous,
+			String outUserName, String outPassword, boolean allowAnonymous,
 			boolean mailingListActive, boolean mergeWithParentCategory,
 			ServiceContext serviceContext)
 		throws PortalException, SystemException {
@@ -547,7 +548,7 @@ public class MBCategoryLocalServiceImpl extends MBCategoryLocalServiceBaseImpl {
 
 				// Indexer
 
-				Indexer indexer = IndexerRegistryUtil.getIndexer(
+				Indexer indexer = IndexerRegistryUtil.nullSafeGetIndexer(
 					MBMessage.class);
 
 				indexer.reindex(message);

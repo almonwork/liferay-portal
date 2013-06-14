@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -52,7 +52,7 @@ import javax.servlet.http.HttpServletRequest;
  */
 public class AssetUtil {
 
-	public static char[] INVALID_CHARACTERS = new char[] {
+	public static final char[] INVALID_CHARACTERS = new char[] {
 		CharPool.AMPERSAND, CharPool.APOSTROPHE, CharPool.AT,
 		CharPool.BACK_SLASH, CharPool.CLOSE_BRACKET, CharPool.CLOSE_CURLY_BRACE,
 		CharPool.COLON, CharPool.COMMA, CharPool.EQUAL, CharPool.GREATER_THAN,
@@ -88,17 +88,19 @@ public class AssetUtil {
 		Collections.reverse(ancestorCategories);
 
 		for (AssetCategory ancestorCategory : ancestorCategories) {
-			portletURL.setParameter("categoryId", String.valueOf(
-				ancestorCategory.getCategoryId()));
+			portletURL.setParameter(
+				"categoryId", String.valueOf(ancestorCategory.getCategoryId()));
 
 			addPortletBreadcrumbEntry(
-				request, ancestorCategory.getName(), portletURL.toString());
+				request, ancestorCategory.getTitleCurrentValue(),
+				portletURL.toString());
 		}
 
 		portletURL.setParameter("categoryId", String.valueOf(assetCategoryId));
 
 		addPortletBreadcrumbEntry(
-			request, assetCategory.getName(), portletURL.toString());
+			request, assetCategory.getTitleCurrentValue(),
+			portletURL.toString());
 	}
 
 	public static void addPortletBreadcrumbEntry(

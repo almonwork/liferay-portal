@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -36,13 +36,13 @@ import java.util.List;
 public class LayoutFinderImpl
 	extends BasePersistenceImpl<Layout> implements LayoutFinder {
 
-	public static String FIND_BY_NULL_FRIENDLY_URL =
+	public static final String FIND_BY_NULL_FRIENDLY_URL =
 		LayoutFinder.class.getName() + ".findByNullFriendlyURL";
 
-	public static String FIND_BY_SCOPE_GROUP =
+	public static final String FIND_BY_SCOPE_GROUP =
 		LayoutFinder.class.getName() + ".findByScopeGroup";
 
-	public static String FIND_BY_C_P_P =
+	public static final String FIND_BY_C_P_P =
 		LayoutFinder.class.getName() + ".findByC_P_P";
 
 	public List<Layout> findByNullFriendlyURL() throws SystemException {
@@ -57,7 +57,7 @@ public class LayoutFinderImpl
 
 			q.addEntity("Layout", LayoutImpl.class);
 
-			return q.list();
+			return q.list(true);
 		}
 		catch (Exception e) {
 			throw new SystemException(e);
@@ -86,7 +86,7 @@ public class LayoutFinderImpl
 			qPos.add(groupId);
 			qPos.add(privateLayout);
 
-			return q.list();
+			return q.list(true);
 		}
 		catch (Exception e) {
 			throw new SystemException(e);
@@ -121,13 +121,13 @@ public class LayoutFinderImpl
 
 			qPos.add(companyId);
 			qPos.add(portletId);
-			qPos.add(portletId + "_INSTANCE_%");
+			qPos.add(portletId.concat("_INSTANCE_%"));
 			qPos.add(preferences);
 
 			List<LayoutReference> layoutReferences =
 				new ArrayList<LayoutReference>();
 
-			Iterator<Object[]> itr = q.list().iterator();
+			Iterator<Object[]> itr = q.iterate();
 
 			while (itr.hasNext()) {
 				Object[] array = itr.next();

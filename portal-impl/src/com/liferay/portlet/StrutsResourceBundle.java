@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -51,10 +51,11 @@ public class StrutsResourceBundle extends ResourceBundle {
 			throw new NullPointerException();
 		}
 
-		if ((key.equals(JavaConstants.JAVAX_PORTLET_TITLE) ||
-			 key.equals(JavaConstants.JAVAX_PORTLET_SHORT_TITLE) ||
-			 key.equals(JavaConstants.JAVAX_PORTLET_KEYWORDS) ||
-			 key.equals(JavaConstants.JAVAX_PORTLET_DESCRIPTION))) {
+		if (key.equals(JavaConstants.JAVAX_PORTLET_DESCRIPTION) ||
+			key.equals(JavaConstants.JAVAX_PORTLET_KEYWORDS) ||
+			key.equals(JavaConstants.JAVAX_PORTLET_LONG_TITLE) ||
+			key.equals(JavaConstants.JAVAX_PORTLET_SHORT_TITLE) ||
+			key.equals(JavaConstants.JAVAX_PORTLET_TITLE)) {
 
 			key = key.concat(StringPool.PERIOD).concat(_portletName);
 		}
@@ -68,7 +69,7 @@ public class StrutsResourceBundle extends ResourceBundle {
 		return value;
 	}
 
-	private String _portletName;
 	private Locale _locale;
+	private String _portletName;
 
 }

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -23,116 +23,118 @@ import java.util.Date;
  */
 public class ReleaseInfo {
 
-	static String name = "Liferay Portal Community Edition";
+	public static final int RELEASE_5_0_0_BUILD_NUMBER = 5000;
 
-	static String version = "6.1.0";
+	public static final int RELEASE_5_0_1_BUILD_NUMBER = 5001;
 
-	static String versionDisplayName = "6.1.0 CE";
+	public static final int RELEASE_5_1_0_BUILD_NUMBER = 5100;
 
-	static String codeName = "Paton";
+	public static final int RELEASE_5_1_1_BUILD_NUMBER = 5101;
 
-	static String build = "6100";
+	public static final int RELEASE_5_1_2_BUILD_NUMBER = 5102;
 
-	static int buildNumber = Integer.parseInt(build);
+	public static final int RELEASE_5_2_0_BUILD_NUMBER = 5200;
 
-	static String date = "March 24, 2011";
+	public static final int RELEASE_5_2_1_BUILD_NUMBER = 5201;
 
-	static String releaseInfoPrefix = System.getProperty(
-		"liferay.release.info.prefix" , StringPool.BLANK);
+	public static final int RELEASE_5_2_2_BUILD_NUMBER = 5202;
 
-	static String releaseInfoSuffix = System.getProperty(
-		"liferay.release.info.suffix" , StringPool.BLANK);
+	public static final int RELEASE_5_2_3_BUILD_NUMBER = 5203;
 
-	static String releaseInfo =
-		releaseInfoPrefix + name + " " + versionDisplayName + " (" + codeName +
-			" / Build " + build + " / " + date + ")" + releaseInfoSuffix;
+	public static final int RELEASE_6_0_0_BUILD_NUMBER = 6000;
 
-	static String serverInfo = name + " / " + version;
+	public static final int RELEASE_6_0_1_BUILD_NUMBER = 6001;
 
-	public static int RELEASE_4_2_0_BUILD_NUMBER = 3500;
+	public static final int RELEASE_6_0_2_BUILD_NUMBER = 6002;
 
-	public static int RELEASE_4_2_1_BUILD_NUMBER = 3501;
+	public static final int RELEASE_6_0_3_BUILD_NUMBER = 6003;
 
-	public static int RELEASE_4_2_2_BUILD_NUMBER = 3502;
+	public static final int RELEASE_6_0_4_BUILD_NUMBER = 6004;
 
-	public static int RELEASE_4_3_0_BUILD_NUMBER = 4300;
+	public static final int RELEASE_6_0_5_BUILD_NUMBER = 6005;
 
-	public static int RELEASE_4_3_1_BUILD_NUMBER = 4301;
+	public static final int RELEASE_6_0_6_BUILD_NUMBER = 6006;
 
-	public static int RELEASE_4_3_2_BUILD_NUMBER = 4302;
+	public static final int RELEASE_6_1_0_BUILD_NUMBER = 6100;
 
-	public static int RELEASE_4_3_3_BUILD_NUMBER = 4303;
+	public static final int RELEASE_6_1_1_BUILD_NUMBER = 6101;
 
-	public static int RELEASE_4_3_4_BUILD_NUMBER = 4304;
-
-	public static int RELEASE_4_3_5_BUILD_NUMBER = 4305;
-
-	public static int RELEASE_4_3_6_BUILD_NUMBER = 4306;
-
-	public static int RELEASE_4_4_0_BUILD_NUMBER = 4400;
-
-	public static int RELEASE_5_0_0_BUILD_NUMBER = 5000;
-
-	public static int RELEASE_5_0_1_BUILD_NUMBER = 5001;
-
-	public static int RELEASE_5_1_0_BUILD_NUMBER = 5100;
-
-	public static int RELEASE_5_1_1_BUILD_NUMBER = 5101;
-
-	public static int RELEASE_5_1_2_BUILD_NUMBER = 5102;
-
-	public static int RELEASE_5_2_0_BUILD_NUMBER = 5200;
-
-	public static int RELEASE_5_2_1_BUILD_NUMBER = 5201;
-
-	public static int RELEASE_5_2_2_BUILD_NUMBER = 5202;
-
-	public static int RELEASE_5_2_3_BUILD_NUMBER = 5203;
-
-	public static int RELEASE_6_0_0_BUILD_NUMBER = 6000;
-
-	public static int RELEASE_6_0_1_BUILD_NUMBER = 6001;
-
-	public static int RELEASE_6_0_2_BUILD_NUMBER = 6002;
-
-	public static int RELEASE_6_0_3_BUILD_NUMBER = 6003;
-
-	public static int RELEASE_6_0_4_BUILD_NUMBER = 6004;
-
-	public static int RELEASE_6_0_5_BUILD_NUMBER = 6005;
-
-	public static int RELEASE_6_0_6_BUILD_NUMBER = 6006;
-
-	public static int RELEASE_6_1_0_BUILD_NUMBER = 6100;
-
-	public static final String getName() {
-		return name;
-	}
-
-	public static final String getVersion() {
-		return version;
-	}
-
-	public static final String getCodeName() {
-		return codeName;
-	}
-
-	public static final int getBuildNumber() {
-		return buildNumber;
-	}
+	public static final int RELEASE_6_2_0_BUILD_NUMBER = 6200;
 
 	public static final Date getBuildDate() {
 		DateFormat df = DateFormat.getDateInstance(DateFormat.LONG);
 
-		return GetterUtil.getDate(date, df);
+		return GetterUtil.getDate(_DATE, df);
+	}
+
+	public static final int getBuildNumber() {
+		return _BUILD_NUMBER;
+	}
+
+	public static final String getCodeName() {
+		return _CODE_NAME;
+	}
+
+	public static final String getName() {
+		return _NAME;
+	}
+
+	public static final int getParentBuildNumber() {
+		return _PARENT_BUILD_NUMBER;
 	}
 
 	public static final String getReleaseInfo() {
-		return releaseInfo;
+		if (_releaseInfo == null) {
+			_releaseInfo =
+				_RELEASE_INFO_PREFIX + _NAME + " " + _VERSION_DISPLAY_NAME +
+					" (" + _CODE_NAME + " / Build " + _BUILD + " / " + _DATE +
+						")" + _RELEASE_INFO_SUFFIX;
+		}
+
+		return _releaseInfo;
 	}
 
 	public static final String getServerInfo() {
-		return serverInfo;
+		if (_serverInfo == null) {
+			_serverInfo = _NAME + " / " + _VERSION;
+		}
+
+		return _serverInfo;
 	}
+
+	public static String getVendor() {
+		return _VENDOR;
+	}
+
+	public static final String getVersion() {
+		return _VERSION;
+	}
+
+	private static final String _BUILD = "6200";
+
+	private static final int _BUILD_NUMBER = Integer.parseInt(_BUILD);
+
+	private static final String _CODE_NAME = "Newton";
+
+	private static final String _DATE = "January 18, 2012";
+
+	private static final String _NAME = "Liferay Portal Community Edition";
+
+	private static final int _PARENT_BUILD_NUMBER = _BUILD_NUMBER;
+
+	private static final String _RELEASE_INFO_PREFIX = System.getProperty(
+		"liferay.release.info.prefix" , StringPool.BLANK);
+
+	private static final String _RELEASE_INFO_SUFFIX = System.getProperty(
+		"liferay.release.info.suffix" , StringPool.BLANK);
+
+	private static final String _VENDOR = "Liferay, Inc.";
+
+	private static final String _VERSION = "6.2.0";
+
+	private static final String _VERSION_DISPLAY_NAME = "6.2.0 CE";
+
+	private static String _releaseInfo;
+	private static String _serverInfo;
 
 }

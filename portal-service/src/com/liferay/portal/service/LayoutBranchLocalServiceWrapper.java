@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -23,7 +23,8 @@ package com.liferay.portal.service;
  * @see       LayoutBranchLocalService
  * @generated
  */
-public class LayoutBranchLocalServiceWrapper implements LayoutBranchLocalService {
+public class LayoutBranchLocalServiceWrapper implements LayoutBranchLocalService,
+	ServiceWrapper<LayoutBranchLocalService> {
 	public LayoutBranchLocalServiceWrapper(
 		LayoutBranchLocalService layoutBranchLocalService) {
 		_layoutBranchLocalService = layoutBranchLocalService;
@@ -57,25 +58,32 @@ public class LayoutBranchLocalServiceWrapper implements LayoutBranchLocalService
 	* Deletes the layout branch with the primary key from the database. Also notifies the appropriate model listeners.
 	*
 	* @param LayoutBranchId the primary key of the layout branch
+	* @return the layout branch that was removed
 	* @throws PortalException if a layout branch with the primary key could not be found
 	* @throws SystemException if a system exception occurred
 	*/
-	public void deleteLayoutBranch(long LayoutBranchId)
+	public com.liferay.portal.model.LayoutBranch deleteLayoutBranch(
+		long LayoutBranchId)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException {
-		_layoutBranchLocalService.deleteLayoutBranch(LayoutBranchId);
+		return _layoutBranchLocalService.deleteLayoutBranch(LayoutBranchId);
 	}
 
 	/**
 	* Deletes the layout branch from the database. Also notifies the appropriate model listeners.
 	*
 	* @param layoutBranch the layout branch
+	* @return the layout branch that was removed
 	* @throws SystemException if a system exception occurred
 	*/
-	public void deleteLayoutBranch(
+	public com.liferay.portal.model.LayoutBranch deleteLayoutBranch(
 		com.liferay.portal.model.LayoutBranch layoutBranch)
 		throws com.liferay.portal.kernel.exception.SystemException {
-		_layoutBranchLocalService.deleteLayoutBranch(layoutBranch);
+		return _layoutBranchLocalService.deleteLayoutBranch(layoutBranch);
+	}
+
+	public com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery() {
+		return _layoutBranchLocalService.dynamicQuery();
 	}
 
 	/**
@@ -147,6 +155,12 @@ public class LayoutBranchLocalServiceWrapper implements LayoutBranchLocalService
 		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery)
 		throws com.liferay.portal.kernel.exception.SystemException {
 		return _layoutBranchLocalService.dynamicQueryCount(dynamicQuery);
+	}
+
+	public com.liferay.portal.model.LayoutBranch fetchLayoutBranch(
+		long LayoutBranchId)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return _layoutBranchLocalService.fetchLayoutBranch(LayoutBranchId);
 	}
 
 	/**
@@ -265,12 +279,24 @@ public class LayoutBranchLocalServiceWrapper implements LayoutBranchLocalService
 			name, description, master, serviceContext);
 	}
 
+	public void deleteLayoutSetBranchLayoutBranches(long layoutSetBranchId)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException {
+		_layoutBranchLocalService.deleteLayoutSetBranchLayoutBranches(layoutSetBranchId);
+	}
+
 	public java.util.List<com.liferay.portal.model.LayoutBranch> getLayoutBranches(
 		long layoutSetBranchId, long plid, int start, int end,
 		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
 		throws com.liferay.portal.kernel.exception.SystemException {
 		return _layoutBranchLocalService.getLayoutBranches(layoutSetBranchId,
 			plid, start, end, orderByComparator);
+	}
+
+	public java.util.List<com.liferay.portal.model.LayoutBranch> getLayoutSetBranchLayoutBranches(
+		long layoutSetBranchId)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return _layoutBranchLocalService.getLayoutSetBranchLayoutBranches(layoutSetBranchId);
 	}
 
 	public com.liferay.portal.model.LayoutBranch getMasterLayoutBranch(
@@ -291,11 +317,26 @@ public class LayoutBranchLocalServiceWrapper implements LayoutBranchLocalService
 			name, description, serviceContext);
 	}
 
+	/**
+	 * @deprecated Renamed to {@link #getWrappedService}
+	 */
 	public LayoutBranchLocalService getWrappedLayoutBranchLocalService() {
 		return _layoutBranchLocalService;
 	}
 
+	/**
+	 * @deprecated Renamed to {@link #setWrappedService}
+	 */
 	public void setWrappedLayoutBranchLocalService(
+		LayoutBranchLocalService layoutBranchLocalService) {
+		_layoutBranchLocalService = layoutBranchLocalService;
+	}
+
+	public LayoutBranchLocalService getWrappedService() {
+		return _layoutBranchLocalService;
+	}
+
+	public void setWrappedService(
 		LayoutBranchLocalService layoutBranchLocalService) {
 		_layoutBranchLocalService = layoutBranchLocalService;
 	}

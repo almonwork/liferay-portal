@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -31,7 +31,21 @@ public interface Channel {
 	public void confirmDelivery(Collection<String> notificationEventUuids)
 		throws ChannelException;
 
+	public void confirmDelivery(
+			Collection<String> notificationEventUuids, boolean archive)
+		throws ChannelException;
+
 	public void confirmDelivery(String notificationEventUuid)
+		throws ChannelException;
+
+	public void confirmDelivery(String notificationEventUuid, boolean archive)
+		throws ChannelException;
+
+	public void deleteUserNotificiationEvent(String notificationEventUuid)
+		throws ChannelException;
+
+	public void deleteUserNotificiationEvents(
+			Collection<String> notificationEventUuids)
 		throws ChannelException;
 
 	public void flush() throws ChannelException;

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -91,14 +91,6 @@ public class ClusterGroupUtil {
 		return getPersistence()
 				   .findWithDynamicQuery(dynamicQuery, start, end,
 			orderByComparator);
-	}
-
-	/**
-	 * @see com.liferay.portal.service.persistence.BasePersistence#remove(com.liferay.portal.model.BaseModel)
-	 */
-	public static ClusterGroup remove(ClusterGroup clusterGroup)
-		throws SystemException {
-		return getPersistence().remove(clusterGroup);
 	}
 
 	/**
@@ -278,11 +270,10 @@ public class ClusterGroupUtil {
 		return _persistence;
 	}
 
+	/**
+	 * @deprecated
+	 */
 	public void setPersistence(ClusterGroupPersistence persistence) {
-		_persistence = persistence;
-
-		ReferenceRegistry.registerReference(ClusterGroupUtil.class,
-			"_persistence");
 	}
 
 	private static ClusterGroupPersistence _persistence;

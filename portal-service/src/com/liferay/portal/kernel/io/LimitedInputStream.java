@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -25,8 +25,7 @@ import java.io.InputStream;
  */
 public class LimitedInputStream extends InputStream {
 
-	public LimitedInputStream(
-			InputStream inputStream, long offset, long length)
+	public LimitedInputStream(InputStream inputStream, long offset, long length)
 		throws IOException {
 
 		if (offset < 0) {
@@ -123,9 +122,7 @@ public class LimitedInputStream extends InputStream {
 	}
 
 	@Override
-	public int read(byte[] bytes, int offset, int length)
-		throws IOException {
-
+	public int read(byte[] bytes, int offset, int length) throws IOException {
 		if (_read >= _length) {
 			return -1;
 		}

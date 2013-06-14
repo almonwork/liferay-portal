@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -15,39 +15,29 @@
 package com.liferay.portal.lar;
 
 import com.liferay.portal.kernel.lar.PortletDataContext;
-import com.liferay.portal.kernel.lar.PortletDataHandlerKeys;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.util.CharPool;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.KeyValuePair;
-import com.liferay.portal.kernel.util.MapUtil;
+import com.liferay.portal.kernel.util.PrimitiveLongList;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.xml.Document;
 import com.liferay.portal.kernel.xml.Element;
 import com.liferay.portal.kernel.xml.SAXReaderUtil;
-import com.liferay.portal.model.Group;
-import com.liferay.portal.model.GroupConstants;
 import com.liferay.portal.model.Layout;
-import com.liferay.portal.model.Permission;
 import com.liferay.portal.model.PortletConstants;
-import com.liferay.portal.model.Resource;
 import com.liferay.portal.model.ResourceConstants;
 import com.liferay.portal.model.Role;
 import com.liferay.portal.model.RoleConstants;
 import com.liferay.portal.model.User;
 import com.liferay.portal.security.permission.ResourceActionsUtil;
-import com.liferay.portal.service.GroupLocalServiceUtil;
-import com.liferay.portal.service.PermissionLocalServiceUtil;
 import com.liferay.portal.service.ResourcePermissionLocalServiceUtil;
 import com.liferay.portal.service.RoleLocalServiceUtil;
 import com.liferay.portal.service.permission.PortletPermissionUtil;
-import com.liferay.portal.util.PropsValues;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import org.apache.commons.lang.time.StopWatch;
+import java.util.Set;
 
 /**
  * @author Brian Wing Shun Chan
@@ -63,29 +53,6 @@ public class PermissionExporter {
 
 	public static final String ROLE_TEAM_PREFIX = "ROLE_TEAM_,*";
 
-	protected Element exportGroupPermissions(
-			long companyId, long groupId, String resourceName,
-			String resourcePrimKey, Element parentElement, String elementName)
-		throws Exception {
-
-		Element element = parentElement.addElement(elementName);
-
-		List<Permission> permissions =
-			PermissionLocalServiceUtil.getGroupPermissions(
-				groupId, companyId, resourceName,
-				ResourceConstants.SCOPE_INDIVIDUAL, resourcePrimKey);
-
-		List<String> actions = ResourceActionsUtil.getActions(permissions);
-
-		for (String action : actions) {
-			Element actionKeyElement = element.addElement("action-key");
-
-			actionKeyElement.addText(action);
-		}
-
-		return element;
-	}
-
 	protected void exportGroupRoles(
 			LayoutCache layoutCache, long companyId, long groupId,
 			String resourceName, String entityName, Element parentElement)
@@ -100,39 +67,6 @@ public class PermissionExporter {
 
 		if (groupElement.elements().isEmpty()) {
 			parentElement.remove(groupElement);
-		}
-	}
-
-	protected void exportInheritedPermissions(
-			LayoutCache layoutCache, long companyId, String resourceName,
-			String resourcePrimKey, Element parentElement, String entityName)
-		throws Exception {
-
-		Element entityPermissionsElement = SAXReaderUtil.createElement(
-			entityName + "-permissions");
-
-		Map<String, Long> entityMap = layoutCache.getEntityMap(
-			companyId, entityName);
-
-		for (Map.Entry<String, Long> entry : entityMap.entrySet()) {
-			String name = entry.getKey();
-
-			long entityGroupId = entry.getValue();
-
-			Element entityElement = exportGroupPermissions(
-				companyId, entityGroupId, resourceName, resourcePrimKey,
-				entityPermissionsElement, entityName + "-actions");
-
-			if (entityElement.elements().isEmpty()) {
-				entityPermissionsElement.remove(entityElement);
-			}
-			else {
-				entityElement.addAttribute("name", name);
-			}
-		}
-
-		if (!entityPermissionsElement.elements().isEmpty()) {
-			parentElement.add(entityPermissionsElement);
 		}
 	}
 
@@ -175,8 +109,7 @@ public class PermissionExporter {
 
 	protected void exportLayoutPermissions(
 			PortletDataContext portletDataContext, LayoutCache layoutCache,
-			long companyId, long groupId, Layout layout, Element layoutElement,
-			boolean exportUserPermissions)
+			long companyId, long groupId, Layout layout, Element layoutElement)
 		throws Exception {
 
 		String resourceName = Layout.class.getName();
@@ -184,21 +117,9 @@ public class PermissionExporter {
 
 		Element permissionsElement = layoutElement.addElement("permissions");
 
-		if (PropsValues.PERMISSIONS_USER_CHECK_ALGORITHM == 5) {
-			exportPermissions_5(
-				layoutCache, companyId, groupId, resourceName, resourcePrimKey,
-				permissionsElement, false);
-		}
-		else if (PropsValues.PERMISSIONS_USER_CHECK_ALGORITHM == 6) {
-			exportPermissions_6(
-				layoutCache, companyId, groupId, resourceName, resourcePrimKey,
-				permissionsElement, false);
-		}
-		else {
-			exportPermissions_1to4(
-				layoutCache, companyId, groupId, resourceName, resourcePrimKey,
-				permissionsElement, exportUserPermissions);
-		}
+		exportPermissions(
+			layoutCache, companyId, groupId, resourceName, resourcePrimKey,
+			permissionsElement, false);
 	}
 
 	protected void exportLayoutRoles(
@@ -224,79 +145,7 @@ public class PermissionExporter {
 			rolesElement);
 	}
 
-	protected void exportPermissions_1to4(
-			LayoutCache layoutCache, long companyId, long groupId,
-			String resourceName, String resourcePrimKey,
-			Element permissionsElement, boolean exportUserPermissions)
-		throws Exception {
-
-		Group guestGroup = GroupLocalServiceUtil.getGroup(
-			companyId, GroupConstants.GUEST);
-
-		exportGroupPermissions(
-			companyId, groupId, resourceName, resourcePrimKey,
-			permissionsElement, "community-actions");
-
-		if (groupId != guestGroup.getGroupId()) {
-			exportGroupPermissions(
-				companyId, guestGroup.getGroupId(), resourceName,
-				resourcePrimKey, permissionsElement, "guest-actions");
-		}
-
-		if (exportUserPermissions) {
-			exportUserPermissions(
-				layoutCache, companyId, groupId, resourceName, resourcePrimKey,
-				permissionsElement);
-		}
-
-		exportInheritedPermissions(
-			layoutCache, companyId, resourceName, resourcePrimKey,
-			permissionsElement, "organization");
-
-		exportInheritedPermissions(
-			layoutCache, companyId, resourceName, resourcePrimKey,
-			permissionsElement, "user-group");
-	}
-
-	protected void exportPermissions_5(
-			LayoutCache layoutCache, long companyId, long groupId,
-			String resourceName, String resourcePrimKey,
-			Element permissionsElement, boolean portletActions)
-		throws Exception {
-
-		Resource resource = layoutCache.getResource(
-			companyId, groupId, resourceName,
-			ResourceConstants.SCOPE_INDIVIDUAL, resourcePrimKey,
-			portletActions);
-
-		List<Role> roles = layoutCache.getGroupRoles_5(groupId, resourceName);
-
-		for (Role role : roles) {
-			if (role.getName().equals(RoleConstants.ADMINISTRATOR)) {
-				continue;
-			}
-
-			Element roleElement = permissionsElement.addElement("role");
-
-			roleElement.addAttribute("name", role.getName());
-			roleElement.addAttribute("description", role.getDescription());
-			roleElement.addAttribute("type", String.valueOf(role.getType()));
-
-			List<Permission> permissions =
-				PermissionLocalServiceUtil.getRolePermissions(
-					role.getRoleId(), resource.getResourceId());
-
-			List<String> actions = ResourceActionsUtil.getActions(permissions);
-
-			for (String action : actions) {
-				Element actionKeyElement = roleElement.addElement("action-key");
-
-				actionKeyElement.addText(action);
-			}
-		}
-	}
-
-	protected void exportPermissions_6(
+	protected void exportPermissions(
 			LayoutCache layoutCache, long companyId, long groupId,
 			String resourceName, String resourcePrimKey,
 			Element permissionsElement, boolean portletActions)
@@ -304,36 +153,57 @@ public class PermissionExporter {
 
 		List<Role> roles = layoutCache.getGroupRoles_5(groupId, resourceName);
 
+		List<String> actionIds = null;
+
+		if (portletActions) {
+			actionIds = ResourceActionsUtil.getPortletResourceActions(
+				resourceName);
+		}
+		else {
+			actionIds = ResourceActionsUtil.getModelResourceActions(
+				resourceName);
+		}
+
+		if (actionIds.isEmpty()) {
+			return;
+		}
+
+		PrimitiveLongList roleIds = new PrimitiveLongList(roles.size());
+		Map<Long, Role> roleIdsToRoles = new HashMap<Long, Role>();
+
 		for (Role role : roles) {
-			if (role.getName().equals(RoleConstants.ADMINISTRATOR)) {
+			String name = role.getName();
+
+			if (name.equals(RoleConstants.ADMINISTRATOR)) {
 				continue;
 			}
+
+			roleIds.add(role.getRoleId());
+			roleIdsToRoles.put(role.getRoleId(), role);
+		}
+
+		Map<Long, Set<String>> roleIdsToActionIds =
+			ResourcePermissionLocalServiceUtil.
+				getAvailableResourcePermissionActionIds(
+					companyId, resourceName, ResourceConstants.SCOPE_INDIVIDUAL,
+					resourcePrimKey, roleIds.getArray(), actionIds);
+
+		for (Role role : roleIdsToRoles.values()) {
+			Set<String> availableActionIds = roleIdsToActionIds.get(
+				role.getRoleId());
 
 			Element roleElement = permissionsElement.addElement("role");
 
 			roleElement.addAttribute("name", role.getName());
+			roleElement.addAttribute("title", role.getTitle());
 			roleElement.addAttribute("description", role.getDescription());
 			roleElement.addAttribute("type", String.valueOf(role.getType()));
 
-			List<String> actionIds = null;
-
-			if (portletActions) {
-				actionIds = ResourceActionsUtil.getPortletResourceActions(
-					resourceName);
-			}
-			else {
-				actionIds = ResourceActionsUtil.getModelResourceActions(
-					resourceName);
+			if ((availableActionIds == null) || availableActionIds.isEmpty()) {
+				continue;
 			}
 
-			List<String> actions =
-				ResourcePermissionLocalServiceUtil.
-					getAvailableResourcePermissionActionIds(
-						companyId, resourceName,
-						ResourceConstants.SCOPE_INDIVIDUAL, resourcePrimKey,
-						role.getRoleId(), actionIds);
-
-			for (String action : actions) {
+			for (String action : availableActionIds) {
 				Element actionKeyElement = roleElement.addElement("action-key");
 
 				actionKeyElement.addText(action);
@@ -347,8 +217,7 @@ public class PermissionExporter {
 
 		Document document = SAXReaderUtil.createDocument();
 
-		Element rootElement = document.addElement(
-			"portlet-data-permissions");
+		Element rootElement = document.addElement("portlet-data-permissions");
 
 		Map<String, List<KeyValuePair>> permissionsMap =
 			portletDataContext.getPermissions();
@@ -362,8 +231,7 @@ public class PermissionExporter {
 			String resourceName = permissionParts[0];
 			long resourcePK = GetterUtil.getLong(permissionParts[1]);
 
-			Element portletDataElement = rootElement.addElement(
-				"portlet-data");
+			Element portletDataElement = rootElement.addElement("portlet-data");
 
 			portletDataElement.addAttribute("resource-name", resourceName);
 			portletDataElement.addAttribute(
@@ -402,30 +270,9 @@ public class PermissionExporter {
 
 		Element permissionsElement = portletElement.addElement("permissions");
 
-		if (PropsValues.PERMISSIONS_USER_CHECK_ALGORITHM == 5) {
-			exportPermissions_5(
-				layoutCache, companyId, groupId, resourceName, resourcePrimKey,
-				permissionsElement, true);
-		}
-		else if (PropsValues.PERMISSIONS_USER_CHECK_ALGORITHM == 6) {
-			exportPermissions_6(
-				layoutCache, companyId, groupId, resourceName, resourcePrimKey,
-				permissionsElement, true);
-		}
-		else {
-			boolean exportUserPermissions = MapUtil.getBoolean(
-				portletDataContext.getParameterMap(),
-				PortletDataHandlerKeys.USER_PERMISSIONS);
-
-			exportPermissions_1to4(
-				layoutCache, companyId, groupId, resourceName, resourcePrimKey,
-				permissionsElement, exportUserPermissions);
-
-			Element rolesElement = portletElement.addElement("roles");
-
-			exportPortletRoles(
-				layoutCache, companyId, groupId, portletId, rolesElement);
-		}
+		exportPermissions(
+			layoutCache, companyId, groupId, resourceName, resourcePrimKey,
+			permissionsElement, true);
 	}
 
 	protected void exportPortletRoles(
@@ -433,8 +280,7 @@ public class PermissionExporter {
 			String portletId, Element rolesElement)
 		throws Exception {
 
-		String resourceName = PortletConstants.getRootPortletId(
-			portletId);
+		String resourceName = PortletConstants.getRootPortletId(portletId);
 
 		Element portletElement = rolesElement.addElement("portlet");
 
@@ -496,62 +342,6 @@ public class PermissionExporter {
 		return element;
 	}
 
-	protected void exportUserPermissions(
-			LayoutCache layoutCache, long companyId, long groupId,
-			String resourceName, String resourcePrimKey, Element parentElement)
-		throws Exception {
-
-		StopWatch stopWatch = null;
-
-		if (_log.isDebugEnabled()) {
-			stopWatch = new StopWatch();
-
-			stopWatch.start();
-		}
-
-		Element userPermissionsElement = SAXReaderUtil.createElement(
-			"user-permissions");
-
-		List<User> users = layoutCache.getGroupUsers(groupId);
-
-		for (User user : users) {
-			String uuid = user.getUuid();
-
-			Element userActionsElement = SAXReaderUtil.createElement(
-				"user-actions");
-
-			List<Permission> permissions =
-				PermissionLocalServiceUtil.getUserPermissions(
-					user.getUserId(), companyId, resourceName,
-					ResourceConstants.SCOPE_INDIVIDUAL, resourcePrimKey);
-
-			List<String> actions = ResourceActionsUtil.getActions(permissions);
-
-			for (String action : actions) {
-				Element actionKeyElement = userActionsElement.addElement(
-					"action-key");
-
-				actionKeyElement.addText(action);
-			}
-
-			if (!userActionsElement.elements().isEmpty()) {
-				userActionsElement.addAttribute("uuid", uuid);
-				userPermissionsElement.add(userActionsElement);
-			}
-		}
-
-		if (!userPermissionsElement.elements().isEmpty()) {
-			parentElement.add(userPermissionsElement);
-		}
-
-		if (_log.isDebugEnabled()) {
-			_log.debug(
-				"Export user permissions for {" + resourceName + ", " +
-					resourcePrimKey + "} with " + users.size() +
-						" users takes " + stopWatch.getTime() + " ms");
-		}
-	}
-
 	protected void exportUserRoles(
 			LayoutCache layoutCache, long companyId, long groupId,
 			String resourceName, Element parentElement)
@@ -597,7 +387,5 @@ public class PermissionExporter {
 
 		return false;
 	}
-
-	private static Log _log = LogFactoryUtil.getLog(PermissionExporter.class);
 
 }

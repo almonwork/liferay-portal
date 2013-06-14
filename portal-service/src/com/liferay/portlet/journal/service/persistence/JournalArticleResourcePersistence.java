@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,7 +14,6 @@
 
 package com.liferay.portlet.journal.service.persistence;
 
-import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.service.persistence.BasePersistence;
 
 import com.liferay.portlet.journal.model.JournalArticleResource;
@@ -450,9 +449,11 @@ public interface JournalArticleResourcePersistence extends BasePersistence<Journ
 	*
 	* @param uuid the uuid
 	* @param groupId the group ID
+	* @return the journal article resource that was removed
 	* @throws SystemException if a system exception occurred
 	*/
-	public void removeByUUID_G(java.lang.String uuid, long groupId)
+	public com.liferay.portlet.journal.model.JournalArticleResource removeByUUID_G(
+		java.lang.String uuid, long groupId)
 		throws com.liferay.portal.kernel.exception.SystemException,
 			com.liferay.portlet.journal.NoSuchArticleResourceException;
 
@@ -470,9 +471,11 @@ public interface JournalArticleResourcePersistence extends BasePersistence<Journ
 	*
 	* @param groupId the group ID
 	* @param articleId the article ID
+	* @return the journal article resource that was removed
 	* @throws SystemException if a system exception occurred
 	*/
-	public void removeByG_A(long groupId, java.lang.String articleId)
+	public com.liferay.portlet.journal.model.JournalArticleResource removeByG_A(
+		long groupId, java.lang.String articleId)
 		throws com.liferay.portal.kernel.exception.SystemException,
 			com.liferay.portlet.journal.NoSuchArticleResourceException;
 
@@ -534,8 +537,4 @@ public interface JournalArticleResourcePersistence extends BasePersistence<Journ
 	*/
 	public int countAll()
 		throws com.liferay.portal.kernel.exception.SystemException;
-
-	public JournalArticleResource remove(
-		JournalArticleResource journalArticleResource)
-		throws SystemException;
 }

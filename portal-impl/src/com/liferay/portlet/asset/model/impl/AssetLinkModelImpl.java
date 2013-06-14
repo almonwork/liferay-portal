@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -17,6 +17,7 @@ package com.liferay.portlet.asset.model.impl;
 import com.liferay.portal.kernel.bean.AutoEscapeBeanHandler;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.ProxyUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.model.CacheModel;
@@ -31,11 +32,11 @@ import com.liferay.portlet.expando.util.ExpandoBridgeFactoryUtil;
 
 import java.io.Serializable;
 
-import java.lang.reflect.Proxy;
-
 import java.sql.Types;
 
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * The base model implementation for the AssetLink service. Represents a row in the &quot;AssetLink&quot; database table, with each column mapped to a property of this class.
@@ -82,15 +83,12 @@ public class AssetLinkModelImpl extends BaseModelImpl<AssetLink>
 	public static final boolean FINDER_CACHE_ENABLED = GetterUtil.getBoolean(com.liferay.portal.util.PropsUtil.get(
 				"value.object.finder.cache.enabled.com.liferay.portlet.asset.model.AssetLink"),
 			true);
-
-	public Class<?> getModelClass() {
-		return AssetLink.class;
-	}
-
-	public String getModelClassName() {
-		return AssetLink.class.getName();
-	}
-
+	public static final boolean COLUMN_BITMASK_ENABLED = GetterUtil.getBoolean(com.liferay.portal.util.PropsUtil.get(
+				"value.object.column.bitmask.enabled.com.liferay.portlet.asset.model.AssetLink"),
+			true);
+	public static long ENTRYID1_COLUMN_BITMASK = 1L;
+	public static long ENTRYID2_COLUMN_BITMASK = 2L;
+	public static long TYPE_COLUMN_BITMASK = 4L;
 	public static final long LOCK_EXPIRATION_TIME = GetterUtil.getLong(com.liferay.portal.util.PropsUtil.get(
 				"lock.expiration.time.com.liferay.portlet.asset.model.AssetLink"));
 
@@ -111,6 +109,88 @@ public class AssetLinkModelImpl extends BaseModelImpl<AssetLink>
 
 	public void setPrimaryKeyObj(Serializable primaryKeyObj) {
 		setPrimaryKey(((Long)primaryKeyObj).longValue());
+	}
+
+	public Class<?> getModelClass() {
+		return AssetLink.class;
+	}
+
+	public String getModelClassName() {
+		return AssetLink.class.getName();
+	}
+
+	@Override
+	public Map<String, Object> getModelAttributes() {
+		Map<String, Object> attributes = new HashMap<String, Object>();
+
+		attributes.put("linkId", getLinkId());
+		attributes.put("companyId", getCompanyId());
+		attributes.put("userId", getUserId());
+		attributes.put("userName", getUserName());
+		attributes.put("createDate", getCreateDate());
+		attributes.put("entryId1", getEntryId1());
+		attributes.put("entryId2", getEntryId2());
+		attributes.put("type", getType());
+		attributes.put("weight", getWeight());
+
+		return attributes;
+	}
+
+	@Override
+	public void setModelAttributes(Map<String, Object> attributes) {
+		Long linkId = (Long)attributes.get("linkId");
+
+		if (linkId != null) {
+			setLinkId(linkId);
+		}
+
+		Long companyId = (Long)attributes.get("companyId");
+
+		if (companyId != null) {
+			setCompanyId(companyId);
+		}
+
+		Long userId = (Long)attributes.get("userId");
+
+		if (userId != null) {
+			setUserId(userId);
+		}
+
+		String userName = (String)attributes.get("userName");
+
+		if (userName != null) {
+			setUserName(userName);
+		}
+
+		Date createDate = (Date)attributes.get("createDate");
+
+		if (createDate != null) {
+			setCreateDate(createDate);
+		}
+
+		Long entryId1 = (Long)attributes.get("entryId1");
+
+		if (entryId1 != null) {
+			setEntryId1(entryId1);
+		}
+
+		Long entryId2 = (Long)attributes.get("entryId2");
+
+		if (entryId2 != null) {
+			setEntryId2(entryId2);
+		}
+
+		Integer type = (Integer)attributes.get("type");
+
+		if (type != null) {
+			setType(type);
+		}
+
+		Integer weight = (Integer)attributes.get("weight");
+
+		if (weight != null) {
+			setWeight(weight);
+		}
 	}
 
 	public long getLinkId() {
@@ -171,6 +251,8 @@ public class AssetLinkModelImpl extends BaseModelImpl<AssetLink>
 	}
 
 	public void setEntryId1(long entryId1) {
+		_columnBitmask |= ENTRYID1_COLUMN_BITMASK;
+
 		if (!_setOriginalEntryId1) {
 			_setOriginalEntryId1 = true;
 
@@ -189,6 +271,8 @@ public class AssetLinkModelImpl extends BaseModelImpl<AssetLink>
 	}
 
 	public void setEntryId2(long entryId2) {
+		_columnBitmask |= ENTRYID2_COLUMN_BITMASK;
+
 		if (!_setOriginalEntryId2) {
 			_setOriginalEntryId2 = true;
 
@@ -207,6 +291,8 @@ public class AssetLinkModelImpl extends BaseModelImpl<AssetLink>
 	}
 
 	public void setType(int type) {
+		_columnBitmask |= TYPE_COLUMN_BITMASK;
+
 		if (!_setOriginalType) {
 			_setOriginalType = true;
 
@@ -225,38 +311,37 @@ public class AssetLinkModelImpl extends BaseModelImpl<AssetLink>
 	}
 
 	public void setWeight(int weight) {
+		_columnBitmask = -1L;
+
 		_weight = weight;
+	}
+
+	public long getColumnBitmask() {
+		return _columnBitmask;
 	}
 
 	@Override
 	public AssetLink toEscapedModel() {
-		if (isEscapedModel()) {
-			return (AssetLink)this;
+		if (_escapedModelProxy == null) {
+			_escapedModelProxy = (AssetLink)ProxyUtil.newProxyInstance(_classLoader,
+					_escapedModelProxyInterfaces,
+					new AutoEscapeBeanHandler(this));
 		}
-		else {
-			if (_escapedModelProxy == null) {
-				_escapedModelProxy = (AssetLink)Proxy.newProxyInstance(_classLoader,
-						_escapedModelProxyInterfaces,
-						new AutoEscapeBeanHandler(this));
-			}
 
-			return _escapedModelProxy;
-		}
+		return _escapedModelProxy;
 	}
 
 	@Override
 	public ExpandoBridge getExpandoBridge() {
-		if (_expandoBridge == null) {
-			_expandoBridge = ExpandoBridgeFactoryUtil.getExpandoBridge(getCompanyId(),
-					AssetLink.class.getName(), getPrimaryKey());
-		}
-
-		return _expandoBridge;
+		return ExpandoBridgeFactoryUtil.getExpandoBridge(getCompanyId(),
+			AssetLink.class.getName(), getPrimaryKey());
 	}
 
 	@Override
 	public void setExpandoBridgeAttributes(ServiceContext serviceContext) {
-		getExpandoBridge().setAttributes(serviceContext);
+		ExpandoBridge expandoBridge = getExpandoBridge();
+
+		expandoBridge.setAttributes(serviceContext);
 	}
 
 	@Override
@@ -343,6 +428,8 @@ public class AssetLinkModelImpl extends BaseModelImpl<AssetLink>
 		assetLinkModelImpl._originalType = assetLinkModelImpl._type;
 
 		assetLinkModelImpl._setOriginalType = false;
+
+		assetLinkModelImpl._columnBitmask = 0;
 	}
 
 	@Override
@@ -479,6 +566,6 @@ public class AssetLinkModelImpl extends BaseModelImpl<AssetLink>
 	private int _originalType;
 	private boolean _setOriginalType;
 	private int _weight;
-	private transient ExpandoBridge _expandoBridge;
+	private long _columnBitmask;
 	private AssetLink _escapedModelProxy;
 }

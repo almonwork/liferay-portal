@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -15,7 +15,6 @@
 package com.liferay.portlet.polls.service;
 
 import com.liferay.portal.kernel.bean.PortalBeanLocatorUtil;
-import com.liferay.portal.kernel.util.MethodCache;
 import com.liferay.portal.kernel.util.ReferenceRegistry;
 
 /**
@@ -66,25 +65,32 @@ public class PollsVoteLocalServiceUtil {
 	* Deletes the polls vote with the primary key from the database. Also notifies the appropriate model listeners.
 	*
 	* @param voteId the primary key of the polls vote
+	* @return the polls vote that was removed
 	* @throws PortalException if a polls vote with the primary key could not be found
 	* @throws SystemException if a system exception occurred
 	*/
-	public static void deletePollsVote(long voteId)
+	public static com.liferay.portlet.polls.model.PollsVote deletePollsVote(
+		long voteId)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException {
-		getService().deletePollsVote(voteId);
+		return getService().deletePollsVote(voteId);
 	}
 
 	/**
 	* Deletes the polls vote from the database. Also notifies the appropriate model listeners.
 	*
 	* @param pollsVote the polls vote
+	* @return the polls vote that was removed
 	* @throws SystemException if a system exception occurred
 	*/
-	public static void deletePollsVote(
+	public static com.liferay.portlet.polls.model.PollsVote deletePollsVote(
 		com.liferay.portlet.polls.model.PollsVote pollsVote)
 		throws com.liferay.portal.kernel.exception.SystemException {
-		getService().deletePollsVote(pollsVote);
+		return getService().deletePollsVote(pollsVote);
+	}
+
+	public static com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery() {
+		return getService().dynamicQuery();
 	}
 
 	/**
@@ -156,6 +162,11 @@ public class PollsVoteLocalServiceUtil {
 		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery)
 		throws com.liferay.portal.kernel.exception.SystemException {
 		return getService().dynamicQueryCount(dynamicQuery);
+	}
+
+	public static com.liferay.portlet.polls.model.PollsVote fetchPollsVote(
+		long voteId) throws com.liferay.portal.kernel.exception.SystemException {
+		return getService().fetchPollsVote(voteId);
 	}
 
 	/**
@@ -297,20 +308,15 @@ public class PollsVoteLocalServiceUtil {
 
 			ReferenceRegistry.registerReference(PollsVoteLocalServiceUtil.class,
 				"_service");
-			MethodCache.remove(PollsVoteLocalService.class);
 		}
 
 		return _service;
 	}
 
+	/**
+	 * @deprecated
+	 */
 	public void setService(PollsVoteLocalService service) {
-		MethodCache.remove(PollsVoteLocalService.class);
-
-		_service = service;
-
-		ReferenceRegistry.registerReference(PollsVoteLocalServiceUtil.class,
-			"_service");
-		MethodCache.remove(PollsVoteLocalService.class);
 	}
 
 	private static PollsVoteLocalService _service;

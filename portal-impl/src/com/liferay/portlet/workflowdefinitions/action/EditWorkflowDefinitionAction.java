@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -21,6 +21,7 @@ import com.liferay.portal.kernel.util.Constants;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.LocalizationUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
+import com.liferay.portal.kernel.util.StreamUtil;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.workflow.WorkflowDefinition;
@@ -32,9 +33,7 @@ import com.liferay.portal.theme.ThemeDisplay;
 import com.liferay.portal.util.PortalUtil;
 import com.liferay.portal.util.WebKeys;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
+import java.io.InputStream;
 
 import java.util.Locale;
 import java.util.Map;
@@ -76,13 +75,11 @@ public class EditWorkflowDefinitionAction extends PortletAction {
 			sendRedirect(actionRequest, actionResponse);
 		}
 		catch (Exception e) {
-			if (e instanceof FileNotFoundException ||
-				e instanceof WorkflowDefinitionFileException) {
-
-				SessionErrors.add(actionRequest, e.getClass().getName());
+			if (e instanceof WorkflowDefinitionFileException) {
+				SessionErrors.add(actionRequest, e.getClass());
 			}
 			else if (e instanceof WorkflowException) {
-				SessionErrors.add(actionRequest, e.getClass().getName());
+				SessionErrors.add(actionRequest, e.getClass());
 
 				setForward(actionRequest, "portlet.workflow_definitions.error");
 			}
@@ -103,7 +100,7 @@ public class EditWorkflowDefinitionAction extends PortletAction {
 		}
 		catch (Exception e) {
 			if (e instanceof WorkflowException) {
-				SessionErrors.add(renderRequest, e.getClass().getName());
+				SessionErrors.add(renderRequest, e.getClass());
 
 				return mapping.findForward(
 					"portlet.workflow_definitions.error");
@@ -143,50 +140,6 @@ public class EditWorkflowDefinitionAction extends PortletAction {
 		}
 	}
 
-	@Override
-	protected boolean isCheckMethodOnProcessAction() {
-		return _CHECK_METHOD_ON_PROCESS_ACTION;
-	}
-
-	protected void updateWorkflowDefinition(ActionRequest actionRequest)
-		throws Exception {
-
-		UploadPortletRequest uploadRequest = PortalUtil.getUploadPortletRequest(
-			actionRequest);
-
-		ThemeDisplay themeDisplay = (ThemeDisplay)actionRequest.getAttribute(
-			WebKeys.THEME_DISPLAY);
-
-		Map<Locale, String> titleMap = LocalizationUtil.getLocalizationMap(
-			actionRequest, "title");
-
-		File file = uploadRequest.getFile("file");
-
-		WorkflowDefinition workflowDefinition = null;
-
-		if (!file.exists()) {
-			String name = ParamUtil.getString(actionRequest, "name");
-			int version = ParamUtil.getInteger(actionRequest, "version");
-
-			workflowDefinition =
-				WorkflowDefinitionManagerUtil.getWorkflowDefinition(
-					themeDisplay.getCompanyId(), name, version);
-
-			WorkflowDefinitionManagerUtil.updateTitle(
-				themeDisplay.getCompanyId(), themeDisplay.getUserId(), name,
-				version, getTitle(titleMap));
-		}
-		else {
-			workflowDefinition =
-				WorkflowDefinitionManagerUtil.deployWorkflowDefinition(
-					themeDisplay.getCompanyId(), themeDisplay.getUserId(),
-					getTitle(titleMap), new FileInputStream(file));
-		}
-
-		actionRequest.setAttribute(
-			WebKeys.WORKFLOW_DEFINITION, workflowDefinition);
-	}
-
 	protected String getTitle(Map<Locale, String> titleMap) {
 		if (titleMap == null) {
 			return null;
@@ -202,15 +155,67 @@ public class EditWorkflowDefinitionAction extends PortletAction {
 
 			if (Validator.isNotNull(title)) {
 				value = LocalizationUtil.updateLocalization(
-					value, "Title",	title, languageId);
+					value, "Title", title, languageId);
 			}
 			else {
 				value = LocalizationUtil.removeLocalization(
-					value, "Title",	languageId);
+					value, "Title", languageId);
 			}
 		}
 
 		return value;
+	}
+
+	@Override
+	protected boolean isCheckMethodOnProcessAction() {
+		return _CHECK_METHOD_ON_PROCESS_ACTION;
+	}
+
+	protected void updateWorkflowDefinition(ActionRequest actionRequest)
+		throws Exception {
+
+		UploadPortletRequest uploadPortletRequest =
+			PortalUtil.getUploadPortletRequest(actionRequest);
+
+		ThemeDisplay themeDisplay = (ThemeDisplay)actionRequest.getAttribute(
+			WebKeys.THEME_DISPLAY);
+
+		Map<Locale, String> titleMap = LocalizationUtil.getLocalizationMap(
+			actionRequest, "title");
+
+		InputStream inputStream = null;
+
+		try {
+			inputStream = uploadPortletRequest.getFileAsStream("file");
+
+			WorkflowDefinition workflowDefinition = null;
+
+			if (inputStream == null) {
+				String name = ParamUtil.getString(actionRequest, "name");
+				int version = ParamUtil.getInteger(actionRequest, "version");
+
+				workflowDefinition =
+					WorkflowDefinitionManagerUtil.getWorkflowDefinition(
+						themeDisplay.getCompanyId(), name, version);
+
+				WorkflowDefinitionManagerUtil.updateTitle(
+					themeDisplay.getCompanyId(), themeDisplay.getUserId(), name,
+					version, getTitle(titleMap));
+			}
+			else {
+				workflowDefinition =
+					WorkflowDefinitionManagerUtil.deployWorkflowDefinition(
+						themeDisplay.getCompanyId(), themeDisplay.getUserId(),
+						getTitle(titleMap), inputStream);
+			}
+
+			actionRequest.setAttribute(
+				WebKeys.WORKFLOW_DEFINITION, workflowDefinition);
+		}
+		finally {
+			StreamUtil.cleanUp(inputStream);
+		}
+
 	}
 
 	private static final boolean _CHECK_METHOD_ON_PROCESS_ACTION = false;

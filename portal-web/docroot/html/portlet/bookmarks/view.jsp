@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -17,7 +17,7 @@
 <%@ include file="/html/portlet/bookmarks/init.jsp" %>
 
 <%
-String topLink = ParamUtil.getString(request, "topLink", "bookmarks-home");
+String topLink = ParamUtil.getString(request, "topLink", "home");
 
 BookmarksFolder folder = (BookmarksFolder)request.getAttribute(WebKeys.BOOKMARKS_FOLDER);
 
@@ -37,27 +37,10 @@ if ((folder == null) && (defaultFolderId != BookmarksFolderConstants.DEFAULT_PAR
 int foldersCount = BookmarksFolderServiceUtil.getFoldersCount(scopeGroupId, folderId);
 int entriesCount = BookmarksEntryServiceUtil.getEntriesCount(scopeGroupId, folderId);
 
-long categoryId = ParamUtil.getLong(request, "categoryId");
-String tagName = ParamUtil.getString(request, "tag");
+long assetCategoryId = ParamUtil.getLong(request, "categoryId");
+String assetTagName = ParamUtil.getString(request, "tag");
 
-String categoryName = null;
-String vocabularyName = null;
-
-if (categoryId != 0) {
-	AssetCategory assetCategory = AssetCategoryLocalServiceUtil.getAssetCategory(categoryId);
-
-	assetCategory = assetCategory.toEscapedModel();
-
-	categoryName = assetCategory.getName();
-
-	AssetVocabulary assetVocabulary = AssetVocabularyLocalServiceUtil.getAssetVocabulary(assetCategory.getVocabularyId());
-
-	assetVocabulary = assetVocabulary.toEscapedModel();
-
-	vocabularyName = assetVocabulary.getName();
-}
-
-boolean useAssetEntryQuery = (categoryId > 0) || Validator.isNotNull(tagName);
+boolean useAssetEntryQuery = (assetCategoryId > 0) || Validator.isNotNull(assetTagName);
 
 PortletURL portletURL = renderResponse.createRenderURL();
 
@@ -78,29 +61,15 @@ request.setAttribute("view.jsp-useAssetEntryQuery", String.valueOf(useAssetEntry
 
 <c:choose>
 	<c:when test="<%= useAssetEntryQuery %>">
-		<c:if test="<%= Validator.isNotNull(categoryName) %>">
-			<h1 class="entry-title">
-				<%= LanguageUtil.format(pageContext, "bookmarks-with-x-x", new String[] {vocabularyName, categoryName}) %>
-			</h1>
-		</c:if>
-
-		<c:if test="<%= Validator.isNotNull(tagName) %>">
-			<h1 class="entry-title">
-				<%= LanguageUtil.format(pageContext, "bookmarks-with-tag-x", tagName) %>
-			</h1>
-		</c:if>
+		<liferay-ui:categorization-filter
+			assetType="bookmarks"
+			portletURL="<%= portletURL %>"
+		/>
 
 		<%@ include file="/html/portlet/bookmarks/view_entries.jspf" %>
 
-		<%
-		if (portletName.equals(PortletKeys.BOOKMARKS)) {
-			PortalUtil.addPageKeywords(tagName, request);
-			PortalUtil.addPageKeywords(categoryName, request);
-		}
-		%>
-
 	</c:when>
-	<c:when test='<%= topLink.equals("bookmarks-home") %>'>
+	<c:when test='<%= topLink.equals("home") %>'>
 		<aui:layout>
 			<c:if test="<%= folder != null %>">
 				<liferay-ui:header
@@ -110,7 +79,7 @@ request.setAttribute("view.jsp-useAssetEntryQuery", String.valueOf(useAssetEntry
 			</c:if>
 
 			<aui:column columnWidth="<%= 75 %>" cssClass="lfr-asset-column lfr-asset-column-details" first="<%= true %>">
-				<liferay-ui:panel-container extended="<%= false %>" persistState="<%= true %>">
+				<liferay-ui:panel-container extended="<%= false %>" id="bookmarksInfoPanelContainer" persistState="<%= true %>">
 					<c:if test="<%= folder != null %>">
 						<div class="lfr-asset-description">
 							<%= HtmlUtil.escape(folder.getDescription()) %>
@@ -141,7 +110,7 @@ request.setAttribute("view.jsp-useAssetEntryQuery", String.valueOf(useAssetEntry
 					</c:if>
 
 					<c:if test="<%= foldersCount > 0 %>">
-						<liferay-ui:panel collapsible="<%= true %>" extended="<%= true %>" persistState="<%= true %>" title='<%= (folder != null) ? "subfolders" : "folders" %>'>
+						<liferay-ui:panel collapsible="<%= true %>" extended="<%= true %>" id="bookmarksEntriesFoldersListingPanel" persistState="<%= true %>" title='<%= (folder != null) ? "subfolders" : "folders" %>'>
 							<liferay-ui:search-container
 								curParam="cur1"
 								delta="<%= foldersPerPage %>"
@@ -174,7 +143,7 @@ request.setAttribute("view.jsp-useAssetEntryQuery", String.valueOf(useAssetEntry
 						</liferay-ui:panel>
 					</c:if>
 
-					<liferay-ui:panel collapsible="<%= true %>" extended="<%= true %>" persistState="<%= true %>" title="bookmarks">
+					<liferay-ui:panel collapsible="<%= true %>" extended="<%= true %>" id="bookmarksEntriesListingPanel" persistState="<%= true %>" title="bookmarks">
 						<%@ include file="/html/portlet/bookmarks/view_entries.jspf" %>
 					</liferay-ui:panel>
 				</liferay-ui:panel-container>
@@ -185,11 +154,11 @@ request.setAttribute("view.jsp-useAssetEntryQuery", String.valueOf(useAssetEntry
 					<liferay-ui:icon
 						cssClass="lfr-asset-avatar"
 						image='<%= "../file_system/large/" + (((foldersCount + entriesCount) > 0) ? "folder_full_bookmark" : "folder_empty") %>'
-						message='<%= (folder != null) ? folder.getName() : LanguageUtil.get(pageContext, "bookmarks-home") %>'
+						message='<%= (folder != null) ? HtmlUtil.escapeAttribute(folder.getName()) : "home" %>'
 					/>
 
 					<div class="lfr-asset-name">
-						<h4><%= (folder != null) ? folder.getName() : LanguageUtil.get(pageContext, "bookmarks-home") %></h4>
+						<h4><%= (folder != null) ? HtmlUtil.escape(folder.getName()) : LanguageUtil.get(pageContext, "home") %></h4>
 					</div>
 				</div>
 
@@ -213,7 +182,7 @@ request.setAttribute("view.jsp-useAssetEntryQuery", String.valueOf(useAssetEntry
 		%>
 
 	</c:when>
-	<c:when test='<%= topLink.equals("my-entries") || topLink.equals("recent-entries") %>'>
+	<c:when test='<%= topLink.equals("mine") || topLink.equals("recent") %>'>
 		<aui:layout>
 			<liferay-ui:header
 				title="<%= topLink %>"
@@ -229,7 +198,7 @@ request.setAttribute("view.jsp-useAssetEntryQuery", String.valueOf(useAssetEntry
 				<%
 				long groupEntriesUserId = 0;
 
-				if (topLink.equals("my-entries") && themeDisplay.isSignedIn()) {
+				if (topLink.equals("mine") && themeDisplay.isSignedIn()) {
 					groupEntriesUserId = user.getUserId();
 				}
 				%>

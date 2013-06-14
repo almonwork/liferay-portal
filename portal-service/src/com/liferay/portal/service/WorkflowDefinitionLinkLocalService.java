@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -35,8 +35,8 @@ import com.liferay.portal.kernel.transaction.Transactional;
  */
 @Transactional(isolation = Isolation.PORTAL, rollbackFor =  {
 	PortalException.class, SystemException.class})
-public interface WorkflowDefinitionLinkLocalService
-	extends PersistedModelLocalService {
+public interface WorkflowDefinitionLinkLocalService extends BaseLocalService,
+	PersistedModelLocalService {
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
@@ -67,10 +67,12 @@ public interface WorkflowDefinitionLinkLocalService
 	* Deletes the workflow definition link with the primary key from the database. Also notifies the appropriate model listeners.
 	*
 	* @param workflowDefinitionLinkId the primary key of the workflow definition link
+	* @return the workflow definition link that was removed
 	* @throws PortalException if a workflow definition link with the primary key could not be found
 	* @throws SystemException if a system exception occurred
 	*/
-	public void deleteWorkflowDefinitionLink(long workflowDefinitionLinkId)
+	public com.liferay.portal.model.WorkflowDefinitionLink deleteWorkflowDefinitionLink(
+		long workflowDefinitionLinkId)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException;
 
@@ -78,11 +80,14 @@ public interface WorkflowDefinitionLinkLocalService
 	* Deletes the workflow definition link from the database. Also notifies the appropriate model listeners.
 	*
 	* @param workflowDefinitionLink the workflow definition link
+	* @return the workflow definition link that was removed
 	* @throws SystemException if a system exception occurred
 	*/
-	public void deleteWorkflowDefinitionLink(
+	public com.liferay.portal.model.WorkflowDefinitionLink deleteWorkflowDefinitionLink(
 		com.liferay.portal.model.WorkflowDefinitionLink workflowDefinitionLink)
 		throws com.liferay.portal.kernel.exception.SystemException;
+
+	public com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery();
 
 	/**
 	* Performs a dynamic query on the database and returns the matching rows.
@@ -144,6 +149,11 @@ public interface WorkflowDefinitionLinkLocalService
 	*/
 	public long dynamicQueryCount(
 		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery)
+		throws com.liferay.portal.kernel.exception.SystemException;
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public com.liferay.portal.model.WorkflowDefinitionLink fetchWorkflowDefinitionLink(
+		long workflowDefinitionLinkId)
 		throws com.liferay.portal.kernel.exception.SystemException;
 
 	/**

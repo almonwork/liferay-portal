@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -23,9 +23,28 @@ package com.liferay.portal.service;
  * @see       CountryService
  * @generated
  */
-public class CountryServiceWrapper implements CountryService {
+public class CountryServiceWrapper implements CountryService,
+	ServiceWrapper<CountryService> {
 	public CountryServiceWrapper(CountryService countryService) {
 		_countryService = countryService;
+	}
+
+	/**
+	* Returns the Spring bean ID for this bean.
+	*
+	* @return the Spring bean ID for this bean
+	*/
+	public java.lang.String getBeanIdentifier() {
+		return _countryService.getBeanIdentifier();
+	}
+
+	/**
+	* Sets the Spring bean ID for this bean.
+	*
+	* @param beanIdentifier the Spring bean ID for this bean
+	*/
+	public void setBeanIdentifier(java.lang.String beanIdentifier) {
+		_countryService.setBeanIdentifier(beanIdentifier);
 	}
 
 	public com.liferay.portal.model.Country addCountry(java.lang.String name,
@@ -34,6 +53,23 @@ public class CountryServiceWrapper implements CountryService {
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException {
 		return _countryService.addCountry(name, a2, a3, number, idd, active);
+	}
+
+	public com.liferay.portal.model.Country fetchCountry(long countryId)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return _countryService.fetchCountry(countryId);
+	}
+
+	public com.liferay.portal.model.Country fetchCountryByA2(
+		java.lang.String a2)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return _countryService.fetchCountryByA2(a2);
+	}
+
+	public com.liferay.portal.model.Country fetchCountryByA3(
+		java.lang.String a3)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return _countryService.fetchCountryByA3(a3);
 	}
 
 	public java.util.List<com.liferay.portal.model.Country> getCountries()
@@ -72,11 +108,25 @@ public class CountryServiceWrapper implements CountryService {
 		return _countryService.getCountryByName(name);
 	}
 
+	/**
+	 * @deprecated Renamed to {@link #getWrappedService}
+	 */
 	public CountryService getWrappedCountryService() {
 		return _countryService;
 	}
 
+	/**
+	 * @deprecated Renamed to {@link #setWrappedService}
+	 */
 	public void setWrappedCountryService(CountryService countryService) {
+		_countryService = countryService;
+	}
+
+	public CountryService getWrappedService() {
+		return _countryService;
+	}
+
+	public void setWrappedService(CountryService countryService) {
 		_countryService = countryService;
 	}
 

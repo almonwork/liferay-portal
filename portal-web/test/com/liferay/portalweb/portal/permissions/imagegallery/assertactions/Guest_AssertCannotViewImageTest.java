@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -23,15 +23,16 @@ import com.liferay.portalweb.portal.util.RuntimeVariables;
 public class Guest_AssertCannotViewImageTest extends BaseTestCase {
 	public void testGuest_AssertCannotViewImage() throws Exception {
 		selenium.open("/web/guest/home/");
+		loadRequiredJavaScriptModules();
 
 		for (int second = 0;; second++) {
-			if (second >= 60) {
+			if (second >= 90) {
 				fail("timeout");
 			}
 
 			try {
 				if (selenium.isElementPresent(
-							"link=Image Gallery Permissions Test Page")) {
+							"link=Media Gallery Permissions Test Page")) {
 					break;
 				}
 			}
@@ -41,49 +42,32 @@ public class Guest_AssertCannotViewImageTest extends BaseTestCase {
 			Thread.sleep(1000);
 		}
 
-		selenium.saveScreenShotAndSource();
-		selenium.clickAt("link=Image Gallery Permissions Test Page",
-			RuntimeVariables.replace(""));
+		selenium.clickAt("link=Media Gallery Permissions Test Page",
+			RuntimeVariables.replace("Media Gallery Permissions Test Page"));
 		selenium.waitForPageToLoad("30000");
-		selenium.saveScreenShotAndSource();
-		selenium.clickAt("//a/strong", RuntimeVariables.replace(""));
+		loadRequiredJavaScriptModules();
+		assertEquals(RuntimeVariables.replace(
+				"Media Gallery Permissions Test Folder 2 Edited"),
+			selenium.getText(
+				"//a[@title='Media Gallery Permissions Test Folder 2 Edited - ']"));
+		selenium.clickAt("//a[@title='Media Gallery Permissions Test Folder 2 Edited - ']",
+			RuntimeVariables.replace(
+				"Media Gallery Permissions Test Folder 2 Edited"));
 		selenium.waitForPageToLoad("30000");
-		selenium.saveScreenShotAndSource();
-		selenium.clickAt("//a/strong", RuntimeVariables.replace(""));
+		loadRequiredJavaScriptModules();
+		assertEquals(RuntimeVariables.replace(
+				"Media Gallery Permissions Test Subfolder 2"),
+			selenium.getText(
+				"//a[@title='Media Gallery Permissions Test Subfolder 2 - ']"));
+		selenium.clickAt("//a[@title='Media Gallery Permissions Test Subfolder 2 - ']",
+			RuntimeVariables.replace(
+				"Media Gallery Permissions Test Subfolder 2"));
 		selenium.waitForPageToLoad("30000");
-		selenium.saveScreenShotAndSource();
-		assertFalse(selenium.isTextPresent("Edited Permissions Image"));
-		selenium.type("_31_keywords1", RuntimeVariables.replace("image"));
-		selenium.saveScreenShotAndSource();
-		selenium.click("//input[@value='Search']");
-		assertFalse(selenium.isTextPresent("Edited Permissions Image"));
-		selenium.open("/web/guest/home/");
-
-		for (int second = 0;; second++) {
-			if (second >= 60) {
-				fail("timeout");
-			}
-
-			try {
-				if (selenium.isElementPresent(
-							"link=Image Gallery Permissions Test Page")) {
-					break;
-				}
-			}
-			catch (Exception e) {
-			}
-
-			Thread.sleep(1000);
-		}
-
-		selenium.saveScreenShotAndSource();
-		selenium.clickAt("link=Image Gallery Permissions Test Page",
-			RuntimeVariables.replace(""));
-		selenium.waitForPageToLoad("30000");
-		selenium.saveScreenShotAndSource();
-		selenium.clickAt("link=Recent Images", RuntimeVariables.replace(""));
-		selenium.waitForPageToLoad("30000");
-		selenium.saveScreenShotAndSource();
-		assertFalse(selenium.isTextPresent("Edited Permissions Image"));
+		loadRequiredJavaScriptModules();
+		assertFalse(selenium.isElementPresent(
+				"//a[@title='Permissions Image Test Edited - ']"));
+		assertEquals(RuntimeVariables.replace(
+				"There are no media files in this folder."),
+			selenium.getText("//div[@class='portlet-msg-info']"));
 	}
 }

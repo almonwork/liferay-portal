@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -192,6 +192,20 @@ public interface BookmarksFolderModel extends BaseModel<BookmarksFolder>,
 	public void setModifiedDate(Date modifiedDate);
 
 	/**
+	 * Returns the resource block ID of this bookmarks folder.
+	 *
+	 * @return the resource block ID of this bookmarks folder
+	 */
+	public long getResourceBlockId();
+
+	/**
+	 * Sets the resource block ID of this bookmarks folder.
+	 *
+	 * @param resourceBlockId the resource block ID of this bookmarks folder
+	 */
+	public void setResourceBlockId(long resourceBlockId);
+
+	/**
 	 * Returns the parent folder ID of this bookmarks folder.
 	 *
 	 * @return the parent folder ID of this bookmarks folder
@@ -244,8 +258,6 @@ public interface BookmarksFolderModel extends BaseModel<BookmarksFolder>,
 	public void setCachedModel(boolean cachedModel);
 
 	public boolean isEscapedModel();
-
-	public void setEscapedModel(boolean escapedModel);
 
 	public Serializable getPrimaryKeyObj();
 

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -58,13 +58,11 @@ public class StructureSearch extends SearchContainer<DDMStructure> {
 			StructureDisplayTerms.CLASS_NAME_ID,
 			String.valueOf(displayTerms.getClassNameId()));
 		iteratorURL.setParameter(
-			StructureDisplayTerms.DESCRIPTION,
-			displayTerms.getDescription());
+			StructureDisplayTerms.DESCRIPTION, displayTerms.getDescription());
 		iteratorURL.setParameter(
 			StructureDisplayTerms.NAME, displayTerms.getName());
 		iteratorURL.setParameter(
-			StructureDisplayTerms.STORAGE_TYPE,
-			displayTerms.getStorageType());
+			StructureDisplayTerms.STORAGE_TYPE, displayTerms.getStorageType());
 	}
 
 }

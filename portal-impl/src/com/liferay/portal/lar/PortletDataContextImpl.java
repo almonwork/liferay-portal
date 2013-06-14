@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,7 +14,6 @@
 
 package com.liferay.portal.lar;
 
-import com.liferay.portal.NoSuchResourceException;
 import com.liferay.portal.NoSuchRoleException;
 import com.liferay.portal.NoSuchTeamException;
 import com.liferay.portal.kernel.exception.PortalException;
@@ -30,6 +29,7 @@ import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.util.KeyValuePair;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.MapUtil;
+import com.liferay.portal.kernel.util.PrimitiveLongList;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
@@ -41,7 +41,6 @@ import com.liferay.portal.model.AuditedModel;
 import com.liferay.portal.model.ClassedModel;
 import com.liferay.portal.model.Group;
 import com.liferay.portal.model.Lock;
-import com.liferay.portal.model.Resource;
 import com.liferay.portal.model.ResourceConstants;
 import com.liferay.portal.model.ResourcedModel;
 import com.liferay.portal.model.Role;
@@ -51,14 +50,13 @@ import com.liferay.portal.model.impl.LockImpl;
 import com.liferay.portal.security.permission.ResourceActionsUtil;
 import com.liferay.portal.service.GroupLocalServiceUtil;
 import com.liferay.portal.service.LockLocalServiceUtil;
-import com.liferay.portal.service.PermissionLocalServiceUtil;
-import com.liferay.portal.service.ResourceLocalServiceUtil;
+import com.liferay.portal.service.ResourceBlockLocalServiceUtil;
+import com.liferay.portal.service.ResourceBlockPermissionLocalServiceUtil;
 import com.liferay.portal.service.ResourcePermissionLocalServiceUtil;
 import com.liferay.portal.service.RoleLocalServiceUtil;
 import com.liferay.portal.service.ServiceContext;
 import com.liferay.portal.service.TeamLocalServiceUtil;
 import com.liferay.portal.util.PortalUtil;
-import com.liferay.portal.util.PropsValues;
 import com.liferay.portlet.asset.NoSuchEntryException;
 import com.liferay.portlet.asset.model.AssetCategory;
 import com.liferay.portlet.asset.model.AssetEntry;
@@ -78,8 +76,6 @@ import com.liferay.portlet.documentlibrary.model.impl.DLFolderImpl;
 import com.liferay.portlet.expando.model.ExpandoBridge;
 import com.liferay.portlet.expando.model.ExpandoColumn;
 import com.liferay.portlet.expando.service.ExpandoColumnLocalServiceUtil;
-import com.liferay.portlet.imagegallery.model.impl.IGFolderImpl;
-import com.liferay.portlet.imagegallery.model.impl.IGImageImpl;
 import com.liferay.portlet.journal.model.impl.JournalArticleImpl;
 import com.liferay.portlet.journal.model.impl.JournalFeedImpl;
 import com.liferay.portlet.journal.model.impl.JournalStructureImpl;
@@ -91,8 +87,8 @@ import com.liferay.portlet.messageboards.model.MBMessageConstants;
 import com.liferay.portlet.messageboards.model.MBThread;
 import com.liferay.portlet.messageboards.model.impl.MBBanImpl;
 import com.liferay.portlet.messageboards.model.impl.MBCategoryImpl;
-import com.liferay.portlet.messageboards.model.impl.MBMessageFlagImpl;
 import com.liferay.portlet.messageboards.model.impl.MBMessageImpl;
+import com.liferay.portlet.messageboards.model.impl.MBThreadFlagImpl;
 import com.liferay.portlet.messageboards.service.MBDiscussionLocalServiceUtil;
 import com.liferay.portlet.messageboards.service.MBMessageLocalServiceUtil;
 import com.liferay.portlet.messageboards.service.MBThreadLocalServiceUtil;
@@ -117,7 +113,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -148,7 +143,7 @@ public class PortletDataContextImpl implements PortletDataContext {
 		_scopeGroupId = groupId;
 		_parameterMap = parameterMap;
 		_primaryKeys = primaryKeys;
-		_dataStrategy =  null;
+		_dataStrategy = null;
 		_userIdStrategy = null;
 		_startDate = startDate;
 		_endDate = endDate;
@@ -168,7 +163,7 @@ public class PortletDataContextImpl implements PortletDataContext {
 		_scopeGroupId = groupId;
 		_parameterMap = parameterMap;
 		_primaryKeys = primaryKeys;
-		_dataStrategy =  MapUtil.getString(
+		_dataStrategy = MapUtil.getString(
 			parameterMap, PortletDataHandlerKeys.DATA_STRATEGY,
 			PortletDataHandlerKeys.DATA_STRATEGY_MIRROR);
 		_userIdStrategy = userIdStrategy;
@@ -184,10 +179,6 @@ public class PortletDataContextImpl implements PortletDataContext {
 		List<AssetCategory> assetCategories =
 			AssetCategoryLocalServiceUtil.getCategories(
 				clazz.getName(), classPK);
-
-		if (assetCategories.isEmpty()) {
-			return;
-		}
 
 		_assetCategoryUuidsMap.put(
 			getPrimaryKeyString(clazz, classPK),
@@ -277,10 +268,6 @@ public class PortletDataContextImpl implements PortletDataContext {
 		String[] tagNames = AssetTagLocalServiceUtil.getTagNames(
 			clazz.getName(), classPK);
 
-		if (tagNames.length == 0) {
-			return;
-		}
-
 		_assetTagNamesMap.put(getPrimaryKeyString(clazz, classPK), tagNames);
 	}
 
@@ -313,19 +300,28 @@ public class PortletDataContextImpl implements PortletDataContext {
 			addLocks(clazz, String.valueOf(classPK));
 			addPermissions(clazz, classPK);
 
-			if (getBooleanParameter(namespace, "categories")) {
+			boolean portletMetadataAll = getBooleanParameter(
+				namespace, PortletDataHandlerKeys.PORTLET_METADATA_ALL);
+
+			if (portletMetadataAll ||
+				getBooleanParameter(namespace, "categories")) {
+
 				addAssetCategories(clazz, classPK);
 			}
 
-			if (getBooleanParameter(namespace, "comments")) {
+			if (portletMetadataAll ||
+				getBooleanParameter(namespace, "comments")) {
+
 				addComments(clazz, classPK);
 			}
 
-			if (getBooleanParameter(namespace, "ratings")) {
+			if (portletMetadataAll ||
+				getBooleanParameter(namespace, "ratings")) {
+
 				addRatingsEntries(clazz, classPK);
 			}
 
-			if (getBooleanParameter(namespace, "tags")) {
+			if (portletMetadataAll || getBooleanParameter(namespace, "tags")) {
 				addAssetTags(clazz, classPK);
 			}
 		}
@@ -352,11 +348,7 @@ public class PortletDataContextImpl implements PortletDataContext {
 			return;
 		}
 
-		Iterator<MBMessage> itr = messages.iterator();
-
-		while (itr.hasNext()) {
-			MBMessage message = itr.next();
-
+		for (MBMessage message : messages) {
 			message.setUserUuid(message.getUserUuid());
 
 			addRatingsEntries(MBDiscussion.class, message.getPrimaryKey());
@@ -369,6 +361,41 @@ public class PortletDataContextImpl implements PortletDataContext {
 		String className, long classPK, List<MBMessage> messages) {
 
 		_commentsMap.put(getPrimaryKeyString(className, classPK), messages);
+	}
+
+	public void addExpando(
+			Element element, String path, ClassedModel classedModel)
+		throws PortalException, SystemException {
+
+		Class<?> clazz = classedModel.getModelClass();
+
+		String className = clazz.getName();
+
+		if (!_expandoColumnsMap.containsKey(className)) {
+			List<ExpandoColumn> expandoColumns =
+				ExpandoColumnLocalServiceUtil.getDefaultTableColumns(
+					_companyId, className);
+
+			for (ExpandoColumn expandoColumn : expandoColumns) {
+				addPermissions(
+					ExpandoColumn.class, expandoColumn.getColumnId());
+			}
+
+			_expandoColumnsMap.put(className, expandoColumns);
+		}
+
+		ExpandoBridge expandoBridge = classedModel.getExpandoBridge();
+
+		Map<String, Serializable> expandoBridgeAttributes =
+			expandoBridge.getAttributes();
+
+		if (!expandoBridgeAttributes.isEmpty()) {
+			String expandoPath = getExpandoPath(path);
+
+			element.addAttribute("expando-path", expandoPath);
+
+			addZipEntry(expandoPath, expandoBridgeAttributes);
+		}
 	}
 
 	public void addLocks(Class<?> clazz, String key)
@@ -396,10 +423,8 @@ public class PortletDataContextImpl implements PortletDataContext {
 	public void addPermissions(String resourceName, long resourcePK)
 		throws PortalException, SystemException {
 
-		if (((PropsValues.PERMISSIONS_USER_CHECK_ALGORITHM != 5) &&
-			 (PropsValues.PERMISSIONS_USER_CHECK_ALGORITHM != 6)) ||
-			(!MapUtil.getBoolean(
-				_parameterMap, PortletDataHandlerKeys.PERMISSIONS))) {
+		if (!MapUtil.getBoolean(
+				_parameterMap, PortletDataHandlerKeys.PERMISSIONS)) {
 
 			return;
 		}
@@ -409,6 +434,9 @@ public class PortletDataContextImpl implements PortletDataContext {
 		Group group = GroupLocalServiceUtil.getGroup(_groupId);
 
 		List<Role> roles = RoleLocalServiceUtil.getRoles(_companyId);
+
+		PrimitiveLongList roleIds = new PrimitiveLongList(roles.size());
+		Map<Long, String> roleIdsToNames = new HashMap<Long, String>();
 
 		for (Role role : roles) {
 			int type = role.getType();
@@ -420,12 +448,9 @@ public class PortletDataContextImpl implements PortletDataContext {
 				 (group.isLayoutSetPrototype() || group.isSite()))) {
 
 				String name = role.getName();
-				String actionIds = getActionIds(
-					role, resourceName, String.valueOf(resourcePK));
 
-				KeyValuePair permission = new KeyValuePair(name, actionIds);
-
-				permissions.add(permission);
+				roleIds.add(role.getRoleId());
+				roleIdsToNames.put(role.getRoleId(), name);
 			}
 			else if ((type == RoleConstants.TYPE_PROVIDER) && role.isTeam()) {
 				Team team = TeamLocalServiceUtil.getTeam(role.getClassPK());
@@ -433,14 +458,34 @@ public class PortletDataContextImpl implements PortletDataContext {
 				if (team.getGroupId() == _groupId) {
 					String name =
 						PermissionExporter.ROLE_TEAM_PREFIX + team.getName();
-					String actionIds = getActionIds(
-						role, resourceName, String.valueOf(resourcePK));
 
-					KeyValuePair permission = new KeyValuePair(name, actionIds);
-
-					permissions.add(permission);
+					roleIds.add(role.getRoleId());
+					roleIdsToNames.put(role.getRoleId(), name);
 				}
 			}
+		}
+
+		List<String> actionIds = ResourceActionsUtil.getModelResourceActions(
+			resourceName);
+
+		Map<Long, Set<String>> roleIdsToActionIds = getActionIds(
+			_companyId, roleIds.getArray(), resourceName, resourcePK,
+			actionIds);
+
+		for (Map.Entry<Long, String> entry : roleIdsToNames.entrySet()) {
+			long roleId = entry.getKey();
+			String name = entry.getValue();
+
+			Set<String> availableActionIds = roleIdsToActionIds.get(roleId);
+
+			if ((availableActionIds == null) || availableActionIds.isEmpty()) {
+				continue;
+			}
+
+			KeyValuePair permission = new KeyValuePair(
+				name, StringUtil.merge(availableActionIds));
+
+			permissions.add(permission);
 		}
 
 		_permissionsMap.put(
@@ -449,12 +494,6 @@ public class PortletDataContextImpl implements PortletDataContext {
 
 	public void addPermissions(
 		String resourceName, long resourcePK, List<KeyValuePair> permissions) {
-
-		if ((PropsValues.PERMISSIONS_USER_CHECK_ALGORITHM != 5) &&
-			(PropsValues.PERMISSIONS_USER_CHECK_ALGORITHM != 6)) {
-
-			return;
-		}
 
 		_permissionsMap.put(
 			getPrimaryKeyString(resourceName, resourcePK), permissions);
@@ -480,11 +519,7 @@ public class PortletDataContextImpl implements PortletDataContext {
 			return;
 		}
 
-		Iterator<RatingsEntry> itr = ratingsEntries.iterator();
-
-		while (itr.hasNext()) {
-			RatingsEntry entry = itr.next();
-
+		for (RatingsEntry entry : ratingsEntries) {
 			entry.setUserUuid(entry.getUserUuid());
 		}
 
@@ -596,8 +631,7 @@ public class PortletDataContextImpl implements PortletDataContext {
 	}
 
 	public long[] getAssetCategoryIds(Class<?> clazz, long classPK) {
-		return _assetCategoryIdsMap.get(
-			getPrimaryKeyString(clazz, classPK));
+		return _assetCategoryIdsMap.get(getPrimaryKeyString(clazz, classPK));
 	}
 
 	public Map<String, long[]> getAssetCategoryIdsMap() {
@@ -751,7 +785,7 @@ public class PortletDataContextImpl implements PortletDataContext {
 		return _startDate;
 	}
 
-	public long getUserId(String userUuid) throws SystemException {
+	public long getUserId(String userUuid) {
 		return _userIdStrategy.getUserId(userUuid);
 	}
 
@@ -846,11 +880,14 @@ public class PortletDataContextImpl implements PortletDataContext {
 		importLocks(clazz, String.valueOf(classPK), String.valueOf(newClassPK));
 		importPermissions(clazz, classPK, newClassPK);
 
-		if (getBooleanParameter(namespace, "comments")) {
+		boolean portletMetadataAll = getBooleanParameter(
+			namespace, PortletDataHandlerKeys.PORTLET_METADATA_ALL);
+
+		if (portletMetadataAll || getBooleanParameter(namespace, "comments")) {
 			importComments(clazz, classPK, newClassPK, getScopeGroupId());
 		}
 
-		if (getBooleanParameter(namespace, "ratings")) {
+		if (portletMetadataAll || getBooleanParameter(namespace, "ratings")) {
 			importRatingsEntries(clazz, classPK, newClassPK);
 		}
 	}
@@ -983,8 +1020,7 @@ public class PortletDataContextImpl implements PortletDataContext {
 			lock.isInheritable(), expirationTime);
 	}
 
-	public void importPermissions(
-			Class<?> clazz, long classPK, long newClassPK)
+	public void importPermissions(Class<?> clazz, long classPK, long newClassPK)
 		throws PortalException, SystemException {
 
 		importPermissions(clazz.getName(), classPK, newClassPK);
@@ -994,10 +1030,8 @@ public class PortletDataContextImpl implements PortletDataContext {
 			String resourceName, long resourcePK, long newResourcePK)
 		throws PortalException, SystemException {
 
-		if (((PropsValues.PERMISSIONS_USER_CHECK_ALGORITHM != 5) &&
-			 (PropsValues.PERMISSIONS_USER_CHECK_ALGORITHM != 6)) ||
-			(!MapUtil.getBoolean(
-				_parameterMap, PortletDataHandlerKeys.PERMISSIONS))) {
+		if (!MapUtil.getBoolean(
+				_parameterMap, PortletDataHandlerKeys.PERMISSIONS)) {
 
 			return;
 		}
@@ -1008,6 +1042,8 @@ public class PortletDataContextImpl implements PortletDataContext {
 		if (permissions == null) {
 			return;
 		}
+
+		Map<Long, String[]> roleIdsToActionIds = new HashMap<Long, String[]>();
 
 		for (KeyValuePair permission : permissions) {
 			String roleName = permission.getKey();
@@ -1051,31 +1087,22 @@ public class PortletDataContextImpl implements PortletDataContext {
 
 			String[] actionIds = StringUtil.split(permission.getValue());
 
-			if (PropsValues.PERMISSIONS_USER_CHECK_ALGORITHM == 5) {
-				Resource resource = null;
+			roleIdsToActionIds.put(role.getRoleId(), actionIds);
+		}
 
-				try {
-					resource = ResourceLocalServiceUtil.getResource(
-						_companyId, resourceName,
-						ResourceConstants.SCOPE_INDIVIDUAL,
-						String.valueOf(newResourcePK));
-				}
-				catch (NoSuchResourceException nsre) {
-					resource = ResourceLocalServiceUtil.addResource(
-						_companyId, resourceName,
-						ResourceConstants.SCOPE_INDIVIDUAL,
-						String.valueOf(newResourcePK));
-				}
+		if (roleIdsToActionIds.isEmpty()) {
+			return;
+		}
 
-				PermissionLocalServiceUtil.setRolePermissions(
-					role.getRoleId(), actionIds, resource.getResourceId());
-			}
-			else if (PropsValues.PERMISSIONS_USER_CHECK_ALGORITHM == 6) {
-				ResourcePermissionLocalServiceUtil.setResourcePermissions(
-					_companyId, resourceName,
-					ResourceConstants.SCOPE_INDIVIDUAL,
-					String.valueOf(newResourcePK), role.getRoleId(), actionIds);
-			}
+		if (ResourceBlockLocalServiceUtil.isSupported(resourceName)) {
+			ResourceBlockLocalServiceUtil.setIndividualScopePermissions(
+				_companyId, _groupId, resourceName, newResourcePK,
+				roleIdsToActionIds);
+		}
+		else {
+			ResourcePermissionLocalServiceUtil.setResourcePermissions(
+				_companyId, resourceName, ResourceConstants.SCOPE_INDIVIDUAL,
+				String.valueOf(newResourcePK), roleIdsToActionIds);
 		}
 	}
 
@@ -1116,7 +1143,7 @@ public class PortletDataContextImpl implements PortletDataContext {
 		}
 	}
 
-	public boolean isDataStrategyMirrorWithOverwritting() {
+	public boolean isDataStrategyMirrorWithOverwriting() {
 		if (_dataStrategy.equals(
 				PortletDataHandlerKeys.DATA_STRATEGY_MIRROR_OVERWRITE)) {
 
@@ -1145,7 +1172,7 @@ public class PortletDataContextImpl implements PortletDataContext {
 			return true;
 		}
 		else if ((_startDate.compareTo(modifiedDate) <= 0) &&
-				 (_endDate.after(modifiedDate))) {
+				 _endDate.after(modifiedDate)) {
 
 			return true;
 		}
@@ -1200,47 +1227,12 @@ public class PortletDataContextImpl implements PortletDataContext {
 		_sourceGroupId = sourceGroupId;
 	}
 
-	public String toXML(Object object) {
-		return _xStream.toXML(object);
-	}
-
 	public void setStartDate(Date startDate) {
 		_startDate = startDate;
 	}
 
-	protected void addExpando(
-			Element element, String path, ClassedModel classedModel)
-		throws PortalException, SystemException {
-
-		Class<?> clazz = classedModel.getModelClass();
-
-		String className = clazz.getName();
-
-		if (!_expandoColumnsMap.containsKey(className)) {
-			List<ExpandoColumn> expandoColumns =
-				ExpandoColumnLocalServiceUtil.getDefaultTableColumns(
-					_companyId, className);
-
-			for (ExpandoColumn expandoColumn : expandoColumns) {
-				addPermissions(
-				ExpandoColumn.class, expandoColumn.getColumnId());
-			}
-
-			_expandoColumnsMap.put(className, expandoColumns);
-		}
-
-		ExpandoBridge expandoBridge = classedModel.getExpandoBridge();
-
-		Map<String, Serializable> expandoBridgeAttributes =
-			expandoBridge.getAttributes();
-
-		if (!expandoBridgeAttributes.isEmpty()) {
-			String expandoPath = getExpandoPath(path);
-
-			element.addAttribute("expando-path", expandoPath);
-
-			addZipEntry(expandoPath, expandoBridgeAttributes);
-		}
+	public String toXML(Object object) {
+		return _xStream.toXML(object);
 	}
 
 	protected ServiceContext createServiceContext(
@@ -1268,20 +1260,28 @@ public class PortletDataContextImpl implements PortletDataContext {
 
 		// Permissions
 
-		serviceContext.setAddGroupPermissions(true);
-		serviceContext.setAddGuestPermissions(true);
+		if (!MapUtil.getBoolean(
+				_parameterMap, PortletDataHandlerKeys.PERMISSIONS)) {
+
+			serviceContext.setAddGroupPermissions(true);
+			serviceContext.setAddGuestPermissions(true);
+		}
 
 		// Asset
 
+		boolean portletMetadataAll = getBooleanParameter(
+			namespace, PortletDataHandlerKeys.PORTLET_METADATA_ALL);
+
 		if (isResourceMain(classedModel)) {
-			if (getBooleanParameter(namespace, "categories")) {
-				long[] assetCategoryIds = getAssetCategoryIds(
-					clazz, classPK);
+			if (portletMetadataAll ||
+				getBooleanParameter(namespace, "categories")) {
+
+				long[] assetCategoryIds = getAssetCategoryIds(clazz, classPK);
 
 				serviceContext.setAssetCategoryIds(assetCategoryIds);
 			}
 
-			if (getBooleanParameter(namespace, "tags")) {
+			if (portletMetadataAll || getBooleanParameter(namespace, "tags")) {
 				String[] assetTagNames = getAssetTagNames(clazz, classPK);
 
 				serviceContext.setAssetTagNames(assetTagNames);
@@ -1317,37 +1317,22 @@ public class PortletDataContextImpl implements PortletDataContext {
 		return serviceContext;
 	}
 
-	protected String getActionIds(
-			Role role, String className, String primKey)
+	protected Map<Long, Set<String>> getActionIds(
+			long companyId, long[] roleIds, String className, long primKey,
+			List<String> actionIds)
 		throws PortalException, SystemException {
 
-		List<String> allActionIds = ResourceActionsUtil.getModelResourceActions(
-			className);
-
-		List<String> actionIds = new ArrayList<String>(allActionIds.size());
-
-		for (String actionId : allActionIds) {
-			if (PropsValues.PERMISSIONS_USER_CHECK_ALGORITHM == 5) {
-				if (PermissionLocalServiceUtil.hasRolePermission(
-						role.getRoleId(), role.getCompanyId(), className,
-						ResourceConstants.SCOPE_INDIVIDUAL, primKey,
-						actionId)) {
-
-					actionIds.add(actionId);
-				}
-			}
-			else if (PropsValues.PERMISSIONS_USER_CHECK_ALGORITHM == 6) {
-				if (ResourcePermissionLocalServiceUtil.hasResourcePermission(
-						role.getCompanyId(), className,
-						ResourceConstants.SCOPE_INDIVIDUAL, primKey,
-						role.getRoleId(), actionId)) {
-
-					actionIds.add(actionId);
-				}
-			}
+		if (ResourceBlockLocalServiceUtil.isSupported(className)) {
+			return ResourceBlockPermissionLocalServiceUtil.
+				getAvailableResourceBlockPermissionActionIds(
+					roleIds, className, primKey, actionIds);
 		}
-
-		return StringUtil.merge(actionIds);
+		else {
+			return ResourcePermissionLocalServiceUtil.
+				getAvailableResourcePermissionActionIds(
+					companyId, className, ResourceConstants.SCOPE_INDIVIDUAL,
+					String.valueOf(primKey), roleIds, actionIds);
+		}
 	}
 
 	protected long getClassPK(ClassedModel classedModel) {
@@ -1370,7 +1355,7 @@ public class PortletDataContextImpl implements PortletDataContext {
 		}
 
 		return path.substring(0, pos).concat("-expando").concat(
-			path.substring(pos, path.length()));
+			path.substring(pos));
 	}
 
 	protected String getPrimaryKeyString(Class<?> clazz, long classPK) {
@@ -1400,17 +1385,15 @@ public class PortletDataContextImpl implements PortletDataContext {
 		_xStream.alias("DLFileEntry", DLFileEntryImpl.class);
 		_xStream.alias("DLFileShortcut", DLFileShortcutImpl.class);
 		_xStream.alias("DLFileRank", DLFileRankImpl.class);
-		_xStream.alias("IGFolder", IGFolderImpl.class);
-		_xStream.alias("IGImage", IGImageImpl.class);
 		_xStream.alias("JournalArticle", JournalArticleImpl.class);
 		_xStream.alias("JournalFeed", JournalFeedImpl.class);
 		_xStream.alias("JournalStructure", JournalStructureImpl.class);
 		_xStream.alias("JournalTemplate", JournalTemplateImpl.class);
 		_xStream.alias("Lock", LockImpl.class);
+		_xStream.alias("MBBan", MBBanImpl.class);
 		_xStream.alias("MBCategory", MBCategoryImpl.class);
 		_xStream.alias("MBMessage", MBMessageImpl.class);
-		_xStream.alias("MBMessageFlag", MBMessageFlagImpl.class);
-		_xStream.alias("MBBan", MBBanImpl.class);
+		_xStream.alias("MBThreadFlag", MBThreadFlagImpl.class);
 		_xStream.alias("PollsQuestion", PollsQuestionImpl.class);
 		_xStream.alias("PollsChoice", PollsChoiceImpl.class);
 		_xStream.alias("PollsVote", PollsVoteImpl.class);
@@ -1432,22 +1415,31 @@ public class PortletDataContextImpl implements PortletDataContext {
 	protected void validateDateRange(Date startDate, Date endDate)
 		throws PortletDataException {
 
-		if ((startDate == null) ^ (endDate == null)) {
+		if ((startDate == null) && (endDate != null)) {
 			throw new PortletDataException(
-				"Both start and end dates must have valid values or be null");
+				PortletDataException.END_DATE_IS_MISSING_START_DATE);
+		}
+		else if ((startDate != null) && (endDate == null)) {
+			throw new PortletDataException(
+				PortletDataException.START_DATE_IS_MISSING_END_DATE);
 		}
 
 		if (startDate != null) {
 			if (startDate.after(endDate) || startDate.equals(endDate)) {
 				throw new PortletDataException(
-					"The start date cannot be after the end date");
+					PortletDataException.START_DATE_AFTER_END_DATE);
 			}
 
 			Date now = new Date();
 
-			if (startDate.after(now) || endDate.after(now)) {
+			if (startDate.after(now)) {
 				throw new PortletDataException(
-					"Dates must not be in the future");
+					PortletDataException.FUTURE_START_DATE);
+			}
+
+			if (endDate.after(now)) {
+				throw new PortletDataException(
+					PortletDataException.FUTURE_END_DATE);
 			}
 		}
 	}

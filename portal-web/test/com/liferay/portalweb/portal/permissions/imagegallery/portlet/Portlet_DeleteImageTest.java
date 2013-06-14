@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -23,15 +23,16 @@ import com.liferay.portalweb.portal.util.RuntimeVariables;
 public class Portlet_DeleteImageTest extends BaseTestCase {
 	public void testPortlet_DeleteImage() throws Exception {
 		selenium.open("/web/guest/home/");
+		loadRequiredJavaScriptModules();
 
 		for (int second = 0;; second++) {
-			if (second >= 60) {
+			if (second >= 90) {
 				fail("timeout");
 			}
 
 			try {
 				if (selenium.isElementPresent(
-							"link=Image Gallery Permissions Test Page")) {
+							"link=Media Gallery Permissions Test Page")) {
 					break;
 				}
 			}
@@ -41,24 +42,30 @@ public class Portlet_DeleteImageTest extends BaseTestCase {
 			Thread.sleep(1000);
 		}
 
-		selenium.saveScreenShotAndSource();
-		selenium.clickAt("link=Image Gallery Permissions Test Page",
-			RuntimeVariables.replace(""));
+		selenium.clickAt("link=Media Gallery Permissions Test Page",
+			RuntimeVariables.replace("Media Gallery Permissions Test Page"));
 		selenium.waitForPageToLoad("30000");
-		selenium.saveScreenShotAndSource();
-		selenium.clickAt("link=Portlet2 Temporary2 Folder2",
-			RuntimeVariables.replace(""));
+		loadRequiredJavaScriptModules();
+		assertEquals(RuntimeVariables.replace("Media Gallery Temporary Folder"),
+			selenium.getText("//a[@title='Media Gallery Temporary Folder - ']"));
+		selenium.clickAt("//a[@title='Media Gallery Temporary Folder - ']",
+			RuntimeVariables.replace("Media Gallery Temporary Folder"));
 		selenium.waitForPageToLoad("30000");
-		selenium.saveScreenShotAndSource();
-		selenium.clickAt("//div[2]/a/img", RuntimeVariables.replace(""));
+		loadRequiredJavaScriptModules();
+		assertEquals(RuntimeVariables.replace(
+				"Portlet Permissions Image 2 Test Title Edited"),
+			selenium.getText(
+				"//a[@title='Portlet Permissions Image 2 Test Title Edited - ']"));
+		selenium.clickAt("//a[@title='Portlet Permissions Image 2 Test Title Edited - ']",
+			RuntimeVariables.replace("Portlet Permissions Image 2 Test Title"));
 
 		for (int second = 0;; second++) {
-			if (second >= 60) {
+			if (second >= 90) {
 				fail("timeout");
 			}
 
 			try {
-				if (selenium.isElementPresent("//a[3]")) {
+				if (selenium.isVisible("//img[@alt='Delete']")) {
 					break;
 				}
 			}
@@ -68,18 +75,52 @@ public class Portlet_DeleteImageTest extends BaseTestCase {
 			Thread.sleep(1000);
 		}
 
-		selenium.saveScreenShotAndSource();
-		assertTrue(selenium.isElementPresent("//img[@alt='Delete']"));
-		selenium.click(RuntimeVariables.replace("//img[@alt='Delete']"));
+		selenium.clickAt("//img[@alt='Delete']",
+			RuntimeVariables.replace("Delete"));
 		selenium.waitForPageToLoad("30000");
+		loadRequiredJavaScriptModules();
 		assertTrue(selenium.getConfirmation()
 						   .matches("^Are you sure you want to delete this[\\s\\S]$"));
-		selenium.saveScreenShotAndSource();
-		assertTrue(selenium.isTextPresent(
-				"Your request completed successfully."));
+		assertEquals(RuntimeVariables.replace(
+				"Your request completed successfully."),
+			selenium.getText("//div[@class='portlet-msg-success']"));
+		assertEquals(RuntimeVariables.replace(
+				"There are no media files in this folder."),
+			selenium.getText("//div[@class='portlet-msg-info']"));
+		selenium.open("/web/guest/home/");
+		loadRequiredJavaScriptModules();
+
+		for (int second = 0;; second++) {
+			if (second >= 90) {
+				fail("timeout");
+			}
+
+			try {
+				if (selenium.isElementPresent(
+							"link=Media Gallery Permissions Test Page")) {
+					break;
+				}
+			}
+			catch (Exception e) {
+			}
+
+			Thread.sleep(1000);
+		}
+
+		selenium.clickAt("link=Media Gallery Permissions Test Page",
+			RuntimeVariables.replace("Media Gallery Permissions Test Page"));
+		selenium.waitForPageToLoad("30000");
+		loadRequiredJavaScriptModules();
+		assertEquals(RuntimeVariables.replace("Media Gallery Temporary Folder"),
+			selenium.getText("//a[@title='Media Gallery Temporary Folder - ']"));
+		selenium.clickAt("//a[@title='Media Gallery Temporary Folder - ']",
+			RuntimeVariables.replace("Media Gallery Temporary Folder"));
+		selenium.waitForPageToLoad("30000");
+		loadRequiredJavaScriptModules();
 		assertFalse(selenium.isElementPresent(
-				"//img[@alt='Edited2 Portlet2 Temporary2 Image2 - ']"));
-		assertFalse(selenium.isElementPresent(
-				"//img[@alt='Portlet2 Temporary2 Image2 - ']"));
+				"//a[@title='Portlet Permissions Image 2 Test Title Edited - ']"));
+		assertEquals(RuntimeVariables.replace(
+				"There are no media files in this folder."),
+			selenium.getText("//div[@class='portlet-msg-info']"));
 	}
 }

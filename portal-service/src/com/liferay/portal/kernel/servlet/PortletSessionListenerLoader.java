@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -34,16 +34,16 @@ public class PortletSessionListenerLoader implements ServletContextListener {
 		_httpSessionListener = httpSessionListener;
 	}
 
-	public void contextInitialized(ServletContextEvent servletContextEvent) {
-		PortletSessionListenerManager.addHttpSessionListener(
-			_httpSessionListener);
-	}
-
 	public void contextDestroyed(ServletContextEvent servletContextEvent) {
 		PortletSessionListenerManager.removeHttpSessionListener(
 			_httpSessionListener);
 
 		_httpSessionListener = null;
+	}
+
+	public void contextInitialized(ServletContextEvent servletContextEvent) {
+		PortletSessionListenerManager.addHttpSessionListener(
+			_httpSessionListener);
 	}
 
 	private HttpSessionListener _httpSessionListener;

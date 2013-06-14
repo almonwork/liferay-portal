@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -24,6 +24,10 @@ import java.util.Date;
  * @author Marcellus Tavares
  */
 public class DefaultWorkflowLog implements Serializable, WorkflowLog {
+
+	public long getAuditUserId() {
+		return _auditUserId;
+	}
 
 	public String getComment() {
 		return _comment;
@@ -67,6 +71,10 @@ public class DefaultWorkflowLog implements Serializable, WorkflowLog {
 
 	public long getWorkflowTaskId() {
 		return _workflowTaskId;
+	}
+
+	public void setAuditUserId(long auditUserId) {
+		_auditUserId = auditUserId;
 	}
 
 	public void setComment(String comment) {
@@ -113,15 +121,16 @@ public class DefaultWorkflowLog implements Serializable, WorkflowLog {
 		_workflowTaskId = workflowTaskId;
 	}
 
+	private long _auditUserId;
 	private String _comment;
 	private Date _createDate;
 	private long _previousRoleId;
 	private String _previousState;
 	private long _previousUserId;
+	private long _roleId;
 	private String _state;
 	private int _type;
 	private long _userId;
-	private long _roleId;
 	private long _workflowLogId;
 	private long _workflowTaskId;
 

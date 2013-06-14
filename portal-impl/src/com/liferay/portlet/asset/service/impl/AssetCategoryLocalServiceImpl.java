@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -26,6 +26,7 @@ import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
+import com.liferay.portal.model.ModelHintsUtil;
 import com.liferay.portal.model.ResourceConstants;
 import com.liferay.portal.model.User;
 import com.liferay.portal.service.ServiceContext;
@@ -62,7 +63,11 @@ public class AssetCategoryLocalServiceImpl
 
 		User user = userPersistence.findByPrimaryKey(userId);
 		long groupId = serviceContext.getScopeGroupId();
+
 		String name = titleMap.get(LocaleUtil.getDefault());
+
+		name = ModelHintsUtil.trimString(
+			AssetCategory.class.getName(), "name", name);
 
 		if (categoryProperties == null) {
 			categoryProperties = new String[0];
@@ -99,12 +104,12 @@ public class AssetCategoryLocalServiceImpl
 
 		// Resources
 
-		if (serviceContext.getAddGroupPermissions() ||
-			serviceContext.getAddGuestPermissions()) {
+		if (serviceContext.isAddGroupPermissions() ||
+			serviceContext.isAddGuestPermissions()) {
 
 			addCategoryResources(
-				category, serviceContext.getAddGroupPermissions(),
-				serviceContext.getAddGuestPermissions());
+				category, serviceContext.isAddGroupPermissions(),
+				serviceContext.isAddGuestPermissions());
 		}
 		else {
 			addCategoryResources(
@@ -161,6 +166,11 @@ public class AssetCategoryLocalServiceImpl
 	public void deleteCategory(AssetCategory category)
 		throws PortalException, SystemException {
 
+		// Entries
+
+		List<AssetEntry> entries = assetTagPersistence.getAssetEntries(
+			category.getCategoryId());
+
 		// Category
 
 		assetCategoryPersistence.remove(category);
@@ -185,6 +195,10 @@ public class AssetCategoryLocalServiceImpl
 
 		assetCategoryPropertyLocalService.deleteCategoryProperties(
 			category.getCategoryId());
+
+		// Indexer
+
+		assetEntryLocalService.reindex(entries);
 	}
 
 	public void deleteCategory(long categoryId)
@@ -207,20 +221,8 @@ public class AssetCategoryLocalServiceImpl
 		}
 	}
 
-	public String[] getCategoryNames() throws SystemException {
-		return getCategoryNames(getCategories());
-	}
-
-	public String[] getCategoryNames(long classNameId, long classPK)
-		throws SystemException {
-
-		return getCategoryNames(getCategories(classNameId, classPK));
-	}
-
-	public String[] getCategoryNames(String className, long classPK)
-		throws SystemException {
-
-		return getCategoryNames(getCategories(className, classPK));
+	public AssetCategory fetchCategory(long categoryId) throws SystemException {
+		return assetCategoryPersistence.fetchByPrimaryKey(categoryId);
 	}
 
 	public List<AssetCategory> getCategories() throws SystemException {
@@ -252,6 +254,22 @@ public class AssetCategoryLocalServiceImpl
 		throws SystemException {
 
 		return getCategoryIds(getCategories(className, classPK));
+	}
+
+	public String[] getCategoryNames() throws SystemException {
+		return getCategoryNames(getCategories());
+	}
+
+	public String[] getCategoryNames(long classNameId, long classPK)
+		throws SystemException {
+
+		return getCategoryNames(getCategories(classNameId, classPK));
+	}
+
+	public String[] getCategoryNames(String className, long classPK)
+		throws SystemException {
+
+		return getCategoryNames(getCategories(className, classPK));
 	}
 
 	public List<AssetCategory> getChildCategories(long parentCategoryId)
@@ -398,6 +416,9 @@ public class AssetCategoryLocalServiceImpl
 
 		String name = titleMap.get(LocaleUtil.getDefault());
 
+		name = ModelHintsUtil.trimString(
+			AssetCategory.class.getName(), "name", name);
+
 		if (categoryProperties == null) {
 			categoryProperties = new String[0];
 		}
@@ -411,8 +432,13 @@ public class AssetCategoryLocalServiceImpl
 		AssetCategory category = assetCategoryPersistence.findByPrimaryKey(
 			categoryId);
 
+		String oldName = category.getName();
+
 		if (vocabularyId != category.getVocabularyId()) {
 			assetVocabularyPersistence.findByPrimaryKey(vocabularyId);
+
+			parentCategoryId =
+				AssetCategoryConstants.DEFAULT_PARENT_CATEGORY_ID;
 
 			category.setVocabularyId(vocabularyId);
 
@@ -459,6 +485,15 @@ public class AssetCategoryLocalServiceImpl
 			}
 		}
 
+		// Indexer
+
+		if (!oldName.equals(name)) {
+			List<AssetEntry> entries = assetCategoryPersistence.getAssetEntries(
+				category.getCategoryId());
+
+			assetEntryLocalService.reindex(entries);
+		}
+
 		return category;
 	}
 
@@ -473,7 +508,7 @@ public class AssetCategoryLocalServiceImpl
 			ListUtil.toString(categories, AssetCategory.NAME_ACCESSOR));
 	}
 
-	protected void updateChildrenVocabularyId (
+	protected void updateChildrenVocabularyId(
 			AssetCategory category, long vocabularyId)
 		throws SystemException {
 
@@ -502,20 +537,10 @@ public class AssetCategoryLocalServiceImpl
 			throw new AssetCategoryNameException();
 		}
 
-		List<AssetCategory> categories = null;
+		AssetCategory category = assetCategoryPersistence.fetchByP_N_V(
+			parentCategoryId, name, vocabularyId);
 
-		if (parentCategoryId == 0) {
-			categories = assetCategoryPersistence.findByN_V(
-				name, vocabularyId);
-		}
-		else {
-			categories = assetCategoryPersistence.findByP_N(
-				parentCategoryId, name);
-		}
-
-		if ((categories.size() > 0) &&
-			(categories.get(0).getCategoryId() != categoryId)) {
-
+		if ((category != null) && (category.getCategoryId() != categoryId)) {
 			StringBundler sb = new StringBundler(4);
 
 			sb.append("There is another category named ");

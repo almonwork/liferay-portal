@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -36,12 +36,16 @@ public class ActionUtil {
 	public static void getStructure(HttpServletRequest request)
 		throws Exception {
 
-		long structureId = ParamUtil.getLong(request, "structureId");
+		long classNameId = ParamUtil.getLong(request, "classNameId");
+		long classPK = ParamUtil.getLong(request, "classPK");
 
 		DDMStructure structure = null;
 
-		if (structureId > 0) {
-			structure = DDMStructureServiceUtil.getStructure(structureId);
+		long structureClassNameId = PortalUtil.getClassNameId(
+			DDMStructure.class);
+
+		if ((structureClassNameId == classNameId) && (classPK > 0)) {
+			structure = DDMStructureServiceUtil.getStructure(classPK);
 		}
 
 		request.setAttribute(WebKeys.DYNAMIC_DATA_MAPPING_STRUCTURE, structure);

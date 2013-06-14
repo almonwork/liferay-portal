@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -24,9 +24,10 @@ public class ViewPortletShowLocalesWebContentWCDTest extends BaseTestCase {
 	public void testViewPortletShowLocalesWebContentWCD()
 		throws Exception {
 		selenium.open("/web/guest/home/");
+		loadRequiredJavaScriptModules();
 
 		for (int second = 0;; second++) {
-			if (second >= 60) {
+			if (second >= 90) {
 				fail("timeout");
 			}
 
@@ -41,82 +42,26 @@ public class ViewPortletShowLocalesWebContentWCDTest extends BaseTestCase {
 			Thread.sleep(1000);
 		}
 
-		selenium.saveScreenShotAndSource();
 		selenium.clickAt("link=Web Content Display Test Page",
 			RuntimeVariables.replace("Web Content Display Test Page"));
 		selenium.waitForPageToLoad("30000");
-		selenium.saveScreenShotAndSource();
-
-		for (int second = 0;; second++) {
-			if (second >= 60) {
-				fail("timeout");
-			}
-
-			try {
-				if (selenium.isVisible("//img[@alt='English (United States)']")) {
-					break;
-				}
-			}
-			catch (Exception e) {
-			}
-
-			Thread.sleep(1000);
-		}
-
-		selenium.saveScreenShotAndSource();
-		selenium.clickAt("//img[@alt='English (United States)']",
-			RuntimeVariables.replace(""));
+		loadRequiredJavaScriptModules();
+		assertTrue(selenium.isElementPresent(
+				"//img[@title='English (United States)']"));
+		selenium.clickAt("//img[@title='English (United States)']",
+			RuntimeVariables.replace("English (United States)"));
 		selenium.waitForPageToLoad("30000");
-		selenium.saveScreenShotAndSource();
-
-		for (int second = 0;; second++) {
-			if (second >= 60) {
-				fail("timeout");
-			}
-
-			try {
-				if (RuntimeVariables.replace("Web Content Content")
-										.equals(selenium.getText("//p"))) {
-					break;
-				}
-			}
-			catch (Exception e) {
-			}
-
-			Thread.sleep(1000);
-		}
-
-		selenium.saveScreenShotAndSource();
-		assertEquals(RuntimeVariables.replace("Web Content Content"),
-			selenium.getText("//p"));
-		assertEquals(RuntimeVariables.replace(""),
-			selenium.getText("//img[@alt='\u4e2d\u6587 (\u4e2d\u56fd)']"));
-		selenium.clickAt("//img[@alt='\u4e2d\u6587 (\u4e2d\u56fd)']",
-			RuntimeVariables.replace(""));
+		loadRequiredJavaScriptModules();
+		assertEquals(RuntimeVariables.replace("WC WebContent Content"),
+			selenium.getText("//div[@class='journal-content-article']/p"));
+		assertTrue(selenium.isElementPresent(
+				"//img[@title='\u4e2d\u6587 (\u4e2d\u56fd)']"));
+		selenium.clickAt("//img[@title='\u4e2d\u6587 (\u4e2d\u56fd)']",
+			RuntimeVariables.replace("\u4e2d\u6587 (\u4e2d\u56fd)"));
 		selenium.waitForPageToLoad("30000");
-		selenium.saveScreenShotAndSource();
-
-		for (int second = 0;; second++) {
-			if (second >= 60) {
-				fail("timeout");
-			}
-
-			try {
-				if (RuntimeVariables.replace(
-							"\u4e16\u754c\u60a8\u597d Page Description")
-										.equals(selenium.getText("//p"))) {
-					break;
-				}
-			}
-			catch (Exception e) {
-			}
-
-			Thread.sleep(1000);
-		}
-
-		selenium.saveScreenShotAndSource();
+		loadRequiredJavaScriptModules();
 		assertEquals(RuntimeVariables.replace(
 				"\u4e16\u754c\u60a8\u597d Page Description"),
-			selenium.getText("//p"));
+			selenium.getText("//div[@class='journal-content-article']/p"));
 	}
 }

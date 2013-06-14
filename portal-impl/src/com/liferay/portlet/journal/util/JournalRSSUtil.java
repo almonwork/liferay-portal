@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -29,8 +29,7 @@ import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.portal.model.Image;
 import com.liferay.portal.service.ImageLocalServiceUtil;
 import com.liferay.portlet.documentlibrary.service.DLAppLocalServiceUtil;
-import com.liferay.portlet.imagegallery.model.IGImage;
-import com.liferay.portlet.imagegallery.service.IGImageLocalServiceUtil;
+import com.liferay.portlet.documentlibrary.util.ImageProcessorUtil;
 import com.liferay.portlet.journal.model.JournalArticle;
 import com.liferay.portlet.journal.model.JournalFeed;
 import com.liferay.portlet.journal.service.JournalArticleLocalServiceUtil;
@@ -46,6 +45,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * @author Raymond Augé
@@ -57,6 +57,7 @@ public class JournalRSSUtil {
 
 		long companyId = feed.getCompanyId();
 		long groupId = feed.getGroupId();
+		long folderId = 0;
 		String articleId = null;
 		Double version = null;
 		String title = null;
@@ -100,31 +101,52 @@ public class JournalRSSUtil {
 		}
 
 		return JournalArticleLocalServiceUtil.search(
-			companyId, groupId, 0, articleId, version, title, description,
-			content, type, structureId, templateId, displayDateGT,
+			companyId, groupId, folderId, 0, articleId, version, title,
+			description, content, type, structureId, templateId, displayDateGT,
 			displayDateLT, status, reviewDate, andOperator, start, end, obc);
 	}
 
 	public static List<SyndEnclosure> getDLEnclosures(
 		String portalURL, String url) {
 
-		List<SyndEnclosure> enclosures = new ArrayList<SyndEnclosure>();
+		List<SyndEnclosure> syndEnclosures = new ArrayList<SyndEnclosure>();
 
 		FileEntry fileEntry = getFileEntry(url);
 
-		if (fileEntry != null) {
-			SyndEnclosure enclosure = new SyndEnclosureImpl();
-
-			enclosure.setLength(fileEntry.getSize());
-
-			enclosure.setType(fileEntry.getMimeType());
-
-			enclosure.setUrl(portalURL + url);
-
-			enclosures.add(enclosure);
+		if (fileEntry == null) {
+			return syndEnclosures;
 		}
 
-		return enclosures;
+		SyndEnclosure syndEnclosure = new SyndEnclosureImpl();
+
+		syndEnclosure.setLength(fileEntry.getSize());
+		syndEnclosure.setType(fileEntry.getMimeType());
+		syndEnclosure.setUrl(portalURL + url);
+
+		syndEnclosures.add(syndEnclosure);
+
+		return syndEnclosures;
+	}
+
+	public static List<SyndLink> getDLLinks(String portalURL, String url) {
+		List<SyndLink> syndLinks = new ArrayList<SyndLink>();
+
+		FileEntry fileEntry = getFileEntry(url);
+
+		if (fileEntry == null) {
+			return syndLinks;
+		}
+
+		SyndLink syndLink = new SyndLinkImpl();
+
+		syndLink.setHref(portalURL + url);
+		syndLink.setLength(fileEntry.getSize());
+		syndLink.setRel("enclosure");
+		syndLink.setType(fileEntry.getMimeType());
+
+		syndLinks.add(syndLink);
+
+		return syndLinks;
 	}
 
 	public static FileEntry getFileEntry(String url) {
@@ -138,13 +160,32 @@ public class JournalRSSUtil {
 		if (url.startsWith("/documents/")) {
 			String[] pathArray = StringUtil.split(url, CharPool.SLASH);
 
+			String uuid = null;
 			long groupId = GetterUtil.getLong(pathArray[2]);
-			long folderId = GetterUtil.getLong(pathArray[3]);
-			String title = HttpUtil.decodeURL(pathArray[4], true);
+			long folderId = 0;
+			String title = null;
+
+			if (pathArray.length == 4) {
+				uuid = pathArray[3];
+			}
+			else if (pathArray.length == 5) {
+				folderId = GetterUtil.getLong(pathArray[3]);
+				title = HttpUtil.decodeURL(pathArray[4], true);
+			}
+			else if (pathArray.length > 5) {
+				uuid = pathArray[5];
+			}
 
 			try {
-				fileEntry = DLAppLocalServiceUtil.getFileEntry(
-					groupId, folderId, title);
+				if (Validator.isNotNull(uuid)) {
+					fileEntry =
+						DLAppLocalServiceUtil.getFileEntryByUuidAndGroupId(
+							uuid, groupId);
+				}
+				else {
+					fileEntry = DLAppLocalServiceUtil.getFileEntry(
+						groupId, folderId, title);
+				}
 			}
 			catch (Exception e) {
 				if (_log.isWarnEnabled()) {
@@ -153,7 +194,7 @@ public class JournalRSSUtil {
 			}
 		}
 		else if (parameters.containsKey("folderId") &&
-			parameters.containsKey("name")) {
+				 parameters.containsKey("name")) {
 
 			try {
 				long fileEntryId = GetterUtil.getLong(
@@ -187,72 +228,49 @@ public class JournalRSSUtil {
 		return fileEntry;
 	}
 
-	public static List<SyndLink> getDLLinks(String portalURL, String url) {
-		List<SyndLink> links = new ArrayList<SyndLink>();
-
-		FileEntry fileEntry = getFileEntry(url);
-
-		if (fileEntry != null) {
-			SyndLink link = new SyndLinkImpl();
-
-			link.setHref(portalURL + url);
-
-			link.setLength(fileEntry.getSize());
-
-			link.setRel("enclosure");
-
-			link.setType(fileEntry.getMimeType());
-
-			links.add(link);
-		}
-
-		return links;
-	}
-
 	public static List<SyndEnclosure> getIGEnclosures(
 		String portalURL, String url) {
 
-		List<SyndEnclosure> enclosures = new ArrayList<SyndEnclosure>();
+		List<SyndEnclosure> syndEnclosures = new ArrayList<SyndEnclosure>();
 
-		Image image = getImage(url);
+		Object[] imageProperties = getImageProperties(url);
 
-		if (image != null) {
-			SyndEnclosure enclosure = new SyndEnclosureImpl();
-
-			enclosure.setLength(image.getSize());
-
-			enclosure.setType(
-				MimeTypesUtil.getContentType("*." + image.getType()));
-
-			enclosure.setUrl(portalURL + url);
-
-			enclosures.add(enclosure);
+		if (imageProperties == null) {
+			return syndEnclosures;
 		}
 
-		return enclosures;
+		SyndEnclosure syndEnclosure = new SyndEnclosureImpl();
+
+		syndEnclosure.setLength((Long)imageProperties[1]);
+		syndEnclosure.setType(
+			MimeTypesUtil.getContentType("*." + imageProperties[0]));
+		syndEnclosure.setUrl(portalURL + url);
+
+		syndEnclosures.add(syndEnclosure);
+
+		return syndEnclosures;
 	}
 
 	public static List<SyndLink> getIGLinks(String portalURL, String url) {
-		List<SyndLink> links = new ArrayList<SyndLink>();
+		List<SyndLink> syndLinks = new ArrayList<SyndLink>();
 
-		Image image = getImage(url);
+		Object[] imageProperties = getImageProperties(url);
 
-		if (image != null) {
-			SyndLink link = new SyndLinkImpl();
-
-			link.setHref(portalURL + url);
-
-			link.setLength(image.getSize());
-
-			link.setRel("enclosure");
-
-			link.setType(
-				MimeTypesUtil.getContentType("*." + image.getType()));
-
-			links.add(link);
+		if (imageProperties == null) {
+			return syndLinks;
 		}
 
-		return links;
+		SyndLink syndLink = new SyndLinkImpl();
+
+		syndLink.setHref(portalURL + url);
+		syndLink.setLength((Long)imageProperties[1]);
+		syndLink.setRel("enclosure");
+		syndLink.setType(
+			MimeTypesUtil.getContentType("*." + imageProperties[0]));
+
+		syndLinks.add(syndLink);
+
+		return syndLinks;
 	}
 
 	public static Image getImage(String url) {
@@ -288,28 +306,38 @@ public class JournalRSSUtil {
 				}
 			}
 		}
-		else if (parameters.containsKey("uuid") &&
-				 parameters.containsKey("groupId")) {
 
-			try {
-				String uuid = parameters.get("uuid")[0];
-				long groupId = GetterUtil.getLong(parameters.get("groupId")[0]);
+		return image;
+	}
 
-				IGImage igImage =
-					IGImageLocalServiceUtil.getImageByUuidAndGroupId(
-						uuid, groupId);
+	protected static Object[] getImageProperties(String url) {
+		String type = null;
+		long size = 0;
 
-				image = ImageLocalServiceUtil.getImage(
-					igImage.getLargeImageId());
-			}
-			catch (Exception e) {
-				if (_log.isWarnEnabled()) {
-					_log.warn(e, e);
-				}
+		Image image = getImage(url);
+
+		if (image != null) {
+			type = image.getType();
+			size = image.getSize();
+		}
+		else {
+			FileEntry fileEntry = getFileEntry(url);
+
+			Set<String> imageMimeTypes = ImageProcessorUtil.getImageMimeTypes();
+
+			if ((fileEntry != null) &&
+				imageMimeTypes.contains(fileEntry.getMimeType())) {
+
+				type = fileEntry.getExtension();
+				size = fileEntry.getSize();
 			}
 		}
 
-		return image;
+		if (Validator.isNotNull(type)) {
+			return new Object[] {type, size};
+		}
+
+		return null;
 	}
 
 	private static Log _log = LogFactoryUtil.getLog(JournalRSSUtil.class);

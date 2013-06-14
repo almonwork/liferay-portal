@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -15,7 +15,6 @@
 package com.liferay.portal.service;
 
 import com.liferay.portal.kernel.bean.PortalBeanLocatorUtil;
-import com.liferay.portal.kernel.util.MethodCache;
 import com.liferay.portal.kernel.util.ReferenceRegistry;
 
 /**
@@ -66,25 +65,32 @@ public class UserTrackerLocalServiceUtil {
 	* Deletes the user tracker with the primary key from the database. Also notifies the appropriate model listeners.
 	*
 	* @param userTrackerId the primary key of the user tracker
+	* @return the user tracker that was removed
 	* @throws PortalException if a user tracker with the primary key could not be found
 	* @throws SystemException if a system exception occurred
 	*/
-	public static void deleteUserTracker(long userTrackerId)
+	public static com.liferay.portal.model.UserTracker deleteUserTracker(
+		long userTrackerId)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException {
-		getService().deleteUserTracker(userTrackerId);
+		return getService().deleteUserTracker(userTrackerId);
 	}
 
 	/**
 	* Deletes the user tracker from the database. Also notifies the appropriate model listeners.
 	*
 	* @param userTracker the user tracker
+	* @return the user tracker that was removed
 	* @throws SystemException if a system exception occurred
 	*/
-	public static void deleteUserTracker(
+	public static com.liferay.portal.model.UserTracker deleteUserTracker(
 		com.liferay.portal.model.UserTracker userTracker)
 		throws com.liferay.portal.kernel.exception.SystemException {
-		getService().deleteUserTracker(userTracker);
+		return getService().deleteUserTracker(userTracker);
+	}
+
+	public static com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery() {
+		return getService().dynamicQuery();
 	}
 
 	/**
@@ -156,6 +162,12 @@ public class UserTrackerLocalServiceUtil {
 		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery)
 		throws com.liferay.portal.kernel.exception.SystemException {
 		return getService().dynamicQueryCount(dynamicQuery);
+	}
+
+	public static com.liferay.portal.model.UserTracker fetchUserTracker(
+		long userTrackerId)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getService().fetchUserTracker(userTrackerId);
 	}
 
 	/**
@@ -277,20 +289,15 @@ public class UserTrackerLocalServiceUtil {
 
 			ReferenceRegistry.registerReference(UserTrackerLocalServiceUtil.class,
 				"_service");
-			MethodCache.remove(UserTrackerLocalService.class);
 		}
 
 		return _service;
 	}
 
+	/**
+	 * @deprecated
+	 */
 	public void setService(UserTrackerLocalService service) {
-		MethodCache.remove(UserTrackerLocalService.class);
-
-		_service = service;
-
-		ReferenceRegistry.registerReference(UserTrackerLocalServiceUtil.class,
-			"_service");
-		MethodCache.remove(UserTrackerLocalService.class);
 	}
 
 	private static UserTrackerLocalService _service;

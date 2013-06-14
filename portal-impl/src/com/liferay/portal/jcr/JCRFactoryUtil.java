@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -15,6 +15,14 @@
 package com.liferay.portal.jcr;
 
 import com.liferay.portal.kernel.bean.PortalBeanLocatorUtil;
+import com.liferay.portal.kernel.memory.FinalizeManager;
+import com.liferay.portal.kernel.util.AutoResetThreadLocal;
+import com.liferay.portal.kernel.util.ProxyUtil;
+import com.liferay.portal.security.pacl.PACLClassLoaderUtil;
+import com.liferay.portal.util.PropsValues;
+
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.jcr.RepositoryException;
 import javax.jcr.Session;
@@ -24,13 +32,14 @@ import javax.jcr.Session;
  */
 public class JCRFactoryUtil {
 
-	public static JCRFactory getJCRFactory() {
-		if (_jcrFactory == null) {
-			_jcrFactory = (JCRFactory)PortalBeanLocatorUtil.locate(
-				_JCR_FACTORY);
+	public static void closeSession(Session session) {
+		if (session != null) {
+			session.logout();
 		}
+	}
 
-		return _jcrFactory;
+	public static Session createSession() throws RepositoryException {
+		return createSession(null);
 	}
 
 	public static Session createSession(String workspaceName)
@@ -40,27 +49,72 @@ public class JCRFactoryUtil {
 			workspaceName = JCRFactory.WORKSPACE_NAME;
 		}
 
-		return getJCRFactory().createSession(workspaceName);
+		if (!PropsValues.JCR_WRAP_SESSION) {
+			JCRFactory jcrFactory = getJCRFactory();
+
+			return jcrFactory.createSession(workspaceName);
+		}
+
+		Map<String, Session> sessions = _sessions.get();
+
+		Session session = sessions.get(workspaceName);
+
+		if (session != null) {
+			return session;
+		}
+
+		JCRFactory jcrFactory = getJCRFactory();
+
+		Session jcrSession = jcrFactory.createSession(workspaceName);
+
+		JCRSessionInvocationHandler jcrSessionInvocationHandler =
+			new JCRSessionInvocationHandler(jcrSession);
+
+		Object sessionProxy = ProxyUtil.newProxyInstance(
+			PACLClassLoaderUtil.getPortalClassLoader(),
+			new Class<?>[] {Map.class, Session.class},
+			jcrSessionInvocationHandler);
+
+		FinalizeManager.register(sessionProxy, jcrSessionInvocationHandler);
+
+		session = (Session)sessionProxy;
+
+		sessions.put(workspaceName, session);
+
+		return session;
 	}
 
-	public static Session createSession() throws RepositoryException {
-		return createSession(null);
+	public static JCRFactory getJCRFactory() {
+		if (_jcrFactory == null) {
+			_jcrFactory = (JCRFactory)PortalBeanLocatorUtil.locate(
+				JCRFactory.class.getName());
+		}
+
+		return _jcrFactory;
 	}
 
 	public static void initialize() throws RepositoryException {
-		getJCRFactory().initialize();
+		JCRFactory jcrFactory = getJCRFactory();
+
+		jcrFactory.initialize();
 	}
 
 	public static void prepare() throws RepositoryException {
-		getJCRFactory().prepare();
+		JCRFactory jcrFactory = getJCRFactory();
+
+		jcrFactory.prepare();
 	}
 
 	public static void shutdown() {
-		getJCRFactory().shutdown();
+		JCRFactory jcrFactory = getJCRFactory();
+
+		jcrFactory.shutdown();
 	}
 
-	private static final String _JCR_FACTORY = JCRFactory.class.getName();
-
 	private static JCRFactory _jcrFactory;
+	private static ThreadLocal<Map<String, Session>> _sessions =
+		new AutoResetThreadLocal<Map<String, Session>>(
+			JCRFactoryUtil.class + "._sessions",
+			new HashMap<String, Session>());
 
 }

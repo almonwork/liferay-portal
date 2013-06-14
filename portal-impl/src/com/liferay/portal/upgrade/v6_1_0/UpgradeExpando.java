@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -32,18 +32,18 @@ public class UpgradeExpando extends UpgradeProcess {
 
 	@Override
 	protected void doUpgrade() throws Exception {
-		updateTypeSettingsIndexable();
-		updateTypeSettingsSelection();
+		updateColumnTypeSettingsIndexable();
+		updateColumnTypeSettingsSelection();
 	}
 
-	protected void updateTypeSettings(long columnId, String typeSettings)
+	protected void updateColumnTypeSettings(long columnId, String typeSettings)
 		throws Exception {
 
 		Connection con = null;
 		PreparedStatement ps = null;
 
 		try {
-			con = DataAccess.getConnection();
+			con = DataAccess.getUpgradeOptimizedConnection();
 
 			ps = con.prepareStatement(
 				"update ExpandoColumn set typeSettings = ? where columnId = ?");
@@ -58,13 +58,13 @@ public class UpgradeExpando extends UpgradeProcess {
 		}
 	}
 
-	protected void updateTypeSettingsIndexable() throws Exception {
+	protected void updateColumnTypeSettingsIndexable() throws Exception {
 		Connection con = null;
 		PreparedStatement ps = null;
 		ResultSet rs = null;
 
 		try {
-			con = DataAccess.getConnection();
+			con = DataAccess.getUpgradeOptimizedConnection();
 
 			ps = con.prepareStatement(
 				"select columnId, type_, typeSettings from ExpandoColumn " +
@@ -109,7 +109,8 @@ public class UpgradeExpando extends UpgradeProcess {
 
 				typeSettingsProperties.remove("indexable");
 
-				updateTypeSettings(columnId, typeSettingsProperties.toString());
+				updateColumnTypeSettings(
+					columnId, typeSettingsProperties.toString());
 			}
 		}
 		finally {
@@ -117,13 +118,13 @@ public class UpgradeExpando extends UpgradeProcess {
 		}
 	}
 
-	protected void updateTypeSettingsSelection() throws Exception {
+	protected void updateColumnTypeSettingsSelection() throws Exception {
 		Connection con = null;
 		PreparedStatement ps = null;
 		ResultSet rs = null;
 
 		try {
-			con = DataAccess.getConnection();
+			con = DataAccess.getUpgradeOptimizedConnection();
 
 			ps = con.prepareStatement(
 				"select columnId, typeSettings from ExpandoColumn where " +
@@ -141,7 +142,7 @@ public class UpgradeExpando extends UpgradeProcess {
 				typeSettings = typeSettings.replace(
 					"selection=0", "display-type=text-box");
 
-				updateTypeSettings(columnId, typeSettings);
+				updateColumnTypeSettings(columnId, typeSettings);
 			}
 		}
 		finally {

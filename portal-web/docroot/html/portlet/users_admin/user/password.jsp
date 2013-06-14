@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -23,7 +23,7 @@ PasswordPolicy passwordPolicy = (PasswordPolicy)request.getAttribute("user.passw
 
 boolean passwordResetDisabled = false;
 
-if ((selUser.getLastLoginDate() == null) && passwordPolicy.isChangeable() && passwordPolicy.isChangeRequired()) {
+if (((selUser == null) || (selUser.getLastLoginDate() == null)) && passwordPolicy.isChangeable() && passwordPolicy.isChangeRequired()) {
 	passwordResetDisabled = true;
 }
 
@@ -99,8 +99,8 @@ else {
 		</aui:validator>
 	</aui:input>
 
-	<c:if test="<%= user.getUserId() != selUser.getUserId() %>">
-		<aui:input disabled="<%= passwordResetDisabled %>" inlineLabel="left" label="password-reset-required" name="passwordReset" type="checkbox" value="<%= passwordReset %>" />
+	<c:if test="<%= (selUser == null) || (user.getUserId() != selUser.getUserId()) %>">
+		<aui:input disabled="<%= passwordResetDisabled %>" label="password-reset-required" name="passwordReset" type="checkbox" value="<%= passwordReset %>" />
 	</c:if>
 </aui:fieldset>
 

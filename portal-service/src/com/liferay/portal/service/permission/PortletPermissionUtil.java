@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -16,11 +16,14 @@ package com.liferay.portal.service.permission;
 
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
+import com.liferay.portal.kernel.security.pacl.permission.PortalRuntimePermission;
 import com.liferay.portal.model.Layout;
 import com.liferay.portal.model.Portlet;
 import com.liferay.portal.security.permission.PermissionChecker;
 
 import java.util.Collection;
+
+import javax.portlet.PortletMode;
 
 /**
  * @author Brian Wing Shun Chan
@@ -181,9 +184,8 @@ public class PortletPermissionUtil {
 	}
 
 	public static boolean contains(
-			PermissionChecker permissionChecker, long groupId, long plid,
-			Collection<Portlet> portlets, String actionId)
-		throws PortalException, SystemException {
+		PermissionChecker permissionChecker, long groupId, long plid,
+		Collection<Portlet> portlets, String actionId) {
 
 		return getPortletPermission().contains(
 			permissionChecker, groupId, plid, portlets, actionId);
@@ -244,11 +246,23 @@ public class PortletPermissionUtil {
 	}
 
 	public static PortletPermission getPortletPermission() {
+		PortalRuntimePermission.checkGetBeanProperty(
+			PortletPermissionUtil.class);
+
 		return _portletPermission;
 	}
 
 	public static String getPrimaryKey(long plid, String portletId) {
 		return getPortletPermission().getPrimaryKey(plid, portletId);
+	}
+
+	public static boolean hasAccessPermission(
+			PermissionChecker permissionChecker, long scopeGroupId,
+			Layout layout, Portlet portlet, PortletMode portletMode)
+		throws PortalException, SystemException {
+
+		return getPortletPermission().hasAccessPermission(
+			permissionChecker, scopeGroupId, layout, portlet, portletMode);
 	}
 
 	public static boolean hasLayoutManagerPermission(
@@ -259,6 +273,8 @@ public class PortletPermissionUtil {
 	}
 
 	public void setPortletPermission(PortletPermission portletPermission) {
+		PortalRuntimePermission.checkSetBeanProperty(getClass());
+
 		_portletPermission = portletPermission;
 	}
 

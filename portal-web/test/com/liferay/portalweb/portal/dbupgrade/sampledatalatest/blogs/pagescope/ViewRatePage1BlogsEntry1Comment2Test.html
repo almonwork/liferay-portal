@@ -30,23 +30,28 @@
 </tr>
 <tr>
 	<td>assertText</td>
-	<td>//div[@class='entry-title']/a</td>
+	<td>//div[@class='entry-title']/h2/a</td>
 	<td>Blogs Entry1 Title</td>
 </tr>
 <tr>
 	<td>clickAtAndWait</td>
-	<td>//div[@class='entry-title']/a</td>
+	<td>//div[@class='entry-title']/h2/a</td>
 	<td>Blogs Entry1 Title</td>
 </tr>
 <tr>
+	<td>waitForText</td>
+	<td>xPath=(//div[@class='lfr-discussion-message'])[2]</td>
+	<td>Blogs Entry1 Comment2 Body</td>
+</tr>
+<tr>
 	<td>assertText</td>
-	<td>//form/div/div/div[3]/div/div[3]/div/div[1]</td>
+	<td>xPath=(//div[@class='lfr-discussion-message'])[2]</td>
 	<td>Blogs Entry1 Comment2 Body</td>
 </tr>
 <tr>
 	<td>assertText</td>
 	<td>xPath=(//div[@class='aui-rating-label-element'])[4]</td>
-	<td>-1 (1 Vote) The average rating is -1 stars out of 5.</td>
+	<td>-1 (1 Vote)</td>
 </tr>
 <tr>
 	<td>open</td>
@@ -64,36 +69,40 @@
 	<td>Control Panel</td>
 </tr>
 <tr>
+	<td>waitForVisible</td>
+	<td>link=Blogs</td>
+	<td>Blogs</td>
+</tr>
+<tr>
 	<td>clickAtAndWait</td>
 	<td>link=Blogs</td>
 	<td>Blogs</td>
 </tr>
 <tr>
 	<td>assertText</td>
-	<td>//div[2]/span/a</td>
-	<td>Default</td>
+	<td>//div/span/ul/li/strong/a/span</td>
+	<td>Scope: Default</td>
 </tr>
 <tr>
 	<td>assertText</td>
-	<td>//div[@class='entry-title']/a</td>
+	<td>//td[2]/a</td>
 	<td>Blogs Entry1 Title</td>
 </tr>
 <tr>
 	<td>clickAtAndWait</td>
-	<td>//div[@class='entry-title']/a</td>
+	<td>//td[2]/a</td>
 	<td>Blogs Entry1 Title</td>
 </tr>
 <tr>
 	<td>assertText</td>
-	<td>//form/div/div/div[3]/div/div[3]/div/div[1]</td>
+	<td>xPath=(//div[@class='lfr-discussion-message'])[2]</td>
 	<td>Blogs Entry1 Comment2 Body</td>
 </tr>
 <tr>
 	<td>assertText</td>
 	<td>xPath=(//div[@class='aui-rating-label-element'])[4]</td>
-	<td>-1 (1 Vote) The average rating is -1 stars out of 5.</td>
+	<td>-1 (1 Vote)</td>
 </tr>
-
 </tbody></table>
 </body>
 </html>

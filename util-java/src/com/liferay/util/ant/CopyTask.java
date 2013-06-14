@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -49,19 +49,20 @@ public class CopyTask {
 
 		fileSet.setDir(source);
 
-		if (Validator.isNotNull(includes)) {
-			fileSet.setIncludes(includes);
-		}
-
 		if (Validator.isNotNull(excludes)) {
 			fileSet.setExcludes(excludes);
 		}
 
-		copy.setProject(AntUtil.getProject());
+		if (Validator.isNotNull(includes)) {
+			fileSet.setIncludes(includes);
+		}
+
 		copy.addFileset(fileSet);
-		copy.setTodir(destination);
+
 		copy.setOverwrite(overwrite);
 		copy.setPreserveLastModified(preserveLastModified);
+		copy.setProject(AntUtil.getProject());
+		copy.setTodir(destination);
 
 		copy.execute();
 	}
@@ -98,18 +99,30 @@ public class CopyTask {
 		File sourceFile, File destinationDir, Map<String, String> filterMap,
 		boolean overwrite, boolean preserveLastModified) {
 
+		copyFile(
+			sourceFile, destinationDir, null, filterMap, overwrite,
+			preserveLastModified);
+	}
+
+	public static void copyFile(
+		File sourceFile, File destinationDir, String destinationFileName,
+		Map<String, String> filterMap, boolean overwrite,
+		boolean preserveLastModified) {
+
 		Copy copy = new Copy();
 
-		FileSet fileSet = new FileSet();
-
-		fileSet.setFile(sourceFile);
-
-		copy.setProject(AntUtil.getProject());
+		copy.setFile(sourceFile);
 		copy.setFiltering(true);
-		copy.addFileset(fileSet);
-		copy.setTodir(destinationDir);
 		copy.setOverwrite(overwrite);
 		copy.setPreserveLastModified(preserveLastModified);
+		copy.setProject(AntUtil.getProject());
+
+		if (destinationFileName == null) {
+			copy.setTodir(destinationDir);
+		}
+		else {
+			copy.setTofile(new File(destinationDir, destinationFileName));
+		}
 
 		if (filterMap != null) {
 			FilterSet filterSet = copy.createFilterSet();

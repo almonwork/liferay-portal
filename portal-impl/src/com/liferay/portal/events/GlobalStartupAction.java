@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -25,6 +25,7 @@ import com.liferay.portal.kernel.deploy.sandbox.SandboxDeployDir;
 import com.liferay.portal.kernel.deploy.sandbox.SandboxDeployListener;
 import com.liferay.portal.kernel.deploy.sandbox.SandboxDeployUtil;
 import com.liferay.portal.kernel.events.SimpleAction;
+import com.liferay.portal.kernel.javadoc.JavadocManagerUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
@@ -32,9 +33,11 @@ import com.liferay.portal.kernel.util.InfrastructureUtil;
 import com.liferay.portal.kernel.util.InstanceFactory;
 import com.liferay.portal.kernel.util.PropsKeys;
 import com.liferay.portal.kernel.util.ServerDetector;
+import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.SystemProperties;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.pop.POPServerUtil;
+import com.liferay.portal.security.pacl.PACLClassLoaderUtil;
 import com.liferay.portal.struts.AuthPublicPathRegistry;
 import com.liferay.portal.util.BrowserLauncher;
 import com.liferay.portal.util.PrefsPropsUtil;
@@ -54,6 +57,10 @@ import org.jamwiki.Environment;
 public class GlobalStartupAction extends SimpleAction {
 
 	public static List<AutoDeployListener> getAutoDeployListeners() {
+		if (_autoDeployListeners != null) {
+			return _autoDeployListeners;
+		}
+
 		List<AutoDeployListener> autoDeployListeners =
 			new ArrayList<AutoDeployListener>();
 
@@ -79,10 +86,16 @@ public class GlobalStartupAction extends SimpleAction {
 			}
 		}
 
-		return autoDeployListeners;
+		_autoDeployListeners = autoDeployListeners;
+
+		return _autoDeployListeners;
 	}
 
 	public static List<HotDeployListener> getHotDeployListeners() {
+		if (_hotDeployListeners != null) {
+			return _hotDeployListeners;
+		}
+
 		List<HotDeployListener> hotDeployListeners =
 			new ArrayList<HotDeployListener>();
 
@@ -106,7 +119,9 @@ public class GlobalStartupAction extends SimpleAction {
 			}
 		}
 
-		return hotDeployListeners;
+		_hotDeployListeners = hotDeployListeners;
+
+		return _hotDeployListeners;
 	}
 
 	public static List<SandboxDeployListener> getSandboxDeployListeners() {
@@ -141,16 +156,6 @@ public class GlobalStartupAction extends SimpleAction {
 
 	@Override
 	public void run(String[] ids) {
-
-		// Hot deploy
-
-		if (_log.isDebugEnabled()) {
-			_log.debug("Registering hot deploy listeners");
-		}
-
-		for (HotDeployListener hotDeployListener : getHotDeployListeners()) {
-			HotDeployUtil.registerListener(hotDeployListener);
-		}
 
 		// Auto deploy
 
@@ -192,6 +197,16 @@ public class GlobalStartupAction extends SimpleAction {
 		}
 		catch (Exception e) {
 			_log.error(e);
+		}
+
+		// Hot deploy
+
+		if (_log.isDebugEnabled()) {
+			_log.debug("Registering hot deploy listeners");
+		}
+
+		for (HotDeployListener hotDeployListener : getHotDeployListeners()) {
+			HotDeployUtil.registerListener(hotDeployListener);
 		}
 
 		// Sandobox deploy
@@ -247,6 +262,13 @@ public class GlobalStartupAction extends SimpleAction {
 			_log.error(t);
 		}
 
+		// Javadoc
+
+		ClassLoader contextClassLoader =
+			PACLClassLoaderUtil.getContextClassLoader();
+
+		JavadocManagerUtil.load(StringPool.BLANK, contextClassLoader);
+
 		// JCR
 
 		try {
@@ -298,5 +320,8 @@ public class GlobalStartupAction extends SimpleAction {
 	}
 
 	private static Log _log = LogFactoryUtil.getLog(GlobalStartupAction.class);
+
+	private static List<AutoDeployListener> _autoDeployListeners;
+	private static List<HotDeployListener> _hotDeployListeners;
 
 }

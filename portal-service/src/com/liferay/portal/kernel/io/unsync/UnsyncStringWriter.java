@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -122,6 +122,12 @@ public class UnsyncStringWriter extends Writer {
 	}
 
 	@Override
+	public void write(char[] chars) {
+		write(chars, 0, chars.length);
+
+	}
+
+	@Override
 	public void write(char[] chars, int offset, int length) {
 		if (length <= 0) {
 			return;
@@ -133,12 +139,6 @@ public class UnsyncStringWriter extends Writer {
 		else {
 			stringBuilder.append(chars, offset, length);
 		}
-	}
-
-	@Override
-	public void write(char[] chars) {
-		write(chars, 0, chars.length);
-
 	}
 
 	@Override
@@ -170,7 +170,12 @@ public class UnsyncStringWriter extends Writer {
 
 	@Override
 	public void write(String string, int offset, int length) {
-		if (stringBundler != null) {
+		if ((string == null) ||
+			((offset == 0) && (length == string.length()))) {
+
+			write(string);
+		}
+		else if (stringBundler != null) {
 			stringBundler.append(string.substring(offset, offset + length));
 		}
 		else {

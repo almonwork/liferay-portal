@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,6 +14,11 @@
 
 package com.liferay.portlet.social.model;
 
+import com.liferay.portal.model.ModelWrapper;
+
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * <p>
  * This class is a wrapper for {@link SocialRequest}.
@@ -23,7 +28,8 @@ package com.liferay.portlet.social.model;
  * @see       SocialRequest
  * @generated
  */
-public class SocialRequestWrapper implements SocialRequest {
+public class SocialRequestWrapper implements SocialRequest,
+	ModelWrapper<SocialRequest> {
 	public SocialRequestWrapper(SocialRequest socialRequest) {
 		_socialRequest = socialRequest;
 	}
@@ -34,6 +40,106 @@ public class SocialRequestWrapper implements SocialRequest {
 
 	public String getModelClassName() {
 		return SocialRequest.class.getName();
+	}
+
+	public Map<String, Object> getModelAttributes() {
+		Map<String, Object> attributes = new HashMap<String, Object>();
+
+		attributes.put("uuid", getUuid());
+		attributes.put("requestId", getRequestId());
+		attributes.put("groupId", getGroupId());
+		attributes.put("companyId", getCompanyId());
+		attributes.put("userId", getUserId());
+		attributes.put("createDate", getCreateDate());
+		attributes.put("modifiedDate", getModifiedDate());
+		attributes.put("classNameId", getClassNameId());
+		attributes.put("classPK", getClassPK());
+		attributes.put("type", getType());
+		attributes.put("extraData", getExtraData());
+		attributes.put("receiverUserId", getReceiverUserId());
+		attributes.put("status", getStatus());
+
+		return attributes;
+	}
+
+	public void setModelAttributes(Map<String, Object> attributes) {
+		String uuid = (String)attributes.get("uuid");
+
+		if (uuid != null) {
+			setUuid(uuid);
+		}
+
+		Long requestId = (Long)attributes.get("requestId");
+
+		if (requestId != null) {
+			setRequestId(requestId);
+		}
+
+		Long groupId = (Long)attributes.get("groupId");
+
+		if (groupId != null) {
+			setGroupId(groupId);
+		}
+
+		Long companyId = (Long)attributes.get("companyId");
+
+		if (companyId != null) {
+			setCompanyId(companyId);
+		}
+
+		Long userId = (Long)attributes.get("userId");
+
+		if (userId != null) {
+			setUserId(userId);
+		}
+
+		Long createDate = (Long)attributes.get("createDate");
+
+		if (createDate != null) {
+			setCreateDate(createDate);
+		}
+
+		Long modifiedDate = (Long)attributes.get("modifiedDate");
+
+		if (modifiedDate != null) {
+			setModifiedDate(modifiedDate);
+		}
+
+		Long classNameId = (Long)attributes.get("classNameId");
+
+		if (classNameId != null) {
+			setClassNameId(classNameId);
+		}
+
+		Long classPK = (Long)attributes.get("classPK");
+
+		if (classPK != null) {
+			setClassPK(classPK);
+		}
+
+		Integer type = (Integer)attributes.get("type");
+
+		if (type != null) {
+			setType(type);
+		}
+
+		String extraData = (String)attributes.get("extraData");
+
+		if (extraData != null) {
+			setExtraData(extraData);
+		}
+
+		Long receiverUserId = (Long)attributes.get("receiverUserId");
+
+		if (receiverUserId != null) {
+			setReceiverUserId(receiverUserId);
+		}
+
+		Integer status = (Integer)attributes.get("status");
+
+		if (status != null) {
+			setStatus(status);
+		}
 	}
 
 	/**
@@ -209,6 +315,10 @@ public class SocialRequestWrapper implements SocialRequest {
 		return _socialRequest.getClassName();
 	}
 
+	public void setClassName(java.lang.String className) {
+		_socialRequest.setClassName(className);
+	}
+
 	/**
 	* Returns the class name ID of this social request.
 	*
@@ -357,10 +467,6 @@ public class SocialRequestWrapper implements SocialRequest {
 		return _socialRequest.isEscapedModel();
 	}
 
-	public void setEscapedModel(boolean escapedModel) {
-		_socialRequest.setEscapedModel(escapedModel);
-	}
-
 	public java.io.Serializable getPrimaryKeyObj() {
 		return _socialRequest.getPrimaryKeyObj();
 	}
@@ -415,7 +521,14 @@ public class SocialRequestWrapper implements SocialRequest {
 		_socialRequest.persist();
 	}
 
+	/**
+	 * @deprecated Renamed to {@link #getWrappedModel}
+	 */
 	public SocialRequest getWrappedSocialRequest() {
+		return _socialRequest;
+	}
+
+	public SocialRequest getWrappedModel() {
 		return _socialRequest;
 	}
 

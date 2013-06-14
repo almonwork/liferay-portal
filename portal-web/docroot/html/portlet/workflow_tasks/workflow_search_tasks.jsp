@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -21,9 +21,9 @@ WorkflowTaskDisplayTerms displayTerms = new WorkflowTaskDisplayTerms(renderReque
 %>
 
 <liferay-ui:search-toggle
-	id="toggle_id_workflow_task_search"
-	displayTerms="<%= displayTerms %>"
 	buttonLabel="search"
+	displayTerms="<%= displayTerms %>"
+	id="toggle_id_workflow_task_search"
 >
 
 	<aui:fieldset>
@@ -34,9 +34,13 @@ WorkflowTaskDisplayTerms displayTerms = new WorkflowTaskDisplayTerms(renderReque
 			<%
 			String displayTermsType = displayTerms.getType();
 
-			List<WorkflowHandler> workflowHhandlers = WorkflowHandlerRegistryUtil.getWorkflowHandlers();
+			List<WorkflowHandler> workflowHandlers = WorkflowHandlerRegistryUtil.getWorkflowHandlers();
 
-			for (WorkflowHandler workflowHandler : workflowHhandlers) {
+			for (WorkflowHandler workflowHandler : workflowHandlers) {
+				if (!workflowHandler.isAssetTypeSearchable()) {
+					continue;
+				}
+
 				String defaultWorkflowHandlerType = workflowHandler.getClassName();
 			%>
 

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,14 +14,14 @@
 
 package com.liferay.portlet.blogs.service.impl;
 
+import com.liferay.portal.kernel.dao.orm.QueryDefinition;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
-import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.HtmlUtil;
-import com.liferay.portal.kernel.util.PropsKeys;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
+import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.portal.model.Company;
 import com.liferay.portal.model.Group;
@@ -30,7 +30,7 @@ import com.liferay.portal.security.permission.ActionKeys;
 import com.liferay.portal.service.ServiceContext;
 import com.liferay.portal.theme.ThemeDisplay;
 import com.liferay.portal.util.PortalUtil;
-import com.liferay.portal.util.PropsUtil;
+import com.liferay.portal.util.PropsValues;
 import com.liferay.portlet.blogs.model.BlogsEntry;
 import com.liferay.portlet.blogs.service.base.BlogsEntryServiceBaseImpl;
 import com.liferay.portlet.blogs.service.permission.BlogsEntryPermission;
@@ -46,15 +46,15 @@ import com.sun.syndication.feed.synd.SyndFeed;
 import com.sun.syndication.feed.synd.SyndFeedImpl;
 import com.sun.syndication.io.FeedException;
 
-import java.io.File;
+import java.io.InputStream;
 
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.Iterator;
 import java.util.List;
 
 /**
  * @author Brian Wing Shun Chan
+ * @author Mate Thurzo
  */
 public class BlogsEntryServiceImpl extends BlogsEntryServiceBaseImpl {
 
@@ -63,7 +63,8 @@ public class BlogsEntryServiceImpl extends BlogsEntryServiceBaseImpl {
 			int displayDateMonth, int displayDateDay, int displayDateYear,
 			int displayDateHour, int displayDateMinute, boolean allowPingbacks,
 			boolean allowTrackbacks, String[] trackbacks, boolean smallImage,
-			String smallImageURL, File smallFile, ServiceContext serviceContext)
+			String smallImageURL, String smallImageFileName,
+			InputStream smallImageInputStream, ServiceContext serviceContext)
 		throws PortalException, SystemException {
 
 		BlogsPermission.check(
@@ -74,7 +75,8 @@ public class BlogsEntryServiceImpl extends BlogsEntryServiceBaseImpl {
 			getUserId(), title, description, content, displayDateMonth,
 			displayDateDay, displayDateYear, displayDateHour, displayDateMinute,
 			allowPingbacks, allowTrackbacks, trackbacks, smallImage,
-			smallImageURL, smallFile, serviceContext);
+			smallImageURL, smallImageFileName, smallImageInputStream,
+			serviceContext);
 	}
 
 	public void deleteEntry(long entryId)
@@ -87,27 +89,35 @@ public class BlogsEntryServiceImpl extends BlogsEntryServiceBaseImpl {
 	}
 
 	public List<BlogsEntry> getCompanyEntries(
-			long companyId, int status, int max)
+			long companyId, Date displayDate, int status, int max)
 		throws PortalException, SystemException {
 
 		List<BlogsEntry> entries = new ArrayList<BlogsEntry>();
 
-		int lastIntervalStart = 0;
 		boolean listNotExhausted = true;
 
+		QueryDefinition queryDefinition = new QueryDefinition(
+			status, false, 0, 0, new EntryDisplayDateComparator());
+
+		if (status == WorkflowConstants.STATUS_ANY) {
+			queryDefinition.setStatus(WorkflowConstants.STATUS_IN_TRASH, true);
+		}
+
 		while ((entries.size() < max) && listNotExhausted) {
+			queryDefinition.setEnd(queryDefinition.getStart() + max);
+
 			List<BlogsEntry> entryList =
 				blogsEntryLocalService.getCompanyEntries(
-					companyId, status, lastIntervalStart,
-					lastIntervalStart + max, new EntryDisplayDateComparator());
+					companyId, displayDate, queryDefinition);
 
-			Iterator<BlogsEntry> itr = entryList.iterator();
+			queryDefinition.setStart(queryDefinition.getStart() + max);
 
-			lastIntervalStart += max;
 			listNotExhausted = (entryList.size() == max);
 
-			while (itr.hasNext() && (entries.size() < max)) {
-				BlogsEntry entry = itr.next();
+			for (BlogsEntry entry : entryList) {
+				if (entries.size() >= max) {
+					break;
+				}
 
 				if (BlogsEntryPermission.contains(
 						getPermissionChecker(), entry, ActionKeys.VIEW)) {
@@ -121,20 +131,19 @@ public class BlogsEntryServiceImpl extends BlogsEntryServiceBaseImpl {
 	}
 
 	public String getCompanyEntriesRSS(
-			long companyId, int status, int max, String type, double version,
-			String displayStyle, String feedURL, String entryURL,
-			ThemeDisplay themeDisplay)
+			long companyId, Date displayDate, int status, int max, String type,
+			double version, String displayStyle, String feedURL,
+			String entryURL, ThemeDisplay themeDisplay)
 		throws PortalException, SystemException {
 
 		Company company = companyPersistence.findByPrimaryKey(companyId);
 
 		String name = company.getName();
-		String description = name;
 		List<BlogsEntry> blogsEntries = getCompanyEntries(
-			companyId, status, max);
+			companyId, displayDate, status, max);
 
 		return exportToRSS(
-			name, description, type, version, displayStyle, feedURL, entryURL,
+			name, name, type, version, displayStyle, feedURL, entryURL,
 			blogsEntries, themeDisplay);
 	}
 
@@ -158,16 +167,32 @@ public class BlogsEntryServiceImpl extends BlogsEntryServiceBaseImpl {
 		return entry;
 	}
 
-	public List<BlogsEntry> getGroupEntries(long groupId, int status, int max)
+	public List<BlogsEntry> getGroupEntries(
+			long groupId, Date displayDate, int status, int max)
+		throws SystemException {
+
+		return getGroupEntries(groupId, displayDate, status, 0, max);
+	}
+
+	public List<BlogsEntry> getGroupEntries(
+			long groupId, Date displayDate, int status, int start, int end)
 		throws SystemException {
 
 		if (status == WorkflowConstants.STATUS_ANY) {
-			return blogsEntryPersistence.filterFindByGroupId(groupId, 0, max);
+			return blogsEntryPersistence.filterFindByG_LtD_NeS(
+				groupId, displayDate, WorkflowConstants.STATUS_IN_TRASH, start,
+				end);
 		}
 		else {
-			return blogsEntryPersistence.filterFindByG_S(
-				groupId, status, 0, max);
+			return blogsEntryPersistence.filterFindByG_LtD_S(
+				groupId, displayDate, status, start, end);
 		}
+	}
+
+	public List<BlogsEntry> getGroupEntries(long groupId, int status, int max)
+		throws SystemException {
+
+		return getGroupEntries(groupId, status, 0, max);
 	}
 
 	public List<BlogsEntry> getGroupEntries(
@@ -175,8 +200,8 @@ public class BlogsEntryServiceImpl extends BlogsEntryServiceBaseImpl {
 		throws SystemException {
 
 		if (status == WorkflowConstants.STATUS_ANY) {
-			return blogsEntryPersistence.filterFindByGroupId(
-				groupId, start, end);
+			return blogsEntryPersistence.filterFindByG_NeS(
+				groupId, WorkflowConstants.STATUS_IN_TRASH, start, end);
 		}
 		else {
 			return blogsEntryPersistence.filterFindByG_S(
@@ -184,11 +209,25 @@ public class BlogsEntryServiceImpl extends BlogsEntryServiceBaseImpl {
 		}
 	}
 
+	public int getGroupEntriesCount(long groupId, Date displayDate, int status)
+		throws SystemException {
+
+		if (status == WorkflowConstants.STATUS_ANY) {
+			return blogsEntryPersistence.filterCountByG_LtD_NeS(
+				groupId, displayDate, WorkflowConstants.STATUS_IN_TRASH);
+		}
+		else {
+			return blogsEntryPersistence.filterCountByG_LtD_S(
+				groupId, displayDate, status);
+		}
+	}
+
 	public int getGroupEntriesCount(long groupId, int status)
 		throws SystemException {
 
 		if (status == WorkflowConstants.STATUS_ANY) {
-			return blogsEntryPersistence.filterCountByGroupId(groupId);
+			return blogsEntryPersistence.filterCountByG_NeS(
+				groupId, WorkflowConstants.STATUS_IN_TRASH);
 		}
 		else {
 			return blogsEntryPersistence.filterCountByG_S(groupId, status);
@@ -196,44 +235,52 @@ public class BlogsEntryServiceImpl extends BlogsEntryServiceBaseImpl {
 	}
 
 	public String getGroupEntriesRSS(
-			long groupId, int status, int max, String type, double version,
-			String displayStyle, String feedURL, String entryURL,
-			ThemeDisplay themeDisplay)
+			long groupId, Date displayDate, int status, int max, String type,
+			double version, String displayStyle, String feedURL,
+			String entryURL, ThemeDisplay themeDisplay)
 		throws PortalException, SystemException {
 
 		Group group = groupPersistence.findByPrimaryKey(groupId);
 
 		String name = HtmlUtil.escape(group.getDescriptiveName());
-		String description = name;
-		List<BlogsEntry> blogsEntries = getGroupEntries(groupId, status, max);
+		List<BlogsEntry> blogsEntries = getGroupEntries(
+			groupId, displayDate, status, max);
 
 		return exportToRSS(
-			name, description, type, version, displayStyle, feedURL, entryURL,
+			name, name, type, version, displayStyle, feedURL, entryURL,
 			blogsEntries, themeDisplay);
 	}
 
 	public List<BlogsEntry> getGroupsEntries(
-			long companyId, long groupId, int status, int max)
+			long companyId, long groupId, Date displayDate, int status, int max)
 		throws PortalException, SystemException {
 
 		List<BlogsEntry> entries = new ArrayList<BlogsEntry>();
 
-		int lastIntervalStart = 0;
 		boolean listNotExhausted = true;
 
+		QueryDefinition queryDefinition = new QueryDefinition(
+			status, false, 0, 0, new EntryDisplayDateComparator());
+
+		if (status == WorkflowConstants.STATUS_ANY) {
+			queryDefinition.setStatus(WorkflowConstants.STATUS_IN_TRASH, true);
+		}
+
 		while ((entries.size() < max) && listNotExhausted) {
+			queryDefinition.setEnd(queryDefinition.getStart() + max);
+
 			List<BlogsEntry> entryList =
 				blogsEntryLocalService.getGroupsEntries(
-					companyId, groupId, status, lastIntervalStart,
-					lastIntervalStart + max);
+					companyId, groupId, displayDate, queryDefinition);
 
-			Iterator<BlogsEntry> itr = entryList.iterator();
+			queryDefinition.setStart(queryDefinition.getStart() + max);
 
-			lastIntervalStart += max;
 			listNotExhausted = (entryList.size() == max);
 
-			while (itr.hasNext() && (entries.size() < max)) {
-				BlogsEntry entry = itr.next();
+			for (BlogsEntry entry : entryList) {
+				if (entries.size() >= max) {
+					break;
+				}
 
 				if (BlogsEntryPermission.contains(
 						getPermissionChecker(), entry, ActionKeys.VIEW)) {
@@ -247,27 +294,34 @@ public class BlogsEntryServiceImpl extends BlogsEntryServiceBaseImpl {
 	}
 
 	public List<BlogsEntry> getOrganizationEntries(
-			long organizationId, int status, int max)
+			long organizationId, Date displayDate, int status, int max)
 		throws PortalException, SystemException {
 
 		List<BlogsEntry> entries = new ArrayList<BlogsEntry>();
 
-		Date displayDate = new Date();
-		int lastIntervalStart = 0;
 		boolean listNotExhausted = true;
 
+		QueryDefinition queryDefinition = new QueryDefinition(
+			status, false, 0, 0, new EntryDisplayDateComparator());
+
+		if (status == WorkflowConstants.STATUS_ANY) {
+			queryDefinition.setStatus(WorkflowConstants.STATUS_IN_TRASH, true);
+		}
+
 		while ((entries.size() < max) && listNotExhausted) {
+			queryDefinition.setEnd(queryDefinition.getStart() + max);
+
 			List<BlogsEntry> entryList = blogsEntryFinder.findByOrganizationId(
-				organizationId, displayDate, status, lastIntervalStart,
-				lastIntervalStart + max);
+				organizationId, displayDate, queryDefinition);
 
-			Iterator<BlogsEntry> itr = entryList.iterator();
+			queryDefinition.setStart(queryDefinition.getStart() + max);
 
-			lastIntervalStart += max;
 			listNotExhausted = (entryList.size() == max);
 
-			while (itr.hasNext() && (entries.size() < max)) {
-				BlogsEntry entry = itr.next();
+			for (BlogsEntry entry : entryList) {
+				if (entries.size() >= max) {
+					break;
+				}
 
 				if (BlogsEntryPermission.contains(
 						getPermissionChecker(), entry, ActionKeys.VIEW)) {
@@ -281,8 +335,8 @@ public class BlogsEntryServiceImpl extends BlogsEntryServiceBaseImpl {
 	}
 
 	public String getOrganizationEntriesRSS(
-			long organizationId, int status, int max, String type,
-			double version, String displayStyle, String feedURL,
+			long organizationId, Date displayDate, int status, int max,
+			String type, double version, String displayStyle, String feedURL,
 			String entryURL, ThemeDisplay themeDisplay)
 		throws PortalException, SystemException {
 
@@ -290,13 +344,30 @@ public class BlogsEntryServiceImpl extends BlogsEntryServiceBaseImpl {
 			organizationId);
 
 		String name = organization.getName();
-		String description = name;
 		List<BlogsEntry> blogsEntries = getOrganizationEntries(
-			organizationId, status, max);
+			organizationId, displayDate, status, max);
 
 		return exportToRSS(
-			name, description, type, version, displayStyle, feedURL, entryURL,
+			name, name, type, version, displayStyle, feedURL, entryURL,
 			blogsEntries, themeDisplay);
+	}
+
+	public void moveEntryToTrash(long entryId)
+		throws PortalException, SystemException {
+
+		BlogsEntryPermission.check(
+			getPermissionChecker(), entryId, ActionKeys.DELETE);
+
+		blogsEntryLocalService.moveEntryToTrash(getUserId(), entryId);
+	}
+
+	public void restoreEntryFromTrash(long entryId)
+		throws PortalException, SystemException {
+
+		BlogsEntryPermission.check(
+			getPermissionChecker(), entryId, ActionKeys.UPDATE);
+
+		blogsEntryLocalService.restoreEntryFromTrash(getUserId(), entryId);
 	}
 
 	public void subscribe(long groupId)
@@ -322,7 +393,8 @@ public class BlogsEntryServiceImpl extends BlogsEntryServiceBaseImpl {
 			int displayDateMonth, int displayDateDay, int displayDateYear,
 			int displayDateHour, int displayDateMinute, boolean allowPingbacks,
 			boolean allowTrackbacks, String[] trackbacks, boolean smallImage,
-			String smallImageURL, File smallFile, ServiceContext serviceContext)
+			String smallImageURL, String smallImageFileName,
+			InputStream smallImageInputStream, ServiceContext serviceContext)
 		throws PortalException, SystemException {
 
 		BlogsEntryPermission.check(
@@ -332,7 +404,8 @@ public class BlogsEntryServiceImpl extends BlogsEntryServiceBaseImpl {
 			getUserId(), entryId, title, description, content, displayDateMonth,
 			displayDateDay, displayDateYear, displayDateHour, displayDateMinute,
 			allowPingbacks, allowTrackbacks, trackbacks, smallImage,
-			smallImageURL, smallFile, serviceContext);
+			smallImageURL, smallImageFileName, smallImageInputStream,
+			serviceContext);
 	}
 
 	protected String exportToRSS(
@@ -376,9 +449,15 @@ public class BlogsEntryServiceImpl extends BlogsEntryServiceBaseImpl {
 			String value = null;
 
 			if (displayStyle.equals(RSSUtil.DISPLAY_STYLE_ABSTRACT)) {
+				String summary = entry.getDescription();
+
+				if (Validator.isNull(summary)) {
+					summary = entry.getContent();
+				}
+
 				value = StringUtil.shorten(
-					HtmlUtil.extractText(entry.getContent()),
-					_RSS_ABSTRACT_LENGTH, StringPool.BLANK);
+					HtmlUtil.extractText(summary),
+					PropsValues.BLOGS_RSS_ABSTRACT_LENGTH, StringPool.BLANK);
 			}
 			else if (displayStyle.equals(RSSUtil.DISPLAY_STYLE_TITLE)) {
 				value = StringPool.BLANK;
@@ -387,14 +466,12 @@ public class BlogsEntryServiceImpl extends BlogsEntryServiceBaseImpl {
 				value = StringUtil.replace(
 					entry.getContent(),
 					new String[] {
-						"href=\"/",
-						"src=\"/"
+						"href=\"/", "src=\"/"
 					},
 					new String[] {
 						"href=\"" + themeDisplay.getURLPortal() + "/",
 						"src=\"" + themeDisplay.getURLPortal() + "/"
-					}
-				);
+					});
 			}
 
 			SyndEntry syndEntry = new SyndEntryImpl();
@@ -408,7 +485,7 @@ public class BlogsEntryServiceImpl extends BlogsEntryServiceBaseImpl {
 
 			SyndContent syndContent = new SyndContentImpl();
 
-			syndContent.setType(RSSUtil.DEFAULT_ENTRY_TYPE);
+			syndContent.setType(RSSUtil.ENTRY_TYPE_DEFAULT);
 			syndContent.setValue(value);
 
 			syndEntry.setDescription(syndContent);
@@ -423,8 +500,5 @@ public class BlogsEntryServiceImpl extends BlogsEntryServiceBaseImpl {
 			throw new SystemException(fe);
 		}
 	}
-
-	private static final int _RSS_ABSTRACT_LENGTH = GetterUtil.getInteger(
-		PropsUtil.get(PropsKeys.BLOGS_RSS_ABSTRACT_LENGTH));
 
 }

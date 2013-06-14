@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -53,6 +53,8 @@ public interface FileEntry extends RepositoryModel<FileEntry> {
 	 * state.
 	 *
 	 * @return content stream of the current file version
+	 * @throws PortalException if a portal exception occurred
+	 * @throws SystemException if a system exception occurred
 	 * @see    #getFileVersion()
 	 */
 	public InputStream getContentStream()
@@ -78,6 +80,8 @@ public interface FileEntry extends RepositoryModel<FileEntry> {
 	 * may function identically.
 	 *
 	 * @return current file version
+	 * @throws PortalException if a portal exception occurred
+	 * @throws SystemException if a system exception occurred
 	 */
 	public FileVersion getFileVersion() throws PortalException, SystemException;
 
@@ -102,6 +106,8 @@ public interface FileEntry extends RepositoryModel<FileEntry> {
 	 * #getFileVersion()}.
 	 *
 	 * @return latest file version
+	 * @throws PortalException if a portal exception occurred
+	 * @throws SystemException if a system exception occurred
 	 */
 	public FileVersion getLatestFileVersion()
 		throws PortalException, SystemException;

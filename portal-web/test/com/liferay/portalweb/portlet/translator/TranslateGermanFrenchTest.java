@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -22,13 +22,16 @@ import com.liferay.portalweb.portal.util.RuntimeVariables;
  */
 public class TranslateGermanFrenchTest extends BaseTestCase {
 	public void testTranslateGermanFrench() throws Exception {
+		selenium.open("/web/guest/home/");
+		loadRequiredJavaScriptModules();
+
 		for (int second = 0;; second++) {
-			if (second >= 60) {
+			if (second >= 90) {
 				fail("timeout");
 			}
 
 			try {
-				if (selenium.isElementPresent("link=Translator Test Page")) {
+				if (selenium.isVisible("link=Translator Test Page")) {
 					break;
 				}
 			}
@@ -38,19 +41,19 @@ public class TranslateGermanFrenchTest extends BaseTestCase {
 			Thread.sleep(1000);
 		}
 
-		selenium.saveScreenShotAndSource();
-		selenium.click(RuntimeVariables.replace("link=Translator Test Page"));
+		selenium.clickAt("link=Translator Test Page",
+			RuntimeVariables.replace("Translator Test Page"));
 		selenium.waitForPageToLoad("30000");
-		selenium.saveScreenShotAndSource();
-		selenium.select("_26_id",
-			RuntimeVariables.replace("label=German to French"));
-		selenium.type("_26_text",
+		loadRequiredJavaScriptModules();
+		selenium.type("//textarea[@id='_26_text']",
 			RuntimeVariables.replace(
-				"Mein Name ist ein Fl\u00fcssig\u00fcbersetzer Liferay unter mehr als 6 Millionen Kommunikationsformen. "));
-		selenium.saveScreenShotAndSource();
-		selenium.click(RuntimeVariables.replace("//input[@value='Translate']"));
+				"Mein Name ist ein Fl\u00fcssig\u00fcbersetzer Liferay unter mehr als 6 Millionen Kommunikationsformen."));
+		selenium.select("//select[@id='_26_id']",
+			RuntimeVariables.replace("German to French"));
+		selenium.clickAt("//input[@value='Translate']",
+			RuntimeVariables.replace("Translate"));
 		selenium.waitForPageToLoad("30000");
-		selenium.saveScreenShotAndSource();
+		loadRequiredJavaScriptModules();
 		assertTrue(selenium.isTextPresent(
 				"Mon nom est un traducteur liquide Liferay sous plus de 6 millions de formes de communication."));
 	}

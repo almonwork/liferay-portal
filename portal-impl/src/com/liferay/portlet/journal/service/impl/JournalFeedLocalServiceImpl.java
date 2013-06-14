@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -100,8 +100,8 @@ public class JournalFeedLocalServiceImpl
 		feed.setContentField(contentField);
 
 		if (Validator.isNull(feedType)) {
-			feed.setFeedType(RSSUtil.DEFAULT_TYPE);
-			feed.setFeedVersion(RSSUtil.DEFAULT_VERSION);
+			feed.setFeedType(RSSUtil.TYPE_DEFAULT);
+			feed.setFeedVersion(RSSUtil.VERSION_DEFAULT);
 		}
 		else {
 			feed.setFeedType(feedType);
@@ -112,12 +112,12 @@ public class JournalFeedLocalServiceImpl
 
 		// Resources
 
-		if (serviceContext.getAddGroupPermissions() ||
-			serviceContext.getAddGuestPermissions()) {
+		if (serviceContext.isAddGroupPermissions() ||
+			serviceContext.isAddGuestPermissions()) {
 
 			addFeedResources(
-				feed, serviceContext.getAddGroupPermissions(),
-				serviceContext.getAddGuestPermissions());
+				feed, serviceContext.isAddGroupPermissions(),
+				serviceContext.isAddGuestPermissions());
 		}
 		else {
 			addFeedResources(
@@ -135,16 +135,6 @@ public class JournalFeedLocalServiceImpl
 	}
 
 	public void addFeedResources(
-			long feedId, boolean addGroupPermissions,
-			boolean addGuestPermissions)
-		throws PortalException, SystemException {
-
-		JournalFeed feed = journalFeedPersistence.findByPrimaryKey(feedId);
-
-		addFeedResources(feed, addGroupPermissions, addGuestPermissions);
-	}
-
-	public void addFeedResources(
 			JournalFeed feed, boolean addGroupPermissions,
 			boolean addGuestPermissions)
 		throws PortalException, SystemException {
@@ -153,15 +143,6 @@ public class JournalFeedLocalServiceImpl
 			feed.getCompanyId(), feed.getGroupId(), feed.getUserId(),
 			JournalFeed.class.getName(), feed.getId(), false,
 			addGroupPermissions, addGuestPermissions);
-	}
-
-	public void addFeedResources(
-			long feedId, String[] groupPermissions, String[] guestPermissions)
-		throws PortalException, SystemException {
-
-		JournalFeed feed = journalFeedPersistence.findByPrimaryKey(feedId);
-
-		addFeedResources(feed, groupPermissions, guestPermissions);
 	}
 
 	public void addFeedResources(
@@ -175,20 +156,23 @@ public class JournalFeedLocalServiceImpl
 			guestPermissions);
 	}
 
-	public void deleteFeed(long feedId)
+	public void addFeedResources(
+			long feedId, boolean addGroupPermissions,
+			boolean addGuestPermissions)
 		throws PortalException, SystemException {
 
 		JournalFeed feed = journalFeedPersistence.findByPrimaryKey(feedId);
 
-		deleteFeed(feed);
+		addFeedResources(feed, addGroupPermissions, addGuestPermissions);
 	}
 
-	public void deleteFeed(long groupId, String feedId)
+	public void addFeedResources(
+			long feedId, String[] groupPermissions, String[] guestPermissions)
 		throws PortalException, SystemException {
 
-		JournalFeed feed = journalFeedPersistence.findByG_F(groupId, feedId);
+		JournalFeed feed = journalFeedPersistence.findByPrimaryKey(feedId);
 
-		deleteFeed(feed);
+		addFeedResources(feed, groupPermissions, guestPermissions);
 	}
 
 	public void deleteFeed(JournalFeed feed)
@@ -208,6 +192,22 @@ public class JournalFeedLocalServiceImpl
 		// Feed
 
 		journalFeedPersistence.remove(feed);
+	}
+
+	public void deleteFeed(long feedId)
+		throws PortalException, SystemException {
+
+		JournalFeed feed = journalFeedPersistence.findByPrimaryKey(feedId);
+
+		deleteFeed(feed);
+	}
+
+	public void deleteFeed(long groupId, String feedId)
+		throws PortalException, SystemException {
+
+		JournalFeed feed = journalFeedPersistence.findByG_F(groupId, feedId);
+
+		deleteFeed(feed);
 	}
 
 	public JournalFeed getFeed(long feedId)
@@ -263,8 +263,7 @@ public class JournalFeedLocalServiceImpl
 	public int searchCount(long companyId, long groupId, String keywords)
 		throws SystemException {
 
-		return journalFeedFinder.countByKeywords(
-			companyId, groupId, keywords);
+		return journalFeedFinder.countByKeywords(companyId, groupId, keywords);
 	}
 
 	public int searchCount(
@@ -283,7 +282,7 @@ public class JournalFeedLocalServiceImpl
 			String orderByType, String targetLayoutFriendlyUrl,
 			String targetPortletId, String contentField, String feedType,
 			double feedVersion, ServiceContext serviceContext)
-		throws PortalException, SystemException{
+		throws PortalException, SystemException {
 
 		// Feed
 
@@ -308,8 +307,8 @@ public class JournalFeedLocalServiceImpl
 		feed.setContentField(contentField);
 
 		if (Validator.isNull(feedType)) {
-			feed.setFeedType(RSSUtil.DEFAULT_TYPE);
-			feed.setFeedVersion(RSSUtil.DEFAULT_VERSION);
+			feed.setFeedType(RSSUtil.TYPE_DEFAULT);
+			feed.setFeedVersion(RSSUtil.VERSION_DEFAULT);
 		}
 		else {
 			feed.setFeedType(feedType);
@@ -340,12 +339,12 @@ public class JournalFeedLocalServiceImpl
 				JournalStructure structure =
 					journalStructurePersistence.findByG_S(groupId, structureId);
 
-				Document doc = SAXReaderUtil.read(structure.getXsd());
+				Document document = SAXReaderUtil.read(structure.getXsd());
 
-				XPath xpathSelector = SAXReaderUtil.createXPath(
+				XPath xPathSelector = SAXReaderUtil.createXPath(
 					"//dynamic-element[@name='"+ contentField + "']");
 
-				Node node = xpathSelector.selectSingleNode(doc);
+				Node node = xPathSelector.selectSingleNode(document);
 
 				if (node != null) {
 					return true;
@@ -366,7 +365,7 @@ public class JournalFeedLocalServiceImpl
 		throws PortalException, SystemException {
 
 		if (!autoFeedId) {
-			if ((Validator.isNull(feedId)) || (Validator.isNumber(feedId)) ||
+			if (Validator.isNull(feedId) || Validator.isNumber(feedId) ||
 				(feedId.indexOf(CharPool.SPACE) != -1)) {
 
 				throw new FeedIdException();

@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -46,15 +46,18 @@ String keywords = ParamUtil.getString(request, "keywords");
 
 	headerNames.add("#");
 	headerNames.add("entry");
-	headerNames.add("score");
 
 	SearchContainer searchContainer = new SearchContainer(renderRequest, null, null, SearchContainer.DEFAULT_CUR_PARAM, SearchContainer.DEFAULT_DELTA, portletURL, headerNames, LanguageUtil.format(pageContext, "no-entries-were-found-that-matched-the-keywords-x", "<strong>" + HtmlUtil.escape(keywords) + "</strong>"));
+
+	searchContainer.setDelta(pageDelta);
+	searchContainer.setDeltaConfigurable(false);
 
 	try {
 		Indexer indexer = IndexerRegistryUtil.getIndexer(BlogsEntry.class);
 
 		SearchContext searchContext = SearchContextFactory.getInstance(request);
 
+		searchContext.setAttribute("paginationType", "regular");
 		searchContext.setEnd(searchContainer.getEnd());
 		searchContext.setKeywords(keywords);
 		searchContext.setStart(searchContainer.getStart());
@@ -103,10 +106,6 @@ String keywords = ParamUtil.getString(request, "keywords");
 
 			row.addText(entry.getTitle(), rowURL);
 
-			// Score
-
-			row.addScore(results.score(i));
-
 			// Add result row
 
 			resultRows.add(row);
@@ -129,6 +128,7 @@ String keywords = ParamUtil.getString(request, "keywords");
 		_log.error(e.getMessage());
 	}
 	%>
+
 </aui:form>
 
 <c:if test="<%= windowState.equals(WindowState.MAXIMIZED) %>">

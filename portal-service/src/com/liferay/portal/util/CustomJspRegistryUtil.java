@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,6 +14,8 @@
 
 package com.liferay.portal.util;
 
+import com.liferay.portal.kernel.security.pacl.permission.PortalRuntimePermission;
+
 import java.util.Set;
 
 /**
@@ -27,6 +29,13 @@ public class CustomJspRegistryUtil {
 
 		return getCustomJspRegistry().getCustomJspFileName(
 			servletContextName, fileName);
+	}
+
+	public static CustomJspRegistry getCustomJspRegistry() {
+		PortalRuntimePermission.checkGetBeanProperty(
+			CustomJspRegistryUtil.class);
+
+		return _customJspRegistry;
 	}
 
 	public static String getDisplayName(String servletContextName) {
@@ -44,18 +53,14 @@ public class CustomJspRegistryUtil {
 			servletContextName, displayName);
 	}
 
-	public static void unregisterServletContextName(
-		String servletContextName) {
-
+	public static void unregisterServletContextName(String servletContextName) {
 		getCustomJspRegistry().unregisterServletContextName(servletContextName);
 	}
 
 	public void setCustomJspRegistry(CustomJspRegistry customJspRegistry) {
-		_customJspRegistry = customJspRegistry;
-	}
+		PortalRuntimePermission.checkSetBeanProperty(getClass());
 
-	public static CustomJspRegistry getCustomJspRegistry() {
-		return _customJspRegistry;
+		_customJspRegistry = customJspRegistry;
 	}
 
 	private static CustomJspRegistry _customJspRegistry;

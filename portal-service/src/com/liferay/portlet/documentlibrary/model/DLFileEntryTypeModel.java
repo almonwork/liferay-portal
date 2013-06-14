@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -61,6 +61,21 @@ public interface DLFileEntryTypeModel extends BaseModel<DLFileEntryType>,
 	 * @param primaryKey the primary key of this document library file entry type
 	 */
 	public void setPrimaryKey(long primaryKey);
+
+	/**
+	 * Returns the uuid of this document library file entry type.
+	 *
+	 * @return the uuid of this document library file entry type
+	 */
+	@AutoEscape
+	public String getUuid();
+
+	/**
+	 * Sets the uuid of this document library file entry type.
+	 *
+	 * @param uuid the uuid of this document library file entry type
+	 */
+	public void setUuid(String uuid);
 
 	/**
 	 * Returns the file entry type ID of this document library file entry type.
@@ -215,8 +230,6 @@ public interface DLFileEntryTypeModel extends BaseModel<DLFileEntryType>,
 	public void setCachedModel(boolean cachedModel);
 
 	public boolean isEscapedModel();
-
-	public void setEscapedModel(boolean escapedModel);
 
 	public Serializable getPrimaryKeyObj();
 

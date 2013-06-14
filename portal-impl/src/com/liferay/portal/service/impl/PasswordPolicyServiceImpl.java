@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -65,8 +65,8 @@ public class PasswordPolicyServiceImpl extends PasswordPolicyServiceBaseImpl {
 			boolean checkSyntax, boolean allowDictionaryWords,
 			int minAlphanumeric, int minLength, int minLowerCase,
 			int minNumbers, int minSymbols, int minUpperCase, boolean history,
-			int historyCount, boolean expireable, long maxAge,
-			long warningTime, int graceLimit, boolean lockout, int maxFailure,
+			int historyCount, boolean expireable, long maxAge, long warningTime,
+			int graceLimit, boolean lockout, int maxFailure,
 			long lockoutDuration, long resetFailureCount,
 			long resetTicketMaxAge)
 		throws PortalException, SystemException {

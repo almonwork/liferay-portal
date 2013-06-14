@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -29,31 +29,6 @@ import javax.servlet.jsp.tagext.BodyTag;
  * @author Brian Wing Shun Chan
  */
 public class PanelContainerTag extends BaseBodyTagSupport implements BodyTag {
-
-	@Override
-	public int doStartTag() {
-		HttpServletRequest request =
-			(HttpServletRequest)pageContext.getRequest();
-
-		if (Validator.isNull(_id)) {
-			_id = PwdGenerator.getPassword(PwdGenerator.KEY3, 4);
-		}
-
-		request.setAttribute(
-			"liferay-ui:panel-container:id", _id);
-		request.setAttribute(
-			"liferay-ui:panel-container:accordion", String.valueOf(_accordion));
-		request.setAttribute(
-			"liferay-ui:panel-container:persistState",
-			String.valueOf(_persistState));
-		request.setAttribute("liferay-ui:panel-container:extended", _extended);
-		request.setAttribute("liferay-ui:panel-container:cssClass", _cssClass);
-		request.setAttribute(
-			"liferay-ui:panel-container:panelCount" + _id,
-			new IntegerWrapper());
-
-		return EVAL_BODY_BUFFERED;
-	}
 
 	@Override
 	public int doAfterBody() {
@@ -109,17 +84,56 @@ public class PanelContainerTag extends BaseBodyTagSupport implements BodyTag {
 		}
 	}
 
+	@Override
+	public int doStartTag() {
+		HttpServletRequest request =
+			(HttpServletRequest)pageContext.getRequest();
+
+		if (Validator.isNull(_id)) {
+			_id = PwdGenerator.getPassword(PwdGenerator.KEY3, 4);
+		}
+
+		request.setAttribute("liferay-ui:panel-container:id", _id);
+		request.setAttribute(
+			"liferay-ui:panel-container:accordion", String.valueOf(_accordion));
+		request.setAttribute(
+			"liferay-ui:panel-container:persistState",
+			String.valueOf(_persistState));
+		request.setAttribute("liferay-ui:panel-container:extended", _extended);
+		request.setAttribute("liferay-ui:panel-container:cssClass", _cssClass);
+		request.setAttribute(
+			"liferay-ui:panel-container:panelCount" + _id,
+			new IntegerWrapper());
+
+		return EVAL_BODY_BUFFERED;
+	}
+
 	public String getId() {
 		return _id;
 	}
 
-	protected String getStartPage() {
-		if (Validator.isNull(_startPage)) {
-			return _START_PAGE;
-		}
-		else {
-			return _startPage;
-		}
+	public void setAccordion(boolean accordion) {
+		_accordion = accordion;
+	}
+
+	public void setCssClass(String cssClass) {
+		_cssClass = cssClass;
+	}
+
+	public void setEndPage(String endPage) {
+		_endPage = endPage;
+	}
+
+	public void setExtended(Boolean extended) {
+		_extended = extended;
+	}
+
+	public void setId(String id) {
+		_id = id;
+	}
+
+	public void setPersistState(boolean persistState) {
+		_persistState = persistState;
 	}
 
 	public void setStartPage(String startPage) {
@@ -135,42 +149,27 @@ public class PanelContainerTag extends BaseBodyTagSupport implements BodyTag {
 		}
 	}
 
-	public void setEndPage(String endPage) {
-		_endPage = endPage;
+	protected String getStartPage() {
+		if (Validator.isNull(_startPage)) {
+			return _START_PAGE;
+		}
+		else {
+			return _startPage;
+		}
 	}
-
-	public void setId(String id) {
-		_id = id;
-	}
-
-	public void setAccordion(boolean accordion) {
-		_accordion = accordion;
-	}
-
-	public void setPersistState(boolean persistState) {
-		_persistState = persistState;
-	}
-
-	public void setExtended(Boolean extended) {
-		_extended = extended;
-	}
-
-	public void setCssClass(String cssClass) {
-		_cssClass = cssClass;
-	}
-
-	private static final String _START_PAGE =
-		"/html/taglib/ui/panel_container/start.jsp";
 
 	private static final String _END_PAGE =
 		"/html/taglib/ui/panel_container/end.jsp";
 
-	private String _startPage;
-	private String _endPage;
-	private String _id;
+	private static final String _START_PAGE =
+		"/html/taglib/ui/panel_container/start.jsp";
+
 	private boolean _accordion;
-	private boolean _persistState;
+	private String _cssClass = StringPool.BLANK;
+	private String _endPage;
 	private Boolean _extended;
- 	private String _cssClass = StringPool.BLANK;
+	private String _id;
+	private boolean _persistState;
+	private String _startPage;
 
 }

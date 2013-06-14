@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -41,10 +41,10 @@ public class GetArticleContentAction extends Action {
 		throws Exception {
 
 		try {
-			UploadServletRequest uploadRequest =
+			UploadServletRequest uploadServletRequest =
 				PortalUtil.getUploadServletRequest(request);
 
-			String xml = ParamUtil.getString(uploadRequest, "xml");
+			String xml = ParamUtil.getString(uploadServletRequest, "xml");
 
 			xml = DDMXMLUtil.formatXML(xml);
 

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -16,6 +16,7 @@ package com.liferay.portal.kernel.audit;
 
 import com.liferay.portal.kernel.json.JSONException;
 import com.liferay.portal.kernel.json.JSONObject;
+import com.liferay.portal.kernel.security.pacl.permission.PortalRuntimePermission;
 
 import java.util.Date;
 
@@ -25,6 +26,9 @@ import java.util.Date;
 public class AuditMessageFactoryUtil {
 
 	public static AuditMessageFactory getAuditMessageFactory() {
+		PortalRuntimePermission.checkGetBeanProperty(
+			AuditMessageFactoryUtil.class);
+
 		return _auditMessageFactory;
 	}
 
@@ -78,6 +82,8 @@ public class AuditMessageFactoryUtil {
 
 	public void setAuditMessageFactory(
 		AuditMessageFactory auditMessageFactory) {
+
+		PortalRuntimePermission.checkSetBeanProperty(getClass());
 
 		_auditMessageFactory = auditMessageFactory;
 	}

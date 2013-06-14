@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -15,52 +15,15 @@
 --%>
 
 <%
+String languageId = LanguageUtil.getLanguageId(request);
+
 if (Validator.isNull(script)) {
 	script = structure.getXsd();
+	scriptJSONArray = DDMXSDUtil.getJSONArray(script);
 }
 
-Set<String> fieldNames = structure.getFieldNames();
-
-JSONArray readOnlyAttributesJSONArray = JSONFactoryUtil.createJSONArray();
-
-readOnlyAttributesJSONArray.put("label");
-readOnlyAttributesJSONArray.put("name");
-readOnlyAttributesJSONArray.put("options");
-readOnlyAttributesJSONArray.put("predefinedValue");
-readOnlyAttributesJSONArray.put("required");
-readOnlyAttributesJSONArray.put("showLabel");
-
-JSONArray structureAvailableFieldsJSONArray = JSONFactoryUtil.createJSONArray();
-
-Iterator<String> itr = fieldNames.iterator();
-
-while (itr.hasNext()) {
-	String fieldName = itr.next();
-
-	StringBundler sb = new StringBundler(5);
-
-	sb.append(structure.getFieldLabel(fieldName));
-	sb.append(CharPool.SPACE);
-	sb.append(CharPool.OPEN_PARENTHESIS);
-	sb.append(structure.getFieldDataType(fieldName));
-	sb.append(CharPool.CLOSE_PARENTHESIS);
-
-	JSONObject fieldJSONObject = JSONFactoryUtil.createJSONObject();
-
-	fieldJSONObject.put("entryLabel", sb.toString());
-
-	if (structure.getFieldRequired(fieldName)) {
-		fieldJSONObject.put("fixed", true);
-	}
-
-	fieldJSONObject.put("key", fieldName);
-	fieldJSONObject.put("label", structure.getFieldLabel(fieldName));
-	fieldJSONObject.put("name", fieldName);
-	fieldJSONObject.put("readOnlyAttributes", readOnlyAttributesJSONArray);
-	fieldJSONObject.put("type", structure.getFieldType(fieldName));
-	fieldJSONObject.put("unique", true);
-
-	structureAvailableFieldsJSONArray.put(fieldJSONObject);
+if (scriptJSONArray != null) {
+	scriptJSONArray = _addDetailTemplateFieldAttributes(structure, scriptJSONArray);
 }
 
 String namespace = renderResponse.getNamespace();
@@ -73,9 +36,7 @@ if (Validator.isNotNull(portletResourceNamespace)){
 <aui:input name="language" type="hidden" value="xsd" />
 <aui:input name="script" type="hidden" />
 
-<aui:script use="liferay-portlet-dynamic-data-mapping">
-	window.<%= namespace %>structureAvailableFields = A.Array(<%= structureAvailableFieldsJSONArray.toString() %>).concat(Liferay.FormBuilder.AVAILABLE_FIELDS.DDM_TEMPLATE);
-
+<aui:script>
 	Liferay.provide(
 		window,
 		'<portlet:namespace />saveTemplate',
@@ -87,3 +48,50 @@ if (Validator.isNotNull(portletResourceNamespace)){
 		['aui-base']
 	);
 </aui:script>
+
+<aui:script use="liferay-portlet-dynamic-data-mapping">
+	var availableFields = A.Array(<%= scriptJSONArray.toString() %>);
+
+	A.Array.each(
+		availableFields,
+		function(item, index, collection) {
+			item.iconClass = Liferay.FormBuilder.DEFAULT_ICON_CLASS;
+		}
+	);
+
+	window.<%= namespace %>structureAvailableFields = availableFields.concat(Liferay.FormBuilder.AVAILABLE_FIELDS.DDM_TEMPLATE);
+</aui:script>
+
+<%!
+public JSONArray _addDetailTemplateFieldAttributes(DDMStructure structure, JSONArray scriptJSONArray) {
+	for (int i = 0; i < scriptJSONArray.length(); i++) {
+		JSONObject jsonObject = scriptJSONArray.getJSONObject(i);
+
+		String fieldName = jsonObject.getString("name");
+
+		try {
+			jsonObject.put("readOnlyAttributes", _getFieldReadOnlyAttributes(structure, fieldName));
+			jsonObject.put("unique", true);
+		}
+		catch (StructureFieldException sfe) {
+		}
+	}
+
+	return scriptJSONArray;
+}
+
+public JSONArray _getFieldReadOnlyAttributes(DDMStructure structure, String fieldName) throws StructureFieldException {
+	JSONArray readOnlyAttributesJSONArray = JSONFactoryUtil.createJSONArray();
+
+	readOnlyAttributesJSONArray.put("name");
+	readOnlyAttributesJSONArray.put("options");
+
+	boolean required = structure.getFieldRequired(fieldName);
+
+	if (required) {
+		readOnlyAttributesJSONArray.put("required");
+	}
+
+	return readOnlyAttributesJSONArray;
+}
+%>

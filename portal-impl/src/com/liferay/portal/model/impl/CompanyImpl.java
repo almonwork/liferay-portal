@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -18,21 +18,26 @@ import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.util.Base64;
 import com.liferay.portal.kernel.util.CharPool;
+import com.liferay.portal.kernel.util.Http;
 import com.liferay.portal.kernel.util.PropsKeys;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.model.Account;
+import com.liferay.portal.model.CacheField;
 import com.liferay.portal.model.Company;
 import com.liferay.portal.model.CompanyConstants;
 import com.liferay.portal.model.Group;
+import com.liferay.portal.model.LayoutSet;
 import com.liferay.portal.model.Shard;
 import com.liferay.portal.model.User;
 import com.liferay.portal.model.VirtualHost;
 import com.liferay.portal.service.AccountLocalServiceUtil;
 import com.liferay.portal.service.GroupLocalServiceUtil;
+import com.liferay.portal.service.LayoutSetLocalServiceUtil;
 import com.liferay.portal.service.ShardLocalServiceUtil;
 import com.liferay.portal.service.UserLocalServiceUtil;
 import com.liferay.portal.service.VirtualHostLocalServiceUtil;
+import com.liferay.portal.util.PortalUtil;
 import com.liferay.portal.util.PrefsPropsUtil;
 import com.liferay.portal.util.PropsValues;
 
@@ -103,12 +108,13 @@ public class CompanyImpl extends CompanyBaseImpl {
 		return new GroupImpl();
 	}
 
+	@Override
 	public Key getKeyObj() {
 		if (_keyObj == null) {
 			String key = getKey();
 
 			if (Validator.isNotNull(key)) {
-				_keyObj = (Key)Base64.stringToObject(key);
+				_keyObj = (Key)Base64.stringToObjectSilent(key);
 			}
 		}
 
@@ -121,6 +127,40 @@ public class CompanyImpl extends CompanyBaseImpl {
 
 	public String getName() throws PortalException, SystemException {
 		return getAccount().getName();
+	}
+
+	public String getPortalURL(long groupId)
+		throws PortalException, SystemException {
+
+		String portalURL = PortalUtil.getPortalURL(
+			getVirtualHostname(), Http.HTTP_PORT, false);
+
+		if (groupId <= 0) {
+			return portalURL;
+		}
+
+		Group group = GroupLocalServiceUtil.getGroup(groupId);
+
+		if (group.hasPublicLayouts()) {
+			LayoutSet layoutSet = LayoutSetLocalServiceUtil.getLayoutSet(
+				groupId, false);
+
+			if (Validator.isNotNull(layoutSet.getVirtualHostname())) {
+				portalURL = PortalUtil.getPortalURL(
+					layoutSet.getVirtualHostname(), Http.HTTP_PORT, false);
+			}
+		}
+		else if (group.hasPrivateLayouts()) {
+			LayoutSet layoutSet = LayoutSetLocalServiceUtil.getLayoutSet(
+				groupId, true);
+
+			if (Validator.isNotNull(layoutSet.getVirtualHostname())) {
+				portalURL = PortalUtil.getPortalURL(
+					layoutSet.getVirtualHostname(), Http.HTTP_PORT, false);
+			}
+		}
+
+		return portalURL;
 	}
 
 	public String getShardName() throws PortalException, SystemException {
@@ -155,9 +195,7 @@ public class CompanyImpl extends CompanyBaseImpl {
 		}
 	}
 
-	public boolean hasCompanyMx(String emailAddress)
-		throws SystemException {
-
+	public boolean hasCompanyMx(String emailAddress) throws SystemException {
 		emailAddress = emailAddress.trim().toLowerCase();
 
 		int pos = emailAddress.indexOf(CharPool.AT);
@@ -166,7 +204,7 @@ public class CompanyImpl extends CompanyBaseImpl {
 			return false;
 		}
 
-		String mx = emailAddress.substring(pos + 1, emailAddress.length());
+		String mx = emailAddress.substring(pos + 1);
 
 		if (mx.equals(getMx())) {
 			return true;
@@ -234,12 +272,12 @@ public class CompanyImpl extends CompanyBaseImpl {
 		super.setKey(key);
 	}
 
+	@Override
 	public void setKeyObj(Key keyObj) {
 		_keyObj = keyObj;
-
-		super.setKey(Base64.objectToString(keyObj));
 	}
 
-	private Key _keyObj = null;
+	@CacheField
+	private Key _keyObj;
 
 }

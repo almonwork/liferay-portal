@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -19,6 +19,9 @@
 <%
 String redirect = ParamUtil.getString(request, "redirect");
 
+long repositoryId = ParamUtil.getLong(request, "repositoryId");
+long folderId = ParamUtil.getLong(request, "folderId");
+
 long breadcrumbsFolderId = ParamUtil.getLong(request, "breadcrumbsFolderId");
 
 long searchFolderId = ParamUtil.getLong(request, "searchFolderId");
@@ -30,16 +33,18 @@ if (searchFolderId > 0) {
 	folderIdsArray = new long[] {searchFolderId};
 }
 else {
-	long folderId = DLFolderConstants.getFolderId(scopeGroupId, DLFolderConstants.getDataRepositoryId(scopeGroupId, searchFolderIds));
+	long dataRepositoryId = DLFolderConstants.getFolderId(scopeGroupId, DLFolderConstants.getDataRepositoryId(scopeGroupId, searchFolderIds));
 
 	List<Long> folderIds = DLAppServiceUtil.getSubfolderIds(scopeGroupId, searchFolderIds);
 
-	folderIds.add(0, folderId);
+	folderIds.add(0, dataRepositoryId);
 
 	folderIdsArray = StringUtil.split(StringUtil.merge(folderIds), 0L);
 }
 
 String keywords = ParamUtil.getString(request, "keywords");
+
+int mountFoldersCount = DLAppServiceUtil.getMountFoldersCount(scopeGroupId, DLFolderConstants.DEFAULT_PARENT_FOLDER_ID);
 %>
 
 <liferay-portlet:renderURL varImpl="searchURL">
@@ -49,6 +54,8 @@ String keywords = ParamUtil.getString(request, "keywords");
 <aui:form action="<%= searchURL %>" method="get" name="fm">
 	<liferay-portlet:renderURLParams varImpl="searchURL" />
 	<aui:input name="redirect" type="hidden" value="<%= redirect %>" />
+	<aui:input name="repositoryId" type="hidden" value="<%= repositoryId %>" />
+	<aui:input name="folderId" type="hidden" value="<%= folderId %>" />
 	<aui:input name="breadcrumbsFolderId" type="hidden" value="<%= breadcrumbsFolderId %>" />
 	<aui:input name="searchFolderId" type="hidden" value="<%= searchFolderId %>" />
 	<aui:input name="searchFolderIds" type="hidden" value="<%= searchFolderIds %>" />
@@ -63,6 +70,8 @@ String keywords = ParamUtil.getString(request, "keywords");
 
 	portletURL.setParameter("struts_action", "/document_library_display/search");
 	portletURL.setParameter("redirect", redirect);
+	portletURL.setParameter("repositoryId", String.valueOf(repositoryId));
+	portletURL.setParameter("folderId", String.valueOf(folderId));
 	portletURL.setParameter("breadcrumbsFolderId", String.valueOf(breadcrumbsFolderId));
 	portletURL.setParameter("searchFolderId", String.valueOf(searchFolderId));
 	portletURL.setParameter("searchFolderIds", String.valueOf(searchFolderIds));
@@ -73,7 +82,6 @@ String keywords = ParamUtil.getString(request, "keywords");
 	headerNames.add("#");
 	headerNames.add("folder");
 	headerNames.add("document");
-	headerNames.add("score");
 	headerNames.add(StringPool.BLANK);
 
 	SearchContainer searchContainer = new SearchContainer(renderRequest, null, null, SearchContainer.DEFAULT_CUR_PARAM, SearchContainer.DEFAULT_DELTA, portletURL, headerNames, LanguageUtil.format(pageContext, "no-documents-were-found-that-matched-the-keywords-x", "<strong>" + HtmlUtil.escape(keywords) + "</strong>"));
@@ -89,7 +97,7 @@ String keywords = ParamUtil.getString(request, "keywords");
 		searchContext.setKeywords(keywords);
 		searchContext.setStart(searchContainer.getStart());
 
-		Hits results = indexer.search(searchContext);
+		Hits results = DLAppServiceUtil.search(repositoryId, searchContext);
 
 		int total = results.getLength();
 
@@ -110,12 +118,6 @@ String keywords = ParamUtil.getString(request, "keywords");
 
 			long fileEntryId = GetterUtil.getLong(doc.get(Field.ENTRY_CLASS_PK));
 
-			long folderId = GetterUtil.getLong(doc.get("repositoryId"));
-
-			if (folderId == scopeGroupId) {
-				folderId = DLFolderConstants.DEFAULT_PARENT_FOLDER_ID;
-			}
-
 			FileEntry fileEntry = null;
 
 			try {
@@ -123,7 +125,7 @@ String keywords = ParamUtil.getString(request, "keywords");
 			}
 			catch (Exception e) {
 				if (_log.isWarnEnabled()) {
-					_log.warn("Document library search index is stale and contains file entry {" + fileEntryId + "}");
+					_log.warn("Documents and Media search index is stale and contains file entry {" + fileEntryId + "}");
 				}
 
 				continue;
@@ -144,10 +146,6 @@ String keywords = ParamUtil.getString(request, "keywords");
 			row.addText(folder.getName(), rowHREF);
 			row.addText(fileEntry.getTitle(), rowHREF);
 
-			// Score
-
-			row.addScore(results.score(i));
-
 			// Action
 
 			row.addJSP("right", SearchEntry.DEFAULT_VALIGN, "/html/portlet/document_library/file_entry_action.jsp");
@@ -165,6 +163,44 @@ String keywords = ParamUtil.getString(request, "keywords");
 		</span>
 
 		<br /><br />
+
+		<c:if test="<%= (mountFoldersCount > 0) && (folderId == DLFolderConstants.DEFAULT_PARENT_FOLDER_ID) %>">
+
+			<%
+			List<Folder> mountFolders = DLAppServiceUtil.getMountFolders(scopeGroupId, DLFolderConstants.DEFAULT_PARENT_FOLDER_ID, QueryUtil.ALL_POS, QueryUtil.ALL_POS);
+
+			StringBundler sb = new StringBundler((6 * mountFoldersCount) - 1);
+
+			for (int i = 0; i < mountFoldersCount; i++) {
+				Folder mountFolder = mountFolders.get(i);
+
+				PortletURL searchExternalRepositoryURL = renderResponse.createRenderURL();
+
+				searchExternalRepositoryURL.setParameter("struts_action", "/document_library_display/search");
+				searchExternalRepositoryURL.setParameter("redirect", redirect);
+				searchExternalRepositoryURL.setParameter("repositoryId", String.valueOf(mountFolder.getRepositoryId()));
+				searchExternalRepositoryURL.setParameter("folderId", String.valueOf(mountFolder.getFolderId()));
+				searchExternalRepositoryURL.setParameter("breadcrumbsFolderId", String.valueOf(breadcrumbsFolderId));
+				searchExternalRepositoryURL.setParameter("searchFolderId", String.valueOf(searchFolderId));
+				searchExternalRepositoryURL.setParameter("searchFolderIds", String.valueOf(searchFolderIds));
+				searchExternalRepositoryURL.setParameter("keywords", keywords);
+
+				sb.append("<a href=\"");
+				sb.append(searchExternalRepositoryURL.toString());
+				sb.append("\">");
+				sb.append(mountFolder.getName());
+				sb.append("</a>");
+
+				if ((i + 1) < mountFoldersCount) {
+					sb.append(", ");
+				}
+			}
+			%>
+
+			<span class="portlet-msg-info">
+				<liferay-ui:message arguments="<%= sb.toString() %>" key="results-from-the-local-repository-search-in-x" />
+			</span>
+		</c:if>
 
 		<liferay-ui:search-iterator searchContainer="<%= searchContainer %>" type="more" />
 

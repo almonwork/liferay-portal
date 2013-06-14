@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -24,10 +24,10 @@ public class LayoutSetBranchConstants {
 	public static final long ALL_BRANCHES = 0;
 
 	public static final String MASTER_BRANCH_DESCRIPTION_PRIVATE =
-		"main-private-pages-variation-of-x";
+		"main-site-pages-variation-of-x";
 
 	public static final String MASTER_BRANCH_DESCRIPTION_PUBLIC =
-		"main-public-pages-variation-of-x";
+		"main-site-pages-variation-of-x";
 
 	public static final String MASTER_BRANCH_NAME = "main-variation";
 

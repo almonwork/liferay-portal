@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -19,6 +19,7 @@
 <%
 String tabs4 = (String)request.getAttribute("edit_pages.jsp-tab4");
 
+Group group = (Group)request.getAttribute("edit_pages.jsp-group");
 Group liveGroup = (Group)request.getAttribute("edit_pages.jsp-liveGroup");
 long groupId = ((Long)request.getAttribute("edit_pages.jsp-groupId")).longValue();
 long selPlid = ((Long)request.getAttribute("edit_pages.jsp-selPlid")).longValue();
@@ -125,6 +126,9 @@ if (!StringUtil.contains(tabs4Names, tabs4)) {
 
 					<%
 					for (int i = 0; i < PropsValues.LAYOUT_TYPES.length; i++) {
+						if (PropsValues.LAYOUT_TYPES[i].equals("article") && (group.isLayoutPrototype() || group.isLayoutSetPrototype())) {
+							continue;
+						}
 					%>
 
 						<option <%= type.equals(PropsValues.LAYOUT_TYPES[i]) ? "selected" : "" %> value="<%= PropsValues.LAYOUT_TYPES[i] %>"><%= LanguageUtil.get(pageContext, "layout.types." + PropsValues.LAYOUT_TYPES[i]) %></option>
@@ -141,7 +145,7 @@ if (!StringUtil.contains(tabs4Names, tabs4)) {
 				<liferay-ui:message key="hidden" />
 			</td>
 			<td>
-				<liferay-ui:input-checkbox param="hidden" defaultValue="<%= hidden %>" />
+				<liferay-ui:input-checkbox defaultValue="<%= hidden %>" param="hidden" />
 			</td>
 		</tr>
 
@@ -151,7 +155,7 @@ if (!StringUtil.contains(tabs4Names, tabs4)) {
 					<liferay-ui:message key="copy-parent" />
 				</td>
 				<td>
-					<liferay-ui:input-checkbox param="inheritFromParentLayoutId" defaultValue="false" />
+					<liferay-ui:input-checkbox defaultValue="false" param="inheritFromParentLayoutId" />
 				</td>
 			</tr>
 		</c:if>
@@ -260,17 +264,17 @@ if (!StringUtil.contains(tabs4Names, tabs4)) {
 		boolean mergeGuestPublicPages = PropertiesParamUtil.getBoolean(groupTypeSettings, request, "mergeGuestPublicPages");
 		%>
 
-		<liferay-ui:message arguments="<%= company.getGroup().getDescriptiveName() %>" key="you-can-configure-the-top-level-pages-of-this-public-site-to-merge-with-the-top-level-pages-of-the-public-x-site" />
+		<liferay-ui:message arguments="<%= company.getGroup().getDescriptiveName(locale) %>" key="you-can-configure-the-top-level-pages-of-this-public-site-to-merge-with-the-top-level-pages-of-the-public-x-site" />
 
 		<br /><br />
 
 		<table class="lfr-table">
 		<tr>
 			<td class="lfr-label">
-				<liferay-ui:message arguments="<%= company.getGroup().getDescriptiveName() %>" key="merge-x-public-pages" />
+				<liferay-ui:message arguments="<%= company.getGroup().getDescriptiveName(locale) %>" key="merge-x-public-pages" />
 			</td>
 			<td>
-				<liferay-ui:input-checkbox param="mergeGuestPublicPages" defaultValue="<%= mergeGuestPublicPages %>" />
+				<liferay-ui:input-checkbox defaultValue="<%= mergeGuestPublicPages %>" param="mergeGuestPublicPages" />
 			</td>
 		</tr>
 		</table>

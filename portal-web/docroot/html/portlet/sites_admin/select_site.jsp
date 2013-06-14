@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -25,6 +25,8 @@ PortletURL portletURL = renderResponse.createRenderURL();
 
 portletURL.setParameter("struts_action", "/sites_admin/select_site");
 portletURL.setParameter("target", target);
+portletURL.setParameter("includeCompany", String.valueOf(includeCompany));
+portletURL.setParameter("includeUserPersonalSite", String.valueOf(includeUserPersonalSite));
 %>
 
 <aui:form action="<%= portletURL.toString() %>" method="post" name="fm">
@@ -50,31 +52,44 @@ portletURL.setParameter("target", target);
 			<%
 			results.clear();
 
+			int additionalSites = 0;
+
+			if (includeCompany) {
+				if (searchContainer.getStart() == 0) {
+					results.add(company.getGroup());
+				}
+
+				additionalSites++;
+			}
+
+			if (includeUserPersonalSite) {
+				if (searchContainer.getStart() == 0) {
+					Group userPersonalSite = GroupLocalServiceUtil.getGroup(company.getCompanyId(), GroupConstants.USER_PERSONAL_SITE);
+
+					results.add(userPersonalSite);
+				}
+
+				additionalSites++;
+			}
+
 			if (filterManageableGroups) {
 				groupParams.put("usersGroups", user.getUserId());
 			}
 
 			groupParams.put("site", Boolean.TRUE);
 
-			List<Group> sites = GroupLocalServiceUtil.search(company.getCompanyId(), null, searchTerms.getName(), searchTerms.getDescription(), groupParams, searchContainer.getStart(), searchContainer.getEnd(), searchContainer.getOrderByComparator());
+			int end = searchContainer.getEnd() - additionalSites;
+			int start = searchContainer.getStart();
+
+			if (searchContainer.getStart() > additionalSites) {
+				start = searchContainer.getStart() - additionalSites;
+			}
+
+			List<Group> sites = GroupLocalServiceUtil.search(company.getCompanyId(), null, searchTerms.getName(), searchTerms.getDescription(), groupParams, start, end, searchContainer.getOrderByComparator());
 
 			results.addAll(sites);
 
-			total = GroupLocalServiceUtil.searchCount(company.getCompanyId(), null, searchTerms.getName(), searchTerms.getDescription(), groupParams);
-
-			if (includeCompany) {
-				results.add(0, company.getGroup());
-
-				total++;
-			}
-
-			if (includeUserPersonalSite) {
-				Group userPersonalSite = GroupLocalServiceUtil.getGroup(company.getCompanyId(), GroupConstants.USER_PERSONAL_SITE);
-
-				results.add(0, userPersonalSite);
-
-				total++;
-			}
+			total = GroupLocalServiceUtil.searchCount(company.getCompanyId(), null, searchTerms.getName(), searchTerms.getDescription(), groupParams) + additionalSites;
 
 			pageContext.setAttribute("results", results);
 			pageContext.setAttribute("total", total);
@@ -87,6 +102,7 @@ portletURL.setParameter("target", target);
 			escapedModel="<%= true %>"
 			keyProperty="groupId"
 			modelVar="group"
+			rowIdProperty="friendlyURL"
 		>
 
 			<%
@@ -97,7 +113,7 @@ portletURL.setParameter("target", target);
 			sb.append("selectGroup('");
 			sb.append(group.getGroupId());
 			sb.append("', '");
-			sb.append(UnicodeFormatter.toString(group.getDescriptiveName()));
+			sb.append(UnicodeFormatter.toString(group.getDescriptiveName(locale)));
 			sb.append("', '");
 			sb.append(target);
 			sb.append("');");
@@ -109,7 +125,7 @@ portletURL.setParameter("target", target);
 			<liferay-ui:search-container-column-text
 				href="<%= rowHREF %>"
 				name="name"
-				value="<%= HtmlUtil.escape(group.getDescriptiveName()) %>"
+				value="<%= HtmlUtil.escape(group.getDescriptiveName(locale)) %>"
 			/>
 
 			<liferay-ui:search-container-column-text

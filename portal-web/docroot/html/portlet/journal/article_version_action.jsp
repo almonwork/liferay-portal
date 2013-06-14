@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -26,10 +26,12 @@ JournalArticle article = (JournalArticle)row.getObject();
 	<c:if test="<%= JournalArticlePermission.contains(permissionChecker, article, ActionKeys.VIEW) %>">
 
 		<%
-		StringBundler sb = new StringBundler(7);
+		StringBundler sb = new StringBundler(9);
 
 		sb.append(themeDisplay.getPathMain());
-		sb.append("/journal/view_article_content?groupId=");
+		sb.append("/journal/view_article_content?cmd=");
+		sb.append(Constants.VIEW);
+		sb.append("&groupId=");
 		sb.append(article.getGroupId());
 		sb.append("&articleId=");
 		sb.append(article.getArticleId());

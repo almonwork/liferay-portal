@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -15,7 +15,6 @@
 package com.liferay.portlet.announcements.service;
 
 import com.liferay.portal.kernel.bean.PortalBeanLocatorUtil;
-import com.liferay.portal.kernel.util.MethodCache;
 import com.liferay.portal.kernel.util.ReferenceRegistry;
 
 /**
@@ -66,25 +65,32 @@ public class AnnouncementsEntryLocalServiceUtil {
 	* Deletes the announcements entry with the primary key from the database. Also notifies the appropriate model listeners.
 	*
 	* @param entryId the primary key of the announcements entry
+	* @return the announcements entry that was removed
 	* @throws PortalException if a announcements entry with the primary key could not be found
 	* @throws SystemException if a system exception occurred
 	*/
-	public static void deleteAnnouncementsEntry(long entryId)
+	public static com.liferay.portlet.announcements.model.AnnouncementsEntry deleteAnnouncementsEntry(
+		long entryId)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException {
-		getService().deleteAnnouncementsEntry(entryId);
+		return getService().deleteAnnouncementsEntry(entryId);
 	}
 
 	/**
 	* Deletes the announcements entry from the database. Also notifies the appropriate model listeners.
 	*
 	* @param announcementsEntry the announcements entry
+	* @return the announcements entry that was removed
 	* @throws SystemException if a system exception occurred
 	*/
-	public static void deleteAnnouncementsEntry(
+	public static com.liferay.portlet.announcements.model.AnnouncementsEntry deleteAnnouncementsEntry(
 		com.liferay.portlet.announcements.model.AnnouncementsEntry announcementsEntry)
 		throws com.liferay.portal.kernel.exception.SystemException {
-		getService().deleteAnnouncementsEntry(announcementsEntry);
+		return getService().deleteAnnouncementsEntry(announcementsEntry);
+	}
+
+	public static com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery() {
+		return getService().dynamicQuery();
 	}
 
 	/**
@@ -156,6 +162,12 @@ public class AnnouncementsEntryLocalServiceUtil {
 		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery)
 		throws com.liferay.portal.kernel.exception.SystemException {
 		return getService().dynamicQueryCount(dynamicQuery);
+	}
+
+	public static com.liferay.portlet.announcements.model.AnnouncementsEntry fetchAnnouncementsEntry(
+		long entryId)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getService().fetchAnnouncementsEntry(entryId);
 	}
 
 	/**
@@ -427,20 +439,15 @@ public class AnnouncementsEntryLocalServiceUtil {
 
 			ReferenceRegistry.registerReference(AnnouncementsEntryLocalServiceUtil.class,
 				"_service");
-			MethodCache.remove(AnnouncementsEntryLocalService.class);
 		}
 
 		return _service;
 	}
 
+	/**
+	 * @deprecated
+	 */
 	public void setService(AnnouncementsEntryLocalService service) {
-		MethodCache.remove(AnnouncementsEntryLocalService.class);
-
-		_service = service;
-
-		ReferenceRegistry.registerReference(AnnouncementsEntryLocalServiceUtil.class,
-			"_service");
-		MethodCache.remove(AnnouncementsEntryLocalService.class);
 	}
 
 	private static AnnouncementsEntryLocalService _service;

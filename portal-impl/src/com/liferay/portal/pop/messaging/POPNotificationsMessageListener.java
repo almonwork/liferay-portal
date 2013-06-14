@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -24,7 +24,6 @@ import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.pop.POPServerUtil;
 import com.liferay.util.mail.MailEngine;
 
-import java.util.Iterator;
 import java.util.List;
 
 import javax.mail.Address;
@@ -119,8 +118,8 @@ public class POPNotificationsMessageListener
 		}
 	}
 
-	protected void nostifyListeners(
-			List<MessageListener> listeners, Message message)
+	protected void notifyMessageListeners(
+			List<MessageListener> messageListeners, Message message)
 		throws Exception {
 
 		String from = getEmailAddress(message.getFrom());
@@ -132,11 +131,7 @@ public class POPNotificationsMessageListener
 			_log.debug("Recipient " + recipient);
 		}
 
-		Iterator<MessageListener> itr = listeners.iterator();
-
-		while (itr.hasNext()) {
-			MessageListener messageListener = itr.next();
-
+		for (MessageListener messageListener : messageListeners) {
 			try {
 				if (messageListener.accept(from, recipient, message)) {
 					messageListener.deliver(from, recipient, message);
@@ -148,12 +143,12 @@ public class POPNotificationsMessageListener
 		}
 	}
 
-	protected void nostifyListeners(Message[] messages) throws Exception {
+	protected void notifyMessageListeners(Message[] messages) throws Exception {
 		if (_log.isDebugEnabled()) {
 			_log.debug("Messages " + messages.length);
 		}
 
-		List<MessageListener> listeners = POPServerUtil.getListeners();
+		List<MessageListener> messageListeners = POPServerUtil.getListeners();
 
 		for (int i = 0; i < messages.length; i++) {
 			Message message = messages[i];
@@ -162,7 +157,7 @@ public class POPNotificationsMessageListener
 				_log.debug("Message " + message);
 			}
 
-			nostifyListeners(listeners, message);
+			notifyMessageListeners(messageListeners, message);
 		}
 	}
 
@@ -172,7 +167,7 @@ public class POPNotificationsMessageListener
 		Message[] messages = _inboxFolder.getMessages();
 
 		try {
-			nostifyListeners(messages);
+			notifyMessageListeners(messages);
 		}
 		finally {
 			if (_log.isDebugEnabled()) {

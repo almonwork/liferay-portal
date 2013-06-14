@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -31,7 +31,7 @@ import com.liferay.portal.webdav.InvalidRequestException;
 import com.liferay.util.xml.XMLFormatter;
 
 import java.util.HashSet;
-import java.util.Iterator;
+import java.util.List;
 import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
@@ -55,6 +55,23 @@ public class PropfindMethodImpl extends BasePropMethodImpl implements Method {
 		catch (Exception e) {
 			throw new WebDAVException(e);
 		}
+	}
+
+	protected Set<QName> generateProps(Set<QName> props) {
+		props.add(DISPLAYNAME);
+		props.add(RESOURCETYPE);
+		props.add(GETCONTENTTYPE);
+		props.add(GETCONTENTLENGTH);
+		props.add(GETLASTMODIFIED);
+		props.add(LOCKDISCOVERY);
+
+		// RFC 3253 Currently Unsupported
+
+		//props.add(new Tuple("checked-in", WebDAVUtil.DAV_URI));
+		//props.add(new Tuple("checked-out", WebDAVUtil.DAV_URI));
+		//props.add(new Tuple("version-name", WebDAVUtil.DAV_URI));
+
+		return props;
 	}
 
 	protected Set<QName> getProps(WebDAVRequest webDavRequest)
@@ -82,30 +99,29 @@ public class PropfindMethodImpl extends BasePropMethodImpl implements Method {
 						XMLFormatter.toString(xml, StringPool.FOUR_SPACES));
 			}
 
-			Document doc = SAXReaderUtil.read(xml);
+			Document document = SAXReaderUtil.read(xml);
 
-			Element root = doc.getRootElement();
+			Element rootElement = document.getRootElement();
 
-			if (root.element(ALLPROP.getName()) != null) {
+			if (rootElement.element(ALLPROP.getName()) != null) {
 
 				// Generate props if <allprop> tag is used. See LEP-6162.
 
 				return generateProps(props);
 			}
 
-			Element prop = root.element("prop");
+			Element propElement = rootElement.element("prop");
 
-			Iterator<Element> itr = prop.elements().iterator();
+			List<Element> elements = propElement.elements();
 
-			while (itr.hasNext()) {
-				Element el = itr.next();
-
-				String prefix = el.getNamespacePrefix();
-				String uri = el.getNamespaceURI();
+			for (Element element : elements) {
+				String prefix = element.getNamespacePrefix();
+				String uri = element.getNamespaceURI();
 
 				Namespace namespace = WebDAVUtil.createNamespace(prefix, uri);
 
-				props.add(SAXReaderUtil.createQName(el.getName(), namespace));
+				props.add(
+					SAXReaderUtil.createQName(element.getName(), namespace));
 			}
 
 			return props;
@@ -113,23 +129,6 @@ public class PropfindMethodImpl extends BasePropMethodImpl implements Method {
 		catch (Exception e) {
 			throw new InvalidRequestException(e);
 		}
-	}
-
-	protected Set<QName> generateProps(Set<QName> props) {
-		props.add(DISPLAYNAME);
-		props.add(RESOURCETYPE);
-		props.add(GETCONTENTTYPE);
-		props.add(GETCONTENTLENGTH);
-		props.add(GETLASTMODIFIED);
-		props.add(LOCKDISCOVERY);
-
-		// RFC 3253 Currently Unsupported
-
-		//props.add(new Tuple("checked-in", WebDAVUtil.DAV_URI));
-		//props.add(new Tuple("checked-out", WebDAVUtil.DAV_URI));
-		//props.add(new Tuple("version-name", WebDAVUtil.DAV_URI));
-
-		return props;
 	}
 
 	private static Log _log = LogFactoryUtil.getLog(PropfindMethodImpl.class);

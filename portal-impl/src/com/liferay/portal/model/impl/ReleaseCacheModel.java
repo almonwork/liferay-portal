@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -19,6 +19,8 @@ import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.model.CacheModel;
 import com.liferay.portal.model.Release;
 
+import java.io.Serializable;
+
 import java.util.Date;
 
 /**
@@ -28,10 +30,10 @@ import java.util.Date;
  * @see Release
  * @generated
  */
-public class ReleaseCacheModel implements CacheModel<Release> {
+public class ReleaseCacheModel implements CacheModel<Release>, Serializable {
 	@Override
 	public String toString() {
-		StringBundler sb = new StringBundler(17);
+		StringBundler sb = new StringBundler(19);
 
 		sb.append("{releaseId=");
 		sb.append(releaseId);
@@ -47,6 +49,8 @@ public class ReleaseCacheModel implements CacheModel<Release> {
 		sb.append(buildDate);
 		sb.append(", verified=");
 		sb.append(verified);
+		sb.append(", state=");
+		sb.append(state);
 		sb.append(", testString=");
 		sb.append(testString);
 		sb.append("}");
@@ -90,6 +94,7 @@ public class ReleaseCacheModel implements CacheModel<Release> {
 		}
 
 		releaseImpl.setVerified(verified);
+		releaseImpl.setState(state);
 
 		if (testString == null) {
 			releaseImpl.setTestString(StringPool.BLANK);
@@ -110,5 +115,6 @@ public class ReleaseCacheModel implements CacheModel<Release> {
 	public int buildNumber;
 	public long buildDate;
 	public boolean verified;
+	public int state;
 	public String testString;
 }

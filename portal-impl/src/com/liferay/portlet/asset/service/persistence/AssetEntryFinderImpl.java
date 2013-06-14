@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -23,6 +23,7 @@ import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.util.CalendarUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
+import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.model.Layout;
 import com.liferay.portal.service.persistence.impl.BasePersistenceImpl;
@@ -44,13 +45,13 @@ import java.util.List;
 public class AssetEntryFinderImpl
 	extends BasePersistenceImpl<AssetEntry> implements AssetEntryFinder {
 
-	public static String FIND_BY_AND_CATEGORY_IDS =
+	public static final String FIND_BY_AND_CATEGORY_IDS =
 		AssetEntryFinder.class.getName() + ".findByAndCategoryIds";
 
-	public static String FIND_BY_AND_CATEGORY_IDS_TREE =
+	public static final String FIND_BY_AND_CATEGORY_IDS_TREE =
 		AssetEntryFinder.class.getName() + ".findByAndCategoryIdsTree";
 
-	public static String FIND_BY_AND_TAG_IDS =
+	public static final String FIND_BY_AND_TAG_IDS =
 		AssetEntryFinder.class.getName() + ".findByAndTagIds";
 
 	public int countEntries(AssetEntryQuery entryQuery) throws SystemException {
@@ -61,7 +62,7 @@ public class AssetEntryFinderImpl
 
 			SQLQuery q = buildAssetQuerySQL(entryQuery, true, session);
 
-			Iterator<Long> itr = q.list().iterator();
+			Iterator<Long> itr = q.iterate();
 
 			if (itr.hasNext()) {
 				Long count = itr.next();
@@ -124,11 +125,16 @@ public class AssetEntryFinderImpl
 		sb.append(StringPool.CLOSE_PARENTHESIS);
 	}
 
-	protected void buildAllTagsSQL(long[] tagIds, StringBundler sb) {
+	protected void buildAllTagsSQL(long[][] tagIds, StringBundler sb) {
 		sb.append(" AND AssetEntry.entryId IN (");
 
 		for (int i = 0; i < tagIds.length; i++) {
-			sb.append(CustomSQLUtil.get(FIND_BY_AND_TAG_IDS));
+			String sql = CustomSQLUtil.get(FIND_BY_AND_TAG_IDS);
+
+			sql = StringUtil.replace(
+				sql, "[$TAG_ID]", getTagIds(tagIds[i], StringPool.EQUAL));
+
+			sb.append(sql);
 
 			if ((i + 1) < tagIds.length) {
 				sb.append(" AND AssetEntry.entryId IN (");
@@ -150,10 +156,20 @@ public class AssetEntryFinderImpl
 		StringBundler sb = new StringBundler();
 
 		if (count) {
-			sb.append("SELECT COUNT(AssetEntry.entryId) AS COUNT_VALUE ");
+			sb.append(
+				"SELECT COUNT(DISTINCT AssetEntry.entryId) AS COUNT_VALUE ");
 		}
 		else {
 			sb.append("SELECT DISTINCT {AssetEntry.*} ");
+
+			String orderByCol1 = entryQuery.getOrderByCol1();
+			String orderByCol2 = entryQuery.getOrderByCol2();
+
+			if (orderByCol1.equals("ratings") ||
+				orderByCol2.equals("ratings")) {
+
+				sb.append(", RatingsEntry.score ");
+			}
 		}
 
 		sb.append("FROM AssetEntry ");
@@ -284,20 +300,27 @@ public class AssetEntryFinderImpl
 			sb.append(") ");
 		}
 
+		// Asset entry subtypes
+
+		if (entryQuery.getClassTypeIds().length > 0) {
+			buildClassTypeIdsSQL(entryQuery.getClassTypeIds(), sb);
+		}
+
 		// Tag conditions
 
 		if (entryQuery.getAllTagIds().length > 0) {
-			buildAllTagsSQL(entryQuery.getAllTagIds(), sb);
+			buildAllTagsSQL(entryQuery.getAllTagIdsArray(), sb);
 		}
 
 		if (entryQuery.getAnyTagIds().length > 0) {
 			sb.append(" AND (");
-			sb.append(getTagIds(entryQuery.getAnyTagIds(), StringPool.EQUAL));
+			sb.append(
+				getAnyTagIds(entryQuery.getAnyTagIds(), StringPool.EQUAL));
 			sb.append(") ");
 		}
 
 		if (entryQuery.getNotAllTagIds().length > 0) {
-			buildNotAnyTagsSQL(entryQuery.getNotAllTagIds(), sb);
+			buildNotAnyTagsSQL(entryQuery.getNotAllTagIdsArray(), sb);
 		}
 
 		if (entryQuery.getNotAnyTagIds().length > 0) {
@@ -308,9 +331,9 @@ public class AssetEntryFinderImpl
 
 		// Other conditions
 
-		int datesIndex = sb.index();
-
-		sb.append("[$DATES$]");
+		sb.append(
+			getDates(
+				entryQuery.getPublishDate(), entryQuery.getExpirationDate()));
 		sb.append(getGroupIds(entryQuery.getGroupIds()));
 		sb.append(getClassNameIds(entryQuery.getClassNameIds()));
 
@@ -344,11 +367,6 @@ public class AssetEntryFinderImpl
 				sb.append(entryQuery.getOrderByType2());
 			}
 		}
-
-		sb.setStringAt(
-			getDates(
-				entryQuery.getPublishDate(), entryQuery.getExpirationDate()),
-			datesIndex);
 
 		if (sb.index() > whereIndex) {
 			String where = sb.stringAt(whereIndex);
@@ -404,13 +422,28 @@ public class AssetEntryFinderImpl
 		qPos.add(entryQuery.getNotAnyTagIds());
 
 		setDates(
-			qPos, entryQuery.getPublishDate(),
-			entryQuery.getExpirationDate());
+			qPos, entryQuery.getPublishDate(), entryQuery.getExpirationDate());
 
 		qPos.add(entryQuery.getGroupIds());
 		qPos.add(entryQuery.getClassNameIds());
 
 		return q;
+	}
+
+	protected void buildClassTypeIdsSQL(long[] classTypeIds, StringBundler sb) {
+		sb.append(" AND (");
+
+		for (int i = 0; i < classTypeIds.length; i++) {
+			sb.append(" AssetEntry.classTypeId = ");
+			sb.append(classTypeIds[i]);
+
+			if ((i + 1) < classTypeIds.length) {
+				sb.append(" OR ");
+			}
+			else {
+				sb.append(StringPool.CLOSE_PARENTHESIS);
+			}
+		}
 	}
 
 	protected void buildNotAnyCategoriesSQL(
@@ -431,20 +464,43 @@ public class AssetEntryFinderImpl
 		sb.append(StringPool.CLOSE_PARENTHESIS);
 	}
 
-	protected void buildNotAnyTagsSQL(long[] tagIds, StringBundler sb) {
+	protected void buildNotAnyTagsSQL(long[][] tagIds, StringBundler sb) {
 		sb.append(" AND (");
 
 		for (int i = 0; i < tagIds.length; i++) {
 			sb.append("AssetEntry.entryId NOT IN (");
-			sb.append(CustomSQLUtil.get(FIND_BY_AND_TAG_IDS));
+
+			String sql = CustomSQLUtil.get(FIND_BY_AND_TAG_IDS);
+
+			sql = StringUtil.replace(
+				sql, "[$TAG_ID]", getTagIds(tagIds[i], StringPool.EQUAL));
+
+			sb.append(sql);
+
 			sb.append(StringPool.CLOSE_PARENTHESIS);
 
-			if ((i + 1) < tagIds.length) {
+			if (((i + 1) < tagIds.length) && (tagIds[i + 1].length > 0)) {
 				sb.append(" OR ");
 			}
 		}
 
 		sb.append(StringPool.CLOSE_PARENTHESIS);
+	}
+
+	protected String getAnyTagIds(long[] tagIds, String operator) {
+		StringBundler sb = new StringBundler(tagIds.length * 4 - 1);
+
+		for (int i = 0; i < tagIds.length; i++) {
+			sb.append("AssetTag.tagId ");
+			sb.append(operator);
+			sb.append(" ? ");
+
+			if ((i + 1) != tagIds.length) {
+				sb.append("OR ");
+			}
+		}
+
+		return sb.toString();
 	}
 
 	protected String getCategoryIds(String sqlId, long[] categoryIds) {
@@ -474,10 +530,10 @@ public class AssetEntryFinderImpl
 
 		StringBundler sb = new StringBundler(classNameIds.length + 2);
 
-		sb.append(" AND (classNameId = ?");
+		sb.append(" AND (AssetEntry.classNameId = ?");
 
 		for (int i = 1; i < classNameIds.length; i++) {
-			sb.append(" OR classNameId = ? ");
+			sb.append(" OR AssetEntry.classNameId = ? ");
 		}
 
 		sb.append(") ");
@@ -486,14 +542,16 @@ public class AssetEntryFinderImpl
 	}
 
 	protected String getDates(Date publishDate, Date expirationDate) {
-		StringBundler sb = new StringBundler(2);
+		StringBundler sb = new StringBundler(4);
 
 		if (publishDate != null) {
-			sb.append(" AND (publishDate IS NULL OR publishDate < ?)");
+			sb.append(" AND (AssetEntry.publishDate IS NULL OR ");
+			sb.append("AssetEntry.publishDate < ?)");
 		}
 
 		if (expirationDate != null) {
-			sb.append(" AND (expirationDate IS NULL OR expirationDate > ?)");
+			sb.append(" AND (AssetEntry.expirationDate IS NULL OR ");
+			sb.append("AssetEntry.expirationDate > ?)");
 		}
 
 		return sb.toString();
@@ -561,7 +619,7 @@ public class AssetEntryFinderImpl
 		StringBundler sb = new StringBundler(tagIds.length * 4 - 1);
 
 		for (int i = 0; i < tagIds.length; i++) {
-			sb.append("AssetTag.tagId ");
+			sb.append("tagId ");
 			sb.append(operator);
 			sb.append(" ? ");
 
@@ -583,8 +641,8 @@ public class AssetEntryFinderImpl
 		}
 
 		if (expirationDate != null) {
-			Timestamp expirationDate_TS =
-				CalendarUtil.getTimestamp(expirationDate);
+			Timestamp expirationDate_TS = CalendarUtil.getTimestamp(
+				expirationDate);
 
 			qPos.add(expirationDate_TS);
 		}

@@ -1,45 +1,82 @@
-<!-- Tag libraries -->
+<#-- Tag libraries -->
 
-<#assign aui = PortalJspTagLibs["/WEB-INF/tld/liferay-aui.tld"] />
+<#assign aui = PortalJspTagLibs["/WEB-INF/tld/aui.tld"] />
+<#assign liferay_portlet = PortalJspTagLibs["/WEB-INF/tld/liferay-portlet.tld"] />
 <#assign liferay_ui = PortalJspTagLibs["/WEB-INF/tld/liferay-ui.tld"] />
 
-<!-- CSS class -->
+<#-- CSS class -->
 
-<#assign cssClass = field.fieldCssClass!"">
+<#assign cssClass = fieldStructure.fieldCssClass!"">
 
-<!-- Field name -->
+<#-- Field name -->
 
-<#assign fieldName = field.name>
+<#assign fieldName = fieldStructure.name>
 
-<#assign parentName = parentField.name!"">
-<#assign parentType = parentField.type!"">
+<#assign parentName = parentFieldStructure.name!"">
+<#assign parentType = parentFieldStructure.type!"">
 
-<#if parentName?? && (parentName != "") && ((parentType == "radio") || (parentType == "select"))>
+<#assign isChildField = parentName?? && (parentName != "") && ((parentType == "radio") || (parentType == "select"))>
+
+<#if isChildField>
 	<#assign fieldName = parentName>
 </#if>
 
 <#assign namespacedFieldName = "${namespace}${fieldName}">
 
-<!-- Field value -->
+<#assign namespacedParentName = "${namespace}${parentName}">
 
-<#assign fieldValue = "">
+<#-- Predefined value -->
 
-<#if fields?? && fields.get(fieldName)??>
-	<#assign fieldValue = fields.get(fieldName).getValue()>
+<#assign predefinedValue = fieldStructure.predefinedValue!"">
+
+<#if isChildField>
+	<#assign predefinedValue = parentFieldStructure.predefinedValue!"">
 </#if>
 
-<!-- Label -->
+<#-- Field value -->
 
-<#assign label = field.label!"">
+<#assign fieldValue = predefinedValue>
+<#assign fieldRawValue = "">
 
-<#if field.showLabel?? && (field.showLabel == "false")>
+<#if fields?? && fields.get(fieldName)??>
+	<#assign field = fields.get(fieldName)>
+
+	<#assign fieldValue = field.getRenderedValue(themeDisplay)>
+	<#assign fieldRawValue = field.getValue()>
+</#if>
+
+<#-- Label -->
+
+<#assign label = fieldStructure.label!"">
+
+<#if fieldStructure.showLabel?? && (fieldStructure.showLabel == "false")>
 	<#assign label = "">
 </#if>
 
-<!-- Required -->
+<#-- Required -->
 
 <#assign required = false>
 
-<#if field.required?? && (field.required == "true")>
+<#if fieldStructure.required?? && (fieldStructure.required == "true")>
 	<#assign required = true>
 </#if>
+
+<#-- Util -->
+
+<#assign jsonFactoryUtil = utilLocator.findUtil("com.liferay.portal.kernel.json.JSONFactory")>
+
+<#function getFileJSONObject fieldValue>
+	<#return jsonFactoryUtil.createJSONObject(fieldValue)>>
+</#function>
+
+<#assign dlAppServiceUtil = serviceLocator.findService("com.liferay.portlet.documentlibrary.service.DLAppService")>
+
+<#function getFileEntry fileJSONObject>
+	<#assign fileEntryUUID = fileJSONObject.getString("uuid")>
+
+	<#return dlAppServiceUtil.getFileEntryByUuidAndGroupId(fileEntryUUID, scopeGroupId)!"">
+</#function>
+
+<#function getFileEntryURL fileEntry>
+	<#return themeDisplay.getPathContext() + "/documents/" + fileEntry.getRepositoryId()?c + "/" + fileEntry.getFolderId()?c + "/" +  httpUtil.encodeURL(htmlUtil.unescape(fileEntry.getTitle()), true) + "/" + fileEntry.getUuid()>
+</#function>

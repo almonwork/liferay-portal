@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -19,6 +19,8 @@ import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.mail.Account;
 import com.liferay.portal.kernel.messaging.BaseMessageListener;
+import com.liferay.portal.kernel.util.ObjectValuePair;
+import com.liferay.portal.kernel.util.StreamUtil;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.model.User;
 import com.liferay.portal.security.permission.PermissionCheckerUtil;
@@ -35,6 +37,10 @@ import com.liferay.portlet.messageboards.util.MBMailMessage;
 import com.liferay.portlet.messageboards.util.MBUtil;
 import com.liferay.portlet.messageboards.util.MailingListThreadLocal;
 import com.liferay.util.mail.MailEngine;
+
+import java.io.InputStream;
+
+import java.util.List;
 
 import javax.mail.Address;
 import javax.mail.Flags;
@@ -96,7 +102,7 @@ public class MailingListMessageListener extends BaseMessageListener {
 				try {
 					store.close();
 				}
-				catch (MessagingException e) {
+				catch (MessagingException me) {
 				}
 			}
 		}
@@ -212,9 +218,9 @@ public class MailingListMessageListener extends BaseMessageListener {
 			_log.debug("Parent message " + parentMessage);
 		}
 
-		MBMailMessage collector = new MBMailMessage();
+		MBMailMessage mbMailMessage = new MBMailMessage();
 
-		MBUtil.collectPartContent(mailMessage, collector);
+		MBUtil.collectPartContent(mailMessage, mbMailMessage);
 
 		PermissionCheckerUtil.setThreadValues(user);
 
@@ -230,18 +236,32 @@ public class MailingListMessageListener extends BaseMessageListener {
 			PortalUtil.getLayoutFullURL(groupId, PortletKeys.MESSAGE_BOARDS));
 		serviceContext.setScopeGroupId(groupId);
 
-		if (parentMessage == null) {
-			MBMessageServiceUtil.addMessage(
-				groupId, categoryId, subject, collector.getBody(),
-				MBMessageConstants.DEFAULT_FORMAT, collector.getFiles(),
-				anonymous, 0.0, true, serviceContext);
+		List<ObjectValuePair<String, InputStream>> inputStreamOVPs =
+			mbMailMessage.getInputStreamOVPs();
+
+		try {
+			if (parentMessage == null) {
+				MBMessageServiceUtil.addMessage(
+					groupId, categoryId, subject, mbMailMessage.getBody(),
+					MBMessageConstants.DEFAULT_FORMAT, inputStreamOVPs,
+					anonymous, 0.0, true, serviceContext);
+			}
+			else {
+				MBMessageServiceUtil.addMessage(
+					groupId, categoryId, parentMessage.getThreadId(),
+					parentMessage.getMessageId(), subject,
+					mbMailMessage.getBody(), MBMessageConstants.DEFAULT_FORMAT,
+					inputStreamOVPs, anonymous, 0.0, true, serviceContext);
+			}
 		}
-		else {
-			MBMessageServiceUtil.addMessage(
-				groupId, categoryId, parentMessage.getThreadId(),
-				parentMessage.getMessageId(), subject, collector.getBody(),
-				MBMessageConstants.DEFAULT_FORMAT, collector.getFiles(),
-				anonymous, 0.0, true, serviceContext);
+		finally {
+			for (ObjectValuePair<String, InputStream> inputStreamOVP :
+					inputStreamOVPs) {
+
+				InputStream inputStream = inputStreamOVP.getValue();
+
+				StreamUtil.cleanUp(inputStream);
+			}
 		}
 	}
 

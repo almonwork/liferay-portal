@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -91,13 +91,6 @@ public class PortletUtil {
 		return getPersistence()
 				   .findWithDynamicQuery(dynamicQuery, start, end,
 			orderByComparator);
-	}
-
-	/**
-	 * @see com.liferay.portal.service.persistence.BasePersistence#remove(com.liferay.portal.model.BaseModel)
-	 */
-	public static Portlet remove(Portlet portlet) throws SystemException {
-		return getPersistence().remove(portlet);
 	}
 
 	/**
@@ -423,12 +416,14 @@ public class PortletUtil {
 	*
 	* @param companyId the company ID
 	* @param portletId the portlet ID
+	* @return the portlet that was removed
 	* @throws SystemException if a system exception occurred
 	*/
-	public static void removeByC_P(long companyId, java.lang.String portletId)
+	public static com.liferay.portal.model.Portlet removeByC_P(long companyId,
+		java.lang.String portletId)
 		throws com.liferay.portal.NoSuchPortletException,
 			com.liferay.portal.kernel.exception.SystemException {
-		getPersistence().removeByC_P(companyId, portletId);
+		return getPersistence().removeByC_P(companyId, portletId);
 	}
 
 	/**
@@ -488,10 +483,10 @@ public class PortletUtil {
 		return _persistence;
 	}
 
+	/**
+	 * @deprecated
+	 */
 	public void setPersistence(PortletPersistence persistence) {
-		_persistence = persistence;
-
-		ReferenceRegistry.registerReference(PortletUtil.class, "_persistence");
 	}
 
 	private static PortletPersistence _persistence;

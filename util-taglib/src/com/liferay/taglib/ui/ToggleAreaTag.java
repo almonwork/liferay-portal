@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -27,6 +27,39 @@ import javax.servlet.jsp.JspWriter;
  * @author Raymond Augé
  */
 public class ToggleAreaTag extends IncludeTag {
+
+	@Override
+	public int doEndTag() throws JspException {
+		try {
+			if (!FileAvailabilityUtil.isAvailable(
+					servletContext, getEndPage())) {
+
+				JspWriter jspWriter = pageContext.getOut();
+
+				jspWriter.write("</div>");
+			}
+			else {
+				include(_endPage);
+			}
+
+			return EVAL_PAGE;
+		}
+		catch (Exception e) {
+			throw new JspException(e);
+		}
+		finally {
+			if (!ServerDetector.isResin()) {
+				_startPage = null;
+				_endPage = null;
+				_id = null;
+				_showMessage = null;
+				_hideMessage = null;
+				_defaultShowContent = true;
+				_stateVar = null;
+				_align = "left";
+			}
+		}
+	}
 
 	@Override
 	public int doStartTag() throws JspException {
@@ -58,45 +91,24 @@ public class ToggleAreaTag extends IncludeTag {
 		}
 	}
 
-	@Override
-	public int doEndTag() throws JspException {
-		try {
-			if (!FileAvailabilityUtil.isAvailable(
-					getServletContext(), getEndPage())) {
-
-				JspWriter jspWriter = pageContext.getOut();
-
-				jspWriter.write("</div>");
-			}
-			else {
-				include(_endPage);
-			}
-
-			return EVAL_PAGE;
-		}
-		catch (Exception e) {
-			throw new JspException(e);
-		}
-		finally {
-			if (!ServerDetector.isResin()) {
-				_startPage = null;
-				_endPage = null;
-				_id = null;
-				_showMessage = null;
-				_hideMessage = null;
-				_defaultShowContent = true;
-				_stateVar = null;
-				_align = "left";
-			}
-		}
+	public void setAlign(String align) {
+		_align = align;
 	}
 
-	public void setStartPage(String startPage) {
-		_startPage = startPage;
+	public void setDefaultShowContent(boolean defaultShowContent) {
+		_defaultShowContent = defaultShowContent;
 	}
 
 	public void setEndPage(String endPage) {
 		_endPage = endPage;
+	}
+
+	public void setHideImage(String hideImage) {
+		_hideImage = hideImage;
+	}
+
+	public void setHideMessage(String hideMessage) {
+		_hideMessage = hideMessage;
 	}
 
 	public void setId(String id) {
@@ -107,28 +119,16 @@ public class ToggleAreaTag extends IncludeTag {
 		_showImage = showImage;
 	}
 
-	public void setHideImage(String hideImage) {
-		_hideImage = hideImage;
-	}
-
 	public void setShowMessage(String showMessage) {
 		_showMessage = showMessage;
 	}
 
-	public void setHideMessage(String hideMessage) {
-		_hideMessage = hideMessage;
-	}
-
-	public void setDefaultShowContent(boolean defaultShowContent) {
-		_defaultShowContent = defaultShowContent;
+	public void setStartPage(String startPage) {
+		_startPage = startPage;
 	}
 
 	public void setStateVar(String stateVar) {
 		_stateVar = stateVar;
-	}
-
-	public void setAlign(String align) {
-		_align = align;
 	}
 
 	@Override
@@ -157,15 +157,15 @@ public class ToggleAreaTag extends IncludeTag {
 	private static final String _START_PAGE =
 		"/html/taglib/ui/toggle_area/start.jsp";
 
-	private String _startPage;
+	private String _align = "left";
+	private boolean _defaultShowContent = true;
 	private String _endPage;
+	private String _hideImage;
+	private String _hideMessage;
 	private String _id;
 	private String _showImage;
-	private String _hideImage;
 	private String _showMessage;
-	private String _hideMessage;
-	private boolean _defaultShowContent = true;
+	private String _startPage;
 	private String _stateVar;
-	private String _align = "left";
 
 }

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -42,10 +42,10 @@ public class JournalStructureFinderImpl
 	extends BasePersistenceImpl<JournalStructure>
 	implements JournalStructureFinder {
 
-	public static String COUNT_BY_C_G_S_N_D =
+	public static final String COUNT_BY_C_G_S_N_D =
 		JournalStructureFinder.class.getName() + ".countByC_G_S_N_D";
 
-	public static String FIND_BY_C_G_S_N_D =
+	public static final String FIND_BY_C_G_S_N_D =
 		JournalStructureFinder.class.getName() + ".findByC_G_S_N_D";
 
 	public int countByKeywords(long companyId, long[] groupIds, String keywords)
@@ -293,7 +293,7 @@ public class JournalStructureFinderImpl
 			qPos.add(names, 2);
 			qPos.add(descriptions, 2);
 
-			Iterator<Long> itr = q.list().iterator();
+			Iterator<Long> itr = q.iterate();
 
 			if (itr.hasNext()) {
 				Long count = itr.next();

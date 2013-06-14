@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -56,7 +56,7 @@ if (layoutRevision.getLayoutRevisionId() == layoutRevisionId) {
 			/>
 		</c:if>
 
-		<c:if test="<%= !layoutRevision.isMajor() && !layoutRevision.isHead() %>">
+		<%--<c:if test="<%= !layoutRevision.isMajor() && !layoutRevision.isHead() %>">
 			<portlet:actionURL var="saveURL">
 				<portlet:param name="struts_action" value="/staging_bar/edit_layouts" />
 				<portlet:param name="<%= Constants.CMD %>" value="update_layout_revision" />
@@ -76,9 +76,9 @@ if (layoutRevision.getLayoutRevisionId() == layoutRevisionId) {
 				message="save"
 				url="<%= taglibURL %>"
 			/>
-		</c:if>
+		</c:if>--%>
 
-		<c:if test="<%= !layoutRevision.isHead() %>">
+		<c:if test="<%= !layoutRevision.isHead() && !layoutRevision.isPending() %>">
 			<portlet:actionURL var="deleteURL">
 				<portlet:param name="struts_action" value="/staging_bar/edit_layouts" />
 				<portlet:param name="<%= Constants.CMD %>" value="delete_layout_revision" />

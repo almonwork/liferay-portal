@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,6 +14,8 @@
 
 package com.liferay.portlet.messageboards.service;
 
+import com.liferay.portal.service.ServiceWrapper;
+
 /**
  * <p>
  * This class is a wrapper for {@link MBStatsUserLocalService}.
@@ -23,7 +25,8 @@ package com.liferay.portlet.messageboards.service;
  * @see       MBStatsUserLocalService
  * @generated
  */
-public class MBStatsUserLocalServiceWrapper implements MBStatsUserLocalService {
+public class MBStatsUserLocalServiceWrapper implements MBStatsUserLocalService,
+	ServiceWrapper<MBStatsUserLocalService> {
 	public MBStatsUserLocalServiceWrapper(
 		MBStatsUserLocalService mbStatsUserLocalService) {
 		_mbStatsUserLocalService = mbStatsUserLocalService;
@@ -57,25 +60,32 @@ public class MBStatsUserLocalServiceWrapper implements MBStatsUserLocalService {
 	* Deletes the message boards stats user with the primary key from the database. Also notifies the appropriate model listeners.
 	*
 	* @param statsUserId the primary key of the message boards stats user
+	* @return the message boards stats user that was removed
 	* @throws PortalException if a message boards stats user with the primary key could not be found
 	* @throws SystemException if a system exception occurred
 	*/
-	public void deleteMBStatsUser(long statsUserId)
+	public com.liferay.portlet.messageboards.model.MBStatsUser deleteMBStatsUser(
+		long statsUserId)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException {
-		_mbStatsUserLocalService.deleteMBStatsUser(statsUserId);
+		return _mbStatsUserLocalService.deleteMBStatsUser(statsUserId);
 	}
 
 	/**
 	* Deletes the message boards stats user from the database. Also notifies the appropriate model listeners.
 	*
 	* @param mbStatsUser the message boards stats user
+	* @return the message boards stats user that was removed
 	* @throws SystemException if a system exception occurred
 	*/
-	public void deleteMBStatsUser(
+	public com.liferay.portlet.messageboards.model.MBStatsUser deleteMBStatsUser(
 		com.liferay.portlet.messageboards.model.MBStatsUser mbStatsUser)
 		throws com.liferay.portal.kernel.exception.SystemException {
-		_mbStatsUserLocalService.deleteMBStatsUser(mbStatsUser);
+		return _mbStatsUserLocalService.deleteMBStatsUser(mbStatsUser);
+	}
+
+	public com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery() {
+		return _mbStatsUserLocalService.dynamicQuery();
 	}
 
 	/**
@@ -147,6 +157,12 @@ public class MBStatsUserLocalServiceWrapper implements MBStatsUserLocalService {
 		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery)
 		throws com.liferay.portal.kernel.exception.SystemException {
 		return _mbStatsUserLocalService.dynamicQueryCount(dynamicQuery);
+	}
+
+	public com.liferay.portlet.messageboards.model.MBStatsUser fetchMBStatsUser(
+		long statsUserId)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return _mbStatsUserLocalService.fetchMBStatsUser(statsUserId);
 	}
 
 	/**
@@ -287,13 +303,15 @@ public class MBStatsUserLocalServiceWrapper implements MBStatsUserLocalService {
 
 	public java.util.List<com.liferay.portlet.messageboards.model.MBStatsUser> getStatsUsersByGroupId(
 		long groupId, int start, int end)
-		throws com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException {
 		return _mbStatsUserLocalService.getStatsUsersByGroupId(groupId, start,
 			end);
 	}
 
 	public int getStatsUsersByGroupIdCount(long groupId)
-		throws com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException {
 		return _mbStatsUserLocalService.getStatsUsersByGroupIdCount(groupId);
 	}
 
@@ -315,11 +333,26 @@ public class MBStatsUserLocalServiceWrapper implements MBStatsUserLocalService {
 			lastPostDate);
 	}
 
+	/**
+	 * @deprecated Renamed to {@link #getWrappedService}
+	 */
 	public MBStatsUserLocalService getWrappedMBStatsUserLocalService() {
 		return _mbStatsUserLocalService;
 	}
 
+	/**
+	 * @deprecated Renamed to {@link #setWrappedService}
+	 */
 	public void setWrappedMBStatsUserLocalService(
+		MBStatsUserLocalService mbStatsUserLocalService) {
+		_mbStatsUserLocalService = mbStatsUserLocalService;
+	}
+
+	public MBStatsUserLocalService getWrappedService() {
+		return _mbStatsUserLocalService;
+	}
+
+	public void setWrappedService(
 		MBStatsUserLocalService mbStatsUserLocalService) {
 		_mbStatsUserLocalService = mbStatsUserLocalService;
 	}

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -18,6 +18,7 @@ import com.liferay.portal.kernel.bean.AutoEscapeBeanHandler;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.json.JSON;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.ProxyUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.model.CacheModel;
@@ -32,12 +33,12 @@ import com.liferay.portlet.expando.util.ExpandoBridgeFactoryUtil;
 
 import java.io.Serializable;
 
-import java.lang.reflect.Proxy;
-
 import java.sql.Types;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * The base model implementation for the LayoutBranch service. Represents a row in the &quot;LayoutBranch&quot; database table, with each column mapped to a property of this class.
@@ -84,6 +85,13 @@ public class LayoutBranchModelImpl extends BaseModelImpl<LayoutBranch>
 	public static final boolean FINDER_CACHE_ENABLED = GetterUtil.getBoolean(com.liferay.portal.util.PropsUtil.get(
 				"value.object.finder.cache.enabled.com.liferay.portal.model.LayoutBranch"),
 			true);
+	public static final boolean COLUMN_BITMASK_ENABLED = GetterUtil.getBoolean(com.liferay.portal.util.PropsUtil.get(
+				"value.object.column.bitmask.enabled.com.liferay.portal.model.LayoutBranch"),
+			true);
+	public static long LAYOUTSETBRANCHID_COLUMN_BITMASK = 1L;
+	public static long MASTER_COLUMN_BITMASK = 2L;
+	public static long NAME_COLUMN_BITMASK = 4L;
+	public static long PLID_COLUMN_BITMASK = 8L;
 
 	/**
 	 * Converts the soap model instance into a normal model instance.
@@ -124,14 +132,6 @@ public class LayoutBranchModelImpl extends BaseModelImpl<LayoutBranch>
 		return models;
 	}
 
-	public Class<?> getModelClass() {
-		return LayoutBranch.class;
-	}
-
-	public String getModelClassName() {
-		return LayoutBranch.class.getName();
-	}
-
 	public static final long LOCK_EXPIRATION_TIME = GetterUtil.getLong(com.liferay.portal.util.PropsUtil.get(
 				"lock.expiration.time.com.liferay.portal.model.LayoutBranch"));
 
@@ -152,6 +152,95 @@ public class LayoutBranchModelImpl extends BaseModelImpl<LayoutBranch>
 
 	public void setPrimaryKeyObj(Serializable primaryKeyObj) {
 		setPrimaryKey(((Long)primaryKeyObj).longValue());
+	}
+
+	public Class<?> getModelClass() {
+		return LayoutBranch.class;
+	}
+
+	public String getModelClassName() {
+		return LayoutBranch.class.getName();
+	}
+
+	@Override
+	public Map<String, Object> getModelAttributes() {
+		Map<String, Object> attributes = new HashMap<String, Object>();
+
+		attributes.put("LayoutBranchId", getLayoutBranchId());
+		attributes.put("groupId", getGroupId());
+		attributes.put("companyId", getCompanyId());
+		attributes.put("userId", getUserId());
+		attributes.put("userName", getUserName());
+		attributes.put("layoutSetBranchId", getLayoutSetBranchId());
+		attributes.put("plid", getPlid());
+		attributes.put("name", getName());
+		attributes.put("description", getDescription());
+		attributes.put("master", getMaster());
+
+		return attributes;
+	}
+
+	@Override
+	public void setModelAttributes(Map<String, Object> attributes) {
+		Long LayoutBranchId = (Long)attributes.get("LayoutBranchId");
+
+		if (LayoutBranchId != null) {
+			setLayoutBranchId(LayoutBranchId);
+		}
+
+		Long groupId = (Long)attributes.get("groupId");
+
+		if (groupId != null) {
+			setGroupId(groupId);
+		}
+
+		Long companyId = (Long)attributes.get("companyId");
+
+		if (companyId != null) {
+			setCompanyId(companyId);
+		}
+
+		Long userId = (Long)attributes.get("userId");
+
+		if (userId != null) {
+			setUserId(userId);
+		}
+
+		String userName = (String)attributes.get("userName");
+
+		if (userName != null) {
+			setUserName(userName);
+		}
+
+		Long layoutSetBranchId = (Long)attributes.get("layoutSetBranchId");
+
+		if (layoutSetBranchId != null) {
+			setLayoutSetBranchId(layoutSetBranchId);
+		}
+
+		Long plid = (Long)attributes.get("plid");
+
+		if (plid != null) {
+			setPlid(plid);
+		}
+
+		String name = (String)attributes.get("name");
+
+		if (name != null) {
+			setName(name);
+		}
+
+		String description = (String)attributes.get("description");
+
+		if (description != null) {
+			setDescription(description);
+		}
+
+		Boolean master = (Boolean)attributes.get("master");
+
+		if (master != null) {
+			setMaster(master);
+		}
 	}
 
 	@JSON
@@ -218,6 +307,8 @@ public class LayoutBranchModelImpl extends BaseModelImpl<LayoutBranch>
 	}
 
 	public void setLayoutSetBranchId(long layoutSetBranchId) {
+		_columnBitmask |= LAYOUTSETBRANCHID_COLUMN_BITMASK;
+
 		if (!_setOriginalLayoutSetBranchId) {
 			_setOriginalLayoutSetBranchId = true;
 
@@ -237,6 +328,8 @@ public class LayoutBranchModelImpl extends BaseModelImpl<LayoutBranch>
 	}
 
 	public void setPlid(long plid) {
+		_columnBitmask |= PLID_COLUMN_BITMASK;
+
 		if (!_setOriginalPlid) {
 			_setOriginalPlid = true;
 
@@ -261,7 +354,17 @@ public class LayoutBranchModelImpl extends BaseModelImpl<LayoutBranch>
 	}
 
 	public void setName(String name) {
+		_columnBitmask |= NAME_COLUMN_BITMASK;
+
+		if (_originalName == null) {
+			_originalName = _name;
+		}
+
 		_name = name;
+	}
+
+	public String getOriginalName() {
+		return GetterUtil.getString(_originalName);
 	}
 
 	@JSON
@@ -288,6 +391,8 @@ public class LayoutBranchModelImpl extends BaseModelImpl<LayoutBranch>
 	}
 
 	public void setMaster(boolean master) {
+		_columnBitmask |= MASTER_COLUMN_BITMASK;
+
 		if (!_setOriginalMaster) {
 			_setOriginalMaster = true;
 
@@ -301,35 +406,32 @@ public class LayoutBranchModelImpl extends BaseModelImpl<LayoutBranch>
 		return _originalMaster;
 	}
 
+	public long getColumnBitmask() {
+		return _columnBitmask;
+	}
+
 	@Override
 	public LayoutBranch toEscapedModel() {
-		if (isEscapedModel()) {
-			return (LayoutBranch)this;
+		if (_escapedModelProxy == null) {
+			_escapedModelProxy = (LayoutBranch)ProxyUtil.newProxyInstance(_classLoader,
+					_escapedModelProxyInterfaces,
+					new AutoEscapeBeanHandler(this));
 		}
-		else {
-			if (_escapedModelProxy == null) {
-				_escapedModelProxy = (LayoutBranch)Proxy.newProxyInstance(_classLoader,
-						_escapedModelProxyInterfaces,
-						new AutoEscapeBeanHandler(this));
-			}
 
-			return _escapedModelProxy;
-		}
+		return _escapedModelProxy;
 	}
 
 	@Override
 	public ExpandoBridge getExpandoBridge() {
-		if (_expandoBridge == null) {
-			_expandoBridge = ExpandoBridgeFactoryUtil.getExpandoBridge(getCompanyId(),
-					LayoutBranch.class.getName(), getPrimaryKey());
-		}
-
-		return _expandoBridge;
+		return ExpandoBridgeFactoryUtil.getExpandoBridge(getCompanyId(),
+			LayoutBranch.class.getName(), getPrimaryKey());
 	}
 
 	@Override
 	public void setExpandoBridgeAttributes(ServiceContext serviceContext) {
-		getExpandoBridge().setAttributes(serviceContext);
+		ExpandoBridge expandoBridge = getExpandoBridge();
+
+		expandoBridge.setAttributes(serviceContext);
 	}
 
 	@Override
@@ -408,9 +510,13 @@ public class LayoutBranchModelImpl extends BaseModelImpl<LayoutBranch>
 
 		layoutBranchModelImpl._setOriginalPlid = false;
 
+		layoutBranchModelImpl._originalName = layoutBranchModelImpl._name;
+
 		layoutBranchModelImpl._originalMaster = layoutBranchModelImpl._master;
 
 		layoutBranchModelImpl._setOriginalMaster = false;
+
+		layoutBranchModelImpl._columnBitmask = 0;
 	}
 
 	@Override
@@ -557,10 +663,11 @@ public class LayoutBranchModelImpl extends BaseModelImpl<LayoutBranch>
 	private long _originalPlid;
 	private boolean _setOriginalPlid;
 	private String _name;
+	private String _originalName;
 	private String _description;
 	private boolean _master;
 	private boolean _originalMaster;
 	private boolean _setOriginalMaster;
-	private transient ExpandoBridge _expandoBridge;
+	private long _columnBitmask;
 	private LayoutBranch _escapedModelProxy;
 }

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,12 +14,15 @@
 
 package com.liferay.portal.service;
 
+import com.liferay.portal.NoSuchUserException;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
+import com.liferay.portal.kernel.upload.UploadPortletRequest;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.Constants;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.StringUtil;
+import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.portal.model.PortletPreferencesIds;
@@ -32,6 +35,7 @@ import com.liferay.portlet.expando.util.ExpandoBridgeFactoryUtil;
 import java.io.Serializable;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
@@ -61,8 +65,13 @@ public class ServiceContextFactory {
 			serviceContext.setCompanyId(themeDisplay.getCompanyId());
 			serviceContext.setLanguageId(themeDisplay.getLanguageId());
 			serviceContext.setLayoutFullURL(
-				PortalUtil.getLayoutFullURL(themeDisplay));
-			serviceContext.setLayoutURL(PortalUtil.getLayoutURL(themeDisplay));
+				PortalUtil.getCanonicalURL(
+					PortalUtil.getLayoutFullURL(themeDisplay), themeDisplay,
+					themeDisplay.getLayout()));
+			serviceContext.setLayoutURL(
+				PortalUtil.getCanonicalURL(
+					PortalUtil.getLayoutURL(themeDisplay), themeDisplay,
+					themeDisplay.getLayout()));
 			serviceContext.setPathMain(PortalUtil.getPathMain());
 			serviceContext.setPlid(themeDisplay.getPlid());
 			serviceContext.setPortalURL(PortalUtil.getPortalURL(request));
@@ -81,7 +90,16 @@ public class ServiceContextFactory {
 
 			serviceContext.setPathMain(PortalUtil.getPathMain());
 
-			User user = PortalUtil.getUser(request);
+			User user = null;
+
+			try {
+				user = PortalUtil.getUser(request);
+			}
+			catch (NoSuchUserException nsue) {
+
+				// LPS-24160
+
+			}
 
 			if (user != null) {
 				serviceContext.setSignedIn(!user.isDefaultUser());
@@ -115,6 +133,54 @@ public class ServiceContextFactory {
 
 		serviceContext.setAttributes(attributes);
 
+		// Command
+
+		String cmd = ParamUtil.getString(request, Constants.CMD);
+
+		serviceContext.setCommand(cmd);
+
+		// Current URL
+
+		String currentURL = PortalUtil.getCurrentURL(request);
+
+		serviceContext.setCurrentURL(currentURL);
+
+		// Form date
+
+		long formDateLong = ParamUtil.getLong(request, "formDate");
+
+		if (formDateLong > 0) {
+			Date formDate = new Date(formDateLong);
+
+			serviceContext.setFormDate(formDate);
+		}
+
+		// Permissions
+
+		boolean addGroupPermissions = ParamUtil.getBoolean(
+			request, "addGroupPermissions");
+		boolean addGuestPermissions = ParamUtil.getBoolean(
+			request, "addGuestPermissions");
+		String[] groupPermissions = PortalUtil.getGroupPermissions(request);
+		String[] guestPermissions = PortalUtil.getGuestPermissions(request);
+
+		serviceContext.setAddGroupPermissions(addGroupPermissions);
+		serviceContext.setAddGuestPermissions(addGuestPermissions);
+		serviceContext.setGroupPermissions(groupPermissions);
+		serviceContext.setGuestPermissions(guestPermissions);
+
+		// Portlet preferences ids
+
+		String portletId = PortalUtil.getPortletId(request);
+
+		if (Validator.isNotNull(portletId)) {
+			PortletPreferencesIds portletPreferencesIds =
+				PortletPreferencesFactoryUtil.getPortletPreferencesIds(
+					request, portletId);
+
+			serviceContext.setPortletPreferencesIds(portletPreferencesIds);
+		}
+
 		// Request
 
 		Map<String, String> headerMap = new HashMap<String, String>();
@@ -133,6 +199,64 @@ public class ServiceContextFactory {
 
 		serviceContext.setRemoteAddr(request.getRemoteAddr());
 		serviceContext.setRemoteHost(request.getRemoteHost());
+		serviceContext.setRequest(request);
+
+		// Asset
+
+		Map<String, String[]> parameterMap = request.getParameterMap();
+
+		List<Long> assetCategoryIdsList = new ArrayList<Long>();
+
+		boolean updateAssetCategoryIds = false;
+
+		for (Map.Entry<String, String[]> entry : parameterMap.entrySet()) {
+			String name = entry.getKey();
+
+			if (name.startsWith("assetCategoryIds")) {
+				updateAssetCategoryIds = true;
+
+				long[] assetVocabularyAssetCategoryIds = StringUtil.split(
+					ParamUtil.getString(request, name), 0L);
+
+				for (long assetCategoryId : assetVocabularyAssetCategoryIds) {
+					assetCategoryIdsList.add(assetCategoryId);
+				}
+			}
+		}
+
+		if (updateAssetCategoryIds) {
+			long[] assetCategoryIds = ArrayUtil.toArray(
+				assetCategoryIdsList.toArray(
+					new Long[assetCategoryIdsList.size()]));
+
+			serviceContext.setAssetCategoryIds(assetCategoryIds);
+		}
+
+		boolean assetEntryVisible = ParamUtil.getBoolean(
+			request, "assetEntryVisible", true);
+
+		serviceContext.setAssetEntryVisible(assetEntryVisible);
+
+		long[] assetLinkEntryIds = StringUtil.split(
+			ParamUtil.getString(
+				request, "assetLinksSearchContainerPrimaryKeys"), 0L);
+
+		serviceContext.setAssetLinkEntryIds(assetLinkEntryIds);
+
+		String assetTagNamesString = request.getParameter("assetTagNames");
+
+		if (assetTagNamesString != null) {
+			String[] assetTagNames = StringUtil.split(assetTagNamesString);
+
+			serviceContext.setAssetTagNames(assetTagNames);
+		}
+
+		// Workflow
+
+		int workflowAction = ParamUtil.getInteger(
+			request, "workflowAction", WorkflowConstants.ACTION_PUBLISH);
+
+		serviceContext.setWorkflowAction(workflowAction);
 
 		return serviceContext;
 	}
@@ -146,8 +270,7 @@ public class ServiceContextFactory {
 			ServiceContextThreadLocal.getServiceContext();
 
 		ThemeDisplay themeDisplay =
-			(ThemeDisplay)portletRequest.getAttribute(
-				WebKeys.THEME_DISPLAY);
+			(ThemeDisplay)portletRequest.getAttribute(WebKeys.THEME_DISPLAY);
 
 		if (serviceContext != null) {
 			serviceContext = (ServiceContext)serviceContext.clone();
@@ -210,6 +333,16 @@ public class ServiceContextFactory {
 
 		serviceContext.setCurrentURL(currentURL);
 
+		// Form date
+
+		long formDateLong = ParamUtil.getLong(portletRequest, "formDate");
+
+		if (formDateLong > 0) {
+			Date formDate = new Date(formDateLong);
+
+			serviceContext.setFormDate(formDate);
+		}
+
 		// Permissions
 
 		boolean addGroupPermissions = ParamUtil.getBoolean(
@@ -257,6 +390,7 @@ public class ServiceContextFactory {
 
 		serviceContext.setRemoteAddr(request.getRemoteAddr());
 		serviceContext.setRemoteHost(request.getRemoteHost());
+		serviceContext.setRequest(request);
 
 		// Asset
 
@@ -264,10 +398,14 @@ public class ServiceContextFactory {
 
 		List<Long> assetCategoryIdsList = new ArrayList<Long>();
 
+		boolean updateAssetCategoryIds = false;
+
 		for (Map.Entry<String, String[]> entry : parameterMap.entrySet()) {
 			String name = entry.getKey();
 
 			if (name.startsWith("assetCategoryIds")) {
+				updateAssetCategoryIds = true;
+
 				long[] assetVocabularyAssetCategoryIds = StringUtil.split(
 					ParamUtil.getString(portletRequest, name), 0L);
 
@@ -277,18 +415,32 @@ public class ServiceContextFactory {
 			}
 		}
 
-		long[] assetCategoryIds = ArrayUtil.toArray(
-			assetCategoryIdsList.toArray(
-				new Long[assetCategoryIdsList.size()]));
+		if (updateAssetCategoryIds) {
+			long[] assetCategoryIds = ArrayUtil.toArray(
+				assetCategoryIdsList.toArray(
+					new Long[assetCategoryIdsList.size()]));
+
+			serviceContext.setAssetCategoryIds(assetCategoryIds);
+		}
+
+		boolean assetEntryVisible = ParamUtil.getBoolean(
+			portletRequest, "assetEntryVisible", true);
+
+		serviceContext.setAssetEntryVisible(assetEntryVisible);
+
 		long[] assetLinkEntryIds = StringUtil.split(
 			ParamUtil.getString(
-				portletRequest, "assetLinkSearchContainerPrimaryKeys"), 0L);
-		String[] assetTagNames = StringUtil.split(
-			ParamUtil.getString(portletRequest, "assetTagNames"));
+				portletRequest, "assetLinksSearchContainerPrimaryKeys"), 0L);
 
-		serviceContext.setAssetCategoryIds(assetCategoryIds);
 		serviceContext.setAssetLinkEntryIds(assetLinkEntryIds);
-		serviceContext.setAssetTagNames(assetTagNames);
+
+		String assetTagNamesString = request.getParameter("assetTagNames");
+
+		if (assetTagNamesString != null) {
+			String[] assetTagNames = StringUtil.split(assetTagNamesString);
+
+			serviceContext.setAssetTagNames(assetTagNames);
+		}
 
 		// Workflow
 
@@ -313,6 +465,25 @@ public class ServiceContextFactory {
 				ExpandoBridgeFactoryUtil.getExpandoBridge(
 					serviceContext.getCompanyId(), className),
 				portletRequest);
+
+		serviceContext.setExpandoBridgeAttributes(expandoBridgeAttributes);
+
+		return serviceContext;
+	}
+
+	public static ServiceContext getInstance(
+			String className, UploadPortletRequest uploadPortletRequest)
+		throws PortalException, SystemException {
+
+		ServiceContext serviceContext = getInstance(uploadPortletRequest);
+
+		// Expando
+
+		Map<String, Serializable> expandoBridgeAttributes =
+			PortalUtil.getExpandoBridgeAttributes(
+				ExpandoBridgeFactoryUtil.getExpandoBridge(
+					serviceContext.getCompanyId(), className),
+				uploadPortletRequest);
 
 		serviceContext.setExpandoBridgeAttributes(expandoBridgeAttributes);
 

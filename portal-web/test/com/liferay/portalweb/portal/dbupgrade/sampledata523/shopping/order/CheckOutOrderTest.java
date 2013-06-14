@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -28,9 +28,10 @@ public class CheckOutOrderTest extends BaseTestCase {
 			switch (label) {
 			case 1:
 				selenium.open("/user/joebloggs/home/");
+				loadRequiredJavaScriptModules();
 
 				for (int second = 0;; second++) {
-					if (second >= 60) {
+					if (second >= 90) {
 						fail("timeout");
 					}
 
@@ -45,49 +46,42 @@ public class CheckOutOrderTest extends BaseTestCase {
 					Thread.sleep(1000);
 				}
 
-				selenium.saveScreenShotAndSource();
 				selenium.clickAt("link=Communities I Own",
 					RuntimeVariables.replace(""));
 				selenium.waitForPageToLoad("30000");
-				selenium.saveScreenShotAndSource();
+				loadRequiredJavaScriptModules();
 				selenium.type("_29_name",
 					RuntimeVariables.replace("Shopping Order Community"));
-				selenium.saveScreenShotAndSource();
 				selenium.clickAt("//input[@value='Search']",
 					RuntimeVariables.replace(""));
 				selenium.waitForPageToLoad("30000");
-				selenium.saveScreenShotAndSource();
+				loadRequiredJavaScriptModules();
 				selenium.clickAt("//td[2]/a", RuntimeVariables.replace("Open"));
 				selenium.waitForPageToLoad("30000");
-				selenium.saveScreenShotAndSource();
+				loadRequiredJavaScriptModules();
 				selenium.clickAt("link=Shopping Order Page",
 					RuntimeVariables.replace(""));
 				selenium.waitForPageToLoad("30000");
-				selenium.saveScreenShotAndSource();
+				loadRequiredJavaScriptModules();
 				selenium.clickAt("link=Cart", RuntimeVariables.replace(""));
 				selenium.waitForPageToLoad("30000");
-				selenium.saveScreenShotAndSource();
+				loadRequiredJavaScriptModules();
 				selenium.clickAt("//input[@value='Checkout']",
 					RuntimeVariables.replace(""));
 				selenium.waitForPageToLoad("30000");
-				selenium.saveScreenShotAndSource();
+				loadRequiredJavaScriptModules();
 				selenium.type("_34_billingStreet",
 					RuntimeVariables.replace("1234 Sesame Street"));
-				selenium.saveScreenShotAndSource();
 				selenium.type("_34_billingCity",
 					RuntimeVariables.replace("Gotham City"));
-				selenium.saveScreenShotAndSource();
 				selenium.select("_34_billingStateSel",
 					RuntimeVariables.replace("label=California"));
 				selenium.type("_34_billingZip",
 					RuntimeVariables.replace("90028"));
-				selenium.saveScreenShotAndSource();
 				selenium.type("_34_billingCountry",
 					RuntimeVariables.replace("USA"));
-				selenium.saveScreenShotAndSource();
 				selenium.type("_34_billingPhone",
 					RuntimeVariables.replace("626-589-1453"));
-				selenium.saveScreenShotAndSource();
 
 				boolean sameAsBillingChecked = selenium.isChecked(
 						"_34_shipToBillingCheckbox");
@@ -103,32 +97,30 @@ public class CheckOutOrderTest extends BaseTestCase {
 
 			case 2:
 				assertTrue(selenium.isChecked("_34_shipToBillingCheckbox"));
-				selenium.saveScreenShotAndSource();
 				selenium.select("_34_ccType",
 					RuntimeVariables.replace("label=Visa"));
 				selenium.type("_34_ccNumber",
 					RuntimeVariables.replace("4111111111111111"));
-				selenium.saveScreenShotAndSource();
 				selenium.select("_34_ccExpYear",
-					RuntimeVariables.replace("label=2011"));
+					RuntimeVariables.replace("label=2017"));
 				selenium.type("_34_comments",
 					RuntimeVariables.replace("Please take care of my order."));
-				selenium.saveScreenShotAndSource();
 				selenium.clickAt("//input[@value='Continue']",
 					RuntimeVariables.replace(""));
 				selenium.waitForPageToLoad("30000");
-				selenium.saveScreenShotAndSource();
+				loadRequiredJavaScriptModules();
 				assertTrue(selenium.isTextPresent("1234 Sesame Street"));
 				selenium.clickAt("//input[@value='Finished']",
 					RuntimeVariables.replace(""));
 				selenium.waitForPageToLoad("30000");
-				selenium.saveScreenShotAndSource();
+				loadRequiredJavaScriptModules();
 				assertTrue(selenium.isTextPresent(
 						"Thank you for your purchase."));
 				selenium.open("/user/joebloggs/home/");
+				loadRequiredJavaScriptModules();
 
 				for (int second = 0;; second++) {
-					if (second >= 60) {
+					if (second >= 90) {
 						fail("timeout");
 					}
 
@@ -143,31 +135,29 @@ public class CheckOutOrderTest extends BaseTestCase {
 					Thread.sleep(1000);
 				}
 
-				selenium.saveScreenShotAndSource();
 				selenium.clickAt("link=Communities I Own",
 					RuntimeVariables.replace(""));
 				selenium.waitForPageToLoad("30000");
-				selenium.saveScreenShotAndSource();
+				loadRequiredJavaScriptModules();
 				selenium.type("_29_name",
 					RuntimeVariables.replace("Shopping Order Community"));
-				selenium.saveScreenShotAndSource();
 				selenium.clickAt("//input[@value='Search']",
 					RuntimeVariables.replace(""));
 				selenium.waitForPageToLoad("30000");
-				selenium.saveScreenShotAndSource();
+				loadRequiredJavaScriptModules();
 				selenium.clickAt("//td[2]/a", RuntimeVariables.replace("Open"));
 				selenium.waitForPageToLoad("30000");
-				selenium.saveScreenShotAndSource();
+				loadRequiredJavaScriptModules();
 				selenium.clickAt("link=Shopping Order Page",
 					RuntimeVariables.replace(""));
 				selenium.waitForPageToLoad("30000");
-				selenium.saveScreenShotAndSource();
+				loadRequiredJavaScriptModules();
 				selenium.clickAt("link=Orders", RuntimeVariables.replace(""));
 				selenium.waitForPageToLoad("30000");
-				selenium.saveScreenShotAndSource();
+				loadRequiredJavaScriptModules();
 				selenium.clickAt("link=Checkout", RuntimeVariables.replace(""));
 				selenium.waitForPageToLoad("30000");
-				selenium.saveScreenShotAndSource();
+				loadRequiredJavaScriptModules();
 				assertTrue(selenium.isTextPresent(
 						"Please take care of my order."));
 

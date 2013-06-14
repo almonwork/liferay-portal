@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,11 +14,13 @@
 
 package com.liferay.portal.service.impl;
 
+import com.liferay.portal.RequiredLayoutPrototypeException;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.model.Group;
+import com.liferay.portal.model.GroupConstants;
 import com.liferay.portal.model.LayoutConstants;
 import com.liferay.portal.model.LayoutPrototype;
 import com.liferay.portal.model.ResourceConstants;
@@ -33,6 +35,7 @@ import java.util.Map;
 /**
  * @author Brian Wing Shun Chan
  * @author Jorge Ferrer
+ * @author Vilmos Papp
  */
 public class LayoutPrototypeLocalServiceImpl
 	extends LayoutPrototypeLocalServiceBaseImpl {
@@ -70,7 +73,8 @@ public class LayoutPrototypeLocalServiceImpl
 			"/template-" + layoutPrototype.getLayoutPrototypeId();
 
 		Group group = groupLocalService.addGroup(
-			userId, LayoutPrototype.class.getName(),
+			userId, GroupConstants.DEFAULT_PARENT_GROUP_ID,
+			LayoutPrototype.class.getName(),
 			layoutPrototype.getLayoutPrototypeId(),
 			layoutPrototype.getName(LocaleUtil.getDefault()), null, 0,
 			friendlyURL, false, true, null);
@@ -80,18 +84,24 @@ public class LayoutPrototypeLocalServiceImpl
 		layoutLocalService.addLayout(
 			userId, group.getGroupId(), true,
 			LayoutConstants.DEFAULT_PARENT_LAYOUT_ID,
-			String.valueOf(layoutPrototype.getLayoutPrototypeId()), null, null,
-			LayoutConstants.TYPE_PORTLET, false, "/layout", false,
-			serviceContext);
+			layoutPrototype.getName(LocaleUtil.getDefault()), null, null,
+			LayoutConstants.TYPE_PORTLET, false, "/layout", serviceContext);
 
 		return layoutPrototype;
 	}
 
 	@Override
-	public void deleteLayoutPrototype(LayoutPrototype layoutPrototype)
+	public LayoutPrototype deleteLayoutPrototype(
+			LayoutPrototype layoutPrototype)
 		throws PortalException, SystemException {
 
 		// Group
+
+		if (layoutPersistence.countByLayoutPrototypeUuid(
+				layoutPrototype.getUuid()) > 0) {
+
+			throw new RequiredLayoutPrototypeException();
+		}
 
 		Group group = layoutPrototype.getGroup();
 
@@ -111,22 +121,35 @@ public class LayoutPrototypeLocalServiceImpl
 		// Permission cache
 
 		PermissionCacheUtil.clearCache();
+
+		return layoutPrototype;
 	}
 
 	@Override
-	public void deleteLayoutPrototype(long layoutPrototypeId)
+	public LayoutPrototype deleteLayoutPrototype(long layoutPrototypeId)
 		throws PortalException, SystemException {
 
 		LayoutPrototype layoutPrototype =
 			layoutPrototypePersistence.findByPrimaryKey(layoutPrototypeId);
 
-		deleteLayoutPrototype(layoutPrototype);
+		return deleteLayoutPrototype(layoutPrototype);
 	}
 
+	/**
+	 * @deprecated {@link #getLayoutPrototypeByUuidAndCompanyId(String, long)}
+	 */
 	public LayoutPrototype getLayoutPrototypeByUuid(String uuid)
 		throws PortalException, SystemException {
 
 		return layoutPrototypePersistence.findByUuid_First(uuid, null);
+	}
+
+	public LayoutPrototype getLayoutPrototypeByUuidAndCompanyId(
+			String uuid, long companyId)
+		throws PortalException, SystemException {
+
+		return layoutPrototypePersistence.findByUuid_C_First(
+			uuid, companyId, null);
 	}
 
 	public List<LayoutPrototype> search(

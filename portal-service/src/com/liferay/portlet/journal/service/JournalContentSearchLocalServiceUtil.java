@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -15,7 +15,6 @@
 package com.liferay.portlet.journal.service;
 
 import com.liferay.portal.kernel.bean.PortalBeanLocatorUtil;
-import com.liferay.portal.kernel.util.MethodCache;
 import com.liferay.portal.kernel.util.ReferenceRegistry;
 
 /**
@@ -66,25 +65,32 @@ public class JournalContentSearchLocalServiceUtil {
 	* Deletes the journal content search with the primary key from the database. Also notifies the appropriate model listeners.
 	*
 	* @param contentSearchId the primary key of the journal content search
+	* @return the journal content search that was removed
 	* @throws PortalException if a journal content search with the primary key could not be found
 	* @throws SystemException if a system exception occurred
 	*/
-	public static void deleteJournalContentSearch(long contentSearchId)
+	public static com.liferay.portlet.journal.model.JournalContentSearch deleteJournalContentSearch(
+		long contentSearchId)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException {
-		getService().deleteJournalContentSearch(contentSearchId);
+		return getService().deleteJournalContentSearch(contentSearchId);
 	}
 
 	/**
 	* Deletes the journal content search from the database. Also notifies the appropriate model listeners.
 	*
 	* @param journalContentSearch the journal content search
+	* @return the journal content search that was removed
 	* @throws SystemException if a system exception occurred
 	*/
-	public static void deleteJournalContentSearch(
+	public static com.liferay.portlet.journal.model.JournalContentSearch deleteJournalContentSearch(
 		com.liferay.portlet.journal.model.JournalContentSearch journalContentSearch)
 		throws com.liferay.portal.kernel.exception.SystemException {
-		getService().deleteJournalContentSearch(journalContentSearch);
+		return getService().deleteJournalContentSearch(journalContentSearch);
+	}
+
+	public static com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery() {
+		return getService().dynamicQuery();
 	}
 
 	/**
@@ -156,6 +162,12 @@ public class JournalContentSearchLocalServiceUtil {
 		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery)
 		throws com.liferay.portal.kernel.exception.SystemException {
 		return getService().dynamicQueryCount(dynamicQuery);
+	}
+
+	public static com.liferay.portlet.journal.model.JournalContentSearch fetchJournalContentSearch(
+		long contentSearchId)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getService().fetchJournalContentSearch(contentSearchId);
 	}
 
 	/**
@@ -325,6 +337,12 @@ public class JournalContentSearchLocalServiceUtil {
 		return getService().getLayoutIdsCount(articleId);
 	}
 
+	public static java.util.List<com.liferay.portlet.journal.model.JournalContentSearch> getPortletContentSearches(
+		java.lang.String portletId)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getService().getPortletContentSearches(portletId);
+	}
+
 	public static com.liferay.portlet.journal.model.JournalContentSearch updateContentSearch(
 		long groupId, boolean privateLayout, long layoutId,
 		java.lang.String portletId, java.lang.String articleId)
@@ -361,20 +379,15 @@ public class JournalContentSearchLocalServiceUtil {
 
 			ReferenceRegistry.registerReference(JournalContentSearchLocalServiceUtil.class,
 				"_service");
-			MethodCache.remove(JournalContentSearchLocalService.class);
 		}
 
 		return _service;
 	}
 
+	/**
+	 * @deprecated
+	 */
 	public void setService(JournalContentSearchLocalService service) {
-		MethodCache.remove(JournalContentSearchLocalService.class);
-
-		_service = service;
-
-		ReferenceRegistry.registerReference(JournalContentSearchLocalServiceUtil.class,
-			"_service");
-		MethodCache.remove(JournalContentSearchLocalService.class);
 	}
 
 	private static JournalContentSearchLocalService _service;

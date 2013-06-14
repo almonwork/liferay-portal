@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -120,6 +120,9 @@ public interface Layout extends LayoutModel, PersistedModel {
 
 	public java.lang.String getTypeSettingsProperty(java.lang.String key);
 
+	public java.lang.String getTypeSettingsProperty(java.lang.String key,
+		java.lang.String defaultValue);
+
 	public com.liferay.portal.model.ColorScheme getWapColorScheme()
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException;
@@ -154,6 +157,8 @@ public interface Layout extends LayoutModel, PersistedModel {
 
 	public boolean isInheritWapLookAndFeel();
 
+	public boolean isLayoutPrototypeLinkActive();
+
 	public boolean isPublicLayout();
 
 	public boolean isRootLayout();
@@ -174,6 +179,12 @@ public interface Layout extends LayoutModel, PersistedModel {
 	public boolean isTypePortlet();
 
 	public boolean isTypeURL();
+
+	public void setGroupId(long groupId);
+
+	public void setLayoutSet(com.liferay.portal.model.LayoutSet layoutSet);
+
+	public void setPrivateLayout(boolean privateLayout);
 
 	public void setTypeSettings(java.lang.String typeSettings);
 

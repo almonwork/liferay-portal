@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,7 +14,6 @@
 
 package com.liferay.portlet.shopping.service.persistence;
 
-import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.service.persistence.BasePersistence;
 
 import com.liferay.portlet.shopping.model.ShoppingCoupon;
@@ -302,9 +301,11 @@ public interface ShoppingCouponPersistence extends BasePersistence<ShoppingCoupo
 	* Removes the shopping coupon where code = &#63; from the database.
 	*
 	* @param code the code
+	* @return the shopping coupon that was removed
 	* @throws SystemException if a system exception occurred
 	*/
-	public void removeByCode(java.lang.String code)
+	public com.liferay.portlet.shopping.model.ShoppingCoupon removeByCode(
+		java.lang.String code)
 		throws com.liferay.portal.kernel.exception.SystemException,
 			com.liferay.portlet.shopping.NoSuchCouponException;
 
@@ -344,7 +345,4 @@ public interface ShoppingCouponPersistence extends BasePersistence<ShoppingCoupo
 	*/
 	public int countAll()
 		throws com.liferay.portal.kernel.exception.SystemException;
-
-	public ShoppingCoupon remove(ShoppingCoupon shoppingCoupon)
-		throws SystemException;
 }

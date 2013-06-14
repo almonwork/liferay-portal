@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -24,7 +24,8 @@ package com.liferay.portal.service;
  * @generated
  */
 public class BrowserTrackerLocalServiceWrapper
-	implements BrowserTrackerLocalService {
+	implements BrowserTrackerLocalService,
+		ServiceWrapper<BrowserTrackerLocalService> {
 	public BrowserTrackerLocalServiceWrapper(
 		BrowserTrackerLocalService browserTrackerLocalService) {
 		_browserTrackerLocalService = browserTrackerLocalService;
@@ -58,25 +59,32 @@ public class BrowserTrackerLocalServiceWrapper
 	* Deletes the browser tracker with the primary key from the database. Also notifies the appropriate model listeners.
 	*
 	* @param browserTrackerId the primary key of the browser tracker
+	* @return the browser tracker that was removed
 	* @throws PortalException if a browser tracker with the primary key could not be found
 	* @throws SystemException if a system exception occurred
 	*/
-	public void deleteBrowserTracker(long browserTrackerId)
+	public com.liferay.portal.model.BrowserTracker deleteBrowserTracker(
+		long browserTrackerId)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException {
-		_browserTrackerLocalService.deleteBrowserTracker(browserTrackerId);
+		return _browserTrackerLocalService.deleteBrowserTracker(browserTrackerId);
 	}
 
 	/**
 	* Deletes the browser tracker from the database. Also notifies the appropriate model listeners.
 	*
 	* @param browserTracker the browser tracker
+	* @return the browser tracker that was removed
 	* @throws SystemException if a system exception occurred
 	*/
-	public void deleteBrowserTracker(
+	public com.liferay.portal.model.BrowserTracker deleteBrowserTracker(
 		com.liferay.portal.model.BrowserTracker browserTracker)
 		throws com.liferay.portal.kernel.exception.SystemException {
-		_browserTrackerLocalService.deleteBrowserTracker(browserTracker);
+		return _browserTrackerLocalService.deleteBrowserTracker(browserTracker);
+	}
+
+	public com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery() {
+		return _browserTrackerLocalService.dynamicQuery();
 	}
 
 	/**
@@ -148,6 +156,12 @@ public class BrowserTrackerLocalServiceWrapper
 		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery)
 		throws com.liferay.portal.kernel.exception.SystemException {
 		return _browserTrackerLocalService.dynamicQueryCount(dynamicQuery);
+	}
+
+	public com.liferay.portal.model.BrowserTracker fetchBrowserTracker(
+		long browserTrackerId)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return _browserTrackerLocalService.fetchBrowserTracker(browserTrackerId);
 	}
 
 	/**
@@ -265,11 +279,26 @@ public class BrowserTrackerLocalServiceWrapper
 			browserKey);
 	}
 
+	/**
+	 * @deprecated Renamed to {@link #getWrappedService}
+	 */
 	public BrowserTrackerLocalService getWrappedBrowserTrackerLocalService() {
 		return _browserTrackerLocalService;
 	}
 
+	/**
+	 * @deprecated Renamed to {@link #setWrappedService}
+	 */
 	public void setWrappedBrowserTrackerLocalService(
+		BrowserTrackerLocalService browserTrackerLocalService) {
+		_browserTrackerLocalService = browserTrackerLocalService;
+	}
+
+	public BrowserTrackerLocalService getWrappedService() {
+		return _browserTrackerLocalService;
+	}
+
+	public void setWrappedService(
 		BrowserTrackerLocalService browserTrackerLocalService) {
 		_browserTrackerLocalService = browserTrackerLocalService;
 	}

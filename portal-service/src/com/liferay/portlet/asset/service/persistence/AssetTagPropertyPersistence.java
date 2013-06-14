@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,7 +14,6 @@
 
 package com.liferay.portlet.asset.service.persistence;
 
-import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.service.persistence.BasePersistence;
 
 import com.liferay.portlet.asset.model.AssetTagProperty;
@@ -540,9 +539,11 @@ public interface AssetTagPropertyPersistence extends BasePersistence<AssetTagPro
 	*
 	* @param tagId the tag ID
 	* @param key the key
+	* @return the asset tag property that was removed
 	* @throws SystemException if a system exception occurred
 	*/
-	public void removeByT_K(long tagId, java.lang.String key)
+	public com.liferay.portlet.asset.model.AssetTagProperty removeByT_K(
+		long tagId, java.lang.String key)
 		throws com.liferay.portal.kernel.exception.SystemException,
 			com.liferay.portlet.asset.NoSuchTagPropertyException;
 
@@ -604,7 +605,4 @@ public interface AssetTagPropertyPersistence extends BasePersistence<AssetTagPro
 	*/
 	public int countAll()
 		throws com.liferay.portal.kernel.exception.SystemException;
-
-	public AssetTagProperty remove(AssetTagProperty assetTagProperty)
-		throws SystemException;
 }

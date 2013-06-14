@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -145,6 +145,27 @@ public interface CountryModel extends BaseModel<Country> {
 	public void setIdd(String idd);
 
 	/**
+	 * Returns the zip required of this country.
+	 *
+	 * @return the zip required of this country
+	 */
+	public boolean getZipRequired();
+
+	/**
+	 * Returns <code>true</code> if this country is zip required.
+	 *
+	 * @return <code>true</code> if this country is zip required; <code>false</code> otherwise
+	 */
+	public boolean isZipRequired();
+
+	/**
+	 * Sets whether this country is zip required.
+	 *
+	 * @param zipRequired the zip required of this country
+	 */
+	public void setZipRequired(boolean zipRequired);
+
+	/**
 	 * Returns the active of this country.
 	 *
 	 * @return the active of this country
@@ -174,8 +195,6 @@ public interface CountryModel extends BaseModel<Country> {
 	public void setCachedModel(boolean cachedModel);
 
 	public boolean isEscapedModel();
-
-	public void setEscapedModel(boolean escapedModel);
 
 	public Serializable getPrimaryKeyObj();
 

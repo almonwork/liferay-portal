@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -55,12 +55,24 @@ public class XSLErrorListener implements ErrorListener {
 		throw exception;
 	}
 
-	public void warning(TransformerException exception)
-		throws TransformerException {
+	public int getColumnNumber() {
+		return _columnNumber;
+	}
 
-		setLocation(exception);
+	public int getLineNumber() {
+		return _lineNumber;
+	}
 
-		throw exception;
+	public String getLocation() {
+		return _location;
+	}
+
+	public String getMessage() {
+		return _message;
+	}
+
+	public String getMessageAndLocation() {
+		return _message + " " + _location;
 	}
 
 	public void setLocation(Throwable exception) {
@@ -121,30 +133,18 @@ public class XSLErrorListener implements ErrorListener {
 		}
 	}
 
-	public String getLocation() {
-		return _location;
+	public void warning(TransformerException exception)
+		throws TransformerException {
+
+		setLocation(exception);
+
+		throw exception;
 	}
 
-	public String getMessage() {
-		return _message;
-	}
-
-	public String getMessageAndLocation() {
-		return _message + " " + _location;
-	}
-
-	public int getLineNumber() {
-		return _lineNumber;
-	}
-
-	public int getColumnNumber() {
-		return _columnNumber;
-	}
-
+	private int _columnNumber;
+	private int _lineNumber;
 	private Locale _locale;
 	private String _location;
 	private String _message;
-	private int _lineNumber;
-	private int _columnNumber;
 
 }

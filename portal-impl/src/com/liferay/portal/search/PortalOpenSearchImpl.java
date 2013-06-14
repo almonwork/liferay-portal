@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -110,6 +110,10 @@ public class PortalOpenSearchImpl extends BaseOpenSearchImpl {
 				long resultScopeGroupId = GetterUtil.getLong(
 					result.get(Field.SCOPE_GROUP_ID));
 
+				if (resultScopeGroupId == 0) {
+					resultScopeGroupId = themeDisplay.getScopeGroupId();
+				}
+
 				String entryClassName = GetterUtil.getString(
 					result.get(Field.ENTRY_CLASS_NAME));
 
@@ -178,8 +182,8 @@ public class PortalOpenSearchImpl extends BaseOpenSearchImpl {
 
 		if (Validator.isNotNull(article.getLayoutUuid())) {
 			String groupFriendlyURL = PortalUtil.getGroupFriendlyURL(
-				GroupLocalServiceUtil.getGroup(article.getGroupId()),
-				false, themeDisplay);
+				GroupLocalServiceUtil.getGroup(article.getGroupId()), false,
+				themeDisplay);
 
 			return groupFriendlyURL.concat(
 				JournalArticleConstants.CANONICAL_URL_SEPARATOR).concat(

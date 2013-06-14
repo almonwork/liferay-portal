@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -21,22 +21,18 @@ import com.liferay.portal.kernel.bean.IdentifiableBean;
 import com.liferay.portal.kernel.dao.jdbc.SqlUpdate;
 import com.liferay.portal.kernel.dao.jdbc.SqlUpdateFactoryUtil;
 import com.liferay.portal.kernel.dao.orm.DynamicQuery;
+import com.liferay.portal.kernel.dao.orm.DynamicQueryFactoryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
-import com.liferay.portal.kernel.search.Indexer;
-import com.liferay.portal.kernel.search.IndexerRegistryUtil;
-import com.liferay.portal.kernel.search.SearchException;
+import com.liferay.portal.kernel.search.Indexable;
+import com.liferay.portal.kernel.search.IndexableType;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.model.PersistedModel;
+import com.liferay.portal.service.BaseLocalServiceImpl;
 import com.liferay.portal.service.PersistedModelLocalServiceRegistry;
 import com.liferay.portal.service.ResourceLocalService;
-import com.liferay.portal.service.ResourceService;
 import com.liferay.portal.service.UserLocalService;
 import com.liferay.portal.service.UserService;
-import com.liferay.portal.service.persistence.ResourceFinder;
-import com.liferay.portal.service.persistence.ResourcePersistence;
 import com.liferay.portal.service.persistence.UserFinder;
 import com.liferay.portal.service.persistence.UserPersistence;
 
@@ -44,7 +40,6 @@ import com.liferay.portlet.dynamicdatamapping.model.DDMStructureLink;
 import com.liferay.portlet.dynamicdatamapping.service.DDMContentLocalService;
 import com.liferay.portlet.dynamicdatamapping.service.DDMStorageLinkLocalService;
 import com.liferay.portlet.dynamicdatamapping.service.DDMStructureLinkLocalService;
-import com.liferay.portlet.dynamicdatamapping.service.DDMStructureLinkService;
 import com.liferay.portlet.dynamicdatamapping.service.DDMStructureLocalService;
 import com.liferay.portlet.dynamicdatamapping.service.DDMStructureService;
 import com.liferay.portlet.dynamicdatamapping.service.DDMTemplateLocalService;
@@ -76,7 +71,8 @@ import javax.sql.DataSource;
  * @generated
  */
 public abstract class DDMStructureLinkLocalServiceBaseImpl
-	implements DDMStructureLinkLocalService, IdentifiableBean {
+	extends BaseLocalServiceImpl implements DDMStructureLinkLocalService,
+		IdentifiableBean {
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
@@ -90,27 +86,12 @@ public abstract class DDMStructureLinkLocalServiceBaseImpl
 	 * @return the d d m structure link that was added
 	 * @throws SystemException if a system exception occurred
 	 */
+	@Indexable(type = IndexableType.REINDEX)
 	public DDMStructureLink addDDMStructureLink(
 		DDMStructureLink ddmStructureLink) throws SystemException {
 		ddmStructureLink.setNew(true);
 
-		ddmStructureLink = ddmStructureLinkPersistence.update(ddmStructureLink,
-				false);
-
-		Indexer indexer = IndexerRegistryUtil.getIndexer(getModelClassName());
-
-		if (indexer != null) {
-			try {
-				indexer.reindex(ddmStructureLink);
-			}
-			catch (SearchException se) {
-				if (_log.isWarnEnabled()) {
-					_log.warn(se, se);
-				}
-			}
-		}
-
-		return ddmStructureLink;
+		return ddmStructureLinkPersistence.update(ddmStructureLink, false);
 	}
 
 	/**
@@ -127,49 +108,34 @@ public abstract class DDMStructureLinkLocalServiceBaseImpl
 	 * Deletes the d d m structure link with the primary key from the database. Also notifies the appropriate model listeners.
 	 *
 	 * @param structureLinkId the primary key of the d d m structure link
+	 * @return the d d m structure link that was removed
 	 * @throws PortalException if a d d m structure link with the primary key could not be found
 	 * @throws SystemException if a system exception occurred
 	 */
-	public void deleteDDMStructureLink(long structureLinkId)
+	@Indexable(type = IndexableType.DELETE)
+	public DDMStructureLink deleteDDMStructureLink(long structureLinkId)
 		throws PortalException, SystemException {
-		DDMStructureLink ddmStructureLink = ddmStructureLinkPersistence.remove(structureLinkId);
-
-		Indexer indexer = IndexerRegistryUtil.getIndexer(getModelClassName());
-
-		if (indexer != null) {
-			try {
-				indexer.delete(ddmStructureLink);
-			}
-			catch (SearchException se) {
-				if (_log.isWarnEnabled()) {
-					_log.warn(se, se);
-				}
-			}
-		}
+		return ddmStructureLinkPersistence.remove(structureLinkId);
 	}
 
 	/**
 	 * Deletes the d d m structure link from the database. Also notifies the appropriate model listeners.
 	 *
 	 * @param ddmStructureLink the d d m structure link
+	 * @return the d d m structure link that was removed
 	 * @throws SystemException if a system exception occurred
 	 */
-	public void deleteDDMStructureLink(DDMStructureLink ddmStructureLink)
-		throws SystemException {
-		ddmStructureLinkPersistence.remove(ddmStructureLink);
+	@Indexable(type = IndexableType.DELETE)
+	public DDMStructureLink deleteDDMStructureLink(
+		DDMStructureLink ddmStructureLink) throws SystemException {
+		return ddmStructureLinkPersistence.remove(ddmStructureLink);
+	}
 
-		Indexer indexer = IndexerRegistryUtil.getIndexer(getModelClassName());
+	public DynamicQuery dynamicQuery() {
+		Class<?> clazz = getClass();
 
-		if (indexer != null) {
-			try {
-				indexer.delete(ddmStructureLink);
-			}
-			catch (SearchException se) {
-				if (_log.isWarnEnabled()) {
-					_log.warn(se, se);
-				}
-			}
-		}
+		return DynamicQueryFactoryUtil.forClass(DDMStructureLink.class,
+			clazz.getClassLoader());
 	}
 
 	/**
@@ -238,6 +204,11 @@ public abstract class DDMStructureLinkLocalServiceBaseImpl
 		return ddmStructureLinkPersistence.countWithDynamicQuery(dynamicQuery);
 	}
 
+	public DDMStructureLink fetchDDMStructureLink(long structureLinkId)
+		throws SystemException {
+		return ddmStructureLinkPersistence.fetchByPrimaryKey(structureLinkId);
+	}
+
 	/**
 	 * Returns the d d m structure link with the primary key.
 	 *
@@ -290,6 +261,7 @@ public abstract class DDMStructureLinkLocalServiceBaseImpl
 	 * @return the d d m structure link that was updated
 	 * @throws SystemException if a system exception occurred
 	 */
+	@Indexable(type = IndexableType.REINDEX)
 	public DDMStructureLink updateDDMStructureLink(
 		DDMStructureLink ddmStructureLink) throws SystemException {
 		return updateDDMStructureLink(ddmStructureLink, true);
@@ -303,28 +275,13 @@ public abstract class DDMStructureLinkLocalServiceBaseImpl
 	 * @return the d d m structure link that was updated
 	 * @throws SystemException if a system exception occurred
 	 */
+	@Indexable(type = IndexableType.REINDEX)
 	public DDMStructureLink updateDDMStructureLink(
 		DDMStructureLink ddmStructureLink, boolean merge)
 		throws SystemException {
 		ddmStructureLink.setNew(false);
 
-		ddmStructureLink = ddmStructureLinkPersistence.update(ddmStructureLink,
-				merge);
-
-		Indexer indexer = IndexerRegistryUtil.getIndexer(getModelClassName());
-
-		if (indexer != null) {
-			try {
-				indexer.reindex(ddmStructureLink);
-			}
-			catch (SearchException se) {
-				if (_log.isWarnEnabled()) {
-					_log.warn(se, se);
-				}
-			}
-		}
-
-		return ddmStructureLink;
+		return ddmStructureLinkPersistence.update(ddmStructureLink, merge);
 	}
 
 	/**
@@ -497,25 +454,6 @@ public abstract class DDMStructureLinkLocalServiceBaseImpl
 	}
 
 	/**
-	 * Returns the d d m structure link remote service.
-	 *
-	 * @return the d d m structure link remote service
-	 */
-	public DDMStructureLinkService getDDMStructureLinkService() {
-		return ddmStructureLinkService;
-	}
-
-	/**
-	 * Sets the d d m structure link remote service.
-	 *
-	 * @param ddmStructureLinkService the d d m structure link remote service
-	 */
-	public void setDDMStructureLinkService(
-		DDMStructureLinkService ddmStructureLinkService) {
-		this.ddmStructureLinkService = ddmStructureLinkService;
-	}
-
-	/**
 	 * Returns the d d m structure link persistence.
 	 *
 	 * @return the d d m structure link persistence
@@ -643,60 +581,6 @@ public abstract class DDMStructureLinkLocalServiceBaseImpl
 	public void setResourceLocalService(
 		ResourceLocalService resourceLocalService) {
 		this.resourceLocalService = resourceLocalService;
-	}
-
-	/**
-	 * Returns the resource remote service.
-	 *
-	 * @return the resource remote service
-	 */
-	public ResourceService getResourceService() {
-		return resourceService;
-	}
-
-	/**
-	 * Sets the resource remote service.
-	 *
-	 * @param resourceService the resource remote service
-	 */
-	public void setResourceService(ResourceService resourceService) {
-		this.resourceService = resourceService;
-	}
-
-	/**
-	 * Returns the resource persistence.
-	 *
-	 * @return the resource persistence
-	 */
-	public ResourcePersistence getResourcePersistence() {
-		return resourcePersistence;
-	}
-
-	/**
-	 * Sets the resource persistence.
-	 *
-	 * @param resourcePersistence the resource persistence
-	 */
-	public void setResourcePersistence(ResourcePersistence resourcePersistence) {
-		this.resourcePersistence = resourcePersistence;
-	}
-
-	/**
-	 * Returns the resource finder.
-	 *
-	 * @return the resource finder
-	 */
-	public ResourceFinder getResourceFinder() {
-		return resourceFinder;
-	}
-
-	/**
-	 * Sets the resource finder.
-	 *
-	 * @param resourceFinder the resource finder
-	 */
-	public void setResourceFinder(ResourceFinder resourceFinder) {
-		this.resourceFinder = resourceFinder;
 	}
 
 	/**
@@ -844,8 +728,6 @@ public abstract class DDMStructureLinkLocalServiceBaseImpl
 	protected DDMStructureFinder ddmStructureFinder;
 	@BeanReference(type = DDMStructureLinkLocalService.class)
 	protected DDMStructureLinkLocalService ddmStructureLinkLocalService;
-	@BeanReference(type = DDMStructureLinkService.class)
-	protected DDMStructureLinkService ddmStructureLinkService;
 	@BeanReference(type = DDMStructureLinkPersistence.class)
 	protected DDMStructureLinkPersistence ddmStructureLinkPersistence;
 	@BeanReference(type = DDMTemplateLocalService.class)
@@ -860,12 +742,6 @@ public abstract class DDMStructureLinkLocalServiceBaseImpl
 	protected CounterLocalService counterLocalService;
 	@BeanReference(type = ResourceLocalService.class)
 	protected ResourceLocalService resourceLocalService;
-	@BeanReference(type = ResourceService.class)
-	protected ResourceService resourceService;
-	@BeanReference(type = ResourcePersistence.class)
-	protected ResourcePersistence resourcePersistence;
-	@BeanReference(type = ResourceFinder.class)
-	protected ResourceFinder resourceFinder;
 	@BeanReference(type = UserLocalService.class)
 	protected UserLocalService userLocalService;
 	@BeanReference(type = UserService.class)
@@ -876,6 +752,5 @@ public abstract class DDMStructureLinkLocalServiceBaseImpl
 	protected UserFinder userFinder;
 	@BeanReference(type = PersistedModelLocalServiceRegistry.class)
 	protected PersistedModelLocalServiceRegistry persistedModelLocalServiceRegistry;
-	private static Log _log = LogFactoryUtil.getLog(DDMStructureLinkLocalServiceBaseImpl.class);
 	private String _beanIdentifier;
 }

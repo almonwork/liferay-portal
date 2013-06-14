@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -23,14 +23,15 @@ import com.liferay.portalweb.portal.util.RuntimeVariables;
 public class SearchWikiPageContentTest extends BaseTestCase {
 	public void testSearchWikiPageContent() throws Exception {
 		selenium.open("/web/guest/home/");
+		loadRequiredJavaScriptModules();
 
 		for (int second = 0;; second++) {
-			if (second >= 60) {
+			if (second >= 90) {
 				fail("timeout");
 			}
 
 			try {
-				if (selenium.isElementPresent("link=Wiki Test Page")) {
+				if (selenium.isVisible("link=Wiki Test Page")) {
 					break;
 				}
 			}
@@ -40,25 +41,27 @@ public class SearchWikiPageContentTest extends BaseTestCase {
 			Thread.sleep(1000);
 		}
 
-		selenium.saveScreenShotAndSource();
-		selenium.clickAt("link=Wiki Test Page", RuntimeVariables.replace(""));
+		selenium.clickAt("link=Wiki Test Page",
+			RuntimeVariables.replace("Wiki Test Page"));
 		selenium.waitForPageToLoad("30000");
-		selenium.saveScreenShotAndSource();
-		selenium.type("_36_keywords",
-			RuntimeVariables.replace("\"This is a wiki page test.\""));
-		selenium.saveScreenShotAndSource();
+		loadRequiredJavaScriptModules();
+		selenium.type("//input[@id='_36_keywords']",
+			RuntimeVariables.replace("Wiki Page Content"));
 		selenium.clickAt("//input[@value='Search']",
-			RuntimeVariables.replace(""));
+			RuntimeVariables.replace("Search"));
 		selenium.waitForPageToLoad("30000");
-		selenium.saveScreenShotAndSource();
-		assertTrue(selenium.isElementPresent("link=Wiki Page Test"));
-		selenium.type("_36_keywords",
-			RuntimeVariables.replace("\"This1 is1 a1 wiki1 page1 test1.\""));
-		selenium.saveScreenShotAndSource();
+		loadRequiredJavaScriptModules();
+		assertEquals(RuntimeVariables.replace("Wiki Page Title"),
+			selenium.getText("//td[3]/a"));
+		selenium.type("//input[@id='_36_keywords']",
+			RuntimeVariables.replace("\"Wiki1 Page1 Content1.\""));
 		selenium.clickAt("//input[@value='Search']",
-			RuntimeVariables.replace(""));
+			RuntimeVariables.replace("Search"));
 		selenium.waitForPageToLoad("30000");
-		selenium.saveScreenShotAndSource();
-		assertFalse(selenium.isElementPresent("link=Wiki Page Test"));
+		loadRequiredJavaScriptModules();
+		assertEquals(RuntimeVariables.replace(
+				"No pages were found that matched the keywords: \"Wiki1 Page1 Content1.\"."),
+			selenium.getText("//div[@class='portlet-msg-info']"));
+		assertFalse(selenium.isTextPresent("Wiki Page Title"));
 	}
 }

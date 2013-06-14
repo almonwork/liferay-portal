@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -69,8 +69,7 @@ public class MethodHandler implements Serializable {
 		Object targetObject = null;
 
 		if (newInstance && !Modifier.isStatic(method.getModifiers())) {
-			Class<?> targetClass = contextClassLoader.loadClass(
-				getClassName());
+			Class<?> targetClass = contextClassLoader.loadClass(getClassName());
 
 			targetObject = targetClass.newInstance();
 		}

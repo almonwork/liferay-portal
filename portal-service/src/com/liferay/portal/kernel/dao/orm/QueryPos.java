@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -63,6 +63,22 @@ public class QueryPos {
 		for (int i = 0; i < values.length; i++) {
 			for (int j = 0; j < count; j++) {
 				add(values[i]);
+			}
+		}
+	}
+
+	public void add(Date value) {
+		add(CalendarUtil.getTimestamp(value));
+	}
+
+	public void add(Date[] values) {
+		add(values, _DEFAULT_ARRAY_COUNT);
+	}
+
+	public void add(Date[] values, int count) {
+		for (int i = 0; i < values.length; i++) {
+			for (int j = 0; j < count; j++) {
+				add(CalendarUtil.getTimestamp(values[i]));
 			}
 		}
 	}

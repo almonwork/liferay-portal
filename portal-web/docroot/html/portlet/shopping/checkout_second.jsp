@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -19,7 +19,7 @@
 <%
 ShoppingCart cart = ShoppingUtil.getCart(renderRequest);
 
-Map items = cart.getItems();
+Map<ShoppingCartItem, Integer> items = cart.getItems();
 
 ShoppingCoupon coupon = cart.getCoupon();
 
@@ -134,7 +134,7 @@ ShoppingOrder order = (ShoppingOrder)request.getAttribute(WebKeys.SHOPPING_ORDER
 			</tr>
 			<tr>
 				<td>
-					<liferay-ui:message key="zip" />:
+					<liferay-ui:message key="postal-code" />:
 				</td>
 				<td>
 					<%= HtmlUtil.escape(order.getBillingZip()) %>
@@ -222,7 +222,7 @@ ShoppingOrder order = (ShoppingOrder)request.getAttribute(WebKeys.SHOPPING_ORDER
 			</tr>
 			<tr>
 				<td>
-					<liferay-ui:message key="zip" />:
+					<liferay-ui:message key="postal-code" />:
 				</td>
 				<td>
 					<%= HtmlUtil.escape(order.getShippingZip()) %>
@@ -339,20 +339,17 @@ ShoppingOrder order = (ShoppingOrder)request.getAttribute(WebKeys.SHOPPING_ORDER
 	searchContainer.setHeaderNames(headerNames);
 	searchContainer.setHover(false);
 
-	Set results = items.entrySet();
 	int total = items.size();
 
 	searchContainer.setTotal(total);
 
 	List resultRows = searchContainer.getResultRows();
 
-	Iterator itr = results.iterator();
+	int i = 0;
 
-	for (int i = 0; itr.hasNext(); i++) {
-		Map.Entry entry = (Map.Entry)itr.next();
-
-		ShoppingCartItem cartItem = (ShoppingCartItem)entry.getKey();
-		Integer count = (Integer)entry.getValue();
+	for (Map.Entry<ShoppingCartItem, Integer> entry : items.entrySet()) {
+		ShoppingCartItem cartItem = entry.getKey();
+		Integer count = entry.getValue();
 
 		ShoppingItem item = cartItem.getItem();
 		String[] fieldsArray = cartItem.getFieldsArray();
@@ -415,6 +412,8 @@ ShoppingOrder order = (ShoppingOrder)request.getAttribute(WebKeys.SHOPPING_ORDER
 		// Add result row
 
 		resultRows.add(row);
+
+		i++;
 	}
 	%>
 

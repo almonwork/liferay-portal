@@ -24,6 +24,11 @@
 	<td>Asset Publisher Test Page</td>
 </tr>
 <tr>
+	<td>pause</td>
+	<td>5000</td>
+	<td></td>
+</tr>
+<tr>
 	<td>assertText</td>
 	<td>//span[@title='Add New']/ul/li/strong/a</td>
 	<td>Add New</td>
@@ -36,21 +41,41 @@
 <tr>
 	<td>waitForVisible</td>
 	<td>//div[@class='lfr-component lfr-menu-list']/ul/li[4]/a</td>
-	<td>Document Library Document</td>
+	<td>Basic Document</td>
 </tr>
 <tr>
 	<td>assertText</td>
 	<td>//div[@class='lfr-component lfr-menu-list']/ul/li[4]/a</td>
-	<td>Document Library Document</td>
-</tr>
-<tr>
-	<td>clickAndWait</td>
-	<td>//div[@class='lfr-component lfr-menu-list']/ul/li[4]/a</td>
-	<td>Document Library Document</td>
+	<td>Basic Document</td>
 </tr>
 <tr>
 	<td>clickAt</td>
-	<td>//input[@value='Select']</td>
+	<td>//div[@class='lfr-component lfr-menu-list']/ul/li[4]/a</td>
+	<td>Basic Document</td>
+</tr>
+<tr>
+	<td>pause</td>
+	<td>5000</td>
+	<td></td>
+</tr>
+<tr>
+	<td>waitForVisible</td>
+	<td>//iframe</td>
+	<td>Documents and Media Document IFrame</td>
+</tr>
+<tr>
+	<td>selectFrame</td>
+	<td>//iframe</td>
+	<td>Documents and Media Document IFrame</td>
+</tr>
+<tr>
+	<td>assertValue</td>
+	<td>//input[@id='_20_openFolderSelectorButton']</td>
+	<td>Select</td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>//input[@id='_20_openFolderSelectorButton']</td>
 	<td>Select</td>
 </tr>
 <tr>
@@ -64,46 +89,6 @@
 	<td></td>
 </tr>
 <tr>
-	<td>pause</td>
-	<td>5000</td>
-	<td></td>
-</tr>
-<tr>
-	<td>store</td>
-	<td>eval(selenium.isElementPresent('//td[4]/input'))</td>
-	<td>choose1Present</td>
-</tr>
-<tr>
-	<td>gotoIf</td>
-	<td>${choose1Present}</td>
-	<td>Choose1NotPresent</td>
-</tr>
-<tr>
-	<td>close</td>
-	<td></td>
-	<td></td>
-</tr>
-<tr>
-	<td>selectWindow</td>
-	<td>null</td>
-	<td></td>
-</tr>
-<tr>
-	<td>label</td>
-	<td>Choose1NotPresent</td>
-	<td></td>
-</tr>
-<tr>
-	<td>store</td>
-	<td>eval(selenium.isElementPresent('//td[4]/input'))</td>
-	<td>choose2Present</td>
-</tr>
-<tr>
-	<td>gotoIf</td>
-	<td>!${choose2Present}</td>
-	<td>Choose2NotPresent</td>
-</tr>
-<tr>
 	<td>waitForVisible</td>
 	<td>//input[@value='Choose']</td>
 	<td>Choose</td>
@@ -114,24 +99,24 @@
 	<td>Choose</td>
 </tr>
 <tr>
-	<td>label</td>
-	<td>Choose2NotPresent</td>
-	<td></td>
-</tr>
-<tr>
 	<td>selectWindow</td>
 	<td>null</td>
 	<td></td>
 </tr>
 <tr>
+	<td>pause</td>
+	<td>5000</td>
+	<td></td>
+</tr>
+<tr>
 	<td>waitForText</td>
 	<td>//a[@id='_20_folderName']</td>
-	<td>DL Folder Name</td>
+	<td>DM Folder Name</td>
 </tr>
 <tr>
 	<td>assertText</td>
 	<td>//a[@id='_20_folderName']</td>
-	<td>DL Folder Name</td>
+	<td>DM Folder Name</td>
 </tr>
 <tr>
 	<td>type</td>
@@ -141,7 +126,7 @@
 <tr>
 	<td>type</td>
 	<td>//input[@id='_20_title']</td>
-	<td>DL Folder Document Title</td>
+	<td>DM Folder Document Title</td>
 </tr>
 <tr>
 	<td>clickAtAndWait</td>
@@ -149,21 +134,40 @@
 	<td>Publish</td>
 </tr>
 <tr>
+	<td>selectFrame</td>
+	<td>relative=top</td>
+	<td>top</td>
+</tr>
+<tr>
+	<td>open</td>
+	<td>/web/guest/home/</td>
+	<td></td>
+</tr>
+<tr>
+	<td>waitForVisible</td>
+	<td>link=Asset Publisher Test Page</td>
+	<td>Asset Publisher Test Page</td>
+</tr>
+<tr>
+	<td>clickAtAndWait</td>
+	<td>link=Asset Publisher Test Page</td>
+	<td>Asset Publisher Test Page</td>
+</tr>
+<tr>
 	<td>waitForText</td>
 	<td>//h3[@class='asset-title']/a</td>
-	<td>DL Folder Document Title</td>
+	<td>DM Folder Document Title</td>
 </tr>
 <tr>
 	<td>assertText</td>
 	<td>//h3[@class='asset-title']/a</td>
-	<td>DL Folder Document Title</td>
+	<td>DM Folder Document Title</td>
 </tr>
 <tr>
 	<td>assertText</td>
 	<td>//div[@class='asset-resource-info']/span/a/span</td>
-	<td>DL Folder Document Title</td>
+	<td>DM Folder Document Title</td>
 </tr>
-
 </tbody></table>
 </body>
 </html>

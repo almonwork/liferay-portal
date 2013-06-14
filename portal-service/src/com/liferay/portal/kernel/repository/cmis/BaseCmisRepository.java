@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -47,6 +47,9 @@ public abstract class BaseCmisRepository extends BaseRepositoryImpl {
 		throws PortalException, SystemException;
 
 	public abstract boolean isCheckOutAllowable(String objectId)
+		throws PortalException, SystemException;
+
+	public abstract boolean isSupportsMinorVersions()
 		throws PortalException, SystemException;
 
 	public abstract FileEntry toFileEntry(String objectId)

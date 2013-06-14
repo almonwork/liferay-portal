@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,6 +14,10 @@
 
 package com.liferay.portal.model;
 
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * <p>
  * This class is a wrapper for {@link MembershipRequest}.
@@ -23,7 +27,8 @@ package com.liferay.portal.model;
  * @see       MembershipRequest
  * @generated
  */
-public class MembershipRequestWrapper implements MembershipRequest {
+public class MembershipRequestWrapper implements MembershipRequest,
+	ModelWrapper<MembershipRequest> {
 	public MembershipRequestWrapper(MembershipRequest membershipRequest) {
 		_membershipRequest = membershipRequest;
 	}
@@ -34,6 +39,85 @@ public class MembershipRequestWrapper implements MembershipRequest {
 
 	public String getModelClassName() {
 		return MembershipRequest.class.getName();
+	}
+
+	public Map<String, Object> getModelAttributes() {
+		Map<String, Object> attributes = new HashMap<String, Object>();
+
+		attributes.put("membershipRequestId", getMembershipRequestId());
+		attributes.put("groupId", getGroupId());
+		attributes.put("companyId", getCompanyId());
+		attributes.put("userId", getUserId());
+		attributes.put("createDate", getCreateDate());
+		attributes.put("comments", getComments());
+		attributes.put("replyComments", getReplyComments());
+		attributes.put("replyDate", getReplyDate());
+		attributes.put("replierUserId", getReplierUserId());
+		attributes.put("statusId", getStatusId());
+
+		return attributes;
+	}
+
+	public void setModelAttributes(Map<String, Object> attributes) {
+		Long membershipRequestId = (Long)attributes.get("membershipRequestId");
+
+		if (membershipRequestId != null) {
+			setMembershipRequestId(membershipRequestId);
+		}
+
+		Long groupId = (Long)attributes.get("groupId");
+
+		if (groupId != null) {
+			setGroupId(groupId);
+		}
+
+		Long companyId = (Long)attributes.get("companyId");
+
+		if (companyId != null) {
+			setCompanyId(companyId);
+		}
+
+		Long userId = (Long)attributes.get("userId");
+
+		if (userId != null) {
+			setUserId(userId);
+		}
+
+		Date createDate = (Date)attributes.get("createDate");
+
+		if (createDate != null) {
+			setCreateDate(createDate);
+		}
+
+		String comments = (String)attributes.get("comments");
+
+		if (comments != null) {
+			setComments(comments);
+		}
+
+		String replyComments = (String)attributes.get("replyComments");
+
+		if (replyComments != null) {
+			setReplyComments(replyComments);
+		}
+
+		Date replyDate = (Date)attributes.get("replyDate");
+
+		if (replyDate != null) {
+			setReplyDate(replyDate);
+		}
+
+		Long replierUserId = (Long)attributes.get("replierUserId");
+
+		if (replierUserId != null) {
+			setReplierUserId(replierUserId);
+		}
+
+		Integer statusId = (Integer)attributes.get("statusId");
+
+		if (statusId != null) {
+			setStatusId(statusId);
+		}
 	}
 
 	/**
@@ -294,10 +378,6 @@ public class MembershipRequestWrapper implements MembershipRequest {
 		return _membershipRequest.isEscapedModel();
 	}
 
-	public void setEscapedModel(boolean escapedModel) {
-		_membershipRequest.setEscapedModel(escapedModel);
-	}
-
 	public java.io.Serializable getPrimaryKeyObj() {
 		return _membershipRequest.getPrimaryKeyObj();
 	}
@@ -352,7 +432,14 @@ public class MembershipRequestWrapper implements MembershipRequest {
 		_membershipRequest.persist();
 	}
 
+	/**
+	 * @deprecated Renamed to {@link #getWrappedModel}
+	 */
 	public MembershipRequest getWrappedMembershipRequest() {
+		return _membershipRequest;
+	}
+
+	public MembershipRequest getWrappedModel() {
 		return _membershipRequest;
 	}
 

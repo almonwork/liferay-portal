@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -19,7 +19,6 @@ import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
-import com.liferay.portal.kernel.plugin.PluginPackage;
 import com.liferay.portal.kernel.search.BooleanClause;
 import com.liferay.portal.kernel.search.BooleanClauseFactoryUtil;
 import com.liferay.portal.kernel.search.BooleanClauseOccur;
@@ -30,14 +29,10 @@ import com.liferay.portal.kernel.search.Indexer;
 import com.liferay.portal.kernel.search.IndexerPostProcessor;
 import com.liferay.portal.kernel.search.IndexerRegistryUtil;
 import com.liferay.portal.kernel.search.SearchContext;
+import com.liferay.portal.kernel.search.SearchEngineUtil;
 import com.liferay.portal.kernel.search.facet.config.FacetConfiguration;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.StringUtil;
-import com.liferay.portlet.asset.model.AssetEntry;
-import com.liferay.portlet.documentlibrary.model.FileModel;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * @author Raymond Augé
@@ -74,12 +69,18 @@ public class AssetEntriesFacet extends MultiValueFacet {
 				continue;
 			}
 
+			String searchEngineId = searchContext.getSearchEngineId();
+
+			if (!searchEngineId.equals(indexer.getSearchEngineId())) {
+				continue;
+			}
+
 			try {
 				BooleanQuery indexerBooleanQuery = indexer.getFacetQuery(
 					entryClassName, searchContext);
 
-				if ((indexerBooleanQuery == null ) ||
-					(indexerBooleanQuery.clauses().isEmpty())) {
+				if ((indexerBooleanQuery == null) ||
+					!indexerBooleanQuery.hasClauses()) {
 
 					continue;
 				}
@@ -105,13 +106,13 @@ public class AssetEntriesFacet extends MultiValueFacet {
 						entityQuery.addRequiredTerm(Field.STAGING_GROUP, true);
 					}
 					else if (searchContext.isIncludeLiveGroups() &&
-							!searchContext.isIncludeStagingGroups()) {
+							 !searchContext.isIncludeStagingGroups()) {
 
 						entityQuery.addRequiredTerm(Field.STAGING_GROUP, false);
 					}
 				}
 
-				if (!entityQuery.clauses().isEmpty()) {
+				if (entityQuery.hasClauses()) {
 					facetQuery.add(entityQuery, BooleanClauseOccur.SHOULD);
 				}
 			}
@@ -120,12 +121,12 @@ public class AssetEntriesFacet extends MultiValueFacet {
 			}
 		}
 
-		if (facetQuery.clauses().isEmpty()) {
+		if (!facetQuery.hasClauses()) {
 			return null;
 		}
 
 		return BooleanClauseFactoryUtil.create(
-			facetQuery, BooleanClauseOccur.MUST.getName());
+			searchContext, facetQuery, BooleanClauseOccur.MUST.getName());
 	}
 
 	protected void initFacetClause() {
@@ -164,22 +165,7 @@ public class AssetEntriesFacet extends MultiValueFacet {
 		}
 
 		if ((entryClassNames == null) || (entryClassNames.length == 0)) {
-			List<String> entryClassNamesList = new ArrayList<String>();
-
-			for (Indexer indexer : IndexerRegistryUtil.getIndexers()) {
-				for (String className : indexer.getClassNames()) {
-					if (!entryClassNamesList.contains(className) &&
-						!className.equals(AssetEntry.class.getName()) &&
-						!className.equals(FileModel.class.getName()) &&
-						!className.equals(PluginPackage.class.getName())) {
-
-						entryClassNamesList.add(className);
-					}
-				}
-			}
-
-			entryClassNames = entryClassNamesList.toArray(
-				new String[entryClassNamesList.size()]);
+			entryClassNames = SearchEngineUtil.getEntryClassNames();
 
 			if (!dataJSONObject.has("values")) {
 				JSONArray entriesJSONArray = JSONFactoryUtil.createJSONArray();

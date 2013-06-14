@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -20,16 +20,12 @@ package com.liferay.portal.model;
  */
 public class LayoutTypePortletConstants {
 
+	public static final String COLUMN_PREFIX = "column-";
+
 	public static final String DEFAULT_ASSET_PUBLISHER_PORTLET_ID =
 		"default-asset-publisher-portlet-id";
 
 	public static final String LAYOUT_TEMPLATE_ID = "layout-template-id";
-
-	public static final String NESTED_COLUMN_IDS = "nested-column-ids";
-
-	public static final String STATE_MAX = "state-max";
-
-	public static final String STATE_MIN = "state-min";
 
 	public static final String MODE_ABOUT = "mode-about";
 
@@ -46,6 +42,16 @@ public class LayoutTypePortletConstants {
 	public static final String MODE_PREVIEW = "mode-preview";
 
 	public static final String MODE_PRINT = "mode-print";
+
+	public static final String NESTED_COLUMN_IDS = "nested-column-ids";
+
+	public static final String RUNTIME_COLUMN_IDS = "runtime-column-ids";
+
+	public static final String RUNTIME_COLUMN_PREFIX = "runtime-column-";
+
+	public static final String STATE_MAX = "state-max";
+
+	public static final String STATE_MIN = "state-min";
 
 	public static final String STATIC_PORTLET_ORGANIZATION_SELECTOR =
 		"organization";

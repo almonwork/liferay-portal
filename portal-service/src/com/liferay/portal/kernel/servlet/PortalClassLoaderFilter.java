@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -17,12 +17,12 @@ package com.liferay.portal.kernel.servlet;
 import com.liferay.portal.kernel.bean.ClassLoaderBeanHandler;
 import com.liferay.portal.kernel.servlet.filters.invoker.InvokerFilterChain;
 import com.liferay.portal.kernel.util.BasePortalLifecycle;
+import com.liferay.portal.kernel.util.InstanceFactory;
 import com.liferay.portal.kernel.util.PortalClassLoaderUtil;
+import com.liferay.portal.kernel.util.ProxyUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 
 import java.io.IOException;
-
-import java.lang.reflect.Proxy;
 
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
@@ -57,7 +57,7 @@ public class PortalClassLoaderFilter
 				PortalClassLoaderUtil.getClassLoader());
 
 			FilterChain contextClassLoaderFilterChain =
-				(FilterChain)Proxy.newProxyInstance(
+				(FilterChain)ProxyUtil.newProxyInstance(
 					contextClassLoader, new Class[] {FilterChain.class},
 					new ClassLoaderBeanHandler(
 						filterChain, contextClassLoader));
@@ -98,6 +98,12 @@ public class PortalClassLoaderFilter
 		return true;
 	}
 
+	public void setFilterEnabled(boolean filterEnabled) {
+		if (_liferayFilter != null) {
+			_liferayFilter.setFilterEnabled(filterEnabled);
+		}
+	}
+
 	@Override
 	protected void doPortalDestroy() {
 		Thread currentThread = Thread.currentThread();
@@ -127,7 +133,7 @@ public class PortalClassLoaderFilter
 				"com.liferay.portal.servlet.filters.");
 		}
 
-		_filter = (Filter)classLoader.loadClass(filterClass).newInstance();
+		_filter = (Filter)InstanceFactory.newInstance(classLoader, filterClass);
 
 		_filter.init(_filterConfig);
 

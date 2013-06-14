@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,6 +14,8 @@
 
 package com.liferay.portlet.softwarecatalog.service;
 
+import com.liferay.portal.service.ServiceWrapper;
+
 /**
  * <p>
  * This class is a wrapper for {@link SCProductEntryLocalService}.
@@ -24,7 +26,8 @@ package com.liferay.portlet.softwarecatalog.service;
  * @generated
  */
 public class SCProductEntryLocalServiceWrapper
-	implements SCProductEntryLocalService {
+	implements SCProductEntryLocalService,
+		ServiceWrapper<SCProductEntryLocalService> {
 	public SCProductEntryLocalServiceWrapper(
 		SCProductEntryLocalService scProductEntryLocalService) {
 		_scProductEntryLocalService = scProductEntryLocalService;
@@ -58,25 +61,32 @@ public class SCProductEntryLocalServiceWrapper
 	* Deletes the s c product entry with the primary key from the database. Also notifies the appropriate model listeners.
 	*
 	* @param productEntryId the primary key of the s c product entry
+	* @return the s c product entry that was removed
 	* @throws PortalException if a s c product entry with the primary key could not be found
 	* @throws SystemException if a system exception occurred
 	*/
-	public void deleteSCProductEntry(long productEntryId)
+	public com.liferay.portlet.softwarecatalog.model.SCProductEntry deleteSCProductEntry(
+		long productEntryId)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException {
-		_scProductEntryLocalService.deleteSCProductEntry(productEntryId);
+		return _scProductEntryLocalService.deleteSCProductEntry(productEntryId);
 	}
 
 	/**
 	* Deletes the s c product entry from the database. Also notifies the appropriate model listeners.
 	*
 	* @param scProductEntry the s c product entry
+	* @return the s c product entry that was removed
 	* @throws SystemException if a system exception occurred
 	*/
-	public void deleteSCProductEntry(
+	public com.liferay.portlet.softwarecatalog.model.SCProductEntry deleteSCProductEntry(
 		com.liferay.portlet.softwarecatalog.model.SCProductEntry scProductEntry)
 		throws com.liferay.portal.kernel.exception.SystemException {
-		_scProductEntryLocalService.deleteSCProductEntry(scProductEntry);
+		return _scProductEntryLocalService.deleteSCProductEntry(scProductEntry);
+	}
+
+	public com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery() {
+		return _scProductEntryLocalService.dynamicQuery();
 	}
 
 	/**
@@ -148,6 +158,12 @@ public class SCProductEntryLocalServiceWrapper
 		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery)
 		throws com.liferay.portal.kernel.exception.SystemException {
 		return _scProductEntryLocalService.dynamicQueryCount(dynamicQuery);
+	}
+
+	public com.liferay.portlet.softwarecatalog.model.SCProductEntry fetchSCProductEntry(
+		long productEntryId)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return _scProductEntryLocalService.fetchSCProductEntry(productEntryId);
 	}
 
 	/**
@@ -304,17 +320,18 @@ public class SCProductEntryLocalServiceWrapper
 		_scProductEntryLocalService.deleteProductEntries(groupId);
 	}
 
-	public void deleteProductEntry(long productEntryId)
+	public com.liferay.portlet.softwarecatalog.model.SCProductEntry deleteProductEntry(
+		long productEntryId)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException {
-		_scProductEntryLocalService.deleteProductEntry(productEntryId);
+		return _scProductEntryLocalService.deleteProductEntry(productEntryId);
 	}
 
-	public void deleteProductEntry(
+	public com.liferay.portlet.softwarecatalog.model.SCProductEntry deleteProductEntry(
 		com.liferay.portlet.softwarecatalog.model.SCProductEntry productEntry)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException {
-		_scProductEntryLocalService.deleteProductEntry(productEntry);
+		return _scProductEntryLocalService.deleteProductEntry(productEntry);
 	}
 
 	public java.util.List<com.liferay.portlet.softwarecatalog.model.SCProductEntry> getCompanyProductEntries(
@@ -408,11 +425,26 @@ public class SCProductEntryLocalServiceWrapper
 			fullImages);
 	}
 
+	/**
+	 * @deprecated Renamed to {@link #getWrappedService}
+	 */
 	public SCProductEntryLocalService getWrappedSCProductEntryLocalService() {
 		return _scProductEntryLocalService;
 	}
 
+	/**
+	 * @deprecated Renamed to {@link #setWrappedService}
+	 */
 	public void setWrappedSCProductEntryLocalService(
+		SCProductEntryLocalService scProductEntryLocalService) {
+		_scProductEntryLocalService = scProductEntryLocalService;
+	}
+
+	public SCProductEntryLocalService getWrappedService() {
+		return _scProductEntryLocalService;
+	}
+
+	public void setWrappedService(
 		SCProductEntryLocalService scProductEntryLocalService) {
 		_scProductEntryLocalService = scProductEntryLocalService;
 	}

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -31,13 +31,16 @@ public class DLFileVersionSoap implements Serializable {
 	public static DLFileVersionSoap toSoapModel(DLFileVersion model) {
 		DLFileVersionSoap soapModel = new DLFileVersionSoap();
 
+		soapModel.setUuid(model.getUuid());
 		soapModel.setFileVersionId(model.getFileVersionId());
 		soapModel.setGroupId(model.getGroupId());
 		soapModel.setCompanyId(model.getCompanyId());
 		soapModel.setUserId(model.getUserId());
 		soapModel.setUserName(model.getUserName());
 		soapModel.setCreateDate(model.getCreateDate());
+		soapModel.setModifiedDate(model.getModifiedDate());
 		soapModel.setRepositoryId(model.getRepositoryId());
+		soapModel.setFolderId(model.getFolderId());
 		soapModel.setFileEntryId(model.getFileEntryId());
 		soapModel.setExtension(model.getExtension());
 		soapModel.setMimeType(model.getMimeType());
@@ -104,6 +107,14 @@ public class DLFileVersionSoap implements Serializable {
 		setFileVersionId(pk);
 	}
 
+	public String getUuid() {
+		return _uuid;
+	}
+
+	public void setUuid(String uuid) {
+		_uuid = uuid;
+	}
+
 	public long getFileVersionId() {
 		return _fileVersionId;
 	}
@@ -152,12 +163,28 @@ public class DLFileVersionSoap implements Serializable {
 		_createDate = createDate;
 	}
 
+	public Date getModifiedDate() {
+		return _modifiedDate;
+	}
+
+	public void setModifiedDate(Date modifiedDate) {
+		_modifiedDate = modifiedDate;
+	}
+
 	public long getRepositoryId() {
 		return _repositoryId;
 	}
 
 	public void setRepositoryId(long repositoryId) {
 		_repositoryId = repositoryId;
+	}
+
+	public long getFolderId() {
+		return _folderId;
+	}
+
+	public void setFolderId(long folderId) {
+		_folderId = folderId;
 	}
 
 	public long getFileEntryId() {
@@ -272,13 +299,16 @@ public class DLFileVersionSoap implements Serializable {
 		_statusDate = statusDate;
 	}
 
+	private String _uuid;
 	private long _fileVersionId;
 	private long _groupId;
 	private long _companyId;
 	private long _userId;
 	private String _userName;
 	private Date _createDate;
+	private Date _modifiedDate;
 	private long _repositoryId;
+	private long _folderId;
 	private long _fileEntryId;
 	private String _extension;
 	private String _mimeType;

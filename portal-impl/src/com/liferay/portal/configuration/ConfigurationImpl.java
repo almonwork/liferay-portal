@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,32 +14,22 @@
 
 package com.liferay.portal.configuration;
 
-import com.germinus.easyconf.AggregatedProperties;
 import com.germinus.easyconf.ComponentConfiguration;
 import com.germinus.easyconf.ComponentProperties;
-import com.germinus.easyconf.Conventions;
-import com.germinus.easyconf.EasyConf;
 
+import com.liferay.portal.configuration.easyconf.ClassLoaderAggregateProperties;
+import com.liferay.portal.configuration.easyconf.ClassLoaderComponentConfiguration;
 import com.liferay.portal.kernel.configuration.Filter;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.util.PropertiesUtil;
 import com.liferay.portal.kernel.util.StringBundler;
-import com.liferay.portal.kernel.util.StringPool;
-import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.model.Company;
 import com.liferay.portal.model.CompanyConstants;
 import com.liferay.portal.service.CompanyLocalServiceUtil;
 
-import java.io.FileWriter;
-import java.io.Writer;
-
 import java.lang.reflect.Field;
-
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.net.URL;
 
 import java.util.HashSet;
 import java.util.Iterator;
@@ -67,47 +57,6 @@ public class ConfigurationImpl
 	public ConfigurationImpl(
 		ClassLoader classLoader, String name, long companyId) {
 
-		try {
-			URL url = classLoader.getResource(
-				name + Conventions.PROPERTIES_EXTENSION);
-
-			if ((url != null) && url.getProtocol().equals("file")) {
-				String basePath = url.getPath();
-
-				int pos = basePath.lastIndexOf(
-					StringPool.SLASH + name + Conventions.PROPERTIES_EXTENSION);
-
-				if (pos != -1) {
-					basePath = basePath.substring(0, pos);
-				}
-
-				Properties properties = new Properties();
-
-				properties.load(url.openStream());
-
-				if (!properties.containsKey("base.path")) {
-					String fileName = StringUtil.replace(
-						url.getFile(), "%20", StringPool.SPACE);
-
-					Writer writer =	new FileWriter(fileName, true);
-
-					StringBundler sb = new StringBundler(4);
-
-					sb.append(StringPool.OS_EOL);
-					sb.append(StringPool.OS_EOL);
-					sb.append("base.path=");
-					sb.append(basePath);
-
-					writer.write(sb.toString());
-
-					writer.close();
-				}
-			}
-		}
-		catch (Exception e) {
-			_log.error(e, e);
-		}
-
 		String webId = null;
 
 		if (companyId > CompanyConstants.SYSTEM) {
@@ -122,16 +71,8 @@ public class ConfigurationImpl
 			}
 		}
 
-		EasyConf.refreshAll();
-
-		if (webId != null) {
-			_componentConfiguration = EasyConf.getConfiguration(
-				webId, getFileName(classLoader, name));
-		}
-		else {
-			_componentConfiguration = EasyConf.getConfiguration(
-				getFileName(classLoader, name));
-		}
+		_componentConfiguration = new ClassLoaderComponentConfiguration(
+			classLoader, webId, name);
 
 		printSources(companyId, webId);
 	}
@@ -141,8 +82,9 @@ public class ConfigurationImpl
 			ComponentProperties componentProperties =
 				_componentConfiguration.getProperties();
 
-			AggregatedProperties aggregatedProperties =
-				(AggregatedProperties)componentProperties.toConfiguration();
+			ClassLoaderAggregateProperties classLoaderAggregateProperties =
+				(ClassLoaderAggregateProperties)
+					componentProperties.toConfiguration();
 
 			Field field1 = CompositeConfiguration.class.getDeclaredField(
 				"configList");
@@ -152,23 +94,17 @@ public class ConfigurationImpl
 			// Add to configList of base conf
 
 			List<Configuration> configurations =
-				(List<Configuration>)field1.get(aggregatedProperties);
+				(List<Configuration>)field1.get(classLoaderAggregateProperties);
 
-			MapConfiguration newConfiguration =
-				new MapConfiguration(properties);
+			MapConfiguration newConfiguration = new MapConfiguration(
+				properties);
 
 			configurations.add(0, newConfiguration);
 
 			// Add to configList of AggregatedProperties itself
 
-			Class<?> clazz = aggregatedProperties.getClass();
-
-			Field field2 = clazz.getDeclaredField("baseConf");
-
-			field2.setAccessible(true);
-
 			CompositeConfiguration compositeConfiguration =
-				(CompositeConfiguration)field2.get(aggregatedProperties);
+				classLoaderAggregateProperties.getBaseConfiguration();
 
 			configurations = (List<Configuration>)field1.get(
 				compositeConfiguration);
@@ -204,9 +140,8 @@ public class ConfigurationImpl
 		if (value == _nullValue) {
 			return false;
 		}
-		else {
-			return true;
-		}
+
+		return true;
 	}
 
 	public String get(String key) {
@@ -230,9 +165,8 @@ public class ConfigurationImpl
 		if (value instanceof String) {
 			return (String)value;
 		}
-		else {
-			return null;
-		}
+
+		return null;
 	}
 
 	public String get(String key, Filter filter) {
@@ -262,10 +196,8 @@ public class ConfigurationImpl
 		if (value instanceof String) {
 			return (String)value;
 		}
-		else {
-			return null;
-		}
 
+		return null;
 	}
 
 	public String[] getArray(String key) {
@@ -284,9 +216,8 @@ public class ConfigurationImpl
 		if (value instanceof String[]) {
 			return (String[])value;
 		}
-		else {
-			return _emptyArray;
-		}
+
+		return _emptyArray;
 	}
 
 	public String[] getArray(String key, Filter filter) {
@@ -310,9 +241,8 @@ public class ConfigurationImpl
 		if (value instanceof String[]) {
 			return (String[])value;
 		}
-		else {
-			return _emptyArray;
-		}
+
+		return _emptyArray;
 	}
 
 	public Properties getProperties() {
@@ -322,7 +252,7 @@ public class ConfigurationImpl
 		// actually returns "xyz=1, 2, 3". This can break applications that
 		// don't expect that extra space. However, getting the property value
 		// directly through componentProperties returns the correct value. This
-		// method fixes the weird behavior by returing properties with the
+		// method fixes the weird behavior by returning properties with the
 		// correct values.
 
 		Properties properties = new Properties();
@@ -355,23 +285,19 @@ public class ConfigurationImpl
 			ComponentProperties componentProperties =
 				_componentConfiguration.getProperties();
 
-			AggregatedProperties aggregatedProperties =
-				(AggregatedProperties)componentProperties.toConfiguration();
-
-			Class<?> clazz = aggregatedProperties.getClass();
-
-			Field field1 = clazz.getDeclaredField("baseConf");
-
-			field1.setAccessible(true);
+			ClassLoaderAggregateProperties classLoaderAggregateProperties =
+				(ClassLoaderAggregateProperties)
+					componentProperties.toConfiguration();
 
 			CompositeConfiguration compositeConfiguration =
-				(CompositeConfiguration)field1.get(aggregatedProperties);
+				classLoaderAggregateProperties.getBaseConfiguration();
 
 			Field field2 = CompositeConfiguration.class.getDeclaredField(
 				"configList");
 
 			field2.setAccessible(true);
 
+			@SuppressWarnings("unchecked")
 			List<Configuration> configurations =
 				(List<Configuration>)field2.get(compositeConfiguration);
 
@@ -390,7 +316,8 @@ public class ConfigurationImpl
 				if (mapConfiguration.getMap() == properties) {
 					itr.remove();
 
-					aggregatedProperties.removeConfiguration(configuration);
+					classLoaderAggregateProperties.removeConfiguration(
+						configuration);
 				}
 			}
 
@@ -484,43 +411,6 @@ public class ConfigurationImpl
 		}
 
 		return easyConfFilter;
-	}
-
-	protected String getFileName(ClassLoader classLoader, String name) {
-		URL url = classLoader.getResource(name + ".properties");
-
-		// If the resource is located inside of a JAR, then EasyConf needs the
-		// "jar:file:" prefix appended to the path. Use URL.toExternalForm() to
-		// achieve that. When running under JBoss, the protocol returned is
-		// "vfsfile" or "vfszip". When running under OC4J, the protocol returned
-		// is "code-source". When running under WebLogic, the protocol returned
-		// is "zip". When running under WebSphere, the protocol returned is
-		// "wsjar".
-
-		String protocol = url.getProtocol();
-
-		if (protocol.equals("code-source") || protocol.equals("jar") ||
-			protocol.equals("vfsfile") || protocol.equals("vfszip") ||
-			protocol.equals("wsjar") || protocol.equals("zip")) {
-
-			name = url.toExternalForm();
-		}
-		else {
-			try {
-				name = new URI(url.getPath()).getPath();
-			}
-			catch (URISyntaxException urise) {
-				name = url.getFile();
-			}
-		}
-
-		int pos = name.lastIndexOf(".properties");
-
-		if (pos != -1) {
-			name = name.substring(0, pos);
-		}
-
-		return name;
 	}
 
 	protected void printSources(long companyId, String webId) {

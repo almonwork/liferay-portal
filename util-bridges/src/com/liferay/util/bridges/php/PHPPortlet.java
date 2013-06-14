@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -16,13 +16,13 @@ package com.liferay.util.bridges.php;
 
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.servlet.DynamicServletConfig;
 import com.liferay.portal.kernel.servlet.PortletServletObjectsFactory;
 import com.liferay.portal.kernel.servlet.ServletObjectsFactory;
 import com.liferay.portal.kernel.servlet.StringServletResponse;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.util.bridges.common.ScriptPostProcess;
-import com.liferay.util.servlet.DynamicServletConfig;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -51,30 +51,9 @@ import javax.servlet.http.HttpServletResponse;
 public class PHPPortlet extends GenericPortlet {
 
 	@Override
-	public void init(PortletConfig portletConfig) throws PortletException {
-		super.init(portletConfig);
-
-		editUri = getInitParameter("edit-uri");
-		helpUri = getInitParameter("help-uri");
-		viewUri = getInitParameter("view-uri");
-
-		addPortletParams = GetterUtil.getBoolean(
-			portletConfig.getInitParameter("add-portlet-params"), true);
-
-		String servletObjectsFactoryName = GetterUtil.getString(
-			getInitParameter("servlet-objects-factory"),
-			PortletServletObjectsFactory.class.getName());
-
-		try {
-			Class<?> servletObjectsFactoryClass = Class.forName(
-				servletObjectsFactoryName);
-
-			servletObjectsFactory =
-				(ServletObjectsFactory)servletObjectsFactoryClass.newInstance();
-		}
-		catch (Exception e) {
-			throw new PortletException(
-				"Unable to instantiate factory" + servletObjectsFactoryName, e);
+	public void destroy() {
+		if (quercusServlet != null) {
+			quercusServlet.destroy();
 		}
 	}
 
@@ -121,19 +100,41 @@ public class PHPPortlet extends GenericPortlet {
 	}
 
 	@Override
-	public void processAction(
-			ActionRequest actionRequest, ActionResponse actionResponse) {
-		String phpURI = actionRequest.getParameter(_PHP_URI_PARAM);
+	public void init(PortletConfig portletConfig) throws PortletException {
+		super.init(portletConfig);
 
-		if (phpURI != null) {
-			actionResponse.setRenderParameter(_PHP_URI_PARAM, phpURI);
+		editUri = getInitParameter("edit-uri");
+		helpUri = getInitParameter("help-uri");
+		viewUri = getInitParameter("view-uri");
+
+		addPortletParams = GetterUtil.getBoolean(
+			portletConfig.getInitParameter("add-portlet-params"), true);
+
+		String servletObjectsFactoryName = GetterUtil.getString(
+			getInitParameter("servlet-objects-factory"),
+			PortletServletObjectsFactory.class.getName());
+
+		try {
+			Class<?> servletObjectsFactoryClass = Class.forName(
+				servletObjectsFactoryName);
+
+			servletObjectsFactory =
+				(ServletObjectsFactory)servletObjectsFactoryClass.newInstance();
+		}
+		catch (Exception e) {
+			throw new PortletException(
+				"Unable to instantiate factory" + servletObjectsFactoryName, e);
 		}
 	}
 
 	@Override
-	public void destroy() {
-		if (quercusServlet != null) {
-			quercusServlet.destroy();
+	public void processAction(
+		ActionRequest actionRequest, ActionResponse actionResponse) {
+
+		String phpURI = actionRequest.getParameter(_PHP_URI_PARAM);
+
+		if (phpURI != null) {
+			actionResponse.setRenderParameter(_PHP_URI_PARAM, phpURI);
 		}
 	}
 
@@ -220,18 +221,18 @@ public class PHPPortlet extends GenericPortlet {
 		return scriptPostProcess.getFinalizedPage();
 	}
 
+	protected boolean addPortletParams;
+	protected String editUri;
+	protected String helpUri;
+	protected HttpServlet quercusServlet;
+	protected ServletObjectsFactory servletObjectsFactory;
+	protected String viewUri;
+
 	private static final String _PHP_URI_PARAM = "phpURI";
 
 	private static final String _QUERCUS_SERVLET =
 		"com.caucho.quercus.servlet.QuercusServlet";
 
 	private static Log _log = LogFactoryUtil.getLog(PHPPortlet.class);
-
-	protected String editUri;
-	protected String helpUri;
-	protected String viewUri;
-	protected boolean addPortletParams;
-	protected ServletObjectsFactory servletObjectsFactory;
-	protected HttpServlet quercusServlet;
 
 }

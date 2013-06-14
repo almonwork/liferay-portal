@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -15,6 +15,7 @@
 package com.liferay.portal.kernel.executor;
 
 import com.liferay.portal.kernel.concurrent.ThreadPoolExecutor;
+import com.liferay.portal.kernel.security.pacl.permission.PortalRuntimePermission;
 
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
@@ -27,9 +28,7 @@ import java.util.concurrent.TimeoutException;
  */
 public class PortalExecutorManagerUtil {
 
-	public static <T> Future<T> execute(
-		String name, Callable<T> callable) {
-
+	public static <T> Future<T> execute(String name, Callable<T> callable) {
 		return getPortalExecutorManager().execute(name, callable);
 	}
 
@@ -53,7 +52,17 @@ public class PortalExecutorManagerUtil {
 	}
 
 	public static PortalExecutorManager getPortalExecutorManager() {
+		PortalRuntimePermission.checkGetBeanProperty(
+			PortalExecutorManagerUtil.class);
+
 		return _portalExecutorManager;
+	}
+
+	public static ThreadPoolExecutor registerPortalExecutor(
+		String name, ThreadPoolExecutor threadPoolExecutor) {
+
+		return getPortalExecutorManager().registerPortalExecutor(
+			name, threadPoolExecutor);
 	}
 
 	public static void shutdown() {
@@ -74,6 +83,8 @@ public class PortalExecutorManagerUtil {
 
 	public void setPortalExecutorManager(
 		PortalExecutorManager portalExecutorManager) {
+
+		PortalRuntimePermission.checkSetBeanProperty(getClass());
 
 		_portalExecutorManager = portalExecutorManager;
 	}

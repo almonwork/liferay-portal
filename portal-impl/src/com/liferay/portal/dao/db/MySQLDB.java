@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -56,16 +56,13 @@ public class MySQLDB extends BaseDB {
 	}
 
 	@Override
-	public List<Index> getIndexes() throws SQLException {
+	public List<Index> getIndexes(Connection con) throws SQLException {
 		List<Index> indexes = new ArrayList<Index>();
 
-		Connection con = null;
 		PreparedStatement ps = null;
 		ResultSet rs = null;
 
 		try {
-			con = DataAccess.getConnection();
-
 			StringBundler sb = new StringBundler(4);
 
 			sb.append("select distinct(index_name), table_name, non_unique ");
@@ -88,7 +85,7 @@ public class MySQLDB extends BaseDB {
 			}
 		}
 		finally {
-			DataAccess.cleanUp(con, ps, rs);
+			DataAccess.cleanUp(null, ps, rs);
 		}
 
 		return indexes;
@@ -198,13 +195,10 @@ public class MySQLDB extends BaseDB {
 		return sb.toString();
 	}
 
-	private static String[] _MYSQL = {
-		"##", "1", "0",
-		"'1970-01-01'", "now()",
-		" longblob", " tinyint", " datetime",
-		" double", " integer", " bigint",
-		" longtext", " longtext", " varchar",
-		"  auto_increment", "commit"
+	private static final String[] _MYSQL = {
+		"##", "1", "0", "'1970-01-01'", "now()", " longblob", " longblob",
+		" tinyint", " datetime", " double", " integer", " bigint", " longtext",
+		" longtext", " varchar", "  auto_increment", "commit"
 	};
 
 	private static final boolean _SUPPORTS_DATE_MILLISECONDS = false;

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -18,6 +18,7 @@ import com.liferay.portal.editor.fckeditor.command.CommandArgument;
 import com.liferay.portal.editor.fckeditor.exception.FCKException;
 import com.liferay.portal.editor.fckeditor.receiver.CommandReceiver;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
+import com.liferay.portal.kernel.io.ByteArrayFileInputStream;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.util.CharPool;
@@ -27,15 +28,18 @@ import com.liferay.portal.kernel.util.HtmlUtil;
 import com.liferay.portal.kernel.util.MimeTypesUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.PropsKeys;
+import com.liferay.portal.kernel.util.StreamUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
+import com.liferay.portal.kernel.util.UniqueList;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.model.Group;
 import com.liferay.portal.model.Organization;
 import com.liferay.portal.service.GroupLocalServiceUtil;
 import com.liferay.portal.service.OrganizationLocalServiceUtil;
 import com.liferay.portal.theme.ThemeDisplay;
+import com.liferay.portal.upload.LiferayFileItem;
 import com.liferay.portal.upload.LiferayFileItemFactory;
 import com.liferay.portal.upload.LiferayFileUpload;
 import com.liferay.portal.upload.LiferayServletRequest;
@@ -43,7 +47,7 @@ import com.liferay.portal.upload.UploadServletRequestImpl;
 import com.liferay.portal.util.PrefsPropsUtil;
 import com.liferay.portal.util.PropsValues;
 
-import java.io.File;
+import java.io.InputStream;
 import java.io.PrintWriter;
 
 import java.util.HashMap;
@@ -109,7 +113,9 @@ public abstract class BaseCommandReceiver implements CommandReceiver {
 				else if (causeString.contains("FolderNameException")) {
 					returnValue = "102";
 				}
-				else if (causeString.contains("NoSuchGroupException")) {
+				else if (causeString.contains("NoSuchGroupException") ||
+						 causeString.contains("PrincipalException")) {
+
 					returnValue = "103";
 				}
 				else {
@@ -123,39 +129,11 @@ public abstract class BaseCommandReceiver implements CommandReceiver {
 		_writeDocument(document, response);
 	}
 
-	public void getFolders(
-		CommandArgument commandArgument, HttpServletRequest request,
-		HttpServletResponse response) {
-
-		Document document = _createDocument();
-
-		Node rootNode = _createRoot(
-			document, commandArgument.getCommand(), commandArgument.getType(),
-			commandArgument.getCurrentFolder(), getPath(commandArgument));
-
-		getFolders(commandArgument, document, rootNode);
-
-		_writeDocument(document, response);
-	}
-
-	public void getFoldersAndFiles(
-		CommandArgument commandArgument, HttpServletRequest request,
-		HttpServletResponse response) {
-
-		Document document = _createDocument();
-
-		Node rootNode = _createRoot(
-			document, commandArgument.getCommand(), commandArgument.getType(),
-			commandArgument.getCurrentFolder(), getPath(commandArgument));
-
-		getFoldersAndFiles(commandArgument, document, rootNode);
-
-		_writeDocument(document, response);
-	}
-
 	public void fileUpload(
 		CommandArgument commandArgument, HttpServletRequest request,
 		HttpServletResponse response) {
+
+		InputStream inputStream = null;
 
 		String returnValue = null;
 
@@ -201,9 +179,19 @@ public abstract class BaseCommandReceiver implements CommandReceiver {
 					diskFileItem.getStoreLocation());
 			}
 
+			if (diskFileItem.isInMemory()) {
+				inputStream = diskFileItem.getInputStream();
+			}
+			else {
+				inputStream = new ByteArrayFileInputStream(
+					diskFileItem.getStoreLocation(),
+					LiferayFileItem.THRESHOLD_SIZE);
+			}
+
+			long size = diskFileItem.getSize();
+
 			returnValue = fileUpload(
-				commandArgument, fileName, diskFileItem.getStoreLocation(),
-				contentType);
+				commandArgument, fileName, inputStream, contentType, size);
 		}
 		catch (Exception e) {
 			FCKException fcke = null;
@@ -253,15 +241,48 @@ public abstract class BaseCommandReceiver implements CommandReceiver {
 
 			_writeUploadResponse(returnValue, response);
 		}
+		finally {
+			StreamUtil.cleanUp(inputStream);
+		}
 
 		_writeUploadResponse(returnValue, response);
+	}
+
+	public void getFolders(
+		CommandArgument commandArgument, HttpServletRequest request,
+		HttpServletResponse response) {
+
+		Document document = _createDocument();
+
+		Node rootNode = _createRoot(
+			document, commandArgument.getCommand(), commandArgument.getType(),
+			commandArgument.getCurrentFolder(), getPath(commandArgument));
+
+		getFolders(commandArgument, document, rootNode);
+
+		_writeDocument(document, response);
+	}
+
+	public void getFoldersAndFiles(
+		CommandArgument commandArgument, HttpServletRequest request,
+		HttpServletResponse response) {
+
+		Document document = _createDocument();
+
+		Node rootNode = _createRoot(
+			document, commandArgument.getCommand(), commandArgument.getType(),
+			commandArgument.getCurrentFolder(), getPath(commandArgument));
+
+		getFoldersAndFiles(commandArgument, document, rootNode);
+
+		_writeDocument(document, response);
 	}
 
 	protected abstract String createFolder(CommandArgument commandArgument);
 
 	protected abstract String fileUpload(
-		CommandArgument commandArgument, String fileName, File file,
-		String contentType);
+		CommandArgument commandArgument, String fileName,
+		InputStream inputStream, String contentType, long size);
 
 	protected abstract void getFolders(
 		CommandArgument commandArgument, Document document, Node rootNode);
@@ -269,23 +290,30 @@ public abstract class BaseCommandReceiver implements CommandReceiver {
 	protected abstract void getFoldersAndFiles(
 		CommandArgument commandArgument, Document document, Node rootNode);
 
+	protected String getPath(CommandArgument commandArgument) {
+		return StringPool.BLANK;
+	}
+
 	protected void getRootFolders(
 			CommandArgument commandArgument, Document document,
 			Element foldersElement)
 		throws Exception {
+
+		List<Group> groups = new UniqueList<Group>();
 
 		LinkedHashMap<String, Object> groupParams =
 			new LinkedHashMap<String, Object>();
 
 		groupParams.put("usersGroups", new Long(commandArgument.getUserId()));
 
-		List<Group> groups = GroupLocalServiceUtil.search(
-			commandArgument.getCompanyId(), null, null, groupParams,
-			QueryUtil.ALL_POS, QueryUtil.ALL_POS);
+		groups.addAll(
+			GroupLocalServiceUtil.search(
+				commandArgument.getCompanyId(), null, null, groupParams,
+				QueryUtil.ALL_POS, QueryUtil.ALL_POS));
 
 		List<Organization> userOrgs =
 			OrganizationLocalServiceUtil.getUserOrganizations(
-				commandArgument.getUserId(), true);
+				commandArgument.getUserId());
 
 		for (Organization organization : userOrgs) {
 			groups.add(0, organization.getGroup());
@@ -330,8 +358,7 @@ public abstract class BaseCommandReceiver implements CommandReceiver {
 					folderElement.setAttribute(
 						"name",
 						stagingGroup.getGroupId() + " - " +
-							HtmlUtil.escape(
-								stagingGroup.getDescriptiveName()));
+							HtmlUtil.escape(stagingGroup.getDescriptiveName()));
 
 					setNameAttribute = true;
 				}
@@ -344,10 +371,6 @@ public abstract class BaseCommandReceiver implements CommandReceiver {
 						HtmlUtil.escape(group.getDescriptiveName()));
 			}
 		}
-	}
-
-	protected String getPath(CommandArgument commandArgument) {
-		return StringPool.BLANK;
 	}
 
 	protected String getSize() {
@@ -378,8 +401,8 @@ public abstract class BaseCommandReceiver implements CommandReceiver {
 	}
 
 	private Node _createRoot(
-		Document document, String command, String resourceType,
-		String path, String url) {
+		Document document, String command, String resourceType, String path,
+		String url) {
 
 		Element rootElement = document.createElement("Connector");
 

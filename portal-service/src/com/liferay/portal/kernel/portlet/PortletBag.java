@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -21,9 +21,12 @@ import com.liferay.portal.kernel.pop.MessageListener;
 import com.liferay.portal.kernel.search.Indexer;
 import com.liferay.portal.kernel.search.OpenSearch;
 import com.liferay.portal.kernel.servlet.URLEncoder;
+import com.liferay.portal.kernel.template.PortletDisplayTemplateHandler;
+import com.liferay.portal.kernel.trash.TrashHandler;
 import com.liferay.portal.kernel.webdav.WebDAVStorage;
 import com.liferay.portal.kernel.workflow.WorkflowHandler;
 import com.liferay.portal.kernel.xmlrpc.Method;
+import com.liferay.portal.security.permission.PermissionPropagator;
 import com.liferay.portlet.ControlPanelEntry;
 import com.liferay.portlet.asset.model.AssetRendererFactory;
 import com.liferay.portlet.expando.model.CustomAttributesDisplay;
@@ -63,11 +66,16 @@ public interface PortletBag extends Cloneable {
 
 	public OpenSearch getOpenSearchInstance();
 
+	public PermissionPropagator getPermissionPropagatorInstance();
+
 	public PollerProcessor getPollerProcessorInstance();
 
 	public MessageListener getPopMessageListenerInstance();
 
 	public PortletDataHandler getPortletDataHandlerInstance();
+
+	public PortletDisplayTemplateHandler
+		getPortletDisplayTemplateHandlerInstance();
 
 	public Portlet getPortletInstance();
 
@@ -86,6 +94,8 @@ public interface PortletBag extends Cloneable {
 	public SocialActivityInterpreter getSocialActivityInterpreterInstance();
 
 	public SocialRequestInterpreter getSocialRequestInterpreterInstance();
+
+	public List<TrashHandler> getTrashHandlerInstances();
 
 	public URLEncoder getURLEncoderInstance();
 

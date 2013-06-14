@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -27,21 +27,13 @@ public class State {
 		_name = name;
 	}
 
-	public String getId() {
-		return _id;
-	}
-
-	public String getName() {
-		return _name;
-	}
-
 	public int compareTo(Object obj) {
 		State state = (State)obj;
 
-		if (getId() != null && state.getId() != null) {
+		if ((getId() != null) && (state.getId() != null)) {
 			return getId().toLowerCase().compareTo(state.getId().toLowerCase());
 		}
-		else if (getName() != null && state.getName() != null) {
+		else if ((getName() != null) && (state.getName() != null)) {
 			return getName().toLowerCase().compareTo(
 				state.getName().toLowerCase());
 		}
@@ -63,6 +55,14 @@ public class State {
 		else {
 			return false;
 		}
+	}
+
+	public String getId() {
+		return _id;
+	}
+
+	public String getName() {
+		return _name;
 	}
 
 	@Override

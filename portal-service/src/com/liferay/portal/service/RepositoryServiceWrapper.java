@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -23,14 +23,52 @@ package com.liferay.portal.service;
  * @see       RepositoryService
  * @generated
  */
-public class RepositoryServiceWrapper implements RepositoryService {
+public class RepositoryServiceWrapper implements RepositoryService,
+	ServiceWrapper<RepositoryService> {
 	public RepositoryServiceWrapper(RepositoryService repositoryService) {
 		_repositoryService = repositoryService;
 	}
 
+	/**
+	* Returns the Spring bean ID for this bean.
+	*
+	* @return the Spring bean ID for this bean
+	*/
+	public java.lang.String getBeanIdentifier() {
+		return _repositoryService.getBeanIdentifier();
+	}
+
+	/**
+	* Sets the Spring bean ID for this bean.
+	*
+	* @param beanIdentifier the Spring bean ID for this bean
+	*/
+	public void setBeanIdentifier(java.lang.String beanIdentifier) {
+		_repositoryService.setBeanIdentifier(beanIdentifier);
+	}
+
+	public long addRepository(long groupId, long classNameId,
+		long parentFolderId, java.lang.String name,
+		java.lang.String description, java.lang.String portletId,
+		com.liferay.portal.kernel.util.UnicodeProperties typeSettingsProperties,
+		com.liferay.portal.service.ServiceContext serviceContext)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException {
+		return _repositoryService.addRepository(groupId, classNameId,
+			parentFolderId, name, description, portletId,
+			typeSettingsProperties, serviceContext);
+	}
+
 	public void checkRepository(long repositoryId)
-		throws com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException {
 		_repositoryService.checkRepository(repositoryId);
+	}
+
+	public void deleteRepository(long repositoryId)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException {
+		_repositoryService.deleteRepository(repositoryId);
 	}
 
 	public com.liferay.portal.kernel.repository.LocalRepository getLocalRepositoryImpl(
@@ -88,30 +126,6 @@ public class RepositoryServiceWrapper implements RepositoryService {
 		return _repositoryService.getTypeSettingsProperties(repositoryId);
 	}
 
-	public long mountRepository(long groupId, long classNameId,
-		long parentFolderId, java.lang.String name,
-		java.lang.String description, java.lang.String portletId,
-		com.liferay.portal.kernel.util.UnicodeProperties typeSettingsProperties,
-		com.liferay.portal.service.ServiceContext serviceContext)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
-		return _repositoryService.mountRepository(groupId, classNameId,
-			parentFolderId, name, description, portletId,
-			typeSettingsProperties, serviceContext);
-	}
-
-	public void unmountRepositories(long groupId)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
-		_repositoryService.unmountRepositories(groupId);
-	}
-
-	public void unmountRepository(long repositoryId)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
-		_repositoryService.unmountRepository(repositoryId);
-	}
-
 	public void updateRepository(long repositoryId, java.lang.String name,
 		java.lang.String description)
 		throws com.liferay.portal.kernel.exception.PortalException,
@@ -119,11 +133,25 @@ public class RepositoryServiceWrapper implements RepositoryService {
 		_repositoryService.updateRepository(repositoryId, name, description);
 	}
 
+	/**
+	 * @deprecated Renamed to {@link #getWrappedService}
+	 */
 	public RepositoryService getWrappedRepositoryService() {
 		return _repositoryService;
 	}
 
+	/**
+	 * @deprecated Renamed to {@link #setWrappedService}
+	 */
 	public void setWrappedRepositoryService(RepositoryService repositoryService) {
+		_repositoryService = repositoryService;
+	}
+
+	public RepositoryService getWrappedService() {
+		return _repositoryService;
+	}
+
+	public void setWrappedService(RepositoryService repositoryService) {
 		_repositoryService = repositoryService;
 	}
 

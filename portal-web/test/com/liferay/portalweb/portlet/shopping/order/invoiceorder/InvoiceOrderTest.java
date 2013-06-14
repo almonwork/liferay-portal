@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -23,14 +23,15 @@ import com.liferay.portalweb.portal.util.RuntimeVariables;
 public class InvoiceOrderTest extends BaseTestCase {
 	public void testInvoiceOrder() throws Exception {
 		selenium.open("/web/guest/home/");
+		loadRequiredJavaScriptModules();
 
 		for (int second = 0;; second++) {
-			if (second >= 60) {
+			if (second >= 90) {
 				fail("timeout");
 			}
 
 			try {
-				if (selenium.isElementPresent("link=Shopping Test Page")) {
+				if (selenium.isVisible("link=Shopping Test Page")) {
 					break;
 				}
 			}
@@ -40,49 +41,35 @@ public class InvoiceOrderTest extends BaseTestCase {
 			Thread.sleep(1000);
 		}
 
-		selenium.saveScreenShotAndSource();
-		selenium.clickAt("link=Shopping Test Page", RuntimeVariables.replace(""));
+		selenium.clickAt("link=Shopping Test Page",
+			RuntimeVariables.replace("Shopping Test Page"));
 		selenium.waitForPageToLoad("30000");
-		selenium.saveScreenShotAndSource();
-		selenium.clickAt("link=Orders", RuntimeVariables.replace(""));
+		loadRequiredJavaScriptModules();
+		selenium.clickAt("link=Orders", RuntimeVariables.replace("Orders"));
 		selenium.waitForPageToLoad("30000");
-		selenium.saveScreenShotAndSource();
+		loadRequiredJavaScriptModules();
 		assertEquals(RuntimeVariables.replace("Joe Bloggs"),
 			selenium.getText("//tr[3]/td[5]"));
-		selenium.clickAt("link=Checkout", RuntimeVariables.replace(""));
+		assertEquals(RuntimeVariables.replace("Checkout"),
+			selenium.getText("//td[4]/a"));
+		selenium.clickAt("//td[4]/a", RuntimeVariables.replace("Checkout"));
 		selenium.waitForPageToLoad("30000");
-		selenium.saveScreenShotAndSource();
-		assertTrue(selenium.isTextPresent("Please take care of my order."));
-
-		for (int second = 0;; second++) {
-			if (second >= 60) {
-				fail("timeout");
-			}
-
-			try {
-				if (selenium.isElementPresent("//input[@value='Invoice']")) {
-					break;
-				}
-			}
-			catch (Exception e) {
-			}
-
-			Thread.sleep(1000);
-		}
-
-		selenium.saveScreenShotAndSource();
+		loadRequiredJavaScriptModules();
+		assertTrue(selenium.isTextPresent("Shopping Category Item Comments"));
 		selenium.clickAt("//input[@value='Invoice']",
-			RuntimeVariables.replace(""));
-		selenium.selectWindow("undefined");
-		selenium.saveScreenShotAndSource();
+			RuntimeVariables.replace("Invoice"));
+		selenium.waitForPopUp("", RuntimeVariables.replace("30000"));
+		selenium.selectWindow("name=undefined");
 
 		for (int second = 0;; second++) {
-			if (second >= 60) {
+			if (second >= 90) {
 				fail("timeout");
 			}
 
 			try {
-				if (selenium.isTextPresent("Invoice")) {
+				if (RuntimeVariables.replace("Invoice")
+										.equals(selenium.getText(
+								"//form[@id='_34_fm']/span/strong"))) {
 					break;
 				}
 			}
@@ -92,10 +79,9 @@ public class InvoiceOrderTest extends BaseTestCase {
 			Thread.sleep(1000);
 		}
 
-		selenium.saveScreenShotAndSource();
-		assertTrue(selenium.isTextPresent("Invoice"));
+		assertEquals(RuntimeVariables.replace("Invoice"),
+			selenium.getText("//form[@id='_34_fm']/span/strong"));
 		selenium.close();
 		selenium.selectWindow("null");
-		selenium.saveScreenShotAndSource();
 	}
 }

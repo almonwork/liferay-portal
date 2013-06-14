@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -60,8 +60,7 @@ public class SourceFormatterHelper {
 		File basedirFile = new File("./");
 
 		String basedirAbsolutePath = StringUtil.replace(
-			basedirFile.getAbsolutePath(),
-			new String[] {".", ":", "/", "\\"},
+			basedirFile.getAbsolutePath(), new String[] {".", ":", "/", "\\"},
 			new String[] {"_", "_", "_", "_"});
 
 		String propertiesFileName =

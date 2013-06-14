@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -23,14 +23,15 @@ import com.liferay.portalweb.portal.util.RuntimeVariables;
 public class AddComment3Test extends BaseTestCase {
 	public void testAddComment3() throws Exception {
 		selenium.open("/web/guest/home/");
+		loadRequiredJavaScriptModules();
 
 		for (int second = 0;; second++) {
-			if (second >= 60) {
+			if (second >= 90) {
 				fail("timeout");
 			}
 
 			try {
-				if (selenium.isElementPresent("link=Page Comments Test Page")) {
+				if (selenium.isVisible("link=Page Comments Test Page")) {
 					break;
 				}
 			}
@@ -40,20 +41,23 @@ public class AddComment3Test extends BaseTestCase {
 			Thread.sleep(1000);
 		}
 
-		selenium.saveScreenShotAndSource();
 		selenium.clickAt("link=Page Comments Test Page",
-			RuntimeVariables.replace(""));
+			RuntimeVariables.replace("Page Comments Test Page"));
 		selenium.waitForPageToLoad("30000");
-		selenium.saveScreenShotAndSource();
-		selenium.clickAt("link=Add Comment", RuntimeVariables.replace(""));
+		loadRequiredJavaScriptModules();
+		assertEquals(RuntimeVariables.replace("Add Comment"),
+			selenium.getText("//span[1]/a/span"));
+		selenium.clickAt("//span[1]/a/span",
+			RuntimeVariables.replace("Add Comment"));
 
 		for (int second = 0;; second++) {
-			if (second >= 60) {
+			if (second >= 90) {
 				fail("timeout");
 			}
 
 			try {
-				if (selenium.isVisible("_107_postReplyBody0")) {
+				if (selenium.isVisible(
+							"//textarea[@name='_107_postReplyBody0']")) {
 					break;
 				}
 			}
@@ -63,25 +67,43 @@ public class AddComment3Test extends BaseTestCase {
 			Thread.sleep(1000);
 		}
 
-		selenium.saveScreenShotAndSource();
-		assertTrue(selenium.isVisible("_107_postReplyBody0"));
-		selenium.type("_107_postReplyBody0",
-			RuntimeVariables.replace("This is a test page3 comment3."));
-		selenium.saveScreenShotAndSource();
-		selenium.keyPress("_107_postReplyBody0",
-			RuntimeVariables.replace("\\48"));
-		selenium.keyPress("_107_postReplyBody0", RuntimeVariables.replace("\\8"));
-		selenium.clickAt("//input[@value='Reply']", RuntimeVariables.replace(""));
-		selenium.waitForPageToLoad("30000");
-		selenium.saveScreenShotAndSource();
+		assertTrue(selenium.isVisible("//textarea[@name='_107_postReplyBody0']"));
+		selenium.type("//textarea[@name='_107_postReplyBody0']",
+			RuntimeVariables.replace("PC Comment3"));
+		selenium.clickAt("//input[@value='Reply']",
+			RuntimeVariables.replace("Reply"));
+
+		for (int second = 0;; second++) {
+			if (second >= 90) {
+				fail("timeout");
+			}
+
+			try {
+				if (RuntimeVariables.replace(
+							"Your request processed successfully.")
+										.equals(selenium.getText(
+								"//div[@class='lfr-message-response portlet-msg-success']"))) {
+					break;
+				}
+			}
+			catch (Exception e) {
+			}
+
+			Thread.sleep(1000);
+		}
+
 		assertEquals(RuntimeVariables.replace(
-				"Your request completed successfully."),
-			selenium.getText("//div[@class='portlet-msg-success']"));
-		assertEquals(RuntimeVariables.replace("This is a test page1 comment1."),
-			selenium.getText("//div/div[3]/div/div[1]"));
-		assertEquals(RuntimeVariables.replace("This is a test page2 comment2."),
-			selenium.getText("//form/div/div/div[3]/div/div[3]/div/div[1]"));
-		assertEquals(RuntimeVariables.replace("This is a test page3 comment3."),
-			selenium.getText("//div[5]/div/div[3]/div/div[1]"));
+				"Your request processed successfully."),
+			selenium.getText(
+				"//div[@class='lfr-message-response portlet-msg-success']"));
+		assertEquals(RuntimeVariables.replace("PC Comment1"),
+			selenium.getText(
+				"xPath=(//div[@class='lfr-discussion-message'])[1]"));
+		assertEquals(RuntimeVariables.replace("PC Comment2"),
+			selenium.getText(
+				"xPath=(//div[@class='lfr-discussion-message'])[2]"));
+		assertEquals(RuntimeVariables.replace("PC Comment3"),
+			selenium.getText(
+				"xPath=(//div[@class='lfr-discussion-message'])[3]"));
 	}
 }

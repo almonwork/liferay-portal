@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -16,11 +16,12 @@ package com.liferay.portlet.bookmarks.service.impl;
 
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
-import com.liferay.portal.kernel.search.Indexer;
-import com.liferay.portal.kernel.search.IndexerRegistryUtil;
+import com.liferay.portal.kernel.search.Indexable;
+import com.liferay.portal.kernel.search.IndexableType;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.ContentTypes;
 import com.liferay.portal.kernel.util.OrderByComparator;
+import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.model.ResourceConstants;
 import com.liferay.portal.model.User;
@@ -32,10 +33,10 @@ import com.liferay.portlet.bookmarks.model.BookmarksEntry;
 import com.liferay.portlet.bookmarks.model.BookmarksFolder;
 import com.liferay.portlet.bookmarks.model.BookmarksFolderConstants;
 import com.liferay.portlet.bookmarks.service.base.BookmarksEntryLocalServiceBaseImpl;
+import com.liferay.portlet.bookmarks.social.BookmarksActivityKeys;
 import com.liferay.portlet.bookmarks.util.comparator.EntryModifiedDateComparator;
 
 import java.util.Date;
-import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -45,6 +46,7 @@ import java.util.List;
 public class BookmarksEntryLocalServiceImpl
 	extends BookmarksEntryLocalServiceBaseImpl {
 
+	@Indexable(type = IndexableType.REINDEX)
 	public BookmarksEntry addEntry(
 			long userId, long groupId, long folderId, String name, String url,
 			String description, ServiceContext serviceContext)
@@ -83,18 +85,7 @@ public class BookmarksEntryLocalServiceImpl
 
 		// Resources
 
-		if (serviceContext.getAddGroupPermissions() ||
-			serviceContext.getAddGuestPermissions()) {
-
-			addEntryResources(
-				entry, serviceContext.getAddGroupPermissions(),
-				serviceContext.getAddGuestPermissions());
-		}
-		else {
-			addEntryResources(
-				entry, serviceContext.getGroupPermissions(),
-				serviceContext.getGuestPermissions());
-		}
+		resourceLocalService.addModelResources(entry, serviceContext);
 
 		// Asset
 
@@ -103,73 +94,28 @@ public class BookmarksEntryLocalServiceImpl
 			serviceContext.getAssetTagNames(),
 			serviceContext.getAssetLinkEntryIds());
 
-		// Indexer
+		// Social
 
-		Indexer indexer = IndexerRegistryUtil.getIndexer(
-			BookmarksEntry.class);
-
-		indexer.reindex(entry);
+		socialActivityLocalService.addActivity(
+			userId, groupId, BookmarksEntry.class.getName(), entryId,
+			BookmarksActivityKeys.ADD_ENTRY, StringPool.BLANK, 0);
 
 		return entry;
-	}
-
-	public void addEntryResources(
-			BookmarksEntry entry, boolean addGroupPermissions,
-			boolean addGuestPermissions)
-		throws PortalException, SystemException {
-
-		resourceLocalService.addResources(
-			entry.getCompanyId(), entry.getGroupId(), entry.getUserId(),
-			BookmarksEntry.class.getName(), entry.getEntryId(), false,
-			addGroupPermissions, addGuestPermissions);
-	}
-
-	public void addEntryResources(
-			BookmarksEntry entry, String[] groupPermissions,
-			String[] guestPermissions)
-		throws PortalException, SystemException {
-
-		resourceLocalService.addModelResources(
-			entry.getCompanyId(), entry.getGroupId(), entry.getUserId(),
-			BookmarksEntry.class.getName(), entry.getEntryId(),
-			groupPermissions, guestPermissions);
-	}
-
-	public void addEntryResources(
-			long entryId, boolean addGroupPermissions,
-			boolean addGuestPermissions)
-		throws PortalException, SystemException {
-
-		BookmarksEntry entry =
-			bookmarksEntryPersistence.findByPrimaryKey(entryId);
-
-		addEntryResources(entry, addGroupPermissions, addGuestPermissions);
-	}
-
-	public void addEntryResources(
-			long entryId, String[] groupPermissions, String[] guestPermissions)
-		throws PortalException, SystemException {
-
-		BookmarksEntry entry =
-			bookmarksEntryPersistence.findByPrimaryKey(entryId);
-
-		addEntryResources(entry, groupPermissions, guestPermissions);
 	}
 
 	public void deleteEntries(long groupId, long folderId)
 		throws PortalException, SystemException {
 
-		Iterator<BookmarksEntry> itr = bookmarksEntryPersistence.findByG_F(
-			groupId, folderId).iterator();
+		List<BookmarksEntry> entries = bookmarksEntryPersistence.findByG_F(
+			groupId, folderId);
 
-		while (itr.hasNext()) {
-			BookmarksEntry entry = itr.next();
-
-			deleteEntry(entry);
+		for (BookmarksEntry entry : entries) {
+			bookmarksEntryLocalService.deleteEntry(entry);
 		}
 	}
 
-	public void deleteEntry(BookmarksEntry entry)
+	@Indexable(type = IndexableType.DELETE)
+	public BookmarksEntry deleteEntry(BookmarksEntry entry)
 		throws PortalException, SystemException {
 
 		// Entry
@@ -179,8 +125,7 @@ public class BookmarksEntryLocalServiceImpl
 		// Resources
 
 		resourceLocalService.deleteResource(
-			entry.getCompanyId(), BookmarksEntry.class.getName(),
-			ResourceConstants.SCOPE_INDIVIDUAL, entry.getEntryId());
+			entry, ResourceConstants.SCOPE_INDIVIDUAL);
 
 		// Asset
 
@@ -192,20 +137,17 @@ public class BookmarksEntryLocalServiceImpl
 		expandoValueLocalService.deleteValues(
 			BookmarksEntry.class.getName(), entry.getEntryId());
 
-		// Indexer
-
-		Indexer indexer = IndexerRegistryUtil.getIndexer(BookmarksEntry.class);
-
-		indexer.delete(entry);
+		return entry;
 	}
 
-	public void deleteEntry(long entryId)
+	@Indexable(type = IndexableType.DELETE)
+	public BookmarksEntry deleteEntry(long entryId)
 		throws PortalException, SystemException {
 
-		BookmarksEntry entry =
-			bookmarksEntryPersistence.findByPrimaryKey(entryId);
+		BookmarksEntry entry = bookmarksEntryPersistence.findByPrimaryKey(
+			entryId);
 
-		deleteEntry(entry);
+		return deleteEntry(entry);
 	}
 
 	public List<BookmarksEntry> getEntries(
@@ -225,8 +167,7 @@ public class BookmarksEntryLocalServiceImpl
 			groupId, folderId, start, end, orderByComparator);
 	}
 
-	public int getEntriesCount(
-			long groupId, long folderId)
+	public int getEntriesCount(long groupId, long folderId)
 		throws SystemException {
 
 		return bookmarksEntryPersistence.countByG_F(groupId, folderId);
@@ -292,15 +233,15 @@ public class BookmarksEntryLocalServiceImpl
 	public BookmarksEntry openEntry(long userId, long entryId)
 		throws PortalException, SystemException {
 
-		BookmarksEntry entry =
-			bookmarksEntryPersistence.findByPrimaryKey(entryId);
+		BookmarksEntry entry = bookmarksEntryPersistence.findByPrimaryKey(
+			entryId);
 
 		entry.setVisits(entry.getVisits() + 1);
 
 		bookmarksEntryPersistence.update(entry, false);
 
 		assetEntryLocalService.incrementViewCounter(
-			userId, BookmarksEntry.class.getName(), entryId);
+			userId, BookmarksEntry.class.getName(), entryId, 1);
 
 		return entry;
 	}
@@ -312,16 +253,17 @@ public class BookmarksEntryLocalServiceImpl
 
 		AssetEntry assetEntry = assetEntryLocalService.updateEntry(
 			userId, entry.getGroupId(), BookmarksEntry.class.getName(),
-			entry.getEntryId(), entry.getUuid(), assetCategoryIds,
-			assetTagNames, true, null, null, null, null,
-			ContentTypes.TEXT_PLAIN, entry.getName(), entry.getDescription(),
-			null, null, entry.getUrl(), 0, 0, null, false);
+			entry.getEntryId(), entry.getUuid(), 0, assetCategoryIds,
+			assetTagNames, true, null, null, null, ContentTypes.TEXT_PLAIN,
+			entry.getName(), entry.getDescription(), null, entry.getUrl(), null,
+			0, 0, null, false);
 
 		assetLinkLocalService.updateLinks(
 			userId, assetEntry.getEntryId(), assetLinkEntryIds,
 			AssetLinkConstants.TYPE_RELATED);
 	}
 
+	@Indexable(type = IndexableType.REINDEX)
 	public BookmarksEntry updateEntry(
 			long userId, long entryId, long groupId, long folderId, String name,
 			String url, String description, ServiceContext serviceContext)
@@ -329,8 +271,8 @@ public class BookmarksEntryLocalServiceImpl
 
 		// Entry
 
-		BookmarksEntry entry =
-			bookmarksEntryPersistence.findByPrimaryKey(entryId);
+		BookmarksEntry entry = bookmarksEntryPersistence.findByPrimaryKey(
+			entryId);
 
 		if (Validator.isNull(name)) {
 			name = url;
@@ -354,12 +296,11 @@ public class BookmarksEntryLocalServiceImpl
 			serviceContext.getAssetTagNames(),
 			serviceContext.getAssetLinkEntryIds());
 
-		// Indexer
+		// Social
 
-		Indexer indexer = IndexerRegistryUtil.getIndexer(
-			BookmarksEntry.class);
-
-		indexer.reindex(entry);
+		socialActivityLocalService.addActivity(
+			userId, entry.getGroupId(), BookmarksEntry.class.getName(), entryId,
+			BookmarksActivityKeys.UPDATE_ENTRY, StringPool.BLANK, 0);
 
 		return entry;
 	}

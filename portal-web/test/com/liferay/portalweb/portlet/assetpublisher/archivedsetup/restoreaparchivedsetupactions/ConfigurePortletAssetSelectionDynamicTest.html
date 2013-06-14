@@ -24,13 +24,18 @@
 	<td>Asset Publisher Test Page</td>
 </tr>
 <tr>
+	<td>pause</td>
+	<td>5000</td>
+	<td></td>
+</tr>
+<tr>
 	<td>assertText</td>
-	<td>//strong/a</td>
+	<td>//span[@title='Options']/ul/li/strong/a</td>
 	<td>Options</td>
 </tr>
 <tr>
 	<td>clickAt</td>
-	<td>//strong/a</td>
+	<td>//span[@title='Options']/ul/li/strong/a</td>
 	<td>Options</td>
 </tr>
 <tr>
@@ -61,7 +66,7 @@
 <tr>
 	<td>select</td>
 	<td>//select[@id='_86_selectionStyle']</td>
-	<td>label=Dynamic</td>
+	<td>Dynamic</td>
 </tr>
 <tr>
 	<td>waitForText</td>
@@ -72,11 +77,6 @@
 	<td>clickAndWait</td>
 	<td>//input[@value='Save']</td>
 	<td>Save</td>
-</tr>
-<tr>
-	<td>waitForText</td>
-	<td>//div[@class='portlet-msg-success']</td>
-	<td>You have successfully updated the setup.</td>
 </tr>
 <tr>
 	<td>assertText</td>
@@ -90,7 +90,7 @@
 </tr>
 <tr>
 	<td>assertText</td>
-	<td>//div[@class='lfr-panel-title']/span</td>
+	<td>xPath=(//div[@class='lfr-panel-title'])[1]/span</td>
 	<td>Source</td>
 </tr>
 <tr>
@@ -101,11 +101,16 @@
 <tr>
 	<td>assertText</td>
 	<td>xPath=(//div[@class='lfr-panel-title'])[3]/span</td>
-	<td>Ordering and Grouping</td>
+	<td>Custom User Attributes</td>
 </tr>
 <tr>
 	<td>assertText</td>
 	<td>xPath=(//div[@class='lfr-panel-title'])[4]/span</td>
+	<td>Ordering and Grouping</td>
+</tr>
+<tr>
+	<td>assertText</td>
+	<td>xPath=(//div[@class='lfr-panel-title'])[5]/span</td>
 	<td>Display Settings</td>
 </tr>
 

@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -53,7 +53,6 @@ String wmode = (String)request.getAttribute("liferay-ui:flash:wmode");
 				base: '<%= base %>',
 				bgcolor: '<%= bgcolor %>',
 				devicefont: '<%= devicefont %>',
-				flashvars: '<%= flashvars %>',
 				loop: '<%= loop %>',
 				menu: '<%= menu %>',
 				play: '<%= play %>',
@@ -63,6 +62,7 @@ String wmode = (String)request.getAttribute("liferay-ui:flash:wmode");
 				swliveconnect: '<%= swliveconnect %>',
 				wmode: '<%= wmode %>'
 			},
+			flashVars: '<%= flashvars %>',
 			height: '<%= height %>',
 			id: '<%= id %>',
 			url: '<%= movie %>',

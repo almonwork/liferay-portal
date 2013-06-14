@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,16 +14,20 @@
  */
 --%>
 
-<aui:script use="aui-datepicker,liferay-portlet-dynamic-data-mapping">
+<aui:script use="aui-datepicker,json,liferay-portlet-dynamic-data-lists,liferay-portlet-dynamic-data-mapping">
 	var FormBuilderTextField = A.FormBuilderTextField;
 	var FormBuilderTypes = A.FormBuilder.types;
 
 	var camelize = Liferay.Util.camelize;
 	var trim = A.Lang.trim;
 
-	var TPL_SEPARATOR = '<div class="separator"></div>';
+	var TPL_BUTTON = '<div class="aui-field-labels-inline">' +
+						'<input type="button" value="<%= UnicodeLanguageUtil.get(pageContext, "select") %>" />' +
+					'<div>';
 
-	var TPL_TEMPLATE_NODE = '<p></p>';
+	var TPL_PARAGRAPH = '<p></p>';
+
+	var TPL_SEPARATOR = '<div class="separator"></div>';
 
 	var DDMTextField = A.Component.create(
 		{
@@ -52,20 +56,27 @@
 			},
 
 			prototype: {
-				renderSettings: function() {
+				getPropertyModel: function() {
 					var instance = this;
 
-					DDMDateField.superclass.renderSettings.apply(instance, arguments);
+					var model = DDMDateField.superclass.getPropertyModel.apply(instance, arguments);
 
-					var settingsNodesMap = instance.settingsNodesMap;
+					A.Array.each(
+						model,
+						function(item, index, collection) {
+							var attributeName = item.attributeName;
 
-					var predefinedValueNode = settingsNodesMap['predefinedValueSettingNode'];
-
-					instance.predefinedValueDatePicker = new A.DatePicker(
-						{
-							trigger: predefinedValueNode
+							if (attributeName === 'predefinedValue') {
+								collection[index] = {
+									attributeName: attributeName,
+									editor: new A.DateCellEditor(),
+									name: '<%= UnicodeLanguageUtil.get(pageContext, "predefined-value") %>'
+								};
+							}
 						}
-					).render();
+					);
+
+					return model;
 				},
 
 				renderUI: function() {
@@ -98,6 +109,147 @@
 		}
 	);
 
+	var DDMDocumentLibraryField = A.Component.create(
+		{
+			EXTENDS: A.FormBuilderField,
+
+			NAME: 'ddm-documentlibrary',
+
+			ATTRS: {
+				dataType: {
+					value: 'document-library'
+				},
+				fieldNamespace: {
+					value: 'ddm'
+				},
+				name: {
+					valueFn: function() {
+						return A.FormBuilderField.buildFieldName('documents-and-media');
+					}
+				}
+			},
+
+			prototype: {
+				getHTML: function() {
+					return TPL_BUTTON;
+				},
+
+				getPropertyModel: function() {
+					var instance = this;
+
+					var model = DDMDocumentLibraryField.superclass.getPropertyModel.apply(instance, arguments);
+
+					A.Array.each(
+						model,
+						function(item, index, collection) {
+							var attributeName = item.attributeName;
+							var DLFileEntryCellEditor = Liferay.SpreadSheet.TYPE_EDITOR['ddm-documentlibrary'];
+
+							if (attributeName === 'predefinedValue') {
+								item.editor = new DLFileEntryCellEditor();
+
+								item.formatter = function(obj) {
+									var data = obj.record.get('data');
+
+									var label = '';
+
+									var value = data.value;
+
+									if (value !== '') {
+										label = '(<%= UnicodeLanguageUtil.get(pageContext, "file") %>)';
+									}
+
+									return label;
+								};
+							}
+							else if (attributeName === 'type') {
+								item.formatter = instance._defaultFormatter;
+							}
+						}
+					);
+
+					return model;
+				},
+
+				_defaultFormatter: function() {
+					var instance = this;
+
+					return 'documents-and-media';
+				},
+
+				_uiSetValue: function() {
+					return '<%= UnicodeLanguageUtil.get(pageContext, "select") %>';
+				}
+
+			}
+
+		}
+	);
+
+	var DDMFileUploadField = A.Component.create(
+		{
+			EXTENDS: A.FormBuilderFileUploadField,
+
+			NAME: 'ddm-fileupload',
+
+			ATTRS: {
+				acceptFiles: {
+					value: '<%= UnicodeFormatter.toString(StringUtil.merge(PrefsPropsUtil.getStringArray(PropsKeys.DL_FILE_EXTENSIONS, StringPool.COMMA))) %>'
+				},
+				dataType: {
+					value: 'file-upload'
+				},
+				fieldNamespace: {
+					value: 'ddm'
+				},
+				folder: {
+					setter: function(val) {
+						if (!A.Lang.isObject(val)) {
+							val = A.JSON.parse(val);
+						}
+
+						return val
+					},
+					value: {
+						folderId: <%= DLFolderConstants.DEFAULT_PARENT_FOLDER_ID %>,
+						folderName: '<%= UnicodeLanguageUtil.get(pageContext, "home") %>'
+					}
+				},
+				tip: {
+					value: '<%= UnicodeLanguageUtil.format(locale, "upload-documents-no-larger-than-x-k", PrefsPropsUtil.getLong(PropsKeys.DL_FILE_MAX_SIZE) / 1024, false) %>'
+				}
+			},
+
+			prototype: {
+				getPropertyModel: function() {
+					var instance = this;
+
+					var model = DDMFileUploadField.superclass.getPropertyModel.apply(instance, arguments);
+
+					A.Array.each(
+						model,
+						function(item, index, collection) {
+							if (item.attributeName === 'predefinedValue') {
+								item.editor = false;
+							}
+						}
+					);
+
+					model.push(
+						{
+							attributeName: 'acceptFiles',
+							name: '<%= UnicodeLanguageUtil.get(pageContext, "allowed-file-extensions") %>'
+						}
+					);
+
+					return model;
+				}
+
+			}
+
+		}
+	);
+
 	var DDMIntegerField = A.Component.create(
 		{
 			EXTENDS: DDMTextField,
@@ -120,7 +272,7 @@
 
 			ATTRS: {
 				dataType: {
-					value: 'double'
+					value: 'number'
 				}
 			}
 		}
@@ -132,20 +284,15 @@
 				dataType: {
 					value: undefined
 				},
-				disabled: {
-					readOnly: true,
-					value: false
-				},
 				fieldNamespace: {
 					value: 'ddm'
 				},
+				showLabel: {
+					readOnly: true,
+					value: true
+				},
 				style: {
 					value: ''
-				},
-				templateNode: {
-					valueFn: function() {
-						return A.Node.create(TPL_TEMPLATE_NODE);
-					}
 				}
 			},
 
@@ -156,37 +303,30 @@
 			NAME: 'ddm-paragraph',
 
 			prototype: {
-				renderSettings: function() {
+				getHTML: function() {
+					return TPL_PARAGRAPH;
+				},
+
+				getPropertyModel: function() {
 					var instance = this;
 
-					var settingsNodesMap = instance.settingsNodesMap;
-
-					var formBuilder = instance.get('formBuilder');
-					var formNode = formBuilder.get('settingsFormNode');
-
-					formNode.empty();
-
-					instance._renderSettingsFields(
-						[
-							{
-								labelText: Liferay.Language.get('label'),
-								name: 'label',
-								type: 'textarea',
-								value: instance.get('label')
-							},
-							{
-								labelText: Liferay.Language.get('style'),
-								name: 'style',
-								type: 'textarea',
-								value: instance.get('style')
-							}
-						],
-						formNode
-					);
-
-					var labelNode = settingsNodesMap.labelSettingNode;
-
-					labelNode.on('input', instance._onLabelInput, instance);
+					return [
+						{
+							attributeName: 'type',
+							editor: false,
+							name: '<%= UnicodeLanguageUtil.get(pageContext, "type") %>'
+						},
+						{
+							attributeName: 'label',
+							editor: new A.TextAreaCellEditor(),
+							name: '<%= UnicodeLanguageUtil.get(pageContext, "text") %>'
+						},
+						{
+							attributeName: 'style',
+							editor: new A.TextAreaCellEditor(),
+							name: '<%= UnicodeLanguageUtil.get(pageContext, "style") %>'
+						}
+					];
 				},
 
 				_uiSetLabel: function(val) {
@@ -230,11 +370,6 @@
 				fieldNamespace: {
 					value: 'ddm'
 				},
-				templateNode: {
-					valueFn: function() {
-						return A.Node.create(TPL_SEPARATOR);
-					}
-				},
 				showLabel: {
 					readOnly: true,
 					value: false
@@ -246,11 +381,18 @@
 			NAME: 'ddm-separator',
 
 			prototype: {
-				renderSettings: function() {
-					var formBuilder = this.get('formBuilder');
-					var formNode = formBuilder.get('settingsFormNode');
+				getHTML: function() {
+					return TPL_SEPARATOR;
+				},
 
-					formNode.empty();
+				getPropertyModel: function() {
+					return [
+						{
+							attributeName: 'type',
+							editor: false,
+							name: '<%= UnicodeLanguageUtil.get(pageContext, "type") %>'
+						}
+					];
 				}
 			}
 		}
@@ -258,6 +400,8 @@
 
 	FormBuilderTypes['ddm-date'] = DDMDateField;
 	FormBuilderTypes['ddm-decimal'] = DDMDecimalField;
+	FormBuilderTypes['ddm-documentlibrary'] = DDMDocumentLibraryField;
+	FormBuilderTypes['ddm-fileupload'] = DDMFileUploadField;
 	FormBuilderTypes['ddm-integer'] = DDMIntegerField;
 	FormBuilderTypes['ddm-number'] = DDMNumberField;
 	FormBuilderTypes['ddm-paragraph'] = DDMParagraphField;

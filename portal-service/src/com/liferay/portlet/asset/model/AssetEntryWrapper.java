@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,6 +14,12 @@
 
 package com.liferay.portlet.asset.model;
 
+import com.liferay.portal.model.ModelWrapper;
+
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * <p>
  * This class is a wrapper for {@link AssetEntry}.
@@ -23,7 +29,7 @@ package com.liferay.portlet.asset.model;
  * @see       AssetEntry
  * @generated
  */
-public class AssetEntryWrapper implements AssetEntry {
+public class AssetEntryWrapper implements AssetEntry, ModelWrapper<AssetEntry> {
 	public AssetEntryWrapper(AssetEntry assetEntry) {
 		_assetEntry = assetEntry;
 	}
@@ -34,6 +40,197 @@ public class AssetEntryWrapper implements AssetEntry {
 
 	public String getModelClassName() {
 		return AssetEntry.class.getName();
+	}
+
+	public Map<String, Object> getModelAttributes() {
+		Map<String, Object> attributes = new HashMap<String, Object>();
+
+		attributes.put("entryId", getEntryId());
+		attributes.put("groupId", getGroupId());
+		attributes.put("companyId", getCompanyId());
+		attributes.put("userId", getUserId());
+		attributes.put("userName", getUserName());
+		attributes.put("createDate", getCreateDate());
+		attributes.put("modifiedDate", getModifiedDate());
+		attributes.put("classNameId", getClassNameId());
+		attributes.put("classPK", getClassPK());
+		attributes.put("classUuid", getClassUuid());
+		attributes.put("classTypeId", getClassTypeId());
+		attributes.put("visible", getVisible());
+		attributes.put("startDate", getStartDate());
+		attributes.put("endDate", getEndDate());
+		attributes.put("publishDate", getPublishDate());
+		attributes.put("expirationDate", getExpirationDate());
+		attributes.put("mimeType", getMimeType());
+		attributes.put("title", getTitle());
+		attributes.put("description", getDescription());
+		attributes.put("summary", getSummary());
+		attributes.put("url", getUrl());
+		attributes.put("layoutUuid", getLayoutUuid());
+		attributes.put("height", getHeight());
+		attributes.put("width", getWidth());
+		attributes.put("priority", getPriority());
+		attributes.put("viewCount", getViewCount());
+
+		return attributes;
+	}
+
+	public void setModelAttributes(Map<String, Object> attributes) {
+		Long entryId = (Long)attributes.get("entryId");
+
+		if (entryId != null) {
+			setEntryId(entryId);
+		}
+
+		Long groupId = (Long)attributes.get("groupId");
+
+		if (groupId != null) {
+			setGroupId(groupId);
+		}
+
+		Long companyId = (Long)attributes.get("companyId");
+
+		if (companyId != null) {
+			setCompanyId(companyId);
+		}
+
+		Long userId = (Long)attributes.get("userId");
+
+		if (userId != null) {
+			setUserId(userId);
+		}
+
+		String userName = (String)attributes.get("userName");
+
+		if (userName != null) {
+			setUserName(userName);
+		}
+
+		Date createDate = (Date)attributes.get("createDate");
+
+		if (createDate != null) {
+			setCreateDate(createDate);
+		}
+
+		Date modifiedDate = (Date)attributes.get("modifiedDate");
+
+		if (modifiedDate != null) {
+			setModifiedDate(modifiedDate);
+		}
+
+		Long classNameId = (Long)attributes.get("classNameId");
+
+		if (classNameId != null) {
+			setClassNameId(classNameId);
+		}
+
+		Long classPK = (Long)attributes.get("classPK");
+
+		if (classPK != null) {
+			setClassPK(classPK);
+		}
+
+		String classUuid = (String)attributes.get("classUuid");
+
+		if (classUuid != null) {
+			setClassUuid(classUuid);
+		}
+
+		Long classTypeId = (Long)attributes.get("classTypeId");
+
+		if (classTypeId != null) {
+			setClassTypeId(classTypeId);
+		}
+
+		Boolean visible = (Boolean)attributes.get("visible");
+
+		if (visible != null) {
+			setVisible(visible);
+		}
+
+		Date startDate = (Date)attributes.get("startDate");
+
+		if (startDate != null) {
+			setStartDate(startDate);
+		}
+
+		Date endDate = (Date)attributes.get("endDate");
+
+		if (endDate != null) {
+			setEndDate(endDate);
+		}
+
+		Date publishDate = (Date)attributes.get("publishDate");
+
+		if (publishDate != null) {
+			setPublishDate(publishDate);
+		}
+
+		Date expirationDate = (Date)attributes.get("expirationDate");
+
+		if (expirationDate != null) {
+			setExpirationDate(expirationDate);
+		}
+
+		String mimeType = (String)attributes.get("mimeType");
+
+		if (mimeType != null) {
+			setMimeType(mimeType);
+		}
+
+		String title = (String)attributes.get("title");
+
+		if (title != null) {
+			setTitle(title);
+		}
+
+		String description = (String)attributes.get("description");
+
+		if (description != null) {
+			setDescription(description);
+		}
+
+		String summary = (String)attributes.get("summary");
+
+		if (summary != null) {
+			setSummary(summary);
+		}
+
+		String url = (String)attributes.get("url");
+
+		if (url != null) {
+			setUrl(url);
+		}
+
+		String layoutUuid = (String)attributes.get("layoutUuid");
+
+		if (layoutUuid != null) {
+			setLayoutUuid(layoutUuid);
+		}
+
+		Integer height = (Integer)attributes.get("height");
+
+		if (height != null) {
+			setHeight(height);
+		}
+
+		Integer width = (Integer)attributes.get("width");
+
+		if (width != null) {
+			setWidth(width);
+		}
+
+		Double priority = (Double)attributes.get("priority");
+
+		if (priority != null) {
+			setPriority(priority);
+		}
+
+		Integer viewCount = (Integer)attributes.get("viewCount");
+
+		if (viewCount != null) {
+			setViewCount(viewCount);
+		}
 	}
 
 	/**
@@ -209,6 +406,10 @@ public class AssetEntryWrapper implements AssetEntry {
 		return _assetEntry.getClassName();
 	}
 
+	public void setClassName(java.lang.String className) {
+		_assetEntry.setClassName(className);
+	}
+
 	/**
 	* Returns the class name ID of this asset entry.
 	*
@@ -261,6 +462,24 @@ public class AssetEntryWrapper implements AssetEntry {
 	*/
 	public void setClassUuid(java.lang.String classUuid) {
 		_assetEntry.setClassUuid(classUuid);
+	}
+
+	/**
+	* Returns the class type ID of this asset entry.
+	*
+	* @return the class type ID of this asset entry
+	*/
+	public long getClassTypeId() {
+		return _assetEntry.getClassTypeId();
+	}
+
+	/**
+	* Sets the class type ID of this asset entry.
+	*
+	* @param classTypeId the class type ID of this asset entry
+	*/
+	public void setClassTypeId(long classTypeId) {
+		_assetEntry.setClassTypeId(classTypeId);
 	}
 
 	/**
@@ -432,6 +651,14 @@ public class AssetEntryWrapper implements AssetEntry {
 		return _assetEntry.getTitle(languageId, useDefault);
 	}
 
+	public java.lang.String getTitleCurrentLanguageId() {
+		return _assetEntry.getTitleCurrentLanguageId();
+	}
+
+	public java.lang.String getTitleCurrentValue() {
+		return _assetEntry.getTitleCurrentValue();
+	}
+
 	/**
 	* Returns a map of the locales and localized titles of this asset entry.
 	*
@@ -472,6 +699,10 @@ public class AssetEntryWrapper implements AssetEntry {
 		_assetEntry.setTitle(title, locale, defaultLocale);
 	}
 
+	public void setTitleCurrentLanguageId(java.lang.String languageId) {
+		_assetEntry.setTitleCurrentLanguageId(languageId);
+	}
+
 	/**
 	* Sets the localized titles of this asset entry from the map of locales and localized titles.
 	*
@@ -504,12 +735,122 @@ public class AssetEntryWrapper implements AssetEntry {
 	}
 
 	/**
+	* Returns the localized description of this asset entry in the language. Uses the default language if no localization exists for the requested language.
+	*
+	* @param locale the locale of the language
+	* @return the localized description of this asset entry
+	*/
+	public java.lang.String getDescription(java.util.Locale locale) {
+		return _assetEntry.getDescription(locale);
+	}
+
+	/**
+	* Returns the localized description of this asset entry in the language, optionally using the default language if no localization exists for the requested language.
+	*
+	* @param locale the local of the language
+	* @param useDefault whether to use the default language if no localization exists for the requested language
+	* @return the localized description of this asset entry. If <code>useDefault</code> is <code>false</code> and no localization exists for the requested language, an empty string will be returned.
+	*/
+	public java.lang.String getDescription(java.util.Locale locale,
+		boolean useDefault) {
+		return _assetEntry.getDescription(locale, useDefault);
+	}
+
+	/**
+	* Returns the localized description of this asset entry in the language. Uses the default language if no localization exists for the requested language.
+	*
+	* @param languageId the ID of the language
+	* @return the localized description of this asset entry
+	*/
+	public java.lang.String getDescription(java.lang.String languageId) {
+		return _assetEntry.getDescription(languageId);
+	}
+
+	/**
+	* Returns the localized description of this asset entry in the language, optionally using the default language if no localization exists for the requested language.
+	*
+	* @param languageId the ID of the language
+	* @param useDefault whether to use the default language if no localization exists for the requested language
+	* @return the localized description of this asset entry
+	*/
+	public java.lang.String getDescription(java.lang.String languageId,
+		boolean useDefault) {
+		return _assetEntry.getDescription(languageId, useDefault);
+	}
+
+	public java.lang.String getDescriptionCurrentLanguageId() {
+		return _assetEntry.getDescriptionCurrentLanguageId();
+	}
+
+	public java.lang.String getDescriptionCurrentValue() {
+		return _assetEntry.getDescriptionCurrentValue();
+	}
+
+	/**
+	* Returns a map of the locales and localized descriptions of this asset entry.
+	*
+	* @return the locales and localized descriptions of this asset entry
+	*/
+	public java.util.Map<java.util.Locale, java.lang.String> getDescriptionMap() {
+		return _assetEntry.getDescriptionMap();
+	}
+
+	/**
 	* Sets the description of this asset entry.
 	*
 	* @param description the description of this asset entry
 	*/
 	public void setDescription(java.lang.String description) {
 		_assetEntry.setDescription(description);
+	}
+
+	/**
+	* Sets the localized description of this asset entry in the language.
+	*
+	* @param description the localized description of this asset entry
+	* @param locale the locale of the language
+	*/
+	public void setDescription(java.lang.String description,
+		java.util.Locale locale) {
+		_assetEntry.setDescription(description, locale);
+	}
+
+	/**
+	* Sets the localized description of this asset entry in the language, and sets the default locale.
+	*
+	* @param description the localized description of this asset entry
+	* @param locale the locale of the language
+	* @param defaultLocale the default locale
+	*/
+	public void setDescription(java.lang.String description,
+		java.util.Locale locale, java.util.Locale defaultLocale) {
+		_assetEntry.setDescription(description, locale, defaultLocale);
+	}
+
+	public void setDescriptionCurrentLanguageId(java.lang.String languageId) {
+		_assetEntry.setDescriptionCurrentLanguageId(languageId);
+	}
+
+	/**
+	* Sets the localized descriptions of this asset entry from the map of locales and localized descriptions.
+	*
+	* @param descriptionMap the locales and localized descriptions of this asset entry
+	*/
+	public void setDescriptionMap(
+		java.util.Map<java.util.Locale, java.lang.String> descriptionMap) {
+		_assetEntry.setDescriptionMap(descriptionMap);
+	}
+
+	/**
+	* Sets the localized descriptions of this asset entry from the map of locales and localized descriptions, and sets the default locale.
+	*
+	* @param descriptionMap the locales and localized descriptions of this asset entry
+	* @param defaultLocale the default locale
+	*/
+	public void setDescriptionMap(
+		java.util.Map<java.util.Locale, java.lang.String> descriptionMap,
+		java.util.Locale defaultLocale) {
+		_assetEntry.setDescriptionMap(descriptionMap, defaultLocale);
 	}
 
 	/**
@@ -522,12 +863,121 @@ public class AssetEntryWrapper implements AssetEntry {
 	}
 
 	/**
+	* Returns the localized summary of this asset entry in the language. Uses the default language if no localization exists for the requested language.
+	*
+	* @param locale the locale of the language
+	* @return the localized summary of this asset entry
+	*/
+	public java.lang.String getSummary(java.util.Locale locale) {
+		return _assetEntry.getSummary(locale);
+	}
+
+	/**
+	* Returns the localized summary of this asset entry in the language, optionally using the default language if no localization exists for the requested language.
+	*
+	* @param locale the local of the language
+	* @param useDefault whether to use the default language if no localization exists for the requested language
+	* @return the localized summary of this asset entry. If <code>useDefault</code> is <code>false</code> and no localization exists for the requested language, an empty string will be returned.
+	*/
+	public java.lang.String getSummary(java.util.Locale locale,
+		boolean useDefault) {
+		return _assetEntry.getSummary(locale, useDefault);
+	}
+
+	/**
+	* Returns the localized summary of this asset entry in the language. Uses the default language if no localization exists for the requested language.
+	*
+	* @param languageId the ID of the language
+	* @return the localized summary of this asset entry
+	*/
+	public java.lang.String getSummary(java.lang.String languageId) {
+		return _assetEntry.getSummary(languageId);
+	}
+
+	/**
+	* Returns the localized summary of this asset entry in the language, optionally using the default language if no localization exists for the requested language.
+	*
+	* @param languageId the ID of the language
+	* @param useDefault whether to use the default language if no localization exists for the requested language
+	* @return the localized summary of this asset entry
+	*/
+	public java.lang.String getSummary(java.lang.String languageId,
+		boolean useDefault) {
+		return _assetEntry.getSummary(languageId, useDefault);
+	}
+
+	public java.lang.String getSummaryCurrentLanguageId() {
+		return _assetEntry.getSummaryCurrentLanguageId();
+	}
+
+	public java.lang.String getSummaryCurrentValue() {
+		return _assetEntry.getSummaryCurrentValue();
+	}
+
+	/**
+	* Returns a map of the locales and localized summaries of this asset entry.
+	*
+	* @return the locales and localized summaries of this asset entry
+	*/
+	public java.util.Map<java.util.Locale, java.lang.String> getSummaryMap() {
+		return _assetEntry.getSummaryMap();
+	}
+
+	/**
 	* Sets the summary of this asset entry.
 	*
 	* @param summary the summary of this asset entry
 	*/
 	public void setSummary(java.lang.String summary) {
 		_assetEntry.setSummary(summary);
+	}
+
+	/**
+	* Sets the localized summary of this asset entry in the language.
+	*
+	* @param summary the localized summary of this asset entry
+	* @param locale the locale of the language
+	*/
+	public void setSummary(java.lang.String summary, java.util.Locale locale) {
+		_assetEntry.setSummary(summary, locale);
+	}
+
+	/**
+	* Sets the localized summary of this asset entry in the language, and sets the default locale.
+	*
+	* @param summary the localized summary of this asset entry
+	* @param locale the locale of the language
+	* @param defaultLocale the default locale
+	*/
+	public void setSummary(java.lang.String summary, java.util.Locale locale,
+		java.util.Locale defaultLocale) {
+		_assetEntry.setSummary(summary, locale, defaultLocale);
+	}
+
+	public void setSummaryCurrentLanguageId(java.lang.String languageId) {
+		_assetEntry.setSummaryCurrentLanguageId(languageId);
+	}
+
+	/**
+	* Sets the localized summaries of this asset entry from the map of locales and localized summaries.
+	*
+	* @param summaryMap the locales and localized summaries of this asset entry
+	*/
+	public void setSummaryMap(
+		java.util.Map<java.util.Locale, java.lang.String> summaryMap) {
+		_assetEntry.setSummaryMap(summaryMap);
+	}
+
+	/**
+	* Sets the localized summaries of this asset entry from the map of locales and localized summaries, and sets the default locale.
+	*
+	* @param summaryMap the locales and localized summaries of this asset entry
+	* @param defaultLocale the default locale
+	*/
+	public void setSummaryMap(
+		java.util.Map<java.util.Locale, java.lang.String> summaryMap,
+		java.util.Locale defaultLocale) {
+		_assetEntry.setSummaryMap(summaryMap, defaultLocale);
 	}
 
 	/**
@@ -658,10 +1108,6 @@ public class AssetEntryWrapper implements AssetEntry {
 		return _assetEntry.isEscapedModel();
 	}
 
-	public void setEscapedModel(boolean escapedModel) {
-		_assetEntry.setEscapedModel(escapedModel);
-	}
-
 	public java.io.Serializable getPrimaryKeyObj() {
 		return _assetEntry.getPrimaryKeyObj();
 	}
@@ -715,6 +1161,14 @@ public class AssetEntryWrapper implements AssetEntry {
 		_assetEntry.persist();
 	}
 
+	public com.liferay.portlet.asset.model.AssetRenderer getAssetRenderer() {
+		return _assetEntry.getAssetRenderer();
+	}
+
+	public com.liferay.portlet.asset.model.AssetRendererFactory getAssetRendererFactory() {
+		return _assetEntry.getAssetRendererFactory();
+	}
+
 	public java.util.List<com.liferay.portlet.asset.model.AssetCategory> getCategories()
 		throws com.liferay.portal.kernel.exception.SystemException {
 		return _assetEntry.getCategories();
@@ -723,10 +1177,6 @@ public class AssetEntryWrapper implements AssetEntry {
 	public long[] getCategoryIds()
 		throws com.liferay.portal.kernel.exception.SystemException {
 		return _assetEntry.getCategoryIds();
-	}
-
-	public double getSocialInformationEquity() {
-		return _assetEntry.getSocialInformationEquity();
 	}
 
 	public java.lang.String[] getTagNames()
@@ -739,11 +1189,14 @@ public class AssetEntryWrapper implements AssetEntry {
 		return _assetEntry.getTags();
 	}
 
-	public void updateSocialInformationEquity(double value) {
-		_assetEntry.updateSocialInformationEquity(value);
+	/**
+	 * @deprecated Renamed to {@link #getWrappedModel}
+	 */
+	public AssetEntry getWrappedAssetEntry() {
+		return _assetEntry;
 	}
 
-	public AssetEntry getWrappedAssetEntry() {
+	public AssetEntry getWrappedModel() {
 		return _assetEntry;
 	}
 

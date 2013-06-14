@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,6 +14,8 @@
 
 package com.liferay.portlet.journal.service;
 
+import com.liferay.portal.service.ServiceWrapper;
+
 /**
  * <p>
  * This class is a wrapper for {@link JournalFeedService}.
@@ -23,9 +25,28 @@ package com.liferay.portlet.journal.service;
  * @see       JournalFeedService
  * @generated
  */
-public class JournalFeedServiceWrapper implements JournalFeedService {
+public class JournalFeedServiceWrapper implements JournalFeedService,
+	ServiceWrapper<JournalFeedService> {
 	public JournalFeedServiceWrapper(JournalFeedService journalFeedService) {
 		_journalFeedService = journalFeedService;
+	}
+
+	/**
+	* Returns the Spring bean ID for this bean.
+	*
+	* @return the Spring bean ID for this bean
+	*/
+	public java.lang.String getBeanIdentifier() {
+		return _journalFeedService.getBeanIdentifier();
+	}
+
+	/**
+	* Sets the Spring bean ID for this bean.
+	*
+	* @param beanIdentifier the Spring bean ID for this bean
+	*/
+	public void setBeanIdentifier(java.lang.String beanIdentifier) {
+		_journalFeedService.setBeanIdentifier(beanIdentifier);
 	}
 
 	public com.liferay.portlet.journal.model.JournalFeed addFeed(long groupId,
@@ -90,12 +111,26 @@ public class JournalFeedServiceWrapper implements JournalFeedService {
 			targetPortletId, contentField, feedType, feedVersion, serviceContext);
 	}
 
+	/**
+	 * @deprecated Renamed to {@link #getWrappedService}
+	 */
 	public JournalFeedService getWrappedJournalFeedService() {
 		return _journalFeedService;
 	}
 
+	/**
+	 * @deprecated Renamed to {@link #setWrappedService}
+	 */
 	public void setWrappedJournalFeedService(
 		JournalFeedService journalFeedService) {
+		_journalFeedService = journalFeedService;
+	}
+
+	public JournalFeedService getWrappedService() {
+		return _journalFeedService;
+	}
+
+	public void setWrappedService(JournalFeedService journalFeedService) {
 		_journalFeedService = journalFeedService;
 	}
 

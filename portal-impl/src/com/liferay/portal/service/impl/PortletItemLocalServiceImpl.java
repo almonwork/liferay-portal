@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -47,8 +47,7 @@ public class PortletItemLocalServiceImpl
 
 		long portletItemId = counterLocalService.increment();
 
-		PortletItem portletItem = portletItemPersistence.create(
-			portletItemId);
+		PortletItem portletItem = portletItemPersistence.create(portletItemId);
 
 		portletItem.setGroupId(groupId);
 		portletItem.setCompanyId(user.getCompanyId());
@@ -63,13 +62,6 @@ public class PortletItemLocalServiceImpl
 		portletItemPersistence.update(portletItem, false);
 
 		return portletItem;
-	}
-
-	@Override
-	public PortletItem getPortletItem(long portletItemId)
-		throws PortalException, SystemException {
-
-		return portletItemPersistence.findByPrimaryKey(portletItemId);
 	}
 
 	public PortletItem getPortletItem(
@@ -119,7 +111,7 @@ public class PortletItemLocalServiceImpl
 
 			portletItemPersistence.update(portletItem, false);
 		}
-		catch (NoSuchPortletItemException nsste) {
+		catch (NoSuchPortletItemException nspie) {
 			portletItem = addPortletItem(
 				userId, groupId, name, portletId,
 				PortletPreferences.class.getName());

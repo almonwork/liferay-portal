@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,6 +14,9 @@
 
 package com.liferay.portal.model;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * <p>
  * This class is a wrapper for {@link ClusterGroup}.
@@ -23,7 +26,8 @@ package com.liferay.portal.model;
  * @see       ClusterGroup
  * @generated
  */
-public class ClusterGroupWrapper implements ClusterGroup {
+public class ClusterGroupWrapper implements ClusterGroup,
+	ModelWrapper<ClusterGroup> {
 	public ClusterGroupWrapper(ClusterGroup clusterGroup) {
 		_clusterGroup = clusterGroup;
 	}
@@ -34,6 +38,43 @@ public class ClusterGroupWrapper implements ClusterGroup {
 
 	public String getModelClassName() {
 		return ClusterGroup.class.getName();
+	}
+
+	public Map<String, Object> getModelAttributes() {
+		Map<String, Object> attributes = new HashMap<String, Object>();
+
+		attributes.put("clusterGroupId", getClusterGroupId());
+		attributes.put("name", getName());
+		attributes.put("clusterNodeIds", getClusterNodeIds());
+		attributes.put("wholeCluster", getWholeCluster());
+
+		return attributes;
+	}
+
+	public void setModelAttributes(Map<String, Object> attributes) {
+		Long clusterGroupId = (Long)attributes.get("clusterGroupId");
+
+		if (clusterGroupId != null) {
+			setClusterGroupId(clusterGroupId);
+		}
+
+		String name = (String)attributes.get("name");
+
+		if (name != null) {
+			setName(name);
+		}
+
+		String clusterNodeIds = (String)attributes.get("clusterNodeIds");
+
+		if (clusterNodeIds != null) {
+			setClusterNodeIds(clusterNodeIds);
+		}
+
+		Boolean wholeCluster = (Boolean)attributes.get("wholeCluster");
+
+		if (wholeCluster != null) {
+			setWholeCluster(wholeCluster);
+		}
 	}
 
 	/**
@@ -155,10 +196,6 @@ public class ClusterGroupWrapper implements ClusterGroup {
 		return _clusterGroup.isEscapedModel();
 	}
 
-	public void setEscapedModel(boolean escapedModel) {
-		_clusterGroup.setEscapedModel(escapedModel);
-	}
-
 	public java.io.Serializable getPrimaryKeyObj() {
 		return _clusterGroup.getPrimaryKeyObj();
 	}
@@ -216,7 +253,14 @@ public class ClusterGroupWrapper implements ClusterGroup {
 		return _clusterGroup.getClusterNodeIdsArray();
 	}
 
+	/**
+	 * @deprecated Renamed to {@link #getWrappedModel}
+	 */
 	public ClusterGroup getWrappedClusterGroup() {
+		return _clusterGroup;
+	}
+
+	public ClusterGroup getWrappedModel() {
 		return _clusterGroup;
 	}
 

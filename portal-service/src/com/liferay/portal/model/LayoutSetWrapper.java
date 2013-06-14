@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,6 +14,10 @@
 
 package com.liferay.portal.model;
 
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * <p>
  * This class is a wrapper for {@link LayoutSet}.
@@ -23,7 +27,7 @@ package com.liferay.portal.model;
  * @see       LayoutSet
  * @generated
  */
-public class LayoutSetWrapper implements LayoutSet {
+public class LayoutSetWrapper implements LayoutSet, ModelWrapper<LayoutSet> {
 	public LayoutSetWrapper(LayoutSet layoutSet) {
 		_layoutSet = layoutSet;
 	}
@@ -34,6 +38,137 @@ public class LayoutSetWrapper implements LayoutSet {
 
 	public String getModelClassName() {
 		return LayoutSet.class.getName();
+	}
+
+	public Map<String, Object> getModelAttributes() {
+		Map<String, Object> attributes = new HashMap<String, Object>();
+
+		attributes.put("layoutSetId", getLayoutSetId());
+		attributes.put("groupId", getGroupId());
+		attributes.put("companyId", getCompanyId());
+		attributes.put("createDate", getCreateDate());
+		attributes.put("modifiedDate", getModifiedDate());
+		attributes.put("privateLayout", getPrivateLayout());
+		attributes.put("logo", getLogo());
+		attributes.put("logoId", getLogoId());
+		attributes.put("themeId", getThemeId());
+		attributes.put("colorSchemeId", getColorSchemeId());
+		attributes.put("wapThemeId", getWapThemeId());
+		attributes.put("wapColorSchemeId", getWapColorSchemeId());
+		attributes.put("css", getCss());
+		attributes.put("pageCount", getPageCount());
+		attributes.put("settings", getSettings());
+		attributes.put("layoutSetPrototypeUuid", getLayoutSetPrototypeUuid());
+		attributes.put("layoutSetPrototypeLinkEnabled",
+			getLayoutSetPrototypeLinkEnabled());
+
+		return attributes;
+	}
+
+	public void setModelAttributes(Map<String, Object> attributes) {
+		Long layoutSetId = (Long)attributes.get("layoutSetId");
+
+		if (layoutSetId != null) {
+			setLayoutSetId(layoutSetId);
+		}
+
+		Long groupId = (Long)attributes.get("groupId");
+
+		if (groupId != null) {
+			setGroupId(groupId);
+		}
+
+		Long companyId = (Long)attributes.get("companyId");
+
+		if (companyId != null) {
+			setCompanyId(companyId);
+		}
+
+		Date createDate = (Date)attributes.get("createDate");
+
+		if (createDate != null) {
+			setCreateDate(createDate);
+		}
+
+		Date modifiedDate = (Date)attributes.get("modifiedDate");
+
+		if (modifiedDate != null) {
+			setModifiedDate(modifiedDate);
+		}
+
+		Boolean privateLayout = (Boolean)attributes.get("privateLayout");
+
+		if (privateLayout != null) {
+			setPrivateLayout(privateLayout);
+		}
+
+		Boolean logo = (Boolean)attributes.get("logo");
+
+		if (logo != null) {
+			setLogo(logo);
+		}
+
+		Long logoId = (Long)attributes.get("logoId");
+
+		if (logoId != null) {
+			setLogoId(logoId);
+		}
+
+		String themeId = (String)attributes.get("themeId");
+
+		if (themeId != null) {
+			setThemeId(themeId);
+		}
+
+		String colorSchemeId = (String)attributes.get("colorSchemeId");
+
+		if (colorSchemeId != null) {
+			setColorSchemeId(colorSchemeId);
+		}
+
+		String wapThemeId = (String)attributes.get("wapThemeId");
+
+		if (wapThemeId != null) {
+			setWapThemeId(wapThemeId);
+		}
+
+		String wapColorSchemeId = (String)attributes.get("wapColorSchemeId");
+
+		if (wapColorSchemeId != null) {
+			setWapColorSchemeId(wapColorSchemeId);
+		}
+
+		String css = (String)attributes.get("css");
+
+		if (css != null) {
+			setCss(css);
+		}
+
+		Integer pageCount = (Integer)attributes.get("pageCount");
+
+		if (pageCount != null) {
+			setPageCount(pageCount);
+		}
+
+		String settings = (String)attributes.get("settings");
+
+		if (settings != null) {
+			setSettings(settings);
+		}
+
+		String layoutSetPrototypeUuid = (String)attributes.get(
+				"layoutSetPrototypeUuid");
+
+		if (layoutSetPrototypeUuid != null) {
+			setLayoutSetPrototypeUuid(layoutSetPrototypeUuid);
+		}
+
+		Boolean layoutSetPrototypeLinkEnabled = (Boolean)attributes.get(
+				"layoutSetPrototypeLinkEnabled");
+
+		if (layoutSetPrototypeLinkEnabled != null) {
+			setLayoutSetPrototypeLinkEnabled(layoutSetPrototypeLinkEnabled);
+		}
 	}
 
 	/**
@@ -106,6 +241,42 @@ public class LayoutSetWrapper implements LayoutSet {
 	*/
 	public void setCompanyId(long companyId) {
 		_layoutSet.setCompanyId(companyId);
+	}
+
+	/**
+	* Returns the create date of this layout set.
+	*
+	* @return the create date of this layout set
+	*/
+	public java.util.Date getCreateDate() {
+		return _layoutSet.getCreateDate();
+	}
+
+	/**
+	* Sets the create date of this layout set.
+	*
+	* @param createDate the create date of this layout set
+	*/
+	public void setCreateDate(java.util.Date createDate) {
+		_layoutSet.setCreateDate(createDate);
+	}
+
+	/**
+	* Returns the modified date of this layout set.
+	*
+	* @return the modified date of this layout set
+	*/
+	public java.util.Date getModifiedDate() {
+		return _layoutSet.getModifiedDate();
+	}
+
+	/**
+	* Sets the modified date of this layout set.
+	*
+	* @param modifiedDate the modified date of this layout set
+	*/
+	public void setModifiedDate(java.util.Date modifiedDate) {
+		_layoutSet.setModifiedDate(modifiedDate);
 	}
 
 	/**
@@ -373,10 +544,6 @@ public class LayoutSetWrapper implements LayoutSet {
 		return _layoutSet.isEscapedModel();
 	}
 
-	public void setEscapedModel(boolean escapedModel) {
-		_layoutSet.setEscapedModel(escapedModel);
-	}
-
 	public java.io.Serializable getPrimaryKeyObj() {
 		return _layoutSet.getPrimaryKeyObj();
 	}
@@ -430,11 +597,6 @@ public class LayoutSetWrapper implements LayoutSet {
 		_layoutSet.persist();
 	}
 
-	public com.liferay.portal.model.Theme getTheme()
-		throws com.liferay.portal.kernel.exception.SystemException {
-		return _layoutSet.getTheme();
-	}
-
 	public com.liferay.portal.model.ColorScheme getColorScheme()
 		throws com.liferay.portal.kernel.exception.SystemException {
 		return _layoutSet.getColorScheme();
@@ -446,12 +608,27 @@ public class LayoutSetWrapper implements LayoutSet {
 		return _layoutSet.getGroup();
 	}
 
+	public long getLayoutSetPrototypeId()
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException {
+		return _layoutSet.getLayoutSetPrototypeId();
+	}
+
+	public long getLiveLogoId() {
+		return _layoutSet.getLiveLogoId();
+	}
+
 	public com.liferay.portal.kernel.util.UnicodeProperties getSettingsProperties() {
 		return _layoutSet.getSettingsProperties();
 	}
 
 	public java.lang.String getSettingsProperty(java.lang.String key) {
 		return _layoutSet.getSettingsProperty(key);
+	}
+
+	public com.liferay.portal.model.Theme getTheme()
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return _layoutSet.getTheme();
 	}
 
 	public java.lang.String getThemeSetting(java.lang.String key,
@@ -464,14 +641,18 @@ public class LayoutSetWrapper implements LayoutSet {
 		return _layoutSet.getVirtualHostname();
 	}
 
+	public com.liferay.portal.model.ColorScheme getWapColorScheme()
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return _layoutSet.getWapColorScheme();
+	}
+
 	public com.liferay.portal.model.Theme getWapTheme()
 		throws com.liferay.portal.kernel.exception.SystemException {
 		return _layoutSet.getWapTheme();
 	}
 
-	public com.liferay.portal.model.ColorScheme getWapColorScheme()
-		throws com.liferay.portal.kernel.exception.SystemException {
-		return _layoutSet.getWapColorScheme();
+	public boolean isLayoutSetPrototypeLinkActive() {
+		return _layoutSet.isLayoutSetPrototypeLinkActive();
 	}
 
 	public void setSettingsProperties(
@@ -479,7 +660,14 @@ public class LayoutSetWrapper implements LayoutSet {
 		_layoutSet.setSettingsProperties(settingsProperties);
 	}
 
+	/**
+	 * @deprecated Renamed to {@link #getWrappedModel}
+	 */
 	public LayoutSet getWrappedLayoutSet() {
+		return _layoutSet;
+	}
+
+	public LayoutSet getWrappedModel() {
 		return _layoutSet;
 	}
 

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -35,7 +35,8 @@ import com.liferay.portal.kernel.transaction.Transactional;
  */
 @Transactional(isolation = Isolation.PORTAL, rollbackFor =  {
 	PortalException.class, SystemException.class})
-public interface OrgLaborLocalService extends PersistedModelLocalService {
+public interface OrgLaborLocalService extends BaseLocalService,
+	PersistedModelLocalService {
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
@@ -65,10 +66,11 @@ public interface OrgLaborLocalService extends PersistedModelLocalService {
 	* Deletes the org labor with the primary key from the database. Also notifies the appropriate model listeners.
 	*
 	* @param orgLaborId the primary key of the org labor
+	* @return the org labor that was removed
 	* @throws PortalException if a org labor with the primary key could not be found
 	* @throws SystemException if a system exception occurred
 	*/
-	public void deleteOrgLabor(long orgLaborId)
+	public com.liferay.portal.model.OrgLabor deleteOrgLabor(long orgLaborId)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException;
 
@@ -76,10 +78,14 @@ public interface OrgLaborLocalService extends PersistedModelLocalService {
 	* Deletes the org labor from the database. Also notifies the appropriate model listeners.
 	*
 	* @param orgLabor the org labor
+	* @return the org labor that was removed
 	* @throws SystemException if a system exception occurred
 	*/
-	public void deleteOrgLabor(com.liferay.portal.model.OrgLabor orgLabor)
+	public com.liferay.portal.model.OrgLabor deleteOrgLabor(
+		com.liferay.portal.model.OrgLabor orgLabor)
 		throws com.liferay.portal.kernel.exception.SystemException;
+
+	public com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery();
 
 	/**
 	* Performs a dynamic query on the database and returns the matching rows.
@@ -141,6 +147,10 @@ public interface OrgLaborLocalService extends PersistedModelLocalService {
 	*/
 	public long dynamicQueryCount(
 		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery)
+		throws com.liferay.portal.kernel.exception.SystemException;
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public com.liferay.portal.model.OrgLabor fetchOrgLabor(long orgLaborId)
 		throws com.liferay.portal.kernel.exception.SystemException;
 
 	/**

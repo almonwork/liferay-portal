@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -47,6 +47,11 @@ public interface DLFileEntry extends DLFileEntryModel, PersistedModel {
 
 	public com.liferay.portal.kernel.util.UnicodeProperties getExtraSettingsProperties();
 
+	public java.util.Map<java.lang.String, com.liferay.portlet.dynamicdatamapping.storage.Fields> getFieldsMap(
+		long fileVersionId)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException;
+
 	public com.liferay.portlet.documentlibrary.model.DLFileVersion getFileVersion()
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException;
@@ -59,11 +64,15 @@ public interface DLFileEntry extends DLFileEntryModel, PersistedModel {
 	public java.util.List<com.liferay.portlet.documentlibrary.model.DLFileVersion> getFileVersions(
 		int status) throws com.liferay.portal.kernel.exception.SystemException;
 
+	public int getFileVersionsCount(int status)
+		throws com.liferay.portal.kernel.exception.SystemException;
+
 	public com.liferay.portlet.documentlibrary.model.DLFolder getFolder();
 
 	public java.lang.String getIcon();
 
-	public com.liferay.portlet.documentlibrary.model.DLFileVersion getLatestFileVersion()
+	public com.liferay.portlet.documentlibrary.model.DLFileVersion getLatestFileVersion(
+		boolean trusted)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException;
 
@@ -79,4 +88,7 @@ public interface DLFileEntry extends DLFileEntryModel, PersistedModel {
 
 	public void setExtraSettingsProperties(
 		com.liferay.portal.kernel.util.UnicodeProperties extraSettingsProperties);
+
+	public void setFileVersion(
+		com.liferay.portlet.documentlibrary.model.DLFileVersion dlFileVersion);
 }

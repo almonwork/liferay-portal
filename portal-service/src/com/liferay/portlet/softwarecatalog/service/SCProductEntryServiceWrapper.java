@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,6 +14,8 @@
 
 package com.liferay.portlet.softwarecatalog.service;
 
+import com.liferay.portal.service.ServiceWrapper;
+
 /**
  * <p>
  * This class is a wrapper for {@link SCProductEntryService}.
@@ -23,10 +25,29 @@ package com.liferay.portlet.softwarecatalog.service;
  * @see       SCProductEntryService
  * @generated
  */
-public class SCProductEntryServiceWrapper implements SCProductEntryService {
+public class SCProductEntryServiceWrapper implements SCProductEntryService,
+	ServiceWrapper<SCProductEntryService> {
 	public SCProductEntryServiceWrapper(
 		SCProductEntryService scProductEntryService) {
 		_scProductEntryService = scProductEntryService;
+	}
+
+	/**
+	* Returns the Spring bean ID for this bean.
+	*
+	* @return the Spring bean ID for this bean
+	*/
+	public java.lang.String getBeanIdentifier() {
+		return _scProductEntryService.getBeanIdentifier();
+	}
+
+	/**
+	* Sets the Spring bean ID for this bean.
+	*
+	* @param beanIdentifier the Spring bean ID for this bean
+	*/
+	public void setBeanIdentifier(java.lang.String beanIdentifier) {
+		_scProductEntryService.setBeanIdentifier(beanIdentifier);
 	}
 
 	public com.liferay.portlet.softwarecatalog.model.SCProductEntry addProductEntry(
@@ -71,12 +92,26 @@ public class SCProductEntryServiceWrapper implements SCProductEntryService {
 			repoGroupId, repoArtifactId, licenseIds, thumbnails, fullImages);
 	}
 
+	/**
+	 * @deprecated Renamed to {@link #getWrappedService}
+	 */
 	public SCProductEntryService getWrappedSCProductEntryService() {
 		return _scProductEntryService;
 	}
 
+	/**
+	 * @deprecated Renamed to {@link #setWrappedService}
+	 */
 	public void setWrappedSCProductEntryService(
 		SCProductEntryService scProductEntryService) {
+		_scProductEntryService = scProductEntryService;
+	}
+
+	public SCProductEntryService getWrappedService() {
+		return _scProductEntryService;
+	}
+
+	public void setWrappedService(SCProductEntryService scProductEntryService) {
 		_scProductEntryService = scProductEntryService;
 	}
 

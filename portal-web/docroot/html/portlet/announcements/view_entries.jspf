@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -17,7 +17,7 @@
 <%
 LinkedHashMap<Long, long[]> scopes = AnnouncementsUtil.getAnnouncementScopes(user.getUserId());
 
-SearchContainer searchContainer = new SearchContainer(renderRequest, null, null, "cur1", delta, portletURL, null, "no-entries-were-found");
+SearchContainer searchContainer = new SearchContainer(renderRequest, null, null, "cur1", pageDelta, portletURL, null, "no-entries-were-found");
 
 List<AnnouncementsEntry> results = null;
 int total = 0;
@@ -34,13 +34,13 @@ boolean hasResults = total > 0;
 %>
 
 <c:if test="<%= hasResults %>">
-	<liferay-ui:search-paginator searchContainer="<%= searchContainer %>" type="article" />
+	<liferay-ui:search-paginator id="pageIteratorTop" searchContainer="<%= searchContainer %>" type="article" />
 </c:if>
 
 <%
 flagValue = AnnouncementsFlagConstants.HIDDEN;
 
-searchContainer = new SearchContainer(renderRequest, null, null, "cur2", delta, portletURL, null, "no-entries-were-found");
+searchContainer = new SearchContainer(renderRequest, null, null, "cur2", pageDelta, portletURL, null, "no-entries-were-found");
 %>
 
 <div class="read-entries">
@@ -52,7 +52,7 @@ hasResults = hasResults || (total > 0);
 %>
 
 <c:if test="<%= total > 0 %>">
-	<liferay-ui:search-paginator searchContainer="<%= searchContainer %>" type="article" />
+	<liferay-ui:search-paginator id="pageIteratorBottom" searchContainer="<%= searchContainer %>" type="article" />
 </c:if>
 
 <aui:script>
@@ -86,7 +86,13 @@ hasResults = hasResults || (total > 0);
 		function(entry, entryId) {
 			var A = AUI();
 
-			Liferay.Service.Announcements.AnnouncementsFlag.addFlag({entryId : entryId, flag: <%= AnnouncementsFlagConstants.HIDDEN %>});
+			Liferay.Service(
+				'/announcementsflag/add-flag',
+				{
+					entryId : entryId,
+					value: <%= AnnouncementsFlagConstants.HIDDEN %>
+				}
+			);
 
 			Liferay.Portlet.refresh('#p_p_id<portlet:namespace />');
 		},
@@ -110,7 +116,7 @@ hasResults = hasResults || (total > 0);
 				}
 
 				if (control) {
-					control.html('<liferay-ui:message key="show" />');
+					control.html('<%= UnicodeLanguageUtil.get(pageContext, "show") %>');
 				}
 			}
 			else {
@@ -121,7 +127,7 @@ hasResults = hasResults || (total > 0);
 				}
 
 				if (control) {
-					control.html('<liferay-ui:message key="hide" />');
+					control.html('<%= UnicodeLanguageUtil.get(pageContext, "hide") %>');
 				}
 			}
 		},
@@ -129,7 +135,7 @@ hasResults = hasResults || (total > 0);
 	);
 </aui:script>
 
-<c:if test="<%= !hasResults && portletName.equals(PortletKeys.ALERTS) && !PortletPermissionUtil.contains(permissionChecker, layout, PortletKeys.ANNOUNCEMENTS, ActionKeys.ADD_ENTRY) %>">
+<c:if test="<%= !hasResults && portletName.equals(PortletKeys.ALERTS) && !AnnouncementsEntryPermission.contains(permissionChecker, layout, PortletKeys.ANNOUNCEMENTS, ActionKeys.ADD_ENTRY) %>">
 	<aui:script use="aui-base">
 		var portlet = A.one('#p_p_id<portlet:namespace />');
 

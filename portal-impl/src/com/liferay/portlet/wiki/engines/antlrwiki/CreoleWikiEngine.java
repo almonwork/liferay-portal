@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -51,8 +51,8 @@ public class CreoleWikiEngine implements WikiEngine {
 		XhtmlTranslator xhtmlTranslator = new XhtmlTranslator();
 
 		return xhtmlTranslator.translate(
-			page, viewPageURL, editPageURL, attachmentURLPrefix, parse(
-			page.getContent()));
+			page, viewPageURL, editPageURL, attachmentURLPrefix,
+			parse(page.getContent()));
 	}
 
 	public Map<String, Boolean> getOutgoingLinks(WikiPage page)
@@ -80,7 +80,11 @@ public class CreoleWikiEngine implements WikiEngine {
 					existingLink = true;
 				}
 
-				outgoingLinks.put(title.toLowerCase(), existingLink);
+				if (existingLink) {
+					title = title.toLowerCase();
+				}
+
+				outgoingLinks.put(title, existingLink);
 			}
 		}
 		catch (SystemException se) {

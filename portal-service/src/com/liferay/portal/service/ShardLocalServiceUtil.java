@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -15,7 +15,6 @@
 package com.liferay.portal.service;
 
 import com.liferay.portal.kernel.bean.PortalBeanLocatorUtil;
-import com.liferay.portal.kernel.util.MethodCache;
 import com.liferay.portal.kernel.util.ReferenceRegistry;
 
 /**
@@ -65,24 +64,31 @@ public class ShardLocalServiceUtil {
 	* Deletes the shard with the primary key from the database. Also notifies the appropriate model listeners.
 	*
 	* @param shardId the primary key of the shard
+	* @return the shard that was removed
 	* @throws PortalException if a shard with the primary key could not be found
 	* @throws SystemException if a system exception occurred
 	*/
-	public static void deleteShard(long shardId)
+	public static com.liferay.portal.model.Shard deleteShard(long shardId)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException {
-		getService().deleteShard(shardId);
+		return getService().deleteShard(shardId);
 	}
 
 	/**
 	* Deletes the shard from the database. Also notifies the appropriate model listeners.
 	*
 	* @param shard the shard
+	* @return the shard that was removed
 	* @throws SystemException if a system exception occurred
 	*/
-	public static void deleteShard(com.liferay.portal.model.Shard shard)
+	public static com.liferay.portal.model.Shard deleteShard(
+		com.liferay.portal.model.Shard shard)
 		throws com.liferay.portal.kernel.exception.SystemException {
-		getService().deleteShard(shard);
+		return getService().deleteShard(shard);
+	}
+
+	public static com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery() {
+		return getService().dynamicQuery();
 	}
 
 	/**
@@ -154,6 +160,11 @@ public class ShardLocalServiceUtil {
 		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery)
 		throws com.liferay.portal.kernel.exception.SystemException {
 		return getService().dynamicQueryCount(dynamicQuery);
+	}
+
+	public static com.liferay.portal.model.Shard fetchShard(long shardId)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getService().fetchShard(shardId);
 	}
 
 	/**
@@ -270,20 +281,15 @@ public class ShardLocalServiceUtil {
 
 			ReferenceRegistry.registerReference(ShardLocalServiceUtil.class,
 				"_service");
-			MethodCache.remove(ShardLocalService.class);
 		}
 
 		return _service;
 	}
 
+	/**
+	 * @deprecated
+	 */
 	public void setService(ShardLocalService service) {
-		MethodCache.remove(ShardLocalService.class);
-
-		_service = service;
-
-		ReferenceRegistry.registerReference(ShardLocalServiceUtil.class,
-			"_service");
-		MethodCache.remove(ShardLocalService.class);
 	}
 
 	private static ShardLocalService _service;

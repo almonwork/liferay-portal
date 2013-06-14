@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -18,6 +18,6 @@
 
 <c:if test="<%= !themeDisplay.isFacebook() %>">
 	<aui:script>
-		Liferay.Portal.Tabs.show("<%= namespace + param %>", <%= namesJS %>, "<%= value %>");
+		Liferay.Portal.Tabs.show("<%= namespace + param %>", <%= namesJS %>, "<%= UnicodeFormatter.toString(value) %>");
 	</aui:script>
 </c:if>

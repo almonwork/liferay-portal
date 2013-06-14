@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -16,6 +16,7 @@ package com.liferay.portal.search.lucene;
 
 import com.liferay.portal.kernel.cluster.Address;
 import com.liferay.portal.kernel.exception.SystemException;
+import com.liferay.portal.kernel.search.BooleanClauseOccur;
 import com.liferay.portal.kernel.util.StringPool;
 
 import java.io.IOException;
@@ -268,6 +269,14 @@ public class LuceneHelperUtil {
 	}
 
 	public static void addTerm(
+		BooleanQuery booleanQuery, String field, String value, boolean like,
+		BooleanClauseOccur booleanClauseOccur) {
+
+		getLuceneHelper().addTerm(
+			booleanQuery, field, value, like, booleanClauseOccur);
+	}
+
+	public static void addTerm(
 		BooleanQuery booleanQuery, String field, String[] values,
 		boolean like) {
 
@@ -356,12 +365,10 @@ public class LuceneHelperUtil {
 		getLuceneHelper().loadIndex(companyId, inputStream);
 	}
 
-	public static Address selectBootupClusterAddress(
-			long companyId, long localLastGeneration)
+	public static void loadIndexesFromCluster(long companyId)
 		throws SystemException {
 
-		return getLuceneHelper().selectBootupClusterAddress(
-			companyId, localLastGeneration);
+		getLuceneHelper().loadIndexesFromCluster(companyId);
 	}
 
 	public static void shutdown() {

@@ -14,6 +14,16 @@
 	<td></td>
 </tr>
 <tr>
+	<td>assertText</td>
+	<td>//li[@id='_145_mySites']/a/span</td>
+	<td>Go to</td>
+</tr>
+<tr>
+	<td>mouseOver</td>
+	<td>//li[@id='_145_mySites']/a/span</td>
+	<td>Go to</td>
+</tr>
+<tr>
 	<td>waitForVisible</td>
 	<td>link=Control Panel</td>
 	<td>Control Panel</td>
@@ -44,49 +54,64 @@
 	<td>Sites</td>
 </tr>
 <tr>
+	<td>assertText</td>
+	<td>//span[@title='Actions']/ul/li/strong/a/span</td>
+	<td>Actions</td>
+</tr>
+<tr>
 	<td>clickAt</td>
-	<td>//td[7]/span/ul/li/strong/a</td>
+	<td>//span[@title='Actions']/ul/li/strong/a/span</td>
 	<td>Actions</td>
 </tr>
 <tr>
 	<td>waitForVisible</td>
-	<td>//div[@class='lfr-component lfr-menu-list']/ul/li[2]/a</td>
+	<td>//div[@class='lfr-component lfr-menu-list']/ul/li[contains(.,'Manage Pages')]/a</td>
 	<td>Manage Pages</td>
 </tr>
 <tr>
 	<td>assertText</td>
-	<td>//div[@class='lfr-component lfr-menu-list']/ul/li[2]/a</td>
+	<td>//div[@class='lfr-component lfr-menu-list']/ul/li[contains(.,'Manage Pages')]/a</td>
 	<td>Manage Pages</td>
 </tr>
 <tr>
 	<td>clickAndWait</td>
-	<td>//div[@class='lfr-component lfr-menu-list']/ul/li[2]/a</td>
+	<td>//div[@class='lfr-component lfr-menu-list']/ul/li[contains(.,'Manage Pages')]/a</td>
 	<td>Manage Pages</td>
 </tr>
 <tr>
 	<td>waitForVisible</td>
-	<td>//a[@id='_134_advancedLink']</td>
+	<td>//a[@id='_156_advancedLink']</td>
 	<td>Advanced</td>
 </tr>
 <tr>
 	<td>clickAt</td>
-	<td>//a[@id='_134_advancedLink']</td>
+	<td>//a[@id='_156_advancedLink']</td>
 	<td>Advanced</td>
 </tr>
 <tr>
 	<td>waitForVisible</td>
-	<td>//input[@id='_134_mergeGuestPublicPagesCheckbox']</td>
+	<td>//input[@id='_156_mergeGuestPublicPagesCheckbox']</td>
+	<td>Merge Liferay public pages</td>
+</tr>
+<tr>
+	<td>assertNotChecked</td>
+	<td>//input[@id='_156_mergeGuestPublicPagesCheckbox']</td>
 	<td>Merge Liferay public pages</td>
 </tr>
 <tr>
 	<td>clickAt</td>
-	<td>//input[@id='_134_mergeGuestPublicPagesCheckbox']</td>
+	<td>//input[@id='_156_mergeGuestPublicPagesCheckbox']</td>
+	<td>Merge Liferay public pages</td>
+</tr>
+<tr>
+	<td>assertChecked</td>
+	<td>//input[@id='_156_mergeGuestPublicPagesCheckbox']</td>
 	<td>Merge Liferay public pages</td>
 </tr>
 <tr>
 	<td>clickAtAndWait</td>
 	<td>//input[@value='Save']</td>
-	<td></td>
+	<td>Save</td>
 </tr>
 <tr>
 	<td>waitForVisible</td>
@@ -98,7 +123,6 @@
 	<td>//div[@class='portlet-msg-success']</td>
 	<td>Your request completed successfully.</td>
 </tr>
-
 </tbody></table>
 </body>
 </html>

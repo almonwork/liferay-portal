@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -15,7 +15,6 @@
 package com.liferay.portlet.blogs.service;
 
 import com.liferay.portal.kernel.bean.PortalBeanLocatorUtil;
-import com.liferay.portal.kernel.util.MethodCache;
 import com.liferay.portal.kernel.util.ReferenceRegistry;
 
 /**
@@ -66,25 +65,32 @@ public class BlogsStatsUserLocalServiceUtil {
 	* Deletes the blogs stats user with the primary key from the database. Also notifies the appropriate model listeners.
 	*
 	* @param statsUserId the primary key of the blogs stats user
+	* @return the blogs stats user that was removed
 	* @throws PortalException if a blogs stats user with the primary key could not be found
 	* @throws SystemException if a system exception occurred
 	*/
-	public static void deleteBlogsStatsUser(long statsUserId)
+	public static com.liferay.portlet.blogs.model.BlogsStatsUser deleteBlogsStatsUser(
+		long statsUserId)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException {
-		getService().deleteBlogsStatsUser(statsUserId);
+		return getService().deleteBlogsStatsUser(statsUserId);
 	}
 
 	/**
 	* Deletes the blogs stats user from the database. Also notifies the appropriate model listeners.
 	*
 	* @param blogsStatsUser the blogs stats user
+	* @return the blogs stats user that was removed
 	* @throws SystemException if a system exception occurred
 	*/
-	public static void deleteBlogsStatsUser(
+	public static com.liferay.portlet.blogs.model.BlogsStatsUser deleteBlogsStatsUser(
 		com.liferay.portlet.blogs.model.BlogsStatsUser blogsStatsUser)
 		throws com.liferay.portal.kernel.exception.SystemException {
-		getService().deleteBlogsStatsUser(blogsStatsUser);
+		return getService().deleteBlogsStatsUser(blogsStatsUser);
+	}
+
+	public static com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery() {
+		return getService().dynamicQuery();
 	}
 
 	/**
@@ -156,6 +162,12 @@ public class BlogsStatsUserLocalServiceUtil {
 		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery)
 		throws com.liferay.portal.kernel.exception.SystemException {
 		return getService().dynamicQueryCount(dynamicQuery);
+	}
+
+	public static com.liferay.portlet.blogs.model.BlogsStatsUser fetchBlogsStatsUser(
+		long statsUserId)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getService().fetchBlogsStatsUser(statsUserId);
 	}
 
 	/**
@@ -364,20 +376,15 @@ public class BlogsStatsUserLocalServiceUtil {
 
 			ReferenceRegistry.registerReference(BlogsStatsUserLocalServiceUtil.class,
 				"_service");
-			MethodCache.remove(BlogsStatsUserLocalService.class);
 		}
 
 		return _service;
 	}
 
+	/**
+	 * @deprecated
+	 */
 	public void setService(BlogsStatsUserLocalService service) {
-		MethodCache.remove(BlogsStatsUserLocalService.class);
-
-		_service = service;
-
-		ReferenceRegistry.registerReference(BlogsStatsUserLocalServiceUtil.class,
-			"_service");
-		MethodCache.remove(BlogsStatsUserLocalService.class);
 	}
 
 	private static BlogsStatsUserLocalService _service;

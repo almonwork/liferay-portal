@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -95,7 +95,7 @@ public class LanguageImpl implements Language {
 		try {
 			pattern = get(locale, pattern);
 
-			if (arguments != null) {
+			if ((arguments != null) && (arguments.length > 0)) {
 				pattern = _escapePattern(pattern);
 
 				Object[] formattedArguments = new Object[arguments.length];
@@ -160,7 +160,7 @@ public class LanguageImpl implements Language {
 		try {
 			pattern = get(pageContext, pattern);
 
-			if (arguments != null) {
+			if ((arguments != null) && (arguments.length > 0)) {
 				pattern = _escapePattern(pattern);
 
 				Object[] formattedArguments = new Object[arguments.length];
@@ -228,15 +228,15 @@ public class LanguageImpl implements Language {
 		try {
 			pattern = get(pageContext, pattern);
 
-			if (arguments != null) {
+			if ((arguments != null) && (arguments.length > 0)) {
 				pattern = _escapePattern(pattern);
 
 				Object[] formattedArguments = new Object[arguments.length];
 
 				for (int i = 0; i < arguments.length; i++) {
 					if (translateArguments) {
-						formattedArguments[i] =
-							get(pageContext, arguments[i].toString());
+						formattedArguments[i] = get(
+							pageContext, arguments[i].toString());
 					}
 					else {
 						formattedArguments[i] = arguments[i];
@@ -263,7 +263,7 @@ public class LanguageImpl implements Language {
 		Object argument) {
 
 		return format(
-		portletConfig, locale, pattern, new Object[] {argument}, true);
+			portletConfig, locale, pattern, new Object[] {argument}, true);
 	}
 
 	public String format(
@@ -295,7 +295,7 @@ public class LanguageImpl implements Language {
 		try {
 			pattern = get(portletConfig, locale, pattern);
 
-			if (arguments != null) {
+			if ((arguments != null) && (arguments.length > 0)) {
 				pattern = _escapePattern(pattern);
 
 				Object[] formattedArguments = new Object[arguments.length];
@@ -330,16 +330,39 @@ public class LanguageImpl implements Language {
 	}
 
 	public String get(Locale locale, String key, String defaultValue) {
-		try {
-			return _get(null, null, locale, key, defaultValue);
+		if (PropsValues.TRANSLATIONS_DISABLED) {
+			return key;
 		}
-		catch (Exception e) {
-			if (_log.isWarnEnabled()) {
-				_log.warn(e, e);
+
+		if (key == null) {
+			return null;
+		}
+
+		String value = LanguageResources.getMessage(locale, key);
+
+		while ((value == null) || value.equals(defaultValue)) {
+			if ((key.length() > 0) &&
+				(key.charAt(key.length() - 1) == CharPool.CLOSE_BRACKET)) {
+
+				int pos = key.lastIndexOf(CharPool.OPEN_BRACKET);
+
+				if (pos != -1) {
+					key = key.substring(0, pos);
+
+					value = LanguageResources.getMessage(locale, key);
+
+					continue;
+				}
 			}
 
-			return defaultValue;
+			break;
 		}
+
+		if (value == null) {
+			value = defaultValue;
+		}
+
+		return value;
 	}
 
 	public String get(PageContext pageContext, String key) {
@@ -418,6 +441,41 @@ public class LanguageImpl implements Language {
 
 	public Locale getLocale(String languageCode) {
 		return _getInstance()._getLocale(languageCode);
+	}
+
+	public String getTimeDescription(Locale locale, long milliseconds) {
+		return getTimeDescription(locale, milliseconds, false);
+	}
+
+	public String getTimeDescription(
+		Locale locale, long milliseconds, boolean approximate) {
+
+		String description = Time.getDescription(milliseconds, approximate);
+
+		String value = null;
+
+		try {
+			int pos = description.indexOf(CharPool.SPACE);
+
+			String x = description.substring(0, pos);
+
+			value = x.concat(StringPool.SPACE).concat(
+				get(
+					locale,
+					description.substring(
+						pos + 1, description.length()).toLowerCase()));
+		}
+		catch (Exception e) {
+			if (_log.isWarnEnabled()) {
+				_log.warn(e, e);
+			}
+		}
+
+		return value;
+	}
+
+	public String getTimeDescription(Locale locale, Long milliseconds) {
+		return getTimeDescription(locale, milliseconds.longValue());
 	}
 
 	public String getTimeDescription(
@@ -535,14 +593,17 @@ public class LanguageImpl implements Language {
 		for (int i = 0; i < localesArray.length; i++) {
 			String languageId = localesArray[i];
 
-			int pos = languageId.indexOf(CharPool.UNDERLINE);
-
-			String language = languageId.substring(0, pos);
-			//String country = languageId.substring(pos + 1);
-
 			Locale locale = LocaleUtil.fromLanguageId(languageId);
 
 			_charEncodings.put(locale.toString(), StringPool.UTF8);
+
+			String language = languageId;
+
+			int pos = languageId.indexOf(CharPool.UNDERLINE);
+
+			if (pos > 0) {
+				language = languageId.substring(0, pos);
+			}
 
 			if (_localesMap.containsKey(language)) {
 				_duplicateLanguageCodes.add(language);
@@ -611,8 +672,8 @@ public class LanguageImpl implements Language {
 
 			String portletName = portletConfig.getPortletName();
 
-			if (((value == null) || (value.equals(defaultValue))) &&
-				(portletName.equals(PortletKeys.PORTLET_CONFIGURATION))) {
+			if (((value == null) || value.equals(defaultValue)) &&
+				portletName.equals(PortletKeys.PORTLET_CONFIGURATION)) {
 
 				value = _getPortletConfigurationValue(pageContext, locale, key);
 			}
@@ -627,7 +688,9 @@ public class LanguageImpl implements Language {
 		}
 
 		if ((value == null) || value.equals(defaultValue)) {
-			if (key.endsWith(StringPool.CLOSE_BRACKET)) {
+			if ((key.length() > 0) &&
+				(key.charAt(key.length() - 1) == CharPool.CLOSE_BRACKET)) {
+
 				int pos = key.lastIndexOf(CharPool.OPEN_BRACKET);
 
 				if (pos != -1) {
@@ -639,7 +702,7 @@ public class LanguageImpl implements Language {
 			}
 		}
 
-		if (value == null) {
+		if ((value == null) || value.equals(key)) {
 			value = defaultValue;
 		}
 
@@ -676,8 +739,7 @@ public class LanguageImpl implements Language {
 		PortletConfig portletConfig = PortletConfigFactoryUtil.create(
 			portlet, pageContext.getServletContext());
 
-		ResourceBundle resourceBundle = portletConfig.getResourceBundle(
-			locale);
+		ResourceBundle resourceBundle = portletConfig.getResourceBundle(locale);
 
 		return ResourceBundleUtil.getString(resourceBundle, key);
 	}

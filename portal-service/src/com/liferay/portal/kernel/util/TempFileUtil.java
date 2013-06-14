@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -16,11 +16,11 @@ package com.liferay.portal.kernel.util;
 
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
+import com.liferay.portal.kernel.io.ByteArrayFileInputStream;
 import com.liferay.portal.kernel.io.FileFilter;
 import com.liferay.portlet.documentlibrary.store.DLStoreUtil;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -35,13 +35,11 @@ public class TempFileUtil {
 
 		String tempFileName = FileUtil.createTempFileName();
 
-		InputStream inputStream = new FileInputStream(file);
-
-		DLStoreUtil.validate(tempFileName, true, inputStream);
+		DLStoreUtil.validate(tempFileName, true, file);
 
 		File tempFile = getTempFile(tempFileName, tempPathName);
 
-		FileUtil.write(tempFile, inputStream);
+		FileUtil.copyFile(file, tempFile);
 
 		return tempFileName;
 	}
@@ -50,13 +48,42 @@ public class TempFileUtil {
 			long userId, String fileName, String tempPathName, File file)
 		throws IOException, PortalException, SystemException {
 
-		InputStream inputStream = new FileInputStream(file);
-
-		DLStoreUtil.validate(fileName, true, inputStream);
+		DLStoreUtil.validate(fileName, true, file);
 
 		File tempFile = getTempFile(userId, fileName, tempPathName);
 
-		FileUtil.write(tempFile, inputStream);
+		FileUtil.copyFile(file, tempFile);
+
+		return fileName;
+	}
+
+	public static String addTempFile(
+			long userId, String fileName, String tempPathName,
+			InputStream inputStream)
+		throws IOException, PortalException, SystemException {
+
+		File file = null;
+
+		if (inputStream instanceof ByteArrayFileInputStream) {
+			ByteArrayFileInputStream byteArrayFileInputStream =
+				(ByteArrayFileInputStream)inputStream;
+
+			file = byteArrayFileInputStream.getFile();
+
+			DLStoreUtil.validate(fileName, true, file);
+		}
+		else {
+			DLStoreUtil.validate(fileName, true, inputStream);
+		}
+
+		File tempFile = getTempFile(userId, fileName, tempPathName);
+
+		if (file != null) {
+			FileUtil.copyFile(file, tempFile);
+		}
+		else {
+			FileUtil.write(tempFile, inputStream);
+		}
 
 		return fileName;
 	}
@@ -66,13 +93,11 @@ public class TempFileUtil {
 
 		String tempFileName = FileUtil.createTempFileName();
 
-		InputStream inputStream = new FileInputStream(file);
-
-		DLStoreUtil.validate(tempFileName, false, inputStream);
+		DLStoreUtil.validate(tempFileName, false, file);
 
 		File tempFile = getTempFile(tempFileName, tempPathName);
 
-		FileUtil.write(tempFile, inputStream);
+		FileUtil.copyFile(file, tempFile);
 
 		return tempFileName;
 	}
@@ -81,42 +106,46 @@ public class TempFileUtil {
 			String fileName, String tempPathName, File file)
 		throws IOException, PortalException, SystemException {
 
-		InputStream inputStream = new FileInputStream(file);
-
-		DLStoreUtil.validate(fileName, true, inputStream);
+		DLStoreUtil.validate(fileName, true, file);
 
 		File tempFile = getTempFile(fileName, tempPathName);
 
-		FileUtil.write(tempFile, inputStream);
+		FileUtil.copyFile(file, tempFile);
 
 		return fileName;
 	}
 
 	public static void deleteTempFile(
-		long userId, String fileName, String tempPathName) {
+			long userId, String fileName, String tempPathName)
+		throws PortalException {
 
 		File file = getTempFile(userId, fileName, tempPathName);
 
 		FileUtil.delete(file);
 	}
 
-	public static void deleteTempFile(String fileName, String tempPathName) {
+	public static void deleteTempFile(String fileName, String tempPathName)
+		throws PortalException {
+
 		File file = getTempFile(fileName, tempPathName);
 
 		FileUtil.delete(file);
 	}
 
 	public static File getTempFile(
-		long userId, String fileName, String tempPathName) {
+			long userId, String fileName, String tempPathName)
+		throws PortalException {
 
-		String absoluteFilePath = getTempAbsolutePath(
+		String absoluteFilePath = _getTempAbsolutePath(
 			userId, fileName, tempPathName);
 
 		return new File(absoluteFilePath);
 	}
 
-	public static File getTempFile(String fileName, String tempPathName) {
-		String absoluteFilePath = getTempAbsolutePath(fileName, tempPathName);
+	public static File getTempFile(String fileName, String tempPathName)
+		throws PortalException {
+
+		String absoluteFilePath = _getTempAbsolutePath(fileName, tempPathName);
 
 		return new File(absoluteFilePath);
 	}
@@ -124,7 +153,7 @@ public class TempFileUtil {
 	public static String[] getTempFileEntryNames(
 		long userId, String tempPathName) {
 
-		File dir = new File(getTempAbsolutePath(tempPathName));
+		File dir = new File(_getTempAbsolutePath(tempPathName));
 
 		StringBundler sb = new StringBundler(5);
 
@@ -161,9 +190,9 @@ public class TempFileUtil {
 	}
 
 	public static String[] getTempFileEntryNames(String tempPathName) {
-		File dir = new File(getTempAbsolutePath(tempPathName));
+		File dir = new File(_getTempAbsolutePath(tempPathName));
 
-		File[] files =  dir.listFiles(
+		File[] files = dir.listFiles(
 			new FileFilter(_SUFFIX_TEMP_FILENAME_REGEX));
 
 		String[] fileNames = new String[files.length];
@@ -180,8 +209,20 @@ public class TempFileUtil {
 		return fileNames;
 	}
 
-	private static String getTempAbsolutePath(
-		long userId, String fileName, String tempPathName) {
+	protected static boolean isValidFileName(String name) {
+		if ((name == null) ||
+			name.contains(StringPool.SLASH) ||
+			name.contains(StringPool.BACK_SLASH)) {
+
+			return false;
+		}
+
+		return true;
+	}
+
+	private static String _getTempAbsolutePath(
+			long userId, String fileName, String tempPathName)
+		throws PortalException {
 
 		StringBundler sb = new StringBundler(5);
 
@@ -189,12 +230,12 @@ public class TempFileUtil {
 		sb.append(_BASE_TEMP_PATHNAME);
 		sb.append(tempPathName);
 		sb.append(StringPool.SLASH);
-		sb.append(getTempFileName(userId, fileName));
+		sb.append(_getTempFileName(userId, fileName));
 
 		return sb.toString();
 	}
 
-	private static String getTempAbsolutePath(String tempPathName) {
+	private static String _getTempAbsolutePath(String tempPathName) {
 		StringBundler sb = new StringBundler(4);
 
 		sb.append(SystemProperties.get(SystemProperties.TMP_DIR));
@@ -205,8 +246,9 @@ public class TempFileUtil {
 		return sb.toString();
 	}
 
-	private static String getTempAbsolutePath(
-		String fileName, String tempPathName) {
+	private static String _getTempAbsolutePath(
+			String fileName, String tempPathName)
+		throws PortalException {
 
 		StringBundler sb = new StringBundler(5);
 
@@ -214,12 +256,18 @@ public class TempFileUtil {
 		sb.append(_BASE_TEMP_PATHNAME);
 		sb.append(tempPathName);
 		sb.append(StringPool.SLASH);
-		sb.append(getTempFileName(fileName));
+		sb.append(_getTempFileName(fileName));
 
 		return sb.toString();
 	}
 
-	private static String getTempFileName(long userId, String fileName) {
+	private static String _getTempFileName(long userId, String fileName)
+		throws PortalException {
+
+		if (!isValidFileName(fileName)) {
+			throw new TempFileNameException();
+		}
+
 		StringBundler sb = new StringBundler(4);
 
 		sb.append(fileName);
@@ -230,7 +278,13 @@ public class TempFileUtil {
 		return sb.toString();
 	}
 
-	private static String getTempFileName(String fileName) {
+	private static String _getTempFileName(String fileName)
+		throws PortalException {
+
+		if (!isValidFileName(fileName)) {
+			throw new TempFileNameException();
+		}
+
 		return fileName + _SUFFIX_TEMP_FILENAME;
 	}
 

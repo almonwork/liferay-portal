@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -37,7 +37,7 @@
 			showTabs1 = true;
 		}
 
-		String tabs2 = ParamUtil.getString(request, "tabs2", "memory");
+		String tabs2 = ParamUtil.getString(request, "tabs2");
 		String tabs3 = ParamUtil.getString(request, "tabs3");
 
 		if (tabs1.equals("plugins")) {
@@ -83,6 +83,16 @@
 			<c:choose>
 				<c:when test='<%= tabs1.equals("server") %>'>
 					<%@ include file="/html/portlet/admin/server.jspf" %>
+
+					<aui:script use="liferay-admin">
+						new Liferay.Portlet.Admin(
+							{
+								form: document.<portlet:namespace />fm,
+								namespace: '<portlet:namespace />',
+								url: '<portlet:actionURL><portlet:param name="struts_action" value="/admin/edit_server" /></portlet:actionURL>'
+							}
+						);
+					</aui:script>
 				</c:when>
 				<c:when test='<%= tabs1.equals("instances") %>'>
 					<%@ include file="/html/portlet/admin/instances.jspf" %>
@@ -90,15 +100,10 @@
 				<c:when test='<%= tabs1.equals("plugins") %>'>
 
 					<%
-					PortletURL installPluginsURL = null;
+					PortletURL marketplaceURL = null;
 
-					if (PrefsPropsUtil.getBoolean(PropsKeys.AUTO_DEPLOY_ENABLED, PropsValues.AUTO_DEPLOY_ENABLED) || PortalUtil.isOmniadmin(user.getUserId())) {
-						installPluginsURL = ((RenderResponseImpl)renderResponse).createRenderURL(PortletKeys.PLUGIN_INSTALLER);
-
-						installPluginsURL.setParameter("struts_action", "/plugin_installer/view");
-						installPluginsURL.setParameter("backURL", currentURL);
-						installPluginsURL.setParameter("tabs1", tabs1);
-						installPluginsURL.setParameter("tabs2", tabs2);
+					if ((PrefsPropsUtil.getBoolean(PropsKeys.AUTO_DEPLOY_ENABLED, PropsValues.AUTO_DEPLOY_ENABLED) || PortalUtil.isOmniadmin(user.getUserId())) && PortletLocalServiceUtil.hasPortlet(themeDisplay.getCompanyId(), PortletKeys.MARKETPLACE_STORE)) {
+						marketplaceURL = ((RenderResponseImpl)renderResponse).createRenderURL(PortletKeys.MARKETPLACE_STORE);
 					}
 
 					boolean showEditPluginHREF = false;

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -20,6 +20,7 @@ import java.util.Map;
 /**
  * @author Michael Young
  * @author Connor McKay
+ * @author Shuyang Zhou
  */
 public class InheritableMap<K, V> extends HashMap<K, V> {
 
@@ -40,7 +41,7 @@ public class InheritableMap<K, V> extends HashMap<K, V> {
 
 	@Override
 	public boolean containsKey(Object key) {
-		if (_parentMap != null && _parentMap.containsKey(key)) {
+		if ((_parentMap != null) && _parentMap.containsKey(key)) {
 		 	return true;
 		}
 		else {
@@ -60,8 +61,10 @@ public class InheritableMap<K, V> extends HashMap<K, V> {
 
 	@Override
 	public V get(Object key) {
-	 	if (super.containsKey(key)) {
-			return super.get(key);
+		V value = super.get(key);
+
+		if (value != null) {
+			return value;
 		}
 		else if (_parentMap != null) {
 			return _parentMap.get(key);
@@ -76,8 +79,10 @@ public class InheritableMap<K, V> extends HashMap<K, V> {
 
 	@Override
 	public V remove(Object key) {
-		if (super.containsKey(key)) {
-			return super.remove(key);
+		V value = super.remove(key);
+
+		if (value != null) {
+			return value;
 		}
 		else if (_parentMap != null) {
 			return _parentMap.remove(key);
@@ -88,6 +93,29 @@ public class InheritableMap<K, V> extends HashMap<K, V> {
 
 	public void setParentMap(Map<? extends K, ? extends V> parentMap) {
 		_parentMap = (Map<K, V>)parentMap;
+	}
+
+	@Override
+	public String toString() {
+		String string = super.toString();
+
+		String parentString = "{}";
+
+		if (_parentMap != null) {
+			parentString = _parentMap.toString();
+		}
+
+		if (string.length() <= 2) {
+			return parentString;
+		}
+
+		StringBundler sb = new StringBundler(3);
+
+		sb.append(string.substring(0, string.length() - 1));
+		sb.append(StringPool.COMMA_AND_SPACE);
+		sb.append(parentString.substring(1));
+
+		return sb.toString();
 	}
 
 	private Map<K, V> _parentMap;

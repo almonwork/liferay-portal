@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,6 +14,12 @@
 
 package com.liferay.portlet.documentlibrary.model;
 
+import com.liferay.portal.model.ModelWrapper;
+
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * <p>
  * This class is a wrapper for {@link DLSync}.
@@ -23,7 +29,7 @@ package com.liferay.portlet.documentlibrary.model;
  * @see       DLSync
  * @generated
  */
-public class DLSyncWrapper implements DLSync {
+public class DLSyncWrapper implements DLSync, ModelWrapper<DLSync> {
 	public DLSyncWrapper(DLSync dlSync) {
 		_dlSync = dlSync;
 	}
@@ -34,6 +40,106 @@ public class DLSyncWrapper implements DLSync {
 
 	public String getModelClassName() {
 		return DLSync.class.getName();
+	}
+
+	public Map<String, Object> getModelAttributes() {
+		Map<String, Object> attributes = new HashMap<String, Object>();
+
+		attributes.put("syncId", getSyncId());
+		attributes.put("companyId", getCompanyId());
+		attributes.put("createDate", getCreateDate());
+		attributes.put("modifiedDate", getModifiedDate());
+		attributes.put("fileId", getFileId());
+		attributes.put("fileUuid", getFileUuid());
+		attributes.put("repositoryId", getRepositoryId());
+		attributes.put("parentFolderId", getParentFolderId());
+		attributes.put("name", getName());
+		attributes.put("description", getDescription());
+		attributes.put("event", getEvent());
+		attributes.put("type", getType());
+		attributes.put("version", getVersion());
+
+		return attributes;
+	}
+
+	public void setModelAttributes(Map<String, Object> attributes) {
+		Long syncId = (Long)attributes.get("syncId");
+
+		if (syncId != null) {
+			setSyncId(syncId);
+		}
+
+		Long companyId = (Long)attributes.get("companyId");
+
+		if (companyId != null) {
+			setCompanyId(companyId);
+		}
+
+		Date createDate = (Date)attributes.get("createDate");
+
+		if (createDate != null) {
+			setCreateDate(createDate);
+		}
+
+		Date modifiedDate = (Date)attributes.get("modifiedDate");
+
+		if (modifiedDate != null) {
+			setModifiedDate(modifiedDate);
+		}
+
+		Long fileId = (Long)attributes.get("fileId");
+
+		if (fileId != null) {
+			setFileId(fileId);
+		}
+
+		String fileUuid = (String)attributes.get("fileUuid");
+
+		if (fileUuid != null) {
+			setFileUuid(fileUuid);
+		}
+
+		Long repositoryId = (Long)attributes.get("repositoryId");
+
+		if (repositoryId != null) {
+			setRepositoryId(repositoryId);
+		}
+
+		Long parentFolderId = (Long)attributes.get("parentFolderId");
+
+		if (parentFolderId != null) {
+			setParentFolderId(parentFolderId);
+		}
+
+		String name = (String)attributes.get("name");
+
+		if (name != null) {
+			setName(name);
+		}
+
+		String description = (String)attributes.get("description");
+
+		if (description != null) {
+			setDescription(description);
+		}
+
+		String event = (String)attributes.get("event");
+
+		if (event != null) {
+			setEvent(event);
+		}
+
+		String type = (String)attributes.get("type");
+
+		if (type != null) {
+			setType(type);
+		}
+
+		String version = (String)attributes.get("version");
+
+		if (version != null) {
+			setVersion(version);
+		}
 	}
 
 	/**
@@ -131,7 +237,7 @@ public class DLSyncWrapper implements DLSync {
 	*
 	* @return the file ID of this d l sync
 	*/
-	public java.lang.String getFileId() {
+	public long getFileId() {
 		return _dlSync.getFileId();
 	}
 
@@ -140,8 +246,26 @@ public class DLSyncWrapper implements DLSync {
 	*
 	* @param fileId the file ID of this d l sync
 	*/
-	public void setFileId(java.lang.String fileId) {
+	public void setFileId(long fileId) {
 		_dlSync.setFileId(fileId);
+	}
+
+	/**
+	* Returns the file uuid of this d l sync.
+	*
+	* @return the file uuid of this d l sync
+	*/
+	public java.lang.String getFileUuid() {
+		return _dlSync.getFileUuid();
+	}
+
+	/**
+	* Sets the file uuid of this d l sync.
+	*
+	* @param fileUuid the file uuid of this d l sync
+	*/
+	public void setFileUuid(java.lang.String fileUuid) {
+		_dlSync.setFileUuid(fileUuid);
 	}
 
 	/**
@@ -160,6 +284,60 @@ public class DLSyncWrapper implements DLSync {
 	*/
 	public void setRepositoryId(long repositoryId) {
 		_dlSync.setRepositoryId(repositoryId);
+	}
+
+	/**
+	* Returns the parent folder ID of this d l sync.
+	*
+	* @return the parent folder ID of this d l sync
+	*/
+	public long getParentFolderId() {
+		return _dlSync.getParentFolderId();
+	}
+
+	/**
+	* Sets the parent folder ID of this d l sync.
+	*
+	* @param parentFolderId the parent folder ID of this d l sync
+	*/
+	public void setParentFolderId(long parentFolderId) {
+		_dlSync.setParentFolderId(parentFolderId);
+	}
+
+	/**
+	* Returns the name of this d l sync.
+	*
+	* @return the name of this d l sync
+	*/
+	public java.lang.String getName() {
+		return _dlSync.getName();
+	}
+
+	/**
+	* Sets the name of this d l sync.
+	*
+	* @param name the name of this d l sync
+	*/
+	public void setName(java.lang.String name) {
+		_dlSync.setName(name);
+	}
+
+	/**
+	* Returns the description of this d l sync.
+	*
+	* @return the description of this d l sync
+	*/
+	public java.lang.String getDescription() {
+		return _dlSync.getDescription();
+	}
+
+	/**
+	* Sets the description of this d l sync.
+	*
+	* @param description the description of this d l sync
+	*/
+	public void setDescription(java.lang.String description) {
+		_dlSync.setDescription(description);
 	}
 
 	/**
@@ -198,6 +376,24 @@ public class DLSyncWrapper implements DLSync {
 		_dlSync.setType(type);
 	}
 
+	/**
+	* Returns the version of this d l sync.
+	*
+	* @return the version of this d l sync
+	*/
+	public java.lang.String getVersion() {
+		return _dlSync.getVersion();
+	}
+
+	/**
+	* Sets the version of this d l sync.
+	*
+	* @param version the version of this d l sync
+	*/
+	public void setVersion(java.lang.String version) {
+		_dlSync.setVersion(version);
+	}
+
 	public boolean isNew() {
 		return _dlSync.isNew();
 	}
@@ -216,10 +412,6 @@ public class DLSyncWrapper implements DLSync {
 
 	public boolean isEscapedModel() {
 		return _dlSync.isEscapedModel();
-	}
-
-	public void setEscapedModel(boolean escapedModel) {
-		_dlSync.setEscapedModel(escapedModel);
 	}
 
 	public java.io.Serializable getPrimaryKeyObj() {
@@ -276,7 +468,14 @@ public class DLSyncWrapper implements DLSync {
 		_dlSync.persist();
 	}
 
+	/**
+	 * @deprecated Renamed to {@link #getWrappedModel}
+	 */
 	public DLSync getWrappedDLSync() {
+		return _dlSync;
+	}
+
+	public DLSync getWrappedModel() {
 		return _dlSync;
 	}
 

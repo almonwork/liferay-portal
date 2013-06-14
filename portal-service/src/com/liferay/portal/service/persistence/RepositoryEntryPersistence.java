@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,7 +14,6 @@
 
 package com.liferay.portal.service.persistence;
 
-import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.model.RepositoryEntry;
 
 /**
@@ -447,9 +446,11 @@ public interface RepositoryEntryPersistence extends BasePersistence<RepositoryEn
 	*
 	* @param uuid the uuid
 	* @param groupId the group ID
+	* @return the repository entry that was removed
 	* @throws SystemException if a system exception occurred
 	*/
-	public void removeByUUID_G(java.lang.String uuid, long groupId)
+	public com.liferay.portal.model.RepositoryEntry removeByUUID_G(
+		java.lang.String uuid, long groupId)
 		throws com.liferay.portal.NoSuchRepositoryEntryException,
 			com.liferay.portal.kernel.exception.SystemException;
 
@@ -467,9 +468,11 @@ public interface RepositoryEntryPersistence extends BasePersistence<RepositoryEn
 	*
 	* @param repositoryId the repository ID
 	* @param mappedId the mapped ID
+	* @return the repository entry that was removed
 	* @throws SystemException if a system exception occurred
 	*/
-	public void removeByR_M(long repositoryId, java.lang.String mappedId)
+	public com.liferay.portal.model.RepositoryEntry removeByR_M(
+		long repositoryId, java.lang.String mappedId)
 		throws com.liferay.portal.NoSuchRepositoryEntryException,
 			com.liferay.portal.kernel.exception.SystemException;
 
@@ -531,7 +534,4 @@ public interface RepositoryEntryPersistence extends BasePersistence<RepositoryEn
 	*/
 	public int countAll()
 		throws com.liferay.portal.kernel.exception.SystemException;
-
-	public RepositoryEntry remove(RepositoryEntry repositoryEntry)
-		throws SystemException;
 }

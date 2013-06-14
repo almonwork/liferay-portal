@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,6 +14,12 @@
 
 package com.liferay.portlet.dynamicdatalists.model;
 
+import com.liferay.portal.model.ModelWrapper;
+
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * <p>
  * This class is a wrapper for {@link DDLRecordVersion}.
@@ -23,7 +29,8 @@ package com.liferay.portlet.dynamicdatalists.model;
  * @see       DDLRecordVersion
  * @generated
  */
-public class DDLRecordVersionWrapper implements DDLRecordVersion {
+public class DDLRecordVersionWrapper implements DDLRecordVersion,
+	ModelWrapper<DDLRecordVersion> {
 	public DDLRecordVersionWrapper(DDLRecordVersion ddlRecordVersion) {
 		_ddlRecordVersion = ddlRecordVersion;
 	}
@@ -34,6 +41,120 @@ public class DDLRecordVersionWrapper implements DDLRecordVersion {
 
 	public String getModelClassName() {
 		return DDLRecordVersion.class.getName();
+	}
+
+	public Map<String, Object> getModelAttributes() {
+		Map<String, Object> attributes = new HashMap<String, Object>();
+
+		attributes.put("recordVersionId", getRecordVersionId());
+		attributes.put("groupId", getGroupId());
+		attributes.put("companyId", getCompanyId());
+		attributes.put("userId", getUserId());
+		attributes.put("userName", getUserName());
+		attributes.put("createDate", getCreateDate());
+		attributes.put("DDMStorageId", getDDMStorageId());
+		attributes.put("recordSetId", getRecordSetId());
+		attributes.put("recordId", getRecordId());
+		attributes.put("version", getVersion());
+		attributes.put("displayIndex", getDisplayIndex());
+		attributes.put("status", getStatus());
+		attributes.put("statusByUserId", getStatusByUserId());
+		attributes.put("statusByUserName", getStatusByUserName());
+		attributes.put("statusDate", getStatusDate());
+
+		return attributes;
+	}
+
+	public void setModelAttributes(Map<String, Object> attributes) {
+		Long recordVersionId = (Long)attributes.get("recordVersionId");
+
+		if (recordVersionId != null) {
+			setRecordVersionId(recordVersionId);
+		}
+
+		Long groupId = (Long)attributes.get("groupId");
+
+		if (groupId != null) {
+			setGroupId(groupId);
+		}
+
+		Long companyId = (Long)attributes.get("companyId");
+
+		if (companyId != null) {
+			setCompanyId(companyId);
+		}
+
+		Long userId = (Long)attributes.get("userId");
+
+		if (userId != null) {
+			setUserId(userId);
+		}
+
+		String userName = (String)attributes.get("userName");
+
+		if (userName != null) {
+			setUserName(userName);
+		}
+
+		Date createDate = (Date)attributes.get("createDate");
+
+		if (createDate != null) {
+			setCreateDate(createDate);
+		}
+
+		Long DDMStorageId = (Long)attributes.get("DDMStorageId");
+
+		if (DDMStorageId != null) {
+			setDDMStorageId(DDMStorageId);
+		}
+
+		Long recordSetId = (Long)attributes.get("recordSetId");
+
+		if (recordSetId != null) {
+			setRecordSetId(recordSetId);
+		}
+
+		Long recordId = (Long)attributes.get("recordId");
+
+		if (recordId != null) {
+			setRecordId(recordId);
+		}
+
+		String version = (String)attributes.get("version");
+
+		if (version != null) {
+			setVersion(version);
+		}
+
+		Integer displayIndex = (Integer)attributes.get("displayIndex");
+
+		if (displayIndex != null) {
+			setDisplayIndex(displayIndex);
+		}
+
+		Integer status = (Integer)attributes.get("status");
+
+		if (status != null) {
+			setStatus(status);
+		}
+
+		Long statusByUserId = (Long)attributes.get("statusByUserId");
+
+		if (statusByUserId != null) {
+			setStatusByUserId(statusByUserId);
+		}
+
+		String statusByUserName = (String)attributes.get("statusByUserName");
+
+		if (statusByUserName != null) {
+			setStatusByUserName(statusByUserName);
+		}
+
+		Date statusDate = (Date)attributes.get("statusDate");
+
+		if (statusDate != null) {
+			setStatusDate(statusDate);
+		}
 	}
 
 	/**
@@ -399,6 +520,15 @@ public class DDLRecordVersionWrapper implements DDLRecordVersion {
 	}
 
 	/**
+	* Returns <code>true</code> if this d d l record version is in the Recycle Bin.
+	*
+	* @return <code>true</code> if this d d l record version is in the Recycle Bin; <code>false</code> otherwise
+	*/
+	public boolean isInTrash() {
+		return _ddlRecordVersion.isInTrash();
+	}
+
+	/**
 	* Returns <code>true</code> if this d d l record version is pending.
 	*
 	* @return <code>true</code> if this d d l record version is pending; <code>false</code> otherwise
@@ -425,10 +555,6 @@ public class DDLRecordVersionWrapper implements DDLRecordVersion {
 
 	public boolean isEscapedModel() {
 		return _ddlRecordVersion.isEscapedModel();
-	}
-
-	public void setEscapedModel(boolean escapedModel) {
-		_ddlRecordVersion.setEscapedModel(escapedModel);
 	}
 
 	public java.io.Serializable getPrimaryKeyObj() {
@@ -486,7 +612,20 @@ public class DDLRecordVersionWrapper implements DDLRecordVersion {
 		return _ddlRecordVersion.getRecord();
 	}
 
+	public com.liferay.portlet.dynamicdatalists.model.DDLRecordSet getRecordSet()
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException {
+		return _ddlRecordVersion.getRecordSet();
+	}
+
+	/**
+	 * @deprecated Renamed to {@link #getWrappedModel}
+	 */
 	public DDLRecordVersion getWrappedDDLRecordVersion() {
+		return _ddlRecordVersion;
+	}
+
+	public DDLRecordVersion getWrappedModel() {
 		return _ddlRecordVersion;
 	}
 

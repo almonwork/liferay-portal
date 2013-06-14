@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,6 +14,8 @@
 
 package com.liferay.portlet.announcements.service;
 
+import com.liferay.portal.service.ServiceWrapper;
+
 /**
  * <p>
  * This class is a wrapper for {@link AnnouncementsDeliveryLocalService}.
@@ -24,7 +26,8 @@ package com.liferay.portlet.announcements.service;
  * @generated
  */
 public class AnnouncementsDeliveryLocalServiceWrapper
-	implements AnnouncementsDeliveryLocalService {
+	implements AnnouncementsDeliveryLocalService,
+		ServiceWrapper<AnnouncementsDeliveryLocalService> {
 	public AnnouncementsDeliveryLocalServiceWrapper(
 		AnnouncementsDeliveryLocalService announcementsDeliveryLocalService) {
 		_announcementsDeliveryLocalService = announcementsDeliveryLocalService;
@@ -58,25 +61,32 @@ public class AnnouncementsDeliveryLocalServiceWrapper
 	* Deletes the announcements delivery with the primary key from the database. Also notifies the appropriate model listeners.
 	*
 	* @param deliveryId the primary key of the announcements delivery
+	* @return the announcements delivery that was removed
 	* @throws PortalException if a announcements delivery with the primary key could not be found
 	* @throws SystemException if a system exception occurred
 	*/
-	public void deleteAnnouncementsDelivery(long deliveryId)
+	public com.liferay.portlet.announcements.model.AnnouncementsDelivery deleteAnnouncementsDelivery(
+		long deliveryId)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException {
-		_announcementsDeliveryLocalService.deleteAnnouncementsDelivery(deliveryId);
+		return _announcementsDeliveryLocalService.deleteAnnouncementsDelivery(deliveryId);
 	}
 
 	/**
 	* Deletes the announcements delivery from the database. Also notifies the appropriate model listeners.
 	*
 	* @param announcementsDelivery the announcements delivery
+	* @return the announcements delivery that was removed
 	* @throws SystemException if a system exception occurred
 	*/
-	public void deleteAnnouncementsDelivery(
+	public com.liferay.portlet.announcements.model.AnnouncementsDelivery deleteAnnouncementsDelivery(
 		com.liferay.portlet.announcements.model.AnnouncementsDelivery announcementsDelivery)
 		throws com.liferay.portal.kernel.exception.SystemException {
-		_announcementsDeliveryLocalService.deleteAnnouncementsDelivery(announcementsDelivery);
+		return _announcementsDeliveryLocalService.deleteAnnouncementsDelivery(announcementsDelivery);
+	}
+
+	public com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery() {
+		return _announcementsDeliveryLocalService.dynamicQuery();
 	}
 
 	/**
@@ -149,6 +159,12 @@ public class AnnouncementsDeliveryLocalServiceWrapper
 		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery)
 		throws com.liferay.portal.kernel.exception.SystemException {
 		return _announcementsDeliveryLocalService.dynamicQueryCount(dynamicQuery);
+	}
+
+	public com.liferay.portlet.announcements.model.AnnouncementsDelivery fetchAnnouncementsDelivery(
+		long deliveryId)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return _announcementsDeliveryLocalService.fetchAnnouncementsDelivery(deliveryId);
 	}
 
 	/**
@@ -309,11 +325,26 @@ public class AnnouncementsDeliveryLocalServiceWrapper
 			email, sms, website);
 	}
 
+	/**
+	 * @deprecated Renamed to {@link #getWrappedService}
+	 */
 	public AnnouncementsDeliveryLocalService getWrappedAnnouncementsDeliveryLocalService() {
 		return _announcementsDeliveryLocalService;
 	}
 
+	/**
+	 * @deprecated Renamed to {@link #setWrappedService}
+	 */
 	public void setWrappedAnnouncementsDeliveryLocalService(
+		AnnouncementsDeliveryLocalService announcementsDeliveryLocalService) {
+		_announcementsDeliveryLocalService = announcementsDeliveryLocalService;
+	}
+
+	public AnnouncementsDeliveryLocalService getWrappedService() {
+		return _announcementsDeliveryLocalService;
+	}
+
+	public void setWrappedService(
 		AnnouncementsDeliveryLocalService announcementsDeliveryLocalService) {
 		_announcementsDeliveryLocalService = announcementsDeliveryLocalService;
 	}

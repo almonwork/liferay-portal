@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -36,7 +36,7 @@ public class VerifyUUID extends VerifyProcess {
 		ResultSet rs = null;
 
 		try {
-			con = DataAccess.getConnection();
+			con = DataAccess.getUpgradeOptimizedConnection();
 
 			ps = con.prepareStatement(
 				"select " + pkColumnName + " from " + modelName +
@@ -77,48 +77,31 @@ public class VerifyUUID extends VerifyProcess {
 
 	private static final String[][] _MODELS = new String[][] {
 		new String[] {
-			"IGFolder",
-			"folderId"
+			"DLFileVersion", "fileVersionId"
 		},
 		new String[] {
-			"IGImage",
-			"imageId"
+			"JournalArticleResource", "resourcePrimKey"
 		},
 		new String[] {
-			"JournalArticle",
-			"id_"
+			"JournalFeed", "id_"
 		},
 		new String[] {
-			"JournalArticleResource",
-			"resourcePrimKey"
+			"JournalStructure", "id_"
 		},
 		new String[] {
-			"JournalFeed",
-			"id_"
+			"JournalTemplate", "id_"
 		},
 		new String[] {
-			"JournalStructure",
-			"id_"
+			"Layout", "plid"
 		},
 		new String[] {
-			"JournalTemplate",
-			"id_"
+			"LayoutPrototype", "layoutPrototypeId"
 		},
 		new String[] {
-			"Layout",
-			"plid"
+			"LayoutSetPrototype", "layoutSetPrototypeId"
 		},
 		new String[] {
-			"LayoutPrototype",
-			"layoutPrototypeId"
-		},
-		new String[] {
-			"LayoutSetPrototype",
-			"layoutSetPrototypeId"
-		},
-		new String[] {
-			"WikiPageResource",
-			"resourcePrimKey"
+			"WikiPageResource", "resourcePrimKey"
 		}
 	};
 

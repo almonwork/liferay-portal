@@ -1,252 +1,103 @@
 <?xml version="1.0"?>
 
 <custom-sql>
-	<sql id="com.liferay.portlet.social.service.impl.SocialEquityLogLocalServiceImpl.addSocialEquityAssetEntry">
+	<sql id="com.liferay.portlet.social.service.persistence.SocialActivityCounterFinder.countU_ByG_C_N_S_E">
 		<![CDATA[
-			INSERT INTO
-				SocialEquityAssetEntry
-					(equityAssetEntryId, groupId, companyId, userId, assetEntryId, informationK, informationB)
-			VALUES
-				([$EQUITY_ASSET_ENTRY_ID$], [$GROUP_ID$], [$COMPANY_ID$], [$USER_ID$], [$ASSET_ENTRY_ID$], 0, 0)
-		]]>
-	</sql>
-	<sql id="com.liferay.portlet.social.service.impl.SocialEquityLogLocalServiceImpl.addSocialEquityUser">
-		<![CDATA[
-			INSERT INTO
-				SocialEquityUser
-					(equityUserId, groupId, companyId, userId, contributionK, contributionB, participationK, participationB, rank)
-			VALUES
-				([$EQUITY_USER_ID$], [$GROUP_ID$], [$COMPANY_ID$], [$USER_ID$], 0, 0, 0, 0, 0)
-		]]>
-	</sql>
-	<sql id="com.liferay.portlet.social.service.impl.SocialEquityLogLocalServiceImpl.updateSocialEquityAssetEntry_IQ">
-		<![CDATA[
-			UPDATE
-				SocialEquityAssetEntry
-			SET
-				informationK = informationK + [$INFORMATION_K$],
-				informationB = informationB + [$INFORMATION_B$]
+			SELECT
+				COUNT(DISTINCT classPK) AS COUNT_VALUE
+			FROM
+				SocialActivityCounter
+			INNER JOIN
+				User_ ON
+					(SocialActivityCounter.classPK = User_.userId)
 			WHERE
-				assetEntryId = [$ASSET_ENTRY_ID$]
+				(groupId = ?) AND
+				(classNameId = ?) AND
+				(name IN ([$NAME$])) AND
+				(startPeriod + ? >= ?) AND
+				(endPeriod = -1) AND
+				(User_.defaultUser != [$TRUE$]) AND
+				(User_.status = 0) AND
+				(SocialActivityCounter.active_ = [$TRUE$])
 		]]>
 	</sql>
-	<sql id="com.liferay.portlet.social.service.impl.SocialEquityLogLocalServiceImpl.updateSocialEquityUser_CQ">
+	<sql id="com.liferay.portlet.social.service.persistence.SocialActivityCounterFinder.findAC_ByG_N_S_E_1">
 		<![CDATA[
-			UPDATE
-				SocialEquityUser
-			SET
-				contributionK = contributionK + [$CONTRIBUTION_K$],
-				contributionB = contributionB + [$CONTRIBUTION_B$]
+			SELECT
+				name, SUM(currentValue) currentValue, startPeriod, endPeriod
+			FROM
+				SocialActivityCounter
 			WHERE
-				(groupId = [$GROUP_ID$]) AND
-				(userId = [$USER_ID$])
-		]]>
-	</sql>
-	<sql id="com.liferay.portlet.social.service.impl.SocialEquityLogLocalServiceImpl.updateSocialEquityUser_PQ">
-		<![CDATA[
-			UPDATE
-				SocialEquityUser
-			SET
-				participationK = participationK + [$PARTICIPATION_K$],
-				participationB = participationB + [$PARTICIPATION_B$]
-			WHERE
-				(groupId = [$GROUP_ID$]) AND
-				(userId = [$USER_ID$])
-		]]>
-	</sql>
-	<sql id="com.liferay.portlet.social.service.impl.SocialEquityLogLocalServiceImpl.checkSocialEquityAssetEntry_IQ">
-		<![CDATA[
-			UPDATE
-				SocialEquityAssetEntry
-			SET
-				informationK =
-					informationK -
-						(
-							SELECT
-								SUM(-value / (expiration - actionDate))
-							FROM
-								SocialEquityLog
-							WHERE
-								(SocialEquityLog.assetEntryId = SocialEquityAssetEntry.assetEntryId) AND
-								(expiration <= [$EXPIRATION$]) AND
-								(active_ = [$TRUE$])
-						),
-				informationB =
-					informationB -
-						(
-							SELECT
-								SUM(-(-value / (expiration - actionDate)) * expiration)
-							FROM
-								SocialEquityLog
-							WHERE
-								(SocialEquityLog.assetEntryId = SocialEquityAssetEntry.assetEntryId) AND
-								(expiration <= [$EXPIRATION$]) AND
-								(active_ = [$TRUE$])
-						)
-			WHERE
-				assetEntryId IN
-					(
-						SELECT
-							assetEntryId
-						FROM
-							SocialEquityLog
-						WHERE
-							(type_ = [$TYPE_INFORMATION$]) AND
-							(expiration <= [$EXPIRATION$]) AND
-							(active_ = [$TRUE$])
-					)
-		]]>
-	</sql>
-	<sql id="com.liferay.portlet.social.service.impl.SocialEquityLogLocalServiceImpl.checkSocialEquityLogs">
-		<![CDATA[
-			UPDATE
-				SocialEquityLog
-			SET
-				active_ = [$FALSE$]
-			WHERE
-				(expiration <= [$EXPIRATION$]) AND
+				(groupId = ?) AND
+				(name = ?) AND
+				(startPeriod >= ?) AND
+				(startPeriod <= ?) AND
+				(startPeriod + ? <= ? + 1) AND
 				(active_ = [$TRUE$])
+			GROUP BY
+				name, startPeriod, endPeriod
+			ORDER BY
+				startPeriod
 		]]>
 	</sql>
-	<sql id="com.liferay.portlet.social.service.impl.SocialEquityLogLocalServiceImpl.checkSocialEquityUser">
-		<![CDATA[
-			DELETE FROM
-				SocialEquityUser
-			WHERE
-				NOT EXISTS
-					(
-						SELECT
-							1
-						FROM
-							User_
-						WHERE
-							User_.userId = SocialEquityUser.userId
-					)
-		]]>
-	</sql>
-	<sql id="com.liferay.portlet.social.service.impl.SocialEquityLogLocalServiceImpl.checkSocialEquityUser_CQ">
-		<![CDATA[
-			UPDATE
-				SocialEquityUser
-			SET
-				contributionK =
-					contributionK -
-						(
-							SELECT
-								SUM(informationK)
-							FROM
-								SocialEquityAssetEntry
-							WHERE
-								(SocialEquityAssetEntry.groupId = SocialEquityUser.groupId) AND
-								(SocialEquityAssetEntry.userId = SocialEquityUser.userId)
-						),
-				contributionB =
-					contributionB -
-						(
-							SELECT
-								SUM(informationB)
-							FROM
-								SocialEquityAssetEntry
-							WHERE
-								(SocialEquityAssetEntry.groupId = SocialEquityUser.groupId) AND
-								(SocialEquityAssetEntry.userId = SocialEquityUser.userId)
-						)
-			WHERE
-				userId IN
-					(
-						SELECT
-							userId
-						FROM
-							SocialEquityLog
-						WHERE
-							(expiration <= [$EXPIRATION$]) AND
-							(active_ = [$TRUE$]) AND
-							(type_ = [$TYPE_INFORMATION$])
-					)
-		]]>
-	</sql>
-	<sql id="com.liferay.portlet.social.service.impl.SocialEquityLogLocalServiceImpl.checkSocialEquityUser_PQ">
-		<![CDATA[
-			UPDATE
-				SocialEquityUser
-			SET
-				participationK =
-					participationK -
-						(
-							SELECT
-								SUM(-value / (expiration - actionDate))
-							FROM
-								SocialEquityLog
-							WHERE
-								(SocialEquityLog.groupId = SocialEquityUser.groupId) AND
-								(SocialEquityLog.userId = SocialEquityUser.userId) AND
-								(type_ = [$TYPE_PARTICIPATION$]) AND
-								(expiration <= [$EXPIRATION$]) AND
-								(active_ = [$TRUE$])
-						),
-				participationB =
-					participationB -
-						(
-							SELECT
-								SUM(-(-value / (expiration - actionDate)) * expiration)
-							FROM
-								SocialEquityLog
-							WHERE
-								(SocialEquityLog.groupId = SocialEquityUser.groupId) AND
-								(SocialEquityLog.userId = SocialEquityUser.userId) AND
-								(type_ = [$TYPE_PARTICIPATION$]) AND
-								(expiration <= [$EXPIRATION$]) AND
-								(active_ = [$TRUE$])
-						)
-			WHERE
-				userId IN
-					(
-						SELECT
-							userId
-						FROM
-							SocialEquityLog
-						WHERE
-							(type_ = [$TYPE_PARTICIPATION$]) AND
-							(expiration <= [$EXPIRATION$]) AND
-							(active_ = [$TRUE$])
-					)
-		]]>
-	</sql>
-	<sql id="com.liferay.portlet.social.service.impl.SocialEquityLogLocalServiceImpl.findSocialEquityUser">
+	<sql id="com.liferay.portlet.social.service.persistence.SocialActivityCounterFinder.findAC_ByG_N_S_E_2">
 		<![CDATA[
 			SELECT
-				equityUserId, SocialEquityUser.groupId, ([$ACTION_DATE$] * (contributionK + participationK) + contributionB + participationB) AS equityValue, status
+				classNameId, name, SUM(currentValue) currentValue
 			FROM
-				SocialEquityUser
-			INNER JOIN
-				User_ ON SocialEquityUser.userId = User_.userId
+				SocialActivityCounter
+			WHERE
+				(groupId = ?) AND
+				(name = ?) AND
+				(startPeriod >= ?) AND
+				(startPeriod <= ?) AND
+				(startPeriod + ? <= ? + 1) AND
+				(active_ = [$TRUE$])
+			GROUP BY
+				classNameId, name
 			ORDER BY
-				groupId, equityValue DESC
+				currentValue DESC
 		]]>
 	</sql>
-	<sql id="com.liferay.portlet.social.service.impl.SocialEquityLogLocalServiceImpl.findSocialEquityUserByGroup">
+	<sql id="com.liferay.portlet.social.service.persistence.SocialActivityCounterFinder.findAC_By_G_C_C_N_S_E">
 		<![CDATA[
 			SELECT
-				equityUserId, SocialEquityUser.groupId, ([$ACTION_DATE$] * (contributionK + participationK) + contributionB + participationB) AS equityValue, status
+				{SocialActivityCounter.*}
 			FROM
-				SocialEquityUser
-			INNER JOIN
-				User_ ON SocialEquityUser.userId = User_.userId
+				SocialActivityCounter
 			WHERE
-				(groupId = [$GROUP_ID$])
+				(groupId = ?) AND
+				(classNameId = ?) AND
+				(classPK IN ([$CLASS_PK$])) AND
+				(name IN ([$NAME$])) AND
+				(endPeriod = -1) AND
+				(active_ = [$TRUE$])
 			ORDER BY
-				equityValue DESC
+				classPK
 		]]>
 	</sql>
-	<sql id="com.liferay.portlet.social.service.impl.SocialEquityLogLocalServiceImpl.updateSocialEquityUserRank">
+	<sql id="com.liferay.portlet.social.service.persistence.SocialActivityCounterFinder.findU_ByG_C_N_S_E">
 		<![CDATA[
-			UPDATE
-				SocialEquityUser
-			SET
-				rank = ?
+			SELECT
+				classPK
+			FROM
+				SocialActivityCounter
+			INNER JOIN
+				User_ ON
+					(SocialActivityCounter.classPK = User_.userId)
 			WHERE
-				(equityUserId = ?) AND
-				(rank != ?)
+				(groupId = ?) AND
+				(classNameId = ?) AND
+				(name IN ([$NAME$])) AND
+				(startPeriod >= ?) AND
+				(endPeriod = -1) AND
+				(User_.defaultUser != [$TRUE$]) AND
+				(User_.status = 0) AND
+				(active_ = [$TRUE$])
+			GROUP BY
+				classPK
+			ORDER BY
+				SUM(currentValue) DESC
 		]]>
 	</sql>
 	<sql id="com.liferay.portlet.social.service.persistence.SocialActivityFinder.countByGroupId">
@@ -321,7 +172,7 @@
 	<sql id="com.liferay.portlet.social.service.persistence.SocialActivityFinder.countByRelationType">
 		<![CDATA[
 			SELECT
-				COUNT(DISTINCT SocialActivity.activityId) AS COUNT_VALUE
+				COUNT(SocialActivity.activityId) AS COUNT_VALUE
 			FROM
 				SocialActivity
 			INNER JOIN
@@ -508,7 +359,7 @@
 	<sql id="com.liferay.portlet.social.service.persistence.SocialActivityFinder.findByRelationType">
 		<![CDATA[
 			SELECT
-				DISTINCT {SocialActivity.*}
+				{SocialActivity.*}
 			FROM
 				SocialActivity
 			INNER JOIN
@@ -549,49 +400,49 @@
 			SELECT
 				TEMP_TABLE.*
 			FROM
-			(
-				SELECT
-					SocialActivity.activityId AS activityId, SocialActivity.createDate AS createDate
-				FROM
-					SocialActivity
-				WHERE
-					(
-						groupId IN (
-							SELECT
-								groupId
-							FROM
-								Users_Groups
-							WHERE
-								userId = ?
-						)
-					) AND
-					(mirrorActivityId = 0)
+				(
+					SELECT
+						SocialActivity.activityId AS activityId, SocialActivity.createDate AS createDate
+					FROM
+						SocialActivity
+					WHERE
+						(
+							groupId IN (
+								SELECT
+									groupId
+								FROM
+									Users_Groups
+								WHERE
+									userId = ?
+							)
+						) AND
+						(mirrorActivityId = 0)
 
-				UNION ALL
+					UNION ALL
 
-				SELECT
-					SocialActivity.activityId AS activityId, SocialActivity.createDate AS createDate
-				FROM
-					SocialActivity
-				INNER JOIN
-					Group_ ON
-						(Group_.groupId = SocialActivity.groupId)
-				INNER JOIN
-					Organization_ ON
-						(Organization_.organizationId = Group_.classPK)
-				WHERE
-					(SocialActivity.mirrorActivityId = 0) AND
-					(
-						Organization_.organizationId IN (
-							SELECT
-								organizationId
-							FROM
-								Users_Orgs
-							WHERE
-								Users_Orgs.userId = ?
+					SELECT
+						SocialActivity.activityId AS activityId, SocialActivity.createDate AS createDate
+					FROM
+						SocialActivity
+					INNER JOIN
+						Group_ ON
+							(Group_.groupId = SocialActivity.groupId)
+					INNER JOIN
+						Organization_ ON
+							(Organization_.organizationId = Group_.classPK)
+					WHERE
+						(SocialActivity.mirrorActivityId = 0) AND
+						(
+							Organization_.organizationId IN (
+								SELECT
+									organizationId
+								FROM
+									Users_Orgs
+								WHERE
+									Users_Orgs.userId = ?
+							)
 						)
-					)
-			) TEMP_TABLE
+				) TEMP_TABLE
 			ORDER BY
 				createDate DESC
 		]]>

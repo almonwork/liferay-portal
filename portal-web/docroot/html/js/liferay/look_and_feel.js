@@ -1,4 +1,4 @@
-AUI().add(
+AUI.add(
 	'liferay-look-and-feel',
 	function(A) {
 		var Browser = Liferay.Browser;
@@ -915,7 +915,7 @@ AUI().add(
 						var firstIndex = 0;
 
 						if (!otherHolders.size()) {
-							otherHolders = fieldset.all('.aui-field');
+							otherHolders = fieldset.all('.aui-field-content');
 							firstIndex = 1;
 						}
 
@@ -1018,6 +1018,7 @@ AUI().add(
 									data: {
 										css: A.JSON.stringify(instance._objData),
 										doAsUserId: themeDisplay.getDoAsUserIdEncoded(),
+										p_auth: Liferay.authToken,
 										p_l_id: themeDisplay.getPlid(),
 										portletId: instance._portletId
 									},
@@ -1062,6 +1063,7 @@ AUI().add(
 					{
 						data: {
 							doAsUserId: themeDisplay.getDoAsUserIdEncoded(),
+							p_auth: Liferay.authToken,
 							p_l_id: themeDisplay.getPlid(),
 							portletId: instance._portletId
 						},
@@ -1070,8 +1072,11 @@ AUI().add(
 							success: function(event, id, obj) {
 								var objectData = this.get('responseData');
 
-								if (objectData) {
+								if (objectData.hasCssValue) {
 									instance._objData = objectData;
+								}
+								else {
+									instance._objData.portletData = objectData.portletData;
 								}
 
 								onLookAndFeelComplete();
@@ -1827,7 +1832,6 @@ AUI().add(
 	},
 	'',
 	{
-		requires: ['aui-color-picker', 'aui-dialog', 'aui-io-request', 'aui-tabs-base'],
-		use: []
+		requires: ['aui-color-picker', 'aui-dialog', 'aui-io-request', 'aui-tabs-base']
 	}
 );

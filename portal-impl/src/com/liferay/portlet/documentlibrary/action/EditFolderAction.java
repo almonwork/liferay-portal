@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -29,6 +29,7 @@ import com.liferay.portlet.documentlibrary.FolderNameException;
 import com.liferay.portlet.documentlibrary.NoSuchFolderException;
 import com.liferay.portlet.documentlibrary.model.DLFileEntry;
 import com.liferay.portlet.documentlibrary.model.DLFolder;
+import com.liferay.portlet.documentlibrary.model.DLFolderConstants;
 import com.liferay.portlet.documentlibrary.service.DLAppServiceUtil;
 
 import javax.portlet.ActionRequest;
@@ -61,10 +62,16 @@ public class EditFolderAction extends PortletAction {
 				updateFolder(actionRequest);
 			}
 			else if (cmd.equals(Constants.DELETE)) {
-				deleteFolders(actionRequest);
+				deleteFolders(actionRequest, false);
 			}
 			else if (cmd.equals(Constants.MOVE)) {
 				moveFolders(actionRequest);
+			}
+			else if (cmd.equals(Constants.MOVE_TO_TRASH)) {
+				deleteFolders(actionRequest, true);
+			}
+			else if (cmd.equals("updateWorkflowDefinitions")) {
+				updateWorkflowDefinitions(actionRequest);
 			}
 
 			sendRedirect(actionRequest, actionResponse);
@@ -73,7 +80,7 @@ public class EditFolderAction extends PortletAction {
 			if (e instanceof NoSuchFolderException ||
 				e instanceof PrincipalException) {
 
-				SessionErrors.add(actionRequest, e.getClass().getName());
+				SessionErrors.add(actionRequest, e.getClass());
 
 				setForward(actionRequest, "portlet.document_library.error");
 			}
@@ -81,7 +88,7 @@ public class EditFolderAction extends PortletAction {
 					 e instanceof DuplicateFolderNameException ||
 					 e instanceof FolderNameException) {
 
-				SessionErrors.add(actionRequest, e.getClass().getName());
+				SessionErrors.add(actionRequest, e.getClass());
 			}
 			else {
 				throw e;
@@ -102,7 +109,7 @@ public class EditFolderAction extends PortletAction {
 			if (e instanceof NoSuchFolderException ||
 				e instanceof PrincipalException) {
 
-				SessionErrors.add(renderRequest, e.getClass().getName());
+				SessionErrors.add(renderRequest, e.getClass());
 
 				return mapping.findForward("portlet.document_library.error");
 			}
@@ -115,25 +122,32 @@ public class EditFolderAction extends PortletAction {
 			getForward(renderRequest, "portlet.document_library.edit_folder"));
 	}
 
-	protected void deleteFolders(ActionRequest actionRequest) throws Exception {
+	protected void deleteFolders(
+			ActionRequest actionRequest, boolean moveToTrash)
+		throws Exception {
+
+		long[] deleteFolderIds = null;
+
 		long folderId = ParamUtil.getLong(actionRequest, "folderId");
 
 		if (folderId > 0) {
-			DLAppServiceUtil.deleteFolder(folderId);
-
-			AssetPublisherUtil.removeRecentFolderId(
-				actionRequest, DLFileEntry.class.getName(), folderId);
+			deleteFolderIds = new long[] {folderId};
 		}
 		else {
-			long[] folderIds = StringUtil.split(
+			deleteFolderIds = StringUtil.split(
 				ParamUtil.getString(actionRequest, "folderIds"), 0L);
+		}
 
-			for (int i = 0; i < folderIds.length; i++) {
-				DLAppServiceUtil.deleteFolder(folderIds[i]);
-
-				AssetPublisherUtil.removeRecentFolderId(
-					actionRequest, DLFileEntry.class.getName(), folderIds[i]);
+		for (long deleteFolderId : deleteFolderIds) {
+			if (moveToTrash) {
+				DLAppServiceUtil.moveFolderToTrash(deleteFolderId);
 			}
+			else {
+				DLAppServiceUtil.deleteFolder(deleteFolderId);
+			}
+
+			AssetPublisherUtil.removeRecentFolderId(
+				actionRequest, DLFileEntry.class.getName(), deleteFolderId);
 		}
 	}
 
@@ -154,9 +168,9 @@ public class EditFolderAction extends PortletAction {
 			long[] folderIds = StringUtil.split(
 				ParamUtil.getString(actionRequest, "folderIds"), 0L);
 
-			for (int i = 0; i < folderIds.length; i++) {
+			for (long curFolderId : folderIds) {
 				DLAppServiceUtil.moveFolder(
-					folderIds[i], parentFolderId, serviceContext);
+					curFolderId, parentFolderId, serviceContext);
 			}
 		}
 	}
@@ -188,6 +202,17 @@ public class EditFolderAction extends PortletAction {
 			DLAppServiceUtil.updateFolder(
 				folderId, name, description, serviceContext);
 		}
+	}
+
+	protected void updateWorkflowDefinitions(ActionRequest actionRequest)
+		throws Exception {
+
+		ServiceContext serviceContext = ServiceContextFactory.getInstance(
+			DLFileEntry.class.getName(), actionRequest);
+
+		DLAppServiceUtil.updateFolder(
+			DLFolderConstants.DEFAULT_PARENT_FOLDER_ID, null, null,
+			serviceContext);
 	}
 
 }

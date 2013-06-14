@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -35,8 +35,24 @@ public class LayoutTypeImpl implements LayoutType {
 		return _layout.getTypeSettingsProperties();
 	}
 
+	public String getTypeSettingsProperty(String key) {
+		return getTypeSettingsProperty(key, null);
+	}
+
+	public String getTypeSettingsProperty(String key, String defaultValue) {
+		UnicodeProperties typeSettingsProperties = getTypeSettingsProperties();
+
+		return typeSettingsProperties.getProperty(key, defaultValue);
+	}
+
 	public void setLayout(Layout layout) {
 		_layout = layout;
+	}
+
+	public void setTypeSettingsProperty(String key, String value) {
+		UnicodeProperties typeSettingsProperties = getTypeSettingsProperties();
+
+		typeSettingsProperties.setProperty(key, value);
 	}
 
 	private Layout _layout;

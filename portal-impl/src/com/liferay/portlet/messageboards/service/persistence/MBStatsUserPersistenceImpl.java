@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -36,7 +36,7 @@ import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.model.CacheModel;
 import com.liferay.portal.model.ModelListener;
 import com.liferay.portal.service.persistence.BatchSessionUtil;
-import com.liferay.portal.service.persistence.ResourcePersistence;
+import com.liferay.portal.service.persistence.GroupPersistence;
 import com.liferay.portal.service.persistence.UserPersistence;
 import com.liferay.portal.service.persistence.impl.BasePersistenceImpl;
 
@@ -71,61 +71,86 @@ public class MBStatsUserPersistenceImpl extends BasePersistenceImpl<MBStatsUser>
 	 * Never modify or reference this class directly. Always use {@link MBStatsUserUtil} to access the message boards stats user persistence. Modify <code>service.xml</code> and rerun ServiceBuilder to regenerate this class.
 	 */
 	public static final String FINDER_CLASS_NAME_ENTITY = MBStatsUserImpl.class.getName();
-	public static final String FINDER_CLASS_NAME_LIST = FINDER_CLASS_NAME_ENTITY +
-		".List";
-	public static final FinderPath FINDER_PATH_FIND_BY_GROUPID = new FinderPath(MBStatsUserModelImpl.ENTITY_CACHE_ENABLED,
+	public static final String FINDER_CLASS_NAME_LIST_WITH_PAGINATION = FINDER_CLASS_NAME_ENTITY +
+		".List1";
+	public static final String FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION = FINDER_CLASS_NAME_ENTITY +
+		".List2";
+	public static final FinderPath FINDER_PATH_WITH_PAGINATION_FIND_BY_GROUPID = new FinderPath(MBStatsUserModelImpl.ENTITY_CACHE_ENABLED,
 			MBStatsUserModelImpl.FINDER_CACHE_ENABLED, MBStatsUserImpl.class,
-			FINDER_CLASS_NAME_LIST, "findByGroupId",
+			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByGroupId",
 			new String[] {
 				Long.class.getName(),
 				
 			"java.lang.Integer", "java.lang.Integer",
 				"com.liferay.portal.kernel.util.OrderByComparator"
 			});
+	public static final FinderPath FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_GROUPID =
+		new FinderPath(MBStatsUserModelImpl.ENTITY_CACHE_ENABLED,
+			MBStatsUserModelImpl.FINDER_CACHE_ENABLED, MBStatsUserImpl.class,
+			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByGroupId",
+			new String[] { Long.class.getName() },
+			MBStatsUserModelImpl.GROUPID_COLUMN_BITMASK);
 	public static final FinderPath FINDER_PATH_COUNT_BY_GROUPID = new FinderPath(MBStatsUserModelImpl.ENTITY_CACHE_ENABLED,
 			MBStatsUserModelImpl.FINDER_CACHE_ENABLED, Long.class,
-			FINDER_CLASS_NAME_LIST, "countByGroupId",
+			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByGroupId",
 			new String[] { Long.class.getName() });
-	public static final FinderPath FINDER_PATH_FIND_BY_USERID = new FinderPath(MBStatsUserModelImpl.ENTITY_CACHE_ENABLED,
+	public static final FinderPath FINDER_PATH_WITH_PAGINATION_FIND_BY_USERID = new FinderPath(MBStatsUserModelImpl.ENTITY_CACHE_ENABLED,
 			MBStatsUserModelImpl.FINDER_CACHE_ENABLED, MBStatsUserImpl.class,
-			FINDER_CLASS_NAME_LIST, "findByUserId",
+			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByUserId",
 			new String[] {
 				Long.class.getName(),
 				
 			"java.lang.Integer", "java.lang.Integer",
 				"com.liferay.portal.kernel.util.OrderByComparator"
 			});
+	public static final FinderPath FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_USERID =
+		new FinderPath(MBStatsUserModelImpl.ENTITY_CACHE_ENABLED,
+			MBStatsUserModelImpl.FINDER_CACHE_ENABLED, MBStatsUserImpl.class,
+			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByUserId",
+			new String[] { Long.class.getName() },
+			MBStatsUserModelImpl.USERID_COLUMN_BITMASK);
 	public static final FinderPath FINDER_PATH_COUNT_BY_USERID = new FinderPath(MBStatsUserModelImpl.ENTITY_CACHE_ENABLED,
 			MBStatsUserModelImpl.FINDER_CACHE_ENABLED, Long.class,
-			FINDER_CLASS_NAME_LIST, "countByUserId",
+			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByUserId",
 			new String[] { Long.class.getName() });
 	public static final FinderPath FINDER_PATH_FETCH_BY_G_U = new FinderPath(MBStatsUserModelImpl.ENTITY_CACHE_ENABLED,
 			MBStatsUserModelImpl.FINDER_CACHE_ENABLED, MBStatsUserImpl.class,
 			FINDER_CLASS_NAME_ENTITY, "fetchByG_U",
-			new String[] { Long.class.getName(), Long.class.getName() });
+			new String[] { Long.class.getName(), Long.class.getName() },
+			MBStatsUserModelImpl.GROUPID_COLUMN_BITMASK |
+			MBStatsUserModelImpl.USERID_COLUMN_BITMASK);
 	public static final FinderPath FINDER_PATH_COUNT_BY_G_U = new FinderPath(MBStatsUserModelImpl.ENTITY_CACHE_ENABLED,
 			MBStatsUserModelImpl.FINDER_CACHE_ENABLED, Long.class,
-			FINDER_CLASS_NAME_LIST, "countByG_U",
+			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByG_U",
 			new String[] { Long.class.getName(), Long.class.getName() });
-	public static final FinderPath FINDER_PATH_FIND_BY_G_NOTM = new FinderPath(MBStatsUserModelImpl.ENTITY_CACHE_ENABLED,
+	public static final FinderPath FINDER_PATH_WITH_PAGINATION_FIND_BY_G_NOTU_NOTM =
+		new FinderPath(MBStatsUserModelImpl.ENTITY_CACHE_ENABLED,
 			MBStatsUserModelImpl.FINDER_CACHE_ENABLED, MBStatsUserImpl.class,
-			FINDER_CLASS_NAME_LIST, "findByG_NotM",
+			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByG_NotU_NotM",
 			new String[] {
-				Long.class.getName(), Integer.class.getName(),
+				Long.class.getName(), Long.class.getName(),
+				Integer.class.getName(),
 				
 			"java.lang.Integer", "java.lang.Integer",
 				"com.liferay.portal.kernel.util.OrderByComparator"
 			});
-	public static final FinderPath FINDER_PATH_COUNT_BY_G_NOTM = new FinderPath(MBStatsUserModelImpl.ENTITY_CACHE_ENABLED,
+	public static final FinderPath FINDER_PATH_WITH_PAGINATION_COUNT_BY_G_NOTU_NOTM =
+		new FinderPath(MBStatsUserModelImpl.ENTITY_CACHE_ENABLED,
 			MBStatsUserModelImpl.FINDER_CACHE_ENABLED, Long.class,
-			FINDER_CLASS_NAME_LIST, "countByG_NotM",
-			new String[] { Long.class.getName(), Integer.class.getName() });
-	public static final FinderPath FINDER_PATH_FIND_ALL = new FinderPath(MBStatsUserModelImpl.ENTITY_CACHE_ENABLED,
+			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "countByG_NotU_NotM",
+			new String[] {
+				Long.class.getName(), Long.class.getName(),
+				Integer.class.getName()
+			});
+	public static final FinderPath FINDER_PATH_WITH_PAGINATION_FIND_ALL = new FinderPath(MBStatsUserModelImpl.ENTITY_CACHE_ENABLED,
 			MBStatsUserModelImpl.FINDER_CACHE_ENABLED, MBStatsUserImpl.class,
-			FINDER_CLASS_NAME_LIST, "findAll", new String[0]);
+			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findAll", new String[0]);
+	public static final FinderPath FINDER_PATH_WITHOUT_PAGINATION_FIND_ALL = new FinderPath(MBStatsUserModelImpl.ENTITY_CACHE_ENABLED,
+			MBStatsUserModelImpl.FINDER_CACHE_ENABLED, MBStatsUserImpl.class,
+			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findAll", new String[0]);
 	public static final FinderPath FINDER_PATH_COUNT_ALL = new FinderPath(MBStatsUserModelImpl.ENTITY_CACHE_ENABLED,
 			MBStatsUserModelImpl.FINDER_CACHE_ENABLED, Long.class,
-			FINDER_CLASS_NAME_LIST, "countAll", new String[0]);
+			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countAll", new String[0]);
 
 	/**
 	 * Caches the message boards stats user in the entity cache if it is enabled.
@@ -154,8 +179,11 @@ public class MBStatsUserPersistenceImpl extends BasePersistenceImpl<MBStatsUser>
 		for (MBStatsUser mbStatsUser : mbStatsUsers) {
 			if (EntityCacheUtil.getResult(
 						MBStatsUserModelImpl.ENTITY_CACHE_ENABLED,
-						MBStatsUserImpl.class, mbStatsUser.getPrimaryKey(), this) == null) {
+						MBStatsUserImpl.class, mbStatsUser.getPrimaryKey()) == null) {
 				cacheResult(mbStatsUser);
+			}
+			else {
+				mbStatsUser.resetOriginalValues();
 			}
 		}
 	}
@@ -174,8 +202,10 @@ public class MBStatsUserPersistenceImpl extends BasePersistenceImpl<MBStatsUser>
 		}
 
 		EntityCacheUtil.clearCache(MBStatsUserImpl.class.getName());
+
 		FinderCacheUtil.clearCache(FINDER_CLASS_NAME_ENTITY);
-		FinderCacheUtil.clearCache(FINDER_CLASS_NAME_LIST);
+		FinderCacheUtil.clearCache(FINDER_CLASS_NAME_LIST_WITH_PAGINATION);
+		FinderCacheUtil.clearCache(FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
 	}
 
 	/**
@@ -190,6 +220,26 @@ public class MBStatsUserPersistenceImpl extends BasePersistenceImpl<MBStatsUser>
 		EntityCacheUtil.removeResult(MBStatsUserModelImpl.ENTITY_CACHE_ENABLED,
 			MBStatsUserImpl.class, mbStatsUser.getPrimaryKey());
 
+		FinderCacheUtil.clearCache(FINDER_CLASS_NAME_LIST_WITH_PAGINATION);
+		FinderCacheUtil.clearCache(FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
+
+		clearUniqueFindersCache(mbStatsUser);
+	}
+
+	@Override
+	public void clearCache(List<MBStatsUser> mbStatsUsers) {
+		FinderCacheUtil.clearCache(FINDER_CLASS_NAME_LIST_WITH_PAGINATION);
+		FinderCacheUtil.clearCache(FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
+
+		for (MBStatsUser mbStatsUser : mbStatsUsers) {
+			EntityCacheUtil.removeResult(MBStatsUserModelImpl.ENTITY_CACHE_ENABLED,
+				MBStatsUserImpl.class, mbStatsUser.getPrimaryKey());
+
+			clearUniqueFindersCache(mbStatsUser);
+		}
+	}
+
+	protected void clearUniqueFindersCache(MBStatsUser mbStatsUser) {
 		FinderCacheUtil.removeResult(FINDER_PATH_FETCH_BY_G_U,
 			new Object[] {
 				Long.valueOf(mbStatsUser.getGroupId()),
@@ -215,20 +265,6 @@ public class MBStatsUserPersistenceImpl extends BasePersistenceImpl<MBStatsUser>
 	/**
 	 * Removes the message boards stats user with the primary key from the database. Also notifies the appropriate model listeners.
 	 *
-	 * @param primaryKey the primary key of the message boards stats user
-	 * @return the message boards stats user that was removed
-	 * @throws com.liferay.portal.NoSuchModelException if a message boards stats user with the primary key could not be found
-	 * @throws SystemException if a system exception occurred
-	 */
-	@Override
-	public MBStatsUser remove(Serializable primaryKey)
-		throws NoSuchModelException, SystemException {
-		return remove(((Long)primaryKey).longValue());
-	}
-
-	/**
-	 * Removes the message boards stats user with the primary key from the database. Also notifies the appropriate model listeners.
-	 *
 	 * @param statsUserId the primary key of the message boards stats user
 	 * @return the message boards stats user that was removed
 	 * @throws com.liferay.portlet.messageboards.NoSuchStatsUserException if a message boards stats user with the primary key could not be found
@@ -236,24 +272,38 @@ public class MBStatsUserPersistenceImpl extends BasePersistenceImpl<MBStatsUser>
 	 */
 	public MBStatsUser remove(long statsUserId)
 		throws NoSuchStatsUserException, SystemException {
+		return remove(Long.valueOf(statsUserId));
+	}
+
+	/**
+	 * Removes the message boards stats user with the primary key from the database. Also notifies the appropriate model listeners.
+	 *
+	 * @param primaryKey the primary key of the message boards stats user
+	 * @return the message boards stats user that was removed
+	 * @throws com.liferay.portlet.messageboards.NoSuchStatsUserException if a message boards stats user with the primary key could not be found
+	 * @throws SystemException if a system exception occurred
+	 */
+	@Override
+	public MBStatsUser remove(Serializable primaryKey)
+		throws NoSuchStatsUserException, SystemException {
 		Session session = null;
 
 		try {
 			session = openSession();
 
 			MBStatsUser mbStatsUser = (MBStatsUser)session.get(MBStatsUserImpl.class,
-					Long.valueOf(statsUserId));
+					primaryKey);
 
 			if (mbStatsUser == null) {
 				if (_log.isWarnEnabled()) {
-					_log.warn(_NO_SUCH_ENTITY_WITH_PRIMARY_KEY + statsUserId);
+					_log.warn(_NO_SUCH_ENTITY_WITH_PRIMARY_KEY + primaryKey);
 				}
 
 				throw new NoSuchStatsUserException(_NO_SUCH_ENTITY_WITH_PRIMARY_KEY +
-					statsUserId);
+					primaryKey);
 			}
 
-			return mbStatsUserPersistence.remove(mbStatsUser);
+			return remove(mbStatsUser);
 		}
 		catch (NoSuchStatsUserException nsee) {
 			throw nsee;
@@ -264,19 +314,6 @@ public class MBStatsUserPersistenceImpl extends BasePersistenceImpl<MBStatsUser>
 		finally {
 			closeSession(session);
 		}
-	}
-
-	/**
-	 * Removes the message boards stats user from the database. Also notifies the appropriate model listeners.
-	 *
-	 * @param mbStatsUser the message boards stats user
-	 * @return the message boards stats user that was removed
-	 * @throws SystemException if a system exception occurred
-	 */
-	@Override
-	public MBStatsUser remove(MBStatsUser mbStatsUser)
-		throws SystemException {
-		return super.remove(mbStatsUser);
 	}
 
 	@Override
@@ -298,18 +335,7 @@ public class MBStatsUserPersistenceImpl extends BasePersistenceImpl<MBStatsUser>
 			closeSession(session);
 		}
 
-		FinderCacheUtil.clearCache(FINDER_CLASS_NAME_LIST);
-
-		MBStatsUserModelImpl mbStatsUserModelImpl = (MBStatsUserModelImpl)mbStatsUser;
-
-		FinderCacheUtil.removeResult(FINDER_PATH_FETCH_BY_G_U,
-			new Object[] {
-				Long.valueOf(mbStatsUserModelImpl.getGroupId()),
-				Long.valueOf(mbStatsUserModelImpl.getUserId())
-			});
-
-		EntityCacheUtil.removeResult(MBStatsUserModelImpl.ENTITY_CACHE_ENABLED,
-			MBStatsUserImpl.class, mbStatsUser.getPrimaryKey());
+		clearCache(mbStatsUser);
 
 		return mbStatsUser;
 	}
@@ -340,29 +366,80 @@ public class MBStatsUserPersistenceImpl extends BasePersistenceImpl<MBStatsUser>
 			closeSession(session);
 		}
 
-		FinderCacheUtil.clearCache(FINDER_CLASS_NAME_LIST);
+		FinderCacheUtil.clearCache(FINDER_CLASS_NAME_LIST_WITH_PAGINATION);
+
+		if (isNew || !MBStatsUserModelImpl.COLUMN_BITMASK_ENABLED) {
+			FinderCacheUtil.clearCache(FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
+		}
+
+		else {
+			if ((mbStatsUserModelImpl.getColumnBitmask() &
+					FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_GROUPID.getColumnBitmask()) != 0) {
+				Object[] args = new Object[] {
+						Long.valueOf(mbStatsUserModelImpl.getOriginalGroupId())
+					};
+
+				FinderCacheUtil.removeResult(FINDER_PATH_COUNT_BY_GROUPID, args);
+				FinderCacheUtil.removeResult(FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_GROUPID,
+					args);
+
+				args = new Object[] {
+						Long.valueOf(mbStatsUserModelImpl.getGroupId())
+					};
+
+				FinderCacheUtil.removeResult(FINDER_PATH_COUNT_BY_GROUPID, args);
+				FinderCacheUtil.removeResult(FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_GROUPID,
+					args);
+			}
+
+			if ((mbStatsUserModelImpl.getColumnBitmask() &
+					FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_USERID.getColumnBitmask()) != 0) {
+				Object[] args = new Object[] {
+						Long.valueOf(mbStatsUserModelImpl.getOriginalUserId())
+					};
+
+				FinderCacheUtil.removeResult(FINDER_PATH_COUNT_BY_USERID, args);
+				FinderCacheUtil.removeResult(FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_USERID,
+					args);
+
+				args = new Object[] {
+						Long.valueOf(mbStatsUserModelImpl.getUserId())
+					};
+
+				FinderCacheUtil.removeResult(FINDER_PATH_COUNT_BY_USERID, args);
+				FinderCacheUtil.removeResult(FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_USERID,
+					args);
+			}
+		}
 
 		EntityCacheUtil.putResult(MBStatsUserModelImpl.ENTITY_CACHE_ENABLED,
 			MBStatsUserImpl.class, mbStatsUser.getPrimaryKey(), mbStatsUser);
 
-		if (!isNew &&
-				((mbStatsUser.getGroupId() != mbStatsUserModelImpl.getOriginalGroupId()) ||
-				(mbStatsUser.getUserId() != mbStatsUserModelImpl.getOriginalUserId()))) {
-			FinderCacheUtil.removeResult(FINDER_PATH_FETCH_BY_G_U,
-				new Object[] {
-					Long.valueOf(mbStatsUserModelImpl.getOriginalGroupId()),
-					Long.valueOf(mbStatsUserModelImpl.getOriginalUserId())
-				});
-		}
-
-		if (isNew ||
-				((mbStatsUser.getGroupId() != mbStatsUserModelImpl.getOriginalGroupId()) ||
-				(mbStatsUser.getUserId() != mbStatsUserModelImpl.getOriginalUserId()))) {
+		if (isNew) {
 			FinderCacheUtil.putResult(FINDER_PATH_FETCH_BY_G_U,
 				new Object[] {
 					Long.valueOf(mbStatsUser.getGroupId()),
 					Long.valueOf(mbStatsUser.getUserId())
 				}, mbStatsUser);
+		}
+		else {
+			if ((mbStatsUserModelImpl.getColumnBitmask() &
+					FINDER_PATH_FETCH_BY_G_U.getColumnBitmask()) != 0) {
+				Object[] args = new Object[] {
+						Long.valueOf(mbStatsUserModelImpl.getOriginalGroupId()),
+						Long.valueOf(mbStatsUserModelImpl.getOriginalUserId())
+					};
+
+				FinderCacheUtil.removeResult(FINDER_PATH_COUNT_BY_G_U, args);
+
+				FinderCacheUtil.removeResult(FINDER_PATH_FETCH_BY_G_U, args);
+
+				FinderCacheUtil.putResult(FINDER_PATH_FETCH_BY_G_U,
+					new Object[] {
+						Long.valueOf(mbStatsUser.getGroupId()),
+						Long.valueOf(mbStatsUser.getUserId())
+					}, mbStatsUser);
+			}
 		}
 
 		return mbStatsUser;
@@ -448,7 +525,7 @@ public class MBStatsUserPersistenceImpl extends BasePersistenceImpl<MBStatsUser>
 	public MBStatsUser fetchByPrimaryKey(long statsUserId)
 		throws SystemException {
 		MBStatsUser mbStatsUser = (MBStatsUser)EntityCacheUtil.getResult(MBStatsUserModelImpl.ENTITY_CACHE_ENABLED,
-				MBStatsUserImpl.class, statsUserId, this);
+				MBStatsUserImpl.class, statsUserId);
 
 		if (mbStatsUser == _nullMBStatsUser) {
 			return null;
@@ -532,15 +609,31 @@ public class MBStatsUserPersistenceImpl extends BasePersistenceImpl<MBStatsUser>
 	 */
 	public List<MBStatsUser> findByGroupId(long groupId, int start, int end,
 		OrderByComparator orderByComparator) throws SystemException {
-		Object[] finderArgs = new Object[] {
-				groupId,
-				
-				String.valueOf(start), String.valueOf(end),
-				String.valueOf(orderByComparator)
-			};
+		FinderPath finderPath = null;
+		Object[] finderArgs = null;
 
-		List<MBStatsUser> list = (List<MBStatsUser>)FinderCacheUtil.getResult(FINDER_PATH_FIND_BY_GROUPID,
+		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) &&
+				(orderByComparator == null)) {
+			finderPath = FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_GROUPID;
+			finderArgs = new Object[] { groupId };
+		}
+		else {
+			finderPath = FINDER_PATH_WITH_PAGINATION_FIND_BY_GROUPID;
+			finderArgs = new Object[] { groupId, start, end, orderByComparator };
+		}
+
+		List<MBStatsUser> list = (List<MBStatsUser>)FinderCacheUtil.getResult(finderPath,
 				finderArgs, this);
+
+		if ((list != null) && !list.isEmpty()) {
+			for (MBStatsUser mbStatsUser : list) {
+				if ((groupId != mbStatsUser.getGroupId())) {
+					list = null;
+
+					break;
+				}
+			}
+		}
 
 		if (list == null) {
 			StringBundler query = null;
@@ -587,14 +680,12 @@ public class MBStatsUserPersistenceImpl extends BasePersistenceImpl<MBStatsUser>
 			}
 			finally {
 				if (list == null) {
-					FinderCacheUtil.removeResult(FINDER_PATH_FIND_BY_GROUPID,
-						finderArgs);
+					FinderCacheUtil.removeResult(finderPath, finderArgs);
 				}
 				else {
 					cacheResult(list);
 
-					FinderCacheUtil.putResult(FINDER_PATH_FIND_BY_GROUPID,
-						finderArgs, list);
+					FinderCacheUtil.putResult(finderPath, finderArgs, list);
 				}
 
 				closeSession(session);
@@ -739,17 +830,17 @@ public class MBStatsUserPersistenceImpl extends BasePersistenceImpl<MBStatsUser>
 		query.append(_FINDER_COLUMN_GROUPID_GROUPID_2);
 
 		if (orderByComparator != null) {
-			String[] orderByFields = orderByComparator.getOrderByFields();
+			String[] orderByConditionFields = orderByComparator.getOrderByConditionFields();
 
-			if (orderByFields.length > 0) {
+			if (orderByConditionFields.length > 0) {
 				query.append(WHERE_AND);
 			}
 
-			for (int i = 0; i < orderByFields.length; i++) {
+			for (int i = 0; i < orderByConditionFields.length; i++) {
 				query.append(_ORDER_BY_ENTITY_ALIAS);
-				query.append(orderByFields[i]);
+				query.append(orderByConditionFields[i]);
 
-				if ((i + 1) < orderByFields.length) {
+				if ((i + 1) < orderByConditionFields.length) {
 					if (orderByComparator.isAscending() ^ previous) {
 						query.append(WHERE_GREATER_THAN_HAS_NEXT);
 					}
@@ -768,6 +859,8 @@ public class MBStatsUserPersistenceImpl extends BasePersistenceImpl<MBStatsUser>
 			}
 
 			query.append(ORDER_BY_CLAUSE);
+
+			String[] orderByFields = orderByComparator.getOrderByFields();
 
 			for (int i = 0; i < orderByFields.length; i++) {
 				query.append(_ORDER_BY_ENTITY_ALIAS);
@@ -808,7 +901,7 @@ public class MBStatsUserPersistenceImpl extends BasePersistenceImpl<MBStatsUser>
 		qPos.add(groupId);
 
 		if (orderByComparator != null) {
-			Object[] values = orderByComparator.getOrderByValues(mbStatsUser);
+			Object[] values = orderByComparator.getOrderByConditionValues(mbStatsUser);
 
 			for (Object value : values) {
 				qPos.add(value);
@@ -871,15 +964,31 @@ public class MBStatsUserPersistenceImpl extends BasePersistenceImpl<MBStatsUser>
 	 */
 	public List<MBStatsUser> findByUserId(long userId, int start, int end,
 		OrderByComparator orderByComparator) throws SystemException {
-		Object[] finderArgs = new Object[] {
-				userId,
-				
-				String.valueOf(start), String.valueOf(end),
-				String.valueOf(orderByComparator)
-			};
+		FinderPath finderPath = null;
+		Object[] finderArgs = null;
 
-		List<MBStatsUser> list = (List<MBStatsUser>)FinderCacheUtil.getResult(FINDER_PATH_FIND_BY_USERID,
+		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) &&
+				(orderByComparator == null)) {
+			finderPath = FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_USERID;
+			finderArgs = new Object[] { userId };
+		}
+		else {
+			finderPath = FINDER_PATH_WITH_PAGINATION_FIND_BY_USERID;
+			finderArgs = new Object[] { userId, start, end, orderByComparator };
+		}
+
+		List<MBStatsUser> list = (List<MBStatsUser>)FinderCacheUtil.getResult(finderPath,
 				finderArgs, this);
+
+		if ((list != null) && !list.isEmpty()) {
+			for (MBStatsUser mbStatsUser : list) {
+				if ((userId != mbStatsUser.getUserId())) {
+					list = null;
+
+					break;
+				}
+			}
+		}
 
 		if (list == null) {
 			StringBundler query = null;
@@ -926,14 +1035,12 @@ public class MBStatsUserPersistenceImpl extends BasePersistenceImpl<MBStatsUser>
 			}
 			finally {
 				if (list == null) {
-					FinderCacheUtil.removeResult(FINDER_PATH_FIND_BY_USERID,
-						finderArgs);
+					FinderCacheUtil.removeResult(finderPath, finderArgs);
 				}
 				else {
 					cacheResult(list);
 
-					FinderCacheUtil.putResult(FINDER_PATH_FIND_BY_USERID,
-						finderArgs, list);
+					FinderCacheUtil.putResult(finderPath, finderArgs, list);
 				}
 
 				closeSession(session);
@@ -1078,17 +1185,17 @@ public class MBStatsUserPersistenceImpl extends BasePersistenceImpl<MBStatsUser>
 		query.append(_FINDER_COLUMN_USERID_USERID_2);
 
 		if (orderByComparator != null) {
-			String[] orderByFields = orderByComparator.getOrderByFields();
+			String[] orderByConditionFields = orderByComparator.getOrderByConditionFields();
 
-			if (orderByFields.length > 0) {
+			if (orderByConditionFields.length > 0) {
 				query.append(WHERE_AND);
 			}
 
-			for (int i = 0; i < orderByFields.length; i++) {
+			for (int i = 0; i < orderByConditionFields.length; i++) {
 				query.append(_ORDER_BY_ENTITY_ALIAS);
-				query.append(orderByFields[i]);
+				query.append(orderByConditionFields[i]);
 
-				if ((i + 1) < orderByFields.length) {
+				if ((i + 1) < orderByConditionFields.length) {
 					if (orderByComparator.isAscending() ^ previous) {
 						query.append(WHERE_GREATER_THAN_HAS_NEXT);
 					}
@@ -1107,6 +1214,8 @@ public class MBStatsUserPersistenceImpl extends BasePersistenceImpl<MBStatsUser>
 			}
 
 			query.append(ORDER_BY_CLAUSE);
+
+			String[] orderByFields = orderByComparator.getOrderByFields();
 
 			for (int i = 0; i < orderByFields.length; i++) {
 				query.append(_ORDER_BY_ENTITY_ALIAS);
@@ -1147,7 +1256,7 @@ public class MBStatsUserPersistenceImpl extends BasePersistenceImpl<MBStatsUser>
 		qPos.add(userId);
 
 		if (orderByComparator != null) {
-			Object[] values = orderByComparator.getOrderByValues(mbStatsUser);
+			Object[] values = orderByComparator.getOrderByConditionValues(mbStatsUser);
 
 			for (Object value : values) {
 				qPos.add(value);
@@ -1233,6 +1342,15 @@ public class MBStatsUserPersistenceImpl extends BasePersistenceImpl<MBStatsUser>
 					finderArgs, this);
 		}
 
+		if (result instanceof MBStatsUser) {
+			MBStatsUser mbStatsUser = (MBStatsUser)result;
+
+			if ((groupId != mbStatsUser.getGroupId()) ||
+					(userId != mbStatsUser.getUserId())) {
+				result = null;
+			}
+		}
+
 		if (result == null) {
 			StringBundler query = new StringBundler(4);
 
@@ -1306,46 +1424,49 @@ public class MBStatsUserPersistenceImpl extends BasePersistenceImpl<MBStatsUser>
 	}
 
 	/**
-	 * Returns all the message boards stats users where groupId = &#63; and messageCount &ne; &#63;.
+	 * Returns all the message boards stats users where groupId = &#63; and userId &ne; &#63; and messageCount &ne; &#63;.
 	 *
 	 * @param groupId the group ID
+	 * @param userId the user ID
 	 * @param messageCount the message count
 	 * @return the matching message boards stats users
 	 * @throws SystemException if a system exception occurred
 	 */
-	public List<MBStatsUser> findByG_NotM(long groupId, int messageCount)
-		throws SystemException {
-		return findByG_NotM(groupId, messageCount, QueryUtil.ALL_POS,
-			QueryUtil.ALL_POS, null);
+	public List<MBStatsUser> findByG_NotU_NotM(long groupId, long userId,
+		int messageCount) throws SystemException {
+		return findByG_NotU_NotM(groupId, userId, messageCount,
+			QueryUtil.ALL_POS, QueryUtil.ALL_POS, null);
 	}
 
 	/**
-	 * Returns a range of all the message boards stats users where groupId = &#63; and messageCount &ne; &#63;.
+	 * Returns a range of all the message boards stats users where groupId = &#63; and userId &ne; &#63; and messageCount &ne; &#63;.
 	 *
 	 * <p>
 	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set.
 	 * </p>
 	 *
 	 * @param groupId the group ID
+	 * @param userId the user ID
 	 * @param messageCount the message count
 	 * @param start the lower bound of the range of message boards stats users
 	 * @param end the upper bound of the range of message boards stats users (not inclusive)
 	 * @return the range of matching message boards stats users
 	 * @throws SystemException if a system exception occurred
 	 */
-	public List<MBStatsUser> findByG_NotM(long groupId, int messageCount,
-		int start, int end) throws SystemException {
-		return findByG_NotM(groupId, messageCount, start, end, null);
+	public List<MBStatsUser> findByG_NotU_NotM(long groupId, long userId,
+		int messageCount, int start, int end) throws SystemException {
+		return findByG_NotU_NotM(groupId, userId, messageCount, start, end, null);
 	}
 
 	/**
-	 * Returns an ordered range of all the message boards stats users where groupId = &#63; and messageCount &ne; &#63;.
+	 * Returns an ordered range of all the message boards stats users where groupId = &#63; and userId &ne; &#63; and messageCount &ne; &#63;.
 	 *
 	 * <p>
 	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set.
 	 * </p>
 	 *
 	 * @param groupId the group ID
+	 * @param userId the user ID
 	 * @param messageCount the message count
 	 * @param start the lower bound of the range of message boards stats users
 	 * @param end the upper bound of the range of message boards stats users (not inclusive)
@@ -1353,35 +1474,52 @@ public class MBStatsUserPersistenceImpl extends BasePersistenceImpl<MBStatsUser>
 	 * @return the ordered range of matching message boards stats users
 	 * @throws SystemException if a system exception occurred
 	 */
-	public List<MBStatsUser> findByG_NotM(long groupId, int messageCount,
-		int start, int end, OrderByComparator orderByComparator)
-		throws SystemException {
-		Object[] finderArgs = new Object[] {
-				groupId, messageCount,
+	public List<MBStatsUser> findByG_NotU_NotM(long groupId, long userId,
+		int messageCount, int start, int end,
+		OrderByComparator orderByComparator) throws SystemException {
+		FinderPath finderPath = null;
+		Object[] finderArgs = null;
+
+		finderPath = FINDER_PATH_WITH_PAGINATION_FIND_BY_G_NOTU_NOTM;
+		finderArgs = new Object[] {
+				groupId, userId, messageCount,
 				
-				String.valueOf(start), String.valueOf(end),
-				String.valueOf(orderByComparator)
+				start, end, orderByComparator
 			};
 
-		List<MBStatsUser> list = (List<MBStatsUser>)FinderCacheUtil.getResult(FINDER_PATH_FIND_BY_G_NOTM,
+		List<MBStatsUser> list = (List<MBStatsUser>)FinderCacheUtil.getResult(finderPath,
 				finderArgs, this);
+
+		if ((list != null) && !list.isEmpty()) {
+			for (MBStatsUser mbStatsUser : list) {
+				if ((groupId != mbStatsUser.getGroupId()) ||
+						(userId != mbStatsUser.getUserId()) ||
+						(messageCount != mbStatsUser.getMessageCount())) {
+					list = null;
+
+					break;
+				}
+			}
+		}
 
 		if (list == null) {
 			StringBundler query = null;
 
 			if (orderByComparator != null) {
-				query = new StringBundler(4 +
+				query = new StringBundler(5 +
 						(orderByComparator.getOrderByFields().length * 3));
 			}
 			else {
-				query = new StringBundler(4);
+				query = new StringBundler(5);
 			}
 
 			query.append(_SQL_SELECT_MBSTATSUSER_WHERE);
 
-			query.append(_FINDER_COLUMN_G_NOTM_GROUPID_2);
+			query.append(_FINDER_COLUMN_G_NOTU_NOTM_GROUPID_2);
 
-			query.append(_FINDER_COLUMN_G_NOTM_MESSAGECOUNT_2);
+			query.append(_FINDER_COLUMN_G_NOTU_NOTM_USERID_2);
+
+			query.append(_FINDER_COLUMN_G_NOTU_NOTM_MESSAGECOUNT_2);
 
 			if (orderByComparator != null) {
 				appendOrderByComparator(query, _ORDER_BY_ENTITY_ALIAS,
@@ -1405,6 +1543,8 @@ public class MBStatsUserPersistenceImpl extends BasePersistenceImpl<MBStatsUser>
 
 				qPos.add(groupId);
 
+				qPos.add(userId);
+
 				qPos.add(messageCount);
 
 				list = (List<MBStatsUser>)QueryUtil.list(q, getDialect(),
@@ -1415,14 +1555,12 @@ public class MBStatsUserPersistenceImpl extends BasePersistenceImpl<MBStatsUser>
 			}
 			finally {
 				if (list == null) {
-					FinderCacheUtil.removeResult(FINDER_PATH_FIND_BY_G_NOTM,
-						finderArgs);
+					FinderCacheUtil.removeResult(finderPath, finderArgs);
 				}
 				else {
 					cacheResult(list);
 
-					FinderCacheUtil.putResult(FINDER_PATH_FIND_BY_G_NOTM,
-						finderArgs, list);
+					FinderCacheUtil.putResult(finderPath, finderArgs, list);
 				}
 
 				closeSession(session);
@@ -1433,32 +1571,36 @@ public class MBStatsUserPersistenceImpl extends BasePersistenceImpl<MBStatsUser>
 	}
 
 	/**
-	 * Returns the first message boards stats user in the ordered set where groupId = &#63; and messageCount &ne; &#63;.
+	 * Returns the first message boards stats user in the ordered set where groupId = &#63; and userId &ne; &#63; and messageCount &ne; &#63;.
 	 *
 	 * <p>
 	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set.
 	 * </p>
 	 *
 	 * @param groupId the group ID
+	 * @param userId the user ID
 	 * @param messageCount the message count
 	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	 * @return the first matching message boards stats user
 	 * @throws com.liferay.portlet.messageboards.NoSuchStatsUserException if a matching message boards stats user could not be found
 	 * @throws SystemException if a system exception occurred
 	 */
-	public MBStatsUser findByG_NotM_First(long groupId, int messageCount,
-		OrderByComparator orderByComparator)
+	public MBStatsUser findByG_NotU_NotM_First(long groupId, long userId,
+		int messageCount, OrderByComparator orderByComparator)
 		throws NoSuchStatsUserException, SystemException {
-		List<MBStatsUser> list = findByG_NotM(groupId, messageCount, 0, 1,
-				orderByComparator);
+		List<MBStatsUser> list = findByG_NotU_NotM(groupId, userId,
+				messageCount, 0, 1, orderByComparator);
 
 		if (list.isEmpty()) {
-			StringBundler msg = new StringBundler(6);
+			StringBundler msg = new StringBundler(8);
 
 			msg.append(_NO_SUCH_ENTITY_WITH_KEY);
 
 			msg.append("groupId=");
 			msg.append(groupId);
+
+			msg.append(", userId=");
+			msg.append(userId);
 
 			msg.append(", messageCount=");
 			msg.append(messageCount);
@@ -1473,34 +1615,38 @@ public class MBStatsUserPersistenceImpl extends BasePersistenceImpl<MBStatsUser>
 	}
 
 	/**
-	 * Returns the last message boards stats user in the ordered set where groupId = &#63; and messageCount &ne; &#63;.
+	 * Returns the last message boards stats user in the ordered set where groupId = &#63; and userId &ne; &#63; and messageCount &ne; &#63;.
 	 *
 	 * <p>
 	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set.
 	 * </p>
 	 *
 	 * @param groupId the group ID
+	 * @param userId the user ID
 	 * @param messageCount the message count
 	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	 * @return the last matching message boards stats user
 	 * @throws com.liferay.portlet.messageboards.NoSuchStatsUserException if a matching message boards stats user could not be found
 	 * @throws SystemException if a system exception occurred
 	 */
-	public MBStatsUser findByG_NotM_Last(long groupId, int messageCount,
-		OrderByComparator orderByComparator)
+	public MBStatsUser findByG_NotU_NotM_Last(long groupId, long userId,
+		int messageCount, OrderByComparator orderByComparator)
 		throws NoSuchStatsUserException, SystemException {
-		int count = countByG_NotM(groupId, messageCount);
+		int count = countByG_NotU_NotM(groupId, userId, messageCount);
 
-		List<MBStatsUser> list = findByG_NotM(groupId, messageCount, count - 1,
-				count, orderByComparator);
+		List<MBStatsUser> list = findByG_NotU_NotM(groupId, userId,
+				messageCount, count - 1, count, orderByComparator);
 
 		if (list.isEmpty()) {
-			StringBundler msg = new StringBundler(6);
+			StringBundler msg = new StringBundler(8);
 
 			msg.append(_NO_SUCH_ENTITY_WITH_KEY);
 
 			msg.append("groupId=");
 			msg.append(groupId);
+
+			msg.append(", userId=");
+			msg.append(userId);
 
 			msg.append(", messageCount=");
 			msg.append(messageCount);
@@ -1515,7 +1661,7 @@ public class MBStatsUserPersistenceImpl extends BasePersistenceImpl<MBStatsUser>
 	}
 
 	/**
-	 * Returns the message boards stats users before and after the current message boards stats user in the ordered set where groupId = &#63; and messageCount &ne; &#63;.
+	 * Returns the message boards stats users before and after the current message boards stats user in the ordered set where groupId = &#63; and userId &ne; &#63; and messageCount &ne; &#63;.
 	 *
 	 * <p>
 	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set.
@@ -1523,14 +1669,16 @@ public class MBStatsUserPersistenceImpl extends BasePersistenceImpl<MBStatsUser>
 	 *
 	 * @param statsUserId the primary key of the current message boards stats user
 	 * @param groupId the group ID
+	 * @param userId the user ID
 	 * @param messageCount the message count
 	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	 * @return the previous, current, and next message boards stats user
 	 * @throws com.liferay.portlet.messageboards.NoSuchStatsUserException if a message boards stats user with the primary key could not be found
 	 * @throws SystemException if a system exception occurred
 	 */
-	public MBStatsUser[] findByG_NotM_PrevAndNext(long statsUserId,
-		long groupId, int messageCount, OrderByComparator orderByComparator)
+	public MBStatsUser[] findByG_NotU_NotM_PrevAndNext(long statsUserId,
+		long groupId, long userId, int messageCount,
+		OrderByComparator orderByComparator)
 		throws NoSuchStatsUserException, SystemException {
 		MBStatsUser mbStatsUser = findByPrimaryKey(statsUserId);
 
@@ -1541,13 +1689,13 @@ public class MBStatsUserPersistenceImpl extends BasePersistenceImpl<MBStatsUser>
 
 			MBStatsUser[] array = new MBStatsUserImpl[3];
 
-			array[0] = getByG_NotM_PrevAndNext(session, mbStatsUser, groupId,
-					messageCount, orderByComparator, true);
+			array[0] = getByG_NotU_NotM_PrevAndNext(session, mbStatsUser,
+					groupId, userId, messageCount, orderByComparator, true);
 
 			array[1] = mbStatsUser;
 
-			array[2] = getByG_NotM_PrevAndNext(session, mbStatsUser, groupId,
-					messageCount, orderByComparator, false);
+			array[2] = getByG_NotU_NotM_PrevAndNext(session, mbStatsUser,
+					groupId, userId, messageCount, orderByComparator, false);
 
 			return array;
 		}
@@ -1559,8 +1707,8 @@ public class MBStatsUserPersistenceImpl extends BasePersistenceImpl<MBStatsUser>
 		}
 	}
 
-	protected MBStatsUser getByG_NotM_PrevAndNext(Session session,
-		MBStatsUser mbStatsUser, long groupId, int messageCount,
+	protected MBStatsUser getByG_NotU_NotM_PrevAndNext(Session session,
+		MBStatsUser mbStatsUser, long groupId, long userId, int messageCount,
 		OrderByComparator orderByComparator, boolean previous) {
 		StringBundler query = null;
 
@@ -1574,22 +1722,24 @@ public class MBStatsUserPersistenceImpl extends BasePersistenceImpl<MBStatsUser>
 
 		query.append(_SQL_SELECT_MBSTATSUSER_WHERE);
 
-		query.append(_FINDER_COLUMN_G_NOTM_GROUPID_2);
+		query.append(_FINDER_COLUMN_G_NOTU_NOTM_GROUPID_2);
 
-		query.append(_FINDER_COLUMN_G_NOTM_MESSAGECOUNT_2);
+		query.append(_FINDER_COLUMN_G_NOTU_NOTM_USERID_2);
+
+		query.append(_FINDER_COLUMN_G_NOTU_NOTM_MESSAGECOUNT_2);
 
 		if (orderByComparator != null) {
-			String[] orderByFields = orderByComparator.getOrderByFields();
+			String[] orderByConditionFields = orderByComparator.getOrderByConditionFields();
 
-			if (orderByFields.length > 0) {
+			if (orderByConditionFields.length > 0) {
 				query.append(WHERE_AND);
 			}
 
-			for (int i = 0; i < orderByFields.length; i++) {
+			for (int i = 0; i < orderByConditionFields.length; i++) {
 				query.append(_ORDER_BY_ENTITY_ALIAS);
-				query.append(orderByFields[i]);
+				query.append(orderByConditionFields[i]);
 
-				if ((i + 1) < orderByFields.length) {
+				if ((i + 1) < orderByConditionFields.length) {
 					if (orderByComparator.isAscending() ^ previous) {
 						query.append(WHERE_GREATER_THAN_HAS_NEXT);
 					}
@@ -1608,6 +1758,8 @@ public class MBStatsUserPersistenceImpl extends BasePersistenceImpl<MBStatsUser>
 			}
 
 			query.append(ORDER_BY_CLAUSE);
+
+			String[] orderByFields = orderByComparator.getOrderByFields();
 
 			for (int i = 0; i < orderByFields.length; i++) {
 				query.append(_ORDER_BY_ENTITY_ALIAS);
@@ -1647,10 +1799,12 @@ public class MBStatsUserPersistenceImpl extends BasePersistenceImpl<MBStatsUser>
 
 		qPos.add(groupId);
 
+		qPos.add(userId);
+
 		qPos.add(messageCount);
 
 		if (orderByComparator != null) {
-			Object[] values = orderByComparator.getOrderByValues(mbStatsUser);
+			Object[] values = orderByComparator.getOrderByConditionValues(mbStatsUser);
 
 			for (Object value : values) {
 				qPos.add(value);
@@ -1709,12 +1863,20 @@ public class MBStatsUserPersistenceImpl extends BasePersistenceImpl<MBStatsUser>
 	 */
 	public List<MBStatsUser> findAll(int start, int end,
 		OrderByComparator orderByComparator) throws SystemException {
-		Object[] finderArgs = new Object[] {
-				String.valueOf(start), String.valueOf(end),
-				String.valueOf(orderByComparator)
-			};
+		FinderPath finderPath = null;
+		Object[] finderArgs = new Object[] { start, end, orderByComparator };
 
-		List<MBStatsUser> list = (List<MBStatsUser>)FinderCacheUtil.getResult(FINDER_PATH_FIND_ALL,
+		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) &&
+				(orderByComparator == null)) {
+			finderPath = FINDER_PATH_WITHOUT_PAGINATION_FIND_ALL;
+			finderArgs = FINDER_ARGS_EMPTY;
+		}
+		else {
+			finderPath = FINDER_PATH_WITH_PAGINATION_FIND_ALL;
+			finderArgs = new Object[] { start, end, orderByComparator };
+		}
+
+		List<MBStatsUser> list = (List<MBStatsUser>)FinderCacheUtil.getResult(finderPath,
 				finderArgs, this);
 
 		if (list == null) {
@@ -1759,14 +1921,12 @@ public class MBStatsUserPersistenceImpl extends BasePersistenceImpl<MBStatsUser>
 			}
 			finally {
 				if (list == null) {
-					FinderCacheUtil.removeResult(FINDER_PATH_FIND_ALL,
-						finderArgs);
+					FinderCacheUtil.removeResult(finderPath, finderArgs);
 				}
 				else {
 					cacheResult(list);
 
-					FinderCacheUtil.putResult(FINDER_PATH_FIND_ALL, finderArgs,
-						list);
+					FinderCacheUtil.putResult(finderPath, finderArgs, list);
 				}
 
 				closeSession(session);
@@ -1784,7 +1944,7 @@ public class MBStatsUserPersistenceImpl extends BasePersistenceImpl<MBStatsUser>
 	 */
 	public void removeByGroupId(long groupId) throws SystemException {
 		for (MBStatsUser mbStatsUser : findByGroupId(groupId)) {
-			mbStatsUserPersistence.remove(mbStatsUser);
+			remove(mbStatsUser);
 		}
 	}
 
@@ -1796,7 +1956,7 @@ public class MBStatsUserPersistenceImpl extends BasePersistenceImpl<MBStatsUser>
 	 */
 	public void removeByUserId(long userId) throws SystemException {
 		for (MBStatsUser mbStatsUser : findByUserId(userId)) {
-			mbStatsUserPersistence.remove(mbStatsUser);
+			remove(mbStatsUser);
 		}
 	}
 
@@ -1805,26 +1965,29 @@ public class MBStatsUserPersistenceImpl extends BasePersistenceImpl<MBStatsUser>
 	 *
 	 * @param groupId the group ID
 	 * @param userId the user ID
+	 * @return the message boards stats user that was removed
 	 * @throws SystemException if a system exception occurred
 	 */
-	public void removeByG_U(long groupId, long userId)
+	public MBStatsUser removeByG_U(long groupId, long userId)
 		throws NoSuchStatsUserException, SystemException {
 		MBStatsUser mbStatsUser = findByG_U(groupId, userId);
 
-		mbStatsUserPersistence.remove(mbStatsUser);
+		return remove(mbStatsUser);
 	}
 
 	/**
-	 * Removes all the message boards stats users where groupId = &#63; and messageCount &ne; &#63; from the database.
+	 * Removes all the message boards stats users where groupId = &#63; and userId &ne; &#63; and messageCount &ne; &#63; from the database.
 	 *
 	 * @param groupId the group ID
+	 * @param userId the user ID
 	 * @param messageCount the message count
 	 * @throws SystemException if a system exception occurred
 	 */
-	public void removeByG_NotM(long groupId, int messageCount)
+	public void removeByG_NotU_NotM(long groupId, long userId, int messageCount)
 		throws SystemException {
-		for (MBStatsUser mbStatsUser : findByG_NotM(groupId, messageCount)) {
-			mbStatsUserPersistence.remove(mbStatsUser);
+		for (MBStatsUser mbStatsUser : findByG_NotU_NotM(groupId, userId,
+				messageCount)) {
+			remove(mbStatsUser);
 		}
 	}
 
@@ -1835,7 +1998,7 @@ public class MBStatsUserPersistenceImpl extends BasePersistenceImpl<MBStatsUser>
 	 */
 	public void removeAll() throws SystemException {
 		for (MBStatsUser mbStatsUser : findAll()) {
-			mbStatsUserPersistence.remove(mbStatsUser);
+			remove(mbStatsUser);
 		}
 	}
 
@@ -2004,28 +2167,31 @@ public class MBStatsUserPersistenceImpl extends BasePersistenceImpl<MBStatsUser>
 	}
 
 	/**
-	 * Returns the number of message boards stats users where groupId = &#63; and messageCount &ne; &#63;.
+	 * Returns the number of message boards stats users where groupId = &#63; and userId &ne; &#63; and messageCount &ne; &#63;.
 	 *
 	 * @param groupId the group ID
+	 * @param userId the user ID
 	 * @param messageCount the message count
 	 * @return the number of matching message boards stats users
 	 * @throws SystemException if a system exception occurred
 	 */
-	public int countByG_NotM(long groupId, int messageCount)
+	public int countByG_NotU_NotM(long groupId, long userId, int messageCount)
 		throws SystemException {
-		Object[] finderArgs = new Object[] { groupId, messageCount };
+		Object[] finderArgs = new Object[] { groupId, userId, messageCount };
 
-		Long count = (Long)FinderCacheUtil.getResult(FINDER_PATH_COUNT_BY_G_NOTM,
+		Long count = (Long)FinderCacheUtil.getResult(FINDER_PATH_WITH_PAGINATION_COUNT_BY_G_NOTU_NOTM,
 				finderArgs, this);
 
 		if (count == null) {
-			StringBundler query = new StringBundler(3);
+			StringBundler query = new StringBundler(4);
 
 			query.append(_SQL_COUNT_MBSTATSUSER_WHERE);
 
-			query.append(_FINDER_COLUMN_G_NOTM_GROUPID_2);
+			query.append(_FINDER_COLUMN_G_NOTU_NOTM_GROUPID_2);
 
-			query.append(_FINDER_COLUMN_G_NOTM_MESSAGECOUNT_2);
+			query.append(_FINDER_COLUMN_G_NOTU_NOTM_USERID_2);
+
+			query.append(_FINDER_COLUMN_G_NOTU_NOTM_MESSAGECOUNT_2);
 
 			String sql = query.toString();
 
@@ -2040,6 +2206,8 @@ public class MBStatsUserPersistenceImpl extends BasePersistenceImpl<MBStatsUser>
 
 				qPos.add(groupId);
 
+				qPos.add(userId);
+
 				qPos.add(messageCount);
 
 				count = (Long)q.uniqueResult();
@@ -2052,7 +2220,7 @@ public class MBStatsUserPersistenceImpl extends BasePersistenceImpl<MBStatsUser>
 					count = Long.valueOf(0);
 				}
 
-				FinderCacheUtil.putResult(FINDER_PATH_COUNT_BY_G_NOTM,
+				FinderCacheUtil.putResult(FINDER_PATH_WITH_PAGINATION_COUNT_BY_G_NOTU_NOTM,
 					finderArgs, count);
 
 				closeSession(session);
@@ -2069,10 +2237,8 @@ public class MBStatsUserPersistenceImpl extends BasePersistenceImpl<MBStatsUser>
 	 * @throws SystemException if a system exception occurred
 	 */
 	public int countAll() throws SystemException {
-		Object[] finderArgs = new Object[0];
-
 		Long count = (Long)FinderCacheUtil.getResult(FINDER_PATH_COUNT_ALL,
-				finderArgs, this);
+				FINDER_ARGS_EMPTY, this);
 
 		if (count == null) {
 			Session session = null;
@@ -2092,8 +2258,8 @@ public class MBStatsUserPersistenceImpl extends BasePersistenceImpl<MBStatsUser>
 					count = Long.valueOf(0);
 				}
 
-				FinderCacheUtil.putResult(FINDER_PATH_COUNT_ALL, finderArgs,
-					count);
+				FinderCacheUtil.putResult(FINDER_PATH_COUNT_ALL,
+					FINDER_ARGS_EMPTY, count);
 
 				closeSession(session);
 			}
@@ -2130,7 +2296,7 @@ public class MBStatsUserPersistenceImpl extends BasePersistenceImpl<MBStatsUser>
 	public void destroy() {
 		EntityCacheUtil.removeCache(MBStatsUserImpl.class.getName());
 		FinderCacheUtil.removeCache(FINDER_CLASS_NAME_ENTITY);
-		FinderCacheUtil.removeCache(FINDER_CLASS_NAME_LIST);
+		FinderCacheUtil.removeCache(FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
 	}
 
 	@BeanReference(type = MBBanPersistence.class)
@@ -2143,14 +2309,14 @@ public class MBStatsUserPersistenceImpl extends BasePersistenceImpl<MBStatsUser>
 	protected MBMailingListPersistence mbMailingListPersistence;
 	@BeanReference(type = MBMessagePersistence.class)
 	protected MBMessagePersistence mbMessagePersistence;
-	@BeanReference(type = MBMessageFlagPersistence.class)
-	protected MBMessageFlagPersistence mbMessageFlagPersistence;
 	@BeanReference(type = MBStatsUserPersistence.class)
 	protected MBStatsUserPersistence mbStatsUserPersistence;
 	@BeanReference(type = MBThreadPersistence.class)
 	protected MBThreadPersistence mbThreadPersistence;
-	@BeanReference(type = ResourcePersistence.class)
-	protected ResourcePersistence resourcePersistence;
+	@BeanReference(type = MBThreadFlagPersistence.class)
+	protected MBThreadFlagPersistence mbThreadFlagPersistence;
+	@BeanReference(type = GroupPersistence.class)
+	protected GroupPersistence groupPersistence;
 	@BeanReference(type = UserPersistence.class)
 	protected UserPersistence userPersistence;
 	private static final String _SQL_SELECT_MBSTATSUSER = "SELECT mbStatsUser FROM MBStatsUser mbStatsUser";
@@ -2161,18 +2327,21 @@ public class MBStatsUserPersistenceImpl extends BasePersistenceImpl<MBStatsUser>
 	private static final String _FINDER_COLUMN_USERID_USERID_2 = "mbStatsUser.userId = ?";
 	private static final String _FINDER_COLUMN_G_U_GROUPID_2 = "mbStatsUser.groupId = ? AND ";
 	private static final String _FINDER_COLUMN_G_U_USERID_2 = "mbStatsUser.userId = ?";
-	private static final String _FINDER_COLUMN_G_NOTM_GROUPID_2 = "mbStatsUser.groupId = ? AND ";
-	private static final String _FINDER_COLUMN_G_NOTM_MESSAGECOUNT_2 = "mbStatsUser.messageCount != ?";
+	private static final String _FINDER_COLUMN_G_NOTU_NOTM_GROUPID_2 = "mbStatsUser.groupId = ? AND ";
+	private static final String _FINDER_COLUMN_G_NOTU_NOTM_USERID_2 = "mbStatsUser.userId != ? AND ";
+	private static final String _FINDER_COLUMN_G_NOTU_NOTM_MESSAGECOUNT_2 = "mbStatsUser.messageCount != ?";
 	private static final String _ORDER_BY_ENTITY_ALIAS = "mbStatsUser.";
 	private static final String _NO_SUCH_ENTITY_WITH_PRIMARY_KEY = "No MBStatsUser exists with the primary key ";
 	private static final String _NO_SUCH_ENTITY_WITH_KEY = "No MBStatsUser exists with the key {";
 	private static final boolean _HIBERNATE_CACHE_USE_SECOND_LEVEL_CACHE = com.liferay.portal.util.PropsValues.HIBERNATE_CACHE_USE_SECOND_LEVEL_CACHE;
 	private static Log _log = LogFactoryUtil.getLog(MBStatsUserPersistenceImpl.class);
 	private static MBStatsUser _nullMBStatsUser = new MBStatsUserImpl() {
+			@Override
 			public Object clone() {
 				return this;
 			}
 
+			@Override
 			public CacheModel<MBStatsUser> toCacheModel() {
 				return _nullMBStatsUserCacheModel;
 			}

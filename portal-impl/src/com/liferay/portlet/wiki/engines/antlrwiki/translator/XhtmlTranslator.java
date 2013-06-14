@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -225,17 +225,21 @@ public class XhtmlTranslator extends XhtmlTranslationVisitor {
 			_log.error(e, e);
 		}
 
-		String pageTitle = HtmlUtil.escape(linkNode.getLink());
+		String pageTitle = linkNode.getLink();
 
 		if ((page != null) && (_viewPageURL != null)) {
 			_viewPageURL.setParameter("title", pageTitle);
 
 			append(_viewPageURL.toString());
+
+			_viewPageURL.setParameter("title", _wikiPage.getTitle());
 		}
 		else if (_editPageURL != null) {
 			_editPageURL.setParameter("title", pageTitle);
 
 			append(_editPageURL.toString());
+
+			_editPageURL.setParameter("title", _wikiPage.getTitle());
 		}
 	}
 

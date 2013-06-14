@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -70,7 +70,6 @@ boolean createNewPage = true;
 	headerNames.add("#");
 	headerNames.add("wiki");
 	headerNames.add("page");
-	headerNames.add("score");
 
 	SearchContainer searchContainer = new SearchContainer(renderRequest, null, null, SearchContainer.DEFAULT_CUR_PARAM, SearchContainer.DEFAULT_DELTA, portletURL, headerNames, LanguageUtil.format(pageContext, "no-pages-were-found-that-matched-the-keywords-x", "<strong>" + HtmlUtil.escape(keywords) + "</strong>"));
 
@@ -133,10 +132,6 @@ boolean createNewPage = true;
 			row.addText(curNode.getName(), rowURL);
 
 			row.addText(title, rowURL);
-
-			// Score
-
-			row.addScore(results.score(i));
 
 			// Add result row
 

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,6 +14,12 @@
 
 package com.liferay.portlet.documentlibrary.model;
 
+import com.liferay.portal.model.ModelWrapper;
+
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * <p>
  * This class is a wrapper for {@link DLFolder}.
@@ -23,7 +29,7 @@ package com.liferay.portlet.documentlibrary.model;
  * @see       DLFolder
  * @generated
  */
-public class DLFolderWrapper implements DLFolder {
+public class DLFolderWrapper implements DLFolder, ModelWrapper<DLFolder> {
 	public DLFolderWrapper(DLFolder dlFolder) {
 		_dlFolder = dlFolder;
 	}
@@ -34,6 +40,157 @@ public class DLFolderWrapper implements DLFolder {
 
 	public String getModelClassName() {
 		return DLFolder.class.getName();
+	}
+
+	public Map<String, Object> getModelAttributes() {
+		Map<String, Object> attributes = new HashMap<String, Object>();
+
+		attributes.put("uuid", getUuid());
+		attributes.put("folderId", getFolderId());
+		attributes.put("groupId", getGroupId());
+		attributes.put("companyId", getCompanyId());
+		attributes.put("userId", getUserId());
+		attributes.put("userName", getUserName());
+		attributes.put("createDate", getCreateDate());
+		attributes.put("modifiedDate", getModifiedDate());
+		attributes.put("repositoryId", getRepositoryId());
+		attributes.put("mountPoint", getMountPoint());
+		attributes.put("parentFolderId", getParentFolderId());
+		attributes.put("name", getName());
+		attributes.put("description", getDescription());
+		attributes.put("lastPostDate", getLastPostDate());
+		attributes.put("defaultFileEntryTypeId", getDefaultFileEntryTypeId());
+		attributes.put("overrideFileEntryTypes", getOverrideFileEntryTypes());
+		attributes.put("status", getStatus());
+		attributes.put("statusByUserId", getStatusByUserId());
+		attributes.put("statusByUserName", getStatusByUserName());
+		attributes.put("statusDate", getStatusDate());
+
+		return attributes;
+	}
+
+	public void setModelAttributes(Map<String, Object> attributes) {
+		String uuid = (String)attributes.get("uuid");
+
+		if (uuid != null) {
+			setUuid(uuid);
+		}
+
+		Long folderId = (Long)attributes.get("folderId");
+
+		if (folderId != null) {
+			setFolderId(folderId);
+		}
+
+		Long groupId = (Long)attributes.get("groupId");
+
+		if (groupId != null) {
+			setGroupId(groupId);
+		}
+
+		Long companyId = (Long)attributes.get("companyId");
+
+		if (companyId != null) {
+			setCompanyId(companyId);
+		}
+
+		Long userId = (Long)attributes.get("userId");
+
+		if (userId != null) {
+			setUserId(userId);
+		}
+
+		String userName = (String)attributes.get("userName");
+
+		if (userName != null) {
+			setUserName(userName);
+		}
+
+		Date createDate = (Date)attributes.get("createDate");
+
+		if (createDate != null) {
+			setCreateDate(createDate);
+		}
+
+		Date modifiedDate = (Date)attributes.get("modifiedDate");
+
+		if (modifiedDate != null) {
+			setModifiedDate(modifiedDate);
+		}
+
+		Long repositoryId = (Long)attributes.get("repositoryId");
+
+		if (repositoryId != null) {
+			setRepositoryId(repositoryId);
+		}
+
+		Boolean mountPoint = (Boolean)attributes.get("mountPoint");
+
+		if (mountPoint != null) {
+			setMountPoint(mountPoint);
+		}
+
+		Long parentFolderId = (Long)attributes.get("parentFolderId");
+
+		if (parentFolderId != null) {
+			setParentFolderId(parentFolderId);
+		}
+
+		String name = (String)attributes.get("name");
+
+		if (name != null) {
+			setName(name);
+		}
+
+		String description = (String)attributes.get("description");
+
+		if (description != null) {
+			setDescription(description);
+		}
+
+		Date lastPostDate = (Date)attributes.get("lastPostDate");
+
+		if (lastPostDate != null) {
+			setLastPostDate(lastPostDate);
+		}
+
+		Long defaultFileEntryTypeId = (Long)attributes.get(
+				"defaultFileEntryTypeId");
+
+		if (defaultFileEntryTypeId != null) {
+			setDefaultFileEntryTypeId(defaultFileEntryTypeId);
+		}
+
+		Boolean overrideFileEntryTypes = (Boolean)attributes.get(
+				"overrideFileEntryTypes");
+
+		if (overrideFileEntryTypes != null) {
+			setOverrideFileEntryTypes(overrideFileEntryTypes);
+		}
+
+		Integer status = (Integer)attributes.get("status");
+
+		if (status != null) {
+			setStatus(status);
+		}
+
+		Long statusByUserId = (Long)attributes.get("statusByUserId");
+
+		if (statusByUserId != null) {
+			setStatusByUserId(statusByUserId);
+		}
+
+		String statusByUserName = (String)attributes.get("statusByUserName");
+
+		if (statusByUserName != null) {
+			setStatusByUserName(statusByUserName);
+		}
+
+		Date statusDate = (Date)attributes.get("statusDate");
+
+		if (statusDate != null) {
+			setStatusDate(statusDate);
+		}
 	}
 
 	/**
@@ -380,6 +537,150 @@ public class DLFolderWrapper implements DLFolder {
 		_dlFolder.setOverrideFileEntryTypes(overrideFileEntryTypes);
 	}
 
+	/**
+	* Returns the status of this document library folder.
+	*
+	* @return the status of this document library folder
+	*/
+	public int getStatus() {
+		return _dlFolder.getStatus();
+	}
+
+	/**
+	* Sets the status of this document library folder.
+	*
+	* @param status the status of this document library folder
+	*/
+	public void setStatus(int status) {
+		_dlFolder.setStatus(status);
+	}
+
+	/**
+	* Returns the status by user ID of this document library folder.
+	*
+	* @return the status by user ID of this document library folder
+	*/
+	public long getStatusByUserId() {
+		return _dlFolder.getStatusByUserId();
+	}
+
+	/**
+	* Sets the status by user ID of this document library folder.
+	*
+	* @param statusByUserId the status by user ID of this document library folder
+	*/
+	public void setStatusByUserId(long statusByUserId) {
+		_dlFolder.setStatusByUserId(statusByUserId);
+	}
+
+	/**
+	* Returns the status by user uuid of this document library folder.
+	*
+	* @return the status by user uuid of this document library folder
+	* @throws SystemException if a system exception occurred
+	*/
+	public java.lang.String getStatusByUserUuid()
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return _dlFolder.getStatusByUserUuid();
+	}
+
+	/**
+	* Sets the status by user uuid of this document library folder.
+	*
+	* @param statusByUserUuid the status by user uuid of this document library folder
+	*/
+	public void setStatusByUserUuid(java.lang.String statusByUserUuid) {
+		_dlFolder.setStatusByUserUuid(statusByUserUuid);
+	}
+
+	/**
+	* Returns the status by user name of this document library folder.
+	*
+	* @return the status by user name of this document library folder
+	*/
+	public java.lang.String getStatusByUserName() {
+		return _dlFolder.getStatusByUserName();
+	}
+
+	/**
+	* Sets the status by user name of this document library folder.
+	*
+	* @param statusByUserName the status by user name of this document library folder
+	*/
+	public void setStatusByUserName(java.lang.String statusByUserName) {
+		_dlFolder.setStatusByUserName(statusByUserName);
+	}
+
+	/**
+	* Returns the status date of this document library folder.
+	*
+	* @return the status date of this document library folder
+	*/
+	public java.util.Date getStatusDate() {
+		return _dlFolder.getStatusDate();
+	}
+
+	/**
+	* Sets the status date of this document library folder.
+	*
+	* @param statusDate the status date of this document library folder
+	*/
+	public void setStatusDate(java.util.Date statusDate) {
+		_dlFolder.setStatusDate(statusDate);
+	}
+
+	/**
+	* @deprecated Renamed to {@link #isApproved()}
+	*/
+	public boolean getApproved() {
+		return _dlFolder.getApproved();
+	}
+
+	/**
+	* Returns <code>true</code> if this document library folder is approved.
+	*
+	* @return <code>true</code> if this document library folder is approved; <code>false</code> otherwise
+	*/
+	public boolean isApproved() {
+		return _dlFolder.isApproved();
+	}
+
+	/**
+	* Returns <code>true</code> if this document library folder is a draft.
+	*
+	* @return <code>true</code> if this document library folder is a draft; <code>false</code> otherwise
+	*/
+	public boolean isDraft() {
+		return _dlFolder.isDraft();
+	}
+
+	/**
+	* Returns <code>true</code> if this document library folder is expired.
+	*
+	* @return <code>true</code> if this document library folder is expired; <code>false</code> otherwise
+	*/
+	public boolean isExpired() {
+		return _dlFolder.isExpired();
+	}
+
+	/**
+	* Returns <code>true</code> if this document library folder is in the Recycle Bin.
+	*
+	* @return <code>true</code> if this document library folder is in the Recycle Bin; <code>false</code> otherwise
+	*/
+	public boolean isInTrash() {
+		return _dlFolder.isInTrash();
+	}
+
+	/**
+	* Returns <code>true</code> if this document library folder is pending.
+	*
+	* @return <code>true</code> if this document library folder is pending; <code>false</code> otherwise
+	*/
+	public boolean isPending() {
+		return _dlFolder.isPending();
+	}
+
 	public boolean isNew() {
 		return _dlFolder.isNew();
 	}
@@ -398,10 +699,6 @@ public class DLFolderWrapper implements DLFolder {
 
 	public boolean isEscapedModel() {
 		return _dlFolder.isEscapedModel();
-	}
-
-	public void setEscapedModel(boolean escapedModel) {
-		_dlFolder.setEscapedModel(escapedModel);
 	}
 
 	public java.io.Serializable getPrimaryKeyObj() {
@@ -498,7 +795,14 @@ public class DLFolderWrapper implements DLFolder {
 		return _dlFolder.isRoot();
 	}
 
+	/**
+	 * @deprecated Renamed to {@link #getWrappedModel}
+	 */
 	public DLFolder getWrappedDLFolder() {
+		return _dlFolder;
+	}
+
+	public DLFolder getWrappedModel() {
 		return _dlFolder;
 	}
 

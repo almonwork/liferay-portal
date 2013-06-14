@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,6 +14,10 @@
 
 package com.liferay.portal.model;
 
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * <p>
  * This class is a wrapper for {@link UserTracker}.
@@ -23,7 +27,8 @@ package com.liferay.portal.model;
  * @see       UserTracker
  * @generated
  */
-public class UserTrackerWrapper implements UserTracker {
+public class UserTrackerWrapper implements UserTracker,
+	ModelWrapper<UserTracker> {
 	public UserTrackerWrapper(UserTracker userTracker) {
 		_userTracker = userTracker;
 	}
@@ -34,6 +39,71 @@ public class UserTrackerWrapper implements UserTracker {
 
 	public String getModelClassName() {
 		return UserTracker.class.getName();
+	}
+
+	public Map<String, Object> getModelAttributes() {
+		Map<String, Object> attributes = new HashMap<String, Object>();
+
+		attributes.put("userTrackerId", getUserTrackerId());
+		attributes.put("companyId", getCompanyId());
+		attributes.put("userId", getUserId());
+		attributes.put("modifiedDate", getModifiedDate());
+		attributes.put("sessionId", getSessionId());
+		attributes.put("remoteAddr", getRemoteAddr());
+		attributes.put("remoteHost", getRemoteHost());
+		attributes.put("userAgent", getUserAgent());
+
+		return attributes;
+	}
+
+	public void setModelAttributes(Map<String, Object> attributes) {
+		Long userTrackerId = (Long)attributes.get("userTrackerId");
+
+		if (userTrackerId != null) {
+			setUserTrackerId(userTrackerId);
+		}
+
+		Long companyId = (Long)attributes.get("companyId");
+
+		if (companyId != null) {
+			setCompanyId(companyId);
+		}
+
+		Long userId = (Long)attributes.get("userId");
+
+		if (userId != null) {
+			setUserId(userId);
+		}
+
+		Date modifiedDate = (Date)attributes.get("modifiedDate");
+
+		if (modifiedDate != null) {
+			setModifiedDate(modifiedDate);
+		}
+
+		String sessionId = (String)attributes.get("sessionId");
+
+		if (sessionId != null) {
+			setSessionId(sessionId);
+		}
+
+		String remoteAddr = (String)attributes.get("remoteAddr");
+
+		if (remoteAddr != null) {
+			setRemoteAddr(remoteAddr);
+		}
+
+		String remoteHost = (String)attributes.get("remoteHost");
+
+		if (remoteHost != null) {
+			setRemoteHost(remoteHost);
+		}
+
+		String userAgent = (String)attributes.get("userAgent");
+
+		if (userAgent != null) {
+			setUserAgent(userAgent);
+		}
 	}
 
 	/**
@@ -238,10 +308,6 @@ public class UserTrackerWrapper implements UserTracker {
 		return _userTracker.isEscapedModel();
 	}
 
-	public void setEscapedModel(boolean escapedModel) {
-		_userTracker.setEscapedModel(escapedModel);
-	}
-
 	public java.io.Serializable getPrimaryKeyObj() {
 		return _userTracker.getPrimaryKeyObj();
 	}
@@ -295,27 +361,34 @@ public class UserTrackerWrapper implements UserTracker {
 		_userTracker.persist();
 	}
 
-	public java.lang.String getFullName() {
-		return _userTracker.getFullName();
+	public void addPath(com.liferay.portal.model.UserTrackerPath path) {
+		_userTracker.addPath(path);
 	}
 
 	public java.lang.String getEmailAddress() {
 		return _userTracker.getEmailAddress();
 	}
 
-	public java.util.List<com.liferay.portal.model.UserTrackerPath> getPaths() {
-		return _userTracker.getPaths();
-	}
-
-	public void addPath(com.liferay.portal.model.UserTrackerPath path) {
-		_userTracker.addPath(path);
+	public java.lang.String getFullName() {
+		return _userTracker.getFullName();
 	}
 
 	public int getHits() {
 		return _userTracker.getHits();
 	}
 
+	public java.util.List<com.liferay.portal.model.UserTrackerPath> getPaths() {
+		return _userTracker.getPaths();
+	}
+
+	/**
+	 * @deprecated Renamed to {@link #getWrappedModel}
+	 */
 	public UserTracker getWrappedUserTracker() {
+		return _userTracker;
+	}
+
+	public UserTracker getWrappedModel() {
 		return _userTracker;
 	}
 

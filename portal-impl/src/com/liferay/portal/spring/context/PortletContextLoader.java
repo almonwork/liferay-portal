@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -32,12 +32,15 @@ public class PortletContextLoader extends ContextLoader {
 	@Override
 	protected void customizeContext(
 		ServletContext servletContext,
-		ConfigurableWebApplicationContext applicationContext) {
+		ConfigurableWebApplicationContext configurableWebApplicationContext) {
 
 		String configLocation = servletContext.getInitParameter(
 			PORTAL_CONFIG_LOCATION_PARAM);
 
-		applicationContext.setConfigLocation(configLocation);
+		configurableWebApplicationContext.setConfigLocation(configLocation);
+
+		configurableWebApplicationContext.addBeanFactoryPostProcessor(
+			new PortletBeanFactoryPostProcessor());
 	}
 
 	@Override

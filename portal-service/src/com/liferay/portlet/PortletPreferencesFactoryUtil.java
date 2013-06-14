@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -16,9 +16,12 @@ package com.liferay.portlet;
 
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
+import com.liferay.portal.kernel.security.pacl.permission.PortalRuntimePermission;
 import com.liferay.portal.model.Layout;
 import com.liferay.portal.model.Portlet;
 import com.liferay.portal.model.PortletPreferencesIds;
+
+import java.util.Map;
 
 import javax.portlet.PortletPreferences;
 import javax.portlet.PortletRequest;
@@ -103,6 +106,9 @@ public class PortletPreferencesFactoryUtil {
 	}
 
 	public static PortletPreferencesFactory getPortletPreferencesFactory() {
+		PortalRuntimePermission.checkGetBeanProperty(
+			PortletPreferencesFactoryUtil.class);
+
 		return _portletPreferencesFactory;
 	}
 
@@ -180,6 +186,15 @@ public class PortletPreferencesFactoryUtil {
 			portletRequest, portletId);
 	}
 
+	public static Map<Long, PortletPreferences> getPortletSetupMap(
+			long companyId, long groupId, long ownerId, int ownerType,
+			String portletId, boolean privateLayout)
+		throws SystemException {
+
+		return getPortletPreferencesFactory().getPortletSetupMap(
+			companyId, groupId, ownerId, ownerType, portletId, privateLayout);
+	}
+
 	public static PortletPreferences getPreferences(
 		HttpServletRequest request) {
 
@@ -210,6 +225,8 @@ public class PortletPreferencesFactoryUtil {
 
 	public void setPortletPreferencesFactory(
 		PortletPreferencesFactory portletPreferencesFactory) {
+
+		PortalRuntimePermission.checkSetBeanProperty(getClass());
 
 		_portletPreferencesFactory = portletPreferencesFactory;
 	}

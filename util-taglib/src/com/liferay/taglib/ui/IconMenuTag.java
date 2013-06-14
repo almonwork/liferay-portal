@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -23,7 +23,6 @@ import com.liferay.portal.kernel.util.IntegerWrapper;
 import com.liferay.portal.kernel.util.PropsKeys;
 import com.liferay.portal.kernel.util.PropsUtil;
 import com.liferay.portal.kernel.util.ServerDetector;
-import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.theme.PortletDisplay;
@@ -85,6 +84,7 @@ public class IconMenuTag extends BaseBodyTagSupport implements BodyTag {
 				_extended = true;
 				_icon = null;
 				_id = null;
+				_localizeMessage = true;
 				_maxDisplayItems = _DEFAULT_MAX_DISPLAY_ITEMS;
 				_message = "actions";
 				_showArrow = true;
@@ -117,18 +117,24 @@ public class IconMenuTag extends BaseBodyTagSupport implements BodyTag {
 		}
 
 		if (Validator.isNull(_id)) {
-			String randomKey = PortalUtil.generateRandomKey(
-				request, IconMenuTag.class.getName());
+			_id = (String)request.getAttribute(
+				"liferay-ui:search-container-row:rowId");
 
-			_id = randomKey + StringPool.UNDERLINE + "menu";
+			if (Validator.isNull(_id)) {
+				_id = PortalUtil.generateRandomKey(
+					request, IconMenuTag.class.getName());
+			}
+
+			_id = _id.concat("_menu");
 		}
-		else {
-			PortletDisplay portletDisplay = themeDisplay.getPortletDisplay();
 
-			String namespace = portletDisplay.getNamespace();
+		request.setAttribute("liferay-ui:icon-menu:id", _id);
 
-			_id = namespace.concat(_id);
-		}
+		PortletDisplay portletDisplay = themeDisplay.getPortletDisplay();
+
+		String namespace = portletDisplay.getNamespace();
+
+		_id = namespace.concat(_id);
 
 		request.setAttribute(
 			"liferay-ui:icon-menu:icon-count", new IntegerWrapper());
@@ -171,6 +177,10 @@ public class IconMenuTag extends BaseBodyTagSupport implements BodyTag {
 		_id = id;
 	}
 
+	public void setLocalizeMessage(boolean localizeMessage) {
+		_localizeMessage = localizeMessage;
+	}
+
 	public void setMaxDisplayItems(int maxDisplayItems) {
 		if (maxDisplayItems <= 0) {
 			maxDisplayItems = _DEFAULT_MAX_DISPLAY_ITEMS;
@@ -180,7 +190,9 @@ public class IconMenuTag extends BaseBodyTagSupport implements BodyTag {
 	}
 
 	public void setMessage(String message) {
-		_message = message;
+		if (message != null) {
+			_message = message;
+		}
 	}
 
 	public void setShowArrow(boolean showArrow) {
@@ -225,6 +237,7 @@ public class IconMenuTag extends BaseBodyTagSupport implements BodyTag {
 			"liferay-ui:icon-menu:icon-count");
 
 		request.removeAttribute("liferay-ui:icon-menu:icon-count");
+		request.removeAttribute("liferay-ui:icon-menu:id");
 
 		Boolean singleIcon = (Boolean)request.getAttribute(
 			"liferay-ui:icon-menu:single-icon");
@@ -250,8 +263,14 @@ public class IconMenuTag extends BaseBodyTagSupport implements BodyTag {
 					jspWriter.write("\">");
 				}
 				else {
+					String message = _message;
+
+					if (_localizeMessage) {
+						message = LanguageUtil.get(pageContext, _message);
+					}
+
 					jspWriter.write("<span title=\"");
-					jspWriter.write(LanguageUtil.get(pageContext, _message));
+					jspWriter.write(message);
 					jspWriter.write("\"><ul class='lfr-component lfr-actions ");
 					jspWriter.write("align-");
 					jspWriter.write(_align);
@@ -281,7 +300,10 @@ public class IconMenuTag extends BaseBodyTagSupport implements BodyTag {
 					jspWriter.write(_id);
 					jspWriter.write("\">");
 					jspWriter.write("<li class=\"lfr-trigger\"><strong>");
-					jspWriter.write("<a class=\"nobr\" href=\"javascript:;\">");
+					jspWriter.write(
+						"<a class=\"nobr\" href=\"javascript:;\" id=\"");
+					jspWriter.write(_id);
+					jspWriter.write("Button\">");
 
 					if (Validator.isNotNull(_icon)) {
 						jspWriter.write("<img alt=\"\" src=\"");
@@ -290,8 +312,13 @@ public class IconMenuTag extends BaseBodyTagSupport implements BodyTag {
 					}
 
 					jspWriter.write("<span class=\"taglib-text\">");
-					jspWriter.write(LanguageUtil.get(pageContext, _message));
+					jspWriter.write(message);
 					jspWriter.write("</span></a></strong>");
+
+					ScriptTag.doTag(
+						null, "liferay-menu",
+						"Liferay.Menu.register('" + _id + "');", bodyContent,
+						pageContext);
 				}
 
 				jspWriter.write("<ul>");
@@ -317,7 +344,7 @@ public class IconMenuTag extends BaseBodyTagSupport implements BodyTag {
 					ScriptTag.doTag(
 						null, "liferay-menu",
 						"Liferay.Menu.handleFocus('#" + _id + "menu');",
-						pageContext);
+						bodyContent, pageContext);
 				}
 				else {
 					jspWriter.write("</li></ul></span>");
@@ -349,6 +376,7 @@ public class IconMenuTag extends BaseBodyTagSupport implements BodyTag {
 	private boolean _extended = true;
 	private String _icon;
 	private String _id;
+	private boolean _localizeMessage = true;
 	private int _maxDisplayItems = _DEFAULT_MAX_DISPLAY_ITEMS;
 	private String _message = "actions";
 	private boolean _showArrow = true;

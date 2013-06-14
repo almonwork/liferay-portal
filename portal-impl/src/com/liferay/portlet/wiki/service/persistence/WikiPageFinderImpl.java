@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -42,16 +42,16 @@ import java.util.List;
 public class WikiPageFinderImpl
 	extends BasePersistenceImpl<WikiPage> implements WikiPageFinder {
 
-	public static String COUNT_BY_CREATE_DATE =
+	public static final String COUNT_BY_CREATE_DATE =
 		WikiPageFinder.class.getName() + ".countByCreateDate";
 
-	public static String FIND_BY_RESOURCE_PRIM_KEY =
+	public static final String FIND_BY_RESOURCE_PRIM_KEY =
 		WikiPageFinder.class.getName() + ".findByResourcePrimKey";
 
-	public static String FIND_BY_CREATE_DATE =
+	public static final String FIND_BY_CREATE_DATE =
 		WikiPageFinder.class.getName() + ".findByCreateDate";
 
-	public static String FIND_BY_NO_ASSETS =
+	public static final String FIND_BY_NO_ASSETS =
 		WikiPageFinder.class.getName() + ".findByNoAssets";
 
 	public int countByCreateDate(long nodeId, Date createDate, boolean before)
@@ -92,7 +92,7 @@ public class WikiPageFinderImpl
 			qPos.add(true);
 			qPos.add(WorkflowConstants.STATUS_APPROVED);
 
-			Iterator<Long> itr = q.list().iterator();
+			Iterator<Long> itr = q.iterate();
 
 			if (itr.hasNext()) {
 				Long count = itr.next();
@@ -130,23 +130,11 @@ public class WikiPageFinderImpl
 
 			qPos.add(resourcePrimKey);
 
-			List<WikiPage> list = q.list();
+			List<WikiPage> pages = q.list();
 
-			if (list.size() == 0) {
-				StringBundler sb = new StringBundler(3);
-
-				sb.append("No WikiPage exists with the key {resourcePrimKey");
-				sb.append(resourcePrimKey);
-				sb.append("}");
-
-				throw new NoSuchPageException(sb.toString());
+			if (!pages.isEmpty()) {
+				return pages.get(0);
 			}
-			else {
-				return list.get(0);
-			}
-		}
-		catch (NoSuchPageException nspe) {
-			throw nspe;
 		}
 		catch (Exception e) {
 			throw new SystemException(e);
@@ -154,6 +142,14 @@ public class WikiPageFinderImpl
 		finally {
 			closeSession(session);
 		}
+
+		StringBundler sb = new StringBundler(3);
+
+		sb.append("No WikiPage exists with the key {resourcePrimKey");
+		sb.append(resourcePrimKey);
+		sb.append("}");
+
+		throw new NoSuchPageException(sb.toString());
 	}
 
 	public List<WikiPage> findByCreateDate(
@@ -218,7 +214,7 @@ public class WikiPageFinderImpl
 
 			q.addEntity("WikiPage", WikiPageImpl.class);
 
-			return q.list();
+			return q.list(true);
 		}
 		catch (Exception e) {
 			throw new SystemException(e);

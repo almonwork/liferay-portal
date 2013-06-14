@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,10 +14,37 @@
 
 package com.liferay.portal.kernel.json;
 
+import com.liferay.portal.kernel.security.pacl.permission.PortalRuntimePermission;
+
+import java.util.List;
+
 /**
  * @author Brian Wing Shun Chan
  */
 public class JSONFactoryUtil {
+
+	public static String convertJSONMLArrayToXML(String jsonml) {
+		return getJSONFactory().convertJSONMLArrayToXML(jsonml);
+	}
+
+	public static String convertJSONMLObjectToXML(String jsonml) {
+		return getJSONFactory().convertJSONMLObjectToXML(jsonml);
+	}
+
+	public static String convertXMLtoJSONMLArray(String xml) {
+		return getJSONFactory().convertXMLtoJSONMLArray(xml);
+	}
+
+	public static String convertXMLtoJSONMLObject(String xml) {
+		return getJSONFactory().convertXMLtoJSONMLObject(xml);
+	}
+
+	public static JSONTransformer createJavaScriptNormalizerJSONTransformer(
+		List<String> javaScriptAttributes) {
+
+		return getJSONFactory().createJavaScriptNormalizerJSONTransformer(
+			javaScriptAttributes);
+	}
 
 	public static JSONArray createJSONArray() {
 		return getJSONFactory().createJSONArray();
@@ -54,6 +81,8 @@ public class JSONFactoryUtil {
 	}
 
 	public static JSONFactory getJSONFactory() {
+		PortalRuntimePermission.checkGetBeanProperty(JSONFactoryUtil.class);
+
 		return _jsonFactory;
 	}
 
@@ -67,6 +96,14 @@ public class JSONFactoryUtil {
 
 	public static <T> T looseDeserialize(String json, Class<T> clazz) {
 		return getJSONFactory().looseDeserialize(json, clazz);
+	}
+
+	public static Object looseDeserializeSafe(String json) {
+		return getJSONFactory().looseDeserializeSafe(json);
+	}
+
+	public static <T> T looseDeserializeSafe(String json, Class<T> clazz) {
+		return getJSONFactory().looseDeserializeSafe(json, clazz);
 	}
 
 	public static String looseSerialize(Object object) {
@@ -87,6 +124,13 @@ public class JSONFactoryUtil {
 		return getJSONFactory().looseSerializeDeep(object);
 	}
 
+	public static String looseSerializeDeep(
+		Object object, JSONTransformer jsonTransformer, Class<?> clazz) {
+
+		return getJSONFactory().looseSerializeDeep(
+			object, jsonTransformer, clazz);
+	}
+
 	public static String serialize(Object object) {
 		return getJSONFactory().serialize(object);
 	}
@@ -96,6 +140,8 @@ public class JSONFactoryUtil {
 	}
 
 	public void setJSONFactory(JSONFactory jsonFactory) {
+		PortalRuntimePermission.checkSetBeanProperty(getClass());
+
 		_jsonFactory = jsonFactory;
 	}
 

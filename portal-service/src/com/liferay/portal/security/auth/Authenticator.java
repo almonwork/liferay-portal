@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -21,11 +21,11 @@ import java.util.Map;
  */
 public interface Authenticator {
 
-	public static final int SUCCESS = 1;
+	public static final int DNE = 0;
 
 	public static final int FAILURE = -1;
 
-	public static final int DNE = 0;
+	public static final int SUCCESS = 1;
 
 	public int authenticateByEmailAddress(
 			long companyId, String emailAddress, String password,

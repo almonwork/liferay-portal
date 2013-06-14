@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -92,14 +92,6 @@ public class DLFileEntryMetadataUtil {
 		return getPersistence()
 				   .findWithDynamicQuery(dynamicQuery, start, end,
 			orderByComparator);
-	}
-
-	/**
-	 * @see com.liferay.portal.service.persistence.BasePersistence#remove(com.liferay.portal.model.BaseModel)
-	 */
-	public static DLFileEntryMetadata remove(
-		DLFileEntryMetadata dlFileEntryMetadata) throws SystemException {
-		return getPersistence().remove(dlFileEntryMetadata);
 	}
 
 	/**
@@ -882,12 +874,14 @@ public class DLFileEntryMetadataUtil {
 	*
 	* @param DDMStructureId the d d m structure ID
 	* @param fileVersionId the file version ID
+	* @return the document library file entry metadata that was removed
 	* @throws SystemException if a system exception occurred
 	*/
-	public static void removeByD_F(long DDMStructureId, long fileVersionId)
+	public static com.liferay.portlet.documentlibrary.model.DLFileEntryMetadata removeByD_F(
+		long DDMStructureId, long fileVersionId)
 		throws com.liferay.portal.kernel.exception.SystemException,
 			com.liferay.portlet.documentlibrary.NoSuchFileEntryMetadataException {
-		getPersistence().removeByD_F(DDMStructureId, fileVersionId);
+		return getPersistence().removeByD_F(DDMStructureId, fileVersionId);
 	}
 
 	/**
@@ -895,12 +889,14 @@ public class DLFileEntryMetadataUtil {
 	*
 	* @param fileEntryId the file entry ID
 	* @param fileVersionId the file version ID
+	* @return the document library file entry metadata that was removed
 	* @throws SystemException if a system exception occurred
 	*/
-	public static void removeByF_V(long fileEntryId, long fileVersionId)
+	public static com.liferay.portlet.documentlibrary.model.DLFileEntryMetadata removeByF_V(
+		long fileEntryId, long fileVersionId)
 		throws com.liferay.portal.kernel.exception.SystemException,
 			com.liferay.portlet.documentlibrary.NoSuchFileEntryMetadataException {
-		getPersistence().removeByF_V(fileEntryId, fileVersionId);
+		return getPersistence().removeByF_V(fileEntryId, fileVersionId);
 	}
 
 	/**
@@ -1009,11 +1005,10 @@ public class DLFileEntryMetadataUtil {
 		return _persistence;
 	}
 
+	/**
+	 * @deprecated
+	 */
 	public void setPersistence(DLFileEntryMetadataPersistence persistence) {
-		_persistence = persistence;
-
-		ReferenceRegistry.registerReference(DLFileEntryMetadataUtil.class,
-			"_persistence");
 	}
 
 	private static DLFileEntryMetadataPersistence _persistence;

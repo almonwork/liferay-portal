@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -23,14 +23,18 @@ import com.liferay.portalweb.portal.util.RuntimeVariables;
 public class ExpireQuestionTest extends BaseTestCase {
 	public void testExpireQuestion() throws Exception {
 		selenium.open("/web/guest/home/");
+		loadRequiredJavaScriptModules();
+		assertEquals(RuntimeVariables.replace("Go to"),
+			selenium.getText("//li[@id='_145_mySites']/a/span"));
+		selenium.mouseOver("//li[@id='_145_mySites']/a/span");
 
 		for (int second = 0;; second++) {
-			if (second >= 60) {
+			if (second >= 90) {
 				fail("timeout");
 			}
 
 			try {
-				if (selenium.isElementPresent("link=Control Panel")) {
+				if (selenium.isVisible("link=Control Panel")) {
 					break;
 				}
 			}
@@ -40,37 +44,39 @@ public class ExpireQuestionTest extends BaseTestCase {
 			Thread.sleep(1000);
 		}
 
-		selenium.saveScreenShotAndSource();
-		selenium.clickAt("link=Control Panel", RuntimeVariables.replace(""));
+		selenium.clickAt("link=Control Panel",
+			RuntimeVariables.replace("Control Panel"));
 		selenium.waitForPageToLoad("30000");
-		selenium.saveScreenShotAndSource();
-		selenium.clickAt("link=Polls", RuntimeVariables.replace(""));
+		loadRequiredJavaScriptModules();
+		selenium.clickAt("link=Polls", RuntimeVariables.replace("Polls"));
 		selenium.waitForPageToLoad("30000");
-		selenium.saveScreenShotAndSource();
+		loadRequiredJavaScriptModules();
 		selenium.clickAt("link=Edited Test Question 2",
-			RuntimeVariables.replace(""));
+			RuntimeVariables.replace("Edited Test Question 2"));
 		selenium.waitForPageToLoad("30000");
-		selenium.saveScreenShotAndSource();
-		assertTrue(selenium.isElementPresent("//span[1]/span/span/input"));
+		loadRequiredJavaScriptModules();
+		assertTrue(selenium.isElementPresent(
+				"//div[2]/div/span[1]/span/span/input"));
 		assertTrue(selenium.isElementPresent("//span[2]/span/span/input"));
 		assertTrue(selenium.isElementPresent("//span[3]/span/span/input"));
 		assertTrue(selenium.isElementPresent("//span[4]/span/span/input"));
 		selenium.clickAt("//input[@value='Cancel']",
-			RuntimeVariables.replace(""));
+			RuntimeVariables.replace("Cancel"));
 		selenium.waitForPageToLoad("30000");
-		selenium.saveScreenShotAndSource();
-		Thread.sleep(5000);
-		selenium.clickAt("//td[5]/span/ul/li/strong/a",
-			RuntimeVariables.replace(""));
+		loadRequiredJavaScriptModules();
+		assertEquals(RuntimeVariables.replace("Actions"),
+			selenium.getText("//span[@title='Actions']/ul/li/strong/a/span"));
+		selenium.clickAt("//span[@title='Actions']/ul/li/strong/a/span",
+			RuntimeVariables.replace("Actions"));
 
 		for (int second = 0;; second++) {
-			if (second >= 60) {
+			if (second >= 90) {
 				fail("timeout");
 			}
 
 			try {
-				if (selenium.isElementPresent(
-							"//div[@class='lfr-component lfr-menu-list']/ul/li[1]/a")) {
+				if (selenium.isVisible(
+							"//div[@class='lfr-component lfr-menu-list']/ul/li[contains(.,'Edit')]/a")) {
 					break;
 				}
 			}
@@ -80,19 +86,26 @@ public class ExpireQuestionTest extends BaseTestCase {
 			Thread.sleep(1000);
 		}
 
-		selenium.saveScreenShotAndSource();
+		assertEquals(RuntimeVariables.replace("Edit"),
+			selenium.getText(
+				"//div[@class='lfr-component lfr-menu-list']/ul/li[contains(.,'Edit')]/a"));
 		selenium.click(RuntimeVariables.replace(
-				"//div[@class='lfr-component lfr-menu-list']/ul/li[1]/a"));
+				"//div[@class='lfr-component lfr-menu-list']/ul/li[contains(.,'Edit')]/a"));
 		selenium.waitForPageToLoad("30000");
-		selenium.saveScreenShotAndSource();
+		loadRequiredJavaScriptModules();
+		assertTrue(selenium.isChecked("//input[@id='_25_neverExpireCheckbox']"));
+		selenium.clickAt("//input[@id='_25_neverExpireCheckbox']",
+			RuntimeVariables.replace("Never Expire"));
+		assertFalse(selenium.isChecked("//input[@id='_25_neverExpireCheckbox']"));
 
 		for (int second = 0;; second++) {
-			if (second >= 60) {
+			if (second >= 90) {
 				fail("timeout");
 			}
 
 			try {
-				if (selenium.isElementPresent("_25_expirationDateMonth")) {
+				if (selenium.isVisible(
+							"//select[@id='_25_expirationDateMonth']")) {
 					break;
 				}
 			}
@@ -102,19 +115,24 @@ public class ExpireQuestionTest extends BaseTestCase {
 			Thread.sleep(1000);
 		}
 
-		selenium.saveScreenShotAndSource();
-		selenium.clickAt("_25_neverExpireCheckbox", RuntimeVariables.replace(""));
-		assertFalse(selenium.isChecked("_25_neverExpireCheckbox"));
-		selenium.saveScreenShotAndSource();
-		selenium.keyPress("_25_expirationDateMonth",
-			RuntimeVariables.replace("\\38"));
-		selenium.keyPress("_25_expirationDateMinute",
-			RuntimeVariables.replace("\\39"));
-		selenium.clickAt("//input[@value='Save']", RuntimeVariables.replace(""));
+		selenium.select("//select[@id='_25_expirationDateYear']",
+			RuntimeVariables.replace("label=2008"));
+		selenium.select("//select[@id='_25_expirationDateMonth']",
+			RuntimeVariables.replace("label=January"));
+		selenium.select("//select[@id='_25_expirationDateDay']",
+			RuntimeVariables.replace("label=1"));
+		selenium.select("//select[@name='_25_expirationDateHour']",
+			RuntimeVariables.replace("label=12"));
+		selenium.select("//select[@name='_25_expirationDateMinute']",
+			RuntimeVariables.replace("label=:00"));
+		selenium.select("//select[@name='_25_expirationDateAmPm']",
+			RuntimeVariables.replace("label=AM"));
+		selenium.clickAt("//input[@value='Save']",
+			RuntimeVariables.replace("Save"));
 		selenium.waitForPageToLoad("30000");
-		selenium.saveScreenShotAndSource();
-		assertTrue(selenium.isTextPresent(
-				"Your request completed successfully."));
-		Thread.sleep(60000);
+		loadRequiredJavaScriptModules();
+		assertEquals(RuntimeVariables.replace(
+				"Your request completed successfully."),
+			selenium.getText("//div[@class='portlet-msg-success']"));
 	}
 }

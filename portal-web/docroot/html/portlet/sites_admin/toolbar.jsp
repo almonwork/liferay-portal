@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -38,30 +38,43 @@ String toolbarItem = ParamUtil.getString(request, "toolbarItem", "view-all");
 		<liferay-portlet:renderURL varImpl="addSiteURL">
 			<portlet:param name="struts_action" value="/sites_admin/edit_site" />
 			<portlet:param name="<%= Constants.CMD %>" value="<%= Constants.ADD %>" />
-			<portlet:param name="redirect" value="<%= currentURL %>" />
+			<portlet:param name="redirect" value="<%= viewSitesURL %>" />
 		</liferay-portlet:renderURL>
 
+		<%
+		boolean hasAddLayoutSetPrototypePermission = PortalPermissionUtil.contains(permissionChecker, ActionKeys.ADD_LAYOUT_SET_PROTOTYPE);
+		%>
+
 		<c:choose>
-			<c:when test="<%= layoutSetPrototypes.isEmpty() %>">
-				<span class="lfr-toolbar-button add-button <%= toolbarItem.equals("add") ? "current" : StringPool.BLANK %>"><a href="<%= addSiteURL %>"><liferay-ui:message key="add" /></a></span>
+			<c:when test="<%= layoutSetPrototypes.isEmpty() && !hasAddLayoutSetPrototypePermission %>">
+				<span class="lfr-toolbar-button add-button <%= toolbarItem.equals("add") ? "current" : StringPool.BLANK %>">
+					<a href="<%= addSiteURL %>"><liferay-ui:message key="add" /></a>
+				</span>
 			</c:when>
 			<c:otherwise>
-				<liferay-ui:icon-menu align="left" direction="down" extended="<%= false %>" icon='<%= themeDisplay.getPathThemeImages() + "/common/add.png" %>' message="add">
+				<liferay-ui:icon-menu align="left" cssClass='<%= "lfr-toolbar-button add-button " + (toolbarItem.equals("add") ? "current" : StringPool.BLANK) %>' direction="down" extended="<%= false %>" icon='<%= themeDisplay.getPathThemeImages() + "/common/add.png" %>' message="add">
+
+					<%
+					addSiteURL.setParameter("showPrototypes", "0");
+					%>
+
 					<liferay-ui:icon
 						image="site_icon"
-						message="custom-site"
+						message="blank-site"
 						method="get"
 						url='<%= addSiteURL.toString() %>'
 					/>
 
 					<%
+					addSiteURL.setParameter("showPrototypes", "1");
+
 					for (LayoutSetPrototype layoutSetPrototype : layoutSetPrototypes) {
 						addSiteURL.setParameter("layoutSetPrototypeId", String.valueOf(layoutSetPrototype.getLayoutSetPrototypeId()));
 					%>
 
 						<liferay-ui:icon
 							image="site_icon"
-							message="<%= layoutSetPrototype.getName(locale) %>"
+							message="<%= HtmlUtil.escape(layoutSetPrototype.getName(locale)) %>"
 							method="get"
 							url='<%= addSiteURL.toString() %>'
 						/>
@@ -70,6 +83,21 @@ String toolbarItem = ParamUtil.getString(request, "toolbarItem", "view-all");
 					}
 					%>
 
+					<c:if test="<%= hasAddLayoutSetPrototypePermission %>">
+						<liferay-portlet:renderURL portletName="<%= PortletKeys.LAYOUT_SET_PROTOTYPE %>" varImpl="manageSiteTemplateURL">
+							<portlet:param name="struts_action" value="/layout_set_prototypes/view" />
+							<portlet:param name="redirect" value="<%= viewSitesURL %>" />
+							<portlet:param name="backURL" value="<%= viewSitesURL %>" />
+						</liferay-portlet:renderURL>
+
+						<liferay-ui:icon
+							cssClass="highlited"
+							image="configuration"
+							message="manage-site-template"
+							method="get"
+							url="<%= manageSiteTemplateURL.toString() %>"
+						/>
+					</c:if>
 				</liferay-ui:icon-menu>
 			</c:otherwise>
 		</c:choose>

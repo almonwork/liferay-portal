@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -35,7 +35,8 @@ import com.liferay.portal.kernel.transaction.Transactional;
  */
 @Transactional(isolation = Isolation.PORTAL, rollbackFor =  {
 	PortalException.class, SystemException.class})
-public interface AccountLocalService extends PersistedModelLocalService {
+public interface AccountLocalService extends BaseLocalService,
+	PersistedModelLocalService {
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
@@ -65,10 +66,11 @@ public interface AccountLocalService extends PersistedModelLocalService {
 	* Deletes the account with the primary key from the database. Also notifies the appropriate model listeners.
 	*
 	* @param accountId the primary key of the account
+	* @return the account that was removed
 	* @throws PortalException if a account with the primary key could not be found
 	* @throws SystemException if a system exception occurred
 	*/
-	public void deleteAccount(long accountId)
+	public com.liferay.portal.model.Account deleteAccount(long accountId)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException;
 
@@ -76,10 +78,14 @@ public interface AccountLocalService extends PersistedModelLocalService {
 	* Deletes the account from the database. Also notifies the appropriate model listeners.
 	*
 	* @param account the account
+	* @return the account that was removed
 	* @throws SystemException if a system exception occurred
 	*/
-	public void deleteAccount(com.liferay.portal.model.Account account)
+	public com.liferay.portal.model.Account deleteAccount(
+		com.liferay.portal.model.Account account)
 		throws com.liferay.portal.kernel.exception.SystemException;
+
+	public com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery();
 
 	/**
 	* Performs a dynamic query on the database and returns the matching rows.
@@ -141,6 +147,10 @@ public interface AccountLocalService extends PersistedModelLocalService {
 	*/
 	public long dynamicQueryCount(
 		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery)
+		throws com.liferay.portal.kernel.exception.SystemException;
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public com.liferay.portal.model.Account fetchAccount(long accountId)
 		throws com.liferay.portal.kernel.exception.SystemException;
 
 	/**

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -22,6 +22,7 @@ import com.liferay.portal.security.permission.PermissionChecker;
 import com.liferay.portal.theme.ThemeDisplay;
 import com.liferay.portlet.social.model.BaseSocialActivityInterpreter;
 import com.liferay.portlet.social.model.SocialActivity;
+import com.liferay.portlet.social.model.SocialActivityConstants;
 import com.liferay.portlet.social.model.SocialActivityFeedEntry;
 import com.liferay.portlet.wiki.model.WikiPage;
 import com.liferay.portlet.wiki.model.WikiPageResource;
@@ -77,19 +78,35 @@ public class WikiActivityInterpreter extends BaseSocialActivityInterpreter {
 
 		String titlePattern = null;
 
-		if (activityType == WikiActivityKeys.ADD_PAGE) {
-			titlePattern = "activity-wiki-add-page";
+		if ((activityType == WikiActivityKeys.ADD_COMMENT) ||
+			(activityType == SocialActivityConstants.TYPE_ADD_COMMENT)) {
+
+			if (Validator.isNull(groupName)) {
+				titlePattern = "activity-wiki-add-comment";
+			}
+			else {
+				titlePattern = "activity-wiki-add-comment-in";
+			}
+		}
+		else if (activityType == WikiActivityKeys.ADD_PAGE) {
+			if (Validator.isNull(groupName)) {
+				titlePattern = "activity-wiki-add-page";
+			}
+			else {
+				titlePattern = "activity-wiki-add-page-in";
+			}
 		}
 		else if (activityType == WikiActivityKeys.UPDATE_PAGE) {
-			titlePattern = "activity-wiki-update-page";
-		}
-
-		if (Validator.isNotNull(groupName)) {
-			titlePattern += "-in";
+			if (Validator.isNull(groupName)) {
+				titlePattern = "activity-wiki-update-page";
+			}
+			else {
+				titlePattern = "activity-wiki-update-page-in";
+			}
 		}
 
 		String pageTitle = wrapLink(
-			link, HtmlUtil.escape(cleanContent(pageResource.getTitle())));
+			link, HtmlUtil.escape(pageResource.getTitle()));
 
 		Object[] titleArguments = new Object[] {
 			groupName, creatorUserName, pageTitle

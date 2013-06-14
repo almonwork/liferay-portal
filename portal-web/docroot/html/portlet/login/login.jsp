@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -27,7 +27,7 @@
 		}
 		%>
 
-		<%= LanguageUtil.format(pageContext, "you-are-signed-in-as-x", signedInAs) %>
+		<%= LanguageUtil.format(pageContext, "you-are-signed-in-as-x", signedInAs, false) %>
 	</c:when>
 	<c:otherwise>
 
@@ -92,6 +92,7 @@
 			</c:choose>
 
 			<liferay-ui:error exception="<%= AuthException.class %>" message="authentication-failed" />
+			<liferay-ui:error exception="<%= CompanyMaxUsersException.class %>" message="unable-to-login-because-the-maximum-number-of-users-has-been-reached" />
 			<liferay-ui:error exception="<%= CookieNotSupportedException.class %>" message="authentication-failed-please-enable-browser-cookies" />
 			<liferay-ui:error exception="<%= NoSuchUserException.class %>" message="authentication-failed" />
 			<liferay-ui:error exception="<%= PasswordExpiredException.class %>" message="your-password-has-expired" />
@@ -116,14 +117,18 @@
 				}
 				%>
 
-				<aui:input label="<%= loginLabel %>" name="login" type="text" value="<%= login %>" />
+				<aui:input label="<%= loginLabel %>" name="login" showRequiredLabel="<%= false %>" type="text" value="<%= login %>">
+					<aui:validator name="required" />
+				</aui:input>
 
-				<aui:input name="password" type="password" value="<%= password %>" />
+				<aui:input name="password" showRequiredLabel="<%= false %>" type="password" value="<%= password %>">
+					<aui:validator name="required" />
+				</aui:input>
 
 				<span id="<portlet:namespace />passwordCapsLockSpan" style="display: none;"><liferay-ui:message key="caps-lock-is-on" /></span>
 
 				<c:if test="<%= company.isAutoLogin() && !PropsValues.SESSION_DISABLED %>">
-					<aui:input checked="<%= rememberMe %>" inlineLabel="left" name="rememberMe" type="checkbox" />
+					<aui:input checked="<%= rememberMe %>" name="rememberMe" type="checkbox" />
 				</c:if>
 			</aui:fieldset>
 

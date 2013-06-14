@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -28,6 +28,9 @@ public interface JavaConstants {
 	public static final String JAVAX_PORTLET_KEYWORDS =
 		"javax.portlet.keywords";
 
+	public static final String JAVAX_PORTLET_LONG_TITLE =
+		"javax.portlet.long-title";
+
 	public static final String JAVAX_PORTLET_PORTLET = "javax.portlet.portlet";
 
 	public static final String JAVAX_PORTLET_REQUEST = "javax.portlet.request";
@@ -42,6 +45,9 @@ public interface JavaConstants {
 		"javax.portlet.short-title";
 
 	public static final String JAVAX_PORTLET_TITLE = "javax.portlet.title";
+
+	public static final String JAVAX_SERVLET_CONTEXT_TEMPDIR =
+		"javax.servlet.context.tempdir";
 
 	public static final String JAVAX_SERVLET_ERROR_EXCEPTION =
 		"javax.servlet.error.exception";
@@ -75,13 +81,13 @@ public interface JavaConstants {
 	public static final String JAVAX_SERVLET_INCLUDE_PATH_INFO =
 		"javax.servlet.include.path_info";
 
+	public static final String JAVAX_SERVLET_INCLUDE_QUERY_STRING =
+		"javax.servlet.include.query_string";
+
 	public static final String JAVAX_SERVLET_INCLUDE_REQUEST_URI =
 		"javax.servlet.include.request_uri";
 
 	public static final String JAVAX_SERVLET_INCLUDE_SERVLET_PATH =
 		"javax.servlet.include.servlet_path";
-
-	public static final String JAVAX_SERVLET_INCLUDE_QUERY_STRING =
-		"javax.servlet.include.query_string";
 
 }

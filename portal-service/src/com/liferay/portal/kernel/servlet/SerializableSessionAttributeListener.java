@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -34,22 +34,26 @@ import javax.servlet.http.HttpSessionBindingEvent;
 public class SerializableSessionAttributeListener
 	extends BasePortalLifecycle implements HttpSessionAttributeListener {
 
-	public void attributeAdded(HttpSessionBindingEvent event) {
+	public void attributeAdded(
+		HttpSessionBindingEvent httpSessionBindingEvent) {
+
 		if (!_sessionVerifySerializableAttribute) {
 			return;
 		}
 
-		String name = event.getName();
-		Object value = event.getValue();
+		String name = httpSessionBindingEvent.getName();
+		Object value = httpSessionBindingEvent.getValue();
 
 		if (!(value instanceof Serializable)) {
+			Class<?> clazz = value.getClass();
+
 			_log.error(
-				value.getClass().getName() +
+				clazz.getName() +
 					" is not serializable and will prevent this session from " +
 						"being replicated");
 
 			if (_requiresSerializable == null) {
-				HttpSession session = event.getSession();
+				HttpSession session = httpSessionBindingEvent.getSession();
 
 				ServletContext servletContext = session.getServletContext();
 
@@ -60,18 +64,21 @@ public class SerializableSessionAttributeListener
 			}
 
 			if (_requiresSerializable) {
-				HttpSession session = event.getSession();
+				HttpSession session = httpSessionBindingEvent.getSession();
 
 				session.removeAttribute(name);
 			}
 		}
 	}
 
-	public void attributeRemoved(HttpSessionBindingEvent event) {
+	public void attributeRemoved(
+		HttpSessionBindingEvent httpSessionBindingEvent) {
 	}
 
-	public void attributeReplaced(HttpSessionBindingEvent event) {
-		attributeAdded(event);
+	public void attributeReplaced(
+		HttpSessionBindingEvent httpSessionBindingEvent) {
+
+		attributeAdded(httpSessionBindingEvent);
 	}
 
 	@Override

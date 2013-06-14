@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -25,10 +25,6 @@ public class Tuple implements Serializable {
 		_array = array;
 	}
 
-	public Object getObject(int i) {
-		return _array[i];
-	}
-
 	@Override
 	public boolean equals(Object obj) {
 		if (!(obj instanceof Tuple)) {
@@ -43,7 +39,7 @@ public class Tuple implements Serializable {
 
 		for (int i = 0; i < _array.length; i++) {
 			if ((tuple._array != null) && (_array[i] != null) &&
-				(!_array[i].equals(tuple._array[i]))) {
+				!_array[i].equals(tuple._array[i])) {
 
 				return false;
 			}
@@ -53,6 +49,10 @@ public class Tuple implements Serializable {
 		}
 
 		return true;
+	}
+
+	public Object getObject(int i) {
+		return _array[i];
 	}
 
 	@Override

@@ -1,9 +1,15 @@
 <#include "../init.ftl">
 
+<#assign multiple = false>
+
+<#if fieldStructure.multiple?? && (fieldStructure.multiple == "true")>
+	<#assign multiple = true>
+</#if>
+
 <#if required>
 	<#assign label = label + " (" + languageUtil.get(locale, "required") + ")">
 </#if>
 
-<@aui.select cssClass=cssClass helpMessage=field.tip label=label name=namespacedFieldName>
-	${field.children}
+<@aui.select cssClass=cssClass helpMessage=fieldStructure.tip label=label multiple=multiple name=namespacedFieldName>
+	${fieldStructure.children}
 </@aui.select>

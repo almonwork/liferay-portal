@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -64,6 +64,10 @@ else {
 
 <h3><liferay-ui:message key="additional-email-addresses" /></h3>
 
+<div class="portlet-msg-info">
+	<liferay-ui:message key="email-address-and-type-are-required-fields" />
+</div>
+
 <liferay-ui:error exception="<%= EmailAddressException.class %>" message="please-enter-a-valid-email-address" />
 <liferay-ui:error key="<%= NoSuchListTypeException.class.getName() + className + ListTypeConstants.EMAIL_ADDRESS %>" message="please-select-a-type" />
 
@@ -82,11 +86,11 @@ else {
 			<div class="row-fields">
 				<aui:input name='<%= "emailAddressId" + emailAddressesIndex %>' type="hidden" value="<%= emailAddress.getEmailAddressId() %>" />
 
-				<aui:input fieldParam='<%= "emailAddressAddress" + emailAddressesIndex %>' label="email-address" name="address" />
+				<aui:input fieldParam='<%= "emailAddressAddress" + emailAddressesIndex %>' id='<%= "emailAddressAddress" + emailAddressesIndex %>' label="email-address" name="address" />
 
-				<aui:select label="type" name='<%= "emailAddressTypeId" + emailAddressesIndex %>' listType="<%= className + ListTypeConstants.EMAIL_ADDRESS %>" />
+				<aui:select label="type" listType="<%= className + ListTypeConstants.EMAIL_ADDRESS %>" name='<%= "emailAddressTypeId" + emailAddressesIndex %>' />
 
-				<aui:input checked="<%= emailAddress.isPrimary() %>" cssClass="primary-ctrl" id='<%= "emailAddressPrimary" + emailAddressesIndex %>' inlineLabel="left" label="primary" name="emailAddressPrimary" type="radio" value="<%= emailAddressesIndex %>" />
+				<aui:input checked="<%= emailAddress.isPrimary() %>" cssClass="primary-ctrl" id='<%= "emailAddressPrimary" + emailAddressesIndex %>' label="primary" name="emailAddressPrimary" type="radio" value="<%= emailAddressesIndex %>" />
 			</div>
 		</div>
 

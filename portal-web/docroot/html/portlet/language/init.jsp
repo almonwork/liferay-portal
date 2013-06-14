@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -33,3 +33,5 @@ String[] availableLanguageIds = LocaleUtil.toLanguageIds(availableLocales);
 String[] languageIds = StringUtil.split(preferences.getValue("languageIds", StringUtil.merge(availableLanguageIds)));
 int displayStyle = GetterUtil.getInteger(preferences.getValue("displayStyle", StringPool.BLANK));
 %>
+
+<%@ include file="/html/portlet/language/init-ext.jsp" %>

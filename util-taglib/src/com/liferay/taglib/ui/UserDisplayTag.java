@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -30,6 +30,23 @@ import javax.servlet.jsp.tagext.TagSupport;
 public class UserDisplayTag extends TagSupport {
 
 	@Override
+	public int doEndTag() throws JspException {
+		try {
+			PortalIncludeUtil.include(pageContext, getEndPage());
+
+			HttpServletRequest request =
+				(HttpServletRequest)pageContext.getRequest();
+
+			request.removeAttribute("liferay-ui:user-display:url");
+
+			return EVAL_PAGE;
+		}
+		catch (Exception e) {
+			throw new JspException(e);
+		}
+	}
+
+	@Override
 	public int doStartTag() throws JspException {
 		try {
 			HttpServletRequest request =
@@ -53,7 +70,7 @@ public class UserDisplayTag extends TagSupport {
 
 				pageContext.setAttribute("userDisplay", user);
 			}
-			catch (NoSuchUserException usue) {
+			catch (NoSuchUserException nsue) {
 				request.removeAttribute("liferay-ui:user-display:user");
 
 				pageContext.removeAttribute("userDisplay");
@@ -78,15 +95,36 @@ public class UserDisplayTag extends TagSupport {
 		}
 	}
 
-	@Override
-	public int doEndTag() throws JspException {
-		try {
-			PortalIncludeUtil.include(pageContext, getEndPage());
+	public void setDisplayStyle(int displayStyle) {
+		_displayStyle = displayStyle;
+	}
 
-			return EVAL_PAGE;
+	public void setEndPage(String endPage) {
+		_endPage = endPage;
+	}
+
+	public void setStartPage(String startPage) {
+		_startPage = startPage;
+	}
+
+	public void setUrl(String url) {
+		_url = url;
+	}
+
+	public void setUserId(long userId) {
+		_userId = userId;
+	}
+
+	public void setUserName(String userName) {
+		_userName = userName;
+	}
+
+	protected String getEndPage() {
+		if (Validator.isNull(_endPage)) {
+			return _END_PAGE;
 		}
-		catch (Exception e) {
-			throw new JspException(e);
+		else {
+			return _endPage;
 		}
 	}
 
@@ -99,50 +137,17 @@ public class UserDisplayTag extends TagSupport {
 		}
 	}
 
-	public void setStartPage(String startPage) {
-		_startPage = startPage;
-	}
-
-	protected String getEndPage() {
-		if (Validator.isNull(_endPage)) {
-			return _END_PAGE;
-		}
-		else {
-			return _endPage;
-		}
-	}
-
-	public void setEndPage(String endPage) {
-		_endPage = endPage;
-	}
-
-	public void setUserId(long userId) {
-		_userId = userId;
-	}
-
-	public void setUserName(String userName) {
-		_userName = userName;
-	}
-
-	public void setUrl(String url) {
-		_url = url;
-	}
-
-	public void setDisplayStyle(int displayStyle) {
-		_displayStyle = displayStyle;
-	}
+	private static final String _END_PAGE =
+		"/html/taglib/ui/user_display/end.jsp";
 
 	private static final String _START_PAGE =
 		"/html/taglib/ui/user_display/start.jsp";
 
-	private static final String _END_PAGE =
-		"/html/taglib/ui/user_display/end.jsp";
-
-	private String _startPage;
+	private int _displayStyle = 1;
 	private String _endPage;
+	private String _startPage;
+	private String _url;
 	private long _userId;
 	private String _userName;
-	private String _url;
-	private int _displayStyle = 1;
 
 }

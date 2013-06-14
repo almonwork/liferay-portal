@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -23,14 +23,18 @@ import com.liferay.portalweb.portal.util.RuntimeVariables;
 public class AddNullDescriptionPollTest extends BaseTestCase {
 	public void testAddNullDescriptionPoll() throws Exception {
 		selenium.open("/web/guest/home/");
+		loadRequiredJavaScriptModules();
+		assertEquals(RuntimeVariables.replace("Go to"),
+			selenium.getText("//li[@id='_145_mySites']/a/span"));
+		selenium.mouseOver("//li[@id='_145_mySites']/a/span");
 
 		for (int second = 0;; second++) {
-			if (second >= 60) {
+			if (second >= 90) {
 				fail("timeout");
 			}
 
 			try {
-				if (selenium.isElementPresent("link=Control Panel")) {
+				if (selenium.isVisible("link=Control Panel")) {
 					break;
 				}
 			}
@@ -40,32 +44,50 @@ public class AddNullDescriptionPollTest extends BaseTestCase {
 			Thread.sleep(1000);
 		}
 
-		selenium.saveScreenShotAndSource();
-		selenium.clickAt("link=Control Panel", RuntimeVariables.replace(""));
+		selenium.clickAt("link=Control Panel",
+			RuntimeVariables.replace("Control Panel"));
 		selenium.waitForPageToLoad("30000");
-		selenium.saveScreenShotAndSource();
-		selenium.clickAt("link=Polls", RuntimeVariables.replace(""));
+		loadRequiredJavaScriptModules();
+		selenium.clickAt("link=Polls", RuntimeVariables.replace("Polls"));
 		selenium.waitForPageToLoad("30000");
-		selenium.saveScreenShotAndSource();
+		loadRequiredJavaScriptModules();
 		selenium.clickAt("//input[@value='Add Question']",
-			RuntimeVariables.replace(""));
+			RuntimeVariables.replace("Add Question"));
 		selenium.waitForPageToLoad("30000");
-		selenium.saveScreenShotAndSource();
-		selenium.type("_25_title_en_US",
+		loadRequiredJavaScriptModules();
+		selenium.type("//input[@id='_25_title_en_US']",
 			RuntimeVariables.replace("Null Description Poll Test Title"));
-		selenium.saveScreenShotAndSource();
-		selenium.type("_25_description_en_US", RuntimeVariables.replace(""));
-		selenium.saveScreenShotAndSource();
-		selenium.type("_25_choiceDescriptiona_en_US",
+		selenium.type("//textarea[@id='_25_description_en_US']",
+			RuntimeVariables.replace(""));
+		selenium.type("//input[@id='_25_choiceDescriptiona_en_US']",
 			RuntimeVariables.replace("Null Description Poll Test Choice A"));
-		selenium.saveScreenShotAndSource();
-		selenium.type("_25_choiceDescriptionb_en_US",
+		selenium.type("//input[@id='_25_choiceDescriptionb_en_US']",
 			RuntimeVariables.replace("Null Description Poll Test Choice B"));
-		selenium.saveScreenShotAndSource();
-		selenium.clickAt("//input[@value='Save']", RuntimeVariables.replace(""));
-		selenium.waitForPageToLoad("30000");
-		selenium.saveScreenShotAndSource();
-		assertTrue(selenium.isTextPresent("Your request failed to complete."));
-		assertTrue(selenium.isTextPresent("Please enter a valid description."));
+		selenium.clickAt("//input[@value='Save']",
+			RuntimeVariables.replace("Save"));
+
+		for (int second = 0;; second++) {
+			if (second >= 90) {
+				fail("timeout");
+			}
+
+			try {
+				if (RuntimeVariables.replace("This field is required.")
+										.equals(selenium.getText(
+								"//div[@role='alert']"))) {
+					break;
+				}
+			}
+			catch (Exception e) {
+			}
+
+			Thread.sleep(1000);
+		}
+
+		assertEquals(RuntimeVariables.replace("This field is required."),
+			selenium.getText("//div[@role='alert']"));
+		assertEquals(RuntimeVariables.replace("Polls Question (Required)"),
+			selenium.getText(
+				"//span[contains(@class,'aui-form-validator-error-container')]/span/label"));
 	}
 }

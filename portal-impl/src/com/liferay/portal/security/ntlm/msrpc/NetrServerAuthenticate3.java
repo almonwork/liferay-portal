@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -23,7 +23,7 @@ import jcifs.dcerpc.ndr.NdrBuffer;
 public class NetrServerAuthenticate3 extends DcerpcMessage {
 
 	public NetrServerAuthenticate3(
-		String primaryName, String accountName,	int secureChannelType,
+		String primaryName, String accountName, int secureChannelType,
 		String computerName, byte[] clientCredential, byte[] serverCredential,
 		int negotiateFlags) {
 

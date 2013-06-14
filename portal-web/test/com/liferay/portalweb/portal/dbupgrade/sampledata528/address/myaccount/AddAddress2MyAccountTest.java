@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -23,9 +23,10 @@ import com.liferay.portalweb.portal.util.RuntimeVariables;
 public class AddAddress2MyAccountTest extends BaseTestCase {
 	public void testAddAddress2MyAccount() throws Exception {
 		selenium.open("/web/guest/home");
+		loadRequiredJavaScriptModules();
 
 		for (int second = 0;; second++) {
-			if (second >= 60) {
+			if (second >= 90) {
 				fail("timeout");
 			}
 
@@ -40,17 +41,16 @@ public class AddAddress2MyAccountTest extends BaseTestCase {
 			Thread.sleep(1000);
 		}
 
-		selenium.saveScreenShotAndSource();
 		selenium.clickAt("link=Control Panel", RuntimeVariables.replace(""));
 		selenium.waitForPageToLoad("30000");
-		selenium.saveScreenShotAndSource();
+		loadRequiredJavaScriptModules();
 		selenium.clickAt("link=My Account", RuntimeVariables.replace(""));
 		selenium.waitForPageToLoad("30000");
-		selenium.saveScreenShotAndSource();
+		loadRequiredJavaScriptModules();
 		selenium.clickAt("addressesLink", RuntimeVariables.replace(""));
 
 		for (int second = 0;; second++) {
-			if (second >= 60) {
+			if (second >= 90) {
 				fail("timeout");
 			}
 
@@ -65,11 +65,10 @@ public class AddAddress2MyAccountTest extends BaseTestCase {
 			Thread.sleep(1000);
 		}
 
-		selenium.saveScreenShotAndSource();
 		selenium.clickAt("//div[2]/div/span/a[1]", RuntimeVariables.replace(""));
 
 		for (int second = 0;; second++) {
-			if (second >= 60) {
+			if (second >= 90) {
 				fail("timeout");
 			}
 
@@ -84,35 +83,26 @@ public class AddAddress2MyAccountTest extends BaseTestCase {
 			Thread.sleep(1000);
 		}
 
-		selenium.saveScreenShotAndSource();
 		selenium.type("_2_addressStreet1_2",
 			RuntimeVariables.replace("123 Lets"));
-		selenium.saveScreenShotAndSource();
 		selenium.select("_2_addressTypeId2",
 			RuntimeVariables.replace("label=Other"));
 		selenium.type("_2_addressStreet2_2",
 			RuntimeVariables.replace("897 Hope"));
-		selenium.saveScreenShotAndSource();
 		selenium.type("_2_addressZip2", RuntimeVariables.replace("00000"));
-		selenium.saveScreenShotAndSource();
 		selenium.type("_2_addressStreet3_2",
 			RuntimeVariables.replace("7896 This"));
-		selenium.saveScreenShotAndSource();
 		selenium.type("_2_addressCity2", RuntimeVariables.replace("Works"));
-		selenium.saveScreenShotAndSource();
 		selenium.select("_2_addressCountryId2",
 			RuntimeVariables.replace("label=Canada"));
 
 		for (int second = 0;; second++) {
-			if (second >= 60) {
+			if (second >= 90) {
 				fail("timeout");
 			}
 
 			try {
-				if (RuntimeVariables.replace(
-							"AlbertaBritish ColumbiaManitobaNew BrunswickNewfoundland and LabradorNorthwest TerritoriesNova ScotiaNunavutOntarioPrince Edward IslandQuebecSaskatchewanYukon")
-										.equals(selenium.getText(
-								"_2_addressRegionId2"))) {
+				if (selenium.isPartialText("_2_addressRegionId2", "Ontario")) {
 					break;
 				}
 			}
@@ -122,16 +112,14 @@ public class AddAddress2MyAccountTest extends BaseTestCase {
 			Thread.sleep(1000);
 		}
 
-		selenium.saveScreenShotAndSource();
 		selenium.select("_2_addressRegionId2",
 			RuntimeVariables.replace("label=Ontario"));
-		Thread.sleep(5000);
 		selenium.clickAt("//input[@value='Save']", RuntimeVariables.replace(""));
 		selenium.waitForPageToLoad("30000");
-		selenium.saveScreenShotAndSource();
+		loadRequiredJavaScriptModules();
 
 		for (int second = 0;; second++) {
-			if (second >= 60) {
+			if (second >= 90) {
 				fail("timeout");
 			}
 
@@ -147,10 +135,8 @@ public class AddAddress2MyAccountTest extends BaseTestCase {
 			Thread.sleep(1000);
 		}
 
-		selenium.saveScreenShotAndSource();
-
 		for (int second = 0;; second++) {
-			if (second >= 60) {
+			if (second >= 90) {
 				fail("timeout");
 			}
 
@@ -166,7 +152,6 @@ public class AddAddress2MyAccountTest extends BaseTestCase {
 			Thread.sleep(1000);
 		}
 
-		selenium.saveScreenShotAndSource();
 		assertEquals(RuntimeVariables.replace(
 				"Your request processed successfully."),
 			selenium.getText("//div[2]/div/div/div"));

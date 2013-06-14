@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -24,14 +24,15 @@ public class ViewConfigurePortletTitleListIGImageAPTest extends BaseTestCase {
 	public void testViewConfigurePortletTitleListIGImageAP()
 		throws Exception {
 		selenium.open("/web/guest/home/");
+		loadRequiredJavaScriptModules();
 
 		for (int second = 0;; second++) {
-			if (second >= 60) {
+			if (second >= 90) {
 				fail("timeout");
 			}
 
 			try {
-				if (selenium.isElementPresent("link=Asset Publisher Test Page")) {
+				if (selenium.isVisible("link=Asset Publisher Test Page")) {
 					break;
 				}
 			}
@@ -41,30 +42,31 @@ public class ViewConfigurePortletTitleListIGImageAPTest extends BaseTestCase {
 			Thread.sleep(1000);
 		}
 
-		selenium.saveScreenShotAndSource();
 		selenium.clickAt("link=Asset Publisher Test Page",
 			RuntimeVariables.replace("Asset Publisher Test Page"));
 		selenium.waitForPageToLoad("30000");
-		selenium.saveScreenShotAndSource();
+		loadRequiredJavaScriptModules();
 		assertEquals(RuntimeVariables.replace("IG Folder Image Name"),
 			selenium.getText("//ul[@class='title-list']/li/span/a/span"));
 		selenium.clickAt("//ul[@class='title-list']/li/span/a/span",
 			RuntimeVariables.replace("IG Folder Image Name"));
 		selenium.waitForPageToLoad("30000");
-		selenium.saveScreenShotAndSource();
+		loadRequiredJavaScriptModules();
 		assertEquals(RuntimeVariables.replace("IG Folder Image Name"),
 			selenium.getText("//h1[@class='header-title']/span"));
-		assertTrue(selenium.isElementPresent(
-				"//div[@class='asset-content']/img"));
-		assertEquals(RuntimeVariables.replace("View Album \u00bb"),
+		assertTrue(selenium.isVisible(
+				"//div[@class='asset-resource-info']/a/div/img"));
+		assertEquals(RuntimeVariables.replace("IG Folder Image Name"),
+			selenium.getText("//div[@class='asset-resource-info']/a/div"));
+		assertEquals(RuntimeVariables.replace("View in Context \u00bb"),
 			selenium.getText("//div[@class='asset-more']/a"));
 		selenium.clickAt("//div[@class='asset-more']/a",
-			RuntimeVariables.replace("View Album \u00bb"));
+			RuntimeVariables.replace("View in Context \u00bb"));
 		selenium.waitForPageToLoad("30000");
-		selenium.saveScreenShotAndSource();
-		assertTrue(selenium.isElementPresent(
-				"//img[@alt='IG Folder Image Name - ']"));
+		loadRequiredJavaScriptModules();
+		assertTrue(selenium.isVisible(
+				"//img[@class='lfr-preview-file-image-current']"));
 		assertEquals(RuntimeVariables.replace("IG Folder Image Name"),
-			selenium.getText("//span[@class='image-title']"));
+			selenium.getText("//h2[@class='document-title']"));
 	}
 }

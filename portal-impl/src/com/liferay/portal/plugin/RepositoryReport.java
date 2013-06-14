@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -18,7 +18,8 @@ import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.Validator;
 
-import java.util.Iterator;
+import java.io.Serializable;
+
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
@@ -26,13 +27,9 @@ import java.util.TreeMap;
 /**
  * @author Jorge Ferrer
  */
-public class RepositoryReport {
+public class RepositoryReport implements Serializable {
 
 	public static final String SUCCESS = "success";
-
-	public void addSuccess(String repositoryURL) {
-		_reportMap.put(repositoryURL, SUCCESS);
-	}
 
 	public void addError(String repositoryURL, PluginPackageException ppe) {
 		StringBundler sb = new StringBundler(3);
@@ -54,6 +51,10 @@ public class RepositoryReport {
 		_reportMap.put(repositoryURL, sb.toString());
 	}
 
+	public void addSuccess(String repositoryURL) {
+		_reportMap.put(repositoryURL, SUCCESS);
+	}
+
 	public Set<String> getRepositoryURLs() {
 		return _reportMap.keySet();
 	}
@@ -64,17 +65,15 @@ public class RepositoryReport {
 
 	@Override
 	public String toString() {
-		Iterator<String> itr = getRepositoryURLs().iterator();
+		Set<String> repositoryURLs = getRepositoryURLs();
 
-		if (getRepositoryURLs().isEmpty()) {
+		if (repositoryURLs.isEmpty()) {
 			return StringPool.BLANK;
 		}
 
-		StringBundler sb = new StringBundler(getRepositoryURLs().size() * 3);
+		StringBundler sb = new StringBundler(repositoryURLs.size() * 3);
 
-		while (itr.hasNext()) {
-			String repositoryURL = itr.next();
-
+		for (String repositoryURL : repositoryURLs) {
 			sb.append(repositoryURL);
 			sb.append(": ");
 			sb.append(_reportMap.get(repositoryURL));

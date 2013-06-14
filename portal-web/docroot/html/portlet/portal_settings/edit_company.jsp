@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -17,8 +17,6 @@
 <%@ include file="/html/portlet/portal_settings/init.jsp" %>
 
 <%
-themeDisplay.setIncludeServiceJs(true);
-
 String[] configurationSections = PropsValues.COMPANY_SETTINGS_FORM_CONFIGURATION;
 String[] identificationSections = PropsValues.COMPANY_SETTINGS_FORM_IDENTIFICATION;
 String[] miscellaneousSections = PropsValues.COMPANY_SETTINGS_FORM_MISCELLANEOUS;
@@ -51,9 +49,9 @@ request.setAttribute("websites.classPK", company.getAccountId());
 	<liferay-util:buffer var="htmlTop">
 		<div class="company-info">
 			<p class="float-container">
-				<img alt="<liferay-ui:message key="logo" />" class="company-logo" src="<%= themeDisplay.getPathImage() %>/company_logo?img_id=<%= company.getLogoId() %>&t=<%= ImageServletTokenUtil.getToken(company.getLogoId()) %>" /><br />
+				<img alt="<liferay-ui:message key="logo" />" class="company-logo" src="<%= themeDisplay.getPathImage() %>/company_logo?img_id=<%= company.getLogoId() %>&t=<%= WebServerServletTokenUtil.getToken(company.getLogoId()) %>" /><br />
 
-				<span class="company-name"><%= company.getName() %></span>
+				<span class="company-name"><%= HtmlUtil.escape(company.getName()) %></span>
 			</p>
 		</div>
 	</liferay-util:buffer>

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -13,6 +13,8 @@
  */
 
 package com.liferay.portal.kernel.util;
+
+import com.liferay.portal.kernel.security.pacl.permission.PortalRuntimePermission;
 
 import java.text.DateFormat;
 
@@ -36,6 +38,13 @@ public class DateFormatFactoryUtil {
 		return getDateFormatFactory().getDate(timeZone);
 	}
 
+	public static DateFormatFactory getDateFormatFactory() {
+		PortalRuntimePermission.checkGetBeanProperty(
+			DateFormatFactoryUtil.class);
+
+		return _fastDateFormatFactory;
+	}
+
 	public static DateFormat getDateTime(Locale locale) {
 		return getDateFormatFactory().getDateTime(locale);
 	}
@@ -46,10 +55,6 @@ public class DateFormatFactoryUtil {
 
 	public static DateFormat getDateTime(TimeZone timeZone) {
 		return getDateFormatFactory().getDateTime(timeZone);
-	}
-
-	public static DateFormatFactory getDateFormatFactory() {
-		return _fastDateFormatFactory;
 	}
 
 	public static DateFormat getSimpleDateFormat(String pattern) {
@@ -72,8 +77,7 @@ public class DateFormatFactoryUtil {
 	public static DateFormat getSimpleDateFormat(
 		String pattern, TimeZone timeZone) {
 
-		return getDateFormatFactory().getSimpleDateFormat(
-			pattern, timeZone);
+		return getDateFormatFactory().getSimpleDateFormat(pattern, timeZone);
 	}
 
 	public static DateFormat getTime(Locale locale) {
@@ -88,8 +92,8 @@ public class DateFormatFactoryUtil {
 		return getDateFormatFactory().getTime(timeZone);
 	}
 
-	public void setDateFormatFactory(
-		DateFormatFactory fastDateFormatFactory) {
+	public void setDateFormatFactory(DateFormatFactory fastDateFormatFactory) {
+		PortalRuntimePermission.checkSetBeanProperty(getClass());
 
 		_fastDateFormatFactory = fastDateFormatFactory;
 	}

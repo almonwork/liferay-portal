@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -15,7 +15,6 @@
 package com.liferay.portlet.calendar.service;
 
 import com.liferay.portal.kernel.bean.PortalBeanLocatorUtil;
-import com.liferay.portal.kernel.util.MethodCache;
 import com.liferay.portal.kernel.util.ReferenceRegistry;
 
 /**
@@ -66,25 +65,32 @@ public class CalEventLocalServiceUtil {
 	* Deletes the cal event with the primary key from the database. Also notifies the appropriate model listeners.
 	*
 	* @param eventId the primary key of the cal event
+	* @return the cal event that was removed
 	* @throws PortalException if a cal event with the primary key could not be found
 	* @throws SystemException if a system exception occurred
 	*/
-	public static void deleteCalEvent(long eventId)
+	public static com.liferay.portlet.calendar.model.CalEvent deleteCalEvent(
+		long eventId)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException {
-		getService().deleteCalEvent(eventId);
+		return getService().deleteCalEvent(eventId);
 	}
 
 	/**
 	* Deletes the cal event from the database. Also notifies the appropriate model listeners.
 	*
 	* @param calEvent the cal event
+	* @return the cal event that was removed
 	* @throws SystemException if a system exception occurred
 	*/
-	public static void deleteCalEvent(
+	public static com.liferay.portlet.calendar.model.CalEvent deleteCalEvent(
 		com.liferay.portlet.calendar.model.CalEvent calEvent)
 		throws com.liferay.portal.kernel.exception.SystemException {
-		getService().deleteCalEvent(calEvent);
+		return getService().deleteCalEvent(calEvent);
+	}
+
+	public static com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery() {
+		return getService().dynamicQuery();
 	}
 
 	/**
@@ -156,6 +162,12 @@ public class CalEventLocalServiceUtil {
 		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery)
 		throws com.liferay.portal.kernel.exception.SystemException {
 		return getService().dynamicQueryCount(dynamicQuery);
+	}
+
+	public static com.liferay.portlet.calendar.model.CalEvent fetchCalEvent(
+		long eventId)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getService().fetchCalEvent(eventId);
 	}
 
 	/**
@@ -330,17 +342,18 @@ public class CalEventLocalServiceUtil {
 		getService().checkEvents();
 	}
 
-	public static void deleteEvent(
+	public static com.liferay.portlet.calendar.model.CalEvent deleteEvent(
 		com.liferay.portlet.calendar.model.CalEvent event)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException {
-		getService().deleteEvent(event);
+		return getService().deleteEvent(event);
 	}
 
-	public static void deleteEvent(long eventId)
+	public static com.liferay.portlet.calendar.model.CalEvent deleteEvent(
+		long eventId)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException {
-		getService().deleteEvent(eventId);
+		return getService().deleteEvent(eventId);
 	}
 
 	public static void deleteEvents(long groupId)
@@ -454,10 +467,11 @@ public class CalEventLocalServiceUtil {
 		return getService().hasEvents(groupId, cal, types);
 	}
 
-	public static void importICal4j(long userId, long groupId, java.io.File file)
+	public static void importICal4j(long userId, long groupId,
+		java.io.InputStream inputStream)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException {
-		getService().importICal4j(userId, groupId, file);
+		getService().importICal4j(userId, groupId, inputStream);
 	}
 
 	public static void updateAsset(long userId,
@@ -499,20 +513,15 @@ public class CalEventLocalServiceUtil {
 
 			ReferenceRegistry.registerReference(CalEventLocalServiceUtil.class,
 				"_service");
-			MethodCache.remove(CalEventLocalService.class);
 		}
 
 		return _service;
 	}
 
+	/**
+	 * @deprecated
+	 */
 	public void setService(CalEventLocalService service) {
-		MethodCache.remove(CalEventLocalService.class);
-
-		_service = service;
-
-		ReferenceRegistry.registerReference(CalEventLocalServiceUtil.class,
-			"_service");
-		MethodCache.remove(CalEventLocalService.class);
 	}
 
 	private static CalEventLocalService _service;

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -56,7 +56,10 @@ public class EditFileShortcutAction extends PortletAction {
 				updateFileShortcut(actionRequest);
 			}
 			else if (cmd.equals(Constants.DELETE)) {
-				deleteFileShortcut(actionRequest);
+				deleteFileShortcut(actionRequest, false);
+			}
+			else if (cmd.equals(Constants.MOVE_TO_TRASH)) {
+				deleteFileShortcut(actionRequest, true);
 			}
 
 			sendRedirect(actionRequest, actionResponse);
@@ -65,14 +68,14 @@ public class EditFileShortcutAction extends PortletAction {
 			if (e instanceof NoSuchFileShortcutException ||
 				e instanceof PrincipalException) {
 
-				SessionErrors.add(actionRequest, e.getClass().getName());
+				SessionErrors.add(actionRequest, e.getClass());
 
 				setForward(actionRequest, "portlet.document_library.error");
 			}
 			else if (e instanceof FileShortcutPermissionException ||
 					 e instanceof NoSuchFileEntryException) {
 
-				SessionErrors.add(actionRequest, e.getClass().getName());
+				SessionErrors.add(actionRequest, e.getClass());
 			}
 			else {
 				throw e;
@@ -93,7 +96,7 @@ public class EditFileShortcutAction extends PortletAction {
 			if (e instanceof NoSuchFileShortcutException ||
 				e instanceof PrincipalException) {
 
-				SessionErrors.add(renderRequest, e.getClass().getName());
+				SessionErrors.add(renderRequest, e.getClass());
 
 				return mapping.findForward("portlet.document_library.error");
 			}
@@ -106,13 +109,19 @@ public class EditFileShortcutAction extends PortletAction {
 			renderRequest, "portlet.document_library.edit_file_shortcut"));
 	}
 
-	protected void deleteFileShortcut(ActionRequest actionRequest)
+	protected void deleteFileShortcut(
+			ActionRequest actionRequest, boolean moveToTrash)
 		throws Exception {
 
 		long fileShortcutId = ParamUtil.getLong(
 			actionRequest, "fileShortcutId");
 
-		DLAppServiceUtil.deleteFileShortcut(fileShortcutId);
+		if (moveToTrash) {
+			DLAppServiceUtil.moveFileShortcutToTrash(fileShortcutId);
+		}
+		else {
+			DLAppServiceUtil.deleteFileShortcut(fileShortcutId);
+		}
 	}
 
 	protected void updateFileShortcut(ActionRequest actionRequest)

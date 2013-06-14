@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,7 +14,12 @@
 
 package com.liferay.portalweb.portlet.assetpublisher.igimage.viewconfigureportletfullcontentigimageap;
 
-import com.liferay.portalweb.portal.BaseTests;
+import com.liferay.portalweb.portal.BaseTestSuite;
+import com.liferay.portalweb.portal.util.TearDownPageTest;
+import com.liferay.portalweb.portlet.assetpublisher.portlet.addportletap.AddPageAPTest;
+import com.liferay.portalweb.portlet.assetpublisher.portlet.addportletap.AddPortletAPTest;
+import com.liferay.portalweb.portlet.documentsandmedia.portlet.addportletdm.AddPageDMTest;
+import com.liferay.portalweb.portlet.documentsandmedia.portlet.addportletdm.AddPortletDMTest;
 
 import junit.framework.Test;
 import junit.framework.TestSuite;
@@ -22,27 +27,20 @@ import junit.framework.TestSuite;
 /**
  * @author Brian Wing Shun Chan
  */
-public class ViewConfigurePortletFullContentIGImageAPTests
-	extends BaseTests {
-
+public class ViewConfigurePortletFullContentIGImageAPTests extends BaseTestSuite {
 	public static Test suite() {
 		TestSuite testSuite = new TestSuite();
-
 		testSuite.addTestSuite(AddPageAPTest.class);
 		testSuite.addTestSuite(AddPortletAPTest.class);
-		testSuite.addTestSuite(AddPageIGTest.class);
-		testSuite.addTestSuite(AddPortletIGTest.class);
+		testSuite.addTestSuite(AddPageDMTest.class);
+		testSuite.addTestSuite(AddPortletDMTest.class);
 		testSuite.addTestSuite(AddIGFolderTest.class);
 		testSuite.addTestSuite(AddNewIGFolderImageAPActionsTest.class);
-		testSuite.addTestSuite(
-			ConfigurePortletDisplayStyleFullContentTest.class);
-		testSuite.addTestSuite(
-			ViewConfigurePortletFullContentIGImageAPTest.class);
-		testSuite.addTestSuite(TearDownIGFolderTest.class);
-		testSuite.addTestSuite(TearDownIGImageTest.class);
+		testSuite.addTestSuite(ConfigurePortletDisplayStyleFullContentTest.class);
+		testSuite.addTestSuite(ViewConfigurePortletFullContentIGImageAPTest.class);
+		testSuite.addTestSuite(TearDownDLDocumentTest.class);
 		testSuite.addTestSuite(TearDownPageTest.class);
 
 		return testSuite;
 	}
-
 }

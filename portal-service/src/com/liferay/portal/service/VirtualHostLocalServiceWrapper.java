@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -23,7 +23,8 @@ package com.liferay.portal.service;
  * @see       VirtualHostLocalService
  * @generated
  */
-public class VirtualHostLocalServiceWrapper implements VirtualHostLocalService {
+public class VirtualHostLocalServiceWrapper implements VirtualHostLocalService,
+	ServiceWrapper<VirtualHostLocalService> {
 	public VirtualHostLocalServiceWrapper(
 		VirtualHostLocalService virtualHostLocalService) {
 		_virtualHostLocalService = virtualHostLocalService;
@@ -57,25 +58,32 @@ public class VirtualHostLocalServiceWrapper implements VirtualHostLocalService {
 	* Deletes the virtual host with the primary key from the database. Also notifies the appropriate model listeners.
 	*
 	* @param virtualHostId the primary key of the virtual host
+	* @return the virtual host that was removed
 	* @throws PortalException if a virtual host with the primary key could not be found
 	* @throws SystemException if a system exception occurred
 	*/
-	public void deleteVirtualHost(long virtualHostId)
+	public com.liferay.portal.model.VirtualHost deleteVirtualHost(
+		long virtualHostId)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException {
-		_virtualHostLocalService.deleteVirtualHost(virtualHostId);
+		return _virtualHostLocalService.deleteVirtualHost(virtualHostId);
 	}
 
 	/**
 	* Deletes the virtual host from the database. Also notifies the appropriate model listeners.
 	*
 	* @param virtualHost the virtual host
+	* @return the virtual host that was removed
 	* @throws SystemException if a system exception occurred
 	*/
-	public void deleteVirtualHost(
+	public com.liferay.portal.model.VirtualHost deleteVirtualHost(
 		com.liferay.portal.model.VirtualHost virtualHost)
 		throws com.liferay.portal.kernel.exception.SystemException {
-		_virtualHostLocalService.deleteVirtualHost(virtualHost);
+		return _virtualHostLocalService.deleteVirtualHost(virtualHost);
+	}
+
+	public com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery() {
+		return _virtualHostLocalService.dynamicQuery();
 	}
 
 	/**
@@ -147,6 +155,12 @@ public class VirtualHostLocalServiceWrapper implements VirtualHostLocalService {
 		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery)
 		throws com.liferay.portal.kernel.exception.SystemException {
 		return _virtualHostLocalService.dynamicQueryCount(dynamicQuery);
+	}
+
+	public com.liferay.portal.model.VirtualHost fetchVirtualHost(
+		long virtualHostId)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return _virtualHostLocalService.fetchVirtualHost(virtualHostId);
 	}
 
 	/**
@@ -278,11 +292,26 @@ public class VirtualHostLocalServiceWrapper implements VirtualHostLocalService {
 			layoutSetId, hostname);
 	}
 
+	/**
+	 * @deprecated Renamed to {@link #getWrappedService}
+	 */
 	public VirtualHostLocalService getWrappedVirtualHostLocalService() {
 		return _virtualHostLocalService;
 	}
 
+	/**
+	 * @deprecated Renamed to {@link #setWrappedService}
+	 */
 	public void setWrappedVirtualHostLocalService(
+		VirtualHostLocalService virtualHostLocalService) {
+		_virtualHostLocalService = virtualHostLocalService;
+	}
+
+	public VirtualHostLocalService getWrappedService() {
+		return _virtualHostLocalService;
+	}
+
+	public void setWrappedService(
 		VirtualHostLocalService virtualHostLocalService) {
 		_virtualHostLocalService = virtualHostLocalService;
 	}

@@ -14,36 +14,60 @@
 	<td></td>
 </tr>
 <tr>
-	<td>waitForElementPresent</td>
+	<td>waitForVisible</td>
 	<td>link=Wiki Display Test Page</td>
-	<td></td>
+	<td>Wiki Display Test Page</td>
 </tr>
 <tr>
 	<td>clickAtAndWait</td>
 	<td>link=Wiki Display Test Page</td>
-	<td></td>
+	<td>Wiki Display Test Page</td>
+</tr>
+<tr>
+	<td>assertText</td>
+	<td>xPath=(//div[@class='child-pages']/ul/li/a)[2]</td>
+	<td>Wiki FrontPage ChildPage2 Title</td>
 </tr>
 <tr>
 	<td>clickAtAndWait</td>
-	<td>link=Front2 Page2 Child2 Page2 Test2</td>
-	<td></td>
+	<td>xPath=(//div[@class='child-pages']/ul/li/a)[2]</td>
+	<td>Wiki FrontPage ChildPage2 Title</td>
+</tr>
+<tr>
+	<td>assertText</td>
+	<td>//h1[@class='header-title']/span</td>
+	<td>Wiki FrontPage ChildPage2 Title</td>
+</tr>
+<tr>
+	<td>assertText</td>
+	<td>//div[@class='wiki-body']/p</td>
+	<td>Wiki FrontPage ChildPage2 Content</td>
+</tr>
+<tr>
+	<td>assertText</td>
+	<td>//div[3]/span[2]/a/span</td>
+	<td>Details</td>
 </tr>
 <tr>
 	<td>clickAtAndWait</td>
-	<td>link=Details</td>
-	<td></td>
+	<td>//div[3]/span[2]/a/span</td>
+	<td>Details</td>
 </tr>
 <tr>
 	<td>clickAtAndWait</td>
 	<td>link=Outgoing Links</td>
-	<td></td>
+	<td>Outgoing Links</td>
 </tr>
 <tr>
-	<td>assertElementNotPresent</td>
-	<td>link=Front1 Page1 Child1 Page1 Test1</td>
+	<td>assertText</td>
+	<td>//div[@class='portlet-msg-info']</td>
+	<td>This page has no links.</td>
+</tr>
+<tr>
+	<td>assertTextNotPresent</td>
+	<td>Wiki FrontPage ChildPage1 Title</td>
 	<td></td>
 </tr>
-
 </tbody></table>
 </body>
 </html>

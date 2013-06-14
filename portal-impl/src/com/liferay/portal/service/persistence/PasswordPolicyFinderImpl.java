@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -37,10 +37,10 @@ public class PasswordPolicyFinderImpl
 	extends BasePersistenceImpl<PasswordPolicy>
 	implements PasswordPolicyFinder {
 
-	public static String COUNT_BY_C_N =
+	public static final String COUNT_BY_C_N =
 		PasswordPolicyFinder.class.getName() + ".countByC_N";
 
-	public static String FIND_BY_C_N =
+	public static final String FIND_BY_C_N =
 		PasswordPolicyFinder.class.getName() + ".findByC_N";
 
 	public int countByC_N(long companyId, String name) throws SystemException {
@@ -63,7 +63,7 @@ public class PasswordPolicyFinderImpl
 			qPos.add(name);
 			qPos.add(name);
 
-			Iterator<Long> itr = q.list().iterator();
+			Iterator<Long> itr = q.iterate();
 
 			if (itr.hasNext()) {
 				Long count = itr.next();

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -82,18 +82,24 @@ public class DLActivityInterpreter extends BaseSocialActivityInterpreter {
 		String titlePattern = null;
 
 		if (activityType == DLActivityKeys.ADD_FILE_ENTRY) {
-			titlePattern = "activity-document-library-add-file";
+			if (Validator.isNull(groupName)) {
+				titlePattern = "activity-document-library-add-file";
+			}
+			else {
+				titlePattern = "activity-document-library-add-file-in";
+			}
 		}
 		else if (activityType == DLActivityKeys.UPDATE_FILE_ENTRY) {
-			titlePattern = "activity-document-library-update-file";
-		}
-
-		if (Validator.isNotNull(groupName)) {
-			titlePattern += "-in";
+			if (Validator.isNull(groupName)) {
+				titlePattern = "activity-document-library-update-file";
+			}
+			else {
+				titlePattern = "activity-document-library-update-file-in";
+			}
 		}
 
 		String fileTitle = wrapLink(
-			link, HtmlUtil.escape(cleanContent(fileEntry.getTitle())));
+			link, HtmlUtil.escape(fileEntry.getTitle()));
 
 		Object[] titleArguments = new Object[] {
 			groupName, creatorUserName, fileTitle

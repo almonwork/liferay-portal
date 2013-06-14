@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -16,6 +16,7 @@ package com.liferay.portal.log;
 
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactory;
+import com.liferay.util.log4j.Log4JUtil;
 
 import org.apache.log4j.LogManager;
 
@@ -30,6 +31,10 @@ public class Log4jLogFactoryImpl implements LogFactory {
 
 	public Log getLog(String name) {
 		return new Log4jLogImpl(LogManager.getLogger(name));
+	}
+
+	public void setLevel(String name, String priority, boolean custom) {
+		Log4JUtil.setLevel(name, priority, custom);
 	}
 
 }

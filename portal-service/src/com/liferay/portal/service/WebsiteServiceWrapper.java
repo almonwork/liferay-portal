@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -23,9 +23,28 @@ package com.liferay.portal.service;
  * @see       WebsiteService
  * @generated
  */
-public class WebsiteServiceWrapper implements WebsiteService {
+public class WebsiteServiceWrapper implements WebsiteService,
+	ServiceWrapper<WebsiteService> {
 	public WebsiteServiceWrapper(WebsiteService websiteService) {
 		_websiteService = websiteService;
+	}
+
+	/**
+	* Returns the Spring bean ID for this bean.
+	*
+	* @return the Spring bean ID for this bean
+	*/
+	public java.lang.String getBeanIdentifier() {
+		return _websiteService.getBeanIdentifier();
+	}
+
+	/**
+	* Sets the Spring bean ID for this bean.
+	*
+	* @param beanIdentifier the Spring bean ID for this bean
+	*/
+	public void setBeanIdentifier(java.lang.String beanIdentifier) {
+		_websiteService.setBeanIdentifier(beanIdentifier);
 	}
 
 	public com.liferay.portal.model.Website addWebsite(
@@ -63,11 +82,25 @@ public class WebsiteServiceWrapper implements WebsiteService {
 		return _websiteService.updateWebsite(websiteId, url, typeId, primary);
 	}
 
+	/**
+	 * @deprecated Renamed to {@link #getWrappedService}
+	 */
 	public WebsiteService getWrappedWebsiteService() {
 		return _websiteService;
 	}
 
+	/**
+	 * @deprecated Renamed to {@link #setWrappedService}
+	 */
 	public void setWrappedWebsiteService(WebsiteService websiteService) {
+		_websiteService = websiteService;
+	}
+
+	public WebsiteService getWrappedService() {
+		return _websiteService;
+	}
+
+	public void setWrappedService(WebsiteService websiteService) {
 		_websiteService = websiteService;
 	}
 

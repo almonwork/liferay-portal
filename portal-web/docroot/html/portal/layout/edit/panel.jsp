@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -60,7 +60,7 @@ String panelTreeKey = "panelSelectedPortletsPanelTree";
 				A.Array.removeItem(selectedPortlets, plid);
 			}
 
-			panelSelectedPortletsEl.val( selectedPortlets.join(',') );
+			panelSelectedPortletsEl.val(selectedPortlets.join(','));
 		}
 	};
 
@@ -82,10 +82,10 @@ String panelTreeKey = "panelSelectedPortletsPanelTree";
 
 	TreeView treeView = portletLister.getTreeView();
 
-	Iterator itr = treeView.getList().iterator();
+	List<TreeNodeView> treeNodeViews = treeView.getList();
 
-	for (int i = 0; itr.hasNext(); i++) {
-		TreeNodeView treeNodeView = (TreeNodeView)itr.next();
+	for (int i = 0; i < treeNodeViews.size(); i++) {
+		TreeNodeView treeNodeView = treeNodeViews.get(i);
 	%>
 
 		var parentNode<%= i %> = treeView.getNodeById('treePanel<%= treeNodeView.getParentId() %>') || treeView;
@@ -96,15 +96,21 @@ String panelTreeKey = "panelSelectedPortletsPanelTree";
 		parentNode<%= i %>.appendChild(
 			new A.TreeNodeTask(
 				{
+					after: {
+						checkedChange: function(event) {
+							if (event.newVal) {
+								onCheck(event, objId<%= i %>);
+							}
+							else {
+								onUncheck(event, objId<%= i %>);
+							}
+						}
+					},
 					checked: checked<%= i %>,
 					expanded: <%= treeNodeView.getDepth() == 0 %>,
 					id: 'treePanel<%= treeNodeView.getId() %>',
 					label: label<%= i %>,
-					leaf: <%= treeNodeView.isLeaf() %>,
-					on: {
-						check: A.rbind(onCheck, window, objId<%= i %>),
-						uncheck: A.rbind(onUncheck, window, objId<%= i %>)
-					}
+					leaf: <%= treeNodeView.isLeaf() %>
 				}
 			)
 		);

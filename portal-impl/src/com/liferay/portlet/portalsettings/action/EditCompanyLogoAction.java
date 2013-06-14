@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -16,15 +16,18 @@ package com.liferay.portlet.portalsettings.action;
 
 import com.liferay.portal.ImageTypeException;
 import com.liferay.portal.kernel.servlet.SessionErrors;
+import com.liferay.portal.kernel.upload.UploadException;
 import com.liferay.portal.kernel.upload.UploadPortletRequest;
-import com.liferay.portal.kernel.util.FileUtil;
+import com.liferay.portal.kernel.util.StreamUtil;
+import com.liferay.portal.model.Company;
 import com.liferay.portal.security.auth.PrincipalException;
 import com.liferay.portal.service.CompanyServiceUtil;
 import com.liferay.portal.struts.PortletAction;
+import com.liferay.portal.theme.ThemeDisplay;
 import com.liferay.portal.util.PortalUtil;
-import com.liferay.util.servlet.UploadException;
+import com.liferay.portal.util.WebKeys;
 
-import java.io.File;
+import java.io.InputStream;
 
 import javax.portlet.ActionRequest;
 import javax.portlet.ActionResponse;
@@ -54,14 +57,14 @@ public class EditCompanyLogoAction extends PortletAction {
 		}
 		catch (Exception e) {
 			if (e instanceof PrincipalException) {
-				SessionErrors.add(actionRequest, e.getClass().getName());
+				SessionErrors.add(actionRequest, e.getClass());
 
 				setForward(actionRequest, "portlet.portal_settings.error");
 			}
 			else if (e instanceof ImageTypeException ||
 					 e instanceof UploadException) {
 
-				SessionErrors.add(actionRequest, e.getClass().getName());
+				SessionErrors.add(actionRequest, e.getClass());
 			}
 			else {
 				throw e;
@@ -80,19 +83,31 @@ public class EditCompanyLogoAction extends PortletAction {
 	}
 
 	protected void updateLogo(ActionRequest actionRequest) throws Exception {
-		UploadPortletRequest uploadRequest = PortalUtil.getUploadPortletRequest(
-			actionRequest);
+		UploadPortletRequest uploadPortletRequest =
+			PortalUtil.getUploadPortletRequest(actionRequest);
 
 		long companyId = PortalUtil.getCompanyId(actionRequest);
 
-		File file = uploadRequest.getFile("fileName");
-		byte[] bytes = FileUtil.getBytes(file);
+		InputStream inputStream = null;
 
-		if ((bytes == null) || (bytes.length == 0)) {
-			throw new UploadException();
+		try {
+			 inputStream = uploadPortletRequest.getFileAsStream("fileName");
+
+			if (inputStream == null) {
+				throw new UploadException();
+			}
+
+			ThemeDisplay themeDisplay =
+				(ThemeDisplay)actionRequest.getAttribute(WebKeys.THEME_DISPLAY);
+
+			Company company = CompanyServiceUtil.updateLogo(
+				companyId, inputStream);
+
+			themeDisplay.setCompany(company);
 		}
-
-		CompanyServiceUtil.updateLogo(companyId, file);
+		finally {
+			StreamUtil.cleanUp(inputStream);
+		}
 	}
 
 }

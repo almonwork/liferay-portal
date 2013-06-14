@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -43,6 +43,10 @@ public class CalEventAssetRenderer extends BaseAssetRenderer {
 
 	public CalEventAssetRenderer(CalEvent event) {
 		_event = event;
+	}
+
+	public String getAssetRendererFactoryClassName() {
+		return CalEventAssetRendererFactory.CLASS_NAME;
 	}
 
 	public long getClassPK() {
@@ -110,16 +114,17 @@ public class CalEventAssetRenderer extends BaseAssetRenderer {
 		LiferayPortletResponse liferayPortletResponse,
 		String noSuchEntryRedirect) {
 
-		ThemeDisplay themeDisplay =
-			(ThemeDisplay)liferayPortletRequest.getAttribute(
-				WebKeys.THEME_DISPLAY);
-
-		return themeDisplay.getPathMain() +
-			"/calendar/find_event?eventId=" + _event.getEventId();
+		return getURLViewInContext(
+			liferayPortletRequest, noSuchEntryRedirect, "/calendar/find_event",
+			"eventId", _event.getEventId());
 	}
 
 	public long getUserId() {
 		return _event.getUserId();
+	}
+
+	public String getUserName() {
+		return _event.getUserName();
 	}
 
 	public String getUuid() {

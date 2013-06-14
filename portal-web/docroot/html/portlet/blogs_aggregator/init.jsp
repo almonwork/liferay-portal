@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -16,10 +16,10 @@
 
 <%@ include file="/html/portlet/init.jsp" %>
 
-<%@ page import="com.liferay.portlet.blogs.model.BlogsEntry" %>
-<%@ page import="com.liferay.portlet.blogs.service.BlogsEntryServiceUtil" %>
-<%@ page import="com.liferay.portlet.blogs.service.permission.BlogsEntryPermission" %>
-<%@ page import="com.liferay.portlet.messageboards.service.MBMessageLocalServiceUtil" %>
+<%@ page import="com.liferay.portlet.blogs.model.BlogsEntry" %><%@
+page import="com.liferay.portlet.blogs.service.BlogsEntryServiceUtil" %><%@
+page import="com.liferay.portlet.blogs.service.permission.BlogsEntryPermission" %><%@
+page import="com.liferay.portlet.messageboards.service.MBMessageLocalServiceUtil" %>
 
 <%
 PortletPreferences preferences = renderRequest.getPreferences();
@@ -47,3 +47,5 @@ if (organizationId == 0) {
 
 Format dateFormatDateTime = FastDateFormatFactoryUtil.getDateTime(locale, timeZone);
 %>
+
+<%@ include file="/html/portlet/blogs_aggregator/init-ext.jsp" %>

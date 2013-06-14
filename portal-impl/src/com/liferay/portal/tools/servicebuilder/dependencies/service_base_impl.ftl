@@ -7,20 +7,21 @@ import ${beanLocatorUtil};
 import com.liferay.portal.kernel.dao.jdbc.SqlUpdate;
 import com.liferay.portal.kernel.dao.jdbc.SqlUpdateFactoryUtil;
 import com.liferay.portal.kernel.dao.orm.DynamicQuery;
+import com.liferay.portal.kernel.dao.orm.DynamicQueryFactoryUtil;
 import com.liferay.portal.kernel.dao.orm.Session;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.search.Indexable;
+import com.liferay.portal.kernel.search.IndexableType;
 import com.liferay.portal.kernel.search.Indexer;
 import com.liferay.portal.kernel.search.IndexerRegistryUtil;
 import com.liferay.portal.kernel.search.SearchException;
 import com.liferay.portal.kernel.util.InfrastructureUtil;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.model.PersistedModel;
+import com.liferay.portal.service.Base${sessionTypeName}ServiceImpl;
 import com.liferay.portal.service.PersistedModelLocalServiceRegistry;
 import com.liferay.portal.service.PersistedModelLocalServiceRegistryUtil;
-import com.liferay.portal.service.base.PrincipalBean;
 
 import java.io.Serializable;
 
@@ -77,7 +78,7 @@ import javax.sql.DataSource;
  * @see ${packagePath}.service.${entity.name}LocalServiceUtil
  * @generated
  */
-	public abstract class ${entity.name}LocalServiceBaseImpl implements ${entity.name}LocalService, IdentifiableBean {
+	public abstract class ${entity.name}LocalServiceBaseImpl extends BaseLocalServiceImpl implements ${entity.name}LocalService, IdentifiableBean {
 
 		/*
 		 * NOTE FOR DEVELOPERS:
@@ -97,7 +98,7 @@ import javax.sql.DataSource;
  * @see ${packagePath}.service.${entity.name}ServiceUtil
  * @generated
  */
-	public abstract class ${entity.name}ServiceBaseImpl extends PrincipalBean implements ${entity.name}Service, IdentifiableBean {
+	public abstract class ${entity.name}ServiceBaseImpl extends BaseServiceImpl implements ${entity.name}Service, IdentifiableBean {
 
 		/*
 		 * NOTE FOR DEVELOPERS:
@@ -122,25 +123,11 @@ import javax.sql.DataSource;
 		</#if>
 		</#list>
 		 */
+		@Indexable(type = IndexableType.REINDEX)
 		public ${entity.name} add${entity.name}(${entity.name} ${entity.varName}) throws ${stringUtil.merge(serviceBaseExceptions)} {
 			${entity.varName}.setNew(true);
 
-			${entity.varName} = ${entity.varName}Persistence.update(${entity.varName}, false);
-
-			Indexer indexer = IndexerRegistryUtil.getIndexer(getModelClassName());
-
-			if (indexer != null) {
-				try {
-					indexer.reindex(${entity.varName});
-				}
-				catch (SearchException se) {
-					if (_log.isWarnEnabled()) {
-						_log.warn(se, se);
-					}
-				}
-			}
-
-			return ${entity.varName};
+			return ${entity.varName}Persistence.update(${entity.varName}, false);
 		}
 
 		/**
@@ -159,6 +146,7 @@ import javax.sql.DataSource;
 		 * Deletes the ${entity.humanName} with the primary key from the database. Also notifies the appropriate model listeners.
 		 *
 		 * @param ${entity.PKVarName} the primary key of the ${entity.humanName}
+		 * @return the ${entity.humanName} that was removed
 		<#list serviceBaseExceptions as exception>
 		<#if exception == "PortalException">
 		 * @throws PortalException if a ${entity.humanName} with the primary key could not be found
@@ -169,21 +157,9 @@ import javax.sql.DataSource;
 		</#if>
 		</#list>
 		 */
-		public void delete${entity.name}(${entity.PKClassName} ${entity.PKVarName}) throws ${stringUtil.merge(serviceBaseExceptions)} {
-			${entity.name} ${entity.varName} = ${entity.varName}Persistence.remove(${entity.PKVarName});
-
-			Indexer indexer = IndexerRegistryUtil.getIndexer(getModelClassName());
-
-			if (indexer != null) {
-				try {
-					indexer.delete(${entity.varName});
-				}
-				catch (SearchException se) {
-					if (_log.isWarnEnabled()) {
-						_log.warn(se, se);
-					}
-				}
-			}
+		@Indexable(type = IndexableType.DELETE)
+		public ${entity.name} delete${entity.name}(${entity.PKClassName} ${entity.PKVarName}) throws ${stringUtil.merge(serviceBaseExceptions)} {
+			return ${entity.varName}Persistence.remove(${entity.PKVarName});
 		}
 
 		<#assign serviceBaseExceptions = serviceBuilder.getServiceBaseExceptions(methods, "delete" + entity.name, [packagePath + ".model." + entity.name], ["SystemException"])>
@@ -192,6 +168,7 @@ import javax.sql.DataSource;
 		 * Deletes the ${entity.humanName} from the database. Also notifies the appropriate model listeners.
 		 *
 		 * @param ${entity.varName} the ${entity.humanName}
+		 * @return the ${entity.humanName} that was removed
 		<#list serviceBaseExceptions as exception>
 		<#if exception == "SystemException">
 		 * @throws SystemException if a system exception occurred
@@ -200,21 +177,15 @@ import javax.sql.DataSource;
 		</#if>
 		</#list>
 		 */
-		public void delete${entity.name}(${entity.name} ${entity.varName}) throws ${stringUtil.merge(serviceBaseExceptions)} {
-			${entity.varName}Persistence.remove(${entity.varName});
+		@Indexable(type = IndexableType.DELETE)
+		public ${entity.name} delete${entity.name}(${entity.name} ${entity.varName}) throws ${stringUtil.merge(serviceBaseExceptions)} {
+			return ${entity.varName}Persistence.remove(${entity.varName});
+		}
 
-			Indexer indexer = IndexerRegistryUtil.getIndexer(getModelClassName());
+		public DynamicQuery dynamicQuery() {
+			Class<?> clazz = getClass();
 
-			if (indexer != null) {
-				try {
-					indexer.delete(${entity.varName});
-				}
-				catch (SearchException se) {
-					if (_log.isWarnEnabled()) {
-						_log.warn(se, se);
-					}
-				}
-			}
+			return DynamicQueryFactoryUtil.forClass(${entity.name}.class, clazz.getClassLoader());
 		}
 
 		/**
@@ -275,6 +246,12 @@ import javax.sql.DataSource;
 		 */
 		public long dynamicQueryCount(DynamicQuery dynamicQuery) throws SystemException {
 			return ${entity.varName}Persistence.countWithDynamicQuery(dynamicQuery);
+		}
+
+		<#assign serviceBaseExceptions = serviceBuilder.getServiceBaseExceptions(methods, "fetch" + entity.name, [entity.PKClassName], ["SystemException"])>
+
+		public ${entity.name} fetch${entity.name}(${entity.PKClassName} ${entity.PKVarName}) throws ${stringUtil.merge(serviceBaseExceptions)} {
+			return ${entity.varName}Persistence.fetchByPrimaryKey(${entity.PKVarName});
 		}
 
 		<#assign serviceBaseExceptions = serviceBuilder.getServiceBaseExceptions(methods, "get" + entity.name, [entity.PKClassName], ["PortalException", "SystemException"])>
@@ -365,6 +342,7 @@ import javax.sql.DataSource;
 		</#if>
 		</#list>
 		 */
+		@Indexable(type = IndexableType.REINDEX)
 		public ${entity.name} update${entity.name}(${entity.name} ${entity.varName}) throws ${stringUtil.merge(serviceBaseExceptions)} {
 			return update${entity.name}(${entity.varName}, true);
 		}
@@ -383,25 +361,11 @@ import javax.sql.DataSource;
 		</#if>
 		</#list>
 		 */
+		@Indexable(type = IndexableType.REINDEX)
 		public ${entity.name} update${entity.name}(${entity.name} ${entity.varName}, boolean merge) throws ${stringUtil.merge(serviceBaseExceptions)} {
 			${entity.varName}.setNew(false);
 
-			${entity.varName} = ${entity.varName}Persistence.update(${entity.varName}, merge);
-
-			Indexer indexer = IndexerRegistryUtil.getIndexer(getModelClassName());
-
-			if (indexer != null) {
-				try {
-					indexer.reindex(${entity.varName});
-				}
-				catch (SearchException se) {
-					if (_log.isWarnEnabled()) {
-						_log.warn(se, se);
-					}
-				}
-			}
-
-			return ${entity.varName};
+			return ${entity.varName}Persistence.update(${entity.varName}, merge);
 		}
 
 		<#list entity.blobList as column>
@@ -545,6 +509,15 @@ import javax.sql.DataSource;
 		_beanIdentifier = beanIdentifier;
 	}
 
+	<#if pluginName != "">
+		public Object invokeMethod(
+				String name, String[] parameterTypes, Object[] arguments)
+			throws Throwable {
+
+			return _clpInvoker.invokeMethod(name, parameterTypes, arguments);
+		}
+	</#if>
+
 	<#if entity.hasColumns()>
 		protected Class<?> getModelClass() {
 			return ${entity.name}.class;
@@ -604,10 +577,12 @@ import javax.sql.DataSource;
 			@BeanReference(type = PersistedModelLocalServiceRegistry.class)
 			protected PersistedModelLocalServiceRegistry persistedModelLocalServiceRegistry;
 		</#if>
-
-		private static Log _log = LogFactoryUtil.getLog(${entity.name}${sessionTypeName}ServiceBaseImpl.class);
 	</#if>
 
 	private String _beanIdentifier;
+
+	<#if pluginName != "">
+		private ${entity.name}${sessionTypeName}ServiceClpInvoker _clpInvoker = new ${entity.name}${sessionTypeName}ServiceClpInvoker();
+	</#if>
 
 }

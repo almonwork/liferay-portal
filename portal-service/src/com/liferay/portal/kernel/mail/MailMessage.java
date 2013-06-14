@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -13,6 +13,8 @@
  */
 
 package com.liferay.portal.kernel.mail;
+
+import com.liferay.mail.model.FileAttachment;
 
 import java.io.File;
 import java.io.Serializable;
@@ -34,13 +36,6 @@ public class MailMessage implements Serializable {
 	}
 
 	public MailMessage(
-		InternetAddress from, String subject, String body,
-		boolean htmlFormat) {
-
-		this(from, null, subject, body, htmlFormat);
-	}
-
-	public MailMessage(
 		InternetAddress from, InternetAddress to, String subject, String body,
 		boolean htmlFormat) {
 
@@ -58,14 +53,24 @@ public class MailMessage implements Serializable {
 		_htmlFormat = htmlFormat;
 	}
 
-	public void addAttachment(File attachment) {
-		if (attachment != null) {
-			_attachments.add(attachment);
-		}
+	public MailMessage(
+		InternetAddress from, String subject, String body, boolean htmlFormat) {
+
+		this(from, null, subject, body, htmlFormat);
 	}
 
-	public File[] getAttachments() {
-		return _attachments.toArray(new File[_attachments.size()]);
+	public void addFileAttachment(File file) {
+		addFileAttachment(file, null);
+	}
+
+	public void addFileAttachment(File file, String fileName) {
+		if (file == null) {
+			return;
+		}
+
+		FileAttachment fileAttachment = new FileAttachment(file, fileName);
+
+		_fileAttachments.add(fileAttachment);
 	}
 
 	public InternetAddress[] getBCC() {
@@ -82,6 +87,10 @@ public class MailMessage implements Serializable {
 
 	public InternetAddress[] getCC() {
 		return _cc;
+	}
+
+	public List<FileAttachment> getFileAttachments() {
+		return _fileAttachments;
 	}
 
 	public InternetAddress getFrom() {
@@ -180,18 +189,19 @@ public class MailMessage implements Serializable {
 		_to = to;
 	}
 
-	private InternetAddress _from;
-	private InternetAddress[] _to;
-	private InternetAddress[] _cc;
 	private InternetAddress[] _bcc;
-	private InternetAddress[] _bulkAddresses;
-	private String _subject;
 	private String _body;
+	private InternetAddress[] _bulkAddresses;
+	private InternetAddress[] _cc;
+	private List<FileAttachment> _fileAttachments =
+		new ArrayList<FileAttachment>();
+	private InternetAddress _from;
 	private boolean _htmlFormat;
-	private InternetAddress[] _replyTo;
-	private String _messageId;
 	private String _inReplyTo;
-	private List<File> _attachments = new ArrayList<File>();
+	private String _messageId;
+	private InternetAddress[] _replyTo;
 	private SMTPAccount _smtpAccount;
+	private String _subject;
+	private InternetAddress[] _to;
 
 }

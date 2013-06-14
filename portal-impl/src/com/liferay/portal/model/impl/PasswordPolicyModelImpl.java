@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -18,6 +18,7 @@ import com.liferay.portal.kernel.bean.AutoEscapeBeanHandler;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.json.JSON;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.ProxyUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.model.CacheModel;
@@ -32,13 +33,13 @@ import com.liferay.portlet.expando.util.ExpandoBridgeFactoryUtil;
 
 import java.io.Serializable;
 
-import java.lang.reflect.Proxy;
-
 import java.sql.Types;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * The base model implementation for the PasswordPolicy service. Represents a row in the &quot;PasswordPolicy&quot; database table, with each column mapped to a property of this class.
@@ -107,6 +108,12 @@ public class PasswordPolicyModelImpl extends BaseModelImpl<PasswordPolicy>
 	public static final boolean FINDER_CACHE_ENABLED = GetterUtil.getBoolean(com.liferay.portal.util.PropsUtil.get(
 				"value.object.finder.cache.enabled.com.liferay.portal.model.PasswordPolicy"),
 			true);
+	public static final boolean COLUMN_BITMASK_ENABLED = GetterUtil.getBoolean(com.liferay.portal.util.PropsUtil.get(
+				"value.object.column.bitmask.enabled.com.liferay.portal.model.PasswordPolicy"),
+			true);
+	public static long COMPANYID_COLUMN_BITMASK = 1L;
+	public static long DEFAULTPOLICY_COLUMN_BITMASK = 2L;
+	public static long NAME_COLUMN_BITMASK = 4L;
 
 	/**
 	 * Converts the soap model instance into a normal model instance.
@@ -169,14 +176,6 @@ public class PasswordPolicyModelImpl extends BaseModelImpl<PasswordPolicy>
 		return models;
 	}
 
-	public Class<?> getModelClass() {
-		return PasswordPolicy.class;
-	}
-
-	public String getModelClassName() {
-		return PasswordPolicy.class.getName();
-	}
-
 	public static final long LOCK_EXPIRATION_TIME = GetterUtil.getLong(com.liferay.portal.util.PropsUtil.get(
 				"lock.expiration.time.com.liferay.portal.model.PasswordPolicy"));
 
@@ -199,6 +198,250 @@ public class PasswordPolicyModelImpl extends BaseModelImpl<PasswordPolicy>
 		setPrimaryKey(((Long)primaryKeyObj).longValue());
 	}
 
+	public Class<?> getModelClass() {
+		return PasswordPolicy.class;
+	}
+
+	public String getModelClassName() {
+		return PasswordPolicy.class.getName();
+	}
+
+	@Override
+	public Map<String, Object> getModelAttributes() {
+		Map<String, Object> attributes = new HashMap<String, Object>();
+
+		attributes.put("passwordPolicyId", getPasswordPolicyId());
+		attributes.put("companyId", getCompanyId());
+		attributes.put("userId", getUserId());
+		attributes.put("userName", getUserName());
+		attributes.put("createDate", getCreateDate());
+		attributes.put("modifiedDate", getModifiedDate());
+		attributes.put("defaultPolicy", getDefaultPolicy());
+		attributes.put("name", getName());
+		attributes.put("description", getDescription());
+		attributes.put("changeable", getChangeable());
+		attributes.put("changeRequired", getChangeRequired());
+		attributes.put("minAge", getMinAge());
+		attributes.put("checkSyntax", getCheckSyntax());
+		attributes.put("allowDictionaryWords", getAllowDictionaryWords());
+		attributes.put("minAlphanumeric", getMinAlphanumeric());
+		attributes.put("minLength", getMinLength());
+		attributes.put("minLowerCase", getMinLowerCase());
+		attributes.put("minNumbers", getMinNumbers());
+		attributes.put("minSymbols", getMinSymbols());
+		attributes.put("minUpperCase", getMinUpperCase());
+		attributes.put("history", getHistory());
+		attributes.put("historyCount", getHistoryCount());
+		attributes.put("expireable", getExpireable());
+		attributes.put("maxAge", getMaxAge());
+		attributes.put("warningTime", getWarningTime());
+		attributes.put("graceLimit", getGraceLimit());
+		attributes.put("lockout", getLockout());
+		attributes.put("maxFailure", getMaxFailure());
+		attributes.put("lockoutDuration", getLockoutDuration());
+		attributes.put("requireUnlock", getRequireUnlock());
+		attributes.put("resetFailureCount", getResetFailureCount());
+		attributes.put("resetTicketMaxAge", getResetTicketMaxAge());
+
+		return attributes;
+	}
+
+	@Override
+	public void setModelAttributes(Map<String, Object> attributes) {
+		Long passwordPolicyId = (Long)attributes.get("passwordPolicyId");
+
+		if (passwordPolicyId != null) {
+			setPasswordPolicyId(passwordPolicyId);
+		}
+
+		Long companyId = (Long)attributes.get("companyId");
+
+		if (companyId != null) {
+			setCompanyId(companyId);
+		}
+
+		Long userId = (Long)attributes.get("userId");
+
+		if (userId != null) {
+			setUserId(userId);
+		}
+
+		String userName = (String)attributes.get("userName");
+
+		if (userName != null) {
+			setUserName(userName);
+		}
+
+		Date createDate = (Date)attributes.get("createDate");
+
+		if (createDate != null) {
+			setCreateDate(createDate);
+		}
+
+		Date modifiedDate = (Date)attributes.get("modifiedDate");
+
+		if (modifiedDate != null) {
+			setModifiedDate(modifiedDate);
+		}
+
+		Boolean defaultPolicy = (Boolean)attributes.get("defaultPolicy");
+
+		if (defaultPolicy != null) {
+			setDefaultPolicy(defaultPolicy);
+		}
+
+		String name = (String)attributes.get("name");
+
+		if (name != null) {
+			setName(name);
+		}
+
+		String description = (String)attributes.get("description");
+
+		if (description != null) {
+			setDescription(description);
+		}
+
+		Boolean changeable = (Boolean)attributes.get("changeable");
+
+		if (changeable != null) {
+			setChangeable(changeable);
+		}
+
+		Boolean changeRequired = (Boolean)attributes.get("changeRequired");
+
+		if (changeRequired != null) {
+			setChangeRequired(changeRequired);
+		}
+
+		Long minAge = (Long)attributes.get("minAge");
+
+		if (minAge != null) {
+			setMinAge(minAge);
+		}
+
+		Boolean checkSyntax = (Boolean)attributes.get("checkSyntax");
+
+		if (checkSyntax != null) {
+			setCheckSyntax(checkSyntax);
+		}
+
+		Boolean allowDictionaryWords = (Boolean)attributes.get(
+				"allowDictionaryWords");
+
+		if (allowDictionaryWords != null) {
+			setAllowDictionaryWords(allowDictionaryWords);
+		}
+
+		Integer minAlphanumeric = (Integer)attributes.get("minAlphanumeric");
+
+		if (minAlphanumeric != null) {
+			setMinAlphanumeric(minAlphanumeric);
+		}
+
+		Integer minLength = (Integer)attributes.get("minLength");
+
+		if (minLength != null) {
+			setMinLength(minLength);
+		}
+
+		Integer minLowerCase = (Integer)attributes.get("minLowerCase");
+
+		if (minLowerCase != null) {
+			setMinLowerCase(minLowerCase);
+		}
+
+		Integer minNumbers = (Integer)attributes.get("minNumbers");
+
+		if (minNumbers != null) {
+			setMinNumbers(minNumbers);
+		}
+
+		Integer minSymbols = (Integer)attributes.get("minSymbols");
+
+		if (minSymbols != null) {
+			setMinSymbols(minSymbols);
+		}
+
+		Integer minUpperCase = (Integer)attributes.get("minUpperCase");
+
+		if (minUpperCase != null) {
+			setMinUpperCase(minUpperCase);
+		}
+
+		Boolean history = (Boolean)attributes.get("history");
+
+		if (history != null) {
+			setHistory(history);
+		}
+
+		Integer historyCount = (Integer)attributes.get("historyCount");
+
+		if (historyCount != null) {
+			setHistoryCount(historyCount);
+		}
+
+		Boolean expireable = (Boolean)attributes.get("expireable");
+
+		if (expireable != null) {
+			setExpireable(expireable);
+		}
+
+		Long maxAge = (Long)attributes.get("maxAge");
+
+		if (maxAge != null) {
+			setMaxAge(maxAge);
+		}
+
+		Long warningTime = (Long)attributes.get("warningTime");
+
+		if (warningTime != null) {
+			setWarningTime(warningTime);
+		}
+
+		Integer graceLimit = (Integer)attributes.get("graceLimit");
+
+		if (graceLimit != null) {
+			setGraceLimit(graceLimit);
+		}
+
+		Boolean lockout = (Boolean)attributes.get("lockout");
+
+		if (lockout != null) {
+			setLockout(lockout);
+		}
+
+		Integer maxFailure = (Integer)attributes.get("maxFailure");
+
+		if (maxFailure != null) {
+			setMaxFailure(maxFailure);
+		}
+
+		Long lockoutDuration = (Long)attributes.get("lockoutDuration");
+
+		if (lockoutDuration != null) {
+			setLockoutDuration(lockoutDuration);
+		}
+
+		Boolean requireUnlock = (Boolean)attributes.get("requireUnlock");
+
+		if (requireUnlock != null) {
+			setRequireUnlock(requireUnlock);
+		}
+
+		Long resetFailureCount = (Long)attributes.get("resetFailureCount");
+
+		if (resetFailureCount != null) {
+			setResetFailureCount(resetFailureCount);
+		}
+
+		Long resetTicketMaxAge = (Long)attributes.get("resetTicketMaxAge");
+
+		if (resetTicketMaxAge != null) {
+			setResetTicketMaxAge(resetTicketMaxAge);
+		}
+	}
+
 	@JSON
 	public long getPasswordPolicyId() {
 		return _passwordPolicyId;
@@ -214,6 +457,8 @@ public class PasswordPolicyModelImpl extends BaseModelImpl<PasswordPolicy>
 	}
 
 	public void setCompanyId(long companyId) {
+		_columnBitmask |= COMPANYID_COLUMN_BITMASK;
+
 		if (!_setOriginalCompanyId) {
 			_setOriginalCompanyId = true;
 
@@ -286,6 +531,8 @@ public class PasswordPolicyModelImpl extends BaseModelImpl<PasswordPolicy>
 	}
 
 	public void setDefaultPolicy(boolean defaultPolicy) {
+		_columnBitmask |= DEFAULTPOLICY_COLUMN_BITMASK;
+
 		if (!_setOriginalDefaultPolicy) {
 			_setOriginalDefaultPolicy = true;
 
@@ -310,6 +557,8 @@ public class PasswordPolicyModelImpl extends BaseModelImpl<PasswordPolicy>
 	}
 
 	public void setName(String name) {
+		_columnBitmask |= NAME_COLUMN_BITMASK;
+
 		if (_originalName == null) {
 			_originalName = _name;
 		}
@@ -574,35 +823,32 @@ public class PasswordPolicyModelImpl extends BaseModelImpl<PasswordPolicy>
 		_resetTicketMaxAge = resetTicketMaxAge;
 	}
 
+	public long getColumnBitmask() {
+		return _columnBitmask;
+	}
+
 	@Override
 	public PasswordPolicy toEscapedModel() {
-		if (isEscapedModel()) {
-			return (PasswordPolicy)this;
+		if (_escapedModelProxy == null) {
+			_escapedModelProxy = (PasswordPolicy)ProxyUtil.newProxyInstance(_classLoader,
+					_escapedModelProxyInterfaces,
+					new AutoEscapeBeanHandler(this));
 		}
-		else {
-			if (_escapedModelProxy == null) {
-				_escapedModelProxy = (PasswordPolicy)Proxy.newProxyInstance(_classLoader,
-						_escapedModelProxyInterfaces,
-						new AutoEscapeBeanHandler(this));
-			}
 
-			return _escapedModelProxy;
-		}
+		return _escapedModelProxy;
 	}
 
 	@Override
 	public ExpandoBridge getExpandoBridge() {
-		if (_expandoBridge == null) {
-			_expandoBridge = ExpandoBridgeFactoryUtil.getExpandoBridge(getCompanyId(),
-					PasswordPolicy.class.getName(), getPrimaryKey());
-		}
-
-		return _expandoBridge;
+		return ExpandoBridgeFactoryUtil.getExpandoBridge(getCompanyId(),
+			PasswordPolicy.class.getName(), getPrimaryKey());
 	}
 
 	@Override
 	public void setExpandoBridgeAttributes(ServiceContext serviceContext) {
-		getExpandoBridge().setAttributes(serviceContext);
+		ExpandoBridge expandoBridge = getExpandoBridge();
+
+		expandoBridge.setAttributes(serviceContext);
 	}
 
 	@Override
@@ -704,6 +950,8 @@ public class PasswordPolicyModelImpl extends BaseModelImpl<PasswordPolicy>
 		passwordPolicyModelImpl._setOriginalDefaultPolicy = false;
 
 		passwordPolicyModelImpl._originalName = passwordPolicyModelImpl._name;
+
+		passwordPolicyModelImpl._columnBitmask = 0;
 	}
 
 	@Override
@@ -1065,6 +1313,6 @@ public class PasswordPolicyModelImpl extends BaseModelImpl<PasswordPolicy>
 	private boolean _requireUnlock;
 	private long _resetFailureCount;
 	private long _resetTicketMaxAge;
-	private transient ExpandoBridge _expandoBridge;
+	private long _columnBitmask;
 	private PasswordPolicy _escapedModelProxy;
 }

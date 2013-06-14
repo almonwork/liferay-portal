@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -38,21 +38,6 @@ import org.apache.struts.action.ActionMapping;
 public class ViewAction extends PortletAction {
 
 	@Override
-	public void serveResource(
-			ActionMapping mapping, ActionForm form, PortletConfig portletConfig,
-			ResourceRequest resourceRequest, ResourceResponse resourceResponse)
-		throws Exception {
-
-		PortletContext portletContext = portletConfig.getPortletContext();
-
-		PortletRequestDispatcher portletRequestDispatcher =
-			portletContext.getRequestDispatcher(
-				"/html/portlet/document_library/view_resources.jsp");
-
-		portletRequestDispatcher.include(resourceRequest, resourceResponse);
-	}
-
-	@Override
 	public ActionForward render(
 			ActionMapping mapping, ActionForm form, PortletConfig portletConfig,
 			RenderRequest renderRequest, RenderResponse renderResponse)
@@ -65,7 +50,7 @@ public class ViewAction extends PortletAction {
 			if (e instanceof NoSuchFolderException ||
 				e instanceof PrincipalException) {
 
-				SessionErrors.add(renderRequest, e.getClass().getName());
+				SessionErrors.add(renderRequest, e.getClass());
 
 				return mapping.findForward("portlet.document_library.error");
 			}
@@ -75,6 +60,21 @@ public class ViewAction extends PortletAction {
 		}
 
 		return mapping.findForward("portlet.document_library.view");
+	}
+
+	@Override
+	public void serveResource(
+			ActionMapping mapping, ActionForm form, PortletConfig portletConfig,
+			ResourceRequest resourceRequest, ResourceResponse resourceResponse)
+		throws Exception {
+
+		PortletContext portletContext = portletConfig.getPortletContext();
+
+		PortletRequestDispatcher portletRequestDispatcher =
+			portletContext.getRequestDispatcher(
+				"/html/portlet/document_library/view_resources.jsp");
+
+		portletRequestDispatcher.include(resourceRequest, resourceResponse);
 	}
 
 }

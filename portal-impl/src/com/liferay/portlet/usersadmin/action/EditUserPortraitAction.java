@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -20,6 +20,7 @@ import com.liferay.portal.UserPortraitTypeException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.servlet.SessionErrors;
+import com.liferay.portal.kernel.upload.UploadException;
 import com.liferay.portal.kernel.upload.UploadPortletRequest;
 import com.liferay.portal.kernel.util.FileUtil;
 import com.liferay.portal.model.User;
@@ -28,9 +29,8 @@ import com.liferay.portal.service.UserServiceUtil;
 import com.liferay.portal.struts.PortletAction;
 import com.liferay.portal.util.PortalUtil;
 import com.liferay.util.portlet.PortletRequestUtil;
-import com.liferay.util.servlet.UploadException;
 
-import java.io.File;
+import java.io.InputStream;
 
 import javax.portlet.ActionRequest;
 import javax.portlet.ActionResponse;
@@ -62,7 +62,7 @@ public class EditUserPortraitAction extends PortletAction {
 			if (e instanceof NoSuchUserException ||
 				e instanceof PrincipalException) {
 
-				SessionErrors.add(actionRequest, e.getClass().getName());
+				SessionErrors.add(actionRequest, e.getClass());
 
 				setForward(actionRequest, "portlet.users_admin.error");
 			}
@@ -70,7 +70,7 @@ public class EditUserPortraitAction extends PortletAction {
 					 e instanceof UserPortraitSizeException ||
 					 e instanceof UserPortraitTypeException) {
 
-				SessionErrors.add(actionRequest, e.getClass().getName());
+				SessionErrors.add(actionRequest, e.getClass());
 			}
 			else {
 				throw e;
@@ -96,17 +96,19 @@ public class EditUserPortraitAction extends PortletAction {
 				actionRequest);
 		}
 
-		UploadPortletRequest uploadRequest = PortalUtil.getUploadPortletRequest(
-			actionRequest);
+		UploadPortletRequest uploadPortletRequest =
+			PortalUtil.getUploadPortletRequest(actionRequest);
 
-		User user = PortalUtil.getSelectedUser(uploadRequest);
+		User user = PortalUtil.getSelectedUser(uploadPortletRequest);
 
-		File file = uploadRequest.getFile("fileName");
-		byte[] bytes = FileUtil.getBytes(file);
+		InputStream inputStream = uploadPortletRequest.getFileAsStream(
+			"fileName");
 
-		if ((bytes == null) || (bytes.length == 0)) {
+		if (inputStream == null) {
 			throw new UploadException();
 		}
+
+		byte[] bytes = FileUtil.getBytes(inputStream);
 
 		UserServiceUtil.updatePortrait(user.getUserId(), bytes);
 	}

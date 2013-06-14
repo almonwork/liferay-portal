@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,6 +14,8 @@
 
 package com.liferay.portlet.asset.service;
 
+import com.liferay.portal.service.ServiceWrapper;
+
 /**
  * <p>
  * This class is a wrapper for {@link AssetCategoryLocalService}.
@@ -24,7 +26,8 @@ package com.liferay.portlet.asset.service;
  * @generated
  */
 public class AssetCategoryLocalServiceWrapper
-	implements AssetCategoryLocalService {
+	implements AssetCategoryLocalService,
+		ServiceWrapper<AssetCategoryLocalService> {
 	public AssetCategoryLocalServiceWrapper(
 		AssetCategoryLocalService assetCategoryLocalService) {
 		_assetCategoryLocalService = assetCategoryLocalService;
@@ -58,25 +61,32 @@ public class AssetCategoryLocalServiceWrapper
 	* Deletes the asset category with the primary key from the database. Also notifies the appropriate model listeners.
 	*
 	* @param categoryId the primary key of the asset category
+	* @return the asset category that was removed
 	* @throws PortalException if a asset category with the primary key could not be found
 	* @throws SystemException if a system exception occurred
 	*/
-	public void deleteAssetCategory(long categoryId)
+	public com.liferay.portlet.asset.model.AssetCategory deleteAssetCategory(
+		long categoryId)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException {
-		_assetCategoryLocalService.deleteAssetCategory(categoryId);
+		return _assetCategoryLocalService.deleteAssetCategory(categoryId);
 	}
 
 	/**
 	* Deletes the asset category from the database. Also notifies the appropriate model listeners.
 	*
 	* @param assetCategory the asset category
+	* @return the asset category that was removed
 	* @throws SystemException if a system exception occurred
 	*/
-	public void deleteAssetCategory(
+	public com.liferay.portlet.asset.model.AssetCategory deleteAssetCategory(
 		com.liferay.portlet.asset.model.AssetCategory assetCategory)
 		throws com.liferay.portal.kernel.exception.SystemException {
-		_assetCategoryLocalService.deleteAssetCategory(assetCategory);
+		return _assetCategoryLocalService.deleteAssetCategory(assetCategory);
+	}
+
+	public com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery() {
+		return _assetCategoryLocalService.dynamicQuery();
 	}
 
 	/**
@@ -148,6 +158,12 @@ public class AssetCategoryLocalServiceWrapper
 		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery)
 		throws com.liferay.portal.kernel.exception.SystemException {
 		return _assetCategoryLocalService.dynamicQueryCount(dynamicQuery);
+	}
+
+	public com.liferay.portlet.asset.model.AssetCategory fetchAssetCategory(
+		long categoryId)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return _assetCategoryLocalService.fetchAssetCategory(categoryId);
 	}
 
 	/**
@@ -315,20 +331,10 @@ public class AssetCategoryLocalServiceWrapper
 		_assetCategoryLocalService.deleteVocabularyCategories(vocabularyId);
 	}
 
-	public java.lang.String[] getCategoryNames()
+	public com.liferay.portlet.asset.model.AssetCategory fetchCategory(
+		long categoryId)
 		throws com.liferay.portal.kernel.exception.SystemException {
-		return _assetCategoryLocalService.getCategoryNames();
-	}
-
-	public java.lang.String[] getCategoryNames(long classNameId, long classPK)
-		throws com.liferay.portal.kernel.exception.SystemException {
-		return _assetCategoryLocalService.getCategoryNames(classNameId, classPK);
-	}
-
-	public java.lang.String[] getCategoryNames(java.lang.String className,
-		long classPK)
-		throws com.liferay.portal.kernel.exception.SystemException {
-		return _assetCategoryLocalService.getCategoryNames(className, classPK);
+		return _assetCategoryLocalService.fetchCategory(categoryId);
 	}
 
 	public java.util.List<com.liferay.portlet.asset.model.AssetCategory> getCategories()
@@ -358,6 +364,22 @@ public class AssetCategoryLocalServiceWrapper
 	public long[] getCategoryIds(java.lang.String className, long classPK)
 		throws com.liferay.portal.kernel.exception.SystemException {
 		return _assetCategoryLocalService.getCategoryIds(className, classPK);
+	}
+
+	public java.lang.String[] getCategoryNames()
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return _assetCategoryLocalService.getCategoryNames();
+	}
+
+	public java.lang.String[] getCategoryNames(long classNameId, long classPK)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return _assetCategoryLocalService.getCategoryNames(classNameId, classPK);
+	}
+
+	public java.lang.String[] getCategoryNames(java.lang.String className,
+		long classPK)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return _assetCategoryLocalService.getCategoryNames(className, classPK);
 	}
 
 	public java.util.List<com.liferay.portlet.asset.model.AssetCategory> getChildCategories(
@@ -455,11 +477,26 @@ public class AssetCategoryLocalServiceWrapper
 			categoryProperties, serviceContext);
 	}
 
+	/**
+	 * @deprecated Renamed to {@link #getWrappedService}
+	 */
 	public AssetCategoryLocalService getWrappedAssetCategoryLocalService() {
 		return _assetCategoryLocalService;
 	}
 
+	/**
+	 * @deprecated Renamed to {@link #setWrappedService}
+	 */
 	public void setWrappedAssetCategoryLocalService(
+		AssetCategoryLocalService assetCategoryLocalService) {
+		_assetCategoryLocalService = assetCategoryLocalService;
+	}
+
+	public AssetCategoryLocalService getWrappedService() {
+		return _assetCategoryLocalService;
+	}
+
+	public void setWrappedService(
 		AssetCategoryLocalService assetCategoryLocalService) {
 		_assetCategoryLocalService = assetCategoryLocalService;
 	}

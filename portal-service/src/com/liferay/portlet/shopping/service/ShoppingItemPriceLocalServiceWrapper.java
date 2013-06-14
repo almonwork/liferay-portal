@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,6 +14,8 @@
 
 package com.liferay.portlet.shopping.service;
 
+import com.liferay.portal.service.ServiceWrapper;
+
 /**
  * <p>
  * This class is a wrapper for {@link ShoppingItemPriceLocalService}.
@@ -24,7 +26,8 @@ package com.liferay.portlet.shopping.service;
  * @generated
  */
 public class ShoppingItemPriceLocalServiceWrapper
-	implements ShoppingItemPriceLocalService {
+	implements ShoppingItemPriceLocalService,
+		ServiceWrapper<ShoppingItemPriceLocalService> {
 	public ShoppingItemPriceLocalServiceWrapper(
 		ShoppingItemPriceLocalService shoppingItemPriceLocalService) {
 		_shoppingItemPriceLocalService = shoppingItemPriceLocalService;
@@ -58,25 +61,32 @@ public class ShoppingItemPriceLocalServiceWrapper
 	* Deletes the shopping item price with the primary key from the database. Also notifies the appropriate model listeners.
 	*
 	* @param itemPriceId the primary key of the shopping item price
+	* @return the shopping item price that was removed
 	* @throws PortalException if a shopping item price with the primary key could not be found
 	* @throws SystemException if a system exception occurred
 	*/
-	public void deleteShoppingItemPrice(long itemPriceId)
+	public com.liferay.portlet.shopping.model.ShoppingItemPrice deleteShoppingItemPrice(
+		long itemPriceId)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException {
-		_shoppingItemPriceLocalService.deleteShoppingItemPrice(itemPriceId);
+		return _shoppingItemPriceLocalService.deleteShoppingItemPrice(itemPriceId);
 	}
 
 	/**
 	* Deletes the shopping item price from the database. Also notifies the appropriate model listeners.
 	*
 	* @param shoppingItemPrice the shopping item price
+	* @return the shopping item price that was removed
 	* @throws SystemException if a system exception occurred
 	*/
-	public void deleteShoppingItemPrice(
+	public com.liferay.portlet.shopping.model.ShoppingItemPrice deleteShoppingItemPrice(
 		com.liferay.portlet.shopping.model.ShoppingItemPrice shoppingItemPrice)
 		throws com.liferay.portal.kernel.exception.SystemException {
-		_shoppingItemPriceLocalService.deleteShoppingItemPrice(shoppingItemPrice);
+		return _shoppingItemPriceLocalService.deleteShoppingItemPrice(shoppingItemPrice);
+	}
+
+	public com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery() {
+		return _shoppingItemPriceLocalService.dynamicQuery();
 	}
 
 	/**
@@ -149,6 +159,12 @@ public class ShoppingItemPriceLocalServiceWrapper
 		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery)
 		throws com.liferay.portal.kernel.exception.SystemException {
 		return _shoppingItemPriceLocalService.dynamicQueryCount(dynamicQuery);
+	}
+
+	public com.liferay.portlet.shopping.model.ShoppingItemPrice fetchShoppingItemPrice(
+		long itemPriceId)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return _shoppingItemPriceLocalService.fetchShoppingItemPrice(itemPriceId);
 	}
 
 	/**
@@ -256,11 +272,26 @@ public class ShoppingItemPriceLocalServiceWrapper
 		return _shoppingItemPriceLocalService.getItemPrices(itemId);
 	}
 
+	/**
+	 * @deprecated Renamed to {@link #getWrappedService}
+	 */
 	public ShoppingItemPriceLocalService getWrappedShoppingItemPriceLocalService() {
 		return _shoppingItemPriceLocalService;
 	}
 
+	/**
+	 * @deprecated Renamed to {@link #setWrappedService}
+	 */
 	public void setWrappedShoppingItemPriceLocalService(
+		ShoppingItemPriceLocalService shoppingItemPriceLocalService) {
+		_shoppingItemPriceLocalService = shoppingItemPriceLocalService;
+	}
+
+	public ShoppingItemPriceLocalService getWrappedService() {
+		return _shoppingItemPriceLocalService;
+	}
+
+	public void setWrappedService(
 		ShoppingItemPriceLocalService shoppingItemPriceLocalService) {
 		_shoppingItemPriceLocalService = shoppingItemPriceLocalService;
 	}

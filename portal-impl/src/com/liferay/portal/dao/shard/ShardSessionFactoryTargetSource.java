@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,6 +14,7 @@
 
 package com.liferay.portal.dao.shard;
 
+import com.liferay.portal.kernel.util.CentralizedThreadLocal;
 import com.liferay.portal.spring.hibernate.PortalHibernateConfiguration;
 import com.liferay.portal.util.PropsValues;
 
@@ -81,8 +82,11 @@ public class ShardSessionFactoryTargetSource implements TargetSource {
 		}
 	}
 
+	private static Map<String, SessionFactory> _sessionFactories =
+		new HashMap<String, SessionFactory>();
+
 	private static ThreadLocal<SessionFactory> _sessionFactory =
-		new ThreadLocal<SessionFactory>() {
+		new CentralizedThreadLocal<SessionFactory>(false) {
 
 		@Override
 		protected SessionFactory initialValue() {
@@ -90,8 +94,5 @@ public class ShardSessionFactoryTargetSource implements TargetSource {
 		}
 
 	};
-
-	private static Map<String, SessionFactory> _sessionFactories =
-		new HashMap<String, SessionFactory>();
 
 }

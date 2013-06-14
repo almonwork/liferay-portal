@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -23,9 +23,10 @@ import com.liferay.portalweb.portal.util.RuntimeVariables;
 public class SignInTest extends BaseTestCase {
 	public void testSignIn() throws Exception {
 		selenium.open("/web/guest/home/");
+		loadRequiredJavaScriptModules();
 
 		for (int second = 0;; second++) {
-			if (second >= 60) {
+			if (second >= 90) {
 				fail("timeout");
 			}
 
@@ -40,18 +41,18 @@ public class SignInTest extends BaseTestCase {
 			Thread.sleep(1000);
 		}
 
-		selenium.saveScreenShotAndSource();
-		selenium.clickAt("link=Sign In", RuntimeVariables.replace(""));
+		selenium.clickAt("link=Sign In", RuntimeVariables.replace("Sign In"));
 		selenium.waitForPageToLoad("30000");
-		selenium.saveScreenShotAndSource();
-		selenium.type("_58_login", RuntimeVariables.replace("test@liferay.com"));
-		selenium.saveScreenShotAndSource();
-		selenium.type("_58_password", RuntimeVariables.replace("test"));
-		selenium.saveScreenShotAndSource();
-		selenium.clickAt("_58_rememberMeCheckbox", RuntimeVariables.replace(""));
+		loadRequiredJavaScriptModules();
+		selenium.type("//input[@name='_58_login']",
+			RuntimeVariables.replace("test@liferay.com"));
+		selenium.type("//input[@name='_58_password']",
+			RuntimeVariables.replace("test"));
+		selenium.clickAt("//input[@id='_58_rememberMeCheckbox']",
+			RuntimeVariables.replace("Remember Me Checkbox"));
 		selenium.clickAt("//input[@value='Sign In']",
-			RuntimeVariables.replace(""));
+			RuntimeVariables.replace("Sign In"));
 		selenium.waitForPageToLoad("30000");
-		selenium.saveScreenShotAndSource();
+		loadRequiredJavaScriptModules();
 	}
 }

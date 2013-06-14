@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,11 +14,16 @@
 
 package com.liferay.portal.kernel.image;
 
-import java.io.File;
+import com.liferay.portal.kernel.security.pacl.permission.PortalRuntimePermission;
+
 import java.io.IOException;
+
+import java.net.URL;
 
 import java.util.List;
 import java.util.Properties;
+
+import javax.servlet.ServletContext;
 
 /**
  * @author Brian Wing Shun Chan
@@ -26,21 +31,26 @@ import java.util.Properties;
 public class SpriteProcessorUtil {
 
 	public static Properties generate(
-			List<File> images, String spriteFileName,
-			String spritePropertiesFileName, String spritePropertiesRootPath,
-			int maxHeight, int maxWidth, int maxSize)
+			ServletContext servletContext, List<URL> imageURLs,
+			String spriteFileName, String spritePropertiesFileName,
+			URL spritePropertiesRootURL, int maxHeight, int maxWidth,
+			int maxSize)
 		throws IOException {
 
 		return getSpriteProcessor().generate(
-			images, spriteFileName, spritePropertiesFileName,
-			spritePropertiesRootPath, maxHeight, maxWidth, maxSize);
+			servletContext, imageURLs, spriteFileName, spritePropertiesFileName,
+			spritePropertiesRootURL, maxHeight, maxWidth, maxSize);
 	}
 
 	public static SpriteProcessor getSpriteProcessor() {
+		PortalRuntimePermission.checkGetBeanProperty(SpriteProcessorUtil.class);
+
 		return _spriteProcessor;
 	}
 
 	public void setSpriteProcessor(SpriteProcessor spriteProcessor) {
+		PortalRuntimePermission.checkSetBeanProperty(getClass());
+
 		_spriteProcessor = spriteProcessor;
 	}
 

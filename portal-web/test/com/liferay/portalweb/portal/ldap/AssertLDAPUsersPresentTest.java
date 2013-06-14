@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -23,9 +23,10 @@ import com.liferay.portalweb.portal.util.RuntimeVariables;
 public class AssertLDAPUsersPresentTest extends BaseTestCase {
 	public void testAssertLDAPUsersPresent() throws Exception {
 		selenium.open("/web/guest/home/");
+		loadRequiredJavaScriptModules();
 
 		for (int second = 0;; second++) {
-			if (second >= 60) {
+			if (second >= 90) {
 				fail("timeout");
 			}
 
@@ -40,21 +41,23 @@ public class AssertLDAPUsersPresentTest extends BaseTestCase {
 			Thread.sleep(1000);
 		}
 
-		selenium.saveScreenShotAndSource();
 		selenium.clickAt("link=Control Panel",
 			RuntimeVariables.replace("Control Panel"));
 		selenium.waitForPageToLoad("30000");
-		selenium.saveScreenShotAndSource();
-		selenium.click(RuntimeVariables.replace("link=Users"));
+		loadRequiredJavaScriptModules();
+		selenium.click(RuntimeVariables.replace("link=Users and Organizations"));
 		selenium.waitForPageToLoad("30000");
-		selenium.saveScreenShotAndSource();
-		selenium.type("//input[@id='_125_toggle_id_enterprise_admin_user_searchkeywords']",
+		loadRequiredJavaScriptModules();
+		selenium.clickAt("link=Search All Users",
+			RuntimeVariables.replace("Search All Users"));
+		selenium.waitForPageToLoad("30000");
+		loadRequiredJavaScriptModules();
+		selenium.type("//input[@name='_125_keywords']",
 			RuntimeVariables.replace("jane"));
-		selenium.saveScreenShotAndSource();
 		selenium.clickAt("//input[@value='Search']",
 			RuntimeVariables.replace("Search"));
 		selenium.waitForPageToLoad("30000");
-		selenium.saveScreenShotAndSource();
+		loadRequiredJavaScriptModules();
 		assertEquals(RuntimeVariables.replace("Jane"),
 			selenium.getText("//td[2]/a"));
 		assertEquals(RuntimeVariables.replace("Smith"),
@@ -62,13 +65,12 @@ public class AssertLDAPUsersPresentTest extends BaseTestCase {
 		assertEquals(RuntimeVariables.replace("janesmith"),
 			selenium.getText("//td[4]/a"));
 		assertFalse(selenium.isTextPresent("No users were found."));
-		selenium.type("//input[@id='_125_toggle_id_enterprise_admin_user_searchkeywords']",
+		selenium.type("//input[@name='_125_keywords']",
 			RuntimeVariables.replace("luke"));
-		selenium.saveScreenShotAndSource();
 		selenium.clickAt("//input[@value='Search']",
 			RuntimeVariables.replace("Search"));
 		selenium.waitForPageToLoad("30000");
-		selenium.saveScreenShotAndSource();
+		loadRequiredJavaScriptModules();
 		assertEquals(RuntimeVariables.replace("Luke"),
 			selenium.getText("//td[2]/a"));
 		assertEquals(RuntimeVariables.replace("Skywalker"),
@@ -76,13 +78,12 @@ public class AssertLDAPUsersPresentTest extends BaseTestCase {
 		assertEquals(RuntimeVariables.replace("lukeskywalker"),
 			selenium.getText("//td[4]/a"));
 		assertFalse(selenium.isTextPresent("No users were found."));
-		selenium.type("//input[@id='_125_toggle_id_enterprise_admin_user_searchkeywords']",
+		selenium.type("//input[@name='_125_keywords']",
 			RuntimeVariables.replace("martin"));
-		selenium.saveScreenShotAndSource();
 		selenium.clickAt("//input[@value='Search']",
 			RuntimeVariables.replace("Search"));
 		selenium.waitForPageToLoad("30000");
-		selenium.saveScreenShotAndSource();
+		loadRequiredJavaScriptModules();
 		assertEquals(RuntimeVariables.replace("Martin"),
 			selenium.getText("//td[2]/a"));
 		assertEquals(RuntimeVariables.replace("Luther"),

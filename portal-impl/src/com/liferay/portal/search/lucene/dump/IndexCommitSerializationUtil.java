@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -78,13 +78,12 @@ public class IndexCommitSerializationUtil {
 					_log.debug("Deserializing segment " + segment);
 				}
 
-				deserializeSegment(
+				_deserializeSegment(
 					objectInputStream, segment.getFileSize(),
 					directory.createOutput(segment.getFileName()));
 			}
 
-			writeSegmentsGen(
-				directory, indexCommitMetaInfo.getGeneration());
+			_writeSegmentsGen(directory, indexCommitMetaInfo.getGeneration());
 		}
 		finally {
 			if (objectInputStream != null) {
@@ -122,7 +121,7 @@ public class IndexCommitSerializationUtil {
 				_log.debug("Serializing segment " + segment);
 			}
 
-			serializeSegment(
+			_serializeSegment(
 				directory.openInput(segment.getFileName()),
 				segment.getFileSize(), objectOputStream);
 		}
@@ -136,7 +135,7 @@ public class IndexCommitSerializationUtil {
 		}
 	}
 
-	private static void deserializeSegment(
+	private static void _deserializeSegment(
 			InputStream inputStream, long length, IndexOutput indexOutput)
 		throws IOException {
 
@@ -166,7 +165,7 @@ public class IndexCommitSerializationUtil {
 		}
 	}
 
-	private static void serializeSegment(
+	private static void _serializeSegment(
 			IndexInput indexInput, long length, OutputStream outputStream)
 		throws IOException {
 
@@ -189,8 +188,7 @@ public class IndexCommitSerializationUtil {
 		}
 	}
 
-	private static void writeSegmentsGen(
-			Directory directory, long generation)
+	private static void _writeSegmentsGen(Directory directory, long generation)
 		throws IOException {
 
 		if (_log.isDebugEnabled()) {

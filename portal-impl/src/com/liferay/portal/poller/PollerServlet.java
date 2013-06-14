@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -18,6 +18,7 @@ import com.liferay.portal.NoSuchLayoutException;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.poller.PollerHeader;
 import com.liferay.portal.kernel.servlet.ServletResponseUtil;
 import com.liferay.portal.kernel.util.ContentTypes;
 import com.liferay.portal.kernel.util.ParamUtil;
@@ -70,12 +71,27 @@ public class PollerServlet extends HttpServlet {
 		long companyId = PortalUtil.getCompanyId(request);
 		long userId = PortalUtil.getUserId(request);
 
+		if (userId == 0) {
+			return StringPool.BLANK;
+		}
+
 		String pollerRequestString = ParamUtil.getString(
 			request, "pollerRequest");
 
+		PollerHeader pollerHeader = PollerRequestHandlerUtil.getPollerHeader(
+			pollerRequestString);
+
+		if (pollerHeader == null) {
+			return StringPool.BLANK;
+		}
+
+		if (userId != pollerHeader.getUserId()) {
+			return StringPool.BLANK;
+		}
+
 		JSONObject pollerResponseHeaderJSONObject =
 			PollerRequestHandlerUtil.processRequest(
-				request.getPathInfo(), pollerRequestString);
+				request, pollerRequestString);
 
 		if (pollerResponseHeaderJSONObject == null) {
 			return StringPool.BLANK;

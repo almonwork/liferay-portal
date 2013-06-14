@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,6 +14,9 @@
 
 package com.liferay.portal.model;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * <p>
  * This class is a wrapper for {@link PluginSetting}.
@@ -23,7 +26,8 @@ package com.liferay.portal.model;
  * @see       PluginSetting
  * @generated
  */
-public class PluginSettingWrapper implements PluginSetting {
+public class PluginSettingWrapper implements PluginSetting,
+	ModelWrapper<PluginSetting> {
 	public PluginSettingWrapper(PluginSetting pluginSetting) {
 		_pluginSetting = pluginSetting;
 	}
@@ -34,6 +38,57 @@ public class PluginSettingWrapper implements PluginSetting {
 
 	public String getModelClassName() {
 		return PluginSetting.class.getName();
+	}
+
+	public Map<String, Object> getModelAttributes() {
+		Map<String, Object> attributes = new HashMap<String, Object>();
+
+		attributes.put("pluginSettingId", getPluginSettingId());
+		attributes.put("companyId", getCompanyId());
+		attributes.put("pluginId", getPluginId());
+		attributes.put("pluginType", getPluginType());
+		attributes.put("roles", getRoles());
+		attributes.put("active", getActive());
+
+		return attributes;
+	}
+
+	public void setModelAttributes(Map<String, Object> attributes) {
+		Long pluginSettingId = (Long)attributes.get("pluginSettingId");
+
+		if (pluginSettingId != null) {
+			setPluginSettingId(pluginSettingId);
+		}
+
+		Long companyId = (Long)attributes.get("companyId");
+
+		if (companyId != null) {
+			setCompanyId(companyId);
+		}
+
+		String pluginId = (String)attributes.get("pluginId");
+
+		if (pluginId != null) {
+			setPluginId(pluginId);
+		}
+
+		String pluginType = (String)attributes.get("pluginType");
+
+		if (pluginType != null) {
+			setPluginType(pluginType);
+		}
+
+		String roles = (String)attributes.get("roles");
+
+		if (roles != null) {
+			setRoles(roles);
+		}
+
+		Boolean active = (Boolean)attributes.get("active");
+
+		if (active != null) {
+			setActive(active);
+		}
 	}
 
 	/**
@@ -191,10 +246,6 @@ public class PluginSettingWrapper implements PluginSetting {
 		return _pluginSetting.isEscapedModel();
 	}
 
-	public void setEscapedModel(boolean escapedModel) {
-		_pluginSetting.setEscapedModel(escapedModel);
-	}
-
 	public java.io.Serializable getPrimaryKeyObj() {
 		return _pluginSetting.getPrimaryKeyObj();
 	}
@@ -265,16 +316,20 @@ public class PluginSettingWrapper implements PluginSetting {
 	}
 
 	/**
-	* Sets an array of required roles of the plugin.
+	* Returns <code>true</code> if the user has permission to use this plugin
+	*
+	* @param userId the primary key of the user
+	* @return <code>true</code> if the user has permission to use this plugin
 	*/
-	public void setRolesArray(java.lang.String[] rolesArray) {
-		_pluginSetting.setRolesArray(rolesArray);
+	public boolean hasPermission(long userId) {
+		return _pluginSetting.hasPermission(userId);
 	}
 
 	/**
 	* Returns <code>true</code> if the plugin has a role with the specified
 	* name.
 	*
+	* @param roleName the role name
 	* @return <code>true</code> if the plugin has a role with the specified
 	name
 	*/
@@ -283,15 +338,20 @@ public class PluginSettingWrapper implements PluginSetting {
 	}
 
 	/**
-	* Returns <code>true</code> if the user has permission to use this plugin
-	*
-	* @return <code>true</code> if the user has permission to use this plugin
+	* Sets an array of required roles of the plugin.
 	*/
-	public boolean hasPermission(long userId) {
-		return _pluginSetting.hasPermission(userId);
+	public void setRolesArray(java.lang.String[] rolesArray) {
+		_pluginSetting.setRolesArray(rolesArray);
 	}
 
+	/**
+	 * @deprecated Renamed to {@link #getWrappedModel}
+	 */
 	public PluginSetting getWrappedPluginSetting() {
+		return _pluginSetting;
+	}
+
+	public PluginSetting getWrappedModel() {
 		return _pluginSetting;
 	}
 

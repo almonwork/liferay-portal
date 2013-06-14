@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -160,6 +160,10 @@ public abstract class BaseWorkflowHandler implements WorkflowHandler {
 			companyId, groupId, getClassName(), 0, 0);
 	}
 
+	public boolean isAssetTypeSearchable() {
+		return _ASSET_TYPE_SEARCHABLE;
+	}
+
 	public boolean isScopeable() {
 		return _SCOPEABLE;
 	}
@@ -202,6 +206,8 @@ public abstract class BaseWorkflowHandler implements WorkflowHandler {
 	protected String getIconPath(ThemeDisplay themeDisplay) {
 		return themeDisplay.getPathThemeImages() + "/common/page.png";
 	}
+
+	private static final boolean _ASSET_TYPE_SEARCHABLE = true;
 
 	private static final boolean _SCOPEABLE = true;
 

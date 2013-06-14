@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -74,14 +74,14 @@ public class EditNodeAction extends PortletAction {
 			if (e instanceof NoSuchNodeException ||
 				e instanceof PrincipalException) {
 
-				SessionErrors.add(actionRequest, e.getClass().getName());
+				SessionErrors.add(actionRequest, e.getClass());
 
 				setForward(actionRequest, "portlet.wiki.error");
 			}
 			else if (e instanceof DuplicateNodeNameException ||
 					 e instanceof NodeNameException) {
 
-				SessionErrors.add(actionRequest, e.getClass().getName());
+				SessionErrors.add(actionRequest, e.getClass());
 			}
 			else {
 				throw e;
@@ -106,7 +106,7 @@ public class EditNodeAction extends PortletAction {
 			if (e instanceof NoSuchNodeException ||
 				e instanceof PrincipalException) {
 
-				SessionErrors.add(renderRequest, e.getClass().getName());
+				SessionErrors.add(renderRequest, e.getClass());
 
 				return mapping.findForward("portlet.wiki.error");
 			}
@@ -141,9 +141,7 @@ public class EditNodeAction extends PortletAction {
 		return node.getName();
 	}
 
-	protected void subscribeNode(ActionRequest actionRequest)
-		throws Exception {
-
+	protected void subscribeNode(ActionRequest actionRequest) throws Exception {
 		long nodeId = ParamUtil.getLong(actionRequest, "nodeId");
 
 		WikiNodeServiceUtil.subscribeNode(nodeId);

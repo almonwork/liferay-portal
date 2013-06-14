@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -21,11 +21,13 @@ import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.util.CharPool;
 import com.liferay.portal.kernel.util.FileUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.PropsKeys;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
+import com.liferay.portal.model.Group;
 import com.liferay.portal.model.Image;
 import com.liferay.portal.model.ResourceConstants;
 import com.liferay.portal.model.User;
@@ -53,6 +55,8 @@ import java.io.IOException;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 
 /**
  * @author Brian Wing Shun Chan
@@ -63,10 +67,11 @@ public class JournalTemplateLocalServiceImpl
 
 	public JournalTemplate addTemplate(
 			long userId, long groupId, String templateId,
-			boolean autoTemplateId, String structureId, String name,
-			String description, String xsl, boolean formatXsl, String langType,
-			boolean cacheable, boolean smallImage, String smallImageURL,
-			File smallFile, ServiceContext serviceContext)
+			boolean autoTemplateId, String structureId,
+			Map<Locale, String> nameMap, Map<Locale, String> descriptionMap,
+			String xsl, boolean formatXsl, String langType, boolean cacheable,
+			boolean smallImage, String smallImageURL, File smallImageFile,
+			ServiceContext serviceContext)
 		throws PortalException, SystemException {
 
 		// Template
@@ -89,17 +94,17 @@ public class JournalTemplateLocalServiceImpl
 			throw new TemplateXslException();
 		}
 
-		byte[] smallBytes = null;
+		byte[] smallImageBytes = null;
 
 		try {
-			smallBytes = FileUtil.getBytes(smallFile);
+			smallImageBytes = FileUtil.getBytes(smallImageFile);
 		}
 		catch (IOException ioe) {
 		}
 
 		validate(
-			groupId, templateId, autoTemplateId, name, xsl, smallImage,
-			smallImageURL, smallFile, smallBytes);
+			groupId, templateId, autoTemplateId, nameMap, xsl, smallImage,
+			smallImageURL, smallImageFile, smallImageBytes);
 
 		if (autoTemplateId) {
 			templateId = String.valueOf(counterLocalService.increment());
@@ -118,8 +123,8 @@ public class JournalTemplateLocalServiceImpl
 		template.setModifiedDate(serviceContext.getModifiedDate(now));
 		template.setTemplateId(templateId);
 		template.setStructureId(structureId);
-		template.setName(name);
-		template.setDescription(description);
+		template.setNameMap(nameMap);
+		template.setDescriptionMap(descriptionMap);
 		template.setXsl(xsl);
 		template.setLangType(langType);
 		template.setCacheable(cacheable);
@@ -131,12 +136,12 @@ public class JournalTemplateLocalServiceImpl
 
 		// Resources
 
-		if (serviceContext.getAddGroupPermissions() ||
-			serviceContext.getAddGuestPermissions()) {
+		if (serviceContext.isAddGroupPermissions() ||
+			serviceContext.isAddGuestPermissions()) {
 
 			addTemplateResources(
-				template, serviceContext.getAddGroupPermissions(),
-				serviceContext.getAddGuestPermissions());
+				template, serviceContext.isAddGroupPermissions(),
+				serviceContext.isAddGuestPermissions());
 		}
 		else {
 			addTemplateResources(
@@ -153,9 +158,32 @@ public class JournalTemplateLocalServiceImpl
 		// Small image
 
 		saveImages(
-			smallImage, template.getSmallImageId(), smallFile, smallBytes);
+			smallImage, template.getSmallImageId(), smallImageFile,
+			smallImageBytes);
 
 		return template;
+	}
+
+	public void addTemplateResources(
+			JournalTemplate template, boolean addGroupPermissions,
+			boolean addGuestPermissions)
+		throws PortalException, SystemException {
+
+		resourceLocalService.addResources(
+			template.getCompanyId(), template.getGroupId(),
+			template.getUserId(), JournalTemplate.class.getName(),
+			template.getId(), false, addGroupPermissions, addGuestPermissions);
+	}
+
+	public void addTemplateResources(
+			JournalTemplate template, String[] groupPermissions,
+			String[] guestPermissions)
+		throws PortalException, SystemException {
+
+		resourceLocalService.addModelResources(
+			template.getCompanyId(), template.getGroupId(),
+			template.getUserId(), JournalTemplate.class.getName(),
+			template.getId(), groupPermissions, guestPermissions);
 	}
 
 	public void addTemplateResources(
@@ -171,18 +199,6 @@ public class JournalTemplateLocalServiceImpl
 	}
 
 	public void addTemplateResources(
-			JournalTemplate template, boolean addGroupPermissions,
-			boolean addGuestPermissions)
-		throws PortalException, SystemException {
-
-		resourceLocalService.addResources(
-			template.getCompanyId(), template.getGroupId(),
-			template.getUserId(), JournalTemplate.class.getName(),
-			template.getId(), false, addGroupPermissions,
-			addGuestPermissions);
-	}
-
-	public void addTemplateResources(
 			long groupId, String templateId, String[] groupPermissions,
 			String[] guestPermissions)
 		throws PortalException, SystemException {
@@ -191,17 +207,6 @@ public class JournalTemplateLocalServiceImpl
 			groupId, templateId);
 
 		addTemplateResources(template, groupPermissions, guestPermissions);
-	}
-
-	public void addTemplateResources(
-			JournalTemplate template, String[] groupPermissions,
-			String[] guestPermissions)
-		throws PortalException, SystemException {
-
-		resourceLocalService.addModelResources(
-			template.getCompanyId(), template.getGroupId(),
-			template.getUserId(), JournalTemplate.class.getName(),
-			template.getId(), groupPermissions, guestPermissions);
 	}
 
 	public void checkNewLine(long groupId, String templateId)
@@ -214,9 +219,7 @@ public class JournalTemplateLocalServiceImpl
 
 		if ((xsl != null) && (xsl.indexOf("\\n") != -1)) {
 			xsl = StringUtil.replace(
-				xsl,
-				new String[] {"\\n", "\\r"},
-				new String[] {"\n", "\r"});
+				xsl, new String[] {"\\n", "\\r"}, new String[] {"\n", "\r"});
 
 			template.setXsl(xsl);
 
@@ -265,8 +268,8 @@ public class JournalTemplateLocalServiceImpl
 		newTemplate.setModifiedDate(now);
 		newTemplate.setTemplateId(newTemplateId);
 		newTemplate.setStructureId(oldTemplate.getStructureId());
-		newTemplate.setName(oldTemplate.getName());
-		newTemplate.setDescription(oldTemplate.getDescription());
+		newTemplate.setNameMap(oldTemplate.getNameMap());
+		newTemplate.setDescriptionMap(oldTemplate.getDescriptionMap());
 		newTemplate.setXsl(oldTemplate.getXsl());
 		newTemplate.setLangType(oldTemplate.getLangType());
 		newTemplate.setCacheable(oldTemplate.isCacheable());
@@ -282,10 +285,10 @@ public class JournalTemplateLocalServiceImpl
 			Image image = imageLocalService.getImage(
 				oldTemplate.getSmallImageId());
 
-			byte[] smallBytes = image.getTextObj();
+			byte[] smallImageBytes = image.getTextObj();
 
 			imageLocalService.updateImage(
-				newTemplate.getSmallImageId(), smallBytes);
+				newTemplate.getSmallImageId(), smallImageBytes);
 		}
 
 		// Resources
@@ -295,24 +298,25 @@ public class JournalTemplateLocalServiceImpl
 		return newTemplate;
 	}
 
-	public void deleteTemplate(long groupId, String templateId)
-		throws PortalException, SystemException {
-
-		templateId = templateId.trim().toUpperCase();
-
-		JournalTemplate template = journalTemplatePersistence.findByG_T(
-			groupId, templateId);
-
-		deleteTemplate(template);
-	}
-
 	public void deleteTemplate(JournalTemplate template)
 		throws PortalException, SystemException {
 
-		if (journalArticlePersistence.countByG_C_T(
-				template.getGroupId(), 0, template.getTemplateId()) > 0) {
+		Group companyGroup = groupLocalService.getCompanyGroup(
+			template.getCompanyId());
 
-			throw new RequiredTemplateException();
+		if (template.getGroupId() == companyGroup.getGroupId()) {
+			if (journalArticlePersistence.countByTemplateId(
+					template.getTemplateId()) > 0) {
+
+				throw new RequiredTemplateException();
+			}
+		}
+		else {
+			if (journalArticlePersistence.countByG_C_T(
+					template.getGroupId(), 0, template.getTemplateId()) > 0) {
+
+				throw new RequiredTemplateException();
+			}
 		}
 
 		// WebDAVProps
@@ -345,6 +349,17 @@ public class JournalTemplateLocalServiceImpl
 		// Template
 
 		journalTemplatePersistence.remove(template);
+	}
+
+	public void deleteTemplate(long groupId, String templateId)
+		throws PortalException, SystemException {
+
+		templateId = templateId.trim().toUpperCase();
+
+		JournalTemplate template = journalTemplatePersistence.findByG_T(
+			groupId, templateId);
+
+		deleteTemplate(template);
 	}
 
 	public void deleteTemplates(long groupId)
@@ -387,6 +402,13 @@ public class JournalTemplateLocalServiceImpl
 	public JournalTemplate getTemplate(long groupId, String templateId)
 		throws PortalException, SystemException {
 
+		return getTemplate(groupId, templateId, false);
+	}
+
+	public JournalTemplate getTemplate(
+			long groupId, String templateId, boolean includeGlobalTemplates)
+		throws PortalException, SystemException {
+
 		templateId = GetterUtil.getString(templateId).toUpperCase();
 
 		if (groupId == 0) {
@@ -396,21 +418,35 @@ public class JournalTemplateLocalServiceImpl
 						"data that references templates without a group id.");
 
 			List<JournalTemplate> templates =
-				journalTemplatePersistence.findByTemplateId(
-					templateId);
+				journalTemplatePersistence.findByTemplateId(templateId);
 
-			if (templates.size() == 0) {
-				throw new NoSuchTemplateException(
-					"No JournalTemplate exists with the template id " +
-						templateId);
-			}
-			else {
+			if (!templates.isEmpty()) {
 				return templates.get(0);
 			}
+
+			throw new NoSuchTemplateException(
+				"No JournalTemplate exists with the template id " + templateId);
 		}
-		else {
-			return journalTemplatePersistence.findByG_T(groupId, templateId);
+
+		JournalTemplate template = journalTemplatePersistence.fetchByG_T(
+			groupId, templateId);
+
+		if (template != null) {
+			return template;
 		}
+
+		if (!includeGlobalTemplates) {
+			throw new NoSuchTemplateException(
+				"No JournalTemplate exists with the template id " + templateId);
+		}
+
+		Group group = groupPersistence.findByPrimaryKey(groupId);
+
+		Group companyGroup = groupLocalService.getCompanyGroup(
+			group.getCompanyId());
+
+		return journalTemplatePersistence.findByG_T(
+			companyGroup.getGroupId(), templateId);
 	}
 
 	public JournalTemplate getTemplateBySmallImageId(long smallImageId)
@@ -487,8 +523,7 @@ public class JournalTemplateLocalServiceImpl
 	public int searchCount(
 			long companyId, long[] groupIds, String templateId,
 			String structureId, String structureIdComparator, String name,
-			String description,
-			boolean andOperator)
+			String description, boolean andOperator)
 		throws SystemException {
 
 		return journalTemplateFinder.countByC_G_T_S_N_D(
@@ -497,10 +532,11 @@ public class JournalTemplateLocalServiceImpl
 	}
 
 	public JournalTemplate updateTemplate(
-			long groupId, String templateId, String structureId, String name,
-			String description, String xsl, boolean formatXsl, String langType,
-			boolean cacheable, boolean smallImage, String smallImageURL,
-			File smallFile, ServiceContext serviceContext)
+			long groupId, String templateId, String structureId,
+			Map<Locale, String> nameMap, Map<Locale, String> descriptionMap,
+			String xsl, boolean formatXsl, String langType, boolean cacheable,
+			boolean smallImage, String smallImageURL, File smallImageFile,
+			ServiceContext serviceContext)
 		throws PortalException, SystemException {
 
 		// Template
@@ -521,15 +557,17 @@ public class JournalTemplateLocalServiceImpl
 			throw new TemplateXslException();
 		}
 
-		byte[] smallBytes = null;
+		byte[] smallImageBytes = null;
 
 		try {
-			smallBytes = FileUtil.getBytes(smallFile);
+			smallImageBytes = FileUtil.getBytes(smallImageFile);
 		}
 		catch (IOException ioe) {
 		}
 
-		validate(name, xsl, smallImage, smallImageURL, smallFile, smallBytes);
+		validate(
+			nameMap, xsl, smallImage, smallImageURL, smallImageFile,
+			smallImageBytes);
 
 		JournalTemplate template = journalTemplatePersistence.findByG_T(
 			groupId, templateId);
@@ -547,8 +585,8 @@ public class JournalTemplateLocalServiceImpl
 			template.setStructureId(structureId);
 		}
 
-		template.setName(name);
-		template.setDescription(description);
+		template.setNameMap(nameMap);
+		template.setDescriptionMap(descriptionMap);
 		template.setXsl(xsl);
 		template.setLangType(langType);
 		template.setCacheable(cacheable);
@@ -567,19 +605,20 @@ public class JournalTemplateLocalServiceImpl
 		// Small image
 
 		saveImages(
-			smallImage, template.getSmallImageId(), smallFile, smallBytes);
+			smallImage, template.getSmallImageId(), smallImageFile,
+			smallImageBytes);
 
 		return template;
 	}
 
 	protected void saveImages(
-			boolean smallImage, long smallImageId, File smallFile,
-			byte[] smallBytes)
+			boolean smallImage, long smallImageId, File smallImageFile,
+			byte[] smallImageBytes)
 		throws PortalException, SystemException {
 
 		if (smallImage) {
-			if ((smallFile != null) && (smallBytes != null)) {
-				imageLocalService.updateImage(smallImageId, smallBytes);
+			if ((smallImageFile != null) && (smallImageBytes != null)) {
+				imageLocalService.updateImage(smallImageId, smallImageBytes);
 			}
 		}
 		else {
@@ -587,19 +626,10 @@ public class JournalTemplateLocalServiceImpl
 		}
 	}
 
-	protected void validate(String templateId) throws PortalException {
-		if ((Validator.isNull(templateId)) ||
-			(Validator.isNumber(templateId)) ||
-			(templateId.indexOf(CharPool.SPACE) != -1)) {
-
-			throw new TemplateIdException();
-		}
-	}
-
 	protected void validate(
 			long groupId, String templateId, boolean autoTemplateId,
-			String name, String xsl, boolean smallImage, String smallImageURL,
-			File smallFile, byte[] smallBytes)
+			Map<Locale, String> nameMap, String xsl, boolean smallImage,
+			String smallImageURL, File smallImageFile, byte[] smallImageBytes)
 		throws PortalException, SystemException {
 
 		if (!autoTemplateId) {
@@ -613,15 +643,19 @@ public class JournalTemplateLocalServiceImpl
 			}
 		}
 
-		validate(name, xsl, smallImage, smallImageURL, smallFile, smallBytes);
+		validate(
+			nameMap, xsl, smallImage, smallImageURL, smallImageFile,
+			smallImageBytes);
 	}
 
 	protected void validate(
-			String name, String xsl, boolean smallImage, String smallImageURL,
-			File smallFile, byte[] smallBytes)
+			Map<Locale, String> nameMap, String xsl, boolean smallImage,
+			String smallImageURL, File smallImageFile, byte[] smallImageBytes)
 		throws PortalException, SystemException {
 
-		if (Validator.isNull(name)) {
+		Locale locale = LocaleUtil.getDefault();
+
+		if (nameMap.isEmpty() || Validator.isNull(nameMap.get(locale))) {
 			throw new TemplateNameException();
 		}
 		else if (Validator.isNull(xsl)) {
@@ -632,9 +666,9 @@ public class JournalTemplateLocalServiceImpl
 			PropsKeys.JOURNAL_IMAGE_EXTENSIONS, StringPool.COMMA);
 
 		if (smallImage && Validator.isNull(smallImageURL) &&
-			smallFile != null && smallBytes != null) {
+			(smallImageFile != null) && (smallImageBytes != null)) {
 
-			String smallImageName = smallFile.getName();
+			String smallImageName = smallImageFile.getName();
 
 			if (smallImageName != null) {
 				boolean validSmallImageExtension = false;
@@ -659,11 +693,20 @@ public class JournalTemplateLocalServiceImpl
 				PropsKeys.JOURNAL_IMAGE_SMALL_MAX_SIZE);
 
 			if ((smallImageMaxSize > 0) &&
-				((smallBytes == null) ||
-					(smallBytes.length > smallImageMaxSize))) {
+				((smallImageBytes == null) ||
+				 (smallImageBytes.length > smallImageMaxSize))) {
 
 				throw new TemplateSmallImageSizeException();
 			}
+		}
+	}
+
+	protected void validate(String templateId) throws PortalException {
+		if (Validator.isNull(templateId) ||
+			Validator.isNumber(templateId) ||
+			(templateId.indexOf(CharPool.SPACE) != -1)) {
+
+			throw new TemplateIdException();
 		}
 	}
 

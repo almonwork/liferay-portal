@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -28,17 +28,16 @@ else if (displayStyle.equals("vertical")) {
 %>
 
 <liferay-util:html-bottom outputKey="taglib_ui_social_bookmark_facebook">
-	<script src="http://connect.facebook.net/<%= locale.getLanguage() %>_<%= locale.getCountry() %>/all.js#xfbml=1"></script>
+	<script src="<%= HttpUtil.getProtocol(request) %>://connect.facebook.net/<%= locale.getLanguage() %>_<%= locale.getCountry() %>/all.js#xfbml=1"></script>
 </liferay-util:html-bottom>
 
-<div id="fb-root"></div>
+<div id="fb-root" />
 
-<fb:like
-	height="<%= (facebookDisplayStyle.equals("standard") || facebookDisplayStyle.equals("button_count")) ? 20 : StringPool.BLANK %>"
-	href="<%= url %>"
-	font=""
-	layout="<%= facebookDisplayStyle%>"
-	send="false"
-	show_faces="true"
->
-</fb:like>
+<div class="fb-like"
+	data-font=""
+	data-height="<%= (facebookDisplayStyle.equals("standard") || facebookDisplayStyle.equals("button_count")) ? 20 : StringPool.BLANK %>"
+	data-href="<%= url %>"
+	data-layout="<%= facebookDisplayStyle %>"
+	data-send="false"
+	data-show_faces="true"
+/>

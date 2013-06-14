@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -50,15 +50,17 @@
 
 		<c:if test="<%= sessionTimeoutWarning > 0 %>">
 			<aui:script use="liferay-session">
-				Liferay.Session.init(
+				Liferay.Session = new Liferay.SessionBase(
 					{
 						autoExtend: <%= PropsValues.SESSION_TIMEOUT_AUTO_EXTEND %>,
-						timeout: <%= sessionTimeout %>,
-						timeoutWarning: <%= sessionTimeoutWarning %>,
+						sessionLength: <%= sessionTimeout %>,
 						redirectOnExpire: <%= sessionRedirectOnExpire %>,
-						redirectUrl: '<%= sessionRedirectUrl %>'
+						redirectUrl: '<%= sessionRedirectUrl %>',
+						warningLength: <%= sessionTimeoutWarning %>
 					}
 				);
+
+				Liferay.Session.plug(Liferay.SessionDisplay);
 			</aui:script>
 		</c:if>
 	</c:if>

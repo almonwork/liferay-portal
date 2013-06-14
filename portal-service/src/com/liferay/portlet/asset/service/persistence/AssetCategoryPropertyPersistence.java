@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,7 +14,6 @@
 
 package com.liferay.portlet.asset.service.persistence;
 
-import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.service.persistence.BasePersistence;
 
 import com.liferay.portlet.asset.model.AssetCategoryProperty;
@@ -541,9 +540,11 @@ public interface AssetCategoryPropertyPersistence extends BasePersistence<AssetC
 	*
 	* @param categoryId the category ID
 	* @param key the key
+	* @return the asset category property that was removed
 	* @throws SystemException if a system exception occurred
 	*/
-	public void removeByCA_K(long categoryId, java.lang.String key)
+	public com.liferay.portlet.asset.model.AssetCategoryProperty removeByCA_K(
+		long categoryId, java.lang.String key)
 		throws com.liferay.portal.kernel.exception.SystemException,
 			com.liferay.portlet.asset.NoSuchCategoryPropertyException;
 
@@ -605,7 +606,4 @@ public interface AssetCategoryPropertyPersistence extends BasePersistence<AssetC
 	*/
 	public int countAll()
 		throws com.liferay.portal.kernel.exception.SystemException;
-
-	public AssetCategoryProperty remove(
-		AssetCategoryProperty assetCategoryProperty) throws SystemException;
 }

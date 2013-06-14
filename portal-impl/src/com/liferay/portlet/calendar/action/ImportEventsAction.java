@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -20,6 +20,7 @@ import com.liferay.portal.kernel.servlet.SessionErrors;
 import com.liferay.portal.kernel.upload.UploadPortletRequest;
 import com.liferay.portal.kernel.util.CalendarUtil;
 import com.liferay.portal.kernel.util.FileUtil;
+import com.liferay.portal.kernel.util.StreamUtil;
 import com.liferay.portal.service.ServiceContext;
 import com.liferay.portal.service.ServiceContextFactory;
 import com.liferay.portal.struts.PortletAction;
@@ -28,7 +29,7 @@ import com.liferay.portlet.calendar.ImportEventsException;
 import com.liferay.portlet.calendar.model.CalEvent;
 import com.liferay.portlet.calendar.service.CalEventServiceUtil;
 
-import java.io.File;
+import java.io.InputStream;
 
 import javax.portlet.ActionRequest;
 import javax.portlet.ActionResponse;
@@ -49,19 +50,23 @@ public class ImportEventsAction extends PortletAction {
 			ActionRequest actionRequest, ActionResponse actionResponse)
 		throws Exception {
 
+		InputStream inputStream = null;
+
 		try {
-			UploadPortletRequest uploadRequest =
+			UploadPortletRequest uploadPortletRequest =
 				PortalUtil.getUploadPortletRequest(actionRequest);
 
 			ServiceContext serviceContext = ServiceContextFactory.getInstance(
 				CalEvent.class.getName(), actionRequest);
 
-			File file = uploadRequest.getFile("file");
+			String fileName = uploadPortletRequest.getFileName("file");
 
-			validate(file);
+			validate(fileName);
+
+			inputStream = uploadPortletRequest.getFileAsStream("file");
 
 			CalEventServiceUtil.importICal4j(
-				serviceContext.getScopeGroupId(), file);
+				serviceContext.getScopeGroupId(), inputStream);
 
 			sendRedirect(actionRequest, actionResponse);
 		}
@@ -70,14 +75,17 @@ public class ImportEventsAction extends PortletAction {
 				_log.error(e, e);
 			}
 
-			SessionErrors.add(actionRequest, e.getClass().getName());
+			SessionErrors.add(actionRequest, e.getClass());
 
 			setForward(actionRequest, "portlet.calendar.error");
 		}
+		finally {
+			StreamUtil.cleanUp(inputStream);
+		}
 	}
 
-	private void validate(File file) throws ImportEventsException {
-		String fileNameExtension = FileUtil.getExtension(file.getName());
+	protected void validate(String fileName) throws ImportEventsException {
+		String fileNameExtension = FileUtil.getExtension(fileName);
 
 		if (!fileNameExtension.equals(CalendarUtil.ICAL_EXTENSION)) {
 			throw new ImportEventsException();

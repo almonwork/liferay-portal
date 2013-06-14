@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -58,7 +58,9 @@ public class LiferayStrutsRequestImpl extends HttpServletRequestWrapper {
 	public Object getAttribute(String name) {
 		Object value = null;
 
-		if (name.startsWith(StrutsUtil.STRUTS_PACKAGE)) {
+		if (name.startsWith(StrutsUtil.STRUTS_PACKAGE) &&
+			_strutsAttributes.containsKey(name)) {
+
 			value = _strutsAttributes.get(name);
 		}
 		else {
@@ -66,16 +68,6 @@ public class LiferayStrutsRequestImpl extends HttpServletRequestWrapper {
 		}
 
 		return value;
-	}
-
-	@Override
-	public void setAttribute(String name, Object value) {
-		if (name.startsWith(StrutsUtil.STRUTS_PACKAGE)) {
-			_strutsAttributes.put(name, value);
-		}
-		else {
-			super.setAttribute(name, value);
-		}
 	}
 
 	@Override
@@ -103,15 +95,35 @@ public class LiferayStrutsRequestImpl extends HttpServletRequestWrapper {
 			InputStream is = super.getInputStream();
 
 			_bytes = FileUtil.getBytes(is);
-
-			is.close();
 		}
 
 		return new UnsyncByteArrayInputStreamWrapper(
 			new UnsyncByteArrayInputStream(_bytes));
 	}
 
-	private Map<String, Object> _strutsAttributes;
+	@Override
+	public void removeAttribute(String name) {
+		if (name.startsWith(StrutsUtil.STRUTS_PACKAGE) &&
+			_strutsAttributes.containsKey(name)) {
+
+			_strutsAttributes.remove(name);
+		}
+		else {
+			super.removeAttribute(name);
+		}
+	}
+
+	@Override
+	public void setAttribute(String name, Object value) {
+		if (name.startsWith(StrutsUtil.STRUTS_PACKAGE)) {
+			_strutsAttributes.put(name, value);
+		}
+		else {
+			super.setAttribute(name, value);
+		}
+	}
+
 	private byte[] _bytes;
+	private Map<String, Object> _strutsAttributes;
 
 }

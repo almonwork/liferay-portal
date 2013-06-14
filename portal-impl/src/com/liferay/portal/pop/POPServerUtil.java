@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -23,7 +23,6 @@ import com.liferay.portal.kernel.scheduler.SchedulerEntryImpl;
 import com.liferay.portal.kernel.scheduler.StorageType;
 import com.liferay.portal.kernel.scheduler.TimeUnit;
 import com.liferay.portal.kernel.scheduler.TriggerType;
-import com.liferay.portal.kernel.util.PortalClassLoaderUtil;
 import com.liferay.portal.kernel.util.UnmodifiableList;
 import com.liferay.portal.pop.messaging.POPNotificationsMessageListener;
 import com.liferay.portal.util.PropsValues;
@@ -37,9 +36,7 @@ import java.util.List;
  */
 public class POPServerUtil {
 
-	public static void addListener(MessageListener listener)
-		throws Exception {
-
+	public static void addListener(MessageListener listener) throws Exception {
 		_instance._addListener(listener);
 	}
 
@@ -85,19 +82,6 @@ public class POPServerUtil {
 		}
 	}
 
-	private void _deleteListener(MessageListenerWrapper listener) {
-		Iterator<MessageListener> itr = _listeners.iterator();
-
-		while (itr.hasNext()) {
-			MessageListenerWrapper curListener =
-				(MessageListenerWrapper)itr.next();
-
-			if (curListener.equals(listener)) {
-				itr.remove();
-			}
-		}
-	}
-
 	private void _deleteListener(MessageListener listener) {
 		if (listener == null) {
 			if (_log.isDebugEnabled()) {
@@ -118,6 +102,19 @@ public class POPServerUtil {
 
 		if (_log.isDebugEnabled()) {
 			_log.debug("Listeners size " + _listeners.size());
+		}
+	}
+
+	private void _deleteListener(MessageListenerWrapper listener) {
+		Iterator<MessageListener> itr = _listeners.iterator();
+
+		while (itr.hasNext()) {
+			MessageListenerWrapper curListener =
+				(MessageListenerWrapper)itr.next();
+
+			if (curListener.equals(listener)) {
+				itr.remove();
+			}
 		}
 	}
 
@@ -145,8 +142,7 @@ public class POPServerUtil {
 				PropsValues.POP_SERVER_NOTIFICATIONS_INTERVAL);
 
 			SchedulerEngineUtil.schedule(
-				schedulerEntry, StorageType.MEMORY_CLUSTERED,
-				PortalClassLoaderUtil.getClassLoader(), 0);
+				schedulerEntry, StorageType.MEMORY_CLUSTERED, null, 0);
 		}
 		catch (Exception e) {
 			_log.error(e, e);

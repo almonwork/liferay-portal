@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -28,6 +28,7 @@ import com.liferay.portal.kernel.xml.QName;
 import com.liferay.portal.kernel.xml.SAXReader;
 import com.liferay.portal.kernel.xml.Text;
 import com.liferay.portal.kernel.xml.XPath;
+import com.liferay.portal.security.pacl.PACLClassLoaderUtil;
 import com.liferay.portal.util.EntityResolver;
 import com.liferay.portal.util.PropsValues;
 import com.liferay.util.xml.XMLSafeReader;
@@ -40,6 +41,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -292,53 +294,39 @@ public class SAXReaderImpl implements SAXReader {
 	}
 
 	public XPath createXPath(String xPathExpression) {
-		return new XPathImpl(DocumentHelper.createXPath(xPathExpression));
+		return createXPath(xPathExpression, null);
 	}
 
-	public List<Node> selectNodes(
-		String xpathFilterExpression, List<Node> nodes) {
+	public XPath createXPath(
+		String xPathExpression, Map<String, String> namespaceContextMap) {
 
-		return toNewNodes(
-			DocumentHelper.selectNodes(
-				xpathFilterExpression, toOldNodes(nodes)));
+		return new XPathImpl(
+			DocumentHelper.createXPath(xPathExpression), namespaceContextMap);
 	}
 
-	public List<Node> selectNodes(
-		String xpathFilterExpression, Node node) {
+	public XPath createXPath(
+		String xPathExpression, String prefix, String namespace) {
 
-		NodeImpl nodeImpl = (NodeImpl)node;
+		Map<String, String> namespaceContextMap = new HashMap<String, String>();
 
-		return toNewNodes(
-			DocumentHelper.selectNodes(
-				xpathFilterExpression, nodeImpl.getWrappedNode()));
-	}
+		namespaceContextMap.put(prefix, namespace);
 
-	public void sort(List<Node> nodes, String xpathExpression) {
-		DocumentHelper.sort(toOldNodes(nodes), xpathExpression);
-	}
-
-	public void sort(
-		List<Node> nodes, String xpathExpression, boolean distinct) {
-
-		DocumentHelper.sort(toOldNodes(nodes), xpathExpression, distinct);
+		return createXPath(xPathExpression, namespaceContextMap);
 	}
 
 	public Document read(File file) throws DocumentException {
 		return read(file, false);
 	}
 
-	public Document read(File file, boolean validate)
-		throws DocumentException {
-
+	public Document read(File file, boolean validate) throws DocumentException {
 		ClassLoader classLoader = getClass().getClassLoader();
 
-		Thread currentThread = Thread.currentThread();
-
-		ClassLoader contextClassLoader = currentThread.getContextClassLoader();
+		ClassLoader contextClassLoader =
+			PACLClassLoaderUtil.getContextClassLoader();
 
 		try {
 			if (contextClassLoader != classLoader) {
-				currentThread.setContextClassLoader(classLoader);
+				PACLClassLoaderUtil.setContextClassLoader(classLoader);
 			}
 
 			org.dom4j.io.SAXReader saxReader = getSAXReader(validate);
@@ -350,7 +338,7 @@ public class SAXReaderImpl implements SAXReader {
 		}
 		finally {
 			if (contextClassLoader != classLoader) {
-				currentThread.setContextClassLoader(contextClassLoader);
+				PACLClassLoaderUtil.setContextClassLoader(contextClassLoader);
 			}
 		}
 	}
@@ -364,13 +352,12 @@ public class SAXReaderImpl implements SAXReader {
 
 		ClassLoader classLoader = getClass().getClassLoader();
 
-		Thread currentThread = Thread.currentThread();
-
-		ClassLoader contextClassLoader = currentThread.getContextClassLoader();
+		ClassLoader contextClassLoader =
+			PACLClassLoaderUtil.getContextClassLoader();
 
 		try {
 			if (contextClassLoader != classLoader) {
-				currentThread.setContextClassLoader(classLoader);
+				PACLClassLoaderUtil.setContextClassLoader(classLoader);
 			}
 
 			org.dom4j.io.SAXReader saxReader = getSAXReader(validate);
@@ -382,7 +369,7 @@ public class SAXReaderImpl implements SAXReader {
 		}
 		finally {
 			if (contextClassLoader != classLoader) {
-				currentThread.setContextClassLoader(contextClassLoader);
+				PACLClassLoaderUtil.setContextClassLoader(contextClassLoader);
 			}
 		}
 	}
@@ -396,13 +383,12 @@ public class SAXReaderImpl implements SAXReader {
 
 		ClassLoader classLoader = getClass().getClassLoader();
 
-		Thread currentThread = Thread.currentThread();
-
-		ClassLoader contextClassLoader = currentThread.getContextClassLoader();
+		ClassLoader contextClassLoader =
+			PACLClassLoaderUtil.getContextClassLoader();
 
 		try {
 			if (contextClassLoader != classLoader) {
-				currentThread.setContextClassLoader(classLoader);
+				PACLClassLoaderUtil.setContextClassLoader(classLoader);
 			}
 
 			org.dom4j.io.SAXReader saxReader = getSAXReader(validate);
@@ -414,7 +400,7 @@ public class SAXReaderImpl implements SAXReader {
 		}
 		finally {
 			if (contextClassLoader != classLoader) {
-				currentThread.setContextClassLoader(contextClassLoader);
+				PACLClassLoaderUtil.setContextClassLoader(contextClassLoader);
 			}
 		}
 	}
@@ -436,13 +422,12 @@ public class SAXReaderImpl implements SAXReader {
 	public Document read(URL url, boolean validate) throws DocumentException {
 		ClassLoader classLoader = getClass().getClassLoader();
 
-		Thread currentThread = Thread.currentThread();
-
-		ClassLoader contextClassLoader = currentThread.getContextClassLoader();
+		ClassLoader contextClassLoader =
+			PACLClassLoaderUtil.getContextClassLoader();
 
 		try {
 			if (contextClassLoader != classLoader) {
-				currentThread.setContextClassLoader(classLoader);
+				PACLClassLoaderUtil.setContextClassLoader(classLoader);
 			}
 
 			org.dom4j.io.SAXReader saxReader = getSAXReader(validate);
@@ -454,7 +439,7 @@ public class SAXReaderImpl implements SAXReader {
 		}
 		finally {
 			if (contextClassLoader != classLoader) {
-				currentThread.setContextClassLoader(contextClassLoader);
+				PACLClassLoaderUtil.setContextClassLoader(contextClassLoader);
 			}
 		}
 	}
@@ -471,6 +456,32 @@ public class SAXReaderImpl implements SAXReader {
 		return read(new URL(url), validate);
 	}
 
+	public List<Node> selectNodes(
+		String xPathFilterExpression, List<Node> nodes) {
+
+		return toNewNodes(
+			DocumentHelper.selectNodes(
+				xPathFilterExpression, toOldNodes(nodes)));
+	}
+
+	public List<Node> selectNodes(String xPathFilterExpression, Node node) {
+		NodeImpl nodeImpl = (NodeImpl)node;
+
+		return toNewNodes(
+			DocumentHelper.selectNodes(
+				xPathFilterExpression, nodeImpl.getWrappedNode()));
+	}
+
+	public void sort(List<Node> nodes, String xPathExpression) {
+		DocumentHelper.sort(toOldNodes(nodes), xPathExpression);
+	}
+
+	public void sort(
+		List<Node> nodes, String xPathExpression, boolean distinct) {
+
+		DocumentHelper.sort(toOldNodes(nodes), xPathExpression, distinct);
+	}
+
 	protected org.dom4j.io.SAXReader getSAXReader(boolean validate) {
 		org.dom4j.io.SAXReader reader = null;
 
@@ -484,15 +495,13 @@ public class SAXReaderImpl implements SAXReader {
 			reader.setEntityResolver(new EntityResolver());
 
 			reader.setFeature(_FEATURES_DYNAMIC, validate);
+			reader.setFeature(_FEATURES_EXTERNAL_GENERAL_ENTITIES, validate);
+			reader.setFeature(_FEATURES_LOAD_DTD_GRAMMAR, validate);
+			reader.setFeature(_FEATURES_LOAD_EXTERNAL_DTD, validate);
 			reader.setFeature(_FEATURES_VALIDATION, validate);
 			reader.setFeature(_FEATURES_VALIDATION_SCHEMA, validate);
 			reader.setFeature(
 				_FEATURES_VALIDATION_SCHEMA_FULL_CHECKING, validate);
-
-			if (!validate) {
-				reader.setFeature(_FEATURES_LOAD_DTD_GRAMMAR, validate);
-				reader.setFeature(_FEATURES_LOAD_EXTERNAL_DTD, validate);
-			}
 		}
 		catch (Exception e) {
 			if (_log.isWarnEnabled()) {
@@ -510,6 +519,9 @@ public class SAXReaderImpl implements SAXReader {
 
 	private static final String _FEATURES_DYNAMIC =
 		"http://apache.org/xml/features/validation/dynamic";
+
+	private static final String _FEATURES_EXTERNAL_GENERAL_ENTITIES =
+		"http://xml.org/sax/features/external-general-entities";
 
 	private static final String _FEATURES_LOAD_DTD_GRAMMAR =
 		"http://apache.org/xml/features/nonvalidating/load-dtd-grammar";

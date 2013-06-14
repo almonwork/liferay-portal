@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,7 +14,6 @@
 
 package com.liferay.portal.service.persistence;
 
-import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.model.ServiceComponent;
 
 /**
@@ -305,10 +304,11 @@ public interface ServiceComponentPersistence extends BasePersistence<ServiceComp
 	*
 	* @param buildNamespace the build namespace
 	* @param buildNumber the build number
+	* @return the service component that was removed
 	* @throws SystemException if a system exception occurred
 	*/
-	public void removeByBNS_BNU(java.lang.String buildNamespace,
-		long buildNumber)
+	public com.liferay.portal.model.ServiceComponent removeByBNS_BNU(
+		java.lang.String buildNamespace, long buildNumber)
 		throws com.liferay.portal.NoSuchServiceComponentException,
 			com.liferay.portal.kernel.exception.SystemException;
 
@@ -349,7 +349,4 @@ public interface ServiceComponentPersistence extends BasePersistence<ServiceComp
 	*/
 	public int countAll()
 		throws com.liferay.portal.kernel.exception.SystemException;
-
-	public ServiceComponent remove(ServiceComponent serviceComponent)
-		throws SystemException;
 }

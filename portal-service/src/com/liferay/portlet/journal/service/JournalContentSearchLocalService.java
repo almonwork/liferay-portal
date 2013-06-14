@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -19,6 +19,7 @@ import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.transaction.Isolation;
 import com.liferay.portal.kernel.transaction.Propagation;
 import com.liferay.portal.kernel.transaction.Transactional;
+import com.liferay.portal.service.BaseLocalService;
 import com.liferay.portal.service.PersistedModelLocalService;
 
 /**
@@ -36,8 +37,8 @@ import com.liferay.portal.service.PersistedModelLocalService;
  */
 @Transactional(isolation = Isolation.PORTAL, rollbackFor =  {
 	PortalException.class, SystemException.class})
-public interface JournalContentSearchLocalService
-	extends PersistedModelLocalService {
+public interface JournalContentSearchLocalService extends BaseLocalService,
+	PersistedModelLocalService {
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
@@ -68,10 +69,12 @@ public interface JournalContentSearchLocalService
 	* Deletes the journal content search with the primary key from the database. Also notifies the appropriate model listeners.
 	*
 	* @param contentSearchId the primary key of the journal content search
+	* @return the journal content search that was removed
 	* @throws PortalException if a journal content search with the primary key could not be found
 	* @throws SystemException if a system exception occurred
 	*/
-	public void deleteJournalContentSearch(long contentSearchId)
+	public com.liferay.portlet.journal.model.JournalContentSearch deleteJournalContentSearch(
+		long contentSearchId)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException;
 
@@ -79,11 +82,14 @@ public interface JournalContentSearchLocalService
 	* Deletes the journal content search from the database. Also notifies the appropriate model listeners.
 	*
 	* @param journalContentSearch the journal content search
+	* @return the journal content search that was removed
 	* @throws SystemException if a system exception occurred
 	*/
-	public void deleteJournalContentSearch(
+	public com.liferay.portlet.journal.model.JournalContentSearch deleteJournalContentSearch(
 		com.liferay.portlet.journal.model.JournalContentSearch journalContentSearch)
 		throws com.liferay.portal.kernel.exception.SystemException;
+
+	public com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery();
 
 	/**
 	* Performs a dynamic query on the database and returns the matching rows.
@@ -145,6 +151,11 @@ public interface JournalContentSearchLocalService
 	*/
 	public long dynamicQueryCount(
 		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery)
+		throws com.liferay.portal.kernel.exception.SystemException;
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public com.liferay.portlet.journal.model.JournalContentSearch fetchJournalContentSearch(
+		long contentSearchId)
 		throws com.liferay.portal.kernel.exception.SystemException;
 
 	/**
@@ -278,6 +289,11 @@ public interface JournalContentSearchLocalService
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public int getLayoutIdsCount(java.lang.String articleId)
+		throws com.liferay.portal.kernel.exception.SystemException;
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public java.util.List<com.liferay.portlet.journal.model.JournalContentSearch> getPortletContentSearches(
+		java.lang.String portletId)
 		throws com.liferay.portal.kernel.exception.SystemException;
 
 	public com.liferay.portlet.journal.model.JournalContentSearch updateContentSearch(

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -90,13 +90,6 @@ public class PhoneUtil {
 		return getPersistence()
 				   .findWithDynamicQuery(dynamicQuery, start, end,
 			orderByComparator);
-	}
-
-	/**
-	 * @see com.liferay.portal.service.persistence.BasePersistence#remove(com.liferay.portal.model.BaseModel)
-	 */
-	public static Phone remove(Phone phone) throws SystemException {
-		return getPersistence().remove(phone);
 	}
 
 	/**
@@ -1059,10 +1052,10 @@ public class PhoneUtil {
 		return _persistence;
 	}
 
+	/**
+	 * @deprecated
+	 */
 	public void setPersistence(PhonePersistence persistence) {
-		_persistence = persistence;
-
-		ReferenceRegistry.registerReference(PhoneUtil.class, "_persistence");
 	}
 
 	private static PhonePersistence _persistence;

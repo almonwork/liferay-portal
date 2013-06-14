@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,6 +14,11 @@
 
 package com.liferay.portlet.ratings.model;
 
+import com.liferay.portal.model.ModelWrapper;
+
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * <p>
  * This class is a wrapper for {@link RatingsStats}.
@@ -23,7 +28,8 @@ package com.liferay.portlet.ratings.model;
  * @see       RatingsStats
  * @generated
  */
-public class RatingsStatsWrapper implements RatingsStats {
+public class RatingsStatsWrapper implements RatingsStats,
+	ModelWrapper<RatingsStats> {
 	public RatingsStatsWrapper(RatingsStats ratingsStats) {
 		_ratingsStats = ratingsStats;
 	}
@@ -34,6 +40,57 @@ public class RatingsStatsWrapper implements RatingsStats {
 
 	public String getModelClassName() {
 		return RatingsStats.class.getName();
+	}
+
+	public Map<String, Object> getModelAttributes() {
+		Map<String, Object> attributes = new HashMap<String, Object>();
+
+		attributes.put("statsId", getStatsId());
+		attributes.put("classNameId", getClassNameId());
+		attributes.put("classPK", getClassPK());
+		attributes.put("totalEntries", getTotalEntries());
+		attributes.put("totalScore", getTotalScore());
+		attributes.put("averageScore", getAverageScore());
+
+		return attributes;
+	}
+
+	public void setModelAttributes(Map<String, Object> attributes) {
+		Long statsId = (Long)attributes.get("statsId");
+
+		if (statsId != null) {
+			setStatsId(statsId);
+		}
+
+		Long classNameId = (Long)attributes.get("classNameId");
+
+		if (classNameId != null) {
+			setClassNameId(classNameId);
+		}
+
+		Long classPK = (Long)attributes.get("classPK");
+
+		if (classPK != null) {
+			setClassPK(classPK);
+		}
+
+		Integer totalEntries = (Integer)attributes.get("totalEntries");
+
+		if (totalEntries != null) {
+			setTotalEntries(totalEntries);
+		}
+
+		Double totalScore = (Double)attributes.get("totalScore");
+
+		if (totalScore != null) {
+			setTotalScore(totalScore);
+		}
+
+		Double averageScore = (Double)attributes.get("averageScore");
+
+		if (averageScore != null) {
+			setAverageScore(averageScore);
+		}
 	}
 
 	/**
@@ -79,6 +136,10 @@ public class RatingsStatsWrapper implements RatingsStats {
 	*/
 	public java.lang.String getClassName() {
 		return _ratingsStats.getClassName();
+	}
+
+	public void setClassName(java.lang.String className) {
+		_ratingsStats.setClassName(className);
 	}
 
 	/**
@@ -191,10 +252,6 @@ public class RatingsStatsWrapper implements RatingsStats {
 		return _ratingsStats.isEscapedModel();
 	}
 
-	public void setEscapedModel(boolean escapedModel) {
-		_ratingsStats.setEscapedModel(escapedModel);
-	}
-
 	public java.io.Serializable getPrimaryKeyObj() {
 		return _ratingsStats.getPrimaryKeyObj();
 	}
@@ -249,7 +306,14 @@ public class RatingsStatsWrapper implements RatingsStats {
 		_ratingsStats.persist();
 	}
 
+	/**
+	 * @deprecated Renamed to {@link #getWrappedModel}
+	 */
 	public RatingsStats getWrappedRatingsStats() {
+		return _ratingsStats;
+	}
+
+	public RatingsStats getWrappedModel() {
 		return _ratingsStats;
 	}
 

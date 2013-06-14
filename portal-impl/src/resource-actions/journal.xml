@@ -51,18 +51,22 @@
 			<supports>
 				<action-key>ADD_ARTICLE</action-key>
 				<action-key>ADD_FEED</action-key>
+				<action-key>ADD_FOLDER</action-key>
 				<action-key>ADD_STRUCTURE</action-key>
 				<action-key>ADD_TEMPLATE</action-key>
 				<action-key>SUBSCRIBE</action-key>
+				<action-key>VIEW</action-key>
 			</supports>
 			<site-member-defaults />
 			<guest-defaults />
 			<guest-unsupported>
 				<action-key>ADD_ARTICLE</action-key>
 				<action-key>ADD_FEED</action-key>
+				<action-key>ADD_FOLDER</action-key>
 				<action-key>ADD_STRUCTURE</action-key>
 				<action-key>ADD_TEMPLATE</action-key>
 				<action-key>SUBSCRIBE</action-key>
+				<action-key>VIEW</action-key>
 			</guest-unsupported>
 		</permissions>
 	</model-resource>
@@ -97,32 +101,6 @@
 				<action-key>UPDATE_DISCUSSION</action-key>
 			</guest-unsupported>
 		</permissions>
-		<social-equity>
-			<social-equity-mapping>
-				<action-key>ADD_ARTICLE</action-key>
-				<participation-value>0</participation-value>
-				<participation-lifespan>0</participation-lifespan>
-			</social-equity-mapping>
-			<social-equity-mapping>
-				<action-key>ADD_DISCUSSION</action-key>
-				<information-value>2</information-value>
-				<information-lifespan>10</information-lifespan>
-				<participation-value>2</participation-value>
-				<participation-lifespan>10</participation-lifespan>
-			</social-equity-mapping>
-			<!--<social-equity-mapping>
-				<action-key>UPDATE</action-key>
-				<participation-value>0</participation-value>
-				<participation-lifespan>0</participation-lifespan>
-			</social-equity-mapping>-->
-			<social-equity-mapping>
-				<action-key>VIEW</action-key>
-				<information-value>1</information-value>
-				<information-lifespan>5</information-lifespan>
-				<participation-value>1</participation-value>
-				<participation-lifespan>5</participation-lifespan>
-			</social-equity-mapping>
-		</social-equity>
 	</model-resource>
 	<model-resource>
 		<model-name>com.liferay.portlet.journal.model.JournalFeed</model-name>
@@ -143,6 +121,35 @@
 				<action-key>VIEW</action-key>
 			</guest-defaults>
 			<guest-unsupported>
+				<action-key>UPDATE</action-key>
+			</guest-unsupported>
+		</permissions>
+	</model-resource>
+	<model-resource>
+		<model-name>com.liferay.portlet.journal.model.JournalFolder</model-name>
+		<portlet-ref>
+			<portlet-name>15</portlet-name>
+		</portlet-ref>
+		<permissions>
+			<supports>
+				<action-key>ACCESS</action-key>
+				<action-key>ADD_ARTICLE</action-key>
+				<action-key>ADD_SUBFOLDER</action-key>
+				<action-key>DELETE</action-key>
+				<action-key>PERMISSIONS</action-key>
+				<action-key>UPDATE</action-key>
+				<action-key>VIEW</action-key>
+			</supports>
+			<site-member-defaults>
+				<action-key>ADD_ARTICLE</action-key>
+				<action-key>VIEW</action-key>
+			</site-member-defaults>
+			<guest-defaults>
+				<action-key>VIEW</action-key>
+			</guest-defaults>
+			<guest-unsupported>
+				<action-key>ADD_ARTICLE</action-key>
+				<action-key>ADD_SUBFOLDER</action-key>
 				<action-key>UPDATE</action-key>
 			</guest-unsupported>
 		</permissions>

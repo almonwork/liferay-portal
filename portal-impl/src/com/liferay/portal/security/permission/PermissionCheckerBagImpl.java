@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -53,22 +53,6 @@ public class PermissionCheckerBagImpl implements PermissionCheckerBag {
 		_roles = roles;
 	}
 
-	public List<Group> getUserGroups() {
-		return _userGroups;
-	}
-
-	public List<Organization> getUserOrgs() {
-		return _userOrgs;
-	}
-
-	public List<Group> getUserOrgGroups() {
-		return _userOrgGroups;
-	}
-
-	public List<Group> getUserUserGroupGroups() {
-		return _userUserGroupGroups;
-	}
-
 	public List<Group> getGroups() {
 		return _groups;
 	}
@@ -95,6 +79,22 @@ public class PermissionCheckerBagImpl implements PermissionCheckerBag {
 
 	public List<Role> getRoles() {
 		return _roles;
+	}
+
+	public List<Group> getUserGroups() {
+		return _userGroups;
+	}
+
+	public List<Group> getUserOrgGroups() {
+		return _userOrgGroups;
+	}
+
+	public List<Organization> getUserOrgs() {
+		return _userOrgs;
+	}
+
+	public List<Group> getUserUserGroupGroups() {
+		return _userUserGroupGroups;
 	}
 
 	/**
@@ -126,13 +126,27 @@ public class PermissionCheckerBagImpl implements PermissionCheckerBag {
 		Boolean value = _groupAdmins.get(group.getGroupId());
 
 		if (value == null) {
-			value = Boolean.valueOf(
-				isGroupAdminImpl(permissionChecker, group));
+			value = Boolean.valueOf(isGroupAdminImpl(permissionChecker, group));
 
 			_groupAdmins.put(group.getGroupId(), value);
 		}
 
 		return value.booleanValue();
+	}
+
+	public boolean isGroupMember(
+			PermissionChecker permissionChecker, Group group)
+		throws Exception {
+
+		for (Role role : _roles) {
+			String name = role.getName();
+
+			if (name.equals(RoleConstants.SITE_MEMBER)) {
+				return true;
+			}
+		}
+
+		return false;
 	}
 
 	public boolean isGroupOwner(
@@ -142,10 +156,26 @@ public class PermissionCheckerBagImpl implements PermissionCheckerBag {
 		Boolean value = _groupOwners.get(group.getGroupId());
 
 		if (value == null) {
-			value = Boolean.valueOf(
-				isGroupOwnerImpl(permissionChecker, group));
+			value = Boolean.valueOf(isGroupOwnerImpl(permissionChecker, group));
 
 			_groupOwners.put(group.getGroupId(), value);
+		}
+
+		return value.booleanValue();
+	}
+
+	public boolean isOrganizationAdmin(
+			PermissionChecker permissionChecker, Organization organization)
+		throws Exception {
+
+		Boolean value = _organizationAdmins.get(
+			organization.getOrganizationId());
+
+		if (value == null) {
+			value = Boolean.valueOf(
+				isOrganizationAdminImpl(permissionChecker, organization));
+
+			_organizationAdmins.put(organization.getOrganizationId(), value);
 		}
 
 		return value.booleanValue();
@@ -160,8 +190,8 @@ public class PermissionCheckerBagImpl implements PermissionCheckerBag {
 					_userId, group.getGroupId(),
 					RoleConstants.SITE_ADMINISTRATOR, true) ||
 				UserGroupRoleLocalServiceUtil.hasUserGroupRole(
-					_userId, group.getGroupId(),
-					RoleConstants.SITE_OWNER, true)) {
+					_userId, group.getGroupId(), RoleConstants.SITE_OWNER,
+					true)) {
 
 				return true;
 			}
@@ -294,15 +324,42 @@ public class PermissionCheckerBagImpl implements PermissionCheckerBag {
 		return false;
 	}
 
-	private long _userId;
-	private List<Group> _userGroups;
-	private List<Organization> _userOrgs;
-	private List<Group> _userOrgGroups;
-	private List<Group> _userUserGroupGroups;
-	private List<Group> _groups;
-	private long[] _roleIds;
-	private List<Role> _roles;
+	protected boolean isOrganizationAdminImpl(
+			PermissionChecker permissionChecker, Organization organization)
+		throws PortalException, SystemException {
+
+		while (organization != null) {
+			Group organizationGroup = organization.getGroup();
+
+			long organizationGroupId = organizationGroup.getGroupId();
+
+			if (UserGroupRoleLocalServiceUtil.hasUserGroupRole(
+					_userId, organizationGroupId,
+					RoleConstants.ORGANIZATION_ADMINISTRATOR, true) ||
+				UserGroupRoleLocalServiceUtil.hasUserGroupRole(
+					_userId, organizationGroupId,
+					RoleConstants.ORGANIZATION_OWNER, true)) {
+
+				return true;
+			}
+
+			organization = organization.getParentOrganization();
+		}
+
+		return false;
+	}
+
 	private Map<Long, Boolean> _groupAdmins = new HashMap<Long, Boolean>();
 	private Map<Long, Boolean> _groupOwners = new HashMap<Long, Boolean>();
+	private List<Group> _groups;
+	private Map<Long, Boolean> _organizationAdmins =
+		new HashMap<Long, Boolean>();
+	private long[] _roleIds;
+	private List<Role> _roles;
+	private List<Group> _userGroups;
+	private long _userId;
+	private List<Group> _userOrgGroups;
+	private List<Organization> _userOrgs;
+	private List<Group> _userUserGroupGroups;
 
 }

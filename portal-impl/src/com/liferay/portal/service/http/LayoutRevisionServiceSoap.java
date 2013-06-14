@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -48,8 +48,8 @@ import java.rmi.RemoteException;
  *
  * <p>
  * You can see a list of services at
- * http://localhost:8080/tunnel-web/secure/axis. Set the property
- * <b>tunnel.servlet.hosts.allowed</b> in portal.properties to configure
+ * http://localhost:8080/api/secure/axis. Set the property
+ * <b>axis.servlet.hosts.allowed</b> in portal.properties to configure
  * security.
  * </p>
  *
@@ -67,7 +67,8 @@ public class LayoutRevisionServiceSoap {
 	public static com.liferay.portal.model.LayoutRevisionSoap addLayoutRevision(
 		long userId, long layoutSetBranchId, long layoutBranchId,
 		long parentLayoutRevisionId, boolean head, long plid,
-		boolean privateLayout, java.lang.String name, java.lang.String title,
+		long portletPreferencesPlid, boolean privateLayout,
+		java.lang.String name, java.lang.String title,
 		java.lang.String description, java.lang.String keywords,
 		java.lang.String robots, java.lang.String typeSettings,
 		boolean iconImage, long iconImageId, java.lang.String themeId,
@@ -78,10 +79,10 @@ public class LayoutRevisionServiceSoap {
 		try {
 			com.liferay.portal.model.LayoutRevision returnValue = LayoutRevisionServiceUtil.addLayoutRevision(userId,
 					layoutSetBranchId, layoutBranchId, parentLayoutRevisionId,
-					head, plid, privateLayout, name, title, description,
-					keywords, robots, typeSettings, iconImage, iconImageId,
-					themeId, colorSchemeId, wapThemeId, wapColorSchemeId, css,
-					serviceContext);
+					head, plid, portletPreferencesPlid, privateLayout, name,
+					title, description, keywords, robots, typeSettings,
+					iconImage, iconImageId, themeId, colorSchemeId, wapThemeId,
+					wapColorSchemeId, css, serviceContext);
 
 			return com.liferay.portal.model.LayoutRevisionSoap.toSoapModel(returnValue);
 		}

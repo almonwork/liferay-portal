@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -38,7 +38,7 @@ import java.util.List;
 public class ShoppingItemFinderImpl
 	extends BasePersistenceImpl<ShoppingItem> implements ShoppingItemFinder {
 
-	public static String COUNT_BY_G_C =
+	public static final String COUNT_BY_G_C =
 		ShoppingItemFinder.class.getName() + ".countByG_C";
 
 	public int countByG_C(long groupId, List<Long> categoryIds)
@@ -67,7 +67,7 @@ public class ShoppingItemFinderImpl
 				for (int i = 0; i < categoryIds.length; i++) {
 					query.append("ShoppingItem.categoryId = ? ");
 
-					if (i + 1 < categoryIds.length) {
+					if ((i + 1) < categoryIds.length) {
 						query.append("OR ");
 					}
 				}
@@ -93,7 +93,7 @@ public class ShoppingItemFinderImpl
 			qPos.add(true);
 			qPos.add(true);
 
-			Iterator<Long> itr = q.list().iterator();
+			Iterator<Long> itr = q.iterate();
 
 			if (itr.hasNext()) {
 				Long count = itr.next();
@@ -134,7 +134,7 @@ public class ShoppingItemFinderImpl
 				for (int i = 0; i < categoryIds.length; i++) {
 					query.append("ShoppingItem.categoryId = ? ");
 
-					if (i + 1 < categoryIds.length) {
+					if ((i + 1) < categoryIds.length) {
 						query.append("OR ");
 					}
 				}
@@ -164,7 +164,7 @@ public class ShoppingItemFinderImpl
 			qPos.add(keywords);
 			qPos.add(keywords);
 
-			Iterator<Long> itr = q.list().iterator();
+			Iterator<Long> itr = q.iterate();
 
 			if (itr.hasNext()) {
 				Long count = itr.next();
@@ -204,7 +204,7 @@ public class ShoppingItemFinderImpl
 				for (int i = 0; i < categoryIds.length; i++) {
 					query.append("ShoppingItem.categoryId = ? ");
 
-					if (i + 1 < categoryIds.length) {
+					if ((i + 1) < categoryIds.length) {
 						query.append("OR ");
 					}
 				}
@@ -230,7 +230,7 @@ public class ShoppingItemFinderImpl
 			qPos.add(true);
 			qPos.add(true);
 
-			Iterator<Long> itr = q.list().iterator();
+			Iterator<Long> itr = q.iterate();
 
 			if (itr.hasNext()) {
 				Long count = itr.next();
@@ -279,7 +279,7 @@ public class ShoppingItemFinderImpl
 				for (int i = 0; i < categoryIds.length; i++) {
 					query.append("ShoppingItem.categoryId = ? ");
 
-					if (i + 1 < categoryIds.length) {
+					if ((i + 1) < categoryIds.length) {
 						query.append("OR ");
 					}
 				}
@@ -338,7 +338,7 @@ public class ShoppingItemFinderImpl
 				for (int i = 0; i < categoryIds.length; i++) {
 					query.append("ShoppingItem.categoryId = ? ");
 
-					if (i + 1 < categoryIds.length) {
+					if ((i + 1) < categoryIds.length) {
 						query.append("OR ");
 					}
 				}
@@ -402,7 +402,7 @@ public class ShoppingItemFinderImpl
 				for (int i = 0; i < categoryIds.length; i++) {
 					query.append("ShoppingItem.categoryId = ? ");
 
-					if (i + 1 < categoryIds.length) {
+					if ((i + 1) < categoryIds.length) {
 						query.append("OR ");
 					}
 				}
@@ -473,7 +473,7 @@ public class ShoppingItemFinderImpl
 				qPos.add(categoryId);
 			}
 
-			Iterator<Long> itr = q.list().iterator();
+			Iterator<Long> itr = q.iterate();
 
 			if (itr.hasNext()) {
 				Long count = itr.next();

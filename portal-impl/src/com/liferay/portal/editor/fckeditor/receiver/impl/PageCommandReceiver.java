@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -20,11 +20,12 @@ import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.model.Group;
 import com.liferay.portal.model.Layout;
 import com.liferay.portal.model.LayoutConstants;
-import com.liferay.portal.service.LayoutLocalServiceUtil;
+import com.liferay.portal.service.LayoutServiceUtil;
 import com.liferay.portal.util.PortalUtil;
 
-import java.io.File;
+import java.io.InputStream;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.w3c.dom.Document;
@@ -43,8 +44,8 @@ public class PageCommandReceiver extends BaseCommandReceiver {
 
 	@Override
 	protected String fileUpload(
-		CommandArgument commandArgument, String fileName, File file,
-		String extension) {
+		CommandArgument commandArgument, String fileName,
+		InputStream inputStream, String extension, long size) {
 
 		return "0";
 	}
@@ -74,46 +75,6 @@ public class PageCommandReceiver extends BaseCommandReceiver {
 		}
 	}
 
-	private Layout _getLayout(String layoutName, Layout layout)
-		throws Exception {
-
-		String friendlyURL = layout.getFriendlyURL();
-
-		if (layoutName.equals(friendlyURL)) {
-			return layout;
-		}
-
-		List<Layout> layoutChildren = layout.getChildren();
-
-		if (layoutChildren.size() == 0) {
-			return null;
-		}
-		else {
-			for (Layout layoutChild : layoutChildren) {
-				Layout currentLayout = _getLayout(layoutName, layoutChild);
-
-				if (currentLayout != null) {
-					return currentLayout;
-				}
-			}
-		}
-
-		return null;
-	}
-
-	private String _getLayoutName(Layout layout) {
-		return layout.getFriendlyURL();
-	}
-
-	private String _getLayoutName(String folderName) {
-		String layoutName = folderName.substring(
-			folderName.lastIndexOf('~') + 1, folderName.length() - 1);
-
-		layoutName = layoutName.replace('>', '/');
-
-		return layoutName;
-	}
-
 	private void _getFiles(
 			CommandArgument commandArgument, Document document, Node rootNode)
 		throws Exception {
@@ -128,9 +89,17 @@ public class PageCommandReceiver extends BaseCommandReceiver {
 
 		Group group = commandArgument.getCurrentGroup();
 
-		List<Layout> layouts = LayoutLocalServiceUtil.getLayouts(
-			group.getGroupId(), false,
-			LayoutConstants.DEFAULT_PARENT_LAYOUT_ID);
+		List<Layout> layouts = new ArrayList<Layout>();
+
+		layouts.addAll(
+			LayoutServiceUtil.getLayouts(
+				group.getGroupId(), false,
+				LayoutConstants.DEFAULT_PARENT_LAYOUT_ID));
+
+		layouts.addAll(
+			LayoutServiceUtil.getLayouts(
+				group.getGroupId(), true,
+				LayoutConstants.DEFAULT_PARENT_LAYOUT_ID));
 
 		if (("/" + commandArgument.getCurrentGroupName() + "/").equals(
 				commandArgument.getCurrentFolder())) {
@@ -146,7 +115,7 @@ public class PageCommandReceiver extends BaseCommandReceiver {
 				fileElement.setAttribute(
 					"url",
 					PortalUtil.getLayoutURL(
-						layout,commandArgument.getThemeDisplay(), false));
+						layout, commandArgument.getThemeDisplay(), false));
 			}
 		}
 		else {
@@ -201,9 +170,17 @@ public class PageCommandReceiver extends BaseCommandReceiver {
 		else {
 			Group group = commandArgument.getCurrentGroup();
 
-			List<Layout> layouts = LayoutLocalServiceUtil.getLayouts(
-				group.getGroupId(), false,
-				LayoutConstants.DEFAULT_PARENT_LAYOUT_ID);
+			List<Layout> layouts = new ArrayList<Layout>();
+
+			layouts.addAll(
+				LayoutServiceUtil.getLayouts(
+					group.getGroupId(), false,
+					LayoutConstants.DEFAULT_PARENT_LAYOUT_ID));
+
+			layouts.addAll(
+				LayoutServiceUtil.getLayouts(
+					group.getGroupId(), true,
+					LayoutConstants.DEFAULT_PARENT_LAYOUT_ID));
 
 			if (("/" + commandArgument.getCurrentGroupName() + "/").equals(
 					commandArgument.getCurrentFolder())) {
@@ -249,6 +226,46 @@ public class PageCommandReceiver extends BaseCommandReceiver {
 				}
 			}
 		}
+	}
+
+	private Layout _getLayout(String layoutName, Layout layout)
+		throws Exception {
+
+		String friendlyURL = layout.getFriendlyURL();
+
+		if (layoutName.equals(friendlyURL)) {
+			return layout;
+		}
+
+		List<Layout> layoutChildren = layout.getChildren();
+
+		if (layoutChildren.size() == 0) {
+			return null;
+		}
+		else {
+			for (Layout layoutChild : layoutChildren) {
+				Layout currentLayout = _getLayout(layoutName, layoutChild);
+
+				if (currentLayout != null) {
+					return currentLayout;
+				}
+			}
+		}
+
+		return null;
+	}
+
+	private String _getLayoutName(Layout layout) {
+		return layout.getFriendlyURL();
+	}
+
+	private String _getLayoutName(String folderName) {
+		String layoutName = folderName.substring(
+			folderName.lastIndexOf('~') + 1, folderName.length() - 1);
+
+		layoutName = layoutName.replace('>', '/');
+
+		return layoutName;
 	}
 
 }

@@ -16,42 +16,77 @@
 <tr>
 	<td>waitForElementPresent</td>
 	<td>link=Control Panel</td>
-	<td></td>
+	<td>Control Panel</td>
 </tr>
 <tr>
 	<td>clickAtAndWait</td>
 	<td>link=Control Panel</td>
-	<td></td>
+	<td>Control Panel</td>
 </tr>
 <tr>
 	<td>clickAtAndWait</td>
 	<td>link=Message Boards</td>
-	<td></td>
+	<td>Message Boards</td>
+</tr>
+<tr>
+	<td>assertText</td>
+	<td>//td[2]/a/strong</td>
+	<td>Tést Catégory</td>
 </tr>
 <tr>
 	<td>clickAtAndWait</td>
-	<td>//a/strong</td>
-	<td></td>
+	<td>//td[2]/a/strong</td>
+	<td>Tést Catégory</td>
 </tr>
 <tr>
 	<td>clickAtAndWait</td>
 	<td>//input[@value='Post New Thread']</td>
-	<td></td>
-</tr>
-<tr>
-	<td>waitForVisible</td>
-	<td>_162_subject</td>
-	<td></td>
-</tr>
-<tr>
-	<td>typeKeys</td>
-	<td>_162_subject</td>
-	<td>Null Test Entr</td>
+	<td>Post New Thread</td>
 </tr>
 <tr>
 	<td>type</td>
-	<td>_162_subject</td>
+	<td>//input[@id='_162_subject']</td>
 	<td>Null Test Entry</td>
+</tr>
+<tr>
+	<td>waitForElementPresent</td>
+	<td>//textarea[@id='_162_editor' and @style='display: none;']</td>
+	<td>Text Area</td>
+</tr>
+<tr>
+	<td>assertText</td>
+	<td>//span[@id='cke_34_label' and .='Source']</td>
+	<td>Source</td>
+</tr>
+<tr>
+	<td>clickAt</td>
+	<td>//span[@id='cke_34_label' and .='Source']</td>
+	<td>Source</td>
+</tr>
+<tr>
+	<td>waitForVisible</td>
+	<td>//td[@id='cke_contents__162_editor']/textarea</td>
+	<td>CK Editor</td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>//td[@id='cke_contents__162_editor']/textarea</td>
+	<td></td>
+</tr>
+<tr>
+	<td>assertText</td>
+	<td>//span[@id='cke_34_label' and .='Source']</td>
+	<td>Source</td>
+</tr>
+<tr>
+	<td>clickAt</td>
+	<td>//span[@id='cke_34_label' and .='Source']</td>
+	<td>Source</td>
+</tr>
+<tr>
+	<td>waitForElementPresent</td>
+	<td>//textarea[@id='_162_editor' and @style='display: none;']</td>
+	<td>Text Area</td>
 </tr>
 <tr>
 	<td>waitForVisible</td>
@@ -64,7 +99,7 @@
 	<td>CK Editor</td>
 </tr>
 <tr>
-	<td>type</td>
+	<td>waitForText</td>
 	<td>//body</td>
 	<td></td>
 </tr>
@@ -74,26 +109,30 @@
 	<td>top</td>
 </tr>
 <tr>
-	<td>waitForVisible</td>
-	<td>//input[@value='Publish']</td>
-	<td></td>
-</tr>
-<tr>
 	<td>clickAtAndWait</td>
 	<td>//input[@value='Publish']</td>
-	<td></td>
+	<td>Publish</td>
 </tr>
 <tr>
-	<td>assertTextPresent</td>
-	<td>Your request failed to complete.</td>
-	<td></td>
+	<td>assertText</td>
+	<td>//div[@class='portlet-msg-success']</td>
+	<td>Your request completed successfully.</td>
 </tr>
 <tr>
-	<td>assertTextPresent</td>
-	<td>Please enter a valid message.</td>
-	<td></td>
+	<td>assertText</td>
+	<td>//div[1]/h1/span</td>
+	<td>Null Test Entry</td>
 </tr>
-
+<tr>
+	<td>assertText</td>
+	<td>//div/a/strong</td>
+	<td>Null Test Entry</td>
+</tr>
+<tr>
+	<td>assertText</td>
+	<td>//div[@class='thread-body']</td>
+	<td>Null Test Entry</td>
+</tr>
 </tbody></table>
 </body>
 </html>

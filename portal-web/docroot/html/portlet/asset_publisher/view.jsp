@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -21,7 +21,7 @@ if (mergeUrlTags || mergeLayoutTags) {
 	String[] compilerTagNames = new String[0];
 
 	if (mergeUrlTags) {
-		compilerTagNames = (String[])request.getAttribute(WebKeys.TAGS_COMPILER_ENTRIES);
+		compilerTagNames = ParamUtil.getParameterValues(request, "tags");
 	}
 
 	if (mergeLayoutTags) {
@@ -78,17 +78,17 @@ if (enableTagBasedNavigation && selectionStyle.equals("manual") && ((assetEntryQ
 	selectionStyle = "dynamic";
 }
 
-Group group = themeDisplay.getScopeGroup();
+Group scopeGroup = themeDisplay.getScopeGroup();
 %>
 
-<c:if test="<%= (group != null) && (!group.hasStagingGroup() || group.isStagingGroup()) && !portletName.equals(PortletKeys.RELATED_ASSETS) %>">
+<c:if test="<%= (scopeGroup != null) && (!scopeGroup.hasStagingGroup() || scopeGroup.isStagingGroup()) && !portletName.equals(PortletKeys.RELATED_ASSETS) %>">
 	<aui:form name="fm">
 
 		<%
 		for (long groupId : groupIds) {
 		%>
 
-			<div class="add-asset-selector">
+			<div class="lfr-meta-actions add-asset-selector">
 				<%@ include file="/html/portlet/asset_publisher/add_asset.jspf" %>
 			</div>
 
@@ -110,32 +110,11 @@ if (!paginationType.equals("none")) {
 }
 %>
 
-<c:if test='<%= (assetCategoryId > 0) && selectionStyle.equals("dynamic") %>'>
-	<h1 class="asset-categorization-title">
-		<%= LanguageUtil.format(pageContext, "content-with-x-x", new String[] {assetVocabularyName, assetCategoryName}) %>
-	</h1>
-
-	<%
-	AssetUtil.addPortletBreadcrumbEntries(assetCategoryId, request, portletURL);
-	%>
-
-</c:if>
-
-<c:if test='<%= Validator.isNotNull(assetTagName) && selectionStyle.equals("dynamic") %>'>
-	<h1 class="asset-categorization-title">
-		<%= LanguageUtil.format(pageContext, "content-with-tag-x", HtmlUtil.escape(assetTagName)) %>
-	</h1>
-
-	<%
-	AssetUtil.addPortletBreadcrumbEntry(request, assetTagName, currentURL);
-	%>
-
-</c:if>
-
-<c:if test='<%= portletName.equals(PortletKeys.RELATED_ASSETS) && (assetEntryQuery.getLinkedAssetEntryId() > 0) %>'>
-	<h1 class="related-assets-title">
-		<%= LanguageUtil.format(pageContext, "content-related-to-x", AssetEntryServiceUtil.getEntry(assetEntryQuery.getLinkedAssetEntryId()).getTitle(locale)) %>
-	</h1>
+<c:if test="<%= showMetadataDescriptions %>">
+	<liferay-ui:categorization-filter
+		assetType="content"
+		portletURL="<%= portletURL%>"
+	/>
 </c:if>
 
 <c:choose>

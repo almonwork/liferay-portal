@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -16,6 +16,7 @@ package com.liferay.portal.upgrade.v6_1_0;
 
 import com.liferay.portal.kernel.dao.jdbc.DataAccess;
 import com.liferay.portal.kernel.language.LanguageUtil;
+import com.liferay.portal.kernel.upgrade.UpgradeProcess;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.LocalizationUtil;
 import com.liferay.portal.kernel.util.StringBundler;
@@ -30,10 +31,10 @@ import java.sql.ResultSet;
 import java.util.Locale;
 
 /**
+ * @author Jorge Ferrer
  * @author Julio Camarero
  */
-public class UpgradeLayout
-	extends com.liferay.portal.upgrade.v4_4_0.UpgradeLayout {
+public class UpgradeLayout extends UpgradeProcess {
 
 	@Override
 	protected void doUpgrade() throws Exception {
@@ -42,7 +43,7 @@ public class UpgradeLayout
 		ResultSet rs = null;
 
 		try {
-			con = DataAccess.getConnection();
+			con = DataAccess.getUpgradeOptimizedConnection();
 
 			ps = con.prepareStatement(
 				"select plid, name, title, typeSettings from Layout");
@@ -60,6 +61,41 @@ public class UpgradeLayout
 		}
 		finally {
 			DataAccess.cleanUp(con, ps, rs);
+		}
+	}
+
+	protected void updateJavaScript(
+			UnicodeProperties typeSettingsProperties, String javaScript1,
+			String javaScript2, String javaScript3)
+		throws Exception {
+
+		StringBundler sb = new StringBundler(6);
+
+		if (Validator.isNotNull(javaScript1)) {
+			sb.append("// Custom JavaScript 1\n\n");
+			sb.append(javaScript1);
+
+			typeSettingsProperties.remove("javascript-1");
+		}
+
+		if (Validator.isNotNull(javaScript2)) {
+			sb.append("\n\n\n // Custom JavaScript 2\n\n");
+			sb.append(javaScript2);
+
+			typeSettingsProperties.remove("javascript-2");
+		}
+
+		if (Validator.isNotNull(javaScript3)) {
+			sb.append("\n\n\n // Custom JavaScript 3\n\n");
+			sb.append(javaScript3);
+
+			typeSettingsProperties.remove("javascript-3");
+		}
+
+		String javascript = sb.toString();
+
+		if (Validator.isNotNull(javascript)) {
+			typeSettingsProperties.put("javascript", javascript);
 		}
 	}
 
@@ -138,41 +174,6 @@ public class UpgradeLayout
 		}
 	}
 
-	protected void updateJavaScript(
-			UnicodeProperties typeSettingsProperties, String javaScript1,
-			String javaScript2, String javaScript3)
-		throws Exception {
-
-		StringBundler sb = new StringBundler(6);
-
-		if (Validator.isNotNull(javaScript1)) {
-			sb.append("// Custom JavaScript 1\n\n");
-			sb.append(javaScript1);
-
-			typeSettingsProperties.remove("javascript-1");
-		}
-
-		if (Validator.isNotNull(javaScript2)) {
-			sb.append("\n\n\n // Custom JavaScript 2\n\n");
-			sb.append(javaScript2);
-
-			typeSettingsProperties.remove("javascript-2");
-		}
-
-		if (Validator.isNotNull(javaScript3)) {
-			sb.append("\n\n\n // Custom JavaScript 3\n\n");
-			sb.append(javaScript3);
-
-			typeSettingsProperties.remove("javascript-3");
-		}
-
-		String javascript = sb.toString();
-
-		if (Validator.isNotNull(javascript)) {
-			typeSettingsProperties.put("javascript", javascript);
-		}
-	}
-
 	protected UnicodeProperties updateMetaField(
 			long plid, UnicodeProperties typeSettingsProperties,
 			String propertyName, String xmlName, String columName)
@@ -200,7 +201,7 @@ public class UpgradeLayout
 		PreparedStatement ps = null;
 
 		try {
-			con = DataAccess.getConnection();
+			con = DataAccess.getUpgradeOptimizedConnection();
 
 			ps = con.prepareStatement(
 				"update Layout set " + columName + " = ? where plid = " + plid);
@@ -216,14 +217,12 @@ public class UpgradeLayout
 		return typeSettingsProperties;
 	}
 
-	protected void updateName(long plid, String name)
-		throws Exception {
-
+	protected void updateName(long plid, String name) throws Exception {
 		Connection con = null;
 		PreparedStatement ps = null;
 
 		try {
-			con = DataAccess.getConnection();
+			con = DataAccess.getUpgradeOptimizedConnection();
 
 			ps = con.prepareStatement(
 				"update Layout set name = ? where plid = " + plid);
@@ -242,12 +241,33 @@ public class UpgradeLayout
 		PreparedStatement ps = null;
 
 		try {
-			con = DataAccess.getConnection();
+			con = DataAccess.getUpgradeOptimizedConnection();
 
 			ps = con.prepareStatement(
 				"update Layout set title = ? where plid = " + plid);
 
 			ps.setString(1, title);
+
+			ps.executeUpdate();
+		}
+		finally {
+			DataAccess.cleanUp(con, ps);
+		}
+	}
+
+	protected void updateTypeSettings(long plid, String typeSettings)
+		throws Exception {
+
+		Connection con = null;
+		PreparedStatement ps = null;
+
+		try {
+			con = DataAccess.getUpgradeOptimizedConnection();
+
+			ps = con.prepareStatement(
+				"update Layout set typeSettings = ? where plid = " + plid);
+
+			ps.setString(1, typeSettings);
 
 			ps.executeUpdate();
 		}

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -15,9 +15,9 @@
 package com.liferay.portal.upgrade.v6_0_5;
 
 import com.liferay.portal.kernel.upgrade.UpgradeProcess;
-import com.liferay.portal.kernel.upgrade.util.UpgradeTable;
-import com.liferay.portal.kernel.upgrade.util.UpgradeTableFactoryUtil;
 import com.liferay.portal.upgrade.v6_0_5.util.JournalArticleTable;
+
+import java.sql.SQLException;
 
 /**
  * @author Brian Wing Shun Chan
@@ -29,16 +29,12 @@ public class UpgradeJournal extends UpgradeProcess {
 		try {
 			runSQL("alter_column_type JournalArticle title VARCHAR(300) null");
 		}
-		catch (Exception e) {
-			UpgradeTable upgradeTable = UpgradeTableFactoryUtil.getUpgradeTable(
+		catch (SQLException sqle) {
+			upgradeTable(
 				JournalArticleTable.TABLE_NAME,
-				JournalArticleTable.TABLE_COLUMNS);
-
-			upgradeTable.setCreateSQL(JournalArticleTable.TABLE_SQL_CREATE);
-			upgradeTable.setIndexesSQL(
+				JournalArticleTable.TABLE_COLUMNS,
+				JournalArticleTable.TABLE_SQL_CREATE,
 				JournalArticleTable.TABLE_SQL_ADD_INDEXES);
-
-			upgradeTable.updateTable();
 		}
 	}
 

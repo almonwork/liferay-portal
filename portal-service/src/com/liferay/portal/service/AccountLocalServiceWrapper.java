@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -23,7 +23,8 @@ package com.liferay.portal.service;
  * @see       AccountLocalService
  * @generated
  */
-public class AccountLocalServiceWrapper implements AccountLocalService {
+public class AccountLocalServiceWrapper implements AccountLocalService,
+	ServiceWrapper<AccountLocalService> {
 	public AccountLocalServiceWrapper(AccountLocalService accountLocalService) {
 		_accountLocalService = accountLocalService;
 	}
@@ -55,24 +56,31 @@ public class AccountLocalServiceWrapper implements AccountLocalService {
 	* Deletes the account with the primary key from the database. Also notifies the appropriate model listeners.
 	*
 	* @param accountId the primary key of the account
+	* @return the account that was removed
 	* @throws PortalException if a account with the primary key could not be found
 	* @throws SystemException if a system exception occurred
 	*/
-	public void deleteAccount(long accountId)
+	public com.liferay.portal.model.Account deleteAccount(long accountId)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException {
-		_accountLocalService.deleteAccount(accountId);
+		return _accountLocalService.deleteAccount(accountId);
 	}
 
 	/**
 	* Deletes the account from the database. Also notifies the appropriate model listeners.
 	*
 	* @param account the account
+	* @return the account that was removed
 	* @throws SystemException if a system exception occurred
 	*/
-	public void deleteAccount(com.liferay.portal.model.Account account)
+	public com.liferay.portal.model.Account deleteAccount(
+		com.liferay.portal.model.Account account)
 		throws com.liferay.portal.kernel.exception.SystemException {
-		_accountLocalService.deleteAccount(account);
+		return _accountLocalService.deleteAccount(account);
+	}
+
+	public com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery() {
+		return _accountLocalService.dynamicQuery();
 	}
 
 	/**
@@ -144,6 +152,11 @@ public class AccountLocalServiceWrapper implements AccountLocalService {
 		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery)
 		throws com.liferay.portal.kernel.exception.SystemException {
 		return _accountLocalService.dynamicQueryCount(dynamicQuery);
+	}
+
+	public com.liferay.portal.model.Account fetchAccount(long accountId)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return _accountLocalService.fetchAccount(accountId);
 	}
 
 	/**
@@ -248,12 +261,26 @@ public class AccountLocalServiceWrapper implements AccountLocalService {
 		return _accountLocalService.getAccount(companyId, accountId);
 	}
 
+	/**
+	 * @deprecated Renamed to {@link #getWrappedService}
+	 */
 	public AccountLocalService getWrappedAccountLocalService() {
 		return _accountLocalService;
 	}
 
+	/**
+	 * @deprecated Renamed to {@link #setWrappedService}
+	 */
 	public void setWrappedAccountLocalService(
 		AccountLocalService accountLocalService) {
+		_accountLocalService = accountLocalService;
+	}
+
+	public AccountLocalService getWrappedService() {
+		return _accountLocalService;
+	}
+
+	public void setWrappedService(AccountLocalService accountLocalService) {
 		_accountLocalService = accountLocalService;
 	}
 

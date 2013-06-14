@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,6 +14,9 @@
 
 package com.liferay.portal.model;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * <p>
  * This class is a wrapper for {@link PortletPreferences}.
@@ -23,7 +26,8 @@ package com.liferay.portal.model;
  * @see       PortletPreferences
  * @generated
  */
-public class PortletPreferencesWrapper implements PortletPreferences {
+public class PortletPreferencesWrapper implements PortletPreferences,
+	ModelWrapper<PortletPreferences> {
 	public PortletPreferencesWrapper(PortletPreferences portletPreferences) {
 		_portletPreferences = portletPreferences;
 	}
@@ -34,6 +38,57 @@ public class PortletPreferencesWrapper implements PortletPreferences {
 
 	public String getModelClassName() {
 		return PortletPreferences.class.getName();
+	}
+
+	public Map<String, Object> getModelAttributes() {
+		Map<String, Object> attributes = new HashMap<String, Object>();
+
+		attributes.put("portletPreferencesId", getPortletPreferencesId());
+		attributes.put("ownerId", getOwnerId());
+		attributes.put("ownerType", getOwnerType());
+		attributes.put("plid", getPlid());
+		attributes.put("portletId", getPortletId());
+		attributes.put("preferences", getPreferences());
+
+		return attributes;
+	}
+
+	public void setModelAttributes(Map<String, Object> attributes) {
+		Long portletPreferencesId = (Long)attributes.get("portletPreferencesId");
+
+		if (portletPreferencesId != null) {
+			setPortletPreferencesId(portletPreferencesId);
+		}
+
+		Long ownerId = (Long)attributes.get("ownerId");
+
+		if (ownerId != null) {
+			setOwnerId(ownerId);
+		}
+
+		Integer ownerType = (Integer)attributes.get("ownerType");
+
+		if (ownerType != null) {
+			setOwnerType(ownerType);
+		}
+
+		Long plid = (Long)attributes.get("plid");
+
+		if (plid != null) {
+			setPlid(plid);
+		}
+
+		String portletId = (String)attributes.get("portletId");
+
+		if (portletId != null) {
+			setPortletId(portletId);
+		}
+
+		String preferences = (String)attributes.get("preferences");
+
+		if (preferences != null) {
+			setPreferences(preferences);
+		}
 	}
 
 	/**
@@ -182,10 +237,6 @@ public class PortletPreferencesWrapper implements PortletPreferences {
 		return _portletPreferences.isEscapedModel();
 	}
 
-	public void setEscapedModel(boolean escapedModel) {
-		_portletPreferences.setEscapedModel(escapedModel);
-	}
-
 	public java.io.Serializable getPrimaryKeyObj() {
 		return _portletPreferences.getPrimaryKeyObj();
 	}
@@ -240,7 +291,14 @@ public class PortletPreferencesWrapper implements PortletPreferences {
 		_portletPreferences.persist();
 	}
 
+	/**
+	 * @deprecated Renamed to {@link #getWrappedModel}
+	 */
 	public PortletPreferences getWrappedPortletPreferences() {
+		return _portletPreferences;
+	}
+
+	public PortletPreferences getWrappedModel() {
 		return _portletPreferences;
 	}
 

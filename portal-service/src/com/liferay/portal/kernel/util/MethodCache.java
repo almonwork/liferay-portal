@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,28 +14,17 @@
 
 package com.liferay.portal.kernel.util;
 
+import com.liferay.portal.kernel.security.pacl.permission.PortalRuntimePermission;
+
 import java.lang.reflect.Method;
 
-import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * @author Michael C. Han
  */
 public class MethodCache {
-
-	public static Method get(String className, String methodName)
-		throws ClassNotFoundException, NoSuchMethodException {
-
-		return get(null, null, className, methodName);
-	}
-
-	public static Method get(
-			String className, String methodName, Class<?>[] parameterTypes)
-		throws ClassNotFoundException, NoSuchMethodException {
-
-		return get(null, null, className, methodName, parameterTypes);
-	}
 
 	public static Method get(
 			Map<String, Class<?>> classesMap, Map<MethodKey, Method> methodsMap,
@@ -53,30 +42,49 @@ public class MethodCache {
 		MethodKey methodKey = new MethodKey(
 			className, methodName, parameterTypes);
 
-		return _instance._get(classesMap, methodsMap, methodKey);
+		return getInstance()._get(classesMap, methodsMap, methodKey);
 	}
 
 	public static Method get(MethodKey methodKey)
 		throws ClassNotFoundException, NoSuchMethodException {
 
-		return _instance._get(null, null, methodKey);
+		return getInstance()._get(null, null, methodKey);
+	}
+
+	public static Method get(String className, String methodName)
+		throws ClassNotFoundException, NoSuchMethodException {
+
+		return get(null, null, className, methodName);
+	}
+
+	public static Method get(
+			String className, String methodName, Class<?>[] parameterTypes)
+		throws ClassNotFoundException, NoSuchMethodException {
+
+		return get(null, null, className, methodName, parameterTypes);
+	}
+
+	public static MethodCache getInstance() {
+		PortalRuntimePermission.checkGetBeanProperty(MethodCache.class);
+
+		return _instance;
 	}
 
 	public static Method put(MethodKey methodKey, Method method) {
-		return _instance._put(methodKey, method);
+		return getInstance()._put(methodKey, method);
 	}
 
 	public static void remove(Class<?> clazz) {
-		_instance._remove(clazz);
+		getInstance()._remove(clazz);
 	}
 
 	public static void reset() {
-		_instance._reset();
+		getInstance()._reset();
 	}
 
 	private MethodCache() {
-		_classesMap = new HashMap<String, Class<?>>();
-		_methodsMap = new HashMap<MethodKey, Method>();
+		_classesMap = new ConcurrentHashMap<String, Class<?>>();
+		_methodsMap = new ConcurrentHashMap<MethodKey, Method>();
 	}
 
 	private Method _get(

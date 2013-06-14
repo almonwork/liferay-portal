@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -21,8 +21,8 @@ String tabs2 = ParamUtil.getString(request, "tabs2", "general");
 
 String redirect = ParamUtil.getString(request, "redirect");
 
-String emailFromName = ParamUtil.getString(request, "emailFromName", MBUtil.getEmailFromName(preferences));
-String emailFromAddress = ParamUtil.getString(request, "emailFromAddress", MBUtil.getEmailFromAddress(preferences));
+String emailFromName = ParamUtil.getString(request, "emailFromName", MBUtil.getEmailFromName(preferences, company.getCompanyId()));
+String emailFromAddress = ParamUtil.getString(request, "emailFromAddress", MBUtil.getEmailFromAddress(preferences, company.getCompanyId()));
 
 String emailMessageAddedSubjectPrefix = ParamUtil.getString(request, "emailMessageAddedSubjectPrefix", MBUtil.getEmailMessageAddedSubjectPrefix(preferences));
 String emailMessageAddedBody = ParamUtil.getString(request, "emailMessageAddedBody", MBUtil.getEmailMessageAddedBody(preferences));
@@ -51,7 +51,7 @@ else if (tabs2.equals("message-updated-email")) {
 }
 %>
 
-<liferay-portlet:renderURL var="portletURL" portletConfiguration="true">
+<liferay-portlet:renderURL portletConfiguration="true" var="portletURL">
 	<portlet:param name="tabs2" value="<%= tabs2 %>" />
 	<portlet:param name="redirect" value="<%= redirect %>" />
 </liferay-portlet:renderURL>
@@ -104,6 +104,13 @@ else if (tabs2.equals("message-updated-email")) {
 				<aui:input name="preferences--enableRatings--" type="checkbox" value="<%= enableRatings %>" />
 
 				<aui:input name="preferences--threadAsQuestionByDefault--" type="checkbox" value="<%= threadAsQuestionByDefault %>" />
+
+				<aui:select label="show-recent-posts-from-last" name="preferences--recentPostsDateOffset--">
+					<aui:option label='<%= LanguageUtil.format(pageContext, "x-hours", 24) %>' selected='<%= recentPostsDateOffset.equals("1") %>' value="1" />
+					<aui:option label='<%= LanguageUtil.format(pageContext, "x-days", 7) %>' selected='<%= recentPostsDateOffset.equals("7") %>' value="7" />
+					<aui:option label='<%= LanguageUtil.format(pageContext, "x-days", 30) %>' selected='<%= recentPostsDateOffset.equals("30") %>' value="30" />
+					<aui:option label='<%= LanguageUtil.format(pageContext, "x-days", 365) %>' selected='<%= recentPostsDateOffset.equals("365") %>' value="365" />
+				</aui:select>
 			</aui:fieldset>
 		</c:when>
 		<c:when test='<%= tabs2.equals("email-from") %>'>
@@ -137,12 +144,16 @@ else if (tabs2.equals("message-updated-email")) {
 					<dd>
 						<liferay-ui:message key="the-company-name-associated-with-the-message-board" />
 					</dd>
-					<dt>
-						[$MAILING_LIST_ADDRESS$]
-					</dt>
-					<dd>
-						<liferay-ui:message key="the-email-address-of-the-mailing-list" />
-					</dd>
+
+					<c:if test="<%= PropsValues.POP_SERVER_NOTIFICATIONS_ENABLED %>">
+						<dt>
+							[$MAILING_LIST_ADDRESS$]
+						</dt>
+						<dd>
+							<liferay-ui:message key="the-email-address-of-the-mailing-list" />
+						</dd>
+					</c:if>
+
 					<dt>
 						[$MESSAGE_USER_ADDRESS$]
 					</dt>
@@ -235,12 +246,16 @@ else if (tabs2.equals("message-updated-email")) {
 					<dd>
 						<%= HtmlUtil.escape(emailFromName) %>
 					</dd>
-					<dt>
-						[$MAILING_LIST_ADDRESS$]
-					</dt>
-					<dd>
-						<liferay-ui:message key="the-email-address-of-the-mailing-list" />
-					</dd>
+
+					<c:if test="<%= PropsValues.POP_SERVER_NOTIFICATIONS_ENABLED %>">
+						<dt>
+							[$MAILING_LIST_ADDRESS$]
+						</dt>
+						<dd>
+							<liferay-ui:message key="the-email-address-of-the-mailing-list" />
+						</dd>
+					</c:if>
+
 					<dt>
 						[$MESSAGE_BODY$]
 					</dt>
@@ -258,6 +273,12 @@ else if (tabs2.equals("message-updated-email")) {
 					</dt>
 					<dd>
 						<liferay-ui:message key="the-message-subject" />
+					</dd>
+					<dt>
+						[$MESSAGE_URL$]
+					</dt>
+					<dd>
+						<liferay-ui:message key="the-message-url" />
 					</dd>
 					<dt>
 						[$MESSAGE_USER_ADDRESS$]
@@ -289,18 +310,21 @@ else if (tabs2.equals("message-updated-email")) {
 					<dd>
 						<liferay-ui:message key="the-site-name-associated-with-the-message-board" />
 					</dd>
-					<dt>
-						[$TO_ADDRESS$]
-					</dt>
-					<dd>
-						<liferay-ui:message key="the-address-of-the-email-recipient" />
-					</dd>
-					<dt>
-						[$TO_NAME$]
-					</dt>
-					<dd>
-						<liferay-ui:message key="the-name-of-the-email-recipient" />
-					</dd>
+
+					<c:if test="<%= !PropsValues.MESSAGE_BOARDS_EMAIL_BULK %>">
+						<dt>
+							[$TO_ADDRESS$]
+						</dt>
+						<dd>
+							<liferay-ui:message key="the-address-of-the-email-recipient" />
+						</dd>
+						<dt>
+							[$TO_NAME$]
+						</dt>
+						<dd>
+							<liferay-ui:message key="the-name-of-the-email-recipient" />
+						</dd>
+					</c:if>
 				</dl>
 			</div>
 		</c:when>
@@ -401,7 +425,7 @@ else if (tabs2.equals("message-updated-email")) {
 					</table>
 				</td>
 				<td>
-					<table id="<portlet:namespace />localized-priorities-table" class='<%= (currentLocale.equals(defaultLocale) ? "aui-helper-hidden" : "") + " lfr-table" %>'>
+					<table class='<%= (currentLocale.equals(defaultLocale) ? "aui-helper-hidden" : "") + " lfr-table" %>' id="<portlet:namespace />localized-priorities-table">
 					<tr>
 						<td class="lfr-label">
 							<liferay-ui:message key="name" />
@@ -464,7 +488,6 @@ else if (tabs2.equals("message-updated-email")) {
 									value = StringPool.BLANK;
 								}
 							}
-
 					%>
 
 							<aui:input name='<%= "priorityName" + j + "_" + LocaleUtil.toLanguageId(locales[i]) %>' type="hidden" value="<%= name %>" />
@@ -516,7 +539,7 @@ else if (tabs2.equals("message-updated-email")) {
 
 						var localizedPriorityTable = A.one('#<portlet:namespace />localized-priorities-table');
 
-						if (selLanguageId) {
+						if (selLanguageId != 'null') {
 							<portlet:namespace />updateLanguageTemps(selLanguageId);
 
 							localizedPriorityTable.show();
@@ -651,7 +674,7 @@ else if (tabs2.equals("message-updated-email")) {
 
 						var ranksTemp = A.one('#<portlet:namespace />ranks_temp');
 
-						if (selLanguageId) {
+						if ((selLanguageId != '') && (selLanguageId != 'null')) {
 							<portlet:namespace />updateLanguageTemps(selLanguageId);
 
 							ranksTemp.show();

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,7 +14,6 @@
 
 package com.liferay.portlet.messageboards.service.persistence;
 
-import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.service.persistence.BasePersistence;
 
 import com.liferay.portlet.messageboards.model.MBDiscussion;
@@ -341,9 +340,11 @@ public interface MBDiscussionPersistence extends BasePersistence<MBDiscussion> {
 	* Removes the message boards discussion where threadId = &#63; from the database.
 	*
 	* @param threadId the thread ID
+	* @return the message boards discussion that was removed
 	* @throws SystemException if a system exception occurred
 	*/
-	public void removeByThreadId(long threadId)
+	public com.liferay.portlet.messageboards.model.MBDiscussion removeByThreadId(
+		long threadId)
 		throws com.liferay.portal.kernel.exception.SystemException,
 			com.liferay.portlet.messageboards.NoSuchDiscussionException;
 
@@ -352,9 +353,11 @@ public interface MBDiscussionPersistence extends BasePersistence<MBDiscussion> {
 	*
 	* @param classNameId the class name ID
 	* @param classPK the class p k
+	* @return the message boards discussion that was removed
 	* @throws SystemException if a system exception occurred
 	*/
-	public void removeByC_C(long classNameId, long classPK)
+	public com.liferay.portlet.messageboards.model.MBDiscussion removeByC_C(
+		long classNameId, long classPK)
 		throws com.liferay.portal.kernel.exception.SystemException,
 			com.liferay.portlet.messageboards.NoSuchDiscussionException;
 
@@ -405,7 +408,4 @@ public interface MBDiscussionPersistence extends BasePersistence<MBDiscussion> {
 	*/
 	public int countAll()
 		throws com.liferay.portal.kernel.exception.SystemException;
-
-	public MBDiscussion remove(MBDiscussion mbDiscussion)
-		throws SystemException;
 }

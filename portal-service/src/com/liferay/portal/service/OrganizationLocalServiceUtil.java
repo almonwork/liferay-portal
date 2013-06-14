@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -15,7 +15,6 @@
 package com.liferay.portal.service;
 
 import com.liferay.portal.kernel.bean.PortalBeanLocatorUtil;
-import com.liferay.portal.kernel.util.MethodCache;
 import com.liferay.portal.kernel.util.ReferenceRegistry;
 
 /**
@@ -66,27 +65,34 @@ public class OrganizationLocalServiceUtil {
 	* Deletes the organization with the primary key from the database. Also notifies the appropriate model listeners.
 	*
 	* @param organizationId the primary key of the organization
+	* @return the organization that was removed
 	* @throws PortalException if a organization with the primary key could not be found
 	* @throws SystemException if a system exception occurred
 	*/
-	public static void deleteOrganization(long organizationId)
+	public static com.liferay.portal.model.Organization deleteOrganization(
+		long organizationId)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException {
-		getService().deleteOrganization(organizationId);
+		return getService().deleteOrganization(organizationId);
 	}
 
 	/**
 	* Deletes the organization from the database. Also notifies the appropriate model listeners.
 	*
 	* @param organization the organization
+	* @return the organization that was removed
 	* @throws PortalException
 	* @throws SystemException if a system exception occurred
 	*/
-	public static void deleteOrganization(
+	public static com.liferay.portal.model.Organization deleteOrganization(
 		com.liferay.portal.model.Organization organization)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException {
-		getService().deleteOrganization(organization);
+		return getService().deleteOrganization(organization);
+	}
+
+	public static com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery() {
+		return getService().dynamicQuery();
 	}
 
 	/**
@@ -158,6 +164,12 @@ public class OrganizationLocalServiceUtil {
 		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery)
 		throws com.liferay.portal.kernel.exception.SystemException {
 		return getService().dynamicQueryCount(dynamicQuery);
+	}
+
+	public static com.liferay.portal.model.Organization fetchOrganization(
+		long organizationId)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getService().fetchOrganization(organizationId);
 	}
 
 	/**
@@ -296,8 +308,8 @@ public class OrganizationLocalServiceUtil {
 	* @param site whether the organization is to be associated with a main
 	site
 	* @param serviceContext the organization's service context (optionally
-	<code>null</code>). Can specify the organization's asset category
-	IDs, asset tag names, and expando bridge attributes.
+	<code>null</code>). Can set asset category IDs, asset tag names,
+	and expando bridge attributes for the organization.
 	* @return the organization
 	* @throws PortalException if a creator or parent organization with the
 	primary key could not be found or if the organization's
@@ -550,55 +562,24 @@ public class OrganizationLocalServiceUtil {
 	}
 
 	/**
-	* Returns all the organizations associated with the user, optionally
-	* including the organizations associated with the user groups to which the
-	* user belongs.
+	* Returns all the organizations associated with the user. If
+	* includeAdministrative is <code>true</code>, the result includes those
+	* organizations that are not directly associated to the user but he is an
+	* administrator or an owner of the organization.
 	*
 	* @param userId the primary key of the user
-	* @param inheritUserGroups whether to include organizations associated
-	with the user groups to which the user belongs
+	* @param includeAdministrative whether to includes organizations that are
+	indirectly associated to the user because he is an administrator
+	or an owner of the organization
 	* @return the organizations associated with the user
 	* @throws PortalException if a user with the primary key could not be found
 	* @throws SystemException if a system exception occurred
 	*/
 	public static java.util.List<com.liferay.portal.model.Organization> getUserOrganizations(
-		long userId, boolean inheritUserGroups)
+		long userId, boolean includeAdministrative)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException {
-		return getService().getUserOrganizations(userId, inheritUserGroups);
-	}
-
-	/**
-	* Returns a range of all the organizations associated with the user,
-	* optionally including the organizations associated with the user groups to
-	* which the user belongs.
-	*
-	* <p>
-	* Useful when paginating results. Returns a maximum of <code>end -
-	* start</code> instances. <code>start</code> and <code>end</code> are not
-	* primary keys, they are indexes in the result set. Thus, <code>0</code>
-	* refers to the first result in the set. Setting both <code>start</code>
-	* and <code>end</code> to {@link
-	* com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full
-	* result set.
-	* </p>
-	*
-	* @param userId the primary key of the user
-	* @param inheritUserGroups whether to include organizations associated
-	with the user groups to which the user belongs
-	* @param start the lower bound of the range of organizations to return
-	* @param end the upper bound of the range of organizations to return (not
-	inclusive)
-	* @return the range organizations associated with the user
-	* @throws PortalException if a user with the primary key could not be found
-	* @throws SystemException if a system exception occurred
-	*/
-	public static java.util.List<com.liferay.portal.model.Organization> getUserOrganizations(
-		long userId, boolean inheritUserGroups, int start, int end)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
-		return getService()
-				   .getUserOrganizations(userId, inheritUserGroups, start, end);
+		return getService().getUserOrganizations(userId, includeAdministrative);
 	}
 
 	/**
@@ -656,13 +637,13 @@ public class OrganizationLocalServiceUtil {
 	}
 
 	/**
-	* Returns <code>true</code> if the password policy has been assigned to
-	* the organization.
+	* Returns <code>true</code> if the password policy has been assigned to the
+	* organization.
 	*
 	* @param passwordPolicyId the primary key of the password policy
 	* @param organizationId the primary key of the organization
-	* @return <code>true</code> if the password policy has been assigned to
-	the organization; <code>false</code> otherwise
+	* @return <code>true</code> if the password policy has been assigned to the
+	organization; <code>false</code> otherwise
 	* @throws SystemException if a system exception occurred
 	*/
 	public static boolean hasPasswordPolicyOrganization(long passwordPolicyId,
@@ -675,8 +656,8 @@ public class OrganizationLocalServiceUtil {
 
 	/**
 	* Returns <code>true</code> if the user is a member of the organization.
-	* This method is usually called to determine if the user has view access
-	* to a resource belonging to the organization.
+	* This method is usually called to determine if the user has view access to
+	* a resource belonging to the organization.
 	*
 	* @param userId the primary key of the user
 	* @param organizationId the primary key of the organization
@@ -691,27 +672,21 @@ public class OrganizationLocalServiceUtil {
 
 	/**
 	* Returns <code>true</code> if the user is a member of the organization,
-	* optionally focusing on sub-organizations, user groups, or the specified
-	* organization. This method is usually called to determine if the user has
-	* view access to a resource belonging to the organization.
+	* optionally focusing on sub-organizations or the specified organization.
+	* This method is usually called to determine if the user has view access to
+	* a resource belonging to the organization.
 	*
 	* <p>
 	*
 	* <ol>
 	* <li>
-	* If <code>inheritSuborganizations=<code>false</code></code> and
-	* <code>inheritUserGroups=<code>false</code></code>: the method checks
-	* whether the user
-	* belongs to the organization specified by <code>organizationId</code>. The
-	* parameter
+	* If <code>inheritSuborganizations=<code>false</code></code>:
+	* the method checks whether the user belongs to the organization specified
+	* by <code>organizationId</code>. The parameter
 	* <code>includeSpecifiedOrganization</code> is ignored.
 	* </li>
 	* <li>
-	* If <code>inheritUserGroups=<code>true</code></code>: the method checks
-	* whether the
-	* user belongs to a user group which has been made as a whole member of the
-	* the organization specified by <code>organizationId</code>. The parameter
-	* <code>includeSpecifiedOrganization</code> is
+	* The parameter <code>includeSpecifiedOrganization</code> is
 	* ignored unless <code>inheritSuborganizations</code> is also
 	* <code>true</code>.
 	* </li>
@@ -738,12 +713,9 @@ public class OrganizationLocalServiceUtil {
 	* @param organizationId the primary key of the organization
 	* @param inheritSuborganizations if <code>true</code> sub-organizations
 	are considered in the determination
-	* @param inheritUserGroups if <code>true</code> organizations inherited
-	from the user groups to which the user belongs are considered in
-	the determination
 	* @param includeSpecifiedOrganization if <code>true</code> the
 	organization specified by <code>organizationId</code> is
-	considered in the determination.
+	considered in the determination
 	* @return <code>true</code> if the user has access to the organization;
 	<code>false</code> otherwise
 	* @throws PortalException if an organization with the primary key could not
@@ -752,14 +724,12 @@ public class OrganizationLocalServiceUtil {
 	* @see com.liferay.portal.service.persistence.OrganizationFinder
 	*/
 	public static boolean hasUserOrganization(long userId, long organizationId,
-		boolean inheritSuborganizations, boolean inheritUserGroups,
-		boolean includeSpecifiedOrganization)
+		boolean inheritSuborganizations, boolean includeSpecifiedOrganization)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException {
 		return getService()
 				   .hasUserOrganization(userId, organizationId,
-			inheritSuborganizations, inheritUserGroups,
-			includeSpecifiedOrganization);
+			inheritSuborganizations, includeSpecifiedOrganization);
 	}
 
 	/**
@@ -772,14 +742,45 @@ public class OrganizationLocalServiceUtil {
 	* </p>
 	*
 	* @param companyId the primary key of the organization's company
-	* @param force whether to force the rebuild even if the tree is not stale
+	* @throws PortalException if an organization with the primary key could not
+	be found
 	* @throws SystemException if a system exception occurred
-	* @see com.liferay.portal.service.persistence.OrganizationPersistence#rebuildTree(
-	long, boolean)
 	*/
-	public static void rebuildTree(long companyId, boolean force)
+	public static void rebuildTree(long companyId)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException {
+		getService().rebuildTree(companyId);
+	}
+
+	/**
+	* Returns a range of all the organizations of the company.
+	*
+	* <p>
+	* Useful when paginating results. Returns a maximum of <code>end -
+	* start</code> instances. <code>start</code> and <code>end</code> are not
+	* primary keys, they are indexes in the result set. Thus, <code>0</code>
+	* refers to the first result in the set. Setting both <code>start</code>
+	* and <code>end</code> to {@link
+	* com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full
+	* result set.
+	* </p>
+	*
+	* @param companyId the primary key of the company
+	* @param params the finder parameters (optionally <code>null</code>). For
+	more information see {@link
+	com.liferay.portlet.enterpriseadmin.util.OrganizationIndexer}
+	* @param start the lower bound of the range of organizations to return
+	* @param end the upper bound of the range of organizations to return (not
+	inclusive)
+	* @return the range of all the organizations of the company
+	* @throws SystemException if a system exception occurred
+	*/
+	public static java.util.List<com.liferay.portal.model.Organization> search(
+		long companyId,
+		java.util.LinkedHashMap<java.lang.String, java.lang.Object> params,
+		int start, int end)
 		throws com.liferay.portal.kernel.exception.SystemException {
-		getService().rebuildTree(companyId, force);
+		return getService().search(companyId, params, start, end);
 	}
 
 	/**
@@ -1075,7 +1076,7 @@ public class OrganizationLocalServiceUtil {
 	more information see {@link
 	com.liferay.portlet.enterpriseadmin.util.OrganizationIndexer}.
 	* @param andSearch whether every field must match its keywords or just one
-	field.
+	field
 	* @param start the lower bound of the range of organizations to return
 	* @param end the upper bound of the range of organizations to return (not
 	inclusive)
@@ -1255,9 +1256,9 @@ public class OrganizationLocalServiceUtil {
 	* @param site whether the organization is to be associated with a main
 	site
 	* @param serviceContext the organization's service context (optionally
-	<code>null</code>). Can specify the organization's replacement
-	asset category IDs, replacement asset tag names, and new expando
-	bridge attributes.
+	<code>null</code>). Can set asset category IDs and asset tag
+	names for the organization, and merge expando bridge attributes
+	for the organization.
 	* @return the organization
 	* @throws PortalException if an organization or parent organization with
 	the primary key could not be found or if the new information was
@@ -1283,20 +1284,15 @@ public class OrganizationLocalServiceUtil {
 
 			ReferenceRegistry.registerReference(OrganizationLocalServiceUtil.class,
 				"_service");
-			MethodCache.remove(OrganizationLocalService.class);
 		}
 
 		return _service;
 	}
 
+	/**
+	 * @deprecated
+	 */
 	public void setService(OrganizationLocalService service) {
-		MethodCache.remove(OrganizationLocalService.class);
-
-		_service = service;
-
-		ReferenceRegistry.registerReference(OrganizationLocalServiceUtil.class,
-			"_service");
-		MethodCache.remove(OrganizationLocalService.class);
 	}
 
 	private static OrganizationLocalService _service;

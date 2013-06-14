@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -19,6 +19,7 @@ import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.json.JSON;
 import com.liferay.portal.kernel.util.DateUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.ProxyUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
@@ -35,13 +36,13 @@ import com.liferay.portlet.messageboards.model.MBThreadSoap;
 
 import java.io.Serializable;
 
-import java.lang.reflect.Proxy;
-
 import java.sql.Types;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * The base model implementation for the MBThread service. Represents a row in the &quot;MBThread&quot; database table, with each column mapped to a property of this class.
@@ -77,12 +78,13 @@ public class MBThreadModelImpl extends BaseModelImpl<MBThread>
 			{ "lastPostByUserId", Types.BIGINT },
 			{ "lastPostDate", Types.TIMESTAMP },
 			{ "priority", Types.DOUBLE },
+			{ "question", Types.BOOLEAN },
 			{ "status", Types.INTEGER },
 			{ "statusByUserId", Types.BIGINT },
 			{ "statusByUserName", Types.VARCHAR },
 			{ "statusDate", Types.TIMESTAMP }
 		};
-	public static final String TABLE_SQL_CREATE = "create table MBThread (threadId LONG not null primary key,groupId LONG,companyId LONG,categoryId LONG,rootMessageId LONG,rootMessageUserId LONG,messageCount INTEGER,viewCount INTEGER,lastPostByUserId LONG,lastPostDate DATE null,priority DOUBLE,status INTEGER,statusByUserId LONG,statusByUserName VARCHAR(75) null,statusDate DATE null)";
+	public static final String TABLE_SQL_CREATE = "create table MBThread (threadId LONG not null primary key,groupId LONG,companyId LONG,categoryId LONG,rootMessageId LONG,rootMessageUserId LONG,messageCount INTEGER,viewCount INTEGER,lastPostByUserId LONG,lastPostDate DATE null,priority DOUBLE,question BOOLEAN,status INTEGER,statusByUserId LONG,statusByUserName VARCHAR(75) null,statusDate DATE null)";
 	public static final String TABLE_SQL_DROP = "drop table MBThread";
 	public static final String ORDER_BY_JPQL = " ORDER BY mbThread.priority DESC, mbThread.lastPostDate DESC";
 	public static final String ORDER_BY_SQL = " ORDER BY MBThread.priority DESC, MBThread.lastPostDate DESC";
@@ -95,6 +97,15 @@ public class MBThreadModelImpl extends BaseModelImpl<MBThread>
 	public static final boolean FINDER_CACHE_ENABLED = GetterUtil.getBoolean(com.liferay.portal.util.PropsUtil.get(
 				"value.object.finder.cache.enabled.com.liferay.portlet.messageboards.model.MBThread"),
 			true);
+	public static final boolean COLUMN_BITMASK_ENABLED = GetterUtil.getBoolean(com.liferay.portal.util.PropsUtil.get(
+				"value.object.column.bitmask.enabled.com.liferay.portlet.messageboards.model.MBThread"),
+			true);
+	public static long CATEGORYID_COLUMN_BITMASK = 1L;
+	public static long GROUPID_COLUMN_BITMASK = 2L;
+	public static long LASTPOSTDATE_COLUMN_BITMASK = 4L;
+	public static long PRIORITY_COLUMN_BITMASK = 8L;
+	public static long ROOTMESSAGEID_COLUMN_BITMASK = 16L;
+	public static long STATUS_COLUMN_BITMASK = 32L;
 
 	/**
 	 * Converts the soap model instance into a normal model instance.
@@ -116,6 +127,7 @@ public class MBThreadModelImpl extends BaseModelImpl<MBThread>
 		model.setLastPostByUserId(soapModel.getLastPostByUserId());
 		model.setLastPostDate(soapModel.getLastPostDate());
 		model.setPriority(soapModel.getPriority());
+		model.setQuestion(soapModel.getQuestion());
 		model.setStatus(soapModel.getStatus());
 		model.setStatusByUserId(soapModel.getStatusByUserId());
 		model.setStatusByUserName(soapModel.getStatusByUserName());
@@ -140,14 +152,6 @@ public class MBThreadModelImpl extends BaseModelImpl<MBThread>
 		return models;
 	}
 
-	public Class<?> getModelClass() {
-		return MBThread.class;
-	}
-
-	public String getModelClassName() {
-		return MBThread.class.getName();
-	}
-
 	public static final long LOCK_EXPIRATION_TIME = GetterUtil.getLong(com.liferay.portal.util.PropsUtil.get(
 				"lock.expiration.time.com.liferay.portlet.messageboards.model.MBThread"));
 
@@ -170,6 +174,137 @@ public class MBThreadModelImpl extends BaseModelImpl<MBThread>
 		setPrimaryKey(((Long)primaryKeyObj).longValue());
 	}
 
+	public Class<?> getModelClass() {
+		return MBThread.class;
+	}
+
+	public String getModelClassName() {
+		return MBThread.class.getName();
+	}
+
+	@Override
+	public Map<String, Object> getModelAttributes() {
+		Map<String, Object> attributes = new HashMap<String, Object>();
+
+		attributes.put("threadId", getThreadId());
+		attributes.put("groupId", getGroupId());
+		attributes.put("companyId", getCompanyId());
+		attributes.put("categoryId", getCategoryId());
+		attributes.put("rootMessageId", getRootMessageId());
+		attributes.put("rootMessageUserId", getRootMessageUserId());
+		attributes.put("messageCount", getMessageCount());
+		attributes.put("viewCount", getViewCount());
+		attributes.put("lastPostByUserId", getLastPostByUserId());
+		attributes.put("lastPostDate", getLastPostDate());
+		attributes.put("priority", getPriority());
+		attributes.put("question", getQuestion());
+		attributes.put("status", getStatus());
+		attributes.put("statusByUserId", getStatusByUserId());
+		attributes.put("statusByUserName", getStatusByUserName());
+		attributes.put("statusDate", getStatusDate());
+
+		return attributes;
+	}
+
+	@Override
+	public void setModelAttributes(Map<String, Object> attributes) {
+		Long threadId = (Long)attributes.get("threadId");
+
+		if (threadId != null) {
+			setThreadId(threadId);
+		}
+
+		Long groupId = (Long)attributes.get("groupId");
+
+		if (groupId != null) {
+			setGroupId(groupId);
+		}
+
+		Long companyId = (Long)attributes.get("companyId");
+
+		if (companyId != null) {
+			setCompanyId(companyId);
+		}
+
+		Long categoryId = (Long)attributes.get("categoryId");
+
+		if (categoryId != null) {
+			setCategoryId(categoryId);
+		}
+
+		Long rootMessageId = (Long)attributes.get("rootMessageId");
+
+		if (rootMessageId != null) {
+			setRootMessageId(rootMessageId);
+		}
+
+		Long rootMessageUserId = (Long)attributes.get("rootMessageUserId");
+
+		if (rootMessageUserId != null) {
+			setRootMessageUserId(rootMessageUserId);
+		}
+
+		Integer messageCount = (Integer)attributes.get("messageCount");
+
+		if (messageCount != null) {
+			setMessageCount(messageCount);
+		}
+
+		Integer viewCount = (Integer)attributes.get("viewCount");
+
+		if (viewCount != null) {
+			setViewCount(viewCount);
+		}
+
+		Long lastPostByUserId = (Long)attributes.get("lastPostByUserId");
+
+		if (lastPostByUserId != null) {
+			setLastPostByUserId(lastPostByUserId);
+		}
+
+		Date lastPostDate = (Date)attributes.get("lastPostDate");
+
+		if (lastPostDate != null) {
+			setLastPostDate(lastPostDate);
+		}
+
+		Double priority = (Double)attributes.get("priority");
+
+		if (priority != null) {
+			setPriority(priority);
+		}
+
+		Boolean question = (Boolean)attributes.get("question");
+
+		if (question != null) {
+			setQuestion(question);
+		}
+
+		Integer status = (Integer)attributes.get("status");
+
+		if (status != null) {
+			setStatus(status);
+		}
+
+		Long statusByUserId = (Long)attributes.get("statusByUserId");
+
+		if (statusByUserId != null) {
+			setStatusByUserId(statusByUserId);
+		}
+
+		String statusByUserName = (String)attributes.get("statusByUserName");
+
+		if (statusByUserName != null) {
+			setStatusByUserName(statusByUserName);
+		}
+
+		Date statusDate = (Date)attributes.get("statusDate");
+
+		if (statusDate != null) {
+			setStatusDate(statusDate);
+		}
+	}
+
 	@JSON
 	public long getThreadId() {
 		return _threadId;
@@ -185,7 +320,19 @@ public class MBThreadModelImpl extends BaseModelImpl<MBThread>
 	}
 
 	public void setGroupId(long groupId) {
+		_columnBitmask |= GROUPID_COLUMN_BITMASK;
+
+		if (!_setOriginalGroupId) {
+			_setOriginalGroupId = true;
+
+			_originalGroupId = _groupId;
+		}
+
 		_groupId = groupId;
+	}
+
+	public long getOriginalGroupId() {
+		return _originalGroupId;
 	}
 
 	@JSON
@@ -203,7 +350,19 @@ public class MBThreadModelImpl extends BaseModelImpl<MBThread>
 	}
 
 	public void setCategoryId(long categoryId) {
+		_columnBitmask |= CATEGORYID_COLUMN_BITMASK;
+
+		if (!_setOriginalCategoryId) {
+			_setOriginalCategoryId = true;
+
+			_originalCategoryId = _categoryId;
+		}
+
 		_categoryId = categoryId;
+	}
+
+	public long getOriginalCategoryId() {
+		return _originalCategoryId;
 	}
 
 	@JSON
@@ -212,6 +371,8 @@ public class MBThreadModelImpl extends BaseModelImpl<MBThread>
 	}
 
 	public void setRootMessageId(long rootMessageId) {
+		_columnBitmask |= ROOTMESSAGEID_COLUMN_BITMASK;
+
 		if (!_setOriginalRootMessageId) {
 			_setOriginalRootMessageId = true;
 
@@ -285,7 +446,17 @@ public class MBThreadModelImpl extends BaseModelImpl<MBThread>
 	}
 
 	public void setLastPostDate(Date lastPostDate) {
+		_columnBitmask = -1L;
+
+		if (_originalLastPostDate == null) {
+			_originalLastPostDate = _lastPostDate;
+		}
+
 		_lastPostDate = lastPostDate;
+	}
+
+	public Date getOriginalLastPostDate() {
+		return _originalLastPostDate;
 	}
 
 	@JSON
@@ -294,7 +465,32 @@ public class MBThreadModelImpl extends BaseModelImpl<MBThread>
 	}
 
 	public void setPriority(double priority) {
+		_columnBitmask = -1L;
+
+		if (!_setOriginalPriority) {
+			_setOriginalPriority = true;
+
+			_originalPriority = _priority;
+		}
+
 		_priority = priority;
+	}
+
+	public double getOriginalPriority() {
+		return _originalPriority;
+	}
+
+	@JSON
+	public boolean getQuestion() {
+		return _question;
+	}
+
+	public boolean isQuestion() {
+		return _question;
+	}
+
+	public void setQuestion(boolean question) {
+		_question = question;
 	}
 
 	@JSON
@@ -303,7 +499,19 @@ public class MBThreadModelImpl extends BaseModelImpl<MBThread>
 	}
 
 	public void setStatus(int status) {
+		_columnBitmask |= STATUS_COLUMN_BITMASK;
+
+		if (!_setOriginalStatus) {
+			_setOriginalStatus = true;
+
+			_originalStatus = _status;
+		}
+
 		_status = status;
+	}
+
+	public int getOriginalStatus() {
+		return _originalStatus;
 	}
 
 	@JSON
@@ -381,6 +589,15 @@ public class MBThreadModelImpl extends BaseModelImpl<MBThread>
 		}
 	}
 
+	public boolean isInTrash() {
+		if (getStatus() == WorkflowConstants.STATUS_IN_TRASH) {
+			return true;
+		}
+		else {
+			return false;
+		}
+	}
+
 	public boolean isPending() {
 		if (getStatus() == WorkflowConstants.STATUS_PENDING) {
 			return true;
@@ -390,35 +607,32 @@ public class MBThreadModelImpl extends BaseModelImpl<MBThread>
 		}
 	}
 
+	public long getColumnBitmask() {
+		return _columnBitmask;
+	}
+
 	@Override
 	public MBThread toEscapedModel() {
-		if (isEscapedModel()) {
-			return (MBThread)this;
+		if (_escapedModelProxy == null) {
+			_escapedModelProxy = (MBThread)ProxyUtil.newProxyInstance(_classLoader,
+					_escapedModelProxyInterfaces,
+					new AutoEscapeBeanHandler(this));
 		}
-		else {
-			if (_escapedModelProxy == null) {
-				_escapedModelProxy = (MBThread)Proxy.newProxyInstance(_classLoader,
-						_escapedModelProxyInterfaces,
-						new AutoEscapeBeanHandler(this));
-			}
 
-			return _escapedModelProxy;
-		}
+		return _escapedModelProxy;
 	}
 
 	@Override
 	public ExpandoBridge getExpandoBridge() {
-		if (_expandoBridge == null) {
-			_expandoBridge = ExpandoBridgeFactoryUtil.getExpandoBridge(getCompanyId(),
-					MBThread.class.getName(), getPrimaryKey());
-		}
-
-		return _expandoBridge;
+		return ExpandoBridgeFactoryUtil.getExpandoBridge(getCompanyId(),
+			MBThread.class.getName(), getPrimaryKey());
 	}
 
 	@Override
 	public void setExpandoBridgeAttributes(ServiceContext serviceContext) {
-		getExpandoBridge().setAttributes(serviceContext);
+		ExpandoBridge expandoBridge = getExpandoBridge();
+
+		expandoBridge.setAttributes(serviceContext);
 	}
 
 	@Override
@@ -436,6 +650,7 @@ public class MBThreadModelImpl extends BaseModelImpl<MBThread>
 		mbThreadImpl.setLastPostByUserId(getLastPostByUserId());
 		mbThreadImpl.setLastPostDate(getLastPostDate());
 		mbThreadImpl.setPriority(getPriority());
+		mbThreadImpl.setQuestion(getQuestion());
 		mbThreadImpl.setStatus(getStatus());
 		mbThreadImpl.setStatusByUserId(getStatusByUserId());
 		mbThreadImpl.setStatusByUserName(getStatusByUserName());
@@ -510,9 +725,29 @@ public class MBThreadModelImpl extends BaseModelImpl<MBThread>
 	public void resetOriginalValues() {
 		MBThreadModelImpl mbThreadModelImpl = this;
 
+		mbThreadModelImpl._originalGroupId = mbThreadModelImpl._groupId;
+
+		mbThreadModelImpl._setOriginalGroupId = false;
+
+		mbThreadModelImpl._originalCategoryId = mbThreadModelImpl._categoryId;
+
+		mbThreadModelImpl._setOriginalCategoryId = false;
+
 		mbThreadModelImpl._originalRootMessageId = mbThreadModelImpl._rootMessageId;
 
 		mbThreadModelImpl._setOriginalRootMessageId = false;
+
+		mbThreadModelImpl._originalLastPostDate = mbThreadModelImpl._lastPostDate;
+
+		mbThreadModelImpl._originalPriority = mbThreadModelImpl._priority;
+
+		mbThreadModelImpl._setOriginalPriority = false;
+
+		mbThreadModelImpl._originalStatus = mbThreadModelImpl._status;
+
+		mbThreadModelImpl._setOriginalStatus = false;
+
+		mbThreadModelImpl._columnBitmask = 0;
 	}
 
 	@Override
@@ -548,6 +783,8 @@ public class MBThreadModelImpl extends BaseModelImpl<MBThread>
 
 		mbThreadCacheModel.priority = getPriority();
 
+		mbThreadCacheModel.question = getQuestion();
+
 		mbThreadCacheModel.status = getStatus();
 
 		mbThreadCacheModel.statusByUserId = getStatusByUserId();
@@ -574,7 +811,7 @@ public class MBThreadModelImpl extends BaseModelImpl<MBThread>
 
 	@Override
 	public String toString() {
-		StringBundler sb = new StringBundler(31);
+		StringBundler sb = new StringBundler(33);
 
 		sb.append("{threadId=");
 		sb.append(getThreadId());
@@ -598,6 +835,8 @@ public class MBThreadModelImpl extends BaseModelImpl<MBThread>
 		sb.append(getLastPostDate());
 		sb.append(", priority=");
 		sb.append(getPriority());
+		sb.append(", question=");
+		sb.append(getQuestion());
 		sb.append(", status=");
 		sb.append(getStatus());
 		sb.append(", statusByUserId=");
@@ -612,7 +851,7 @@ public class MBThreadModelImpl extends BaseModelImpl<MBThread>
 	}
 
 	public String toXmlString() {
-		StringBundler sb = new StringBundler(49);
+		StringBundler sb = new StringBundler(52);
 
 		sb.append("<model><model-name>");
 		sb.append("com.liferay.portlet.messageboards.model.MBThread");
@@ -663,6 +902,10 @@ public class MBThreadModelImpl extends BaseModelImpl<MBThread>
 		sb.append(getPriority());
 		sb.append("]]></column-value></column>");
 		sb.append(
+			"<column><column-name>question</column-name><column-value><![CDATA[");
+		sb.append(getQuestion());
+		sb.append("]]></column-value></column>");
+		sb.append(
 			"<column><column-name>status</column-name><column-value><![CDATA[");
 		sb.append(getStatus());
 		sb.append("]]></column-value></column>");
@@ -690,8 +933,12 @@ public class MBThreadModelImpl extends BaseModelImpl<MBThread>
 		};
 	private long _threadId;
 	private long _groupId;
+	private long _originalGroupId;
+	private boolean _setOriginalGroupId;
 	private long _companyId;
 	private long _categoryId;
+	private long _originalCategoryId;
+	private boolean _setOriginalCategoryId;
 	private long _rootMessageId;
 	private long _originalRootMessageId;
 	private boolean _setOriginalRootMessageId;
@@ -702,12 +949,18 @@ public class MBThreadModelImpl extends BaseModelImpl<MBThread>
 	private long _lastPostByUserId;
 	private String _lastPostByUserUuid;
 	private Date _lastPostDate;
+	private Date _originalLastPostDate;
 	private double _priority;
+	private double _originalPriority;
+	private boolean _setOriginalPriority;
+	private boolean _question;
 	private int _status;
+	private int _originalStatus;
+	private boolean _setOriginalStatus;
 	private long _statusByUserId;
 	private String _statusByUserUuid;
 	private String _statusByUserName;
 	private Date _statusDate;
-	private transient ExpandoBridge _expandoBridge;
+	private long _columnBitmask;
 	private MBThread _escapedModelProxy;
 }

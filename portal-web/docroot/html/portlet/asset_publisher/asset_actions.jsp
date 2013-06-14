@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -44,10 +44,12 @@ if (showEditURL && (editPortletURL != null)) {
 
 	redirectURL.setParameter("struts_action", "/asset_publisher/add_asset_redirect");
 
-	editPortletURL.setParameter("redirect", HtmlUtil.escapeURL(redirectURL.toString()));
+	editPortletURL.setParameter("redirect", redirectURL.toString());
+	editPortletURL.setParameter("originalRedirect", redirectURL.toString());
 
 	editPortletURLString = editPortletURL.toString();
 
+	editPortletURLString = HttpUtil.addParameter(editPortletURLString, "doAsGroupId", assetRenderer.getGroupId());
 	editPortletURLString = HttpUtil.addParameter(editPortletURLString, "refererPlid", plid);
 }
 
@@ -62,7 +64,7 @@ if (themeDisplay.getScopeGroup().isLayout()) {
 	<div class="lfr-meta-actions asset-actions">
 
 		<%
-		String taglibEditURL = "javascript:Liferay.Util.openWindow({dialog: {width: 960}, id: '" + renderResponse.getNamespace() + "', title: '" + LanguageUtil.format(pageContext, "edit-x", HtmlUtil.escape(assetRenderer.getTitle(locale))) + "', uri:'" + editPortletURLString + "'});";
+		String taglibEditURL = "javascript:Liferay.Util.openWindow({dialog: {width: 960}, id: '" + renderResponse.getNamespace() + "editAsset', title: '" + LanguageUtil.format(pageContext, "edit-x", HtmlUtil.escape(assetRenderer.getTitle(locale))) + "', uri:'" + HtmlUtil.escapeURL(editPortletURLString) + "'});";
 		%>
 
 		<liferay-ui:icon

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -19,6 +19,7 @@ import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.transaction.Isolation;
 import com.liferay.portal.kernel.transaction.Propagation;
 import com.liferay.portal.kernel.transaction.Transactional;
+import com.liferay.portal.service.BaseLocalService;
 import com.liferay.portal.service.PersistedModelLocalService;
 
 /**
@@ -36,7 +37,8 @@ import com.liferay.portal.service.PersistedModelLocalService;
  */
 @Transactional(isolation = Isolation.PORTAL, rollbackFor =  {
 	PortalException.class, SystemException.class})
-public interface RatingsStatsLocalService extends PersistedModelLocalService {
+public interface RatingsStatsLocalService extends BaseLocalService,
+	PersistedModelLocalService {
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
@@ -67,10 +69,12 @@ public interface RatingsStatsLocalService extends PersistedModelLocalService {
 	* Deletes the ratings stats with the primary key from the database. Also notifies the appropriate model listeners.
 	*
 	* @param statsId the primary key of the ratings stats
+	* @return the ratings stats that was removed
 	* @throws PortalException if a ratings stats with the primary key could not be found
 	* @throws SystemException if a system exception occurred
 	*/
-	public void deleteRatingsStats(long statsId)
+	public com.liferay.portlet.ratings.model.RatingsStats deleteRatingsStats(
+		long statsId)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException;
 
@@ -78,11 +82,14 @@ public interface RatingsStatsLocalService extends PersistedModelLocalService {
 	* Deletes the ratings stats from the database. Also notifies the appropriate model listeners.
 	*
 	* @param ratingsStats the ratings stats
+	* @return the ratings stats that was removed
 	* @throws SystemException if a system exception occurred
 	*/
-	public void deleteRatingsStats(
+	public com.liferay.portlet.ratings.model.RatingsStats deleteRatingsStats(
 		com.liferay.portlet.ratings.model.RatingsStats ratingsStats)
 		throws com.liferay.portal.kernel.exception.SystemException;
+
+	public com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery();
 
 	/**
 	* Performs a dynamic query on the database and returns the matching rows.
@@ -144,6 +151,11 @@ public interface RatingsStatsLocalService extends PersistedModelLocalService {
 	*/
 	public long dynamicQueryCount(
 		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery)
+		throws com.liferay.portal.kernel.exception.SystemException;
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public com.liferay.portlet.ratings.model.RatingsStats fetchRatingsStats(
+		long statsId)
 		throws com.liferay.portal.kernel.exception.SystemException;
 
 	/**

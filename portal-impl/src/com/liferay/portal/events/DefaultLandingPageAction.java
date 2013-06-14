@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -25,8 +25,6 @@ import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.util.PortalUtil;
 import com.liferay.portal.util.PrefsPropsUtil;
 import com.liferay.portal.util.WebKeys;
-
-import java.util.HashMap;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -64,8 +62,7 @@ public class DefaultLandingPageAction extends Action {
 		}
 
 		if (Validator.isNotNull(path)) {
-			LastPath lastPath = new LastPath(
-				StringPool.BLANK, path, new HashMap<String, String[]>());
+			LastPath lastPath = new LastPath(StringPool.BLANK, path);
 
 			HttpSession session = request.getSession();
 

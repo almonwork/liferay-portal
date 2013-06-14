@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -21,14 +21,15 @@ import com.liferay.portal.kernel.bean.IdentifiableBean;
 import com.liferay.portal.kernel.dao.jdbc.SqlUpdate;
 import com.liferay.portal.kernel.dao.jdbc.SqlUpdateFactoryUtil;
 import com.liferay.portal.kernel.exception.SystemException;
+import com.liferay.portal.service.BaseServiceImpl;
+import com.liferay.portal.service.GroupLocalService;
+import com.liferay.portal.service.GroupService;
 import com.liferay.portal.service.ResourceLocalService;
-import com.liferay.portal.service.ResourceService;
 import com.liferay.portal.service.UserLocalService;
 import com.liferay.portal.service.UserService;
 import com.liferay.portal.service.WebDAVPropsLocalService;
-import com.liferay.portal.service.base.PrincipalBean;
-import com.liferay.portal.service.persistence.ResourceFinder;
-import com.liferay.portal.service.persistence.ResourcePersistence;
+import com.liferay.portal.service.persistence.GroupFinder;
+import com.liferay.portal.service.persistence.GroupPersistence;
 import com.liferay.portal.service.persistence.UserFinder;
 import com.liferay.portal.service.persistence.UserPersistence;
 import com.liferay.portal.service.persistence.WebDAVPropsPersistence;
@@ -44,6 +45,8 @@ import com.liferay.portlet.journal.service.JournalArticleService;
 import com.liferay.portlet.journal.service.JournalContentSearchLocalService;
 import com.liferay.portlet.journal.service.JournalFeedLocalService;
 import com.liferay.portlet.journal.service.JournalFeedService;
+import com.liferay.portlet.journal.service.JournalFolderLocalService;
+import com.liferay.portlet.journal.service.JournalFolderService;
 import com.liferay.portlet.journal.service.JournalStructureLocalService;
 import com.liferay.portlet.journal.service.JournalStructureService;
 import com.liferay.portlet.journal.service.JournalTemplateLocalService;
@@ -55,6 +58,8 @@ import com.liferay.portlet.journal.service.persistence.JournalArticleResourcePer
 import com.liferay.portlet.journal.service.persistence.JournalContentSearchPersistence;
 import com.liferay.portlet.journal.service.persistence.JournalFeedFinder;
 import com.liferay.portlet.journal.service.persistence.JournalFeedPersistence;
+import com.liferay.portlet.journal.service.persistence.JournalFolderFinder;
+import com.liferay.portlet.journal.service.persistence.JournalFolderPersistence;
 import com.liferay.portlet.journal.service.persistence.JournalStructureFinder;
 import com.liferay.portlet.journal.service.persistence.JournalStructurePersistence;
 import com.liferay.portlet.journal.service.persistence.JournalTemplateFinder;
@@ -74,7 +79,7 @@ import javax.sql.DataSource;
  * @see com.liferay.portlet.journal.service.JournalStructureServiceUtil
  * @generated
  */
-public abstract class JournalStructureServiceBaseImpl extends PrincipalBean
+public abstract class JournalStructureServiceBaseImpl extends BaseServiceImpl
 	implements JournalStructureService, IdentifiableBean {
 	/*
 	 * NOTE FOR DEVELOPERS:
@@ -347,6 +352,81 @@ public abstract class JournalStructureServiceBaseImpl extends PrincipalBean
 	}
 
 	/**
+	 * Returns the journal folder local service.
+	 *
+	 * @return the journal folder local service
+	 */
+	public JournalFolderLocalService getJournalFolderLocalService() {
+		return journalFolderLocalService;
+	}
+
+	/**
+	 * Sets the journal folder local service.
+	 *
+	 * @param journalFolderLocalService the journal folder local service
+	 */
+	public void setJournalFolderLocalService(
+		JournalFolderLocalService journalFolderLocalService) {
+		this.journalFolderLocalService = journalFolderLocalService;
+	}
+
+	/**
+	 * Returns the journal folder remote service.
+	 *
+	 * @return the journal folder remote service
+	 */
+	public JournalFolderService getJournalFolderService() {
+		return journalFolderService;
+	}
+
+	/**
+	 * Sets the journal folder remote service.
+	 *
+	 * @param journalFolderService the journal folder remote service
+	 */
+	public void setJournalFolderService(
+		JournalFolderService journalFolderService) {
+		this.journalFolderService = journalFolderService;
+	}
+
+	/**
+	 * Returns the journal folder persistence.
+	 *
+	 * @return the journal folder persistence
+	 */
+	public JournalFolderPersistence getJournalFolderPersistence() {
+		return journalFolderPersistence;
+	}
+
+	/**
+	 * Sets the journal folder persistence.
+	 *
+	 * @param journalFolderPersistence the journal folder persistence
+	 */
+	public void setJournalFolderPersistence(
+		JournalFolderPersistence journalFolderPersistence) {
+		this.journalFolderPersistence = journalFolderPersistence;
+	}
+
+	/**
+	 * Returns the journal folder finder.
+	 *
+	 * @return the journal folder finder
+	 */
+	public JournalFolderFinder getJournalFolderFinder() {
+		return journalFolderFinder;
+	}
+
+	/**
+	 * Sets the journal folder finder.
+	 *
+	 * @param journalFolderFinder the journal folder finder
+	 */
+	public void setJournalFolderFinder(JournalFolderFinder journalFolderFinder) {
+		this.journalFolderFinder = journalFolderFinder;
+	}
+
+	/**
 	 * Returns the journal structure local service.
 	 *
 	 * @return the journal structure local service
@@ -517,6 +597,78 @@ public abstract class JournalStructureServiceBaseImpl extends PrincipalBean
 	}
 
 	/**
+	 * Returns the group local service.
+	 *
+	 * @return the group local service
+	 */
+	public GroupLocalService getGroupLocalService() {
+		return groupLocalService;
+	}
+
+	/**
+	 * Sets the group local service.
+	 *
+	 * @param groupLocalService the group local service
+	 */
+	public void setGroupLocalService(GroupLocalService groupLocalService) {
+		this.groupLocalService = groupLocalService;
+	}
+
+	/**
+	 * Returns the group remote service.
+	 *
+	 * @return the group remote service
+	 */
+	public GroupService getGroupService() {
+		return groupService;
+	}
+
+	/**
+	 * Sets the group remote service.
+	 *
+	 * @param groupService the group remote service
+	 */
+	public void setGroupService(GroupService groupService) {
+		this.groupService = groupService;
+	}
+
+	/**
+	 * Returns the group persistence.
+	 *
+	 * @return the group persistence
+	 */
+	public GroupPersistence getGroupPersistence() {
+		return groupPersistence;
+	}
+
+	/**
+	 * Sets the group persistence.
+	 *
+	 * @param groupPersistence the group persistence
+	 */
+	public void setGroupPersistence(GroupPersistence groupPersistence) {
+		this.groupPersistence = groupPersistence;
+	}
+
+	/**
+	 * Returns the group finder.
+	 *
+	 * @return the group finder
+	 */
+	public GroupFinder getGroupFinder() {
+		return groupFinder;
+	}
+
+	/**
+	 * Sets the group finder.
+	 *
+	 * @param groupFinder the group finder
+	 */
+	public void setGroupFinder(GroupFinder groupFinder) {
+		this.groupFinder = groupFinder;
+	}
+
+	/**
 	 * Returns the resource local service.
 	 *
 	 * @return the resource local service
@@ -533,60 +685,6 @@ public abstract class JournalStructureServiceBaseImpl extends PrincipalBean
 	public void setResourceLocalService(
 		ResourceLocalService resourceLocalService) {
 		this.resourceLocalService = resourceLocalService;
-	}
-
-	/**
-	 * Returns the resource remote service.
-	 *
-	 * @return the resource remote service
-	 */
-	public ResourceService getResourceService() {
-		return resourceService;
-	}
-
-	/**
-	 * Sets the resource remote service.
-	 *
-	 * @param resourceService the resource remote service
-	 */
-	public void setResourceService(ResourceService resourceService) {
-		this.resourceService = resourceService;
-	}
-
-	/**
-	 * Returns the resource persistence.
-	 *
-	 * @return the resource persistence
-	 */
-	public ResourcePersistence getResourcePersistence() {
-		return resourcePersistence;
-	}
-
-	/**
-	 * Sets the resource persistence.
-	 *
-	 * @param resourcePersistence the resource persistence
-	 */
-	public void setResourcePersistence(ResourcePersistence resourcePersistence) {
-		this.resourcePersistence = resourcePersistence;
-	}
-
-	/**
-	 * Returns the resource finder.
-	 *
-	 * @return the resource finder
-	 */
-	public ResourceFinder getResourceFinder() {
-		return resourceFinder;
-	}
-
-	/**
-	 * Sets the resource finder.
-	 *
-	 * @param resourceFinder the resource finder
-	 */
-	public void setResourceFinder(ResourceFinder resourceFinder) {
-		this.resourceFinder = resourceFinder;
 	}
 
 	/**
@@ -834,6 +932,14 @@ public abstract class JournalStructureServiceBaseImpl extends PrincipalBean
 	protected JournalFeedPersistence journalFeedPersistence;
 	@BeanReference(type = JournalFeedFinder.class)
 	protected JournalFeedFinder journalFeedFinder;
+	@BeanReference(type = JournalFolderLocalService.class)
+	protected JournalFolderLocalService journalFolderLocalService;
+	@BeanReference(type = JournalFolderService.class)
+	protected JournalFolderService journalFolderService;
+	@BeanReference(type = JournalFolderPersistence.class)
+	protected JournalFolderPersistence journalFolderPersistence;
+	@BeanReference(type = JournalFolderFinder.class)
+	protected JournalFolderFinder journalFolderFinder;
 	@BeanReference(type = JournalStructureLocalService.class)
 	protected JournalStructureLocalService journalStructureLocalService;
 	@BeanReference(type = JournalStructureService.class)
@@ -852,14 +958,16 @@ public abstract class JournalStructureServiceBaseImpl extends PrincipalBean
 	protected JournalTemplateFinder journalTemplateFinder;
 	@BeanReference(type = CounterLocalService.class)
 	protected CounterLocalService counterLocalService;
+	@BeanReference(type = GroupLocalService.class)
+	protected GroupLocalService groupLocalService;
+	@BeanReference(type = GroupService.class)
+	protected GroupService groupService;
+	@BeanReference(type = GroupPersistence.class)
+	protected GroupPersistence groupPersistence;
+	@BeanReference(type = GroupFinder.class)
+	protected GroupFinder groupFinder;
 	@BeanReference(type = ResourceLocalService.class)
 	protected ResourceLocalService resourceLocalService;
-	@BeanReference(type = ResourceService.class)
-	protected ResourceService resourceService;
-	@BeanReference(type = ResourcePersistence.class)
-	protected ResourcePersistence resourcePersistence;
-	@BeanReference(type = ResourceFinder.class)
-	protected ResourceFinder resourceFinder;
 	@BeanReference(type = UserLocalService.class)
 	protected UserLocalService userLocalService;
 	@BeanReference(type = UserService.class)

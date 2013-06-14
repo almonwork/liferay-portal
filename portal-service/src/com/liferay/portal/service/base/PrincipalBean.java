@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -27,9 +27,15 @@ import com.liferay.portal.security.permission.PermissionThreadLocal;
 import com.liferay.portal.service.UserLocalServiceUtil;
 
 /**
- * @author Brian Wing Shun Chan
+ * @author     Brian Wing Shun Chan
+ * @deprecated {@link com.liferay.portal.service.BaseServiceImpl}
  */
 public class PrincipalBean {
+
+	public static final String[] ANONYMOUS_NAMES = {
+		PrincipalBean.JRUN_ANONYMOUS, PrincipalBean.ORACLE_ANONYMOUS,
+		PrincipalBean.SUN_ANONYMOUS, PrincipalBean.WEBLOGIC_ANONYMOUS
+	};
 
 	public static final String JRUN_ANONYMOUS = "anonymous-guest";
 
@@ -38,10 +44,6 @@ public class PrincipalBean {
 	public static final String SUN_ANONYMOUS = "ANONYMOUS";
 
 	public static final String WEBLOGIC_ANONYMOUS = "<anonymous>";
-
-	public static final String[] ANONYMOUS_NAMES = {
-		JRUN_ANONYMOUS, ORACLE_ANONYMOUS, SUN_ANONYMOUS, WEBLOGIC_ANONYMOUS
-	};
 
 	public User getGuestOrUser() throws PortalException, SystemException {
 		try {

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,6 +14,8 @@
 
 package com.liferay.portlet.announcements.service;
 
+import com.liferay.portal.service.ServiceWrapper;
+
 /**
  * <p>
  * This class is a wrapper for {@link AnnouncementsEntryLocalService}.
@@ -24,7 +26,8 @@ package com.liferay.portlet.announcements.service;
  * @generated
  */
 public class AnnouncementsEntryLocalServiceWrapper
-	implements AnnouncementsEntryLocalService {
+	implements AnnouncementsEntryLocalService,
+		ServiceWrapper<AnnouncementsEntryLocalService> {
 	public AnnouncementsEntryLocalServiceWrapper(
 		AnnouncementsEntryLocalService announcementsEntryLocalService) {
 		_announcementsEntryLocalService = announcementsEntryLocalService;
@@ -58,25 +61,32 @@ public class AnnouncementsEntryLocalServiceWrapper
 	* Deletes the announcements entry with the primary key from the database. Also notifies the appropriate model listeners.
 	*
 	* @param entryId the primary key of the announcements entry
+	* @return the announcements entry that was removed
 	* @throws PortalException if a announcements entry with the primary key could not be found
 	* @throws SystemException if a system exception occurred
 	*/
-	public void deleteAnnouncementsEntry(long entryId)
+	public com.liferay.portlet.announcements.model.AnnouncementsEntry deleteAnnouncementsEntry(
+		long entryId)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException {
-		_announcementsEntryLocalService.deleteAnnouncementsEntry(entryId);
+		return _announcementsEntryLocalService.deleteAnnouncementsEntry(entryId);
 	}
 
 	/**
 	* Deletes the announcements entry from the database. Also notifies the appropriate model listeners.
 	*
 	* @param announcementsEntry the announcements entry
+	* @return the announcements entry that was removed
 	* @throws SystemException if a system exception occurred
 	*/
-	public void deleteAnnouncementsEntry(
+	public com.liferay.portlet.announcements.model.AnnouncementsEntry deleteAnnouncementsEntry(
 		com.liferay.portlet.announcements.model.AnnouncementsEntry announcementsEntry)
 		throws com.liferay.portal.kernel.exception.SystemException {
-		_announcementsEntryLocalService.deleteAnnouncementsEntry(announcementsEntry);
+		return _announcementsEntryLocalService.deleteAnnouncementsEntry(announcementsEntry);
+	}
+
+	public com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery() {
+		return _announcementsEntryLocalService.dynamicQuery();
 	}
 
 	/**
@@ -149,6 +159,12 @@ public class AnnouncementsEntryLocalServiceWrapper
 		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery)
 		throws com.liferay.portal.kernel.exception.SystemException {
 		return _announcementsEntryLocalService.dynamicQueryCount(dynamicQuery);
+	}
+
+	public com.liferay.portlet.announcements.model.AnnouncementsEntry fetchAnnouncementsEntry(
+		long entryId)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return _announcementsEntryLocalService.fetchAnnouncementsEntry(entryId);
 	}
 
 	/**
@@ -411,11 +427,26 @@ public class AnnouncementsEntryLocalServiceWrapper
 			expirationDateHour, expirationDateMinute, priority);
 	}
 
+	/**
+	 * @deprecated Renamed to {@link #getWrappedService}
+	 */
 	public AnnouncementsEntryLocalService getWrappedAnnouncementsEntryLocalService() {
 		return _announcementsEntryLocalService;
 	}
 
+	/**
+	 * @deprecated Renamed to {@link #setWrappedService}
+	 */
 	public void setWrappedAnnouncementsEntryLocalService(
+		AnnouncementsEntryLocalService announcementsEntryLocalService) {
+		_announcementsEntryLocalService = announcementsEntryLocalService;
+	}
+
+	public AnnouncementsEntryLocalService getWrappedService() {
+		return _announcementsEntryLocalService;
+	}
+
+	public void setWrappedService(
 		AnnouncementsEntryLocalService announcementsEntryLocalService) {
 		_announcementsEntryLocalService = announcementsEntryLocalService;
 	}

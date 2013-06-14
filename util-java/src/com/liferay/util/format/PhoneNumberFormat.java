@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -15,12 +15,11 @@
 package com.liferay.util.format;
 
 /**
- * @author Brian Wing Shun Chan
+ * @author     Brian Wing Shun Chan
+ * @author     Manuel de la Peña
+ * @deprecated Moved to {@link
+ *             com.liferay.portal.kernel.format.PhoneNumberFormat}
  */
-public interface PhoneNumberFormat {
-
-	public String format(String phoneNumber);
-
-	public String strip(String phoneNumber);
-
+public interface PhoneNumberFormat
+	extends com.liferay.portal.kernel.format.PhoneNumberFormat {
 }

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -25,9 +25,10 @@ public class ViewScopeDefaultWCWebContentListCurrentPageCPTest
 	public void testViewScopeDefaultWCWebContentListCurrentPageCP()
 		throws Exception {
 		selenium.open("/web/guest/home/");
+		loadRequiredJavaScriptModules();
 
 		for (int second = 0;; second++) {
-			if (second >= 60) {
+			if (second >= 90) {
 				fail("timeout");
 			}
 
@@ -42,42 +43,26 @@ public class ViewScopeDefaultWCWebContentListCurrentPageCPTest
 			Thread.sleep(1000);
 		}
 
-		selenium.saveScreenShotAndSource();
 		selenium.clickAt("link=Control Panel",
 			RuntimeVariables.replace("Control Panel"));
 		selenium.waitForPageToLoad("30000");
-		selenium.saveScreenShotAndSource();
+		loadRequiredJavaScriptModules();
 		selenium.clickAt("link=Web Content",
 			RuntimeVariables.replace("Web Content"));
 		selenium.waitForPageToLoad("30000");
-		selenium.saveScreenShotAndSource();
-		assertTrue(selenium.isElementPresent("//div[2]/span"));
-		selenium.clickAt("//div[2]/span/a", RuntimeVariables.replace("Default"));
-
-		for (int second = 0;; second++) {
-			if (second >= 60) {
-				fail("timeout");
-			}
-
-			try {
-				if (selenium.isVisible("link=Web Content Display Test Page2")) {
-					break;
-				}
-			}
-			catch (Exception e) {
-			}
-
-			Thread.sleep(1000);
-		}
-
-		selenium.saveScreenShotAndSource();
-		selenium.clickAt("link=Web Content Display Test Page2",
+		loadRequiredJavaScriptModules();
+		assertTrue(selenium.isPartialText("//div/span/ul/li/strong/a",
+				"Scope: Default"));
+		selenium.clickAt("//div/span/ul/li/strong/a",
+			RuntimeVariables.replace("Scope: Default"));
+		assertEquals(RuntimeVariables.replace("Web Content Display Test Page2"),
+			selenium.getText("//li[2]/a"));
+		selenium.clickAt("//li[2]/a",
 			RuntimeVariables.replace("Web Content Display Test Page2"));
 		selenium.waitForPageToLoad("30000");
-		selenium.saveScreenShotAndSource();
-		assertEquals(RuntimeVariables.replace(
-				"Scope Web Content Display Test Page2"),
-			selenium.getText("//div[2]/span"));
+		loadRequiredJavaScriptModules();
+		assertTrue(selenium.isPartialText("//div/span/ul/li/strong/a",
+				"Scope: Web Content Display Test Page2"));
 		assertEquals(RuntimeVariables.replace("No Web Content was found."),
 			selenium.getText("//div[@class='portlet-msg-info']"));
 	}

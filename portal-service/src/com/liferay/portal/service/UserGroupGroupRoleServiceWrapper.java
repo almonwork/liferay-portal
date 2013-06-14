@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -24,10 +24,29 @@ package com.liferay.portal.service;
  * @generated
  */
 public class UserGroupGroupRoleServiceWrapper
-	implements UserGroupGroupRoleService {
+	implements UserGroupGroupRoleService,
+		ServiceWrapper<UserGroupGroupRoleService> {
 	public UserGroupGroupRoleServiceWrapper(
 		UserGroupGroupRoleService userGroupGroupRoleService) {
 		_userGroupGroupRoleService = userGroupGroupRoleService;
+	}
+
+	/**
+	* Returns the Spring bean ID for this bean.
+	*
+	* @return the Spring bean ID for this bean
+	*/
+	public java.lang.String getBeanIdentifier() {
+		return _userGroupGroupRoleService.getBeanIdentifier();
+	}
+
+	/**
+	* Sets the Spring bean ID for this bean.
+	*
+	* @param beanIdentifier the Spring bean ID for this bean
+	*/
+	public void setBeanIdentifier(java.lang.String beanIdentifier) {
+		_userGroupGroupRoleService.setBeanIdentifier(beanIdentifier);
 	}
 
 	public void addUserGroupGroupRoles(long userGroupId, long groupId,
@@ -62,11 +81,26 @@ public class UserGroupGroupRoleServiceWrapper
 			groupId, roleId);
 	}
 
+	/**
+	 * @deprecated Renamed to {@link #getWrappedService}
+	 */
 	public UserGroupGroupRoleService getWrappedUserGroupGroupRoleService() {
 		return _userGroupGroupRoleService;
 	}
 
+	/**
+	 * @deprecated Renamed to {@link #setWrappedService}
+	 */
 	public void setWrappedUserGroupGroupRoleService(
+		UserGroupGroupRoleService userGroupGroupRoleService) {
+		_userGroupGroupRoleService = userGroupGroupRoleService;
+	}
+
+	public UserGroupGroupRoleService getWrappedService() {
+		return _userGroupGroupRoleService;
+	}
+
+	public void setWrappedService(
 		UserGroupGroupRoleService userGroupGroupRoleService) {
 		_userGroupGroupRoleService = userGroupGroupRoleService;
 	}

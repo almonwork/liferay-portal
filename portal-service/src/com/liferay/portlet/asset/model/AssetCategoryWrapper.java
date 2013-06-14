@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,6 +14,12 @@
 
 package com.liferay.portlet.asset.model;
 
+import com.liferay.portal.model.ModelWrapper;
+
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * <p>
  * This class is a wrapper for {@link AssetCategory}.
@@ -23,7 +29,8 @@ package com.liferay.portlet.asset.model;
  * @see       AssetCategory
  * @generated
  */
-public class AssetCategoryWrapper implements AssetCategory {
+public class AssetCategoryWrapper implements AssetCategory,
+	ModelWrapper<AssetCategory> {
 	public AssetCategoryWrapper(AssetCategory assetCategory) {
 		_assetCategory = assetCategory;
 	}
@@ -34,6 +41,120 @@ public class AssetCategoryWrapper implements AssetCategory {
 
 	public String getModelClassName() {
 		return AssetCategory.class.getName();
+	}
+
+	public Map<String, Object> getModelAttributes() {
+		Map<String, Object> attributes = new HashMap<String, Object>();
+
+		attributes.put("uuid", getUuid());
+		attributes.put("categoryId", getCategoryId());
+		attributes.put("groupId", getGroupId());
+		attributes.put("companyId", getCompanyId());
+		attributes.put("userId", getUserId());
+		attributes.put("userName", getUserName());
+		attributes.put("createDate", getCreateDate());
+		attributes.put("modifiedDate", getModifiedDate());
+		attributes.put("parentCategoryId", getParentCategoryId());
+		attributes.put("leftCategoryId", getLeftCategoryId());
+		attributes.put("rightCategoryId", getRightCategoryId());
+		attributes.put("name", getName());
+		attributes.put("title", getTitle());
+		attributes.put("description", getDescription());
+		attributes.put("vocabularyId", getVocabularyId());
+
+		return attributes;
+	}
+
+	public void setModelAttributes(Map<String, Object> attributes) {
+		String uuid = (String)attributes.get("uuid");
+
+		if (uuid != null) {
+			setUuid(uuid);
+		}
+
+		Long categoryId = (Long)attributes.get("categoryId");
+
+		if (categoryId != null) {
+			setCategoryId(categoryId);
+		}
+
+		Long groupId = (Long)attributes.get("groupId");
+
+		if (groupId != null) {
+			setGroupId(groupId);
+		}
+
+		Long companyId = (Long)attributes.get("companyId");
+
+		if (companyId != null) {
+			setCompanyId(companyId);
+		}
+
+		Long userId = (Long)attributes.get("userId");
+
+		if (userId != null) {
+			setUserId(userId);
+		}
+
+		String userName = (String)attributes.get("userName");
+
+		if (userName != null) {
+			setUserName(userName);
+		}
+
+		Date createDate = (Date)attributes.get("createDate");
+
+		if (createDate != null) {
+			setCreateDate(createDate);
+		}
+
+		Date modifiedDate = (Date)attributes.get("modifiedDate");
+
+		if (modifiedDate != null) {
+			setModifiedDate(modifiedDate);
+		}
+
+		Long parentCategoryId = (Long)attributes.get("parentCategoryId");
+
+		if (parentCategoryId != null) {
+			setParentCategoryId(parentCategoryId);
+		}
+
+		Long leftCategoryId = (Long)attributes.get("leftCategoryId");
+
+		if (leftCategoryId != null) {
+			setLeftCategoryId(leftCategoryId);
+		}
+
+		Long rightCategoryId = (Long)attributes.get("rightCategoryId");
+
+		if (rightCategoryId != null) {
+			setRightCategoryId(rightCategoryId);
+		}
+
+		String name = (String)attributes.get("name");
+
+		if (name != null) {
+			setName(name);
+		}
+
+		String title = (String)attributes.get("title");
+
+		if (title != null) {
+			setTitle(title);
+		}
+
+		String description = (String)attributes.get("description");
+
+		if (description != null) {
+			setDescription(description);
+		}
+
+		Long vocabularyId = (Long)attributes.get("vocabularyId");
+
+		if (vocabularyId != null) {
+			setVocabularyId(vocabularyId);
+		}
 	}
 
 	/**
@@ -342,6 +463,14 @@ public class AssetCategoryWrapper implements AssetCategory {
 		return _assetCategory.getTitle(languageId, useDefault);
 	}
 
+	public java.lang.String getTitleCurrentLanguageId() {
+		return _assetCategory.getTitleCurrentLanguageId();
+	}
+
+	public java.lang.String getTitleCurrentValue() {
+		return _assetCategory.getTitleCurrentValue();
+	}
+
 	/**
 	* Returns a map of the locales and localized titles of this asset category.
 	*
@@ -380,6 +509,10 @@ public class AssetCategoryWrapper implements AssetCategory {
 	public void setTitle(java.lang.String title, java.util.Locale locale,
 		java.util.Locale defaultLocale) {
 		_assetCategory.setTitle(title, locale, defaultLocale);
+	}
+
+	public void setTitleCurrentLanguageId(java.lang.String languageId) {
+		_assetCategory.setTitleCurrentLanguageId(languageId);
 	}
 
 	/**
@@ -457,6 +590,14 @@ public class AssetCategoryWrapper implements AssetCategory {
 		return _assetCategory.getDescription(languageId, useDefault);
 	}
 
+	public java.lang.String getDescriptionCurrentLanguageId() {
+		return _assetCategory.getDescriptionCurrentLanguageId();
+	}
+
+	public java.lang.String getDescriptionCurrentValue() {
+		return _assetCategory.getDescriptionCurrentValue();
+	}
+
 	/**
 	* Returns a map of the locales and localized descriptions of this asset category.
 	*
@@ -496,6 +637,10 @@ public class AssetCategoryWrapper implements AssetCategory {
 	public void setDescription(java.lang.String description,
 		java.util.Locale locale, java.util.Locale defaultLocale) {
 		_assetCategory.setDescription(description, locale, defaultLocale);
+	}
+
+	public void setDescriptionCurrentLanguageId(java.lang.String languageId) {
+		_assetCategory.setDescriptionCurrentLanguageId(languageId);
 	}
 
 	/**
@@ -556,10 +701,6 @@ public class AssetCategoryWrapper implements AssetCategory {
 
 	public boolean isEscapedModel() {
 		return _assetCategory.isEscapedModel();
-	}
-
-	public void setEscapedModel(boolean escapedModel) {
-		_assetCategory.setEscapedModel(escapedModel);
 	}
 
 	public java.io.Serializable getPrimaryKeyObj() {
@@ -626,7 +767,14 @@ public class AssetCategoryWrapper implements AssetCategory {
 		return _assetCategory.isRootCategory();
 	}
 
+	/**
+	 * @deprecated Renamed to {@link #getWrappedModel}
+	 */
 	public AssetCategory getWrappedAssetCategory() {
+		return _assetCategory;
+	}
+
+	public AssetCategory getWrappedModel() {
 		return _assetCategory;
 	}
 

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,6 +14,10 @@
 
 package com.liferay.portal.model;
 
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * <p>
  * This class is a wrapper for {@link PasswordTracker}.
@@ -23,7 +27,8 @@ package com.liferay.portal.model;
  * @see       PasswordTracker
  * @generated
  */
-public class PasswordTrackerWrapper implements PasswordTracker {
+public class PasswordTrackerWrapper implements PasswordTracker,
+	ModelWrapper<PasswordTracker> {
 	public PasswordTrackerWrapper(PasswordTracker passwordTracker) {
 		_passwordTracker = passwordTracker;
 	}
@@ -34,6 +39,43 @@ public class PasswordTrackerWrapper implements PasswordTracker {
 
 	public String getModelClassName() {
 		return PasswordTracker.class.getName();
+	}
+
+	public Map<String, Object> getModelAttributes() {
+		Map<String, Object> attributes = new HashMap<String, Object>();
+
+		attributes.put("passwordTrackerId", getPasswordTrackerId());
+		attributes.put("userId", getUserId());
+		attributes.put("createDate", getCreateDate());
+		attributes.put("password", getPassword());
+
+		return attributes;
+	}
+
+	public void setModelAttributes(Map<String, Object> attributes) {
+		Long passwordTrackerId = (Long)attributes.get("passwordTrackerId");
+
+		if (passwordTrackerId != null) {
+			setPasswordTrackerId(passwordTrackerId);
+		}
+
+		Long userId = (Long)attributes.get("userId");
+
+		if (userId != null) {
+			setUserId(userId);
+		}
+
+		Date createDate = (Date)attributes.get("createDate");
+
+		if (createDate != null) {
+			setCreateDate(createDate);
+		}
+
+		String password = (String)attributes.get("password");
+
+		if (password != null) {
+			setPassword(password);
+		}
 	}
 
 	/**
@@ -166,10 +208,6 @@ public class PasswordTrackerWrapper implements PasswordTracker {
 		return _passwordTracker.isEscapedModel();
 	}
 
-	public void setEscapedModel(boolean escapedModel) {
-		_passwordTracker.setEscapedModel(escapedModel);
-	}
-
 	public java.io.Serializable getPrimaryKeyObj() {
 		return _passwordTracker.getPrimaryKeyObj();
 	}
@@ -224,7 +262,14 @@ public class PasswordTrackerWrapper implements PasswordTracker {
 		_passwordTracker.persist();
 	}
 
+	/**
+	 * @deprecated Renamed to {@link #getWrappedModel}
+	 */
 	public PasswordTracker getWrappedPasswordTracker() {
+		return _passwordTracker;
+	}
+
+	public PasswordTracker getWrappedModel() {
 		return _passwordTracker;
 	}
 

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,7 +14,15 @@
 
 package com.liferay.portal.kernel.portlet;
 
-import com.liferay.portal.kernel.servlet.PortletServlet;
+import com.liferay.portal.kernel.security.pacl.PACLConstants;
+import com.liferay.portal.kernel.security.pacl.permission.PortalRuntimePermission;
+import com.liferay.portal.kernel.servlet.PluginContextListener;
+import com.liferay.portal.kernel.util.StringPool;
+
+import java.security.Permission;
+
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.servlet.ServletContext;
 
@@ -24,10 +32,22 @@ import javax.servlet.ServletContext;
 public class PortletClassLoaderUtil {
 
 	public static ClassLoader getClassLoader() {
-		return _classLoader;
+		Thread currentThread = Thread.currentThread();
+
+		return _classLoaders.get(currentThread.getId());
 	}
 
 	public static ClassLoader getClassLoader(String portletId) {
+		SecurityManager securityManager = System.getSecurityManager();
+
+		if (securityManager != null) {
+			Permission permission = new RuntimePermission(
+				PACLConstants.RUNTIME_PERMISSION_GET_CLASSLOADER.concat(
+					StringPool.PERIOD).concat(portletId));
+
+			securityManager.checkPermission(permission);
+		}
+
 		PortletBag portletBag = PortletBagPool.get(portletId);
 
 		if (portletBag == null) {
@@ -36,11 +56,8 @@ public class PortletClassLoaderUtil {
 
 		ServletContext servletContext = portletBag.getServletContext();
 
-		ClassLoader portletClassLoader =
-			(ClassLoader)servletContext.getAttribute(
-				PortletServlet.PORTLET_CLASS_LOADER);
-
-		return portletClassLoader;
+		return (ClassLoader)servletContext.getAttribute(
+			PluginContextListener.PLUGIN_CLASS_LOADER);
 	}
 
 	public static String getServletContextName() {
@@ -48,14 +65,24 @@ public class PortletClassLoaderUtil {
 	}
 
 	public static void setClassLoader(ClassLoader classLoader) {
-		_classLoader = classLoader;
+		PortalRuntimePermission.checkSetBeanProperty(
+			PortletClassLoaderUtil.class);
+
+		Thread currentThread = Thread.currentThread();
+
+		_classLoaders.put(currentThread.getId(), classLoader);
 	}
 
 	public static void setServletContextName(String servletContextName) {
+		PortalRuntimePermission.checkSetBeanProperty(
+			PortletClassLoaderUtil.class);
+
 		_servletContextName = servletContextName;
 	}
 
-	private static ClassLoader _classLoader;
+	private static Map<Long, ClassLoader> _classLoaders =
+		new HashMap<Long, ClassLoader>();
+
 	private static String _servletContextName;
 
 }

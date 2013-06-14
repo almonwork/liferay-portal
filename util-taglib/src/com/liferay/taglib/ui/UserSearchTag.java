@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -59,12 +59,9 @@ public class UserSearchTag extends IncludeTag {
 
 	@Override
 	protected void setAttributes(HttpServletRequest request) {
-		request.setAttribute(
-			"liferay-ui:user-search:portletURL", _portletURL);
-		request.setAttribute(
-			"liferay-ui:user-search:rowChecker", _rowChecker);
-		request.setAttribute(
-			"liferay-ui:user-search:userParams", _userParams);
+		request.setAttribute("liferay-ui:user-search:portletURL", _portletURL);
+		request.setAttribute("liferay-ui:user-search:rowChecker", _rowChecker);
+		request.setAttribute("liferay-ui:user-search:userParams", _userParams);
 	}
 
 	private static final String _END_PAGE =

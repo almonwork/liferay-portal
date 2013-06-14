@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,6 +14,12 @@
 
 package com.liferay.portlet.shopping.model;
 
+import com.liferay.portal.model.ModelWrapper;
+
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * <p>
  * This class is a wrapper for {@link ShoppingCoupon}.
@@ -23,7 +29,8 @@ package com.liferay.portlet.shopping.model;
  * @see       ShoppingCoupon
  * @generated
  */
-public class ShoppingCouponWrapper implements ShoppingCoupon {
+public class ShoppingCouponWrapper implements ShoppingCoupon,
+	ModelWrapper<ShoppingCoupon> {
 	public ShoppingCouponWrapper(ShoppingCoupon shoppingCoupon) {
 		_shoppingCoupon = shoppingCoupon;
 	}
@@ -34,6 +41,141 @@ public class ShoppingCouponWrapper implements ShoppingCoupon {
 
 	public String getModelClassName() {
 		return ShoppingCoupon.class.getName();
+	}
+
+	public Map<String, Object> getModelAttributes() {
+		Map<String, Object> attributes = new HashMap<String, Object>();
+
+		attributes.put("couponId", getCouponId());
+		attributes.put("groupId", getGroupId());
+		attributes.put("companyId", getCompanyId());
+		attributes.put("userId", getUserId());
+		attributes.put("userName", getUserName());
+		attributes.put("createDate", getCreateDate());
+		attributes.put("modifiedDate", getModifiedDate());
+		attributes.put("code", getCode());
+		attributes.put("name", getName());
+		attributes.put("description", getDescription());
+		attributes.put("startDate", getStartDate());
+		attributes.put("endDate", getEndDate());
+		attributes.put("active", getActive());
+		attributes.put("limitCategories", getLimitCategories());
+		attributes.put("limitSkus", getLimitSkus());
+		attributes.put("minOrder", getMinOrder());
+		attributes.put("discount", getDiscount());
+		attributes.put("discountType", getDiscountType());
+
+		return attributes;
+	}
+
+	public void setModelAttributes(Map<String, Object> attributes) {
+		Long couponId = (Long)attributes.get("couponId");
+
+		if (couponId != null) {
+			setCouponId(couponId);
+		}
+
+		Long groupId = (Long)attributes.get("groupId");
+
+		if (groupId != null) {
+			setGroupId(groupId);
+		}
+
+		Long companyId = (Long)attributes.get("companyId");
+
+		if (companyId != null) {
+			setCompanyId(companyId);
+		}
+
+		Long userId = (Long)attributes.get("userId");
+
+		if (userId != null) {
+			setUserId(userId);
+		}
+
+		String userName = (String)attributes.get("userName");
+
+		if (userName != null) {
+			setUserName(userName);
+		}
+
+		Date createDate = (Date)attributes.get("createDate");
+
+		if (createDate != null) {
+			setCreateDate(createDate);
+		}
+
+		Date modifiedDate = (Date)attributes.get("modifiedDate");
+
+		if (modifiedDate != null) {
+			setModifiedDate(modifiedDate);
+		}
+
+		String code = (String)attributes.get("code");
+
+		if (code != null) {
+			setCode(code);
+		}
+
+		String name = (String)attributes.get("name");
+
+		if (name != null) {
+			setName(name);
+		}
+
+		String description = (String)attributes.get("description");
+
+		if (description != null) {
+			setDescription(description);
+		}
+
+		Date startDate = (Date)attributes.get("startDate");
+
+		if (startDate != null) {
+			setStartDate(startDate);
+		}
+
+		Date endDate = (Date)attributes.get("endDate");
+
+		if (endDate != null) {
+			setEndDate(endDate);
+		}
+
+		Boolean active = (Boolean)attributes.get("active");
+
+		if (active != null) {
+			setActive(active);
+		}
+
+		String limitCategories = (String)attributes.get("limitCategories");
+
+		if (limitCategories != null) {
+			setLimitCategories(limitCategories);
+		}
+
+		String limitSkus = (String)attributes.get("limitSkus");
+
+		if (limitSkus != null) {
+			setLimitSkus(limitSkus);
+		}
+
+		Double minOrder = (Double)attributes.get("minOrder");
+
+		if (minOrder != null) {
+			setMinOrder(minOrder);
+		}
+
+		Double discount = (Double)attributes.get("discount");
+
+		if (discount != null) {
+			setDiscount(discount);
+		}
+
+		String discountType = (String)attributes.get("discountType");
+
+		if (discountType != null) {
+			setDiscountType(discountType);
+		}
 	}
 
 	/**
@@ -427,10 +569,6 @@ public class ShoppingCouponWrapper implements ShoppingCoupon {
 		return _shoppingCoupon.isEscapedModel();
 	}
 
-	public void setEscapedModel(boolean escapedModel) {
-		_shoppingCoupon.setEscapedModel(escapedModel);
-	}
-
 	public java.io.Serializable getPrimaryKeyObj() {
 		return _shoppingCoupon.getPrimaryKeyObj();
 	}
@@ -497,7 +635,14 @@ public class ShoppingCouponWrapper implements ShoppingCoupon {
 		return _shoppingCoupon.hasValidStartDate();
 	}
 
+	/**
+	 * @deprecated Renamed to {@link #getWrappedModel}
+	 */
 	public ShoppingCoupon getWrappedShoppingCoupon() {
+		return _shoppingCoupon;
+	}
+
+	public ShoppingCoupon getWrappedModel() {
 		return _shoppingCoupon;
 	}
 

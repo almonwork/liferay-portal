@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -63,10 +63,8 @@ public class WorkflowTaskSearch extends SearchContainer<WorkflowTask> {
 		iteratorURL.setParameter(
 			WorkflowTaskDisplayTerms.TYPE, displayTerms.getType());
 
-		String orderByCol = ParamUtil.getString(
-			portletRequest, "orderByCol");
-		String orderByType = ParamUtil.getString(
-			portletRequest, "orderByType");
+		String orderByCol = ParamUtil.getString(portletRequest, "orderByCol");
+		String orderByType = ParamUtil.getString(portletRequest, "orderByType");
 
 		OrderByComparator orderByComparator = getOrderByComparator(
 			orderByCol, orderByType);
@@ -88,14 +86,14 @@ public class WorkflowTaskSearch extends SearchContainer<WorkflowTask> {
 
 		OrderByComparator orderByComparator = null;
 
-		if (orderByCol.equals("due-date")) {
+		if (orderByCol.equals("name")) {
+			orderByComparator =
+				WorkflowComparatorFactoryUtil.getTaskNameComparator(orderByAsc);
+		}
+		else {
 			orderByComparator =
 				WorkflowComparatorFactoryUtil.getTaskDueDateComparator(
 					orderByAsc);
-		}
-		else if (orderByCol.equals("name")) {
-			orderByComparator =
-				WorkflowComparatorFactoryUtil.getTaskNameComparator(orderByAsc);
 		}
 
 		return orderByComparator;

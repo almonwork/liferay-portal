@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -73,9 +73,9 @@ public class RSSAction extends Action {
 		int max = ParamUtil.getInteger(
 			request, "max", SearchContainer.DEFAULT_DELTA);
 		String type = ParamUtil.getString(
-			request, "type", RSSUtil.DEFAULT_TYPE);
+			request, "type", RSSUtil.TYPE_DEFAULT);
 		double version = ParamUtil.getDouble(
-			request, "version", RSSUtil.DEFAULT_VERSION);
+			request, "version", RSSUtil.VERSION_DEFAULT);
 		String displayStyle = ParamUtil.getString(
 			request, "displayStyle", RSSUtil.DISPLAY_STYLE_FULL_CONTENT);
 
@@ -93,9 +93,21 @@ public class RSSAction extends Action {
 				version, displayStyle, feedURL, entryURL, themeDisplay);
 		}
 		else if (groupId > 0) {
-			String feedURL =
-				themeDisplay.getPortalURL() + themeDisplay.getPathMain() +
-					"/message_boards/find_recent_posts?p_l_id=" + plid;
+			String topLink = ParamUtil.getString(request, "topLink");
+
+			String feedURL = null;
+
+			if (topLink.equals("recent-posts")) {
+				feedURL =
+					themeDisplay.getPortalURL() + themeDisplay.getPathMain() +
+						"/message_boards/find_recent_posts?p_l_id=" + plid;
+			}
+			else {
+				feedURL =
+					themeDisplay.getPortalURL() + themeDisplay.getPathMain() +
+						"/message_boards/find_category?p_l_id=" + plid +
+							"&mbCategoryId=" + categoryId;
+			}
 
 			if (userId > 0) {
 				rss = MBMessageServiceUtil.getGroupMessagesRSS(

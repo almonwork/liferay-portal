@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -82,8 +82,8 @@ public class LiferayPageProvider implements WikiPageProvider {
 		try {
 			return getAllPages();
 		}
-		catch (ProviderException e) {
-			_log.error("Could not get changed pages", e);
+		catch (ProviderException pe) {
+			_log.error("Could not get changed pages", pe);
 
 			return Collections.emptyList();
 		}

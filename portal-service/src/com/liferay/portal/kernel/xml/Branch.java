@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -13,8 +13,6 @@
  */
 
 package com.liferay.portal.kernel.xml;
-
-import java.io.IOException;
 
 import java.util.Iterator;
 import java.util.List;
@@ -45,13 +43,6 @@ public interface Branch extends Node {
 	public List<Node> content();
 
 	public Element elementByID(String elementID);
-
-	public String formattedString() throws IOException;
-
-	public String formattedString(String indent) throws IOException;
-
-	public String formattedString(String indent, boolean expandEmptyElements)
-		throws IOException;
 
 	public int indexOf(Node node);
 

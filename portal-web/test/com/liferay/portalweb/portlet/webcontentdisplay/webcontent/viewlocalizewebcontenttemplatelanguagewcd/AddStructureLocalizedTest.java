@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -23,9 +23,10 @@ import com.liferay.portalweb.portal.util.RuntimeVariables;
 public class AddStructureLocalizedTest extends BaseTestCase {
 	public void testAddStructureLocalized() throws Exception {
 		selenium.open("/web/guest/home/");
+		loadRequiredJavaScriptModules();
 
 		for (int second = 0;; second++) {
-			if (second >= 60) {
+			if (second >= 90) {
 				fail("timeout");
 			}
 
@@ -40,39 +41,37 @@ public class AddStructureLocalizedTest extends BaseTestCase {
 			Thread.sleep(1000);
 		}
 
-		selenium.saveScreenShotAndSource();
-		selenium.clickAt("link=Control Panel", RuntimeVariables.replace(""));
+		selenium.clickAt("link=Control Panel",
+			RuntimeVariables.replace("Control Panel"));
 		selenium.waitForPageToLoad("30000");
-		selenium.saveScreenShotAndSource();
-		assertEquals(RuntimeVariables.replace("Web Content"),
-			selenium.getText("//div[2]/div[2]/div[2]/ul/li[3]/a"));
-		selenium.clickAt("//div[2]/div[2]/div[2]/ul/li[3]/a",
+		loadRequiredJavaScriptModules();
+		selenium.clickAt("link=Web Content",
 			RuntimeVariables.replace("Web Content"));
 		selenium.waitForPageToLoad("30000");
-		selenium.saveScreenShotAndSource();
-		selenium.clickAt("link=Structures", RuntimeVariables.replace(""));
+		loadRequiredJavaScriptModules();
+		selenium.clickAt("link=Structures",
+			RuntimeVariables.replace("Structures"));
 		selenium.waitForPageToLoad("30000");
-		selenium.saveScreenShotAndSource();
-		selenium.clickAt("//input[@value=\"Add Structure\"]",
-			RuntimeVariables.replace(""));
+		loadRequiredJavaScriptModules();
+		selenium.clickAt("//input[@value='Add Structure']",
+			RuntimeVariables.replace("Add Structure"));
 		selenium.waitForPageToLoad("30000");
-		selenium.saveScreenShotAndSource();
-		selenium.type("_15_name",
-			RuntimeVariables.replace("Test Localized Structure"));
-		selenium.saveScreenShotAndSource();
-		selenium.type("_15_description",
-			RuntimeVariables.replace("This is a test localized structure."));
-		selenium.saveScreenShotAndSource();
-		selenium.clickAt("_15_editorButton", RuntimeVariables.replace(""));
-		Thread.sleep(5000);
+		loadRequiredJavaScriptModules();
+		selenium.type("//input[@id='_15_name_en_US']",
+			RuntimeVariables.replace("Web Content Localized Structure Name"));
+		selenium.type("//textarea[@id='_15_description_en_US']",
+			RuntimeVariables.replace(
+				"Web Content Localized Structure Description"));
+		selenium.clickAt("//input[@id='_15_editorButton']",
+			RuntimeVariables.replace("Launch Editor"));
 
 		for (int second = 0;; second++) {
-			if (second >= 60) {
+			if (second >= 90) {
 				fail("timeout");
 			}
 
 			try {
-				if (selenium.isElementPresent("_15_xsdContent")) {
+				if (selenium.isVisible("//textarea[@id='_15_plainEditorField']")) {
 					break;
 				}
 			}
@@ -82,20 +81,44 @@ public class AddStructureLocalizedTest extends BaseTestCase {
 			Thread.sleep(1000);
 		}
 
-		selenium.saveScreenShotAndSource();
-		selenium.type("_15_xsdContent",
-			RuntimeVariables.replace(
-				"<root> \n\n <dynamic-element name='page-name' type='text'></dynamic-element> \n\n <dynamic-element name='page-description' type='text'></dynamic-element> \n\n</root>"));
-		selenium.saveScreenShotAndSource();
-		selenium.click("//input[@value='Update']");
 		Thread.sleep(5000);
-		assertEquals("page-name", selenium.getValue("_15_structure_el0_name"));
+		selenium.type("//textarea[@id='_15_plainEditorField']",
+			RuntimeVariables.replace(
+				"<root>\n\n<dynamic-element name='page-name' type='text'></dynamic-element> \n\n<dynamic-element name='page-description' type='text'></dynamic-element>\n\n</root>"));
+		selenium.click("//input[@value='Update']");
+
+		for (int second = 0;; second++) {
+			if (second >= 90) {
+				fail("timeout");
+			}
+
+			try {
+				if (selenium.isVisible("//input[@id='_15_structure_el0_name']")) {
+					break;
+				}
+			}
+			catch (Exception e) {
+			}
+
+			Thread.sleep(1000);
+		}
+
+		assertEquals("page-name",
+			selenium.getValue("//input[@id='_15_structure_el0_name']"));
 		assertEquals("page-description",
-			selenium.getValue("_15_structure_el1_name"));
-		selenium.clickAt("//input[@value=\"Save\"]",
-			RuntimeVariables.replace(""));
+			selenium.getValue("//input[@id='_15_structure_el1_name']"));
+		selenium.clickAt("//input[@value='Save']",
+			RuntimeVariables.replace("Save"));
 		selenium.waitForPageToLoad("30000");
-		selenium.saveScreenShotAndSource();
-		assertTrue(selenium.isTextPresent("Test Localized Structure"));
+		loadRequiredJavaScriptModules();
+		assertEquals(RuntimeVariables.replace(
+				"Your request completed successfully."),
+			selenium.getText("//div[@class='portlet-msg-success']"));
+		assertEquals(RuntimeVariables.replace(
+				"Web Content Localized Structure Name"),
+			selenium.getText("//td[3]/a"));
+		assertEquals(RuntimeVariables.replace(
+				"Web Content Localized Structure Description"),
+			selenium.getText("//td[4]/a"));
 	}
 }

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -75,7 +75,7 @@ public class PooledMemcachePortalCache implements PortalCache {
 		Map<String, Object> values = null;
 
 		try {
-			Future<Map<String,Object>> future = null;
+			Future<Map<String, Object>> future = null;
 
 			try {
 				future = memcachedClient.asyncGetBulk(processedKeys);
@@ -279,8 +279,7 @@ public class PooledMemcachePortalCache implements PortalCache {
 		}
 	}
 
-	private static Log _log = LogFactoryUtil.getLog(
-		MemcachePortalCache.class);
+	private static Log _log = LogFactoryUtil.getLog(MemcachePortalCache.class);
 
 	private MemcachedClientFactory _memcachedClientFactory;
 	private String _name;

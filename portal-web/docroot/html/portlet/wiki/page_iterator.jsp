@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -26,7 +26,7 @@ String tagName = ParamUtil.getString(request, "tag");
 
 PortletURL portletURL = renderResponse.createRenderURL();
 
-portletURL.setParameter("nodeId", String.valueOf(node.getNodeId()));
+portletURL.setParameter("nodeName", node.getName());
 
 if (wikiPage != null) {
 	portletURL.setParameter("title", wikiPage.getTitle());
@@ -40,8 +40,6 @@ if (type.equals("all_pages")) {
 else if (type.equals("categorized_pages")) {
 	portletURL.setParameter("struts_action", "/wiki/view_categorized_pages");
 	portletURL.setParameter("categoryId", String.valueOf(categoryId));
-
-	AssetUtil.addPortletBreadcrumbEntries(categoryId, request, PortletURLUtil.clone(portletURL, renderResponse));
 }
 else if (type.equals("draft_pages") && type.equals("pending_pages")) {
 	portletURL.setParameter("struts_action", "/wiki/view_draft_pages");
@@ -94,8 +92,6 @@ else if (type.equals("recent_changes")) {
 else if (type.equals("tagged_pages")) {
 	portletURL.setParameter("struts_action", "/wiki/view_tagged_pages");
 	portletURL.setParameter("tag", tagName);
-
-	PortalUtil.addPortletBreadcrumbEntry(request, tagName, portletURL.toString());
 }
 
 List<String> headerNames = new ArrayList<String>();
@@ -145,7 +141,7 @@ OrderByComparator orderByComparator = WikiUtil.getPageOrderByComparator(orderByC
 
 Map orderableHeaders = new HashMap();
 
-SearchContainer searchContainer = new SearchContainer(renderRequest, null, null, SearchContainer.DEFAULT_CUR_PARAM, SearchContainer.DEFAULT_DELTA, portletURL, headerNames, emptyResultsMessage);
+SearchContainer searchContainer = new SearchContainer(renderRequest, null, null, SearchContainer.DEFAULT_CUR_PARAM, SearchContainer.DEFAULT_DELTA, currentURLObj, headerNames, emptyResultsMessage);
 
 searchContainer.setOrderableHeaders(orderableHeaders);
 searchContainer.setOrderByCol(orderByCol);
@@ -359,19 +355,24 @@ for (int i = 0; i < results.size(); i++) {
 
 <c:if test='<%= type.equals("all_pages") && WikiNodePermission.contains(permissionChecker, node.getNodeId(), ActionKeys.ADD_PAGE) %>'>
 	<aui:button-row>
-		<portlet:actionURL var="addPageURL">
-			<portlet:param name="struts_action" value="/wiki/edit_page" />
-			<portlet:param name="redirect" value="<%= currentURL %>" />
-			<portlet:param name="nodeId" value="<%= String.valueOf(node.getNodeId()) %>" />
-			<portlet:param name="title" value="<%= StringPool.BLANK %>" />
-			<portlet:param name="editTitle" value="1" />
-		</portlet:actionURL>
+		<liferay-portlet:actionURL allowEmptyParam="<%= true %>" var="addPageURL">
+			<liferay-portlet:param name="struts_action" value="/wiki/edit_page" />
+			<liferay-portlet:param name="redirect" value="<%= currentURL %>" />
+			<liferay-portlet:param name="nodeId" value="<%= String.valueOf(node.getNodeId()) %>" />
+			<liferay-portlet:param name="title" value="<%= StringPool.BLANK %>" />
+			<liferay-portlet:param name="editTitle" value="1" />
+		</liferay-portlet:actionURL>
 
 		<aui:button href="<%= addPageURL %>" name="addPageButton" value="add-page" />
 	</aui:button-row>
 </c:if>
 
-<liferay-ui:search-iterator searchContainer="<%= searchContainer %>" paginate='<%= type.equals("history") ? false : true %>' />
+<liferay-ui:categorization-filter
+	assetType="pages"
+	portletURL="<%= portletURL %>"
+/>
+
+<liferay-ui:search-iterator paginate='<%= type.equals("history") ? false : true %>' searchContainer="<%= searchContainer %>" />
 
 <c:if test='<%= type.equals("history") %>'>
 	<aui:script>

@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -62,7 +62,7 @@ for (int i = 0; i < choices.size(); i++) {
 	int votesPercentWidth = (int)Math.floor(votesPercent * votesPixelWidth);
 %>
 
-<tr class="<%= className %>" style="font-size: x-small;" onMouseEnter="this.className = '<%= classHoverName %>';" onMouseLeave="this.className = '<%= className %>';">
+<tr class="<%= className %>" onMouseEnter="this.className = '<%= classHoverName %>';" onMouseLeave="this.className = '<%= className %>';" style="font-size: x-small;">
 	<td>
 		<%= percentFormat.format(votesPercent) %>
 	</td>
@@ -87,7 +87,7 @@ for (int i = 0; i < choices.size(); i++) {
 		<strong><%= choice.getName() %>.</strong>
 	</td>
 	<td width="99%">
-		<%= HtmlUtil.escape(choice.getDescription(locale)) %>
+		<%= choice.getDescription(locale) %>
 	</td>
 </tr>
 
@@ -183,7 +183,7 @@ for (int i = 0; i < choices.size(); i++) {
 
 			PollsChoice choice = vote.getChoice();
 
-			row.addText(choice.getName() + ". " + choice.getDescription());
+			row.addText(choice.getName() + ". " + choice.getDescription(locale));
 
 			// Vote date
 

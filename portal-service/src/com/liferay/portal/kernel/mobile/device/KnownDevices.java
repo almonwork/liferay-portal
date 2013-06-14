@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -23,13 +23,13 @@ import java.util.Set;
  */
 public interface KnownDevices {
 
-	public Map<Capability, Set<String>> getDeviceIds();
-
 	public Set<VersionableName> getBrands();
 
-	public Set<VersionableName> getOperatingSystems();
-
 	public Set<VersionableName> getBrowsers();
+
+	public Map<Capability, Set<String>> getDeviceIds();
+
+	public Set<VersionableName> getOperatingSystems();
 
 	public Set<String> getPointingMethods();
 

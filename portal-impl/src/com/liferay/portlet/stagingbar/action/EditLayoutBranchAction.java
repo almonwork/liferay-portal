@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,16 +14,22 @@
 
 package com.liferay.portlet.stagingbar.action;
 
+import com.liferay.portal.LayoutBranchNameException;
 import com.liferay.portal.NoSuchGroupException;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.servlet.SessionErrors;
+import com.liferay.portal.kernel.servlet.SessionMessages;
 import com.liferay.portal.kernel.util.Constants;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.security.auth.PrincipalException;
 import com.liferay.portal.service.LayoutBranchServiceUtil;
 import com.liferay.portal.service.ServiceContext;
 import com.liferay.portal.service.ServiceContextFactory;
+import com.liferay.portal.util.PortletKeys;
 import com.liferay.portlet.layoutsadmin.action.EditLayoutsAction;
+
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.portlet.ActionRequest;
 import javax.portlet.ActionResponse;
@@ -58,19 +64,42 @@ public class EditLayoutBranchAction extends EditLayoutsAction {
 
 		try {
 			if (cmd.equals(Constants.ADD) || cmd.equals(Constants.UPDATE)) {
-				updateLayoutSetBranch(actionRequest);
+				updateLayoutBranch(actionRequest);
 			}
 			else if (cmd.equals(Constants.DELETE)) {
-				deleteLayoutBranch(actionRequest);
+				deleteLayoutBranch(actionRequest, portletConfig);
+			}
+
+			if (SessionErrors.isEmpty(actionRequest)) {
+				SessionMessages.add(
+					actionRequest,
+					portletConfig.getPortletName() +
+						SessionMessages.KEY_SUFFIX_REFRESH_PORTLET,
+					PortletKeys.STAGING_BAR);
+
+				Map<String, String> data = new HashMap<String, String>();
+
+				data.put("preventNotification", Boolean.TRUE.toString());
+
+				SessionMessages.add(
+					actionRequest,
+					portletConfig.getPortletName() +
+						SessionMessages.KEY_SUFFIX_REFRESH_PORTLET_DATA,
+					data);
 			}
 
 			sendRedirect(actionRequest, actionResponse);
 		}
 		catch (Exception e) {
-			if (e instanceof PrincipalException ||
-				e instanceof SystemException) {
+			if (e instanceof LayoutBranchNameException) {
+				SessionErrors.add(actionRequest, e.getClass(), e);
 
-				SessionErrors.add(actionRequest, e.getClass().getName());
+				sendRedirect(actionRequest, actionResponse);
+			}
+			else if (e instanceof PrincipalException ||
+					 e instanceof SystemException) {
+
+				SessionErrors.add(actionRequest, e.getClass());
 
 				setForward(actionRequest, "portlet.staging_bar.error");
 			}
@@ -103,7 +132,7 @@ public class EditLayoutBranchAction extends EditLayoutsAction {
 			if (e instanceof NoSuchGroupException ||
 				e instanceof PrincipalException) {
 
-				SessionErrors.add(renderRequest, e.getClass().getName());
+				SessionErrors.add(renderRequest, e.getClass());
 
 				return mapping.findForward("portlet.staging_bar.error");
 			}
@@ -117,23 +146,36 @@ public class EditLayoutBranchAction extends EditLayoutsAction {
 				renderRequest, "portlet.staging_bar.edit_layout_branch"));
 	}
 
-	protected void deleteLayoutBranch(ActionRequest actionRequest)
+	protected void deleteLayoutBranch(
+			ActionRequest actionRequest, PortletConfig portletConfig)
 		throws Exception {
 
 		long layoutBranchId = ParamUtil.getLong(
 			actionRequest, "layoutBranchId");
 
+		long currentLayoutBranchId = ParamUtil.getLong(
+			actionRequest, "currentLayoutBranchId");
+
 		LayoutBranchServiceUtil.deleteLayoutBranch(layoutBranchId);
+
+		SessionMessages.add(actionRequest, "pageVariationDeleted");
+
+		if (layoutBranchId == currentLayoutBranchId) {
+			SessionMessages.add(
+				actionRequest,
+				portletConfig.getPortletName() +
+					SessionMessages.KEY_SUFFIX_PORTLET_NOT_AJAXABLE);
+		}
 	}
 
-	protected void updateLayoutSetBranch(ActionRequest actionRequest)
+	protected void updateLayoutBranch(ActionRequest actionRequest)
 		throws Exception {
 
 		long layoutBranchId = ParamUtil.getLong(
 			actionRequest, "layoutBranchId");
 
 		long layoutRevisionId = ParamUtil.getLong(
-			actionRequest, "mergeLayoutRevisionId");
+			actionRequest, "copyLayoutRevisionId");
 		String name = ParamUtil.getString(actionRequest, "name");
 		String description = ParamUtil.getString(actionRequest, "description");
 
@@ -143,10 +185,14 @@ public class EditLayoutBranchAction extends EditLayoutsAction {
 		if (layoutBranchId <= 0) {
 			LayoutBranchServiceUtil.addLayoutBranch(
 				layoutRevisionId, name, description, false, serviceContext);
+
+			SessionMessages.add(actionRequest, "pageVariationAdded");
 		}
 		else {
 			LayoutBranchServiceUtil.updateLayoutBranch(
 				layoutBranchId, name, description, serviceContext);
+
+			SessionMessages.add(actionRequest, "pageVariationUpdated");
 		}
 	}
 

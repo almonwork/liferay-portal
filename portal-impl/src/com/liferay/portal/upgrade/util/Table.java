@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -60,19 +60,21 @@ public class Table {
 	public static final int BATCH_SIZE = GetterUtil.getInteger(
 		PropsUtil.get("hibernate.jdbc.batch_size"));
 
-	public static final String SAFE_COMMA_CHARACTER =
-		"_SAFE_COMMA_CHARACTER_";
+	public static final String[][] SAFE_CHARS = {
+		{StringPool.RETURN, StringPool.COMMA, StringPool.NEW_LINE},
+		{
+			Table.SAFE_RETURN_CHARACTER, Table.SAFE_COMMA_CHARACTER,
+			Table.SAFE_NEWLINE_CHARACTER
+		}
+	};
+
+	public static final String SAFE_COMMA_CHARACTER = "_SAFE_COMMA_CHARACTER_";
 
 	public static final String SAFE_NEWLINE_CHARACTER =
 		"_SAFE_NEWLINE_CHARACTER_";
 
 	public static final String SAFE_RETURN_CHARACTER =
 		"_SAFE_RETURN_CHARACTER_";
-
-	public static final String[][] SAFE_CHARS = {
-		{StringPool.RETURN, StringPool.COMMA, StringPool.NEW_LINE},
-		{SAFE_RETURN_CHARACTER, SAFE_COMMA_CHARACTER, SAFE_NEWLINE_CHARACTER}
-	};
 
 	public Table(String tableName) {
 		_tableName = tableName;
@@ -139,6 +141,94 @@ public class Table {
 		}
 
 		appendColumn(sb, value, last);
+	}
+
+	public String generateTempFile() throws Exception {
+		Connection con = DataAccess.getUpgradeOptimizedConnection();
+
+		try {
+			return generateTempFile(con);
+		}
+		finally {
+			DataAccess.cleanUp(con);
+		}
+	}
+
+	public String generateTempFile(Connection con) throws Exception {
+		PreparedStatement ps = null;
+		ResultSet rs = null;
+
+		boolean empty = true;
+
+		String tempFileName =
+			SystemProperties.get(SystemProperties.TMP_DIR) + "/temp-db-" +
+				_tableName + "-" + System.currentTimeMillis();
+
+		StopWatch stopWatch = null;
+
+		if (_log.isInfoEnabled()) {
+			stopWatch = new StopWatch();
+
+			stopWatch.start();
+
+			_log.info(
+				"Starting backup of " + _tableName + " to " + tempFileName);
+		}
+
+		UnsyncBufferedWriter unsyncBufferedWriter = new UnsyncBufferedWriter(
+			new FileWriter(tempFileName));
+
+		try {
+			ps = getSelectPreparedStatement(con);
+
+			rs = ps.executeQuery();
+
+			while (rs.next()) {
+				String data = null;
+
+				try {
+					data = getExportedData(rs);
+
+					unsyncBufferedWriter.write(data);
+
+					_totalRows++;
+
+					empty = false;
+				}
+				catch (StagnantRowException sre) {
+					if (_log.isWarnEnabled()) {
+						_log.warn(
+							"Skipping stagnant data in " + _tableName + ": " +
+								sre.getMessage());
+					}
+				}
+			}
+
+			if (_log.isInfoEnabled()) {
+				_log.info(
+					"Finished backup of " + _tableName + " to " +
+						tempFileName + " in " + stopWatch.getTime() + " ms");
+			}
+		}
+		catch (Exception e) {
+			FileUtil.delete(tempFileName);
+
+			throw e;
+		}
+		finally {
+			DataAccess.cleanUp(null, ps, rs);
+
+			unsyncBufferedWriter.close();
+		}
+
+		if (!empty) {
+			return tempFileName;
+		}
+		else {
+			FileUtil.delete(tempFileName);
+
+			return null;
+		}
 	}
 
 	public Object[][] getColumns() {
@@ -229,6 +319,12 @@ public class Table {
 		return _order;
 	}
 
+	public PreparedStatement getSelectPreparedStatement(Connection con)
+		throws Exception {
+
+		return con.prepareStatement(getSelectSQL());
+	}
+
 	public String getSelectSQL() throws Exception {
 		if (_selectSQL == null) {
 			/*String sql = "select ";
@@ -272,9 +368,12 @@ public class Table {
 			try {
 				value = GetterUtil.getLong(rs.getLong(name));
 			}
-			catch (SQLException e) {
+			catch (SQLException sqle) {
 				value = GetterUtil.getLong(rs.getString(name));
 			}
+		}
+		else if (t == Types.BIT) {
+			value = GetterUtil.getBoolean(rs.getBoolean(name));
 		}
 		else if (t == Types.BOOLEAN) {
 			value = GetterUtil.getBoolean(rs.getBoolean(name));
@@ -347,98 +446,8 @@ public class Table {
 		return value;
 	}
 
-	public String generateTempFile() throws Exception {
-		Connection con = DataAccess.getConnection();
-
-		try {
-			return generateTempFile(con);
-		}
-		finally {
-			DataAccess.cleanUp(con);
-		}
-	}
-
-	public String generateTempFile(Connection con) throws Exception {
-		PreparedStatement ps = null;
-		ResultSet rs = null;
-
-		boolean empty = true;
-
-		String tempFileName =
-			SystemProperties.get(SystemProperties.TMP_DIR) + "/temp-db-" +
-				_tableName + "-" + System.currentTimeMillis();
-
-		StopWatch stopWatch = null;
-
-		if (_log.isInfoEnabled()) {
-			stopWatch = new StopWatch();
-
-			stopWatch.start();
-
-			_log.info(
-				"Starting backup of " + _tableName + " to " + tempFileName);
-		}
-
-		String selectSQL = getSelectSQL();
-
-		UnsyncBufferedWriter unsyncBufferedWriter = new UnsyncBufferedWriter(
-			new FileWriter(tempFileName));
-
-		try {
-			ps = con.prepareStatement(selectSQL);
-
-			rs = ps.executeQuery();
-
-			while (rs.next()) {
-				String data = null;
-
-				try {
-					data = getExportedData(rs);
-
-					unsyncBufferedWriter.write(data);
-
-					_totalRows++;
-
-					empty = false;
-				}
-				catch (StagnantRowException sre) {
-					if (_log.isWarnEnabled()) {
-						_log.warn(
-							"Skipping stagnant data in " + _tableName + ": " +
-								sre.getMessage());
-					}
-				}
-			}
-
-			if (_log.isInfoEnabled()) {
-				_log.info(
-					"Finished backup of " + _tableName + " to " +
-						tempFileName + " in " + stopWatch.getTime() + " ms");
-			}
-		}
-		catch (Exception e) {
-			FileUtil.delete(tempFileName);
-
-			throw e;
-		}
-		finally {
-			DataAccess.cleanUp(null, ps, rs);
-
-			unsyncBufferedWriter.close();
-		}
-
-		if (!empty) {
-			return tempFileName;
-		}
-		else {
-			FileUtil.delete(tempFileName);
-
-			return null;
-		}
-	}
-
 	public void populateTable(String tempFileName) throws Exception {
-		Connection con = DataAccess.getConnection();
+		Connection con = DataAccess.getUpgradeOptimizedConnection();
 
 		try {
 			populateTable(tempFileName, con);
@@ -476,10 +485,10 @@ public class Table {
 
 				Object[][] columns = getColumns();
 
-				if ((values.length) != (columns.length)) {
+				if (values.length != columns.length) {
 					throw new UpgradeException(
 						"Column lengths differ between temp file and schema. " +
-							"Attempted to insert row " + line  + ".");
+							"Attempted to insert row " + line + ".");
 				}
 
 				if (count == 0) {

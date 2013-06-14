@@ -1,7 +1,15 @@
-AUI().add(
+AUI.add(
 	'liferay-upload',
 	function(A) {
 		var Lang = A.Lang;
+
+		var TPL_FILE_ERROR = '<li class="upload-file upload-error"><span class="file-title" title="{0}">{0}</span> <span class="error-message">{1}</span></li>';
+
+		var TPL_FILE_PENDING = '<li class="upload-file upload-complete pending-file selectable">' +
+			'<input class="select-file" data-fileName="{0}" name="{1}" type="checkbox" value="{0}" />' +
+			'<span class="file-title" title="{0}">{0}</span>' +
+			'<a class="lfr-button delete-button" href="javascript:;">{2}</a>' +
+		'</li>';
 
 		/**
 		 * OPTIONS
@@ -11,7 +19,7 @@ AUI().add(
 		 * container {string|object}: The container where the uploader will be placed.
 		 * deleteFile {string}: The URL that will handle the deleting of the pending files.
 		 * maxFileSize {number}: The maximum file size that can be uploaded.
-		 * service {json}: configuration of the service to retrieve the pending files.
+		 * tempFileURL {string|object}: The URL or configuration of the service to retrieve the pending files.
 		 * uploadFile {string}: The URL to where the file will be uploaded.
 		 *
 		 * Optional
@@ -49,7 +57,7 @@ AUI().add(
 			instance._metadataContainer = A.one(options.metadataContainer);
 			instance._metadataExplanationContainer = A.one(options.metadataExplanationContainer);
 
-			instance._service = options.service;
+			instance._tempFileURL = options.tempFileURL;
 			instance._uploadFile = options.uploadFile;
 
 			instance._buttonUrl = options.buttonUrl || '';
@@ -98,19 +106,20 @@ AUI().add(
 			instance._fileTypesDescriptionText = options.fileDescription || instance._allowedFileTypes;
 			instance._invalidFileExtensionText = Liferay.Language.get('document-names-must-end-with-one-of-the-following-extensions') + instance._allowedFileTypes;
 			instance._invalidFileNameText = Liferay.Language.get('please-enter-a-file-with-a-valid-file-name');
-			instance._invalidFileSizeText = Liferay.Language.get('please-enter-a-file-with-a-valid-file-size');
+			instance._invalidFileSizeText = Liferay.Language.get('please-enter-a-file-with-a-valid-file-size-no-larger-than-x');
 			instance._noFilesSelectedText = Liferay.Language.get('no-files-selected');
 			instance._pendingFileText = Liferay.Language.get('these-files-have-been-previously-uploaded-but-not-actually-saved.-please-save-or-delete-them-before-they-are-removed');
 			instance._unexpectedDeleteErrorText = Liferay.Language.get('an-unexpected-error-occurred-while-deleting-the-file');
 			instance._unexpectedUploadErrorText = Liferay.Language.get('an-unexpected-error-occurred-while-uploading-your-file');
 			instance._uploadsCompleteText = Liferay.Language.get('all-files-ready-to-be-saved');
 			instance._uploadStatusText = Liferay.Language.get('uploading-file-x-of-x');
+			instance._zeroByteFileText = Liferay.Language.get('the-file-contains-no-data-and-cannot-be-uploaded.-please-use-the-classic-uploader');
 
 			instance._errorMessages = {
-				'1000': instance._duplicateFileText,
-				'1001': instance._invalidFileExtensionText,
-				'1002': instance._invalidFileNameText,
-				'1003': instance._invalidFileSizeText
+				'490': instance._duplicateFileText,
+				'491': instance._invalidFileExtensionText,
+				'492': instance._invalidFileNameText,
+				'493': instance._invalidFileSizeText
 			};
 
 			if (instance._fallbackContainer) {
@@ -170,7 +179,7 @@ AUI().add(
 				var li = A.Node.create(
 					'<li class="upload-file" id="' + fileId + '">' +
 						'<input class="aui-helper-hidden select-file" data-fileName="' + fileName + '" id="' + fileId + 'checkbox" name="' + instance._namespace('selectUploadedFileCheckbox') + '" type="checkbox" value="' + fileName + '" />' +
-						'<span class="file-title">' + fileName + '</span>' +
+						'<span class="file-title" title="' + fileName + '">' + fileName + '</span>' +
 						'<span class="progress-bar">' +
 							'<span class="progress" id="' + fileId + 'progress"></span>' +
 						'</span>' +
@@ -209,10 +218,20 @@ AUI().add(
 			fileAddError: function(file, error_code, msg) {
 				var instance = this;
 
-				if (error_code == SWFUpload.QUEUE_ERROR.FILE_EXCEEDS_SIZE_LIMIT) {
+				var queueError = SWFUpload.QUEUE_ERROR;
+
+				if (error_code == queueError.FILE_EXCEEDS_SIZE_LIMIT || error_code == queueError.ZERO_BYTE_FILE) {
+					var maxFileSizeInKB = Math.floor(instance._maxFileSize.replace(/\D/g,'') / 1024);
+
+					var dataBuffer = [file.name, instance._invalidFileSizeText.replace('{0}', maxFileSizeInKB)];
+
+					if (error_code == queueError.ZERO_BYTE_FILE) {
+						dataBuffer[1] = instance._zeroByteFileText;
+					}
+
 					var ul = instance.getFileListUl();
 
-					ul.append('<li class="upload-file upload-error"><span class="file-title">' + file.name + '</span> <span class="error-message">' + instance._invalidFileSizeText + '</span></li>');
+					ul.append(Lang.sub(TPL_FILE_ERROR, dataBuffer));
 				}
 			},
 
@@ -352,7 +371,7 @@ AUI().add(
 
 					var message = instance._errorMessages[msg] || instance._unexpectedUploadErrorText;
 
-					ul.append('<li class="upload-file upload-error"><span class="file-title">' + file.name + '</span><span class="error-message">' + message + '</span></li>');
+					ul.append(Lang.sub(TPL_FILE_ERROR, [file.name, message]));
 				}
 
 				if (instance._onUploadError) {
@@ -405,7 +424,7 @@ AUI().add(
 				var listLength = (stats.successful_uploads + stats.upload_errors + stats.files_queued);
 				var position = (stats.successful_uploads + stats.upload_errors + 1);
 
-				var currentListText = A.substitute(instance._uploadStatusText, [position, listLength]);
+				var currentListText = Lang.sub(instance._uploadStatusText, [position, listLength]);
 				var fileId = instance._namespace(file.id);
 
 				instance._updateList(listLength, currentListText);
@@ -435,6 +454,49 @@ AUI().add(
 				}
 
 				instance._updateManageUploadDisplay();
+			},
+
+			_formatTempFiles: function(fileNames) {
+				var instance = this;
+
+				var allRowIdsCheckbox = A.one('#' + instance._namespace('allRowIdsCheckbox'));
+
+				if (fileNames.length) {
+					var ul = instance.getFileListUl();
+
+					instance._pendingFileInfo.show();
+
+					allRowIdsCheckbox.show();
+
+					instance._clearUploadsButton.show();
+					instance._manageUploadTarget.show();
+
+					if (instance._metadataExplanationContainer) {
+						instance._metadataExplanationContainer.show();
+					}
+
+					var buffer = [];
+
+					var dataBuffer = [
+						null,
+						instance._namespace('selectUploadedFileCheckbox'),
+						instance._deleteFileText
+					];
+
+					A.each(
+						fileNames,
+						function(item, index, collection) {
+							dataBuffer[0] = item;
+
+							buffer.push(Lang.sub(TPL_FILE_PENDING, dataBuffer));
+						}
+					);
+
+					ul.append(buffer.join(''));
+				}
+				else {
+					allRowIdsCheckbox.attr('checked', true);
+				}
 			},
 
 			_handleDeleteResponse: function(json, li) {
@@ -641,55 +703,24 @@ AUI().add(
 						'.select-file, li .delete-button'
 					);
 
-					instance._service['method'](
-						instance._service['params'],
-						function(fileNames) {
-							var allRowIdsCheckbox = A.one('#' + instance._namespace('allRowIdsCheckbox'));
+					var tempFileURL = instance._tempFileURL;
 
-							if (fileNames.length) {
-								var ul = instance.getFileListUl();
-
-								instance._pendingFileInfo.show();
-
-								allRowIdsCheckbox.show();
-
-								instance._clearUploadsButton.show();
-								instance._manageUploadTarget.show();
-
-								if (instance._metadataExplanationContainer) {
-									instance._metadataExplanationContainer.show();
-								}
-
-								var buffer = [];
-
-								var pendingFileTpl = '<li class="upload-file upload-complete pending-file selectable">' +
-									'<input class="select-file" data-fileName="{0}" name="{1}" type="checkbox" value="{0}" />' +
-									'<span class="file-title">{0}</span>' +
-									'<a class="lfr-button delete-button" href="javascript:;">{2}</a>' +
-								'</li>';
-
-								var dataBuffer = [
-									null,
-									instance._namespace('selectUploadedFileCheckbox'),
-									instance._deleteFileText
-								];
-
-								A.each(
-									fileNames,
-									function(item, index, collection) {
-										dataBuffer[0] = item;
-
-										buffer.push(Lang.sub(pendingFileTpl, dataBuffer));
+					if (Lang.isString(tempFileURL)) {
+						A.io.request(
+							tempFileURL,
+							{
+								after: {
+									success: function(event) {
+										instance._formatTempFiles(this.get('responseData'));
 									}
-								);
-
-								ul.append(buffer.join(''));
+								},
+								dataType: 'json'
 							}
-							else {
-								allRowIdsCheckbox.attr('checked', true);
-							}
-						}
-					);
+						);
+					}
+					else {
+						tempFileURL['method'](tempFileURL['params'], A.bind('_formatTempFiles', instance));
+					}
 
 					var container = instance._container;
 					var manageUploadTarget = instance._manageUploadTarget;
@@ -779,9 +810,17 @@ AUI().add(
 
 								var movieBoundingBox = instance._movieBoundingBox;
 
+								var metadataContainer = instance._metadataContainer;
+								var metadataExplanationContainer = instance._metadataExplanationContainer;
+
 								if (fallback && fallback.hasClass(newUploaderClass)) {
 									if (movieBoundingBox) {
 										movieBoundingBox.hide();
+									}
+
+									if (metadataContainer && metadataExplanationContainer) {
+										metadataContainer.hide();
+										metadataExplanationContainer.hide();
 									}
 
 									instance._container.hide();
@@ -803,6 +842,21 @@ AUI().add(
 								else {
 									if (movieBoundingBox) {
 										movieBoundingBox.show();
+									}
+
+									if (metadataContainer && metadataExplanationContainer) {
+										var totalFiles = instance._fileList.all('li input[name=' + instance._namespace('selectUploadedFileCheckbox') + ']');
+
+										var selectedFiles = totalFiles.filter(':checked');
+
+										var selectedFilesCount = selectedFiles.size();
+
+										if (selectedFilesCount > 0) {
+											metadataContainer.show();
+										}
+										else {
+											metadataExplanationContainer.show();
+										}
 									}
 
 									instance._container.show();
@@ -950,7 +1004,10 @@ AUI().add(
 			_updateMetadataContainer: function() {
 				var instance = this;
 
-				if (instance._metadataContainer && instance._metadataExplanationContainer) {
+				var metadataContainer = instance._metadataContainer;
+				var metadataExplanationContainer = instance._metadataExplanationContainer;
+
+				if (metadataContainer && metadataExplanationContainer) {
 					var totalFiles = instance._fileList.all('li input[name=' + instance._namespace('selectUploadedFileCheckbox') + ']');
 
 					var totalFilesCount = totalFiles.size();
@@ -965,28 +1022,32 @@ AUI().add(
 						selectedFileName = selectedFiles.item(0).attr('data-fileName');
 					}
 
-					if (instance._metadataContainer) {
-						instance._metadataContainer.toggle((selectedFilesCount > 0));
+					if (metadataContainer) {
+						metadataContainer.toggle((selectedFilesCount > 0));
 
 						var selectedFilesText = instance._noFilesSelectedText;
 
 						if (selectedFilesCount == 1) {
 							selectedFilesText = selectedFileName;
 						}
-						else if (selectedFilesCount > 1) {
-							selectedFilesText = instance._filesSelectedText.replace('{0}', selectedFilesCount);
-						}
 						else if (selectedFilesCount == totalFilesCount) {
 							selectedFilesText = instance._allFilesSelectedText;
 						}
+						else if (selectedFilesCount > 1) {
+							selectedFilesText = instance._filesSelectedText.replace('{0}', selectedFilesCount);
+						}
 
-						var selectedFilesCountContainer = instance._metadataContainer.one('.selected-files-count');
+						var selectedFilesCountContainer = metadataContainer.one('.selected-files-count');
 
-						selectedFilesCountContainer.setContent(selectedFilesText);
+						if (selectedFilesCountContainer != null) {
+							selectedFilesCountContainer.setContent(selectedFilesText);
+
+							selectedFilesCountContainer.attr('title', selectedFilesText);
+						}
 					}
 
-					if (instance._metadataExplanationContainer) {
-						instance._metadataExplanationContainer.toggle((!selectedFilesCount) && (totalFilesCount > 0));
+					if (metadataExplanationContainer) {
+						metadataExplanationContainer.toggle((!selectedFilesCount) && (totalFilesCount > 0));
 					}
 				}
 			},
@@ -1018,6 +1079,6 @@ AUI().add(
 	},
 	'',
 	{
-		requires: ['aui-base', 'aui-swf', 'collection', 'substitute', 'swfupload']
+		requires: ['aui-io-request', 'aui-swf', 'collection', 'swfupload']
 	}
 );

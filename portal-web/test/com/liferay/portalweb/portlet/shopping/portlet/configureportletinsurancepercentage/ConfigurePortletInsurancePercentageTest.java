@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -24,14 +24,15 @@ public class ConfigurePortletInsurancePercentageTest extends BaseTestCase {
 	public void testConfigurePortletInsurancePercentage()
 		throws Exception {
 		selenium.open("/web/guest/home/");
+		loadRequiredJavaScriptModules();
 
 		for (int second = 0;; second++) {
-			if (second >= 60) {
+			if (second >= 90) {
 				fail("timeout");
 			}
 
 			try {
-				if (selenium.isElementPresent("link=Shopping Test Page")) {
+				if (selenium.isVisible("link=Shopping Test Page")) {
 					break;
 				}
 			}
@@ -41,24 +42,25 @@ public class ConfigurePortletInsurancePercentageTest extends BaseTestCase {
 			Thread.sleep(1000);
 		}
 
-		selenium.saveScreenShotAndSource();
-		selenium.clickAt("link=Shopping Test Page", RuntimeVariables.replace(""));
+		selenium.clickAt("link=Shopping Test Page",
+			RuntimeVariables.replace("Shopping Test Page"));
 		selenium.waitForPageToLoad("30000");
-		selenium.saveScreenShotAndSource();
-		selenium.clickAt("link=Cart", RuntimeVariables.replace(""));
+		loadRequiredJavaScriptModules();
+		selenium.clickAt("link=Cart", RuntimeVariables.replace("Cart"));
 		selenium.waitForPageToLoad("30000");
-		selenium.saveScreenShotAndSource();
+		loadRequiredJavaScriptModules();
 		assertFalse(selenium.isTextPresent("Insurance"));
-		assertFalse(selenium.isElementPresent("_34_insure"));
+		assertFalse(selenium.isElementPresent("//select[@id='_34_insure']"));
 		selenium.open("/web/guest/home/");
+		loadRequiredJavaScriptModules();
 
 		for (int second = 0;; second++) {
-			if (second >= 60) {
+			if (second >= 90) {
 				fail("timeout");
 			}
 
 			try {
-				if (selenium.isElementPresent("link=Shopping Test Page")) {
+				if (selenium.isVisible("link=Shopping Test Page")) {
 					break;
 				}
 			}
@@ -68,14 +70,17 @@ public class ConfigurePortletInsurancePercentageTest extends BaseTestCase {
 			Thread.sleep(1000);
 		}
 
-		selenium.saveScreenShotAndSource();
-		selenium.clickAt("link=Shopping Test Page", RuntimeVariables.replace(""));
+		selenium.clickAt("link=Shopping Test Page",
+			RuntimeVariables.replace("Shopping Test Page"));
 		selenium.waitForPageToLoad("30000");
-		selenium.saveScreenShotAndSource();
+		loadRequiredJavaScriptModules();
+		Thread.sleep(5000);
+		assertEquals(RuntimeVariables.replace("Options"),
+			selenium.getText("//strong/a"));
 		selenium.clickAt("//strong/a", RuntimeVariables.replace("Options"));
 
 		for (int second = 0;; second++) {
-			if (second >= 60) {
+			if (second >= 90) {
 				fail("timeout");
 			}
 
@@ -91,14 +96,13 @@ public class ConfigurePortletInsurancePercentageTest extends BaseTestCase {
 			Thread.sleep(1000);
 		}
 
-		selenium.saveScreenShotAndSource();
 		assertEquals(RuntimeVariables.replace("Configuration"),
 			selenium.getText(
 				"//div[@class='lfr-component lfr-menu-list']/ul/li[2]/a"));
 		selenium.click("//div[@class='lfr-component lfr-menu-list']/ul/li[2]/a");
 
 		for (int second = 0;; second++) {
-			if (second >= 60) {
+			if (second >= 90) {
 				fail("timeout");
 			}
 
@@ -113,38 +117,39 @@ public class ConfigurePortletInsurancePercentageTest extends BaseTestCase {
 			Thread.sleep(1000);
 		}
 
-		selenium.saveScreenShotAndSource();
 		selenium.clickAt("link=Insurance Calculation",
-			RuntimeVariables.replace(""));
+			RuntimeVariables.replace("Insurance Calculation"));
 		selenium.waitForPageToLoad("30000");
-		selenium.saveScreenShotAndSource();
-		selenium.select("_86_insuranceFormula",
-			RuntimeVariables.replace("label=Percentage"));
-		selenium.type("_86_insurance0", RuntimeVariables.replace(".10"));
-		selenium.saveScreenShotAndSource();
-		selenium.type("_86_insurance1", RuntimeVariables.replace(".10"));
-		selenium.saveScreenShotAndSource();
-		selenium.type("_86_insurance2", RuntimeVariables.replace(".10"));
-		selenium.saveScreenShotAndSource();
-		selenium.type("_86_insurance3", RuntimeVariables.replace(".10"));
-		selenium.saveScreenShotAndSource();
-		selenium.type("_86_insurance4", RuntimeVariables.replace(".10"));
-		selenium.saveScreenShotAndSource();
-		selenium.clickAt("//input[@value='Save']", RuntimeVariables.replace(""));
+		loadRequiredJavaScriptModules();
+		selenium.select("//select[@id='_86_insuranceFormula']",
+			RuntimeVariables.replace("Percentage"));
+		selenium.type("//input[@id='_86_insurance0']",
+			RuntimeVariables.replace("0.10"));
+		selenium.type("//input[@id='_86_insurance1']",
+			RuntimeVariables.replace("0.10"));
+		selenium.type("//input[@id='_86_insurance2']",
+			RuntimeVariables.replace("0.10"));
+		selenium.type("//input[@id='_86_insurance3']",
+			RuntimeVariables.replace("0.10"));
+		selenium.type("//input[@id='_86_insurance4']",
+			RuntimeVariables.replace("0.10"));
+		selenium.clickAt("//input[@value='Save']",
+			RuntimeVariables.replace("Save"));
 		selenium.waitForPageToLoad("30000");
-		selenium.saveScreenShotAndSource();
+		loadRequiredJavaScriptModules();
 		assertEquals(RuntimeVariables.replace(
 				"You have successfully updated the setup."),
 			selenium.getText("//div[@class='portlet-msg-success']"));
 		selenium.open("/web/guest/home/");
+		loadRequiredJavaScriptModules();
 
 		for (int second = 0;; second++) {
-			if (second >= 60) {
+			if (second >= 90) {
 				fail("timeout");
 			}
 
 			try {
-				if (selenium.isElementPresent("link=Shopping Test Page")) {
+				if (selenium.isVisible("link=Shopping Test Page")) {
 					break;
 				}
 			}
@@ -154,16 +159,16 @@ public class ConfigurePortletInsurancePercentageTest extends BaseTestCase {
 			Thread.sleep(1000);
 		}
 
-		selenium.saveScreenShotAndSource();
-		selenium.clickAt("link=Shopping Test Page", RuntimeVariables.replace(""));
+		selenium.clickAt("link=Shopping Test Page",
+			RuntimeVariables.replace("Shopping Test Page"));
 		selenium.waitForPageToLoad("30000");
-		selenium.saveScreenShotAndSource();
-		selenium.clickAt("link=Cart", RuntimeVariables.replace(""));
+		loadRequiredJavaScriptModules();
+		selenium.clickAt("link=Cart", RuntimeVariables.replace("Cart"));
 		selenium.waitForPageToLoad("30000");
-		selenium.saveScreenShotAndSource();
+		loadRequiredJavaScriptModules();
 		assertEquals(RuntimeVariables.replace("Insurance"),
-			selenium.getText("//span/label"));
+			selenium.getText("//div/span[1]/span/label"));
 		assertEquals(RuntimeVariables.replace("None $1.00"),
-			selenium.getText("_34_insure"));
+			selenium.getText("//select[@id='_34_insure']"));
 	}
 }

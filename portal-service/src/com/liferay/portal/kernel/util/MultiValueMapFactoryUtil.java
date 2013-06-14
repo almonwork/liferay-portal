@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -13,6 +13,8 @@
  */
 
 package com.liferay.portal.kernel.util;
+
+import com.liferay.portal.kernel.security.pacl.permission.PortalRuntimePermission;
 
 /**
  * @author Brian Wing Shun Chan
@@ -28,11 +30,16 @@ public class MultiValueMapFactoryUtil {
 	}
 
 	public static MultiValueMapFactory getMultiValueMapFactory() {
+		PortalRuntimePermission.checkGetBeanProperty(
+			MultiValueMapFactoryUtil.class);
+
 		return _multiValueMapFactory;
 	}
 
 	public void setMultiValueMapFactory(
 		MultiValueMapFactory multiValueMapFactory) {
+
+		PortalRuntimePermission.checkSetBeanProperty(getClass());
 
 		_multiValueMapFactory = multiValueMapFactory;
 	}

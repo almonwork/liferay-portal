@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -15,7 +15,6 @@
 package com.liferay.portal.service;
 
 import com.liferay.portal.kernel.bean.PortalBeanLocatorUtil;
-import com.liferay.portal.kernel.util.MethodCache;
 import com.liferay.portal.kernel.util.ReferenceRegistry;
 
 /**
@@ -65,24 +64,31 @@ public class ImageLocalServiceUtil {
 	* Deletes the image with the primary key from the database. Also notifies the appropriate model listeners.
 	*
 	* @param imageId the primary key of the image
+	* @return the image that was removed
 	* @throws PortalException if a image with the primary key could not be found
 	* @throws SystemException if a system exception occurred
 	*/
-	public static void deleteImage(long imageId)
+	public static com.liferay.portal.model.Image deleteImage(long imageId)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException {
-		getService().deleteImage(imageId);
+		return getService().deleteImage(imageId);
 	}
 
 	/**
 	* Deletes the image from the database. Also notifies the appropriate model listeners.
 	*
 	* @param image the image
+	* @return the image that was removed
 	* @throws SystemException if a system exception occurred
 	*/
-	public static void deleteImage(com.liferay.portal.model.Image image)
+	public static com.liferay.portal.model.Image deleteImage(
+		com.liferay.portal.model.Image image)
 		throws com.liferay.portal.kernel.exception.SystemException {
-		getService().deleteImage(image);
+		return getService().deleteImage(image);
+	}
+
+	public static com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery() {
+		return getService().dynamicQuery();
 	}
 
 	/**
@@ -154,6 +160,11 @@ public class ImageLocalServiceUtil {
 		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery)
 		throws com.liferay.portal.kernel.exception.SystemException {
 		return getService().dynamicQueryCount(dynamicQuery);
+	}
+
+	public static com.liferay.portal.model.Image fetchImage(long imageId)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getService().fetchImage(imageId);
 	}
 
 	/**
@@ -294,6 +305,13 @@ public class ImageLocalServiceUtil {
 		return getService().getImage(is);
 	}
 
+	public static com.liferay.portal.model.Image getImage(
+		java.io.InputStream is, boolean cleanUpStream)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException {
+		return getService().getImage(is, cleanUpStream);
+	}
+
 	public static com.liferay.portal.model.Image getImageOrDefault(long imageId) {
 		return getService().getImageOrDefault(imageId);
 	}
@@ -320,6 +338,14 @@ public class ImageLocalServiceUtil {
 	}
 
 	public static com.liferay.portal.model.Image updateImage(long imageId,
+		byte[] bytes, java.lang.String type, int height, int width, int size)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException {
+		return getService()
+				   .updateImage(imageId, bytes, type, height, width, size);
+	}
+
+	public static com.liferay.portal.model.Image updateImage(long imageId,
 		java.io.File file)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException {
@@ -334,11 +360,10 @@ public class ImageLocalServiceUtil {
 	}
 
 	public static com.liferay.portal.model.Image updateImage(long imageId,
-		byte[] bytes, java.lang.String type, int height, int width, int size)
+		java.io.InputStream is, boolean cleanUpStream)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException {
-		return getService()
-				   .updateImage(imageId, bytes, type, height, width, size);
+		return getService().updateImage(imageId, is, cleanUpStream);
 	}
 
 	public static ImageLocalService getService() {
@@ -347,20 +372,15 @@ public class ImageLocalServiceUtil {
 
 			ReferenceRegistry.registerReference(ImageLocalServiceUtil.class,
 				"_service");
-			MethodCache.remove(ImageLocalService.class);
 		}
 
 		return _service;
 	}
 
+	/**
+	 * @deprecated
+	 */
 	public void setService(ImageLocalService service) {
-		MethodCache.remove(ImageLocalService.class);
-
-		_service = service;
-
-		ReferenceRegistry.registerReference(ImageLocalServiceUtil.class,
-			"_service");
-		MethodCache.remove(ImageLocalService.class);
 	}
 
 	private static ImageLocalService _service;

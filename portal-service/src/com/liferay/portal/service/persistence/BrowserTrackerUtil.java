@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -91,14 +91,6 @@ public class BrowserTrackerUtil {
 		return getPersistence()
 				   .findWithDynamicQuery(dynamicQuery, start, end,
 			orderByComparator);
-	}
-
-	/**
-	 * @see com.liferay.portal.service.persistence.BasePersistence#remove(com.liferay.portal.model.BaseModel)
-	 */
-	public static BrowserTracker remove(BrowserTracker browserTracker)
-		throws SystemException {
-		return getPersistence().remove(browserTracker);
 	}
 
 	/**
@@ -291,12 +283,14 @@ public class BrowserTrackerUtil {
 	* Removes the browser tracker where userId = &#63; from the database.
 	*
 	* @param userId the user ID
+	* @return the browser tracker that was removed
 	* @throws SystemException if a system exception occurred
 	*/
-	public static void removeByUserId(long userId)
+	public static com.liferay.portal.model.BrowserTracker removeByUserId(
+		long userId)
 		throws com.liferay.portal.NoSuchBrowserTrackerException,
 			com.liferay.portal.kernel.exception.SystemException {
-		getPersistence().removeByUserId(userId);
+		return getPersistence().removeByUserId(userId);
 	}
 
 	/**
@@ -343,11 +337,10 @@ public class BrowserTrackerUtil {
 		return _persistence;
 	}
 
+	/**
+	 * @deprecated
+	 */
 	public void setPersistence(BrowserTrackerPersistence persistence) {
-		_persistence = persistence;
-
-		ReferenceRegistry.registerReference(BrowserTrackerUtil.class,
-			"_persistence");
 	}
 
 	private static BrowserTrackerPersistence _persistence;

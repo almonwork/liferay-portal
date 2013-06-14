@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -16,14 +16,16 @@
 
 <%@ include file="/html/portal/init.jsp" %>
 
-<%@ page import="com.liferay.portlet.messageboards.util.BBCodeUtil" %>
+<%@ page import="com.liferay.portal.kernel.parsers.bbcode.BBCodeTranslatorUtil" %>
 
 <%
-for (int i = 0; i < BBCodeUtil.EMOTICONS.length; i++) {
-	String image = StringUtil.replace(BBCodeUtil.EMOTICONS[i][0], "@theme_images_path@", themeDisplay.getPathThemeImages());
+String[][] emoticons = BBCodeTranslatorUtil.getEmoticons();
+
+for (int i = 0; i < emoticons.length; i++) {
+	String image = StringUtil.replace(emoticons[i][0], "@theme_images_path@", themeDisplay.getPathThemeImages());
 %>
 
-	<a class="lfr-button emoticon" emoticonCode="<%= BBCodeUtil.EMOTICONS[i][1] %>"><%= image %></a>
+	<a class="lfr-button emoticon" emoticonCode="<%= emoticons[i][1] %>"><%= image %></a>
 
 <%
 }

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,6 +14,8 @@
 
 package com.liferay.portlet.shopping.service;
 
+import com.liferay.portal.service.ServiceWrapper;
+
 /**
  * <p>
  * This class is a wrapper for {@link ShoppingCouponService}.
@@ -23,10 +25,29 @@ package com.liferay.portlet.shopping.service;
  * @see       ShoppingCouponService
  * @generated
  */
-public class ShoppingCouponServiceWrapper implements ShoppingCouponService {
+public class ShoppingCouponServiceWrapper implements ShoppingCouponService,
+	ServiceWrapper<ShoppingCouponService> {
 	public ShoppingCouponServiceWrapper(
 		ShoppingCouponService shoppingCouponService) {
 		_shoppingCouponService = shoppingCouponService;
+	}
+
+	/**
+	* Returns the Spring bean ID for this bean.
+	*
+	* @return the Spring bean ID for this bean
+	*/
+	public java.lang.String getBeanIdentifier() {
+		return _shoppingCouponService.getBeanIdentifier();
+	}
+
+	/**
+	* Sets the Spring bean ID for this bean.
+	*
+	* @param beanIdentifier the Spring bean ID for this bean
+	*/
+	public void setBeanIdentifier(java.lang.String beanIdentifier) {
+		_shoppingCouponService.setBeanIdentifier(beanIdentifier);
 	}
 
 	public com.liferay.portlet.shopping.model.ShoppingCoupon addCoupon(
@@ -88,12 +109,26 @@ public class ShoppingCouponServiceWrapper implements ShoppingCouponService {
 			limitSkus, minOrder, discount, discountType, serviceContext);
 	}
 
+	/**
+	 * @deprecated Renamed to {@link #getWrappedService}
+	 */
 	public ShoppingCouponService getWrappedShoppingCouponService() {
 		return _shoppingCouponService;
 	}
 
+	/**
+	 * @deprecated Renamed to {@link #setWrappedService}
+	 */
 	public void setWrappedShoppingCouponService(
 		ShoppingCouponService shoppingCouponService) {
+		_shoppingCouponService = shoppingCouponService;
+	}
+
+	public ShoppingCouponService getWrappedService() {
+		return _shoppingCouponService;
+	}
+
+	public void setWrappedService(ShoppingCouponService shoppingCouponService) {
 		_shoppingCouponService = shoppingCouponService;
 	}
 

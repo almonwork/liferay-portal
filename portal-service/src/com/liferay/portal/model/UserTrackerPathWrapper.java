@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,6 +14,10 @@
 
 package com.liferay.portal.model;
 
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * <p>
  * This class is a wrapper for {@link UserTrackerPath}.
@@ -23,7 +27,8 @@ package com.liferay.portal.model;
  * @see       UserTrackerPath
  * @generated
  */
-public class UserTrackerPathWrapper implements UserTrackerPath {
+public class UserTrackerPathWrapper implements UserTrackerPath,
+	ModelWrapper<UserTrackerPath> {
 	public UserTrackerPathWrapper(UserTrackerPath userTrackerPath) {
 		_userTrackerPath = userTrackerPath;
 	}
@@ -34,6 +39,43 @@ public class UserTrackerPathWrapper implements UserTrackerPath {
 
 	public String getModelClassName() {
 		return UserTrackerPath.class.getName();
+	}
+
+	public Map<String, Object> getModelAttributes() {
+		Map<String, Object> attributes = new HashMap<String, Object>();
+
+		attributes.put("userTrackerPathId", getUserTrackerPathId());
+		attributes.put("userTrackerId", getUserTrackerId());
+		attributes.put("path", getPath());
+		attributes.put("pathDate", getPathDate());
+
+		return attributes;
+	}
+
+	public void setModelAttributes(Map<String, Object> attributes) {
+		Long userTrackerPathId = (Long)attributes.get("userTrackerPathId");
+
+		if (userTrackerPathId != null) {
+			setUserTrackerPathId(userTrackerPathId);
+		}
+
+		Long userTrackerId = (Long)attributes.get("userTrackerId");
+
+		if (userTrackerId != null) {
+			setUserTrackerId(userTrackerId);
+		}
+
+		String path = (String)attributes.get("path");
+
+		if (path != null) {
+			setPath(path);
+		}
+
+		Date pathDate = (Date)attributes.get("pathDate");
+
+		if (pathDate != null) {
+			setPathDate(pathDate);
+		}
 	}
 
 	/**
@@ -146,10 +188,6 @@ public class UserTrackerPathWrapper implements UserTrackerPath {
 		return _userTrackerPath.isEscapedModel();
 	}
 
-	public void setEscapedModel(boolean escapedModel) {
-		_userTrackerPath.setEscapedModel(escapedModel);
-	}
-
 	public java.io.Serializable getPrimaryKeyObj() {
 		return _userTrackerPath.getPrimaryKeyObj();
 	}
@@ -204,7 +242,14 @@ public class UserTrackerPathWrapper implements UserTrackerPath {
 		_userTrackerPath.persist();
 	}
 
+	/**
+	 * @deprecated Renamed to {@link #getWrappedModel}
+	 */
 	public UserTrackerPath getWrappedUserTrackerPath() {
+		return _userTrackerPath;
+	}
+
+	public UserTrackerPath getWrappedModel() {
 		return _userTrackerPath;
 	}
 

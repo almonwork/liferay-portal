@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -24,7 +24,8 @@ package com.liferay.portal.service;
  * @generated
  */
 public class LayoutPrototypeLocalServiceWrapper
-	implements LayoutPrototypeLocalService {
+	implements LayoutPrototypeLocalService,
+		ServiceWrapper<LayoutPrototypeLocalService> {
 	public LayoutPrototypeLocalServiceWrapper(
 		LayoutPrototypeLocalService layoutPrototypeLocalService) {
 		_layoutPrototypeLocalService = layoutPrototypeLocalService;
@@ -58,27 +59,34 @@ public class LayoutPrototypeLocalServiceWrapper
 	* Deletes the layout prototype with the primary key from the database. Also notifies the appropriate model listeners.
 	*
 	* @param layoutPrototypeId the primary key of the layout prototype
+	* @return the layout prototype that was removed
 	* @throws PortalException if a layout prototype with the primary key could not be found
 	* @throws SystemException if a system exception occurred
 	*/
-	public void deleteLayoutPrototype(long layoutPrototypeId)
+	public com.liferay.portal.model.LayoutPrototype deleteLayoutPrototype(
+		long layoutPrototypeId)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException {
-		_layoutPrototypeLocalService.deleteLayoutPrototype(layoutPrototypeId);
+		return _layoutPrototypeLocalService.deleteLayoutPrototype(layoutPrototypeId);
 	}
 
 	/**
 	* Deletes the layout prototype from the database. Also notifies the appropriate model listeners.
 	*
 	* @param layoutPrototype the layout prototype
+	* @return the layout prototype that was removed
 	* @throws PortalException
 	* @throws SystemException if a system exception occurred
 	*/
-	public void deleteLayoutPrototype(
+	public com.liferay.portal.model.LayoutPrototype deleteLayoutPrototype(
 		com.liferay.portal.model.LayoutPrototype layoutPrototype)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException {
-		_layoutPrototypeLocalService.deleteLayoutPrototype(layoutPrototype);
+		return _layoutPrototypeLocalService.deleteLayoutPrototype(layoutPrototype);
+	}
+
+	public com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery() {
+		return _layoutPrototypeLocalService.dynamicQuery();
 	}
 
 	/**
@@ -151,6 +159,12 @@ public class LayoutPrototypeLocalServiceWrapper
 		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery)
 		throws com.liferay.portal.kernel.exception.SystemException {
 		return _layoutPrototypeLocalService.dynamicQueryCount(dynamicQuery);
+	}
+
+	public com.liferay.portal.model.LayoutPrototype fetchLayoutPrototype(
+		long layoutPrototypeId)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return _layoutPrototypeLocalService.fetchLayoutPrototype(layoutPrototypeId);
 	}
 
 	/**
@@ -260,11 +274,22 @@ public class LayoutPrototypeLocalServiceWrapper
 			companyId, nameMap, description, active);
 	}
 
+	/**
+	* @deprecated {@link #getLayoutPrototypeByUuidAndCompanyId(String, long)}
+	*/
 	public com.liferay.portal.model.LayoutPrototype getLayoutPrototypeByUuid(
 		java.lang.String uuid)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException {
 		return _layoutPrototypeLocalService.getLayoutPrototypeByUuid(uuid);
+	}
+
+	public com.liferay.portal.model.LayoutPrototype getLayoutPrototypeByUuidAndCompanyId(
+		java.lang.String uuid, long companyId)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException {
+		return _layoutPrototypeLocalService.getLayoutPrototypeByUuidAndCompanyId(uuid,
+			companyId);
 	}
 
 	public java.util.List<com.liferay.portal.model.LayoutPrototype> search(
@@ -290,11 +315,26 @@ public class LayoutPrototypeLocalServiceWrapper
 			nameMap, description, active);
 	}
 
+	/**
+	 * @deprecated Renamed to {@link #getWrappedService}
+	 */
 	public LayoutPrototypeLocalService getWrappedLayoutPrototypeLocalService() {
 		return _layoutPrototypeLocalService;
 	}
 
+	/**
+	 * @deprecated Renamed to {@link #setWrappedService}
+	 */
 	public void setWrappedLayoutPrototypeLocalService(
+		LayoutPrototypeLocalService layoutPrototypeLocalService) {
+		_layoutPrototypeLocalService = layoutPrototypeLocalService;
+	}
+
+	public LayoutPrototypeLocalService getWrappedService() {
+		return _layoutPrototypeLocalService;
+	}
+
+	public void setWrappedService(
 		LayoutPrototypeLocalService layoutPrototypeLocalService) {
 		_layoutPrototypeLocalService = layoutPrototypeLocalService;
 	}

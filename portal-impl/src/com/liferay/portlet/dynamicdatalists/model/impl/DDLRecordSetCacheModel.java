@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -20,6 +20,8 @@ import com.liferay.portal.model.CacheModel;
 
 import com.liferay.portlet.dynamicdatalists.model.DDLRecordSet;
 
+import java.io.Serializable;
+
 import java.util.Date;
 
 /**
@@ -29,10 +31,11 @@ import java.util.Date;
  * @see DDLRecordSet
  * @generated
  */
-public class DDLRecordSetCacheModel implements CacheModel<DDLRecordSet> {
+public class DDLRecordSetCacheModel implements CacheModel<DDLRecordSet>,
+	Serializable {
 	@Override
 	public String toString() {
-		StringBundler sb = new StringBundler(27);
+		StringBundler sb = new StringBundler(29);
 
 		sb.append("{uuid=");
 		sb.append(uuid);
@@ -60,6 +63,8 @@ public class DDLRecordSetCacheModel implements CacheModel<DDLRecordSet> {
 		sb.append(description);
 		sb.append(", minDisplayRows=");
 		sb.append(minDisplayRows);
+		sb.append(", scope=");
+		sb.append(scope);
 		sb.append("}");
 
 		return sb.toString();
@@ -125,6 +130,7 @@ public class DDLRecordSetCacheModel implements CacheModel<DDLRecordSet> {
 		}
 
 		ddlRecordSetImpl.setMinDisplayRows(minDisplayRows);
+		ddlRecordSetImpl.setScope(scope);
 
 		ddlRecordSetImpl.resetOriginalValues();
 
@@ -144,4 +150,5 @@ public class DDLRecordSetCacheModel implements CacheModel<DDLRecordSet> {
 	public String name;
 	public String description;
 	public int minDisplayRows;
+	public int scope;
 }

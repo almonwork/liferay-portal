@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -15,7 +15,6 @@
 package com.liferay.portal.kernel.util;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -47,33 +46,25 @@ public class DiffResult {
 		_changedLines.add(changedLine);
 	}
 
-	public List<String> getChangedLines() {
-		return _changedLines;
-	}
-
-	public void setChangedLines(List<String> changedLines) {
-		_changedLines = changedLines;
-	}
-
-	public int getLineNumber() {
-		return _lineNumber;
-	}
-
-	public void setLineNumber(int lineNumber) {
-		_lineNumber = lineNumber;
-	}
-
 	@Override
 	public boolean equals(Object obj) {
 		DiffResult diffResult = (DiffResult)obj;
 
 		if ((diffResult.getLineNumber() == _lineNumber) &&
-			(diffResult.getChangedLines().equals(_changedLines))) {
+			diffResult.getChangedLines().equals(_changedLines)) {
 
 			return true;
 		}
 
 		return false;
+	}
+
+	public List<String> getChangedLines() {
+		return _changedLines;
+	}
+
+	public int getLineNumber() {
+		return _lineNumber;
 	}
 
 	@Override
@@ -86,28 +77,35 @@ public class DiffResult {
 		return hashCode.toHashCode();
 	}
 
+	public void setChangedLines(List<String> changedLines) {
+		_changedLines = changedLines;
+	}
+
+	public void setLineNumber(int lineNumber) {
+		_lineNumber = lineNumber;
+	}
+
 	@Override
 	public String toString() {
-		StringBundler sb = new StringBundler(2 * _changedLines.size() + 2);
+		StringBundler sb = new StringBundler(2 * _changedLines.size() + 3);
 
 		sb.append("Line: ");
 		sb.append(_lineNumber);
 		sb.append("\n");
 
-		Iterator<String> itr = _changedLines.iterator();
+		for (String changedLine : _changedLines) {
+			sb.append(changedLine);
+			sb.append("\n");
+		}
 
-		while (itr.hasNext()) {
-			sb.append(itr.next());
-
-			if (itr.hasNext()) {
-				sb.append("\n");
-			}
+		if (!_changedLines.isEmpty()) {
+			sb.setIndex(sb.index() - 1);
 		}
 
 		return sb.toString();
 	}
 
-	private int _lineNumber;
 	private List<String> _changedLines;
+	private int _lineNumber;
 
 }

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -19,6 +19,8 @@ import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.model.CacheModel;
 import com.liferay.portal.model.Layout;
 
+import java.io.Serializable;
+
 import java.util.Date;
 
 /**
@@ -28,10 +30,10 @@ import java.util.Date;
  * @see Layout
  * @generated
  */
-public class LayoutCacheModel implements CacheModel<Layout> {
+public class LayoutCacheModel implements CacheModel<Layout>, Serializable {
 	@Override
 	public String toString() {
-		StringBundler sb = new StringBundler(57);
+		StringBundler sb = new StringBundler(59);
 
 		sb.append("{uuid=");
 		sb.append(uuid);
@@ -89,6 +91,8 @@ public class LayoutCacheModel implements CacheModel<Layout> {
 		sb.append(layoutPrototypeUuid);
 		sb.append(", layoutPrototypeLinkEnabled=");
 		sb.append(layoutPrototypeLinkEnabled);
+		sb.append(", sourcePrototypeLayoutUuid=");
+		sb.append(sourcePrototypeLayoutUuid);
 		sb.append("}");
 
 		return sb.toString();
@@ -233,6 +237,13 @@ public class LayoutCacheModel implements CacheModel<Layout> {
 
 		layoutImpl.setLayoutPrototypeLinkEnabled(layoutPrototypeLinkEnabled);
 
+		if (sourcePrototypeLayoutUuid == null) {
+			layoutImpl.setSourcePrototypeLayoutUuid(StringPool.BLANK);
+		}
+		else {
+			layoutImpl.setSourcePrototypeLayoutUuid(sourcePrototypeLayoutUuid);
+		}
+
 		layoutImpl.resetOriginalValues();
 
 		return layoutImpl;
@@ -266,4 +277,5 @@ public class LayoutCacheModel implements CacheModel<Layout> {
 	public int priority;
 	public String layoutPrototypeUuid;
 	public boolean layoutPrototypeLinkEnabled;
+	public String sourcePrototypeLayoutUuid;
 }

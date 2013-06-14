@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -48,14 +48,14 @@ public abstract class BaseCometRequest implements CometRequest {
 		_companyId = companyId;
 	}
 
+	public void setPathInfo(String pathInfo) {
+		_pathInfo = pathInfo;
+	}
+
 	public void setRequest(HttpServletRequest request) {
 		setCompanyId(PortalUtil.getCompanyId(request));
 		setPathInfo(request.getPathInfo());
 		setUserId(PortalUtil.getUserId(request));
-	}
-
-	public void setPathInfo(String pathInfo) {
-		_pathInfo = pathInfo;
 	}
 
 	public void setTimestamp(long timestamp) {

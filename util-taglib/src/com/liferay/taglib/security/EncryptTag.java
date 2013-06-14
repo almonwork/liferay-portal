@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -43,6 +43,20 @@ import javax.servlet.jsp.tagext.TagSupport;
  * @author Brian Wing Shun Chan
  */
 public class EncryptTag extends TagSupport {
+
+	@Override
+	public int doEndTag() throws JspException {
+		try {
+			JspWriter jspWriter = pageContext.getOut();
+
+			jspWriter.write("</a>");
+
+			return EVAL_PAGE;
+		}
+		catch (Exception e) {
+			throw new JspException(e);
+		}
+	}
 
 	@Override
 	public int doStartTag() throws JspException {
@@ -91,8 +105,7 @@ public class EncryptTag extends TagSupport {
 					int x = paramAndValue.indexOf(CharPool.EQUAL);
 
 					String param = paramAndValue.substring(0, x);
-					String value = paramAndValue.substring(
-						x + 1, paramAndValue.length());
+					String value = paramAndValue.substring(x + 1);
 
 					sb.append(param).append(StringPool.EQUAL);
 
@@ -148,30 +161,20 @@ public class EncryptTag extends TagSupport {
 		}
 	}
 
-	@Override
-	public int doEndTag() throws JspException {
-		try {
-			JspWriter jspWriter = pageContext.getOut();
-
-			jspWriter.write("</a>");
-
-			return EVAL_PAGE;
-		}
-		catch (Exception e) {
-			throw new JspException(e);
-		}
-	}
-
 	public void setClassName(String className) {
 		_className = className;
+	}
+
+	public void setProtocol(String protocol) {
+		_protocol = protocol;
 	}
 
 	public void setStyle(String style) {
 		_style = style;
 	}
 
-	public void setProtocol(String protocol) {
-		_protocol = protocol;
+	public void setTarget(String target) {
+		_target = target;
 	}
 
 	public void setUnencryptedParams(String unencryptedParams) {
@@ -188,17 +191,13 @@ public class EncryptTag extends TagSupport {
 		_url = url;
 	}
 
-	public void setTarget(String target) {
-		_target = target;
-	}
-
 	private static Log _log = LogFactoryUtil.getLog(EncryptTag.class);
 
 	private String _className;
-	private String _style;
 	private String _protocol;
+	private String _style;
+	private String _target;
 	private Set<String> _unencryptedParamsSet = new HashSet<String>();
 	private String _url;
-	private String _target;
 
 }

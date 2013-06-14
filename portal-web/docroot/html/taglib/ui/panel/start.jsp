@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -29,7 +29,7 @@
 		</div>
 
 		<c:if test="<%= collapsible && extended %>">
-			<a class="lfr-panel-button" href="javascript:;"></a>
+			<a class="lfr-panel-button" href="javascript:;" title="<liferay-ui:message key='<%= panelState.equals("open") ? "collapse" : "expand" %>' />"></a>
 		</c:if>
 	</div>
 

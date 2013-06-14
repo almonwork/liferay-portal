@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -21,16 +21,16 @@ import com.liferay.portal.kernel.bean.IdentifiableBean;
 import com.liferay.portal.kernel.dao.jdbc.SqlUpdate;
 import com.liferay.portal.kernel.dao.jdbc.SqlUpdateFactoryUtil;
 import com.liferay.portal.kernel.exception.SystemException;
+import com.liferay.portal.service.BaseServiceImpl;
 import com.liferay.portal.service.LockLocalService;
 import com.liferay.portal.service.ResourceLocalService;
-import com.liferay.portal.service.ResourceService;
+import com.liferay.portal.service.SubscriptionLocalService;
 import com.liferay.portal.service.UserLocalService;
 import com.liferay.portal.service.UserService;
 import com.liferay.portal.service.WorkflowInstanceLinkLocalService;
-import com.liferay.portal.service.base.PrincipalBean;
+import com.liferay.portal.service.persistence.LockFinder;
 import com.liferay.portal.service.persistence.LockPersistence;
-import com.liferay.portal.service.persistence.ResourceFinder;
-import com.liferay.portal.service.persistence.ResourcePersistence;
+import com.liferay.portal.service.persistence.SubscriptionPersistence;
 import com.liferay.portal.service.persistence.UserFinder;
 import com.liferay.portal.service.persistence.UserPersistence;
 import com.liferay.portal.service.persistence.WorkflowInstanceLinkPersistence;
@@ -46,11 +46,10 @@ import com.liferay.portlet.messageboards.service.MBCategoryLocalService;
 import com.liferay.portlet.messageboards.service.MBCategoryService;
 import com.liferay.portlet.messageboards.service.MBDiscussionLocalService;
 import com.liferay.portlet.messageboards.service.MBMailingListLocalService;
-import com.liferay.portlet.messageboards.service.MBMessageFlagLocalService;
-import com.liferay.portlet.messageboards.service.MBMessageFlagService;
 import com.liferay.portlet.messageboards.service.MBMessageLocalService;
 import com.liferay.portlet.messageboards.service.MBMessageService;
 import com.liferay.portlet.messageboards.service.MBStatsUserLocalService;
+import com.liferay.portlet.messageboards.service.MBThreadFlagLocalService;
 import com.liferay.portlet.messageboards.service.MBThreadLocalService;
 import com.liferay.portlet.messageboards.service.MBThreadService;
 import com.liferay.portlet.messageboards.service.persistence.MBBanPersistence;
@@ -59,10 +58,10 @@ import com.liferay.portlet.messageboards.service.persistence.MBCategoryPersisten
 import com.liferay.portlet.messageboards.service.persistence.MBDiscussionPersistence;
 import com.liferay.portlet.messageboards.service.persistence.MBMailingListPersistence;
 import com.liferay.portlet.messageboards.service.persistence.MBMessageFinder;
-import com.liferay.portlet.messageboards.service.persistence.MBMessageFlagPersistence;
 import com.liferay.portlet.messageboards.service.persistence.MBMessagePersistence;
 import com.liferay.portlet.messageboards.service.persistence.MBStatsUserPersistence;
 import com.liferay.portlet.messageboards.service.persistence.MBThreadFinder;
+import com.liferay.portlet.messageboards.service.persistence.MBThreadFlagPersistence;
 import com.liferay.portlet.messageboards.service.persistence.MBThreadPersistence;
 import com.liferay.portlet.ratings.service.RatingsStatsLocalService;
 import com.liferay.portlet.ratings.service.persistence.RatingsStatsFinder;
@@ -85,7 +84,7 @@ import javax.sql.DataSource;
  * @see com.liferay.portlet.messageboards.service.MBThreadServiceUtil
  * @generated
  */
-public abstract class MBThreadServiceBaseImpl extends PrincipalBean
+public abstract class MBThreadServiceBaseImpl extends BaseServiceImpl
 	implements MBThreadService, IdentifiableBean {
 	/*
 	 * NOTE FOR DEVELOPERS:
@@ -372,63 +371,6 @@ public abstract class MBThreadServiceBaseImpl extends PrincipalBean
 	}
 
 	/**
-	 * Returns the message boards message flag local service.
-	 *
-	 * @return the message boards message flag local service
-	 */
-	public MBMessageFlagLocalService getMBMessageFlagLocalService() {
-		return mbMessageFlagLocalService;
-	}
-
-	/**
-	 * Sets the message boards message flag local service.
-	 *
-	 * @param mbMessageFlagLocalService the message boards message flag local service
-	 */
-	public void setMBMessageFlagLocalService(
-		MBMessageFlagLocalService mbMessageFlagLocalService) {
-		this.mbMessageFlagLocalService = mbMessageFlagLocalService;
-	}
-
-	/**
-	 * Returns the message boards message flag remote service.
-	 *
-	 * @return the message boards message flag remote service
-	 */
-	public MBMessageFlagService getMBMessageFlagService() {
-		return mbMessageFlagService;
-	}
-
-	/**
-	 * Sets the message boards message flag remote service.
-	 *
-	 * @param mbMessageFlagService the message boards message flag remote service
-	 */
-	public void setMBMessageFlagService(
-		MBMessageFlagService mbMessageFlagService) {
-		this.mbMessageFlagService = mbMessageFlagService;
-	}
-
-	/**
-	 * Returns the message boards message flag persistence.
-	 *
-	 * @return the message boards message flag persistence
-	 */
-	public MBMessageFlagPersistence getMBMessageFlagPersistence() {
-		return mbMessageFlagPersistence;
-	}
-
-	/**
-	 * Sets the message boards message flag persistence.
-	 *
-	 * @param mbMessageFlagPersistence the message boards message flag persistence
-	 */
-	public void setMBMessageFlagPersistence(
-		MBMessageFlagPersistence mbMessageFlagPersistence) {
-		this.mbMessageFlagPersistence = mbMessageFlagPersistence;
-	}
-
-	/**
 	 * Returns the message boards stats user local service.
 	 *
 	 * @return the message boards stats user local service
@@ -540,6 +482,44 @@ public abstract class MBThreadServiceBaseImpl extends PrincipalBean
 	}
 
 	/**
+	 * Returns the message boards thread flag local service.
+	 *
+	 * @return the message boards thread flag local service
+	 */
+	public MBThreadFlagLocalService getMBThreadFlagLocalService() {
+		return mbThreadFlagLocalService;
+	}
+
+	/**
+	 * Sets the message boards thread flag local service.
+	 *
+	 * @param mbThreadFlagLocalService the message boards thread flag local service
+	 */
+	public void setMBThreadFlagLocalService(
+		MBThreadFlagLocalService mbThreadFlagLocalService) {
+		this.mbThreadFlagLocalService = mbThreadFlagLocalService;
+	}
+
+	/**
+	 * Returns the message boards thread flag persistence.
+	 *
+	 * @return the message boards thread flag persistence
+	 */
+	public MBThreadFlagPersistence getMBThreadFlagPersistence() {
+		return mbThreadFlagPersistence;
+	}
+
+	/**
+	 * Sets the message boards thread flag persistence.
+	 *
+	 * @param mbThreadFlagPersistence the message boards thread flag persistence
+	 */
+	public void setMBThreadFlagPersistence(
+		MBThreadFlagPersistence mbThreadFlagPersistence) {
+		this.mbThreadFlagPersistence = mbThreadFlagPersistence;
+	}
+
+	/**
 	 * Returns the counter local service.
 	 *
 	 * @return the counter local service
@@ -594,6 +574,24 @@ public abstract class MBThreadServiceBaseImpl extends PrincipalBean
 	}
 
 	/**
+	 * Returns the lock finder.
+	 *
+	 * @return the lock finder
+	 */
+	public LockFinder getLockFinder() {
+		return lockFinder;
+	}
+
+	/**
+	 * Sets the lock finder.
+	 *
+	 * @param lockFinder the lock finder
+	 */
+	public void setLockFinder(LockFinder lockFinder) {
+		this.lockFinder = lockFinder;
+	}
+
+	/**
 	 * Returns the resource local service.
 	 *
 	 * @return the resource local service
@@ -613,57 +611,41 @@ public abstract class MBThreadServiceBaseImpl extends PrincipalBean
 	}
 
 	/**
-	 * Returns the resource remote service.
+	 * Returns the subscription local service.
 	 *
-	 * @return the resource remote service
+	 * @return the subscription local service
 	 */
-	public ResourceService getResourceService() {
-		return resourceService;
+	public SubscriptionLocalService getSubscriptionLocalService() {
+		return subscriptionLocalService;
 	}
 
 	/**
-	 * Sets the resource remote service.
+	 * Sets the subscription local service.
 	 *
-	 * @param resourceService the resource remote service
+	 * @param subscriptionLocalService the subscription local service
 	 */
-	public void setResourceService(ResourceService resourceService) {
-		this.resourceService = resourceService;
+	public void setSubscriptionLocalService(
+		SubscriptionLocalService subscriptionLocalService) {
+		this.subscriptionLocalService = subscriptionLocalService;
 	}
 
 	/**
-	 * Returns the resource persistence.
+	 * Returns the subscription persistence.
 	 *
-	 * @return the resource persistence
+	 * @return the subscription persistence
 	 */
-	public ResourcePersistence getResourcePersistence() {
-		return resourcePersistence;
+	public SubscriptionPersistence getSubscriptionPersistence() {
+		return subscriptionPersistence;
 	}
 
 	/**
-	 * Sets the resource persistence.
+	 * Sets the subscription persistence.
 	 *
-	 * @param resourcePersistence the resource persistence
+	 * @param subscriptionPersistence the subscription persistence
 	 */
-	public void setResourcePersistence(ResourcePersistence resourcePersistence) {
-		this.resourcePersistence = resourcePersistence;
-	}
-
-	/**
-	 * Returns the resource finder.
-	 *
-	 * @return the resource finder
-	 */
-	public ResourceFinder getResourceFinder() {
-		return resourceFinder;
-	}
-
-	/**
-	 * Sets the resource finder.
-	 *
-	 * @param resourceFinder the resource finder
-	 */
-	public void setResourceFinder(ResourceFinder resourceFinder) {
-		this.resourceFinder = resourceFinder;
+	public void setSubscriptionPersistence(
+		SubscriptionPersistence subscriptionPersistence) {
+		this.subscriptionPersistence = subscriptionPersistence;
 	}
 
 	/**
@@ -1044,12 +1026,6 @@ public abstract class MBThreadServiceBaseImpl extends PrincipalBean
 	protected MBMessagePersistence mbMessagePersistence;
 	@BeanReference(type = MBMessageFinder.class)
 	protected MBMessageFinder mbMessageFinder;
-	@BeanReference(type = MBMessageFlagLocalService.class)
-	protected MBMessageFlagLocalService mbMessageFlagLocalService;
-	@BeanReference(type = MBMessageFlagService.class)
-	protected MBMessageFlagService mbMessageFlagService;
-	@BeanReference(type = MBMessageFlagPersistence.class)
-	protected MBMessageFlagPersistence mbMessageFlagPersistence;
 	@BeanReference(type = MBStatsUserLocalService.class)
 	protected MBStatsUserLocalService mbStatsUserLocalService;
 	@BeanReference(type = MBStatsUserPersistence.class)
@@ -1062,20 +1038,24 @@ public abstract class MBThreadServiceBaseImpl extends PrincipalBean
 	protected MBThreadPersistence mbThreadPersistence;
 	@BeanReference(type = MBThreadFinder.class)
 	protected MBThreadFinder mbThreadFinder;
+	@BeanReference(type = MBThreadFlagLocalService.class)
+	protected MBThreadFlagLocalService mbThreadFlagLocalService;
+	@BeanReference(type = MBThreadFlagPersistence.class)
+	protected MBThreadFlagPersistence mbThreadFlagPersistence;
 	@BeanReference(type = CounterLocalService.class)
 	protected CounterLocalService counterLocalService;
 	@BeanReference(type = LockLocalService.class)
 	protected LockLocalService lockLocalService;
 	@BeanReference(type = LockPersistence.class)
 	protected LockPersistence lockPersistence;
+	@BeanReference(type = LockFinder.class)
+	protected LockFinder lockFinder;
 	@BeanReference(type = ResourceLocalService.class)
 	protected ResourceLocalService resourceLocalService;
-	@BeanReference(type = ResourceService.class)
-	protected ResourceService resourceService;
-	@BeanReference(type = ResourcePersistence.class)
-	protected ResourcePersistence resourcePersistence;
-	@BeanReference(type = ResourceFinder.class)
-	protected ResourceFinder resourceFinder;
+	@BeanReference(type = SubscriptionLocalService.class)
+	protected SubscriptionLocalService subscriptionLocalService;
+	@BeanReference(type = SubscriptionPersistence.class)
+	protected SubscriptionPersistence subscriptionPersistence;
 	@BeanReference(type = UserLocalService.class)
 	protected UserLocalService userLocalService;
 	@BeanReference(type = UserService.class)

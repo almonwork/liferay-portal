@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -16,6 +16,7 @@ package com.liferay.portal.dao.orm.jpa;
 
 import com.liferay.portal.dao.orm.common.SQLTransformer;
 import com.liferay.portal.kernel.dao.orm.CacheMode;
+import com.liferay.portal.kernel.dao.orm.LockMode;
 import com.liferay.portal.kernel.dao.orm.ORMException;
 import com.liferay.portal.kernel.dao.orm.Query;
 import com.liferay.portal.kernel.dao.orm.ScrollableResults;
@@ -33,6 +34,7 @@ import java.util.List;
 import java.util.Map;
 
 import javax.persistence.FlushModeType;
+import javax.persistence.LockModeType;
 
 /**
  * @author Prashant Dighe
@@ -53,8 +55,8 @@ public class QueryImpl implements Query {
 		try {
 			return sessionImpl.executeUpdate(
 				queryString, positionalParameterMap, namedParameterMap,
-				strictName, firstResult, maxResults, flushModeType, sqlQuery,
-				entityClass);
+				strictName, firstResult, maxResults, flushModeType,
+				lockModeType, sqlQuery, entityClass);
 		}
 		catch (Exception e) {
 			throw ExceptionTranslator.translate(e);
@@ -74,23 +76,41 @@ public class QueryImpl implements Query {
 		}
 	}
 
+	public Object iterateNext() throws ORMException {
+		Iterator<?> iterator = iterate(false);
+
+		if (iterator.hasNext()) {
+			return iterator.next();
+		}
+
+		return null;
+	}
+
 	public List<?> list() throws ORMException {
-		return list(true);
+		return list(false, false);
 	}
 
 	public List<?> list(boolean unmodifiable) throws ORMException {
+		return list(true, unmodifiable);
+	}
+
+	public List<?> list(boolean copy, boolean unmodifiable)
+		throws ORMException {
+
 		try {
 			List<?> list = sessionImpl.list(
 				queryString, positionalParameterMap, namedParameterMap,
-				strictName, firstResult, maxResults, flushModeType, sqlQuery,
-				entityClass);
+				strictName, firstResult, maxResults, flushModeType,
+				lockModeType, sqlQuery, entityClass);
 
 			if (unmodifiable) {
-				return new UnmodifiableList<Object>(list);
+				list = new UnmodifiableList<Object>(list);
 			}
-			else {
-				return ListUtil.copy(list);
+			else if (copy) {
+				list = ListUtil.copy(list);
 			}
+
+			return list;
 		}
 		catch (Exception e) {
 			throw ExceptionTranslator.translate(e);
@@ -178,6 +198,12 @@ public class QueryImpl implements Query {
 		return this;
 	}
 
+	public Query setLockMode(String alias, LockMode lockMode) {
+		lockModeType = LockModeTranslator.translate(lockMode);
+
+		return this;
+	}
+
 	public Query setLong(int pos, long value) {
 		positionalParameterMap.put(pos, Long.valueOf(value));
 
@@ -260,8 +286,8 @@ public class QueryImpl implements Query {
 		try {
 			return sessionImpl.uniqueResult(
 				queryString, positionalParameterMap, namedParameterMap,
-				strictName, firstResult, maxResults, flushModeType, sqlQuery,
-				entityClass);
+				strictName, firstResult, maxResults, flushModeType,
+				lockModeType, sqlQuery, entityClass);
 		}
 		catch (Exception e) {
 			throw ExceptionTranslator.translate(e);
@@ -271,6 +297,7 @@ public class QueryImpl implements Query {
 	protected Class<?> entityClass;
 	protected int firstResult = -1;
 	protected FlushModeType flushModeType;
+	protected LockModeType lockModeType;
 	protected int maxResults = -1;
 	protected Map<String, Object> namedParameterMap =
 		new HashMap<String, Object>();

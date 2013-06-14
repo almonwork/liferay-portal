@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -23,12 +23,12 @@ import java.sql.Types;
  */
 public class CyrusVirtual implements Serializable {
 
-	public static Object[][] TABLE_COLUMNS = {
+	public static final Object[][] TABLE_COLUMNS = {
 		{"emailAddress", new Integer(Types.VARCHAR)},
 		{"userId", new Integer(Types.VARCHAR)}
 	};
 
-	public static String TABLE_NAME = "CyrusVirtual";
+	public static final String TABLE_NAME = "CyrusVirtual";
 
 	public static final String TABLE_SQL_CREATE =
 		"create table CyrusVirtual (emailAddress VARCHAR(75) not null " +

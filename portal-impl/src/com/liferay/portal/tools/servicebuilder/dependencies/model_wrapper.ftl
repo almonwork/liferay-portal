@@ -1,9 +1,16 @@
 package ${packagePath}.model;
 
 import com.liferay.portal.kernel.exception.SystemException;
+import com.liferay.portal.model.ModelWrapper;
 import com.liferay.portal.service.ServiceContext;
 import com.liferay.portlet.expando.model.ExpandoBridge;
 import com.liferay.portlet.expando.util.ExpandoBridgeFactoryUtil;
+
+import java.sql.Blob;
+
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * <p>
@@ -14,7 +21,7 @@ import com.liferay.portlet.expando.util.ExpandoBridgeFactoryUtil;
  * @see       ${entity.name}
  * @generated
  */
-public class ${entity.name}Wrapper implements ${entity.name} {
+public class ${entity.name}Wrapper implements ${entity.name}, ModelWrapper<${entity.name}> {
 
 	public ${entity.name}Wrapper(${entity.name} ${entity.varName}) {
 		_${entity.varName} = ${entity.varName};
@@ -26,6 +33,40 @@ public class ${entity.name}Wrapper implements ${entity.name} {
 
 	public String getModelClassName() {
 		return ${entity.name}.class.getName();
+	}
+
+	public Map<String, Object> getModelAttributes() {
+		Map<String, Object> attributes = new HashMap<String, Object>();
+
+		<#list entity.regularColList as column>
+			attributes.put("${column.name}", get${column.methodName}());
+		</#list>
+
+		return attributes;
+	}
+
+	public void setModelAttributes(Map<String, Object> attributes) {
+		<#list entity.regularColList as column>
+			<#if column.isPrimitiveType()>
+				${serviceBuilder.getPrimitiveObj(column.type)}
+			<#else>
+				${column.type}
+			</#if>
+
+			${column.name} =
+
+			<#if column.isPrimitiveType()>
+				(${serviceBuilder.getPrimitiveObj(column.type)})
+			<#else>
+				(${column.type})
+			</#if>
+
+			attributes.get("${column.name}");
+
+			if (${column.name} != null) {
+				set${column.methodName}(${column.name});
+			}
+		</#list>
 	}
 
 	<#list methods as method>
@@ -86,7 +127,14 @@ public class ${entity.name}Wrapper implements ${entity.name} {
 		</#if>
 	</#list>
 
+	/**
+	 * @deprecated Renamed to {@link #getWrappedModel}
+	 */
 	public ${entity.name} getWrapped${entity.name}() {
+		return _${entity.varName};
+	}
+
+	public ${entity.name} getWrappedModel() {
 		return _${entity.varName};
 	}
 

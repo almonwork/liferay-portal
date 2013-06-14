@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -15,7 +15,6 @@
 package com.liferay.counter.service;
 
 import com.liferay.portal.kernel.bean.PortalBeanLocatorUtil;
-import com.liferay.portal.kernel.util.MethodCache;
 import com.liferay.portal.kernel.util.ReferenceRegistry;
 
 /**
@@ -66,24 +65,32 @@ public class CounterLocalServiceUtil {
 	* Deletes the counter with the primary key from the database. Also notifies the appropriate model listeners.
 	*
 	* @param name the primary key of the counter
+	* @return the counter that was removed
 	* @throws PortalException if a counter with the primary key could not be found
 	* @throws SystemException if a system exception occurred
 	*/
-	public static void deleteCounter(java.lang.String name)
+	public static com.liferay.counter.model.Counter deleteCounter(
+		java.lang.String name)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException {
-		getService().deleteCounter(name);
+		return getService().deleteCounter(name);
 	}
 
 	/**
 	* Deletes the counter from the database. Also notifies the appropriate model listeners.
 	*
 	* @param counter the counter
+	* @return the counter that was removed
 	* @throws SystemException if a system exception occurred
 	*/
-	public static void deleteCounter(com.liferay.counter.model.Counter counter)
+	public static com.liferay.counter.model.Counter deleteCounter(
+		com.liferay.counter.model.Counter counter)
 		throws com.liferay.portal.kernel.exception.SystemException {
-		getService().deleteCounter(counter);
+		return getService().deleteCounter(counter);
+	}
+
+	public static com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery() {
+		return getService().dynamicQuery();
 	}
 
 	/**
@@ -155,6 +162,12 @@ public class CounterLocalServiceUtil {
 		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery)
 		throws com.liferay.portal.kernel.exception.SystemException {
 		return getService().dynamicQueryCount(dynamicQuery);
+	}
+
+	public static com.liferay.counter.model.Counter fetchCounter(
+		java.lang.String name)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getService().fetchCounter(name);
 	}
 
 	/**
@@ -294,20 +307,15 @@ public class CounterLocalServiceUtil {
 
 			ReferenceRegistry.registerReference(CounterLocalServiceUtil.class,
 				"_service");
-			MethodCache.remove(CounterLocalService.class);
 		}
 
 		return _service;
 	}
 
+	/**
+	 * @deprecated
+	 */
 	public void setService(CounterLocalService service) {
-		MethodCache.remove(CounterLocalService.class);
-
-		_service = service;
-
-		ReferenceRegistry.registerReference(CounterLocalServiceUtil.class,
-			"_service");
-		MethodCache.remove(CounterLocalService.class);
 	}
 
 	private static CounterLocalService _service;

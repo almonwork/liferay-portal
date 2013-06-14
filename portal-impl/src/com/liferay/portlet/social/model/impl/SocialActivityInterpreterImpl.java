@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -61,12 +61,11 @@ public class SocialActivityInterpreterImpl
 	public SocialActivityFeedEntry interpret(
 		SocialActivity activity, ThemeDisplay themeDisplay) {
 
-		return _activityInterpreter.interpret(
-			activity, themeDisplay);
+		return _activityInterpreter.interpret(activity, themeDisplay);
 	}
 
-	private String _portletId;
 	private SocialActivityInterpreter _activityInterpreter;
 	private Set<String> _classNames = new HashSet<String>();
+	private String _portletId;
 
 }

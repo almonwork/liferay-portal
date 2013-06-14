@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -39,13 +39,13 @@ import com.liferay.portal.util.WebKeys;
 import java.io.Writer;
 
 import java.lang.reflect.Constructor;
-import java.lang.reflect.Method;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 import javax.portlet.MimeResponse;
 import javax.portlet.PortletException;
@@ -57,6 +57,7 @@ import javax.portlet.PortletURL;
 import javax.portlet.PortletURLGenerationListener;
 import javax.portlet.ResourceURL;
 import javax.portlet.WindowStateException;
+import javax.portlet.filter.PortletResponseWrapper;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
@@ -83,32 +84,21 @@ public abstract class PortletResponseImpl implements LiferayPortletResponse {
 	public static PortletResponseImpl getPortletResponseImpl(
 		PortletResponse portletResponse) {
 
-		PortletResponseImpl portletResponseImpl = null;
+		while (!(portletResponse instanceof PortletResponseImpl)) {
+			if (portletResponse instanceof PortletResponseWrapper) {
+				PortletResponseWrapper portletResponseWrapper =
+					(PortletResponseWrapper)portletResponse;
 
-		if (portletResponse instanceof PortletResponseImpl) {
-			portletResponseImpl = (PortletResponseImpl)portletResponse;
-		}
-		else {
-
-			// LEP-4033
-
-			try {
-				Method method = portletResponse.getClass().getMethod(
-					"getResponse");
-
-				Object obj = method.invoke(portletResponse, (Object[])null);
-
-				portletResponseImpl = getPortletResponseImpl(
-					(PortletResponse)obj);
+				portletResponse = portletResponseWrapper.getResponse();
 			}
-			catch (Exception e) {
+			else {
 				throw new RuntimeException(
-					"Unable to get the portlet response from " +
-						portletResponse.getClass().getName());
+					"Unable to unwrap the portlet response from " +
+						portletResponse.getClass());
 			}
 		}
 
-		return portletResponseImpl;
+		return (PortletResponseImpl)portletResponse;
 	}
 
 	public void addDateHeader(String name, long date) {
@@ -251,13 +241,14 @@ public abstract class PortletResponseImpl implements LiferayPortletResponse {
 			Layout layout = (Layout)_portletRequestImpl.getAttribute(
 				WebKeys.LAYOUT);
 
-			PortletPreferences portletSetup =
-				PortletPreferencesFactoryUtil.getStrictLayoutPortletSetup(
-					layout, _portletName);
+			if (_portletSetup == null) {
+				_portletSetup =
+					PortletPreferencesFactoryUtil.getStrictLayoutPortletSetup(
+						layout, _portletName);
+			}
 
 			String linkToLayoutUuid = GetterUtil.getString(
-				portletSetup.getValue(
-					"portlet-setup-link-to-layout-uuid", null));
+				_portletSetup.getValue("portletSetupLinkToLayoutUuid", null));
 
 			if (Validator.isNotNull(linkToLayoutUuid)) {
 				try {
@@ -271,9 +262,9 @@ public abstract class PortletResponseImpl implements LiferayPortletResponse {
 				}
 			}
 		}
-		catch (SystemException e) {
+		catch (SystemException se) {
 			if (_log.isWarnEnabled()) {
-				_log.warn(e);
+				_log.warn(se);
 			}
 		}
 
@@ -291,15 +282,24 @@ public abstract class PortletResponseImpl implements LiferayPortletResponse {
 			Validator.isNotNull(portletURLClass)) {
 
 			try {
-				Class<?> portletURLClassObj = Class.forName(portletURLClass);
+				Constructor<? extends PortletURLImpl> constructor =
+					_constructors.get(portletURLClass);
 
-				Constructor<?> constructor = portletURLClassObj.getConstructor(
-					new Class[] {
-						com.liferay.portlet.PortletResponseImpl.class,
-						long.class, String.class
-					});
+				if (constructor == null) {
+					Class<?> portletURLClassObj = Class.forName(
+						portletURLClass);
 
-				portletURLImpl = (PortletURLImpl)constructor.newInstance(
+					constructor = (Constructor<? extends PortletURLImpl>)
+						portletURLClassObj.getConstructor(
+							new Class[] {
+								com.liferay.portlet.PortletResponseImpl.class,
+								long.class, String.class
+							});
+
+					_constructors.put(portletURLClass, constructor);
+				}
+
+				portletURLImpl = constructor.newInstance(
 					new Object[] {this, plid, lifecycle});
 			}
 			catch (Exception e) {
@@ -660,6 +660,8 @@ public abstract class PortletResponseImpl implements LiferayPortletResponse {
 	private static Log _log = LogFactoryUtil.getLog(PortletResponseImpl.class);
 
 	private long _companyId;
+	private Map<String, Constructor<? extends PortletURLImpl>> _constructors =
+		new ConcurrentHashMap<String, Constructor<? extends PortletURLImpl>>();
 	private Document _document;
 	private Map<String, Object> _headers = new LinkedHashMap<String, Object>();
 	private Map<String, List<Element>> _markupHeadElements =
@@ -669,6 +671,7 @@ public abstract class PortletResponseImpl implements LiferayPortletResponse {
 	private Portlet _portlet;
 	private String _portletName;
 	private PortletRequestImpl _portletRequestImpl;
+	private PortletPreferences _portletSetup;
 	private HttpServletResponse _response;
 	private URLEncoder _urlEncoder;
 	private boolean _wsrp;

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,6 +14,9 @@
 
 package com.liferay.portal.model;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * <p>
  * This class is a wrapper for {@link OrgGroupRole}.
@@ -23,7 +26,8 @@ package com.liferay.portal.model;
  * @see       OrgGroupRole
  * @generated
  */
-public class OrgGroupRoleWrapper implements OrgGroupRole {
+public class OrgGroupRoleWrapper implements OrgGroupRole,
+	ModelWrapper<OrgGroupRole> {
 	public OrgGroupRoleWrapper(OrgGroupRole orgGroupRole) {
 		_orgGroupRole = orgGroupRole;
 	}
@@ -34,6 +38,36 @@ public class OrgGroupRoleWrapper implements OrgGroupRole {
 
 	public String getModelClassName() {
 		return OrgGroupRole.class.getName();
+	}
+
+	public Map<String, Object> getModelAttributes() {
+		Map<String, Object> attributes = new HashMap<String, Object>();
+
+		attributes.put("organizationId", getOrganizationId());
+		attributes.put("groupId", getGroupId());
+		attributes.put("roleId", getRoleId());
+
+		return attributes;
+	}
+
+	public void setModelAttributes(Map<String, Object> attributes) {
+		Long organizationId = (Long)attributes.get("organizationId");
+
+		if (organizationId != null) {
+			setOrganizationId(organizationId);
+		}
+
+		Long groupId = (Long)attributes.get("groupId");
+
+		if (groupId != null) {
+			setGroupId(groupId);
+		}
+
+		Long roleId = (Long)attributes.get("roleId");
+
+		if (roleId != null) {
+			setRoleId(roleId);
+		}
 	}
 
 	/**
@@ -129,10 +163,6 @@ public class OrgGroupRoleWrapper implements OrgGroupRole {
 		return _orgGroupRole.isEscapedModel();
 	}
 
-	public void setEscapedModel(boolean escapedModel) {
-		_orgGroupRole.setEscapedModel(escapedModel);
-	}
-
 	public java.io.Serializable getPrimaryKeyObj() {
 		return _orgGroupRole.getPrimaryKeyObj();
 	}
@@ -181,17 +211,24 @@ public class OrgGroupRoleWrapper implements OrgGroupRole {
 		return _orgGroupRole.toXmlString();
 	}
 
-	public boolean containsOrganization(
-		java.util.List<com.liferay.portal.model.Organization> organizations) {
-		return _orgGroupRole.containsOrganization(organizations);
-	}
-
 	public boolean containsGroup(
 		java.util.List<com.liferay.portal.model.Group> groups) {
 		return _orgGroupRole.containsGroup(groups);
 	}
 
+	public boolean containsOrganization(
+		java.util.List<com.liferay.portal.model.Organization> organizations) {
+		return _orgGroupRole.containsOrganization(organizations);
+	}
+
+	/**
+	 * @deprecated Renamed to {@link #getWrappedModel}
+	 */
 	public OrgGroupRole getWrappedOrgGroupRole() {
+		return _orgGroupRole;
+	}
+
+	public OrgGroupRole getWrappedModel() {
 		return _orgGroupRole;
 	}
 

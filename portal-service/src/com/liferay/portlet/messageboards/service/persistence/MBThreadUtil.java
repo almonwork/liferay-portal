@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -92,13 +92,6 @@ public class MBThreadUtil {
 		return getPersistence()
 				   .findWithDynamicQuery(dynamicQuery, start, end,
 			orderByComparator);
-	}
-
-	/**
-	 * @see com.liferay.portal.service.persistence.BasePersistence#remove(com.liferay.portal.model.BaseModel)
-	 */
-	public static MBThread remove(MBThread mbThread) throws SystemException {
-		return getPersistence().remove(mbThread);
 	}
 
 	/**
@@ -314,6 +307,80 @@ public class MBThreadUtil {
 			com.liferay.portlet.messageboards.NoSuchThreadException {
 		return getPersistence()
 				   .findByGroupId_PrevAndNext(threadId, groupId,
+			orderByComparator);
+	}
+
+	/**
+	* Returns all the message boards threads that the user has permission to view where groupId = &#63;.
+	*
+	* @param groupId the group ID
+	* @return the matching message boards threads that the user has permission to view
+	* @throws SystemException if a system exception occurred
+	*/
+	public static java.util.List<com.liferay.portlet.messageboards.model.MBThread> filterFindByGroupId(
+		long groupId)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getPersistence().filterFindByGroupId(groupId);
+	}
+
+	/**
+	* Returns a range of all the message boards threads that the user has permission to view where groupId = &#63;.
+	*
+	* <p>
+	* Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set.
+	* </p>
+	*
+	* @param groupId the group ID
+	* @param start the lower bound of the range of message boards threads
+	* @param end the upper bound of the range of message boards threads (not inclusive)
+	* @return the range of matching message boards threads that the user has permission to view
+	* @throws SystemException if a system exception occurred
+	*/
+	public static java.util.List<com.liferay.portlet.messageboards.model.MBThread> filterFindByGroupId(
+		long groupId, int start, int end)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getPersistence().filterFindByGroupId(groupId, start, end);
+	}
+
+	/**
+	* Returns an ordered range of all the message boards threads that the user has permissions to view where groupId = &#63;.
+	*
+	* <p>
+	* Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set.
+	* </p>
+	*
+	* @param groupId the group ID
+	* @param start the lower bound of the range of message boards threads
+	* @param end the upper bound of the range of message boards threads (not inclusive)
+	* @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
+	* @return the ordered range of matching message boards threads that the user has permission to view
+	* @throws SystemException if a system exception occurred
+	*/
+	public static java.util.List<com.liferay.portlet.messageboards.model.MBThread> filterFindByGroupId(
+		long groupId, int start, int end,
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getPersistence()
+				   .filterFindByGroupId(groupId, start, end, orderByComparator);
+	}
+
+	/**
+	* Returns the message boards threads before and after the current message boards thread in the ordered set of message boards threads that the user has permission to view where groupId = &#63;.
+	*
+	* @param threadId the primary key of the current message boards thread
+	* @param groupId the group ID
+	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	* @return the previous, current, and next message boards thread
+	* @throws com.liferay.portlet.messageboards.NoSuchThreadException if a message boards thread with the primary key could not be found
+	* @throws SystemException if a system exception occurred
+	*/
+	public static com.liferay.portlet.messageboards.model.MBThread[] filterFindByGroupId_PrevAndNext(
+		long threadId, long groupId,
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
+		throws com.liferay.portal.kernel.exception.SystemException,
+			com.liferay.portlet.messageboards.NoSuchThreadException {
+		return getPersistence()
+				   .filterFindByGroupId_PrevAndNext(threadId, groupId,
 			orderByComparator);
 	}
 
@@ -551,6 +618,143 @@ public class MBThreadUtil {
 	}
 
 	/**
+	* Returns all the message boards threads that the user has permission to view where groupId = &#63; and categoryId = &#63;.
+	*
+	* @param groupId the group ID
+	* @param categoryId the category ID
+	* @return the matching message boards threads that the user has permission to view
+	* @throws SystemException if a system exception occurred
+	*/
+	public static java.util.List<com.liferay.portlet.messageboards.model.MBThread> filterFindByG_C(
+		long groupId, long categoryId)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getPersistence().filterFindByG_C(groupId, categoryId);
+	}
+
+	/**
+	* Returns a range of all the message boards threads that the user has permission to view where groupId = &#63; and categoryId = &#63;.
+	*
+	* <p>
+	* Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set.
+	* </p>
+	*
+	* @param groupId the group ID
+	* @param categoryId the category ID
+	* @param start the lower bound of the range of message boards threads
+	* @param end the upper bound of the range of message boards threads (not inclusive)
+	* @return the range of matching message boards threads that the user has permission to view
+	* @throws SystemException if a system exception occurred
+	*/
+	public static java.util.List<com.liferay.portlet.messageboards.model.MBThread> filterFindByG_C(
+		long groupId, long categoryId, int start, int end)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getPersistence().filterFindByG_C(groupId, categoryId, start, end);
+	}
+
+	/**
+	* Returns an ordered range of all the message boards threads that the user has permissions to view where groupId = &#63; and categoryId = &#63;.
+	*
+	* <p>
+	* Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set.
+	* </p>
+	*
+	* @param groupId the group ID
+	* @param categoryId the category ID
+	* @param start the lower bound of the range of message boards threads
+	* @param end the upper bound of the range of message boards threads (not inclusive)
+	* @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
+	* @return the ordered range of matching message boards threads that the user has permission to view
+	* @throws SystemException if a system exception occurred
+	*/
+	public static java.util.List<com.liferay.portlet.messageboards.model.MBThread> filterFindByG_C(
+		long groupId, long categoryId, int start, int end,
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getPersistence()
+				   .filterFindByG_C(groupId, categoryId, start, end,
+			orderByComparator);
+	}
+
+	/**
+	* Returns the message boards threads before and after the current message boards thread in the ordered set of message boards threads that the user has permission to view where groupId = &#63; and categoryId = &#63;.
+	*
+	* @param threadId the primary key of the current message boards thread
+	* @param groupId the group ID
+	* @param categoryId the category ID
+	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	* @return the previous, current, and next message boards thread
+	* @throws com.liferay.portlet.messageboards.NoSuchThreadException if a message boards thread with the primary key could not be found
+	* @throws SystemException if a system exception occurred
+	*/
+	public static com.liferay.portlet.messageboards.model.MBThread[] filterFindByG_C_PrevAndNext(
+		long threadId, long groupId, long categoryId,
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
+		throws com.liferay.portal.kernel.exception.SystemException,
+			com.liferay.portlet.messageboards.NoSuchThreadException {
+		return getPersistence()
+				   .filterFindByG_C_PrevAndNext(threadId, groupId, categoryId,
+			orderByComparator);
+	}
+
+	/**
+	* Returns all the message boards threads that the user has permission to view where groupId = &#63; and categoryId = any &#63;.
+	*
+	* @param groupId the group ID
+	* @param categoryIds the category IDs
+	* @return the matching message boards threads that the user has permission to view
+	* @throws SystemException if a system exception occurred
+	*/
+	public static java.util.List<com.liferay.portlet.messageboards.model.MBThread> filterFindByG_C(
+		long groupId, long[] categoryIds)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getPersistence().filterFindByG_C(groupId, categoryIds);
+	}
+
+	/**
+	* Returns a range of all the message boards threads that the user has permission to view where groupId = &#63; and categoryId = any &#63;.
+	*
+	* <p>
+	* Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set.
+	* </p>
+	*
+	* @param groupId the group ID
+	* @param categoryIds the category IDs
+	* @param start the lower bound of the range of message boards threads
+	* @param end the upper bound of the range of message boards threads (not inclusive)
+	* @return the range of matching message boards threads that the user has permission to view
+	* @throws SystemException if a system exception occurred
+	*/
+	public static java.util.List<com.liferay.portlet.messageboards.model.MBThread> filterFindByG_C(
+		long groupId, long[] categoryIds, int start, int end)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getPersistence().filterFindByG_C(groupId, categoryIds, start, end);
+	}
+
+	/**
+	* Returns an ordered range of all the message boards threads that the user has permission to view where groupId = &#63; and categoryId = any &#63;.
+	*
+	* <p>
+	* Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set.
+	* </p>
+	*
+	* @param groupId the group ID
+	* @param categoryIds the category IDs
+	* @param start the lower bound of the range of message boards threads
+	* @param end the upper bound of the range of message boards threads (not inclusive)
+	* @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
+	* @return the ordered range of matching message boards threads that the user has permission to view
+	* @throws SystemException if a system exception occurred
+	*/
+	public static java.util.List<com.liferay.portlet.messageboards.model.MBThread> filterFindByG_C(
+		long groupId, long[] categoryIds, int start, int end,
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getPersistence()
+				   .filterFindByG_C(groupId, categoryIds, start, end,
+			orderByComparator);
+	}
+
+	/**
 	* Returns all the message boards threads where groupId = &#63; and categoryId &ne; &#63;.
 	*
 	* @param groupId the group ID
@@ -680,6 +884,86 @@ public class MBThreadUtil {
 	}
 
 	/**
+	* Returns all the message boards threads that the user has permission to view where groupId = &#63; and categoryId &ne; &#63;.
+	*
+	* @param groupId the group ID
+	* @param categoryId the category ID
+	* @return the matching message boards threads that the user has permission to view
+	* @throws SystemException if a system exception occurred
+	*/
+	public static java.util.List<com.liferay.portlet.messageboards.model.MBThread> filterFindByG_NotC(
+		long groupId, long categoryId)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getPersistence().filterFindByG_NotC(groupId, categoryId);
+	}
+
+	/**
+	* Returns a range of all the message boards threads that the user has permission to view where groupId = &#63; and categoryId &ne; &#63;.
+	*
+	* <p>
+	* Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set.
+	* </p>
+	*
+	* @param groupId the group ID
+	* @param categoryId the category ID
+	* @param start the lower bound of the range of message boards threads
+	* @param end the upper bound of the range of message boards threads (not inclusive)
+	* @return the range of matching message boards threads that the user has permission to view
+	* @throws SystemException if a system exception occurred
+	*/
+	public static java.util.List<com.liferay.portlet.messageboards.model.MBThread> filterFindByG_NotC(
+		long groupId, long categoryId, int start, int end)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getPersistence()
+				   .filterFindByG_NotC(groupId, categoryId, start, end);
+	}
+
+	/**
+	* Returns an ordered range of all the message boards threads that the user has permissions to view where groupId = &#63; and categoryId &ne; &#63;.
+	*
+	* <p>
+	* Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set.
+	* </p>
+	*
+	* @param groupId the group ID
+	* @param categoryId the category ID
+	* @param start the lower bound of the range of message boards threads
+	* @param end the upper bound of the range of message boards threads (not inclusive)
+	* @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
+	* @return the ordered range of matching message boards threads that the user has permission to view
+	* @throws SystemException if a system exception occurred
+	*/
+	public static java.util.List<com.liferay.portlet.messageboards.model.MBThread> filterFindByG_NotC(
+		long groupId, long categoryId, int start, int end,
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getPersistence()
+				   .filterFindByG_NotC(groupId, categoryId, start, end,
+			orderByComparator);
+	}
+
+	/**
+	* Returns the message boards threads before and after the current message boards thread in the ordered set of message boards threads that the user has permission to view where groupId = &#63; and categoryId &ne; &#63;.
+	*
+	* @param threadId the primary key of the current message boards thread
+	* @param groupId the group ID
+	* @param categoryId the category ID
+	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	* @return the previous, current, and next message boards thread
+	* @throws com.liferay.portlet.messageboards.NoSuchThreadException if a message boards thread with the primary key could not be found
+	* @throws SystemException if a system exception occurred
+	*/
+	public static com.liferay.portlet.messageboards.model.MBThread[] filterFindByG_NotC_PrevAndNext(
+		long threadId, long groupId, long categoryId,
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
+		throws com.liferay.portal.kernel.exception.SystemException,
+			com.liferay.portlet.messageboards.NoSuchThreadException {
+		return getPersistence()
+				   .filterFindByG_NotC_PrevAndNext(threadId, groupId,
+			categoryId, orderByComparator);
+	}
+
+	/**
 	* Returns all the message boards threads where groupId = &#63; and status = &#63;.
 	*
 	* @param groupId the group ID
@@ -804,6 +1088,85 @@ public class MBThreadUtil {
 			com.liferay.portlet.messageboards.NoSuchThreadException {
 		return getPersistence()
 				   .findByG_S_PrevAndNext(threadId, groupId, status,
+			orderByComparator);
+	}
+
+	/**
+	* Returns all the message boards threads that the user has permission to view where groupId = &#63; and status = &#63;.
+	*
+	* @param groupId the group ID
+	* @param status the status
+	* @return the matching message boards threads that the user has permission to view
+	* @throws SystemException if a system exception occurred
+	*/
+	public static java.util.List<com.liferay.portlet.messageboards.model.MBThread> filterFindByG_S(
+		long groupId, int status)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getPersistence().filterFindByG_S(groupId, status);
+	}
+
+	/**
+	* Returns a range of all the message boards threads that the user has permission to view where groupId = &#63; and status = &#63;.
+	*
+	* <p>
+	* Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set.
+	* </p>
+	*
+	* @param groupId the group ID
+	* @param status the status
+	* @param start the lower bound of the range of message boards threads
+	* @param end the upper bound of the range of message boards threads (not inclusive)
+	* @return the range of matching message boards threads that the user has permission to view
+	* @throws SystemException if a system exception occurred
+	*/
+	public static java.util.List<com.liferay.portlet.messageboards.model.MBThread> filterFindByG_S(
+		long groupId, int status, int start, int end)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getPersistence().filterFindByG_S(groupId, status, start, end);
+	}
+
+	/**
+	* Returns an ordered range of all the message boards threads that the user has permissions to view where groupId = &#63; and status = &#63;.
+	*
+	* <p>
+	* Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set.
+	* </p>
+	*
+	* @param groupId the group ID
+	* @param status the status
+	* @param start the lower bound of the range of message boards threads
+	* @param end the upper bound of the range of message boards threads (not inclusive)
+	* @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
+	* @return the ordered range of matching message boards threads that the user has permission to view
+	* @throws SystemException if a system exception occurred
+	*/
+	public static java.util.List<com.liferay.portlet.messageboards.model.MBThread> filterFindByG_S(
+		long groupId, int status, int start, int end,
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getPersistence()
+				   .filterFindByG_S(groupId, status, start, end,
+			orderByComparator);
+	}
+
+	/**
+	* Returns the message boards threads before and after the current message boards thread in the ordered set of message boards threads that the user has permission to view where groupId = &#63; and status = &#63;.
+	*
+	* @param threadId the primary key of the current message boards thread
+	* @param groupId the group ID
+	* @param status the status
+	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	* @return the previous, current, and next message boards thread
+	* @throws com.liferay.portlet.messageboards.NoSuchThreadException if a message boards thread with the primary key could not be found
+	* @throws SystemException if a system exception occurred
+	*/
+	public static com.liferay.portlet.messageboards.model.MBThread[] filterFindByG_S_PrevAndNext(
+		long threadId, long groupId, int status,
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
+		throws com.liferay.portal.kernel.exception.SystemException,
+			com.liferay.portlet.messageboards.NoSuchThreadException {
+		return getPersistence()
+				   .filterFindByG_S_PrevAndNext(threadId, groupId, status,
 			orderByComparator);
 	}
 
@@ -1206,6 +1569,94 @@ public class MBThreadUtil {
 	}
 
 	/**
+	* Returns all the message boards threads that the user has permission to view where groupId = &#63; and categoryId = &#63; and lastPostDate = &#63;.
+	*
+	* @param groupId the group ID
+	* @param categoryId the category ID
+	* @param lastPostDate the last post date
+	* @return the matching message boards threads that the user has permission to view
+	* @throws SystemException if a system exception occurred
+	*/
+	public static java.util.List<com.liferay.portlet.messageboards.model.MBThread> filterFindByG_C_L(
+		long groupId, long categoryId, java.util.Date lastPostDate)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getPersistence()
+				   .filterFindByG_C_L(groupId, categoryId, lastPostDate);
+	}
+
+	/**
+	* Returns a range of all the message boards threads that the user has permission to view where groupId = &#63; and categoryId = &#63; and lastPostDate = &#63;.
+	*
+	* <p>
+	* Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set.
+	* </p>
+	*
+	* @param groupId the group ID
+	* @param categoryId the category ID
+	* @param lastPostDate the last post date
+	* @param start the lower bound of the range of message boards threads
+	* @param end the upper bound of the range of message boards threads (not inclusive)
+	* @return the range of matching message boards threads that the user has permission to view
+	* @throws SystemException if a system exception occurred
+	*/
+	public static java.util.List<com.liferay.portlet.messageboards.model.MBThread> filterFindByG_C_L(
+		long groupId, long categoryId, java.util.Date lastPostDate, int start,
+		int end) throws com.liferay.portal.kernel.exception.SystemException {
+		return getPersistence()
+				   .filterFindByG_C_L(groupId, categoryId, lastPostDate, start,
+			end);
+	}
+
+	/**
+	* Returns an ordered range of all the message boards threads that the user has permissions to view where groupId = &#63; and categoryId = &#63; and lastPostDate = &#63;.
+	*
+	* <p>
+	* Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set.
+	* </p>
+	*
+	* @param groupId the group ID
+	* @param categoryId the category ID
+	* @param lastPostDate the last post date
+	* @param start the lower bound of the range of message boards threads
+	* @param end the upper bound of the range of message boards threads (not inclusive)
+	* @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
+	* @return the ordered range of matching message boards threads that the user has permission to view
+	* @throws SystemException if a system exception occurred
+	*/
+	public static java.util.List<com.liferay.portlet.messageboards.model.MBThread> filterFindByG_C_L(
+		long groupId, long categoryId, java.util.Date lastPostDate, int start,
+		int end,
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getPersistence()
+				   .filterFindByG_C_L(groupId, categoryId, lastPostDate, start,
+			end, orderByComparator);
+	}
+
+	/**
+	* Returns the message boards threads before and after the current message boards thread in the ordered set of message boards threads that the user has permission to view where groupId = &#63; and categoryId = &#63; and lastPostDate = &#63;.
+	*
+	* @param threadId the primary key of the current message boards thread
+	* @param groupId the group ID
+	* @param categoryId the category ID
+	* @param lastPostDate the last post date
+	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	* @return the previous, current, and next message boards thread
+	* @throws com.liferay.portlet.messageboards.NoSuchThreadException if a message boards thread with the primary key could not be found
+	* @throws SystemException if a system exception occurred
+	*/
+	public static com.liferay.portlet.messageboards.model.MBThread[] filterFindByG_C_L_PrevAndNext(
+		long threadId, long groupId, long categoryId,
+		java.util.Date lastPostDate,
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
+		throws com.liferay.portal.kernel.exception.SystemException,
+			com.liferay.portlet.messageboards.NoSuchThreadException {
+		return getPersistence()
+				   .filterFindByG_C_L_PrevAndNext(threadId, groupId,
+			categoryId, lastPostDate, orderByComparator);
+	}
+
+	/**
 	* Returns all the message boards threads where groupId = &#63; and categoryId = &#63; and status = &#63;.
 	*
 	* @param groupId the group ID
@@ -1410,6 +1861,152 @@ public class MBThreadUtil {
 	}
 
 	/**
+	* Returns all the message boards threads that the user has permission to view where groupId = &#63; and categoryId = &#63; and status = &#63;.
+	*
+	* @param groupId the group ID
+	* @param categoryId the category ID
+	* @param status the status
+	* @return the matching message boards threads that the user has permission to view
+	* @throws SystemException if a system exception occurred
+	*/
+	public static java.util.List<com.liferay.portlet.messageboards.model.MBThread> filterFindByG_C_S(
+		long groupId, long categoryId, int status)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getPersistence().filterFindByG_C_S(groupId, categoryId, status);
+	}
+
+	/**
+	* Returns a range of all the message boards threads that the user has permission to view where groupId = &#63; and categoryId = &#63; and status = &#63;.
+	*
+	* <p>
+	* Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set.
+	* </p>
+	*
+	* @param groupId the group ID
+	* @param categoryId the category ID
+	* @param status the status
+	* @param start the lower bound of the range of message boards threads
+	* @param end the upper bound of the range of message boards threads (not inclusive)
+	* @return the range of matching message boards threads that the user has permission to view
+	* @throws SystemException if a system exception occurred
+	*/
+	public static java.util.List<com.liferay.portlet.messageboards.model.MBThread> filterFindByG_C_S(
+		long groupId, long categoryId, int status, int start, int end)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getPersistence()
+				   .filterFindByG_C_S(groupId, categoryId, status, start, end);
+	}
+
+	/**
+	* Returns an ordered range of all the message boards threads that the user has permissions to view where groupId = &#63; and categoryId = &#63; and status = &#63;.
+	*
+	* <p>
+	* Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set.
+	* </p>
+	*
+	* @param groupId the group ID
+	* @param categoryId the category ID
+	* @param status the status
+	* @param start the lower bound of the range of message boards threads
+	* @param end the upper bound of the range of message boards threads (not inclusive)
+	* @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
+	* @return the ordered range of matching message boards threads that the user has permission to view
+	* @throws SystemException if a system exception occurred
+	*/
+	public static java.util.List<com.liferay.portlet.messageboards.model.MBThread> filterFindByG_C_S(
+		long groupId, long categoryId, int status, int start, int end,
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getPersistence()
+				   .filterFindByG_C_S(groupId, categoryId, status, start, end,
+			orderByComparator);
+	}
+
+	/**
+	* Returns the message boards threads before and after the current message boards thread in the ordered set of message boards threads that the user has permission to view where groupId = &#63; and categoryId = &#63; and status = &#63;.
+	*
+	* @param threadId the primary key of the current message boards thread
+	* @param groupId the group ID
+	* @param categoryId the category ID
+	* @param status the status
+	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	* @return the previous, current, and next message boards thread
+	* @throws com.liferay.portlet.messageboards.NoSuchThreadException if a message boards thread with the primary key could not be found
+	* @throws SystemException if a system exception occurred
+	*/
+	public static com.liferay.portlet.messageboards.model.MBThread[] filterFindByG_C_S_PrevAndNext(
+		long threadId, long groupId, long categoryId, int status,
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
+		throws com.liferay.portal.kernel.exception.SystemException,
+			com.liferay.portlet.messageboards.NoSuchThreadException {
+		return getPersistence()
+				   .filterFindByG_C_S_PrevAndNext(threadId, groupId,
+			categoryId, status, orderByComparator);
+	}
+
+	/**
+	* Returns all the message boards threads that the user has permission to view where groupId = &#63; and categoryId = any &#63; and status = &#63;.
+	*
+	* @param groupId the group ID
+	* @param categoryIds the category IDs
+	* @param status the status
+	* @return the matching message boards threads that the user has permission to view
+	* @throws SystemException if a system exception occurred
+	*/
+	public static java.util.List<com.liferay.portlet.messageboards.model.MBThread> filterFindByG_C_S(
+		long groupId, long[] categoryIds, int status)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getPersistence().filterFindByG_C_S(groupId, categoryIds, status);
+	}
+
+	/**
+	* Returns a range of all the message boards threads that the user has permission to view where groupId = &#63; and categoryId = any &#63; and status = &#63;.
+	*
+	* <p>
+	* Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set.
+	* </p>
+	*
+	* @param groupId the group ID
+	* @param categoryIds the category IDs
+	* @param status the status
+	* @param start the lower bound of the range of message boards threads
+	* @param end the upper bound of the range of message boards threads (not inclusive)
+	* @return the range of matching message boards threads that the user has permission to view
+	* @throws SystemException if a system exception occurred
+	*/
+	public static java.util.List<com.liferay.portlet.messageboards.model.MBThread> filterFindByG_C_S(
+		long groupId, long[] categoryIds, int status, int start, int end)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getPersistence()
+				   .filterFindByG_C_S(groupId, categoryIds, status, start, end);
+	}
+
+	/**
+	* Returns an ordered range of all the message boards threads that the user has permission to view where groupId = &#63; and categoryId = any &#63; and status = &#63;.
+	*
+	* <p>
+	* Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set.
+	* </p>
+	*
+	* @param groupId the group ID
+	* @param categoryIds the category IDs
+	* @param status the status
+	* @param start the lower bound of the range of message boards threads
+	* @param end the upper bound of the range of message boards threads (not inclusive)
+	* @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
+	* @return the ordered range of matching message boards threads that the user has permission to view
+	* @throws SystemException if a system exception occurred
+	*/
+	public static java.util.List<com.liferay.portlet.messageboards.model.MBThread> filterFindByG_C_S(
+		long groupId, long[] categoryIds, int status, int start, int end,
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getPersistence()
+				   .filterFindByG_C_S(groupId, categoryIds, status, start, end,
+			orderByComparator);
+	}
+
+	/**
 	* Returns all the message boards threads where groupId = &#63; and categoryId &ne; &#63; and status = &#63;.
 	*
 	* @param groupId the group ID
@@ -1548,6 +2145,90 @@ public class MBThreadUtil {
 	}
 
 	/**
+	* Returns all the message boards threads that the user has permission to view where groupId = &#63; and categoryId &ne; &#63; and status = &#63;.
+	*
+	* @param groupId the group ID
+	* @param categoryId the category ID
+	* @param status the status
+	* @return the matching message boards threads that the user has permission to view
+	* @throws SystemException if a system exception occurred
+	*/
+	public static java.util.List<com.liferay.portlet.messageboards.model.MBThread> filterFindByG_NotC_S(
+		long groupId, long categoryId, int status)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getPersistence().filterFindByG_NotC_S(groupId, categoryId, status);
+	}
+
+	/**
+	* Returns a range of all the message boards threads that the user has permission to view where groupId = &#63; and categoryId &ne; &#63; and status = &#63;.
+	*
+	* <p>
+	* Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set.
+	* </p>
+	*
+	* @param groupId the group ID
+	* @param categoryId the category ID
+	* @param status the status
+	* @param start the lower bound of the range of message boards threads
+	* @param end the upper bound of the range of message boards threads (not inclusive)
+	* @return the range of matching message boards threads that the user has permission to view
+	* @throws SystemException if a system exception occurred
+	*/
+	public static java.util.List<com.liferay.portlet.messageboards.model.MBThread> filterFindByG_NotC_S(
+		long groupId, long categoryId, int status, int start, int end)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getPersistence()
+				   .filterFindByG_NotC_S(groupId, categoryId, status, start, end);
+	}
+
+	/**
+	* Returns an ordered range of all the message boards threads that the user has permissions to view where groupId = &#63; and categoryId &ne; &#63; and status = &#63;.
+	*
+	* <p>
+	* Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set.
+	* </p>
+	*
+	* @param groupId the group ID
+	* @param categoryId the category ID
+	* @param status the status
+	* @param start the lower bound of the range of message boards threads
+	* @param end the upper bound of the range of message boards threads (not inclusive)
+	* @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
+	* @return the ordered range of matching message boards threads that the user has permission to view
+	* @throws SystemException if a system exception occurred
+	*/
+	public static java.util.List<com.liferay.portlet.messageboards.model.MBThread> filterFindByG_NotC_S(
+		long groupId, long categoryId, int status, int start, int end,
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getPersistence()
+				   .filterFindByG_NotC_S(groupId, categoryId, status, start,
+			end, orderByComparator);
+	}
+
+	/**
+	* Returns the message boards threads before and after the current message boards thread in the ordered set of message boards threads that the user has permission to view where groupId = &#63; and categoryId &ne; &#63; and status = &#63;.
+	*
+	* @param threadId the primary key of the current message boards thread
+	* @param groupId the group ID
+	* @param categoryId the category ID
+	* @param status the status
+	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	* @return the previous, current, and next message boards thread
+	* @throws com.liferay.portlet.messageboards.NoSuchThreadException if a message boards thread with the primary key could not be found
+	* @throws SystemException if a system exception occurred
+	*/
+	public static com.liferay.portlet.messageboards.model.MBThread[] filterFindByG_NotC_S_PrevAndNext(
+		long threadId, long groupId, long categoryId, int status,
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
+		throws com.liferay.portal.kernel.exception.SystemException,
+			com.liferay.portlet.messageboards.NoSuchThreadException {
+		return getPersistence()
+				   .filterFindByG_NotC_S_PrevAndNext(threadId, groupId,
+			categoryId, status, orderByComparator);
+	}
+
+	/**
 	* Returns all the message boards threads.
 	*
 	* @return the message boards threads
@@ -1611,12 +2292,14 @@ public class MBThreadUtil {
 	* Removes the message boards thread where rootMessageId = &#63; from the database.
 	*
 	* @param rootMessageId the root message ID
+	* @return the message boards thread that was removed
 	* @throws SystemException if a system exception occurred
 	*/
-	public static void removeByRootMessageId(long rootMessageId)
+	public static com.liferay.portlet.messageboards.model.MBThread removeByRootMessageId(
+		long rootMessageId)
 		throws com.liferay.portal.kernel.exception.SystemException,
 			com.liferay.portlet.messageboards.NoSuchThreadException {
-		getPersistence().removeByRootMessageId(rootMessageId);
+		return getPersistence().removeByRootMessageId(rootMessageId);
 	}
 
 	/**
@@ -1742,6 +2425,18 @@ public class MBThreadUtil {
 	}
 
 	/**
+	* Returns the number of message boards threads that the user has permission to view where groupId = &#63;.
+	*
+	* @param groupId the group ID
+	* @return the number of matching message boards threads that the user has permission to view
+	* @throws SystemException if a system exception occurred
+	*/
+	public static int filterCountByGroupId(long groupId)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getPersistence().filterCountByGroupId(groupId);
+	}
+
+	/**
 	* Returns the number of message boards threads where rootMessageId = &#63;.
 	*
 	* @param rootMessageId the root message ID
@@ -1780,6 +2475,32 @@ public class MBThreadUtil {
 	}
 
 	/**
+	* Returns the number of message boards threads that the user has permission to view where groupId = &#63; and categoryId = &#63;.
+	*
+	* @param groupId the group ID
+	* @param categoryId the category ID
+	* @return the number of matching message boards threads that the user has permission to view
+	* @throws SystemException if a system exception occurred
+	*/
+	public static int filterCountByG_C(long groupId, long categoryId)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getPersistence().filterCountByG_C(groupId, categoryId);
+	}
+
+	/**
+	* Returns the number of message boards threads that the user has permission to view where groupId = &#63; and categoryId = any &#63;.
+	*
+	* @param groupId the group ID
+	* @param categoryIds the category IDs
+	* @return the number of matching message boards threads that the user has permission to view
+	* @throws SystemException if a system exception occurred
+	*/
+	public static int filterCountByG_C(long groupId, long[] categoryIds)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getPersistence().filterCountByG_C(groupId, categoryIds);
+	}
+
+	/**
 	* Returns the number of message boards threads where groupId = &#63; and categoryId &ne; &#63;.
 	*
 	* @param groupId the group ID
@@ -1793,6 +2514,19 @@ public class MBThreadUtil {
 	}
 
 	/**
+	* Returns the number of message boards threads that the user has permission to view where groupId = &#63; and categoryId &ne; &#63;.
+	*
+	* @param groupId the group ID
+	* @param categoryId the category ID
+	* @return the number of matching message boards threads that the user has permission to view
+	* @throws SystemException if a system exception occurred
+	*/
+	public static int filterCountByG_NotC(long groupId, long categoryId)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getPersistence().filterCountByG_NotC(groupId, categoryId);
+	}
+
+	/**
 	* Returns the number of message boards threads where groupId = &#63; and status = &#63;.
 	*
 	* @param groupId the group ID
@@ -1803,6 +2537,19 @@ public class MBThreadUtil {
 	public static int countByG_S(long groupId, int status)
 		throws com.liferay.portal.kernel.exception.SystemException {
 		return getPersistence().countByG_S(groupId, status);
+	}
+
+	/**
+	* Returns the number of message boards threads that the user has permission to view where groupId = &#63; and status = &#63;.
+	*
+	* @param groupId the group ID
+	* @param status the status
+	* @return the number of matching message boards threads that the user has permission to view
+	* @throws SystemException if a system exception occurred
+	*/
+	public static int filterCountByG_S(long groupId, int status)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getPersistence().filterCountByG_S(groupId, status);
 	}
 
 	/**
@@ -1847,6 +2594,22 @@ public class MBThreadUtil {
 	}
 
 	/**
+	* Returns the number of message boards threads that the user has permission to view where groupId = &#63; and categoryId = &#63; and lastPostDate = &#63;.
+	*
+	* @param groupId the group ID
+	* @param categoryId the category ID
+	* @param lastPostDate the last post date
+	* @return the number of matching message boards threads that the user has permission to view
+	* @throws SystemException if a system exception occurred
+	*/
+	public static int filterCountByG_C_L(long groupId, long categoryId,
+		java.util.Date lastPostDate)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getPersistence()
+				   .filterCountByG_C_L(groupId, categoryId, lastPostDate);
+	}
+
+	/**
 	* Returns the number of message boards threads where groupId = &#63; and categoryId = &#63; and status = &#63;.
 	*
 	* @param groupId the group ID
@@ -1875,6 +2638,34 @@ public class MBThreadUtil {
 	}
 
 	/**
+	* Returns the number of message boards threads that the user has permission to view where groupId = &#63; and categoryId = &#63; and status = &#63;.
+	*
+	* @param groupId the group ID
+	* @param categoryId the category ID
+	* @param status the status
+	* @return the number of matching message boards threads that the user has permission to view
+	* @throws SystemException if a system exception occurred
+	*/
+	public static int filterCountByG_C_S(long groupId, long categoryId,
+		int status) throws com.liferay.portal.kernel.exception.SystemException {
+		return getPersistence().filterCountByG_C_S(groupId, categoryId, status);
+	}
+
+	/**
+	* Returns the number of message boards threads that the user has permission to view where groupId = &#63; and categoryId = any &#63; and status = &#63;.
+	*
+	* @param groupId the group ID
+	* @param categoryIds the category IDs
+	* @param status the status
+	* @return the number of matching message boards threads that the user has permission to view
+	* @throws SystemException if a system exception occurred
+	*/
+	public static int filterCountByG_C_S(long groupId, long[] categoryIds,
+		int status) throws com.liferay.portal.kernel.exception.SystemException {
+		return getPersistence().filterCountByG_C_S(groupId, categoryIds, status);
+	}
+
+	/**
 	* Returns the number of message boards threads where groupId = &#63; and categoryId &ne; &#63; and status = &#63;.
 	*
 	* @param groupId the group ID
@@ -1886,6 +2677,21 @@ public class MBThreadUtil {
 	public static int countByG_NotC_S(long groupId, long categoryId, int status)
 		throws com.liferay.portal.kernel.exception.SystemException {
 		return getPersistence().countByG_NotC_S(groupId, categoryId, status);
+	}
+
+	/**
+	* Returns the number of message boards threads that the user has permission to view where groupId = &#63; and categoryId &ne; &#63; and status = &#63;.
+	*
+	* @param groupId the group ID
+	* @param categoryId the category ID
+	* @param status the status
+	* @return the number of matching message boards threads that the user has permission to view
+	* @throws SystemException if a system exception occurred
+	*/
+	public static int filterCountByG_NotC_S(long groupId, long categoryId,
+		int status) throws com.liferay.portal.kernel.exception.SystemException {
+		return getPersistence()
+				   .filterCountByG_NotC_S(groupId, categoryId, status);
 	}
 
 	/**
@@ -1910,10 +2716,10 @@ public class MBThreadUtil {
 		return _persistence;
 	}
 
+	/**
+	 * @deprecated
+	 */
 	public void setPersistence(MBThreadPersistence persistence) {
-		_persistence = persistence;
-
-		ReferenceRegistry.registerReference(MBThreadUtil.class, "_persistence");
 	}
 
 	private static MBThreadPersistence _persistence;

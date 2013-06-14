@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -106,7 +106,7 @@ portletURL.setParameter("categoryId", String.valueOf(categoryId));
 		}
 
 		boolean showAddCategoryButton = ShoppingCategoryPermission.contains(permissionChecker, scopeGroupId, categoryId, ActionKeys.ADD_CATEGORY);
-		boolean showPermissionsButton = GroupPermissionUtil.contains(permissionChecker, scopeGroupId, ActionKeys.PERMISSIONS);
+		boolean showPermissionsButton = ShoppingCategoryPermission.contains(permissionChecker, scopeGroupId, categoryId, ActionKeys.PERMISSIONS);
 		boolean showSearch = !results.isEmpty();
 		%>
 
@@ -248,7 +248,7 @@ portletURL.setParameter("categoryId", String.valueOf(categoryId));
 					sb.append("/shopping/item?img_id=");
 					sb.append(item.getSmallImageId());
 					sb.append("&t=");
-					sb.append(ImageServletTokenUtil.getToken(item.getSmallImageId()));
+					sb.append(WebServerServletTokenUtil.getToken(item.getSmallImageId()));
 				}
 
 				sb.append("\">");
@@ -341,13 +341,15 @@ portletURL.setParameter("categoryId", String.valueOf(categoryId));
 
 							<aui:button href="<%= addItemURL %>" value="add-item" />
 
-							<portlet:renderURL var="addBooksURL">
-								<portlet:param name="struts_action" value="/shopping/add_book_items" />
-								<portlet:param name="redirect" value="<%= currentURL %>" />
-								<portlet:param name="categoryId" value="<%= String.valueOf(categoryId) %>" />
-							</portlet:renderURL>
+							<c:if test="<%= AmazonRankingsUtil.isEnabled() %>">
+								<portlet:renderURL var="addBooksURL">
+									<portlet:param name="struts_action" value="/shopping/add_book_items" />
+									<portlet:param name="redirect" value="<%= currentURL %>" />
+									<portlet:param name="categoryId" value="<%= String.valueOf(categoryId) %>" />
+								</portlet:renderURL>
 
-							<aui:button href="<%= addBooksURL %>" value="add-books" />
+								<aui:button href="<%= addBooksURL %>" value="add-books" />
+							</c:if>
 						</c:if>
 					</aui:button-row>
 				</c:if>

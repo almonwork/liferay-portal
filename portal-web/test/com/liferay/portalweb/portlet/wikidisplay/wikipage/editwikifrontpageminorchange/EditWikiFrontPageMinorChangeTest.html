@@ -14,33 +14,98 @@
 	<td></td>
 </tr>
 <tr>
-	<td>waitForElementPresent</td>
+	<td>waitForVisible</td>
 	<td>link=Wiki Display Test Page</td>
-	<td></td>
-</tr>
-<tr>
-	<td>clickAndWait</td>
-	<td>link=Wiki Display Test Page</td>
-	<td></td>
-</tr>
-<tr>
-	<td>assertText</td>
-	<td>//div[5]/div</td>
-	<td>This is a wiki frontpage article test.</td>
+	<td>Wiki Display Test Page</td>
 </tr>
 <tr>
 	<td>clickAtAndWait</td>
-	<td>link=Edit</td>
-	<td></td>
+	<td>link=Wiki Display Test Page</td>
+	<td>Wiki Display Test Page</td>
+</tr>
+<tr>
+	<td>assertText</td>
+	<td>//div[@class='wiki-body']/p</td>
+	<td>Wiki FrontPage Content</td>
+</tr>
+<tr>
+	<td>assertText</td>
+	<td>//span[contains(.,'Edit')]/a/span</td>
+	<td>Edit</td>
+</tr>
+<tr>
+	<td>clickAtAndWait</td>
+	<td>//span[contains(.,'Edit')]/a/span</td>
+	<td>Edit</td>
+</tr>
+<tr>
+	<td>waitForElementPresent</td>
+	<td>//textarea[contains(@id,'_editor') and contains(@style,'display: none;')]</td>
+	<td>Text Area</td>
+</tr>
+<tr>
+	<td>assertText</td>
+	<td>//span[.='Source']</td>
+	<td>Source</td>
+</tr>
+<tr>
+	<td>clickAt</td>
+	<td>//span[.='Source']</td>
+	<td>Source</td>
+</tr>
+<tr>
+	<td>waitForVisible</td>
+	<td>//a[@class='cke_button_source cke_on']</td>
+	<td>Source Button On</td>
+</tr>
+<tr>
+	<td>waitForVisible</td>
+	<td>//td[contains(@id,'cke_contents__54')]/textarea</td>
+	<td>CK Editor</td>
 </tr>
 <tr>
 	<td>type</td>
-	<td>//textarea</td>
-	<td>This is an edited wiki frontpage article test. Minor edit.</td>
+	<td>//td[contains(@id,'cke_contents__54')]/textarea</td>
+	<td>Wiki FrontPage Content Edit</td>
 </tr>
 <tr>
-	<td>store</td>
-	<td>eval(selenium.isChecked('//span/input[2]'))</td>
+	<td>assertText</td>
+	<td>//span[.='Source']</td>
+	<td>Source</td>
+</tr>
+<tr>
+	<td>clickAt</td>
+	<td>//span[.='Source']</td>
+	<td>Source</td>
+</tr>
+<tr>
+	<td>waitForElementPresent</td>
+	<td>//textarea[contains(@id,'_editor') and contains(@style,'display: none;')]</td>
+	<td>Text Area</td>
+</tr>
+<tr>
+	<td>assertVisible</td>
+	<td>//td[contains(@id,'cke_contents__54')]/iframe</td>
+	<td>CK Editor</td>
+</tr>
+<tr>
+	<td>selectFrame</td>
+	<td>//td[contains(@id,'cke_contents__54')]/iframe</td>
+	<td>CK Editor</td>
+</tr>
+<tr>
+	<td>waitForText</td>
+	<td>//body</td>
+	<td>Wiki FrontPage Content Edit</td>
+</tr>
+<tr>
+	<td>selectFrame</td>
+	<td>relative=top</td>
+	<td>top</td>
+</tr>
+<tr>
+	<td>storeChecked</td>
+	<td>//input[contains(@id,'_minorEditCheckbox')]</td>
 	<td>minorEditChecked</td>
 </tr>
 <tr>
@@ -49,9 +114,14 @@
 	<td>MinorEditChecked</td>
 </tr>
 <tr>
-	<td>click</td>
-	<td>//span/input[2]</td>
-	<td></td>
+	<td>assertNotChecked</td>
+	<td>//input[contains(@id,'_minorEditCheckbox')]</td>
+	<td>This is a minor edit.</td>
+</tr>
+<tr>
+	<td>clickAt</td>
+	<td>//input[contains(@id,'_minorEditCheckbox')]</td>
+	<td>This is a minor edit.</td>
 </tr>
 <tr>
 	<td>label</td>
@@ -59,19 +129,29 @@
 	<td></td>
 </tr>
 <tr>
+	<td>assertChecked</td>
+	<td>//input[contains(@id,'_minorEditCheckbox')]</td>
+	<td>This is a minor edit.</td>
+</tr>
+<tr>
 	<td>clickAtAndWait</td>
 	<td>//input[@value='Publish']</td>
-	<td></td>
+	<td>Publish</td>
 </tr>
 <tr>
 	<td>assertText</td>
-	<td>//section/div/div/div/div[1]</td>
+	<td>//div[@class='portlet-msg-success']</td>
 	<td>Your request completed successfully.</td>
 </tr>
 <tr>
-	<td>assertPartialText</td>
-	<td>//div[@class='wiki-body']</td>
-	<td>Minor edit.</td>
+	<td>assertText</td>
+	<td>//div[@class='wiki-body']/p</td>
+	<td>Wiki FrontPage Content Edit</td>
+</tr>
+<tr>
+	<td>assertNotText</td>
+	<td>//div[@class='wiki-body']/p</td>
+	<td>Wiki FrontPage Content</td>
 </tr>
 <tr>
 	<td>open</td>
@@ -79,41 +159,45 @@
 	<td></td>
 </tr>
 <tr>
-	<td>waitForElementPresent</td>
+	<td>waitForVisible</td>
 	<td>link=Wiki Display Test Page</td>
-	<td></td>
-</tr>
-<tr>
-	<td>clickAndWait</td>
-	<td>link=Wiki Display Test Page</td>
-	<td></td>
+	<td>Wiki Display Test Page</td>
 </tr>
 <tr>
 	<td>clickAtAndWait</td>
-	<td>link=Details</td>
-	<td></td>
+	<td>link=Wiki Display Test Page</td>
+	<td>Wiki Display Test Page</td>
+</tr>
+<tr>
+	<td>assertText</td>
+	<td>//div[3]/span[2]/a/span</td>
+	<td>Details</td>
+</tr>
+<tr>
+	<td>clickAtAndWait</td>
+	<td>//div[3]/span[2]/a/span</td>
+	<td>Details</td>
 </tr>
 <tr>
 	<td>clickAtAndWait</td>
 	<td>link=History</td>
-	<td></td>
+	<td>History</td>
 </tr>
 <tr>
-	<td>assertElementPresent</td>
-	<td>link=1.2 (Minor Edit)</td>
-	<td></td>
+	<td>assertText</td>
+	<td>//td[4]/a</td>
+	<td>1.2 (Minor Edit)</td>
 </tr>
 <tr>
-	<td>assertElementPresent</td>
-	<td>link=1.1</td>
-	<td></td>
+	<td>assertText</td>
+	<td>//tr[4]/td[4]/a</td>
+	<td>1.1</td>
 </tr>
 <tr>
-	<td>assertElementPresent</td>
-	<td>link=1.0 (Minor Edit)</td>
-	<td></td>
+	<td>assertText</td>
+	<td>//tr[5]/td[4]/a</td>
+	<td>1.0 (Minor Edit)</td>
 </tr>
-
 </tbody></table>
 </body>
 </html>

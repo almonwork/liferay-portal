@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -20,19 +20,24 @@
 	if (iframe) {
 		iframe.plug(A.Plugin.ResizeIframe);
 
-		var height = A.Plugin.ResizeIframe.getContentHeight(iframe);
+		iframe.on(
+			'load',
+			function() {
+				var height = A.Plugin.ResizeIframe.getContentHeight(iframe);
 
-		if (height == null) {
-			if (themeDisplay.isStateMaximized()) {
-				height = A.getDoc().get('docHeight');
+				if (height == null) {
+					if (themeDisplay.isStateMaximized()) {
+						height = A.getDoc().get('docHeight');
+					}
+					else {
+						height = 600;
+
+						iframe.resizeiframe.set('monitorHeight', false);
+					}
+				}
+
+				iframe.setStyle('height', height);
 			}
-			else {
-				height = 600;
-
-				iframe.resizeiframe.set('monitorHeight', false);
-			}
-		}
-
-		iframe.setStyle('height', height);
+		);
 	}
 </aui:script>

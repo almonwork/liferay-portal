@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -84,14 +84,11 @@ public class XMLFormatter {
 		return StringUtil.replace(
 			xml,
 			new String[] {
-				StringPool.RETURN_NEW_LINE,
-				StringPool.NEW_LINE,
+				StringPool.RETURN_NEW_LINE, StringPool.NEW_LINE,
 				StringPool.RETURN
 			},
 			new String[] {
-				"[$NEW_LINE$]",
-				"[$NEW_LINE$]",
-				"[$NEW_LINE$]"
+				"[$NEW_LINE$]", "[$NEW_LINE$]", "[$NEW_LINE$]"
 			});
 	}
 
@@ -99,9 +96,7 @@ public class XMLFormatter {
 		return toString(node, StringPool.TAB);
 	}
 
-	public static String toString(Node node, String indent)
-		throws IOException {
-
+	public static String toString(Node node, String indent) throws IOException {
 		return toString(node, StringPool.TAB, false);
 	}
 

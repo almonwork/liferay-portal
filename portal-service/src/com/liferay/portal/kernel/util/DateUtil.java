@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -86,19 +86,9 @@ public class DateUtil {
 			return equals(date1, date2);
 		}
 
-		long time1 = 0;
+		long deltaTime = date1.getTime() - date2.getTime();
 
-		if (date1 != null) {
-			time1 = date1.getTime() / Time.SECOND;
-		}
-
-		long time2 = 0;
-
-		if (date2 != null) {
-			time2 = date2.getTime() / Time.SECOND;
-		}
-
-		if (time1 == time2) {
+		if ((deltaTime > -1000) && (deltaTime < 1000)) {
 			return true;
 		}
 		else {
@@ -132,19 +122,42 @@ public class DateUtil {
 		return dateFormat.format(date);
 	}
 
+	public static int getDaysBetween(Date date1, Date date2) {
+		return getDaysBetween(date1, date2, null);
+	}
+
 	public static int getDaysBetween(
-		Date startDate, Date endDate, TimeZone timeZone) {
+		Date date1, Date date2, TimeZone timeZone) {
 
-		int offset = timeZone.getRawOffset();
+		if (date1.after(date2)) {
+			Date tempDate = date1;
 
-		Calendar startCal = new GregorianCalendar(timeZone);
+			date1 = date2;
+			date2 = tempDate;
+		}
 
-		startCal.setTime(startDate);
+		Calendar startCal = null;
+		Calendar endCal = null;
+
+		int offset = 0;
+
+		if (timeZone == null) {
+			startCal = new GregorianCalendar();
+			endCal = new GregorianCalendar();
+		}
+		else {
+			startCal = new GregorianCalendar(timeZone);
+			endCal = new GregorianCalendar(timeZone);
+
+			offset = timeZone.getRawOffset();
+		}
+
+		startCal.setTime(date1);
+
 		startCal.add(Calendar.MILLISECOND, offset);
 
-		Calendar endCal = new GregorianCalendar(timeZone);
+		endCal.setTime(date2);
 
-		endCal.setTime(endDate);
 		endCal.add(Calendar.MILLISECOND, offset);
 
 		int daysBetween = 0;
@@ -156,6 +169,10 @@ public class DateUtil {
 		}
 
 		return daysBetween;
+	}
+
+	public static DateFormat getISO8601Format() {
+		return DateFormatFactoryUtil.getSimpleDateFormat(ISO_8601_PATTERN);
 	}
 
 	public static DateFormat getISOFormat() {
@@ -188,10 +205,6 @@ public class DateUtil {
 		}
 
 		return DateFormatFactoryUtil.getSimpleDateFormat(pattern);
-	}
-
-	public static DateFormat getISO8601Format() {
-		return DateFormatFactoryUtil.getSimpleDateFormat(ISO_8601_PATTERN);
 	}
 
 	public static DateFormat getUTCFormat() {
@@ -230,6 +243,12 @@ public class DateUtil {
 
 	public static Date newDate(long date) {
 		return new Date(date);
+	}
+
+	public static long newTime() {
+		Date date = new Date();
+
+		return date.getTime();
 	}
 
 }

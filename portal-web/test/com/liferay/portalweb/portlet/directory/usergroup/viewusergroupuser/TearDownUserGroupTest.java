@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -28,9 +28,10 @@ public class TearDownUserGroupTest extends BaseTestCase {
 			switch (label) {
 			case 1:
 				selenium.open("/web/guest/home/");
+				loadRequiredJavaScriptModules();
 
 				for (int second = 0;; second++) {
-					if (second >= 60) {
+					if (second >= 90) {
 						fail("timeout");
 					}
 
@@ -45,18 +46,17 @@ public class TearDownUserGroupTest extends BaseTestCase {
 					Thread.sleep(1000);
 				}
 
-				selenium.saveScreenShotAndSource();
 				selenium.clickAt("link=Control Panel",
-					RuntimeVariables.replace(""));
+					RuntimeVariables.replace("Control Panel"));
 				selenium.waitForPageToLoad("30000");
-				selenium.saveScreenShotAndSource();
+				loadRequiredJavaScriptModules();
 				selenium.clickAt("link=User Groups",
-					RuntimeVariables.replace(""));
+					RuntimeVariables.replace("User Groups"));
 				selenium.waitForPageToLoad("30000");
-				selenium.saveScreenShotAndSource();
+				loadRequiredJavaScriptModules();
 
 				boolean userGroup1Present = selenium.isElementPresent(
-						"//strong/a");
+						"_127_rowIds");
 
 				if (!userGroup1Present) {
 					label = 2;
@@ -64,16 +64,19 @@ public class TearDownUserGroupTest extends BaseTestCase {
 					continue;
 				}
 
-				selenium.clickAt("//strong/a", RuntimeVariables.replace(""));
+				assertEquals(RuntimeVariables.replace("Actions"),
+					selenium.getText("//span[@title='Actions']/ul/li/strong/a"));
+				selenium.clickAt("//span[@title='Actions']/ul/li/strong/a",
+					RuntimeVariables.replace("Actions"));
 
 				for (int second = 0;; second++) {
-					if (second >= 60) {
+					if (second >= 90) {
 						fail("timeout");
 					}
 
 					try {
 						if (selenium.isVisible(
-									"//div[@class='lfr-component lfr-menu-list']/ul/li[4]/a")) {
+									"//div[@class='lfr-component lfr-menu-list']/ul/li[5]/a")) {
 							break;
 						}
 					}
@@ -83,23 +86,32 @@ public class TearDownUserGroupTest extends BaseTestCase {
 					Thread.sleep(1000);
 				}
 
-				selenium.saveScreenShotAndSource();
+				assertEquals(RuntimeVariables.replace("Assign Members"),
+					selenium.getText(
+						"//div[@class='lfr-component lfr-menu-list']/ul/li[5]/a"));
 				selenium.click(RuntimeVariables.replace(
-						"//div[@class='lfr-component lfr-menu-list']/ul/li[4]/a"));
+						"//div[@class='lfr-component lfr-menu-list']/ul/li[5]/a"));
 				selenium.waitForPageToLoad("30000");
-				selenium.saveScreenShotAndSource();
-				selenium.clickAt("_127_allRowIds", RuntimeVariables.replace(""));
+				loadRequiredJavaScriptModules();
+				selenium.clickAt("//input[@name='_127_allRowIds']",
+					RuntimeVariables.replace("All Rows"));
 				selenium.clickAt("//input[@value='Update Associations']",
-					RuntimeVariables.replace(""));
+					RuntimeVariables.replace("Update Associations"));
 				selenium.waitForPageToLoad("30000");
-				selenium.saveScreenShotAndSource();
-				selenium.clickAt("_127_TabsBack", RuntimeVariables.replace(""));
+				loadRequiredJavaScriptModules();
+				assertEquals(RuntimeVariables.replace("\u00ab Back"),
+					selenium.getText("//a[@id='_127_TabsBack']"));
+				selenium.clickAt("//a[@id='_127_TabsBack']",
+					RuntimeVariables.replace("\u00ab Back"));
 				selenium.waitForPageToLoad("30000");
-				selenium.saveScreenShotAndSource();
-				selenium.clickAt("//strong/a", RuntimeVariables.replace(""));
+				loadRequiredJavaScriptModules();
+				assertEquals(RuntimeVariables.replace("Actions"),
+					selenium.getText("//span[@title='Actions']/ul/li/strong/a"));
+				selenium.clickAt("//span[@title='Actions']/ul/li/strong/a",
+					RuntimeVariables.replace("Actions"));
 
 				for (int second = 0;; second++) {
-					if (second >= 60) {
+					if (second >= 90) {
 						fail("timeout");
 					}
 
@@ -115,18 +127,18 @@ public class TearDownUserGroupTest extends BaseTestCase {
 					Thread.sleep(1000);
 				}
 
-				selenium.saveScreenShotAndSource();
+				assertEquals(RuntimeVariables.replace("Delete"),
+					selenium.getText(
+						"//div[@class='lfr-component lfr-menu-list']/ul/li[6]/a"));
 				selenium.click(RuntimeVariables.replace(
 						"//div[@class='lfr-component lfr-menu-list']/ul/li[6]/a"));
 				selenium.waitForPageToLoad("30000");
+				loadRequiredJavaScriptModules();
 				assertTrue(selenium.getConfirmation()
 								   .matches("^Are you sure you want to delete this[\\s\\S]$"));
-				selenium.saveScreenShotAndSource();
-
-			case 2:
 
 				boolean userGroup2Present = selenium.isElementPresent(
-						"//strong/a");
+						"_127_rowIds");
 
 				if (!userGroup2Present) {
 					label = 3;
@@ -134,16 +146,19 @@ public class TearDownUserGroupTest extends BaseTestCase {
 					continue;
 				}
 
-				selenium.clickAt("//strong/a", RuntimeVariables.replace(""));
+				assertEquals(RuntimeVariables.replace("Actions"),
+					selenium.getText("//span[@title='Actions']/ul/li/strong/a"));
+				selenium.clickAt("//span[@title='Actions']/ul/li/strong/a",
+					RuntimeVariables.replace("Actions"));
 
 				for (int second = 0;; second++) {
-					if (second >= 60) {
+					if (second >= 90) {
 						fail("timeout");
 					}
 
 					try {
 						if (selenium.isVisible(
-									"//div[@class='lfr-component lfr-menu-list']/ul/li[4]/a")) {
+									"//div[@class='lfr-component lfr-menu-list']/ul/li[5]/a")) {
 							break;
 						}
 					}
@@ -153,23 +168,32 @@ public class TearDownUserGroupTest extends BaseTestCase {
 					Thread.sleep(1000);
 				}
 
-				selenium.saveScreenShotAndSource();
+				assertEquals(RuntimeVariables.replace("Assign Members"),
+					selenium.getText(
+						"//div[@class='lfr-component lfr-menu-list']/ul/li[5]/a"));
 				selenium.click(RuntimeVariables.replace(
-						"//div[@class='lfr-component lfr-menu-list']/ul/li[4]/a"));
+						"//div[@class='lfr-component lfr-menu-list']/ul/li[5]/a"));
 				selenium.waitForPageToLoad("30000");
-				selenium.saveScreenShotAndSource();
-				selenium.clickAt("_127_allRowIds", RuntimeVariables.replace(""));
+				loadRequiredJavaScriptModules();
+				selenium.clickAt("//input[@name='_127_allRowIds']",
+					RuntimeVariables.replace("All Rows"));
 				selenium.clickAt("//input[@value='Update Associations']",
-					RuntimeVariables.replace(""));
+					RuntimeVariables.replace("Update Associations"));
 				selenium.waitForPageToLoad("30000");
-				selenium.saveScreenShotAndSource();
-				selenium.clickAt("_127_TabsBack", RuntimeVariables.replace(""));
+				loadRequiredJavaScriptModules();
+				assertEquals(RuntimeVariables.replace("\u00ab Back"),
+					selenium.getText("//a[@id='_127_TabsBack']"));
+				selenium.clickAt("//a[@id='_127_TabsBack']",
+					RuntimeVariables.replace("\u00ab Back"));
 				selenium.waitForPageToLoad("30000");
-				selenium.saveScreenShotAndSource();
-				selenium.clickAt("//strong/a", RuntimeVariables.replace(""));
+				loadRequiredJavaScriptModules();
+				assertEquals(RuntimeVariables.replace("Actions"),
+					selenium.getText("//span[@title='Actions']/ul/li/strong/a"));
+				selenium.clickAt("//span[@title='Actions']/ul/li/strong/a",
+					RuntimeVariables.replace("Actions"));
 
 				for (int second = 0;; second++) {
-					if (second >= 60) {
+					if (second >= 90) {
 						fail("timeout");
 					}
 
@@ -185,18 +209,18 @@ public class TearDownUserGroupTest extends BaseTestCase {
 					Thread.sleep(1000);
 				}
 
-				selenium.saveScreenShotAndSource();
+				assertEquals(RuntimeVariables.replace("Delete"),
+					selenium.getText(
+						"//div[@class='lfr-component lfr-menu-list']/ul/li[6]/a"));
 				selenium.click(RuntimeVariables.replace(
 						"//div[@class='lfr-component lfr-menu-list']/ul/li[6]/a"));
 				selenium.waitForPageToLoad("30000");
+				loadRequiredJavaScriptModules();
 				assertTrue(selenium.getConfirmation()
 								   .matches("^Are you sure you want to delete this[\\s\\S]$"));
-				selenium.saveScreenShotAndSource();
-
-			case 3:
 
 				boolean userGroup3Present = selenium.isElementPresent(
-						"//strong/a");
+						"_127_rowIds");
 
 				if (!userGroup3Present) {
 					label = 4;
@@ -204,16 +228,19 @@ public class TearDownUserGroupTest extends BaseTestCase {
 					continue;
 				}
 
-				selenium.clickAt("//strong/a", RuntimeVariables.replace(""));
+				assertEquals(RuntimeVariables.replace("Actions"),
+					selenium.getText("//span[@title='Actions']/ul/li/strong/a"));
+				selenium.clickAt("//span[@title='Actions']/ul/li/strong/a",
+					RuntimeVariables.replace("Actions"));
 
 				for (int second = 0;; second++) {
-					if (second >= 60) {
+					if (second >= 90) {
 						fail("timeout");
 					}
 
 					try {
 						if (selenium.isVisible(
-									"//div[@class='lfr-component lfr-menu-list']/ul/li[4]/a")) {
+									"//div[@class='lfr-component lfr-menu-list']/ul/li[5]/a")) {
 							break;
 						}
 					}
@@ -223,23 +250,32 @@ public class TearDownUserGroupTest extends BaseTestCase {
 					Thread.sleep(1000);
 				}
 
-				selenium.saveScreenShotAndSource();
+				assertEquals(RuntimeVariables.replace("Assign Members"),
+					selenium.getText(
+						"//div[@class='lfr-component lfr-menu-list']/ul/li[5]/a"));
 				selenium.click(RuntimeVariables.replace(
-						"//div[@class='lfr-component lfr-menu-list']/ul/li[4]/a"));
+						"//div[@class='lfr-component lfr-menu-list']/ul/li[5]/a"));
 				selenium.waitForPageToLoad("30000");
-				selenium.saveScreenShotAndSource();
-				selenium.clickAt("_127_allRowIds", RuntimeVariables.replace(""));
+				loadRequiredJavaScriptModules();
+				selenium.clickAt("//input[@name='_127_allRowIds']",
+					RuntimeVariables.replace("All Rows"));
 				selenium.clickAt("//input[@value='Update Associations']",
-					RuntimeVariables.replace(""));
+					RuntimeVariables.replace("Update Associations"));
 				selenium.waitForPageToLoad("30000");
-				selenium.saveScreenShotAndSource();
-				selenium.clickAt("_127_TabsBack", RuntimeVariables.replace(""));
+				loadRequiredJavaScriptModules();
+				assertEquals(RuntimeVariables.replace("\u00ab Back"),
+					selenium.getText("//a[@id='_127_TabsBack']"));
+				selenium.clickAt("//a[@id='_127_TabsBack']",
+					RuntimeVariables.replace("\u00ab Back"));
 				selenium.waitForPageToLoad("30000");
-				selenium.saveScreenShotAndSource();
-				selenium.clickAt("//strong/a", RuntimeVariables.replace(""));
+				loadRequiredJavaScriptModules();
+				assertEquals(RuntimeVariables.replace("Actions"),
+					selenium.getText("//span[@title='Actions']/ul/li/strong/a"));
+				selenium.clickAt("//span[@title='Actions']/ul/li/strong/a",
+					RuntimeVariables.replace("Actions"));
 
 				for (int second = 0;; second++) {
-					if (second >= 60) {
+					if (second >= 90) {
 						fail("timeout");
 					}
 
@@ -255,18 +291,18 @@ public class TearDownUserGroupTest extends BaseTestCase {
 					Thread.sleep(1000);
 				}
 
-				selenium.saveScreenShotAndSource();
+				assertEquals(RuntimeVariables.replace("Delete"),
+					selenium.getText(
+						"//div[@class='lfr-component lfr-menu-list']/ul/li[6]/a"));
 				selenium.click(RuntimeVariables.replace(
 						"//div[@class='lfr-component lfr-menu-list']/ul/li[6]/a"));
 				selenium.waitForPageToLoad("30000");
+				loadRequiredJavaScriptModules();
 				assertTrue(selenium.getConfirmation()
 								   .matches("^Are you sure you want to delete this[\\s\\S]$"));
-				selenium.saveScreenShotAndSource();
-
-			case 4:
 
 				boolean userGroup4Present = selenium.isElementPresent(
-						"//strong/a");
+						"_127_rowIds");
 
 				if (!userGroup4Present) {
 					label = 5;
@@ -274,16 +310,19 @@ public class TearDownUserGroupTest extends BaseTestCase {
 					continue;
 				}
 
-				selenium.clickAt("//strong/a", RuntimeVariables.replace(""));
+				assertEquals(RuntimeVariables.replace("Actions"),
+					selenium.getText("//span[@title='Actions']/ul/li/strong/a"));
+				selenium.clickAt("//span[@title='Actions']/ul/li/strong/a",
+					RuntimeVariables.replace("Actions"));
 
 				for (int second = 0;; second++) {
-					if (second >= 60) {
+					if (second >= 90) {
 						fail("timeout");
 					}
 
 					try {
 						if (selenium.isVisible(
-									"//div[@class='lfr-component lfr-menu-list']/ul/li[4]/a")) {
+									"//div[@class='lfr-component lfr-menu-list']/ul/li[5]/a")) {
 							break;
 						}
 					}
@@ -293,23 +332,32 @@ public class TearDownUserGroupTest extends BaseTestCase {
 					Thread.sleep(1000);
 				}
 
-				selenium.saveScreenShotAndSource();
+				assertEquals(RuntimeVariables.replace("Assign Members"),
+					selenium.getText(
+						"//div[@class='lfr-component lfr-menu-list']/ul/li[5]/a"));
 				selenium.click(RuntimeVariables.replace(
-						"//div[@class='lfr-component lfr-menu-list']/ul/li[4]/a"));
+						"//div[@class='lfr-component lfr-menu-list']/ul/li[5]/a"));
 				selenium.waitForPageToLoad("30000");
-				selenium.saveScreenShotAndSource();
-				selenium.clickAt("_127_allRowIds", RuntimeVariables.replace(""));
+				loadRequiredJavaScriptModules();
+				selenium.clickAt("//input[@name='_127_allRowIds']",
+					RuntimeVariables.replace("All Rows"));
 				selenium.clickAt("//input[@value='Update Associations']",
-					RuntimeVariables.replace(""));
+					RuntimeVariables.replace("Update Associations"));
 				selenium.waitForPageToLoad("30000");
-				selenium.saveScreenShotAndSource();
-				selenium.clickAt("_127_TabsBack", RuntimeVariables.replace(""));
+				loadRequiredJavaScriptModules();
+				assertEquals(RuntimeVariables.replace("\u00ab Back"),
+					selenium.getText("//a[@id='_127_TabsBack']"));
+				selenium.clickAt("//a[@id='_127_TabsBack']",
+					RuntimeVariables.replace("\u00ab Back"));
 				selenium.waitForPageToLoad("30000");
-				selenium.saveScreenShotAndSource();
-				selenium.clickAt("//strong/a", RuntimeVariables.replace(""));
+				loadRequiredJavaScriptModules();
+				assertEquals(RuntimeVariables.replace("Actions"),
+					selenium.getText("//span[@title='Actions']/ul/li/strong/a"));
+				selenium.clickAt("//span[@title='Actions']/ul/li/strong/a",
+					RuntimeVariables.replace("Actions"));
 
 				for (int second = 0;; second++) {
-					if (second >= 60) {
+					if (second >= 90) {
 						fail("timeout");
 					}
 
@@ -325,18 +373,18 @@ public class TearDownUserGroupTest extends BaseTestCase {
 					Thread.sleep(1000);
 				}
 
-				selenium.saveScreenShotAndSource();
+				assertEquals(RuntimeVariables.replace("Delete"),
+					selenium.getText(
+						"//div[@class='lfr-component lfr-menu-list']/ul/li[6]/a"));
 				selenium.click(RuntimeVariables.replace(
 						"//div[@class='lfr-component lfr-menu-list']/ul/li[6]/a"));
 				selenium.waitForPageToLoad("30000");
+				loadRequiredJavaScriptModules();
 				assertTrue(selenium.getConfirmation()
 								   .matches("^Are you sure you want to delete this[\\s\\S]$"));
-				selenium.saveScreenShotAndSource();
-
-			case 5:
 
 				boolean userGroup5Present = selenium.isElementPresent(
-						"//strong/a");
+						"_127_rowIds");
 
 				if (!userGroup5Present) {
 					label = 6;
@@ -344,16 +392,19 @@ public class TearDownUserGroupTest extends BaseTestCase {
 					continue;
 				}
 
-				selenium.clickAt("//strong/a", RuntimeVariables.replace(""));
+				assertEquals(RuntimeVariables.replace("Actions"),
+					selenium.getText("//span[@title='Actions']/ul/li/strong/a"));
+				selenium.clickAt("//span[@title='Actions']/ul/li/strong/a",
+					RuntimeVariables.replace("Actions"));
 
 				for (int second = 0;; second++) {
-					if (second >= 60) {
+					if (second >= 90) {
 						fail("timeout");
 					}
 
 					try {
 						if (selenium.isVisible(
-									"//div[@class='lfr-component lfr-menu-list']/ul/li[4]/a")) {
+									"//div[@class='lfr-component lfr-menu-list']/ul/li[5]/a")) {
 							break;
 						}
 					}
@@ -363,23 +414,32 @@ public class TearDownUserGroupTest extends BaseTestCase {
 					Thread.sleep(1000);
 				}
 
-				selenium.saveScreenShotAndSource();
+				assertEquals(RuntimeVariables.replace("Assign Members"),
+					selenium.getText(
+						"//div[@class='lfr-component lfr-menu-list']/ul/li[5]/a"));
 				selenium.click(RuntimeVariables.replace(
-						"//div[@class='lfr-component lfr-menu-list']/ul/li[4]/a"));
+						"//div[@class='lfr-component lfr-menu-list']/ul/li[5]/a"));
 				selenium.waitForPageToLoad("30000");
-				selenium.saveScreenShotAndSource();
-				selenium.clickAt("_127_allRowIds", RuntimeVariables.replace(""));
+				loadRequiredJavaScriptModules();
+				selenium.clickAt("//input[@name='_127_allRowIds']",
+					RuntimeVariables.replace("All Rows"));
 				selenium.clickAt("//input[@value='Update Associations']",
-					RuntimeVariables.replace(""));
+					RuntimeVariables.replace("Update Associations"));
 				selenium.waitForPageToLoad("30000");
-				selenium.saveScreenShotAndSource();
-				selenium.clickAt("_127_TabsBack", RuntimeVariables.replace(""));
+				loadRequiredJavaScriptModules();
+				assertEquals(RuntimeVariables.replace("\u00ab Back"),
+					selenium.getText("//a[@id='_127_TabsBack']"));
+				selenium.clickAt("//a[@id='_127_TabsBack']",
+					RuntimeVariables.replace("\u00ab Back"));
 				selenium.waitForPageToLoad("30000");
-				selenium.saveScreenShotAndSource();
-				selenium.clickAt("//strong/a", RuntimeVariables.replace(""));
+				loadRequiredJavaScriptModules();
+				assertEquals(RuntimeVariables.replace("Actions"),
+					selenium.getText("//span[@title='Actions']/ul/li/strong/a"));
+				selenium.clickAt("//span[@title='Actions']/ul/li/strong/a",
+					RuntimeVariables.replace("Actions"));
 
 				for (int second = 0;; second++) {
-					if (second >= 60) {
+					if (second >= 90) {
 						fail("timeout");
 					}
 
@@ -395,14 +455,20 @@ public class TearDownUserGroupTest extends BaseTestCase {
 					Thread.sleep(1000);
 				}
 
-				selenium.saveScreenShotAndSource();
+				assertEquals(RuntimeVariables.replace("Delete"),
+					selenium.getText(
+						"//div[@class='lfr-component lfr-menu-list']/ul/li[6]/a"));
 				selenium.click(RuntimeVariables.replace(
 						"//div[@class='lfr-component lfr-menu-list']/ul/li[6]/a"));
 				selenium.waitForPageToLoad("30000");
+				loadRequiredJavaScriptModules();
 				assertTrue(selenium.getConfirmation()
 								   .matches("^Are you sure you want to delete this[\\s\\S]$"));
-				selenium.saveScreenShotAndSource();
 
+			case 2:
+			case 3:
+			case 4:
+			case 5:
 			case 6:
 			case 100:
 				label = -1;

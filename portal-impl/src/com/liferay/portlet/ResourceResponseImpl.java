@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -102,10 +102,6 @@ public class ResourceResponseImpl
 		_response.setCharacterEncoding(charset);
 	}
 
-	public void setLocale(Locale locale) {
-		_response.setLocale(locale);
-	}
-
 	public void setContentLength(int length) {
 		_response.setContentLength(length);
 	}
@@ -130,6 +126,10 @@ public class ResourceResponseImpl
 	@Override
 	public void setIntHeader(String name, int value) {
 		_response.setIntHeader(name, value);
+	}
+
+	public void setLocale(Locale locale) {
+		_response.setLocale(locale);
 	}
 
 	@Override

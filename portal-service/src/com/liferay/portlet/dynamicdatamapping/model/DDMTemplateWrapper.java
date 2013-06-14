@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,6 +14,12 @@
 
 package com.liferay.portlet.dynamicdatamapping.model;
 
+import com.liferay.portal.model.ModelWrapper;
+
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * <p>
  * This class is a wrapper for {@link DDMTemplate}.
@@ -23,7 +29,8 @@ package com.liferay.portlet.dynamicdatamapping.model;
  * @see       DDMTemplate
  * @generated
  */
-public class DDMTemplateWrapper implements DDMTemplate {
+public class DDMTemplateWrapper implements DDMTemplate,
+	ModelWrapper<DDMTemplate> {
 	public DDMTemplateWrapper(DDMTemplate ddmTemplate) {
 		_ddmTemplate = ddmTemplate;
 	}
@@ -34,6 +41,134 @@ public class DDMTemplateWrapper implements DDMTemplate {
 
 	public String getModelClassName() {
 		return DDMTemplate.class.getName();
+	}
+
+	public Map<String, Object> getModelAttributes() {
+		Map<String, Object> attributes = new HashMap<String, Object>();
+
+		attributes.put("uuid", getUuid());
+		attributes.put("templateId", getTemplateId());
+		attributes.put("groupId", getGroupId());
+		attributes.put("companyId", getCompanyId());
+		attributes.put("userId", getUserId());
+		attributes.put("userName", getUserName());
+		attributes.put("createDate", getCreateDate());
+		attributes.put("modifiedDate", getModifiedDate());
+		attributes.put("classNameId", getClassNameId());
+		attributes.put("classPK", getClassPK());
+		attributes.put("templateKey", getTemplateKey());
+		attributes.put("name", getName());
+		attributes.put("description", getDescription());
+		attributes.put("type", getType());
+		attributes.put("mode", getMode());
+		attributes.put("language", getLanguage());
+		attributes.put("script", getScript());
+
+		return attributes;
+	}
+
+	public void setModelAttributes(Map<String, Object> attributes) {
+		String uuid = (String)attributes.get("uuid");
+
+		if (uuid != null) {
+			setUuid(uuid);
+		}
+
+		Long templateId = (Long)attributes.get("templateId");
+
+		if (templateId != null) {
+			setTemplateId(templateId);
+		}
+
+		Long groupId = (Long)attributes.get("groupId");
+
+		if (groupId != null) {
+			setGroupId(groupId);
+		}
+
+		Long companyId = (Long)attributes.get("companyId");
+
+		if (companyId != null) {
+			setCompanyId(companyId);
+		}
+
+		Long userId = (Long)attributes.get("userId");
+
+		if (userId != null) {
+			setUserId(userId);
+		}
+
+		String userName = (String)attributes.get("userName");
+
+		if (userName != null) {
+			setUserName(userName);
+		}
+
+		Date createDate = (Date)attributes.get("createDate");
+
+		if (createDate != null) {
+			setCreateDate(createDate);
+		}
+
+		Date modifiedDate = (Date)attributes.get("modifiedDate");
+
+		if (modifiedDate != null) {
+			setModifiedDate(modifiedDate);
+		}
+
+		Long classNameId = (Long)attributes.get("classNameId");
+
+		if (classNameId != null) {
+			setClassNameId(classNameId);
+		}
+
+		Long classPK = (Long)attributes.get("classPK");
+
+		if (classPK != null) {
+			setClassPK(classPK);
+		}
+
+		String templateKey = (String)attributes.get("templateKey");
+
+		if (templateKey != null) {
+			setTemplateKey(templateKey);
+		}
+
+		String name = (String)attributes.get("name");
+
+		if (name != null) {
+			setName(name);
+		}
+
+		String description = (String)attributes.get("description");
+
+		if (description != null) {
+			setDescription(description);
+		}
+
+		String type = (String)attributes.get("type");
+
+		if (type != null) {
+			setType(type);
+		}
+
+		String mode = (String)attributes.get("mode");
+
+		if (mode != null) {
+			setMode(mode);
+		}
+
+		String language = (String)attributes.get("language");
+
+		if (language != null) {
+			setLanguage(language);
+		}
+
+		String script = (String)attributes.get("script");
+
+		if (script != null) {
+			setScript(script);
+		}
 	}
 
 	/**
@@ -219,21 +354,70 @@ public class DDMTemplateWrapper implements DDMTemplate {
 	}
 
 	/**
-	* Returns the structure ID of this d d m template.
+	* Returns the fully qualified class name of this d d m template.
 	*
-	* @return the structure ID of this d d m template
+	* @return the fully qualified class name of this d d m template
 	*/
-	public long getStructureId() {
-		return _ddmTemplate.getStructureId();
+	public java.lang.String getClassName() {
+		return _ddmTemplate.getClassName();
+	}
+
+	public void setClassName(java.lang.String className) {
+		_ddmTemplate.setClassName(className);
 	}
 
 	/**
-	* Sets the structure ID of this d d m template.
+	* Returns the class name ID of this d d m template.
 	*
-	* @param structureId the structure ID of this d d m template
+	* @return the class name ID of this d d m template
 	*/
-	public void setStructureId(long structureId) {
-		_ddmTemplate.setStructureId(structureId);
+	public long getClassNameId() {
+		return _ddmTemplate.getClassNameId();
+	}
+
+	/**
+	* Sets the class name ID of this d d m template.
+	*
+	* @param classNameId the class name ID of this d d m template
+	*/
+	public void setClassNameId(long classNameId) {
+		_ddmTemplate.setClassNameId(classNameId);
+	}
+
+	/**
+	* Returns the class p k of this d d m template.
+	*
+	* @return the class p k of this d d m template
+	*/
+	public long getClassPK() {
+		return _ddmTemplate.getClassPK();
+	}
+
+	/**
+	* Sets the class p k of this d d m template.
+	*
+	* @param classPK the class p k of this d d m template
+	*/
+	public void setClassPK(long classPK) {
+		_ddmTemplate.setClassPK(classPK);
+	}
+
+	/**
+	* Returns the template key of this d d m template.
+	*
+	* @return the template key of this d d m template
+	*/
+	public java.lang.String getTemplateKey() {
+		return _ddmTemplate.getTemplateKey();
+	}
+
+	/**
+	* Sets the template key of this d d m template.
+	*
+	* @param templateKey the template key of this d d m template
+	*/
+	public void setTemplateKey(java.lang.String templateKey) {
+		_ddmTemplate.setTemplateKey(templateKey);
 	}
 
 	/**
@@ -288,6 +472,14 @@ public class DDMTemplateWrapper implements DDMTemplate {
 		return _ddmTemplate.getName(languageId, useDefault);
 	}
 
+	public java.lang.String getNameCurrentLanguageId() {
+		return _ddmTemplate.getNameCurrentLanguageId();
+	}
+
+	public java.lang.String getNameCurrentValue() {
+		return _ddmTemplate.getNameCurrentValue();
+	}
+
 	/**
 	* Returns a map of the locales and localized names of this d d m template.
 	*
@@ -326,6 +518,10 @@ public class DDMTemplateWrapper implements DDMTemplate {
 	public void setName(java.lang.String name, java.util.Locale locale,
 		java.util.Locale defaultLocale) {
 		_ddmTemplate.setName(name, locale, defaultLocale);
+	}
+
+	public void setNameCurrentLanguageId(java.lang.String languageId) {
+		_ddmTemplate.setNameCurrentLanguageId(languageId);
 	}
 
 	/**
@@ -403,6 +599,14 @@ public class DDMTemplateWrapper implements DDMTemplate {
 		return _ddmTemplate.getDescription(languageId, useDefault);
 	}
 
+	public java.lang.String getDescriptionCurrentLanguageId() {
+		return _ddmTemplate.getDescriptionCurrentLanguageId();
+	}
+
+	public java.lang.String getDescriptionCurrentValue() {
+		return _ddmTemplate.getDescriptionCurrentValue();
+	}
+
 	/**
 	* Returns a map of the locales and localized descriptions of this d d m template.
 	*
@@ -444,6 +648,10 @@ public class DDMTemplateWrapper implements DDMTemplate {
 		_ddmTemplate.setDescription(description, locale, defaultLocale);
 	}
 
+	public void setDescriptionCurrentLanguageId(java.lang.String languageId) {
+		_ddmTemplate.setDescriptionCurrentLanguageId(languageId);
+	}
+
 	/**
 	* Sets the localized descriptions of this d d m template from the map of locales and localized descriptions.
 	*
@@ -482,6 +690,24 @@ public class DDMTemplateWrapper implements DDMTemplate {
 	*/
 	public void setType(java.lang.String type) {
 		_ddmTemplate.setType(type);
+	}
+
+	/**
+	* Returns the mode of this d d m template.
+	*
+	* @return the mode of this d d m template
+	*/
+	public java.lang.String getMode() {
+		return _ddmTemplate.getMode();
+	}
+
+	/**
+	* Sets the mode of this d d m template.
+	*
+	* @param mode the mode of this d d m template
+	*/
+	public void setMode(java.lang.String mode) {
+		_ddmTemplate.setMode(mode);
 	}
 
 	/**
@@ -540,10 +766,6 @@ public class DDMTemplateWrapper implements DDMTemplate {
 		return _ddmTemplate.isEscapedModel();
 	}
 
-	public void setEscapedModel(boolean escapedModel) {
-		_ddmTemplate.setEscapedModel(escapedModel);
-	}
-
 	public java.io.Serializable getPrimaryKeyObj() {
 		return _ddmTemplate.getPrimaryKeyObj();
 	}
@@ -598,13 +820,14 @@ public class DDMTemplateWrapper implements DDMTemplate {
 		_ddmTemplate.persist();
 	}
 
-	public com.liferay.portlet.dynamicdatamapping.model.DDMStructure getStructure()
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
-		return _ddmTemplate.getStructure();
+	/**
+	 * @deprecated Renamed to {@link #getWrappedModel}
+	 */
+	public DDMTemplate getWrappedDDMTemplate() {
+		return _ddmTemplate;
 	}
 
-	public DDMTemplate getWrappedDDMTemplate() {
+	public DDMTemplate getWrappedModel() {
 		return _ddmTemplate;
 	}
 

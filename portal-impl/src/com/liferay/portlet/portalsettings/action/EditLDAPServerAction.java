@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -69,7 +69,7 @@ public class EditLDAPServerAction extends PortletAction {
 		}
 		catch (Exception e) {
 			if (e instanceof PrincipalException) {
-				SessionErrors.add(actionRequest, e.getClass().getName());
+				SessionErrors.add(actionRequest, e.getClass());
 
 				setForward(actionRequest, "portlet.portal_settings.error");
 			}
@@ -156,8 +156,7 @@ public class EditLDAPServerAction extends PortletAction {
 			keys[i] = _KEYS[i] + postfix;
 		}
 
-		CompanyServiceUtil.removePreferences(
-			themeDisplay.getCompanyId(), keys);
+		CompanyServiceUtil.removePreferences(themeDisplay.getCompanyId(), keys);
 
 		// Update preferences
 
@@ -190,32 +189,25 @@ public class EditLDAPServerAction extends PortletAction {
 			actionRequest, "settings--");
 
 		if (ldapServerId <= 0) {
-			properties = addLDAPServer(
-				themeDisplay.getCompanyId(), properties);
+			properties = addLDAPServer(themeDisplay.getCompanyId(), properties);
 		}
 
 		CompanyServiceUtil.updatePreferences(
 			themeDisplay.getCompanyId(), properties);
 	}
 
-	private final String[] _KEYS = {
-		PropsKeys.LDAP_AUTH_SEARCH_FILTER,
-		PropsKeys.LDAP_BASE_DN,
+	private static final String[] _KEYS = {
+		PropsKeys.LDAP_AUTH_SEARCH_FILTER, PropsKeys.LDAP_BASE_DN,
 		PropsKeys.LDAP_BASE_PROVIDER_URL,
-		PropsKeys.LDAP_CONTACT_CUSTOM_MAPPINGS,
-		PropsKeys.LDAP_CONTACT_MAPPINGS,
+		PropsKeys.LDAP_CONTACT_CUSTOM_MAPPINGS, PropsKeys.LDAP_CONTACT_MAPPINGS,
 		PropsKeys.LDAP_GROUP_DEFAULT_OBJECT_CLASSES,
-		PropsKeys.LDAP_GROUP_MAPPINGS,
-		PropsKeys.LDAP_GROUPS_DN,
+		PropsKeys.LDAP_GROUP_MAPPINGS, PropsKeys.LDAP_GROUPS_DN,
 		PropsKeys.LDAP_IMPORT_GROUP_SEARCH_FILTER,
 		PropsKeys.LDAP_IMPORT_USER_SEARCH_FILTER,
-		PropsKeys.LDAP_SECURITY_CREDENTIALS,
-		PropsKeys.LDAP_SECURITY_PRINCIPAL,
-		PropsKeys.LDAP_SERVER_NAME,
-		PropsKeys.LDAP_USER_CUSTOM_MAPPINGS,
+		PropsKeys.LDAP_SECURITY_CREDENTIALS, PropsKeys.LDAP_SECURITY_PRINCIPAL,
+		PropsKeys.LDAP_SERVER_NAME, PropsKeys.LDAP_USER_CUSTOM_MAPPINGS,
 		PropsKeys.LDAP_USER_DEFAULT_OBJECT_CLASSES,
-		PropsKeys.LDAP_USER_MAPPINGS,
-		PropsKeys.LDAP_USERS_DN
+		PropsKeys.LDAP_USER_MAPPINGS, PropsKeys.LDAP_USERS_DN
 	};
 
 }

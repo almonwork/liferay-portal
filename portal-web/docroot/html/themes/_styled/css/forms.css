@@ -88,6 +88,10 @@ fieldset {
 	overflow: hidden;
 }
 
+.aui-text-placeholder {
+	color: #777;
+}
+
 legend {
 	font-weight: bold;
 	padding: 0 6px;
@@ -111,7 +115,7 @@ input {
 	background: #FFF;
 }
 
-input[type="text"], input[type="password"], input[type="file"], input[type="submit"], input[type="button"], input[type="reset"], select, textarea, .textarea, button {
+input[type="text"], input[type="password"], input[type="file"], input[type="submit"], input[type="button"], input[type="reset"], select, textarea, .textarea, button, .aui-field-input-text {
 	@include input-field-default;
 }
 
@@ -155,7 +159,7 @@ input, textarea {
 		}
 	}
 
-	&:disabled {
+	&.disabled, &.disabled:hover {
 		&, ul {
 			@include button-disabled;
 		}
@@ -169,12 +173,12 @@ input, textarea {
 }
 
 .lfr-actions.disabled .taglib-text {
-	color: #555;
+	color: #A9A9A9;
 }
 
 .aui-button-disabled {
 	input[type], button {
-		&:hover, &:focus {
+		&, &:hover, &:focus {
 			@include button-disabled;
 		}
 	}

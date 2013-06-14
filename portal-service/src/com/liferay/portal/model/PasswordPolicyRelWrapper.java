@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,6 +14,9 @@
 
 package com.liferay.portal.model;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * <p>
  * This class is a wrapper for {@link PasswordPolicyRel}.
@@ -23,7 +26,8 @@ package com.liferay.portal.model;
  * @see       PasswordPolicyRel
  * @generated
  */
-public class PasswordPolicyRelWrapper implements PasswordPolicyRel {
+public class PasswordPolicyRelWrapper implements PasswordPolicyRel,
+	ModelWrapper<PasswordPolicyRel> {
 	public PasswordPolicyRelWrapper(PasswordPolicyRel passwordPolicyRel) {
 		_passwordPolicyRel = passwordPolicyRel;
 	}
@@ -34,6 +38,43 @@ public class PasswordPolicyRelWrapper implements PasswordPolicyRel {
 
 	public String getModelClassName() {
 		return PasswordPolicyRel.class.getName();
+	}
+
+	public Map<String, Object> getModelAttributes() {
+		Map<String, Object> attributes = new HashMap<String, Object>();
+
+		attributes.put("passwordPolicyRelId", getPasswordPolicyRelId());
+		attributes.put("passwordPolicyId", getPasswordPolicyId());
+		attributes.put("classNameId", getClassNameId());
+		attributes.put("classPK", getClassPK());
+
+		return attributes;
+	}
+
+	public void setModelAttributes(Map<String, Object> attributes) {
+		Long passwordPolicyRelId = (Long)attributes.get("passwordPolicyRelId");
+
+		if (passwordPolicyRelId != null) {
+			setPasswordPolicyRelId(passwordPolicyRelId);
+		}
+
+		Long passwordPolicyId = (Long)attributes.get("passwordPolicyId");
+
+		if (passwordPolicyId != null) {
+			setPasswordPolicyId(passwordPolicyId);
+		}
+
+		Long classNameId = (Long)attributes.get("classNameId");
+
+		if (classNameId != null) {
+			setClassNameId(classNameId);
+		}
+
+		Long classPK = (Long)attributes.get("classPK");
+
+		if (classPK != null) {
+			setClassPK(classPK);
+		}
 	}
 
 	/**
@@ -99,6 +140,10 @@ public class PasswordPolicyRelWrapper implements PasswordPolicyRel {
 		return _passwordPolicyRel.getClassName();
 	}
 
+	public void setClassName(java.lang.String className) {
+		_passwordPolicyRel.setClassName(className);
+	}
+
 	/**
 	* Returns the class name ID of this password policy rel.
 	*
@@ -155,10 +200,6 @@ public class PasswordPolicyRelWrapper implements PasswordPolicyRel {
 		return _passwordPolicyRel.isEscapedModel();
 	}
 
-	public void setEscapedModel(boolean escapedModel) {
-		_passwordPolicyRel.setEscapedModel(escapedModel);
-	}
-
 	public java.io.Serializable getPrimaryKeyObj() {
 		return _passwordPolicyRel.getPrimaryKeyObj();
 	}
@@ -213,7 +254,14 @@ public class PasswordPolicyRelWrapper implements PasswordPolicyRel {
 		_passwordPolicyRel.persist();
 	}
 
+	/**
+	 * @deprecated Renamed to {@link #getWrappedModel}
+	 */
 	public PasswordPolicyRel getWrappedPasswordPolicyRel() {
+		return _passwordPolicyRel;
+	}
+
+	public PasswordPolicyRel getWrappedModel() {
 		return _passwordPolicyRel;
 	}
 

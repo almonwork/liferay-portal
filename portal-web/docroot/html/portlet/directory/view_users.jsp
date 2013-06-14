@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -33,7 +33,7 @@ if (Validator.isNotNull(viewUsersRedirect)) {
 <liferay-ui:search-container
 	searchContainer="<%= new UserSearch(renderRequest, portletURL) %>"
 >
-	<aui:input name="usersRedirect" type="hidden" value="<%= portletURL.toString() %>" />
+	<aui:input disabled="<%= true %>" name="usersRedirect" type="hidden" value="<%= portletURL.toString() %>" />
 
 	<%
 	UserSearchTerms searchTerms = (UserSearchTerms)searchContainer.getSearchTerms();
@@ -43,7 +43,7 @@ if (Validator.isNotNull(viewUsersRedirect)) {
 
 	Organization organization = null;
 
-	if ((organizationId > 0)) {
+	if (organizationId > 0) {
 		try {
 			organization = OrganizationLocalServiceUtil.getOrganization(organizationId);
 		}
@@ -92,7 +92,7 @@ if (Validator.isNotNull(viewUsersRedirect)) {
 
 	<liferay-ui:search-container-results>
 		<c:choose>
-			<c:when test="<%= PropsValues.USERS_SEARCH_WITH_INDEX %>">
+			<c:when test="<%= PropsValues.USERS_INDEXER_ENABLED && PropsValues.USERS_SEARCH_WITH_INDEX %>">
 				<%@ include file="/html/portlet/users_admin/user_search_results_index.jspf" %>
 			</c:when>
 			<c:otherwise>
@@ -106,6 +106,7 @@ if (Validator.isNotNull(viewUsersRedirect)) {
 		escapedModel="<%= true %>"
 		keyProperty="userId"
 		modelVar="user2"
+		rowIdProperty="screenName"
 	>
 		<liferay-portlet:renderURL varImpl="rowURL">
 			<portlet:param name="struts_action" value="/directory/view_user" />

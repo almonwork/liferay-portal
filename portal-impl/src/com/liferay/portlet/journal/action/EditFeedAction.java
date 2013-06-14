@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -59,6 +59,10 @@ public class EditFeedAction extends PortletAction {
 
 		String cmd = ParamUtil.getString(actionRequest, Constants.CMD);
 
+		if (Validator.isNull(cmd)) {
+			return;
+		}
+
 		try {
 			if (cmd.equals(Constants.ADD) || cmd.equals(Constants.UPDATE)) {
 				updateFeed(actionRequest);
@@ -73,7 +77,7 @@ public class EditFeedAction extends PortletAction {
 			if (e instanceof NoSuchFeedException ||
 				e instanceof PrincipalException) {
 
-				SessionErrors.add(actionRequest, e.getClass().getName());
+				SessionErrors.add(actionRequest, e.getClass());
 
 				setForward(actionRequest, "portlet.journal.error");
 			}
@@ -84,7 +88,7 @@ public class EditFeedAction extends PortletAction {
 					 e instanceof FeedTargetLayoutFriendlyUrlException ||
 					 e instanceof FeedTargetPortletIdException) {
 
-				SessionErrors.add(actionRequest, e.getClass().getName());
+				SessionErrors.add(actionRequest, e.getClass());
 			}
 			else {
 				throw e;
@@ -105,7 +109,7 @@ public class EditFeedAction extends PortletAction {
 				ActionUtil.getFeed(renderRequest);
 			}
 		}
-		catch (NoSuchFeedException nssfe) {
+		catch (NoSuchFeedException nsfe) {
 
 			// Let this slide because the user can manually input a feed id for
 			// a new syndicated feed that does not yet exist.
@@ -113,7 +117,7 @@ public class EditFeedAction extends PortletAction {
 		}
 		catch (Exception e) {
 			if (e instanceof PrincipalException) {
-				SessionErrors.add(renderRequest, e.getClass().getName());
+				SessionErrors.add(renderRequest, e.getClass());
 
 				return mapping.findForward("portlet.journal.error");
 			}
@@ -162,8 +166,8 @@ public class EditFeedAction extends PortletAction {
 		String contentField = ParamUtil.getString(
 			actionRequest, "contentField");
 
-		String feedType = RSSUtil.DEFAULT_TYPE;
-		double feedVersion = RSSUtil.DEFAULT_VERSION;
+		String feedType = RSSUtil.TYPE_DEFAULT;
+		double feedVersion = RSSUtil.VERSION_DEFAULT;
 
 		String feedTypeAndVersion = ParamUtil.getString(
 			actionRequest, "feedTypeAndVersion");

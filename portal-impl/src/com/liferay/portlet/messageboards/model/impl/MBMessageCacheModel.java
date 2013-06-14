@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -20,6 +20,8 @@ import com.liferay.portal.model.CacheModel;
 
 import com.liferay.portlet.messageboards.model.MBMessage;
 
+import java.io.Serializable;
+
 import java.util.Date;
 
 /**
@@ -29,10 +31,10 @@ import java.util.Date;
  * @see MBMessage
  * @generated
  */
-public class MBMessageCacheModel implements CacheModel<MBMessage> {
+public class MBMessageCacheModel implements CacheModel<MBMessage>, Serializable {
 	@Override
 	public String toString() {
-		StringBundler sb = new StringBundler(51);
+		StringBundler sb = new StringBundler(53);
 
 		sb.append("{uuid=");
 		sb.append(uuid);
@@ -76,6 +78,8 @@ public class MBMessageCacheModel implements CacheModel<MBMessage> {
 		sb.append(priority);
 		sb.append(", allowPingbacks=");
 		sb.append(allowPingbacks);
+		sb.append(", answer=");
+		sb.append(answer);
 		sb.append(", status=");
 		sb.append(status);
 		sb.append(", statusByUserId=");
@@ -157,6 +161,7 @@ public class MBMessageCacheModel implements CacheModel<MBMessage> {
 		mbMessageImpl.setAnonymous(anonymous);
 		mbMessageImpl.setPriority(priority);
 		mbMessageImpl.setAllowPingbacks(allowPingbacks);
+		mbMessageImpl.setAnswer(answer);
 		mbMessageImpl.setStatus(status);
 		mbMessageImpl.setStatusByUserId(statusByUserId);
 
@@ -200,6 +205,7 @@ public class MBMessageCacheModel implements CacheModel<MBMessage> {
 	public boolean anonymous;
 	public double priority;
 	public boolean allowPingbacks;
+	public boolean answer;
 	public int status;
 	public long statusByUserId;
 	public String statusByUserName;

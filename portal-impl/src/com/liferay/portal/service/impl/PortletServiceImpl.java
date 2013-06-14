@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -19,6 +19,8 @@ import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.json.JSONArray;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
+import com.liferay.portal.kernel.jsonwebservice.JSONWebService;
+import com.liferay.portal.kernel.jsonwebservice.JSONWebServiceMode;
 import com.liferay.portal.model.Portlet;
 import com.liferay.portal.model.PortletApp;
 import com.liferay.portal.model.RoleConstants;
@@ -30,6 +32,7 @@ import java.util.List;
 /**
  * @author Brian Wing Shun Chan
  */
+@JSONWebService(mode = JSONWebServiceMode.MANUAL)
 public class PortletServiceImpl extends PortletServiceBaseImpl {
 
 	public JSONArray getWARPortlets() {
@@ -45,8 +48,7 @@ public class PortletServiceImpl extends PortletServiceBaseImpl {
 
 				jsonObject.put("portlet_name", portlet.getPortletName());
 				jsonObject.put(
-					"servlet_context_name",
-					portletApp.getServletContextName());
+					"servlet_context_name", portletApp.getServletContextName());
 
 				jsonArray.put(jsonObject);
 			}

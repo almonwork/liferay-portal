@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -124,16 +124,13 @@ public class OracleDB extends BaseDB {
 	}
 
 	@Override
-	public List<Index> getIndexes() throws SQLException {
+	public List<Index> getIndexes(Connection con) throws SQLException {
 		List<Index> indexes = new ArrayList<Index>();
 
-		Connection con = null;
 		PreparedStatement ps = null;
 		ResultSet rs = null;
 
 		try {
-			con = DataAccess.getConnection();
-
 			StringBundler sb = new StringBundler(3);
 
 			sb.append("select index_name, table_name, uniqueness from ");
@@ -161,7 +158,7 @@ public class OracleDB extends BaseDB {
 			}
 		}
 		finally {
-			DataAccess.cleanUp(con, ps, rs);
+			DataAccess.cleanUp(null, ps, rs);
 		}
 
 		return indexes;
@@ -225,13 +222,13 @@ public class OracleDB extends BaseDB {
 		StringBuffer sb = new StringBuffer();
 
 		while (matcher.find()) {
-			int size = GetterUtil.getInteger(matcher.group()) * 4;
+			int size = GetterUtil.getInteger(matcher.group());
 
 			if (size > 4000) {
 				size = 4000;
 			}
 
-			matcher.appendReplacement(sb, "VARCHAR(" + size + ")");
+			matcher.appendReplacement(sb, "VARCHAR2(" + size + " CHAR)");
 		}
 
 		matcher.appendTail(sb);
@@ -294,6 +291,13 @@ public class OracleDB extends BaseDB {
 		sb.append("\n");
 	}
 
+	private String _postBuildSQL(String template) throws IOException {
+		template = removeLongInserts(template);
+		template = StringUtil.replace(template, "\\n", "'||CHR(10)||'");
+
+		return template;
+	}
+
 	private String _preBuildSQL(String template) throws IOException {
 		template = convertTimestamp(template);
 		template = replaceTemplate(template, getTemplate());
@@ -307,20 +311,12 @@ public class OracleDB extends BaseDB {
 		return template;
 	}
 
-	private String _postBuildSQL(String template) throws IOException {
-		template = removeLongInserts(template);
-		template = StringUtil.replace(template, "\\n", "'||CHR(10)||'");
-
-		return template;
-	}
-
-	private static String[] _ORACLE = {
+	private static final String[] _ORACLE = {
 		"--", "1", "0",
 		"to_date('1970-01-01 00:00:00','YYYY-MM-DD HH24:MI:SS')", "sysdate",
-		" blob", " number(1, 0)", " timestamp",
-		" number(30,20)", " number(30,0)", " number(30,0)",
-		" varchar2(4000)", " clob", " varchar2",
-		"", "commit"
+		" blob", " blob", " number(1, 0)", " timestamp", " number(30,20)",
+		" number(30,0)", " number(30,0)", " varchar2(4000)", " clob",
+		" varchar2", "", "commit"
 	};
 
 	private static final boolean _SUPPORTS_INLINE_DISTINCT = false;

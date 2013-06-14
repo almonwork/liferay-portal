@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -18,11 +18,11 @@ import com.liferay.portal.NoSuchOrganizationException;
 import com.liferay.portal.NoSuchUserException;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.search.Document;
 import com.liferay.portal.kernel.search.Field;
 import com.liferay.portal.kernel.search.Hits;
+import com.liferay.portal.kernel.search.Indexer;
+import com.liferay.portal.kernel.search.IndexerRegistryUtil;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.ListUtil;
@@ -30,6 +30,7 @@ import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Tuple;
+import com.liferay.portal.kernel.util.UniqueList;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.model.Address;
 import com.liferay.portal.model.EmailAddress;
@@ -49,6 +50,7 @@ import com.liferay.portal.service.AddressLocalServiceUtil;
 import com.liferay.portal.service.AddressServiceUtil;
 import com.liferay.portal.service.EmailAddressLocalServiceUtil;
 import com.liferay.portal.service.EmailAddressServiceUtil;
+import com.liferay.portal.service.GroupLocalServiceUtil;
 import com.liferay.portal.service.OrgLaborLocalServiceUtil;
 import com.liferay.portal.service.OrgLaborServiceUtil;
 import com.liferay.portal.service.OrganizationLocalServiceUtil;
@@ -81,7 +83,6 @@ import com.liferay.portal.util.comparator.UserGroupNameComparator;
 import com.liferay.portal.util.comparator.UserJobTitleComparator;
 import com.liferay.portal.util.comparator.UserLastNameComparator;
 import com.liferay.portal.util.comparator.UserScreenNameComparator;
-import com.liferay.util.UniqueList;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -195,9 +196,31 @@ public class UsersAdminImpl implements UsersAdmin {
 					RoleConstants.ORGANIZATION_ADMINISTRATOR) ||
 				groupRoleName.equals(RoleConstants.ORGANIZATION_OWNER) ||
 				groupRoleName.equals(RoleConstants.SITE_ADMINISTRATOR) ||
-				groupRoleName.equals(RoleConstants.SITE_OWNER) ||
-				!GroupPermissionUtil.contains(
-					permissionChecker, groupId, ActionKeys.ASSIGN_USER_ROLES)) {
+				groupRoleName.equals(RoleConstants.SITE_OWNER)) {
+
+				itr.remove();
+			}
+		}
+
+		Group group = GroupLocalServiceUtil.getGroup(groupId);
+
+		if (GroupPermissionUtil.contains(
+				permissionChecker, groupId, ActionKeys.ASSIGN_USER_ROLES) ||
+			OrganizationPermissionUtil.contains(
+				permissionChecker, group.getOrganizationId(),
+				ActionKeys.ASSIGN_USER_ROLES)) {
+
+			return filteredGroupRoles;
+		}
+
+		itr = filteredGroupRoles.iterator();
+
+		while (itr.hasNext()) {
+			Role role = itr.next();
+
+			if (!RolePermissionUtil.contains(
+					permissionChecker, groupId, role.getRoleId(),
+					ActionKeys.ASSIGN_MEMBERS)) {
 
 				itr.remove();
 			}
@@ -306,8 +329,8 @@ public class UsersAdminImpl implements UsersAdmin {
 			List<UserGroupRole> userGroupRoles)
 		throws PortalException, SystemException {
 
-		List<UserGroupRole> filteredUserGroupRoles =
-			ListUtil.copy(userGroupRoles);
+		List<UserGroupRole> filteredUserGroupRoles = ListUtil.copy(
+			userGroupRoles);
 
 		Iterator<UserGroupRole> itr = filteredUserGroupRoles.iterator();
 
@@ -371,10 +394,22 @@ public class UsersAdminImpl implements UsersAdmin {
 	}
 
 	public List<Address> getAddresses(ActionRequest actionRequest) {
+		return getAddresses(actionRequest, Collections.<Address>emptyList());
+	}
+
+	public List<Address> getAddresses(
+		ActionRequest actionRequest, List<Address> defaultAddresses) {
+
+		String addressesIndexesString = actionRequest.getParameter(
+			"addressesIndexes");
+
+		if (addressesIndexesString == null) {
+			return defaultAddresses;
+		}
+
 		List<Address> addresses = new ArrayList<Address>();
 
-		int[] addressesIndexes = StringUtil.split(
-			ParamUtil.getString(actionRequest, "addressesIndexes"), 0);
+		int[] addressesIndexes = StringUtil.split(addressesIndexesString, 0);
 
 		int addressPrimary = ParamUtil.getInteger(
 			actionRequest, "addressPrimary");
@@ -436,10 +471,24 @@ public class UsersAdminImpl implements UsersAdmin {
 	}
 
 	public List<EmailAddress> getEmailAddresses(ActionRequest actionRequest) {
+		return getEmailAddresses(
+			actionRequest, Collections.<EmailAddress>emptyList());
+	}
+
+	public List<EmailAddress> getEmailAddresses(
+		ActionRequest actionRequest, List<EmailAddress> defaultEmailAddresses) {
+
+		String emailAddressesIndexesString = actionRequest.getParameter(
+			"emailAddressesIndexes");
+
+		if (emailAddressesIndexesString == null) {
+			return defaultEmailAddresses;
+		}
+
 		List<EmailAddress> emailAddresses = new ArrayList<EmailAddress>();
 
 		int[] emailAddressesIndexes = StringUtil.split(
-			ParamUtil.getString(actionRequest, "emailAddressesIndexes"), 0);
+			emailAddressesIndexesString, 0);
 
 		int emailAddressPrimary = ParamUtil.getInteger(
 			actionRequest, "emailAddressPrimary");
@@ -499,42 +548,6 @@ public class UsersAdminImpl implements UsersAdmin {
 		}
 
 		return orderByComparator;
-	}
-
-	public Long[][] getLeftAndRightOrganizationIds(long organizationId)
-		throws PortalException, SystemException {
-
-		Organization organization =
-			OrganizationLocalServiceUtil.getOrganization(organizationId);
-
-		return getLeftAndRightOrganizationIds(organization);
-	}
-
-	public Long[][] getLeftAndRightOrganizationIds(Organization organization) {
-		return new Long[][] {
-			new Long[] {
-				organization.getLeftOrganizationId(),
-				organization.getRightOrganizationId()
-			}
-		};
-	}
-
-	public Long[][] getLeftAndRightOrganizationIds(
-		List<Organization> organizations) {
-
-		Long[][] leftAndRightOrganizationIds = new Long[organizations.size()][];
-
-		for (int i = 0; i < organizations.size(); i++) {
-			Organization organization = organizations.get(i);
-
-			leftAndRightOrganizationIds[i] =
-				new Long[] {
-					organization.getLeftOrganizationId(),
-					organization.getRightOrganizationId()
-				};
-		}
-
-		return leftAndRightOrganizationIds;
 	}
 
 	public Long[] getOrganizationIds(List<Organization> organizations) {
@@ -599,9 +612,13 @@ public class UsersAdminImpl implements UsersAdmin {
 			catch (NoSuchOrganizationException nsoe) {
 				corruptIndex = true;
 
-				_log.error(
-					"Organization " + organizationId + " does not exist in " +
-						"the search index");
+				Indexer indexer = IndexerRegistryUtil.getIndexer(
+					Organization.class);
+
+				long companyId = GetterUtil.getLong(
+					document.get(Field.COMPANY_ID));
+
+				indexer.delete(companyId, document.getUID());
 			}
 		}
 
@@ -680,10 +697,22 @@ public class UsersAdminImpl implements UsersAdmin {
 	}
 
 	public List<Phone> getPhones(ActionRequest actionRequest) {
+		return getPhones(actionRequest, Collections.<Phone>emptyList());
+	}
+
+	public List<Phone> getPhones(
+		ActionRequest actionRequest, List<Phone> defaultPhones) {
+
+		String phonesIndexesString = actionRequest.getParameter(
+			"phonesIndexes");
+
+		if (phonesIndexesString == null) {
+			return defaultPhones;
+		}
+
 		List<Phone> phones = new ArrayList<Phone>();
 
-		int[] phonesIndexes = StringUtil.split(
-			ParamUtil.getString(actionRequest, "phonesIndexes"), 0);
+		int[] phonesIndexes = StringUtil.split(phonesIndexesString, 0);
 
 		int phonePrimary = ParamUtil.getInteger(actionRequest, "phonePrimary");
 
@@ -796,9 +825,7 @@ public class UsersAdminImpl implements UsersAdmin {
 		}
 
 		for (int i = 0; i < groupRolesGroupIds.length; i++) {
-			if ((groupRolesGroupIds[i] == 0) ||
-				(groupRolesRoleIds[i] == 0)) {
-
+			if ((groupRolesGroupIds[i] == 0) || (groupRolesRoleIds[i] == 0)) {
 				continue;
 			}
 
@@ -865,8 +892,12 @@ public class UsersAdminImpl implements UsersAdmin {
 			catch (NoSuchUserException nsue) {
 				corruptIndex = true;
 
-				_log.error(
-					"User " + userId + " does not exist in the search index");
+				Indexer indexer = IndexerRegistryUtil.getIndexer(User.class);
+
+				long companyId = GetterUtil.getLong(
+					document.get(Field.COMPANY_ID));
+
+				indexer.delete(companyId, document.getUID());
 			}
 		}
 
@@ -874,10 +905,22 @@ public class UsersAdminImpl implements UsersAdmin {
 	}
 
 	public List<Website> getWebsites(ActionRequest actionRequest) {
+		return getWebsites(actionRequest, Collections.<Website>emptyList());
+	}
+
+	public List<Website> getWebsites(
+		ActionRequest actionRequest, List<Website> defaultWebsites) {
+
+		String websitesIndexesString = actionRequest.getParameter(
+			"websitesIndexes");
+
+		if (websitesIndexesString == null) {
+			return defaultWebsites;
+		}
+
 		List<Website> websites = new ArrayList<Website>();
 
-		int[] websitesIndexes = StringUtil.split(
-			ParamUtil.getString(actionRequest, "websitesIndexes"), 0);
+		int[] websitesIndexes = StringUtil.split(websitesIndexesString, 0);
 
 		int websitePrimary = ParamUtil.getInteger(
 			actionRequest, "websitePrimary");
@@ -1202,7 +1245,5 @@ public class UsersAdminImpl implements UsersAdmin {
 			}
 		}
 	}
-
-	private static Log _log = LogFactoryUtil.getLog(UsersAdminImpl.class);
 
 }

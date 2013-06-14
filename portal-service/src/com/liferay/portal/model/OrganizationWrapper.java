@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,6 +14,9 @@
 
 package com.liferay.portal.model;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * <p>
  * This class is a wrapper for {@link Organization}.
@@ -23,7 +26,8 @@ package com.liferay.portal.model;
  * @see       Organization
  * @generated
  */
-public class OrganizationWrapper implements Organization {
+public class OrganizationWrapper implements Organization,
+	ModelWrapper<Organization> {
 	public OrganizationWrapper(Organization organization) {
 		_organization = organization;
 	}
@@ -34,6 +38,92 @@ public class OrganizationWrapper implements Organization {
 
 	public String getModelClassName() {
 		return Organization.class.getName();
+	}
+
+	public Map<String, Object> getModelAttributes() {
+		Map<String, Object> attributes = new HashMap<String, Object>();
+
+		attributes.put("organizationId", getOrganizationId());
+		attributes.put("companyId", getCompanyId());
+		attributes.put("parentOrganizationId", getParentOrganizationId());
+		attributes.put("treePath", getTreePath());
+		attributes.put("name", getName());
+		attributes.put("type", getType());
+		attributes.put("recursable", getRecursable());
+		attributes.put("regionId", getRegionId());
+		attributes.put("countryId", getCountryId());
+		attributes.put("statusId", getStatusId());
+		attributes.put("comments", getComments());
+
+		return attributes;
+	}
+
+	public void setModelAttributes(Map<String, Object> attributes) {
+		Long organizationId = (Long)attributes.get("organizationId");
+
+		if (organizationId != null) {
+			setOrganizationId(organizationId);
+		}
+
+		Long companyId = (Long)attributes.get("companyId");
+
+		if (companyId != null) {
+			setCompanyId(companyId);
+		}
+
+		Long parentOrganizationId = (Long)attributes.get("parentOrganizationId");
+
+		if (parentOrganizationId != null) {
+			setParentOrganizationId(parentOrganizationId);
+		}
+
+		String treePath = (String)attributes.get("treePath");
+
+		if (treePath != null) {
+			setTreePath(treePath);
+		}
+
+		String name = (String)attributes.get("name");
+
+		if (name != null) {
+			setName(name);
+		}
+
+		String type = (String)attributes.get("type");
+
+		if (type != null) {
+			setType(type);
+		}
+
+		Boolean recursable = (Boolean)attributes.get("recursable");
+
+		if (recursable != null) {
+			setRecursable(recursable);
+		}
+
+		Long regionId = (Long)attributes.get("regionId");
+
+		if (regionId != null) {
+			setRegionId(regionId);
+		}
+
+		Long countryId = (Long)attributes.get("countryId");
+
+		if (countryId != null) {
+			setCountryId(countryId);
+		}
+
+		Integer statusId = (Integer)attributes.get("statusId");
+
+		if (statusId != null) {
+			setStatusId(statusId);
+		}
+
+		String comments = (String)attributes.get("comments");
+
+		if (comments != null) {
+			setComments(comments);
+		}
 	}
 
 	/**
@@ -109,39 +199,21 @@ public class OrganizationWrapper implements Organization {
 	}
 
 	/**
-	* Returns the left organization ID of this organization.
+	* Returns the tree path of this organization.
 	*
-	* @return the left organization ID of this organization
+	* @return the tree path of this organization
 	*/
-	public long getLeftOrganizationId() {
-		return _organization.getLeftOrganizationId();
+	public java.lang.String getTreePath() {
+		return _organization.getTreePath();
 	}
 
 	/**
-	* Sets the left organization ID of this organization.
+	* Sets the tree path of this organization.
 	*
-	* @param leftOrganizationId the left organization ID of this organization
+	* @param treePath the tree path of this organization
 	*/
-	public void setLeftOrganizationId(long leftOrganizationId) {
-		_organization.setLeftOrganizationId(leftOrganizationId);
-	}
-
-	/**
-	* Returns the right organization ID of this organization.
-	*
-	* @return the right organization ID of this organization
-	*/
-	public long getRightOrganizationId() {
-		return _organization.getRightOrganizationId();
-	}
-
-	/**
-	* Sets the right organization ID of this organization.
-	*
-	* @param rightOrganizationId the right organization ID of this organization
-	*/
-	public void setRightOrganizationId(long rightOrganizationId) {
-		_organization.setRightOrganizationId(rightOrganizationId);
+	public void setTreePath(java.lang.String treePath) {
+		_organization.setTreePath(treePath);
 	}
 
 	/**
@@ -299,10 +371,6 @@ public class OrganizationWrapper implements Organization {
 		return _organization.isEscapedModel();
 	}
 
-	public void setEscapedModel(boolean escapedModel) {
-		_organization.setEscapedModel(escapedModel);
-	}
-
 	public java.io.Serializable getPrimaryKeyObj() {
 		return _organization.getPrimaryKeyObj();
 	}
@@ -356,6 +424,12 @@ public class OrganizationWrapper implements Organization {
 		_organization.persist();
 	}
 
+	public java.lang.String buildTreePath()
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException {
+		return _organization.buildTreePath();
+	}
+
 	public com.liferay.portal.model.Address getAddress() {
 		return _organization.getAddress();
 	}
@@ -382,6 +456,10 @@ public class OrganizationWrapper implements Organization {
 
 	public com.liferay.portal.model.Group getGroup() {
 		return _organization.getGroup();
+	}
+
+	public long getGroupId() {
+		return _organization.getGroupId();
 	}
 
 	public long getLogoId() {
@@ -454,7 +532,14 @@ public class OrganizationWrapper implements Organization {
 		return _organization.isRoot();
 	}
 
+	/**
+	 * @deprecated Renamed to {@link #getWrappedModel}
+	 */
 	public Organization getWrappedOrganization() {
+		return _organization;
+	}
+
+	public Organization getWrappedModel() {
 		return _organization;
 	}
 

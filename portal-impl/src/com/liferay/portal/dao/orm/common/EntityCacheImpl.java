@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -80,8 +80,7 @@ public class EntityCacheImpl implements CacheRegistryItem, EntityCache {
 	}
 
 	public Object getResult(
-		boolean entityCacheEnabled, Class<?> clazz, Serializable primaryKey,
-		SessionFactory sessionFactory) {
+		boolean entityCacheEnabled, Class<?> clazz, Serializable primaryKey) {
 
 		if (!PropsValues.VALUE_OBJECT_ENTITY_CACHE_ENABLED ||
 			!entityCacheEnabled || !CacheRegistryUtil.isActive()) {
@@ -224,8 +223,8 @@ public class EntityCacheImpl implements CacheRegistryItem, EntityCache {
 		if (_localCacheAvailable) {
 			Map<Serializable, Object> localCache = _localCache.get();
 
-			Serializable localCacheKey = _encodeLocalCacheKey(clazz,
-				primaryKey);
+			Serializable localCacheKey = _encodeLocalCacheKey(
+				clazz, primaryKey);
 
 			localCache.put(localCacheKey, result);
 		}
@@ -257,8 +256,8 @@ public class EntityCacheImpl implements CacheRegistryItem, EntityCache {
 		if (_localCacheAvailable) {
 			Map<Serializable, Object> localCache = _localCache.get();
 
-			Serializable localCacheKey = _encodeLocalCacheKey(clazz,
-				primaryKey);
+			Serializable localCacheKey = _encodeLocalCacheKey(
+				clazz, primaryKey);
 
 			localCache.remove(localCacheKey);
 		}
@@ -322,13 +321,28 @@ public class EntityCacheImpl implements CacheRegistryItem, EntityCache {
 		}
 	}
 
-	private static Log _log = LogFactoryUtil.getLog(EntityCacheImpl.class);
-
 	private static final String _GROUP_KEY_PREFIX = CACHE_NAME.concat(
 		StringPool.PERIOD);
 
+	private static Log _log = LogFactoryUtil.getLog(EntityCacheImpl.class);
+
 	private static ThreadLocal<LRUMap> _localCache;
 	private static boolean _localCacheAvailable;
+
+	static {
+		if (PropsValues.VALUE_OBJECT_ENTITY_THREAD_LOCAL_CACHE_MAX_SIZE > 0) {
+			_localCache = new AutoResetThreadLocal<LRUMap>(
+				EntityCacheImpl.class + "._localCache",
+				new LRUMap(
+					PropsValues.
+						VALUE_OBJECT_ENTITY_THREAD_LOCAL_CACHE_MAX_SIZE));
+			_localCacheAvailable = true;
+		}
+	}
+
+	private MultiVMPool _multiVMPool;
+	private ConcurrentMap<String, PortalCache> _portalCaches =
+		new ConcurrentHashMap<String, PortalCache>();
 
 	private static class CacheKey implements Serializable {
 
@@ -337,6 +351,7 @@ public class EntityCacheImpl implements CacheRegistryItem, EntityCache {
 			_primaryKey = primaryKey;
 		}
 
+		@Override
 		public boolean equals(Object obj) {
 			CacheKey cacheKey = (CacheKey)obj;
 
@@ -350,6 +365,7 @@ public class EntityCacheImpl implements CacheRegistryItem, EntityCache {
 			}
 		}
 
+		@Override
 		public int hashCode() {
 			return _shardName.hashCode() * 11 + _primaryKey.hashCode();
 		}
@@ -371,6 +387,7 @@ public class EntityCacheImpl implements CacheRegistryItem, EntityCache {
 			_primaryKey = primaryKey;
 		}
 
+		@Override
 		public boolean equals(Object obj) {
 			LocalCacheKey localCacheKey = (LocalCacheKey)obj;
 
@@ -385,6 +402,7 @@ public class EntityCacheImpl implements CacheRegistryItem, EntityCache {
 			}
 		}
 
+		@Override
 		public int hashCode() {
 			int hashCode = HashUtil.hash(0, _shardName);
 
@@ -400,21 +418,6 @@ public class EntityCacheImpl implements CacheRegistryItem, EntityCache {
 		private final Serializable _primaryKey;
 		private final String _shardName;
 
-	}
-
-	private MultiVMPool _multiVMPool;
-	private ConcurrentMap<String, PortalCache> _portalCaches =
-		new ConcurrentHashMap<String, PortalCache>();
-
-	static {
-		if (PropsValues.VALUE_OBJECT_ENTITY_THREAD_LOCAL_CACHE_MAX_SIZE > 0) {
-			_localCache = new AutoResetThreadLocal<LRUMap>(
-				EntityCacheImpl.class + "._localCache",
-				new LRUMap(
-					PropsValues.
-						VALUE_OBJECT_ENTITY_THREAD_LOCAL_CACHE_MAX_SIZE));
-			_localCacheAvailable = true;
-		}
 	}
 
 }

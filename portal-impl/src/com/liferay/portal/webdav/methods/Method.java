@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -46,24 +46,26 @@ public interface Method {
 
 	public static final String PUT = "PUT";
 
-	public static final String UNLOCK = "UNLOCK";
-
 	public static final String[] SUPPORTED_METHODS_ARRAY = {
 		COPY, DELETE, GET, HEAD, LOCK, MKCOL, MOVE, OPTIONS, PROPFIND,
-		PROPPATCH, PUT, UNLOCK
+		PROPPATCH, PUT, Method.UNLOCK
 	};
 
-	public static final String SUPPORTED_METHODS =
-		StringUtil.merge(SUPPORTED_METHODS_ARRAY);
+	public static final String SUPPORTED_METHODS = StringUtil.merge(
+		SUPPORTED_METHODS_ARRAY);
+
+	public static final String UNLOCK = "UNLOCK";
 
 	/**
 	 * Returns -1 or a supported HTTP status code. If it is -1, then the status
 	 * code has already been set. Otherwise, the status code needs to be set by
 	 * the caller.
 	 *
+	 * @param  webDavRequest the WebDAV request
 	 * @return -1 or a supported HTTP status code. If it is -1, then the status
 	 *         code has already been set. Otherwise, the status code needs to be
 	 *         set by the caller.
+	 * @throws WebDAVException if a WebDAV exception occurred
 	 */
 	public int process(WebDAVRequest webDavRequest) throws WebDAVException;
 

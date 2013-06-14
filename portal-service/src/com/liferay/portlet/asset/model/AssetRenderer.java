@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -19,6 +19,7 @@ import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.portlet.LiferayPortletRequest;
 import com.liferay.portal.kernel.portlet.LiferayPortletResponse;
 import com.liferay.portal.security.permission.PermissionChecker;
+import com.liferay.portal.theme.ThemeDisplay;
 
 import java.util.Locale;
 
@@ -38,6 +39,8 @@ public interface AssetRenderer {
 
 	public static final String TEMPLATE_FULL_CONTENT = "full_content";
 
+	public String getAssetRendererFactoryClassName();
+
 	public String[] getAvailableLocales() throws Exception;
 
 	public long getClassPK();
@@ -51,6 +54,8 @@ public interface AssetRenderer {
 	public String getSummary(Locale locale);
 
 	public String getTitle(Locale locale);
+
+	public String getURLDownload(ThemeDisplay themeDisplay);
 
 	public PortletURL getURLEdit(
 			LiferayPortletRequest liferayPortletRequest,
@@ -77,6 +82,8 @@ public interface AssetRenderer {
 
 	public long getUserId();
 
+	public String getUserName();
+
 	public String getUuid();
 
 	public String getViewInContextMessage();
@@ -89,7 +96,11 @@ public interface AssetRenderer {
 
 	public boolean isConvertible();
 
+	public boolean isDisplayable();
+
 	public boolean isLocalizable();
+
+	public boolean isPreviewInContext();
 
 	public boolean isPrintable();
 

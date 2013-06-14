@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,6 +14,7 @@
 
 package com.liferay.util.mail;
 
+import com.liferay.mail.model.FileAttachment;
 import com.liferay.mail.service.MailServiceUtil;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.io.unsync.UnsyncByteArrayInputStream;
@@ -23,8 +24,11 @@ import com.liferay.portal.kernel.log.LogUtil;
 import com.liferay.portal.kernel.mail.Account;
 import com.liferay.portal.kernel.mail.MailMessage;
 import com.liferay.portal.kernel.mail.SMTPAccount;
+import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.InfrastructureUtil;
+import com.liferay.portal.kernel.util.PropsKeys;
+import com.liferay.portal.kernel.util.PropsUtil;
 import com.liferay.portal.kernel.util.Validator;
 
 import java.io.File;
@@ -33,12 +37,14 @@ import java.net.SocketException;
 
 import java.util.Arrays;
 import java.util.Date;
+import java.util.List;
 import java.util.Properties;
 
 import javax.activation.DataHandler;
 import javax.activation.DataSource;
 import javax.activation.FileDataSource;
 
+import javax.mail.Address;
 import javax.mail.Message;
 import javax.mail.MessagingException;
 import javax.mail.Part;
@@ -111,7 +117,7 @@ public class MailEngine {
 			Message message = new MimeMessage(
 				session, new UnsyncByteArrayInputStream(bytes));
 
-			_send(session, message, null);
+			_send(session, message, null, _BATCH_SIZE);
 		}
 		catch (Exception e) {
 			throw new MailEngineException(e);
@@ -155,12 +161,12 @@ public class MailEngine {
 			InternetAddress[] bcc, InternetAddress[] bulkAddresses,
 			String subject, String body, boolean htmlFormat,
 			InternetAddress[] replyTo, String messageId, String inReplyTo,
-			File[] attachments)
+			List<FileAttachment> fileAttachments)
 		throws MailEngineException {
 
 		send(
 			from, to, cc, bcc, bulkAddresses, subject, body, htmlFormat,
-			replyTo, messageId, inReplyTo, attachments, null);
+			replyTo, messageId, inReplyTo, fileAttachments, null);
 	}
 
 	public static void send(
@@ -168,7 +174,7 @@ public class MailEngine {
 			InternetAddress[] bcc, InternetAddress[] bulkAddresses,
 			String subject, String body, boolean htmlFormat,
 			InternetAddress[] replyTo, String messageId, String inReplyTo,
-			File[] attachments, SMTPAccount smtpAccount)
+			List<FileAttachment> fileAttachments, SMTPAccount smtpAccount)
 		throws MailEngineException {
 
 		StopWatch stopWatch = null;
@@ -190,15 +196,19 @@ public class MailEngine {
 			_log.debug("Message ID: " + messageId);
 			_log.debug("In Reply To: " + inReplyTo);
 
-			if (attachments != null) {
-				for (int i = 0; i < attachments.length; i++) {
-					File attachment = attachments[i];
+			if ((fileAttachments != null) && _log.isDebugEnabled()) {
+				for (int i = 0; i < fileAttachments.size(); i++) {
+					FileAttachment fileAttachment = fileAttachments.get(i);
 
-					if (attachment != null) {
-						String path = attachment.getAbsolutePath();
+					File file = fileAttachment.getFile();
 
-						_log.debug("Attachment #" + (i + 1) + ": " + path);
+					if (file == null) {
+						continue;
 					}
+
+					_log.debug(
+						"Attachment " + i + " file " + file.getAbsolutePath() +
+							" and file name " + fileAttachment.getFileName());
 				}
 			}
 		}
@@ -230,7 +240,7 @@ public class MailEngine {
 
 			message.setSubject(subject);
 
-			if ((attachments != null) && (attachments.length > 0)) {
+			if ((fileAttachments != null) && (fileAttachments.size() > 0)) {
 				MimeMultipart rootMultipart = new MimeMultipart(
 					_MULTIPART_TYPE_MIXED);
 
@@ -258,20 +268,30 @@ public class MailEngine {
 					messageMultipart.addBodyPart(bodyPart);
 				}
 
-				for (int i = 0; i < attachments.length; i++) {
-					File attachment = attachments[i];
+				for (int i = 0; i < fileAttachments.size(); i++) {
+					FileAttachment fileAttachment = fileAttachments.get(i);
 
-					if (attachment != null) {
-						MimeBodyPart bodyPart = new MimeBodyPart();
+					File file = fileAttachment.getFile();
 
-						DataSource source = new FileDataSource(attachment);
-
-						bodyPart.setDisposition(Part.ATTACHMENT);
-						bodyPart.setDataHandler(new DataHandler(source));
-						bodyPart.setFileName(attachment.getName());
-
-						rootMultipart.addBodyPart(bodyPart);
+					if (file == null) {
+						continue;
 					}
+
+					MimeBodyPart mimeBodyPart = new MimeBodyPart();
+
+					DataSource dataSource = new FileDataSource(file);
+
+					mimeBodyPart.setDataHandler(new DataHandler(dataSource));
+					mimeBodyPart.setDisposition(Part.ATTACHMENT);
+
+					if (fileAttachment.getFileName() != null) {
+						mimeBodyPart.setFileName(fileAttachment.getFileName());
+					}
+					else {
+						mimeBodyPart.setFileName(file.getName());
+					}
+
+					rootMultipart.addBodyPart(mimeBodyPart);
 				}
 
 				message.setContent(rootMultipart);
@@ -302,7 +322,10 @@ public class MailEngine {
 				message.setHeader("References", inReplyTo);
 			}
 
-			_send(session, message, bulkAddresses);
+			int batchSize = GetterUtil.getInteger(
+				PropsUtil.get(PropsKeys.MAIL_BATCH_SIZE), _BATCH_SIZE);
+
+			_send(session, message, bulkAddresses, batchSize);
 		}
 		catch (SendFailedException sfe) {
 			_log.error(sfe);
@@ -377,7 +400,7 @@ public class MailEngine {
 			mailMessage.getSubject(), mailMessage.getBody(),
 			mailMessage.isHTMLFormat(), mailMessage.getReplyTo(),
 			mailMessage.getMessageId(), mailMessage.getInReplyTo(),
-			mailMessage.getAttachments(), mailMessage.getSMTPAccount());
+			mailMessage.getFileAttachments(), mailMessage.getSMTPAccount());
 	}
 
 	public static void send(String from, String to, String subject, String body)
@@ -391,6 +414,31 @@ public class MailEngine {
 		catch (AddressException ae) {
 			throw new MailEngineException(ae);
 		}
+	}
+
+	private static Address[] _getBatchAddresses(
+		Address[] addresses, int index, int batchSize) {
+
+		if ((batchSize == _BATCH_SIZE) && (index == 0)) {
+			return addresses;
+		}
+		else if (batchSize == _BATCH_SIZE) {
+			return null;
+		}
+
+		int start = index * batchSize;
+
+		if (start > addresses.length) {
+			return null;
+		}
+
+		int end = ((index + 1) * batchSize);
+
+		if (end > addresses.length) {
+			end = addresses.length;
+		}
+
+		return ArrayUtil.subset(addresses, start, end);
 	}
 
 	private static Properties _getProperties(Account account) {
@@ -438,7 +486,8 @@ public class MailEngine {
 	}
 
 	private static void _send(
-		Session session, Message message, InternetAddress[] bulkAddresses) {
+		Session session, Message message, InternetAddress[] bulkAddresses,
+		int batchSize) {
 
 		try {
 			boolean smtpAuth = GetterUtil.getBoolean(
@@ -460,18 +509,45 @@ public class MailEngine {
 
 				transport.connect(smtpHost, smtpPort, user, password);
 
-				if ((bulkAddresses != null) && (bulkAddresses.length > 0)) {
-					transport.sendMessage(message, bulkAddresses);
+				Address[] addresses = null;
+
+				if (Validator.isNotNull(bulkAddresses)) {
+					addresses = bulkAddresses;
 				}
 				else {
-					transport.sendMessage(message, message.getAllRecipients());
+					addresses = message.getAllRecipients();
+				}
+
+				for (int i = 0;; i++) {
+					Address[] batchAddresses = _getBatchAddresses(
+						addresses, i, batchSize);
+
+					if ((batchAddresses == null) ||
+						(batchAddresses.length == 0)) {
+
+						break;
+					}
+
+					transport.sendMessage(message, batchAddresses);
 				}
 
 				transport.close();
 			}
 			else {
-				if ((bulkAddresses != null) && (bulkAddresses.length > 0)) {
-					Transport.send(message, bulkAddresses);
+				if (Validator.isNotNull(bulkAddresses)) {
+					int curBatch = 0;
+
+					Address[] portion = _getBatchAddresses(
+						bulkAddresses, curBatch, batchSize);
+
+					while (Validator.isNotNull(portion)) {
+						Transport.send(message, portion);
+
+						curBatch++;
+
+						portion = _getBatchAddresses(
+							bulkAddresses, curBatch, batchSize);
+					}
 				}
 				else {
 					Transport.send(message);
@@ -494,6 +570,8 @@ public class MailEngine {
 			}
 		}
 	}
+
+	private static final int _BATCH_SIZE = 0;
 
 	private static final String _MULTIPART_TYPE_ALTERNATIVE = "alternative";
 

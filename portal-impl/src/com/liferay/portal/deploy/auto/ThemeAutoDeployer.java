@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -15,7 +15,6 @@
 package com.liferay.portal.deploy.auto;
 
 import com.liferay.portal.deploy.DeployUtil;
-import com.liferay.portal.kernel.deploy.auto.AutoDeployException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.util.PropsKeys;
@@ -67,21 +66,6 @@ public class ThemeAutoDeployer extends ThemeDeployer implements AutoDeployer {
 		}
 		catch (Exception e) {
 			_log.error(e);
-		}
-	}
-
-	public void autoDeploy(String file) throws AutoDeployException {
-		List<String> wars = new ArrayList<String>();
-
-		wars.add(file);
-
-		this.wars = wars;
-
-		try {
-			deploy();
-		}
-		catch (Exception e) {
-			throw new AutoDeployException(e);
 		}
 	}
 

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -15,7 +15,6 @@
 package com.liferay.portal.service;
 
 import com.liferay.portal.kernel.bean.PortalBeanLocatorUtil;
-import com.liferay.portal.kernel.util.MethodCache;
 import com.liferay.portal.kernel.util.ReferenceRegistry;
 
 /**
@@ -37,9 +36,47 @@ public class RepositoryServiceUtil {
 	 *
 	 * Never modify this class directly. Add custom service methods to {@link com.liferay.portal.service.impl.RepositoryServiceImpl} and rerun ServiceBuilder to regenerate this class.
 	 */
+
+	/**
+	* Returns the Spring bean ID for this bean.
+	*
+	* @return the Spring bean ID for this bean
+	*/
+	public static java.lang.String getBeanIdentifier() {
+		return getService().getBeanIdentifier();
+	}
+
+	/**
+	* Sets the Spring bean ID for this bean.
+	*
+	* @param beanIdentifier the Spring bean ID for this bean
+	*/
+	public static void setBeanIdentifier(java.lang.String beanIdentifier) {
+		getService().setBeanIdentifier(beanIdentifier);
+	}
+
+	public static long addRepository(long groupId, long classNameId,
+		long parentFolderId, java.lang.String name,
+		java.lang.String description, java.lang.String portletId,
+		com.liferay.portal.kernel.util.UnicodeProperties typeSettingsProperties,
+		com.liferay.portal.service.ServiceContext serviceContext)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException {
+		return getService()
+				   .addRepository(groupId, classNameId, parentFolderId, name,
+			description, portletId, typeSettingsProperties, serviceContext);
+	}
+
 	public static void checkRepository(long repositoryId)
-		throws com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException {
 		getService().checkRepository(repositoryId);
+	}
+
+	public static void deleteRepository(long repositoryId)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException {
+		getService().deleteRepository(repositoryId);
 	}
 
 	public static com.liferay.portal.kernel.repository.LocalRepository getLocalRepositoryImpl(
@@ -98,30 +135,6 @@ public class RepositoryServiceUtil {
 		return getService().getTypeSettingsProperties(repositoryId);
 	}
 
-	public static long mountRepository(long groupId, long classNameId,
-		long parentFolderId, java.lang.String name,
-		java.lang.String description, java.lang.String portletId,
-		com.liferay.portal.kernel.util.UnicodeProperties typeSettingsProperties,
-		com.liferay.portal.service.ServiceContext serviceContext)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
-		return getService()
-				   .mountRepository(groupId, classNameId, parentFolderId, name,
-			description, portletId, typeSettingsProperties, serviceContext);
-	}
-
-	public static void unmountRepositories(long groupId)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
-		getService().unmountRepositories(groupId);
-	}
-
-	public static void unmountRepository(long repositoryId)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
-		getService().unmountRepository(repositoryId);
-	}
-
 	public static void updateRepository(long repositoryId,
 		java.lang.String name, java.lang.String description)
 		throws com.liferay.portal.kernel.exception.PortalException,
@@ -135,20 +148,15 @@ public class RepositoryServiceUtil {
 
 			ReferenceRegistry.registerReference(RepositoryServiceUtil.class,
 				"_service");
-			MethodCache.remove(RepositoryService.class);
 		}
 
 		return _service;
 	}
 
+	/**
+	 * @deprecated
+	 */
 	public void setService(RepositoryService service) {
-		MethodCache.remove(RepositoryService.class);
-
-		_service = service;
-
-		ReferenceRegistry.registerReference(RepositoryServiceUtil.class,
-			"_service");
-		MethodCache.remove(RepositoryService.class);
 	}
 
 	private static RepositoryService _service;

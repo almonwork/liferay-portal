@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -19,15 +19,20 @@ import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.portlet.LiferayWindowState;
 import com.liferay.portal.kernel.search.Field;
 import com.liferay.portal.kernel.search.Hits;
+import com.liferay.portal.kernel.search.Indexer;
+import com.liferay.portal.kernel.search.IndexerRegistryUtil;
 import com.liferay.portal.kernel.templateparser.Transformer;
 import com.liferay.portal.kernel.templateparser.TransformerListener;
 import com.liferay.portal.kernel.util.CharPool;
+import com.liferay.portal.kernel.util.FriendlyURLNormalizerUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.HttpUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.OrderByComparator;
+import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.PropsKeys;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
@@ -43,24 +48,29 @@ import com.liferay.portal.kernel.xml.XPath;
 import com.liferay.portal.model.Group;
 import com.liferay.portal.model.Layout;
 import com.liferay.portal.model.LayoutSet;
+import com.liferay.portal.model.ModelHintsUtil;
 import com.liferay.portal.model.User;
 import com.liferay.portal.service.ImageLocalServiceUtil;
 import com.liferay.portal.service.LayoutLocalServiceUtil;
 import com.liferay.portal.service.UserLocalServiceUtil;
 import com.liferay.portal.theme.ThemeDisplay;
-import com.liferay.portal.util.FriendlyURLNormalizer;
+import com.liferay.portal.util.PortalUtil;
 import com.liferay.portal.util.PropsUtil;
 import com.liferay.portal.util.PropsValues;
 import com.liferay.portal.util.WebKeys;
 import com.liferay.portlet.asset.service.AssetTagLocalServiceUtil;
 import com.liferay.portlet.dynamicdatamapping.util.DDMXMLUtil;
 import com.liferay.portlet.journal.NoSuchArticleException;
+import com.liferay.portlet.journal.StructureXsdException;
 import com.liferay.portlet.journal.model.JournalArticle;
+import com.liferay.portlet.journal.model.JournalFolder;
+import com.liferay.portlet.journal.model.JournalFolderConstants;
 import com.liferay.portlet.journal.model.JournalStructure;
 import com.liferay.portlet.journal.model.JournalStructureConstants;
 import com.liferay.portlet.journal.model.JournalTemplate;
 import com.liferay.portlet.journal.service.JournalArticleImageLocalServiceUtil;
 import com.liferay.portlet.journal.service.JournalArticleLocalServiceUtil;
+import com.liferay.portlet.journal.service.JournalFolderLocalServiceUtil;
 import com.liferay.portlet.journal.service.JournalTemplateLocalServiceUtil;
 import com.liferay.portlet.journal.util.comparator.ArticleCreateDateComparator;
 import com.liferay.portlet.journal.util.comparator.ArticleDisplayDateComparator;
@@ -71,8 +81,10 @@ import com.liferay.portlet.journal.util.comparator.ArticleTitleComparator;
 import com.liferay.portlet.journal.util.comparator.ArticleVersionComparator;
 import com.liferay.util.ContentUtil;
 import com.liferay.util.FiniteUniqueStack;
+import com.liferay.util.JS;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -83,6 +95,10 @@ import java.util.Stack;
 import javax.portlet.PortletPreferences;
 import javax.portlet.PortletRequest;
 import javax.portlet.PortletSession;
+import javax.portlet.PortletURL;
+import javax.portlet.RenderResponse;
+
+import javax.servlet.http.HttpServletRequest;
 
 /**
  * @author Brian Wing Shun Chan
@@ -96,8 +112,8 @@ public class JournalUtil {
 	public static final int MAX_STACK_SIZE = 20;
 
 	public static void addAllReservedEls(
-		Element rootElement, Map<String, String> tokens,
-		JournalArticle article) {
+		Element rootElement, Map<String, String> tokens, JournalArticle article,
+		String languageId) {
 
 		JournalUtil.addReservedEl(
 			rootElement, tokens, JournalStructureConstants.RESERVED_ARTICLE_ID,
@@ -111,7 +127,7 @@ public class JournalUtil {
 		JournalUtil.addReservedEl(
 			rootElement, tokens,
 			JournalStructureConstants.RESERVED_ARTICLE_TITLE,
-			article.getTitle());
+			article.getTitle(languageId));
 
 		JournalUtil.addReservedEl(
 			rootElement, tokens,
@@ -121,7 +137,7 @@ public class JournalUtil {
 		JournalUtil.addReservedEl(
 			rootElement, tokens,
 			JournalStructureConstants.RESERVED_ARTICLE_DESCRIPTION,
-			article.getDescription());
+			article.getDescription(languageId));
 
 		JournalUtil.addReservedEl(
 			rootElement, tokens,
@@ -208,6 +224,93 @@ public class JournalUtil {
 			userJobTitle);
 	}
 
+	public static void addPortletBreadcrumbEntries(
+			JournalArticle article, HttpServletRequest request,
+			RenderResponse renderResponse)
+		throws Exception {
+
+		JournalFolder folder = article.getFolder();
+
+		if (folder.getFolderId() !=
+			JournalFolderConstants.DEFAULT_PARENT_FOLDER_ID) {
+
+			addPortletBreadcrumbEntries(folder, request, renderResponse);
+		}
+
+		PortletURL portletURL = renderResponse.createRenderURL();
+
+		portletURL.setParameter("struts_action", "/article/view_article");
+		portletURL.setParameter(
+			"groupId", String.valueOf(article.getGroupId()));
+		portletURL.setParameter(
+			"articleId", String.valueOf(article.getArticleId()));
+
+		PortalUtil.addPortletBreadcrumbEntry(
+			request, article.getTitle(), portletURL.toString());
+	}
+
+	public static void addPortletBreadcrumbEntries(
+			JournalFolder folder, HttpServletRequest request,
+			RenderResponse renderResponse)
+		throws Exception {
+
+		String strutsAction = ParamUtil.getString(request, "struts_action");
+
+		PortletURL portletURL = renderResponse.createRenderURL();
+
+		if (strutsAction.equals("/journal/select_folder")) {
+			ThemeDisplay themeDisplay = (ThemeDisplay)request.getAttribute(
+				WebKeys.THEME_DISPLAY);
+
+			portletURL.setWindowState(LiferayWindowState.POP_UP);
+
+			portletURL.setParameter("struts_action", "/journal/select_folder");
+
+			PortalUtil.addPortletBreadcrumbEntry(
+				request, themeDisplay.translate("home"), portletURL.toString());
+		}
+		else {
+			portletURL.setParameter("struts_action", "/journal/view");
+		}
+
+		List<JournalFolder> ancestorFolders = folder.getAncestors();
+
+		Collections.reverse(ancestorFolders);
+
+		for (JournalFolder ancestorFolder : ancestorFolders) {
+			portletURL.setParameter(
+				"folderId", String.valueOf(ancestorFolder.getFolderId()));
+
+			PortalUtil.addPortletBreadcrumbEntry(
+				request, ancestorFolder.getName(), portletURL.toString());
+		}
+
+		portletURL.setParameter(
+			"folderId", String.valueOf(folder.getFolderId()));
+
+		if (folder.getFolderId() !=
+			JournalFolderConstants.DEFAULT_PARENT_FOLDER_ID) {
+
+			PortalUtil.addPortletBreadcrumbEntry(
+				request, folder.getName(), portletURL.toString());
+		}
+	}
+
+	public static void addPortletBreadcrumbEntries(
+			long folderId, HttpServletRequest request,
+			RenderResponse renderResponse)
+		throws Exception {
+
+		if (folderId == JournalFolderConstants.DEFAULT_PARENT_FOLDER_ID) {
+			return;
+		}
+
+		JournalFolder folder = JournalFolderLocalServiceUtil.getFolder(
+			folderId);
+
+		addPortletBreadcrumbEntries(folder, request, renderResponse);
+	}
+
 	public static void addRecentArticle(
 		PortletRequest portletRequest, JournalArticle article) {
 
@@ -286,8 +389,7 @@ public class JournalUtil {
 		// Tokens
 
 		tokens.put(
-			StringUtil.replace(name, CharPool.DASH, CharPool.UNDERLINE),
-			value);
+			StringUtil.replace(name, CharPool.DASH, CharPool.UNDERLINE), value);
 	}
 
 	public static String formatVM(String vm) {
@@ -353,31 +455,17 @@ public class JournalUtil {
 			catch (NoSuchArticleException nsae) {
 				corruptIndex = true;
 
-				_log.error(
-					"Article " + articleId +
-						" does not exist in the search index");
+				Indexer indexer = IndexerRegistryUtil.getIndexer(
+					JournalArticle.class);
+
+				long companyId = GetterUtil.getLong(
+					document.get(Field.COMPANY_ID));
+
+				indexer.delete(companyId, document.getUID());
 			}
 		}
 
 		return new Tuple(articles, corruptIndex);
-	}
-
-	public static List<Layout> getDefaultAssetPublisherLayouts(
-			long groupId, boolean privateLayout)
-		throws SystemException {
-
-		List<Layout> defaultAssetPublisherLayouts = new ArrayList<Layout>();
-
-		List<Layout> layouts = LayoutLocalServiceUtil.getLayouts(
-			groupId, privateLayout);
-
-		for (Layout layout : layouts) {
-			if (layout.isContentDisplayPage()) {
-				defaultAssetPublisherLayouts.add(layout);
-			}
-		}
-
-		return defaultAssetPublisherLayouts;
 	}
 
 	public static String getEmailArticleAddedBody(
@@ -650,18 +738,20 @@ public class JournalUtil {
 		}
 	}
 
-	public static String getEmailFromAddress(PortletPreferences preferences) {
-		String emailFromAddress = PropsUtil.get(
-			PropsKeys.JOURNAL_EMAIL_FROM_ADDRESS);
+	public static String getEmailFromAddress(
+			PortletPreferences preferences, long companyId)
+		throws SystemException {
 
-		return preferences.getValue("emailFromAddress", emailFromAddress);
+		return PortalUtil.getEmailFromAddress(
+			preferences, companyId, PropsValues.JOURNAL_EMAIL_FROM_ADDRESS);
 	}
 
-	public static String getEmailFromName(PortletPreferences preferences) {
-		String emailFromName = PropsUtil.get(
-			PropsKeys.JOURNAL_EMAIL_FROM_NAME);
+	public static String getEmailFromName(
+			PortletPreferences preferences, long companyId)
+		throws SystemException {
 
-		return preferences.getValue("emailFromName", emailFromName);
+		return PortalUtil.getEmailFromName(
+			preferences, companyId, PropsValues.JOURNAL_EMAIL_FROM_NAME);
 	}
 
 	public static Stack<JournalArticle> getRecentArticles(
@@ -734,16 +824,15 @@ public class JournalUtil {
 
 			// Listeners
 
-			String[] listeners =
-				PropsUtil.getArray(PropsKeys.JOURNAL_TRANSFORMER_LISTENER);
+			String[] listeners = PropsUtil.getArray(
+				PropsKeys.JOURNAL_TRANSFORMER_LISTENER);
 
 			for (int i = 0; i < listeners.length; i++) {
 				TransformerListener listener = null;
 
 				try {
-					listener =
-						(TransformerListener)Class.forName(
-							listeners[i]).newInstance();
+					listener = (TransformerListener)Class.forName(
+						listeners[i]).newInstance();
 
 					listener.setTemplateDriven(true);
 					listener.setLanguageId(languageId);
@@ -814,17 +903,24 @@ public class JournalUtil {
 	}
 
 	public static String getUrlTitle(long id, String title) {
+		if (title == null) {
+			return String.valueOf(id);
+		}
+
 		title = title.trim().toLowerCase();
 
 		if (Validator.isNull(title) || Validator.isNumber(title) ||
 			title.equals("rss")) {
 
-			return String.valueOf(id);
+			title = String.valueOf(id);
 		}
 		else {
-			return FriendlyURLNormalizer.normalize(
+			title = FriendlyURLNormalizerUtil.normalize(
 				title, _URL_TITLE_REPLACE_CHARS);
 		}
+
+		return ModelHintsUtil.trimString(
+			JournalArticle.class.getName(), "urlTitle", title);
 	}
 
 	public static String mergeArticleContent(
@@ -859,6 +955,27 @@ public class JournalUtil {
 		}
 
 		return curContent;
+	}
+
+	public static String processXMLAttributes(String xsd)
+		throws PortalException {
+
+		try {
+			Document document = SAXReaderUtil.read(xsd);
+
+			Element rootElement = document.getRootElement();
+
+			List<Element> elements = new ArrayList<Element>();
+
+			elements.addAll(rootElement.elements());
+
+			_decodeXMLAttributes(elements);
+
+			return document.asXML();
+		}
+		catch (Exception e) {
+			throw new StructureXsdException();
+		}
 	}
 
 	public static void removeArticleLocale(Element element, String languageId)
@@ -1017,7 +1134,7 @@ public class JournalUtil {
 			themeDisplay, tokens, viewMode, languageId, xml, script, langType);
 	}
 
-	private static void _addElementOptions (
+	private static void _addElementOptions(
 		Element curContentElement, Element newContentElement) {
 
 		List<Element> newElementOptions = newContentElement.elements("option");
@@ -1028,6 +1145,27 @@ public class JournalUtil {
 			curElementOption.addCDATA(newElementOption.getText());
 
 			curContentElement.add(curElementOption);
+		}
+	}
+
+	private static void _decodeXMLAttributes(List<Element> elements) {
+		for (Element element : elements) {
+			String elName = element.attributeValue("name", StringPool.BLANK);
+			String elType = element.attributeValue("type", StringPool.BLANK);
+
+			if (Validator.isNotNull(elName)) {
+				elName = JS.decodeURIComponent(elName);
+
+				element.addAttribute("name", elName);
+			}
+
+			if (Validator.isNotNull(elType)) {
+				elType = JS.decodeURIComponent(elType);
+
+				element.addAttribute("type", elType);
+			}
+
+			_decodeXMLAttributes(element.elements());
 		}
 	}
 

@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -48,7 +48,13 @@ if (classNameId > 0) {
 }
 else if (article != null) {
 	localizeTitle = false;
-	title = article.getTitle(locale);
+
+	if (Validator.isNotNull(toLanguageId)) {
+		title = article.getTitle(toLanguageId);
+	}
+	else {
+		title = article.getTitle(locale);
+	}
 }
 %>
 

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -15,7 +15,6 @@
 package com.liferay.portal.service;
 
 import com.liferay.portal.kernel.bean.PortalBeanLocatorUtil;
-import com.liferay.portal.kernel.util.MethodCache;
 import com.liferay.portal.kernel.util.ReferenceRegistry;
 
 /**
@@ -66,25 +65,32 @@ public class MembershipRequestLocalServiceUtil {
 	* Deletes the membership request with the primary key from the database. Also notifies the appropriate model listeners.
 	*
 	* @param membershipRequestId the primary key of the membership request
+	* @return the membership request that was removed
 	* @throws PortalException if a membership request with the primary key could not be found
 	* @throws SystemException if a system exception occurred
 	*/
-	public static void deleteMembershipRequest(long membershipRequestId)
+	public static com.liferay.portal.model.MembershipRequest deleteMembershipRequest(
+		long membershipRequestId)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException {
-		getService().deleteMembershipRequest(membershipRequestId);
+		return getService().deleteMembershipRequest(membershipRequestId);
 	}
 
 	/**
 	* Deletes the membership request from the database. Also notifies the appropriate model listeners.
 	*
 	* @param membershipRequest the membership request
+	* @return the membership request that was removed
 	* @throws SystemException if a system exception occurred
 	*/
-	public static void deleteMembershipRequest(
+	public static com.liferay.portal.model.MembershipRequest deleteMembershipRequest(
 		com.liferay.portal.model.MembershipRequest membershipRequest)
 		throws com.liferay.portal.kernel.exception.SystemException {
-		getService().deleteMembershipRequest(membershipRequest);
+		return getService().deleteMembershipRequest(membershipRequest);
+	}
+
+	public static com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery() {
+		return getService().dynamicQuery();
 	}
 
 	/**
@@ -156,6 +162,12 @@ public class MembershipRequestLocalServiceUtil {
 		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery)
 		throws com.liferay.portal.kernel.exception.SystemException {
 		return getService().dynamicQueryCount(dynamicQuery);
+	}
+
+	public static com.liferay.portal.model.MembershipRequest fetchMembershipRequest(
+		long membershipRequestId)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getService().fetchMembershipRequest(membershipRequestId);
 	}
 
 	/**
@@ -256,10 +268,13 @@ public class MembershipRequestLocalServiceUtil {
 	}
 
 	public static com.liferay.portal.model.MembershipRequest addMembershipRequest(
-		long userId, long groupId, java.lang.String comments)
+		long userId, long groupId, java.lang.String comments,
+		com.liferay.portal.service.ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException {
-		return getService().addMembershipRequest(userId, groupId, comments);
+		return getService()
+				   .addMembershipRequest(userId, groupId, comments,
+			serviceContext);
 	}
 
 	public static void deleteMembershipRequests(long groupId)
@@ -302,12 +317,13 @@ public class MembershipRequestLocalServiceUtil {
 
 	public static void updateStatus(long replierUserId,
 		long membershipRequestId, java.lang.String replyComments, int statusId,
-		boolean addUserToGroup)
+		boolean addUserToGroup,
+		com.liferay.portal.service.ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException {
 		getService()
 			.updateStatus(replierUserId, membershipRequestId, replyComments,
-			statusId, addUserToGroup);
+			statusId, addUserToGroup, serviceContext);
 	}
 
 	public static MembershipRequestLocalService getService() {
@@ -316,20 +332,15 @@ public class MembershipRequestLocalServiceUtil {
 
 			ReferenceRegistry.registerReference(MembershipRequestLocalServiceUtil.class,
 				"_service");
-			MethodCache.remove(MembershipRequestLocalService.class);
 		}
 
 		return _service;
 	}
 
+	/**
+	 * @deprecated
+	 */
 	public void setService(MembershipRequestLocalService service) {
-		MethodCache.remove(MembershipRequestLocalService.class);
-
-		_service = service;
-
-		ReferenceRegistry.registerReference(MembershipRequestLocalServiceUtil.class,
-			"_service");
-		MethodCache.remove(MembershipRequestLocalService.class);
 	}
 
 	private static MembershipRequestLocalService _service;

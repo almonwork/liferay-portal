@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -18,6 +18,7 @@ import com.liferay.portal.kernel.bean.AutoEscapeBeanHandler;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.json.JSON;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.ProxyUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.model.CacheModel;
@@ -33,13 +34,13 @@ import com.liferay.portlet.messageboards.model.MBCategorySoap;
 
 import java.io.Serializable;
 
-import java.lang.reflect.Proxy;
-
 import java.sql.Types;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * The base model implementation for the MBCategory service. Represents a row in the &quot;MBCategory&quot; database table, with each column mapped to a property of this class.
@@ -93,6 +94,13 @@ public class MBCategoryModelImpl extends BaseModelImpl<MBCategory>
 	public static final boolean FINDER_CACHE_ENABLED = GetterUtil.getBoolean(com.liferay.portal.util.PropsUtil.get(
 				"value.object.finder.cache.enabled.com.liferay.portlet.messageboards.model.MBCategory"),
 			true);
+	public static final boolean COLUMN_BITMASK_ENABLED = GetterUtil.getBoolean(com.liferay.portal.util.PropsUtil.get(
+				"value.object.column.bitmask.enabled.com.liferay.portlet.messageboards.model.MBCategory"),
+			true);
+	public static long COMPANYID_COLUMN_BITMASK = 1L;
+	public static long GROUPID_COLUMN_BITMASK = 2L;
+	public static long PARENTCATEGORYID_COLUMN_BITMASK = 4L;
+	public static long UUID_COLUMN_BITMASK = 8L;
 
 	/**
 	 * Converts the soap model instance into a normal model instance.
@@ -138,14 +146,6 @@ public class MBCategoryModelImpl extends BaseModelImpl<MBCategory>
 		return models;
 	}
 
-	public Class<?> getModelClass() {
-		return MBCategory.class;
-	}
-
-	public String getModelClassName() {
-		return MBCategory.class.getName();
-	}
-
 	public static final long LOCK_EXPIRATION_TIME = GetterUtil.getLong(com.liferay.portal.util.PropsUtil.get(
 				"lock.expiration.time.com.liferay.portlet.messageboards.model.MBCategory"));
 
@@ -166,6 +166,130 @@ public class MBCategoryModelImpl extends BaseModelImpl<MBCategory>
 
 	public void setPrimaryKeyObj(Serializable primaryKeyObj) {
 		setPrimaryKey(((Long)primaryKeyObj).longValue());
+	}
+
+	public Class<?> getModelClass() {
+		return MBCategory.class;
+	}
+
+	public String getModelClassName() {
+		return MBCategory.class.getName();
+	}
+
+	@Override
+	public Map<String, Object> getModelAttributes() {
+		Map<String, Object> attributes = new HashMap<String, Object>();
+
+		attributes.put("uuid", getUuid());
+		attributes.put("categoryId", getCategoryId());
+		attributes.put("groupId", getGroupId());
+		attributes.put("companyId", getCompanyId());
+		attributes.put("userId", getUserId());
+		attributes.put("userName", getUserName());
+		attributes.put("createDate", getCreateDate());
+		attributes.put("modifiedDate", getModifiedDate());
+		attributes.put("parentCategoryId", getParentCategoryId());
+		attributes.put("name", getName());
+		attributes.put("description", getDescription());
+		attributes.put("displayStyle", getDisplayStyle());
+		attributes.put("threadCount", getThreadCount());
+		attributes.put("messageCount", getMessageCount());
+		attributes.put("lastPostDate", getLastPostDate());
+
+		return attributes;
+	}
+
+	@Override
+	public void setModelAttributes(Map<String, Object> attributes) {
+		String uuid = (String)attributes.get("uuid");
+
+		if (uuid != null) {
+			setUuid(uuid);
+		}
+
+		Long categoryId = (Long)attributes.get("categoryId");
+
+		if (categoryId != null) {
+			setCategoryId(categoryId);
+		}
+
+		Long groupId = (Long)attributes.get("groupId");
+
+		if (groupId != null) {
+			setGroupId(groupId);
+		}
+
+		Long companyId = (Long)attributes.get("companyId");
+
+		if (companyId != null) {
+			setCompanyId(companyId);
+		}
+
+		Long userId = (Long)attributes.get("userId");
+
+		if (userId != null) {
+			setUserId(userId);
+		}
+
+		String userName = (String)attributes.get("userName");
+
+		if (userName != null) {
+			setUserName(userName);
+		}
+
+		Date createDate = (Date)attributes.get("createDate");
+
+		if (createDate != null) {
+			setCreateDate(createDate);
+		}
+
+		Date modifiedDate = (Date)attributes.get("modifiedDate");
+
+		if (modifiedDate != null) {
+			setModifiedDate(modifiedDate);
+		}
+
+		Long parentCategoryId = (Long)attributes.get("parentCategoryId");
+
+		if (parentCategoryId != null) {
+			setParentCategoryId(parentCategoryId);
+		}
+
+		String name = (String)attributes.get("name");
+
+		if (name != null) {
+			setName(name);
+		}
+
+		String description = (String)attributes.get("description");
+
+		if (description != null) {
+			setDescription(description);
+		}
+
+		String displayStyle = (String)attributes.get("displayStyle");
+
+		if (displayStyle != null) {
+			setDisplayStyle(displayStyle);
+		}
+
+		Integer threadCount = (Integer)attributes.get("threadCount");
+
+		if (threadCount != null) {
+			setThreadCount(threadCount);
+		}
+
+		Integer messageCount = (Integer)attributes.get("messageCount");
+
+		if (messageCount != null) {
+			setMessageCount(messageCount);
+		}
+
+		Date lastPostDate = (Date)attributes.get("lastPostDate");
+
+		if (lastPostDate != null) {
+			setLastPostDate(lastPostDate);
+		}
 	}
 
 	@JSON
@@ -205,6 +329,8 @@ public class MBCategoryModelImpl extends BaseModelImpl<MBCategory>
 	}
 
 	public void setGroupId(long groupId) {
+		_columnBitmask |= GROUPID_COLUMN_BITMASK;
+
 		if (!_setOriginalGroupId) {
 			_setOriginalGroupId = true;
 
@@ -224,7 +350,19 @@ public class MBCategoryModelImpl extends BaseModelImpl<MBCategory>
 	}
 
 	public void setCompanyId(long companyId) {
+		_columnBitmask |= COMPANYID_COLUMN_BITMASK;
+
+		if (!_setOriginalCompanyId) {
+			_setOriginalCompanyId = true;
+
+			_originalCompanyId = _companyId;
+		}
+
 		_companyId = companyId;
+	}
+
+	public long getOriginalCompanyId() {
+		return _originalCompanyId;
 	}
 
 	@JSON
@@ -282,7 +420,19 @@ public class MBCategoryModelImpl extends BaseModelImpl<MBCategory>
 	}
 
 	public void setParentCategoryId(long parentCategoryId) {
+		_columnBitmask = -1L;
+
+		if (!_setOriginalParentCategoryId) {
+			_setOriginalParentCategoryId = true;
+
+			_originalParentCategoryId = _parentCategoryId;
+		}
+
 		_parentCategoryId = parentCategoryId;
+	}
+
+	public long getOriginalParentCategoryId() {
+		return _originalParentCategoryId;
 	}
 
 	@JSON
@@ -296,6 +446,8 @@ public class MBCategoryModelImpl extends BaseModelImpl<MBCategory>
 	}
 
 	public void setName(String name) {
+		_columnBitmask = -1L;
+
 		_name = name;
 	}
 
@@ -354,35 +506,32 @@ public class MBCategoryModelImpl extends BaseModelImpl<MBCategory>
 		_lastPostDate = lastPostDate;
 	}
 
+	public long getColumnBitmask() {
+		return _columnBitmask;
+	}
+
 	@Override
 	public MBCategory toEscapedModel() {
-		if (isEscapedModel()) {
-			return (MBCategory)this;
+		if (_escapedModelProxy == null) {
+			_escapedModelProxy = (MBCategory)ProxyUtil.newProxyInstance(_classLoader,
+					_escapedModelProxyInterfaces,
+					new AutoEscapeBeanHandler(this));
 		}
-		else {
-			if (_escapedModelProxy == null) {
-				_escapedModelProxy = (MBCategory)Proxy.newProxyInstance(_classLoader,
-						_escapedModelProxyInterfaces,
-						new AutoEscapeBeanHandler(this));
-			}
 
-			return _escapedModelProxy;
-		}
+		return _escapedModelProxy;
 	}
 
 	@Override
 	public ExpandoBridge getExpandoBridge() {
-		if (_expandoBridge == null) {
-			_expandoBridge = ExpandoBridgeFactoryUtil.getExpandoBridge(getCompanyId(),
-					MBCategory.class.getName(), getPrimaryKey());
-		}
-
-		return _expandoBridge;
+		return ExpandoBridgeFactoryUtil.getExpandoBridge(getCompanyId(),
+			MBCategory.class.getName(), getPrimaryKey());
 	}
 
 	@Override
 	public void setExpandoBridgeAttributes(ServiceContext serviceContext) {
-		getExpandoBridge().setAttributes(serviceContext);
+		ExpandoBridge expandoBridge = getExpandoBridge();
+
+		expandoBridge.setAttributes(serviceContext);
 	}
 
 	@Override
@@ -476,6 +625,16 @@ public class MBCategoryModelImpl extends BaseModelImpl<MBCategory>
 		mbCategoryModelImpl._originalGroupId = mbCategoryModelImpl._groupId;
 
 		mbCategoryModelImpl._setOriginalGroupId = false;
+
+		mbCategoryModelImpl._originalCompanyId = mbCategoryModelImpl._companyId;
+
+		mbCategoryModelImpl._setOriginalCompanyId = false;
+
+		mbCategoryModelImpl._originalParentCategoryId = mbCategoryModelImpl._parentCategoryId;
+
+		mbCategoryModelImpl._setOriginalParentCategoryId = false;
+
+		mbCategoryModelImpl._columnBitmask = 0;
 	}
 
 	@Override
@@ -689,18 +848,22 @@ public class MBCategoryModelImpl extends BaseModelImpl<MBCategory>
 	private long _originalGroupId;
 	private boolean _setOriginalGroupId;
 	private long _companyId;
+	private long _originalCompanyId;
+	private boolean _setOriginalCompanyId;
 	private long _userId;
 	private String _userUuid;
 	private String _userName;
 	private Date _createDate;
 	private Date _modifiedDate;
 	private long _parentCategoryId;
+	private long _originalParentCategoryId;
+	private boolean _setOriginalParentCategoryId;
 	private String _name;
 	private String _description;
 	private String _displayStyle;
 	private int _threadCount;
 	private int _messageCount;
 	private Date _lastPostDate;
-	private transient ExpandoBridge _expandoBridge;
+	private long _columnBitmask;
 	private MBCategory _escapedModelProxy;
 }

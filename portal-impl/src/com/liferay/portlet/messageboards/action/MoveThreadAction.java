@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -38,7 +38,9 @@ import com.liferay.portlet.messageboards.service.MBMessageServiceUtil;
 import com.liferay.portlet.messageboards.service.MBThreadLocalServiceUtil;
 import com.liferay.portlet.messageboards.service.MBThreadServiceUtil;
 
-import java.util.ArrayList;
+import java.io.InputStream;
+
+import java.util.Collections;
 
 import javax.portlet.ActionRequest;
 import javax.portlet.ActionResponse;
@@ -70,7 +72,7 @@ public class MoveThreadAction extends PortletAction {
 			if (e instanceof PrincipalException ||
 				e instanceof RequiredMessageException) {
 
-				SessionErrors.add(actionRequest, e.getClass().getName());
+				SessionErrors.add(actionRequest, e.getClass());
 
 				setForward(actionRequest, "portlet.message_boards.error");
 			}
@@ -78,7 +80,7 @@ public class MoveThreadAction extends PortletAction {
 					 e instanceof MessageSubjectException ||
 					 e instanceof NoSuchThreadException) {
 
-				SessionErrors.add(actionRequest, e.getClass().getName());
+				SessionErrors.add(actionRequest, e.getClass());
 			}
 			else {
 				throw e;
@@ -99,7 +101,7 @@ public class MoveThreadAction extends PortletAction {
 			if (e instanceof NoSuchMessageException ||
 				e instanceof PrincipalException) {
 
-				SessionErrors.add(renderRequest, e.getClass().getName());
+				SessionErrors.add(renderRequest, e.getClass());
 
 				return mapping.findForward("portlet.message_boards.error");
 			}
@@ -146,8 +148,9 @@ public class MoveThreadAction extends PortletAction {
 			MBMessageServiceUtil.addMessage(
 				groupId, categoryId, threadId, thread.getRootMessageId(),
 				subject, body, format,
-				new ArrayList<ObjectValuePair<String, byte[]>>(), false,
-				MBThreadConstants.PRIORITY_NOT_GIVEN, false, serviceContext);
+				Collections.<ObjectValuePair<String, InputStream>>emptyList(),
+				false, MBThreadConstants.PRIORITY_NOT_GIVEN, false,
+				serviceContext);
 		}
 
 		PortletURL portletURL =

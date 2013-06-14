@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -21,9 +21,9 @@ import com.liferay.portal.util.PortalInstances;
 import com.liferay.portal.util.PropsValues;
 
 import java.sql.Connection;
-import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.Timestamp;
 
 /**
  * @author Juan Fernández
@@ -32,15 +32,15 @@ public class UpgradeSubscription extends UpgradeProcess {
 
 	protected void addSubscription(
 			long subscriptionId, long companyId, long userId, String userName,
-			Date createDate, Date modifiedDate, long classNameId, long classPK,
-			String frequency)
+			Timestamp createDate, Timestamp modifiedDate, long classNameId,
+			long classPK, String frequency)
 		throws Exception {
 
 		Connection con = null;
 		PreparedStatement ps = null;
 
 		try {
-			con = DataAccess.getConnection();
+			con = DataAccess.getUpgradeOptimizedConnection();
 
 			StringBundler sb = new StringBundler(4);
 
@@ -49,14 +49,16 @@ public class UpgradeSubscription extends UpgradeProcess {
 			sb.append("classNameId, classPK, frequency) values (?, ?, ?, ?, ");
 			sb.append("?, ?, ?, ?, ?)");
 
-			ps = con.prepareStatement(sb.toString());
+			String sql = sb.toString();
+
+			ps = con.prepareStatement(sql);
 
 			ps.setLong(1, subscriptionId);
 			ps.setLong(2, companyId);
 			ps.setLong(3, userId);
 			ps.setString(4, userName);
-			ps.setDate(5, createDate);
-			ps.setDate(6, modifiedDate);
+			ps.setTimestamp(5, createDate);
+			ps.setTimestamp(6, modifiedDate);
 			ps.setLong(7, classNameId);
 			ps.setLong(8, classPK);
 			ps.setString(9, frequency);
@@ -87,25 +89,28 @@ public class UpgradeSubscription extends UpgradeProcess {
 		ResultSet rs = null;
 
 		try {
-			con = DataAccess.getConnection();
+			con = DataAccess.getUpgradeOptimizedConnection();
 
 			StringBundler sb = new StringBundler(5);
 
-			sb.append("select userId, MIN(userName), classNameId, classPK, ");
-			sb.append("MIN(createDate), MIN(modifiedDate) from MBMessage ");
+			sb.append("select userId, MIN(userName) as userName, ");
+			sb.append("classNameId, classPK, MIN(createDate) as createDate, ");
+			sb.append("MIN(modifiedDate) as modifiedDate from MBMessage ");
 			sb.append("where (companyId = " + companyId + ") and ");
 			sb.append("(classNameId != 0) and (parentMessageId != 0) ");
-			sb.append("group by userId, userName, classNameId, classPK");
+			sb.append("group by userId, classNameId, classPK");
 
-			ps = con.prepareStatement(sb.toString());
+			String sql = sb.toString();
+
+			ps = con.prepareStatement(sql);
 
 			rs = ps.executeQuery();
 
 			while (rs.next()) {
 				long userId = rs.getLong("userId");
 				String userName = rs.getString("userName");
-				Date createDate = rs.getDate("createDate");
-				Date modifiedDate = rs.getDate("modifiedDate");
+				Timestamp createDate = rs.getTimestamp("createDate");
+				Timestamp modifiedDate = rs.getTimestamp("modifiedDate");
 				long classNameId = rs.getLong("classNameId");
 				long classPK = rs.getLong("classPK");
 

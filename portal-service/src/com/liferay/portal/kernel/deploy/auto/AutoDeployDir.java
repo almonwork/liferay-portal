@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,6 +14,7 @@
 
 package com.liferay.portal.kernel.deploy.auto;
 
+import com.liferay.portal.kernel.deploy.auto.context.AutoDeploymentContext;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.util.IntegerWrapper;
@@ -130,6 +131,15 @@ public class AutoDeployDir {
 		_autoDeployListeners.remove(autoDeployListener);
 	}
 
+	protected AutoDeploymentContext buildAutoDeploymentContext(File file) {
+		AutoDeploymentContext autoDeploymentContext =
+			new AutoDeploymentContext();
+
+		autoDeploymentContext.setFile(file);
+
+		return autoDeploymentContext;
+	}
+
 	protected void processFile(File file) {
 		String fileName = file.getName();
 
@@ -176,8 +186,11 @@ public class AutoDeployDir {
 		}
 
 		try {
+			AutoDeploymentContext autoDeploymentContext =
+				buildAutoDeploymentContext(file);
+
 			for (AutoDeployListener autoDeployListener : _autoDeployListeners) {
-				autoDeployListener.deploy(file);
+				autoDeployListener.deploy(autoDeploymentContext);
 			}
 
 			if (file.delete()) {
@@ -214,9 +227,10 @@ public class AutoDeployDir {
 		for (File file : files) {
 			String fileName = file.getName().toLowerCase();
 
-			if ((file.isFile()) &&
-				(fileName.endsWith(".war") || fileName.endsWith(".zip") ||
-				 fileName.endsWith(".xml"))) {
+			if (file.isFile() &&
+				(fileName.endsWith(".jar") || fileName.endsWith(".lpkg") ||
+				 fileName.endsWith(".war") || fileName.endsWith(".xml") ||
+				 fileName.endsWith(".zip"))) {
 
 				processFile(file);
 			}

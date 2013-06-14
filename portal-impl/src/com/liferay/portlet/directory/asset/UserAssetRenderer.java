@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -42,6 +42,10 @@ public class UserAssetRenderer extends BaseAssetRenderer {
 		_user = user;
 	}
 
+	public String getAssetRendererFactoryClassName() {
+		return UserAssetRendererFactory.CLASS_NAME;
+	}
+
 	public long getClassPK() {
 		return _user.getPrimaryKey();
 	}
@@ -56,7 +60,7 @@ public class UserAssetRenderer extends BaseAssetRenderer {
 	}
 
 	public String getSummary(Locale locale) {
-		return _user.getFullName();
+		return _user.getComments();
 	}
 
 	public String getTitle(Locale locale) {
@@ -90,16 +94,17 @@ public class UserAssetRenderer extends BaseAssetRenderer {
 		LiferayPortletResponse liferayPortletResponse,
 		String noSuchEntryRedirect) {
 
-		ThemeDisplay themeDisplay =
-			(ThemeDisplay)liferayPortletRequest.getAttribute(
-				WebKeys.THEME_DISPLAY);
-
-		return themeDisplay.getPortalURL() + themeDisplay.getPathMain() +
-			"/directory/find_user?p_u_i_d=" + _user.getUserId();
+		return getURLViewInContext(
+			liferayPortletRequest, noSuchEntryRedirect, "/directory/find_user",
+			"p_u_i_d", _user.getUserId());
 	}
 
 	public long getUserId() {
 		return _user.getUserId();
+	}
+
+	public String getUserName() {
+		return _user.getFullName();
 	}
 
 	public String getUuid() {

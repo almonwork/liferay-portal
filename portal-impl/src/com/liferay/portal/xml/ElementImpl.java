@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -31,6 +31,7 @@ import java.io.IOException;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 
 /**
  * @author Brian Wing Shun Chan
@@ -103,6 +104,10 @@ public class ElementImpl extends BranchImpl implements Element {
 		return new ElementImpl(_element.addEntity(name, text));
 	}
 
+	public List<Namespace> additionalNamespaces() {
+		return SAXReaderImpl.toNewNamespaces(_element.additionalNamespaces());
+	}
+
 	public Element addNamespace(String prefix, String uri) {
 		return new ElementImpl(_element.addNamespace(prefix, uri));
 	}
@@ -119,10 +124,6 @@ public class ElementImpl extends BranchImpl implements Element {
 
 	public Element addText(String text) {
 		return new ElementImpl(_element.addText(text));
-	}
-
-	public List<Namespace> additionalNamespaces() {
-		return SAXReaderImpl.toNewNamespaces(_element.additionalNamespaces());
 	}
 
 	public void appendAttributes(Element element) {
@@ -175,6 +176,10 @@ public class ElementImpl extends BranchImpl implements Element {
 		return attributes().iterator();
 	}
 
+	public List<Attribute> attributes() {
+		return SAXReaderImpl.toNewAttributes(_element.attributes());
+	}
+
 	public String attributeValue(QName qName) {
 		QNameImpl qNameImpl = (QNameImpl)qName;
 
@@ -194,10 +199,6 @@ public class ElementImpl extends BranchImpl implements Element {
 
 	public String attributeValue(String name, String defaultValue) {
 		return _element.attributeValue(name, defaultValue);
-	}
-
-	public List<Attribute> attributes() {
-		return SAXReaderImpl.toNewAttributes(_element.attributes());
 	}
 
 	public Element createCopy() {
@@ -256,6 +257,21 @@ public class ElementImpl extends BranchImpl implements Element {
 		return elements(name).iterator();
 	}
 
+	public List<Element> elements() {
+		return SAXReaderImpl.toNewElements(_element.elements());
+	}
+
+	public List<Element> elements(QName qName) {
+		QNameImpl qNameImpl = (QNameImpl)qName;
+
+		return SAXReaderImpl.toNewElements(
+			_element.elements(qNameImpl.getWrappedQName()));
+	}
+
+	public List<Element> elements(String name) {
+		return SAXReaderImpl.toNewElements(_element.elements(name));
+	}
+
 	public String elementText(QName qName) {
 		QNameImpl qNameImpl = (QNameImpl)qName;
 
@@ -276,23 +292,20 @@ public class ElementImpl extends BranchImpl implements Element {
 		return _element.elementTextTrim(name);
 	}
 
-	public List<Element> elements() {
-		return SAXReaderImpl.toNewElements(_element.elements());
-	}
-
-	public List<Element> elements(QName qName) {
-		QNameImpl qNameImpl = (QNameImpl)qName;
-
-		return SAXReaderImpl.toNewElements(
-			_element.elements(qNameImpl.getWrappedQName()));
-	}
-
-	public List<Element> elements(String name) {
-		return SAXReaderImpl.toNewElements(_element.elements(name));
-	}
-
 	@Override
 	public boolean equals(Object obj) {
+		if (obj instanceof NodeImpl) {
+			NodeImpl nodeImpl = (NodeImpl)obj;
+
+			if (nodeImpl.getWrappedNode() instanceof org.dom4j.Element) {
+				obj = new ElementImpl(
+					(org.dom4j.Element)nodeImpl.getWrappedNode());
+			}
+			else {
+				return false;
+			}
+		}
+
 		org.dom4j.Element element = ((ElementImpl)obj).getWrappedElement();
 
 		return _element.equals(element);
@@ -356,12 +369,12 @@ public class ElementImpl extends BranchImpl implements Element {
 		return _element.getNamespacePrefix();
 	}
 
-	public String getNamespaceURI() {
-		return _element.getNamespaceURI();
-	}
-
 	public List<Namespace> getNamespacesForURI(String uri) {
 		return SAXReaderImpl.toNewNamespaces(_element.getNamespacesForURI(uri));
+	}
+
+	public String getNamespaceURI() {
+		return _element.getNamespaceURI();
 	}
 
 	public QName getQName() {
@@ -468,6 +481,141 @@ public class ElementImpl extends BranchImpl implements Element {
 		QNameImpl qNameImpl = (QNameImpl)qName;
 
 		_element.setQName(qNameImpl.getWrappedQName());
+	}
+
+	public void sortAttributes(boolean recursive) {
+		Map<String, Attribute> attributesMap = new TreeMap<String, Attribute>();
+
+		List<Attribute> attributes = attributes();
+
+		for (Attribute attribute : attributes) {
+			attribute.detach();
+
+			attributesMap.put(attribute.getName(), attribute);
+		}
+
+		for (Map.Entry<String, Attribute> entry : attributesMap.entrySet()) {
+			Attribute attribute = entry.getValue();
+
+			add(attribute);
+		}
+
+		if (!recursive) {
+			return;
+		}
+
+		List<Element> elements = elements();
+
+		for (Element element : elements) {
+			element.sortAttributes(true);
+		}
+	}
+
+	public void sortElementsByAttribute(
+		String elementName, String attributeName) {
+
+		Map<String, Element> elementsMap = new TreeMap<String, Element>();
+
+		List<Element> elements = elements();
+
+		for (Element element : elements) {
+			element.detach();
+
+			if (elementName.equals(element.getName())) {
+				String attributeValue = element.attributeValue(attributeName);
+
+				elementsMap.put(attributeValue, element);
+			}
+		}
+
+		for (Element element : elements) {
+			if (elementName.equals(element.getName())) {
+				break;
+			}
+
+			add(element);
+		}
+
+		for (Map.Entry<String, Element> entry : elementsMap.entrySet()) {
+			Element element = entry.getValue();
+
+			add(element);
+		}
+
+		boolean foundLastElementWithElementName = false;
+
+		for (int i = 0; i < elements.size(); i++) {
+			Element element = elements.get(i);
+
+			if (!foundLastElementWithElementName) {
+				if (elementName.equals(element.getName())) {
+					if ((i + 1) < elements.size()) {
+						Element nextElement = elements.get(i + 1);
+
+						if (!elementName.equals(nextElement.getName())) {
+							foundLastElementWithElementName = true;
+						}
+					}
+				}
+			}
+			else {
+				add(element);
+			}
+		}
+	}
+
+	public void sortElementsByChildElement(
+		String elementName, String childElementName) {
+
+		Map<String, Element> elementsMap = new TreeMap<String, Element>();
+
+		List<Element> elements = elements();
+
+		for (Element element : elements) {
+			element.detach();
+
+			if (elementName.equals(element.getName())) {
+				String childElementValue = element.elementText(
+					childElementName);
+
+				elementsMap.put(childElementValue, element);
+			}
+		}
+
+		for (Element element : elements) {
+			if (elementName.equals(element.getName())) {
+				break;
+			}
+
+			add(element);
+		}
+
+		for (Map.Entry<String, Element> entry : elementsMap.entrySet()) {
+			Element element = entry.getValue();
+
+			add(element);
+		}
+
+		boolean foundLastElementWithElementName = false;
+
+		for (int i = 0; i < elements.size(); i++) {
+			Element element = elements.get(i);
+
+			if (!foundLastElementWithElementName) {
+				if (elementName.equals(element.getName())) {
+					if ((i + 1) < elements.size()) {
+						Element nextElement = elements.get(i + 1);
+
+						if (!elementName.equals(nextElement.getName())) {
+							foundLastElementWithElementName = true;
+						}
+					}
+				}
+			}
+			else {
+				add(element);
+			}
+		}
 	}
 
 	@Override

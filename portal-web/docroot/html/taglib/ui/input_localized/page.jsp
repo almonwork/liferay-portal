@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -20,16 +20,28 @@
 String randomNamespace = PortalUtil.generateRandomKey(request, "taglib_ui_input_localized_page");
 
 String cssClass = GetterUtil.getString((String)request.getAttribute("liferay-ui:input-localized:cssClass"));
+String defaultLanguageId = (String)request.getAttribute("liferay-ui:input-localized:defaultLanguageId");
 boolean disabled = GetterUtil.getBoolean((String) request.getAttribute("liferay-ui:input-localized:disabled"));
+String id = (String)request.getAttribute("liferay-ui:input-localized:id");
 Map<String, Object> dynamicAttributes = (Map<String, Object>)request.getAttribute("liferay-ui:input-localized:dynamicAttributes");
 String formName = (String)request.getAttribute("liferay-ui:input-localized:formName");
+boolean ignoreRequestValue = GetterUtil.getBoolean((String) request.getAttribute("liferay-ui:input-localized:ignoreRequestValue"));
 String languageId = (String)request.getAttribute("liferay-ui:input-localized:languageId");
+String maxLength = GetterUtil.getString((String)request.getAttribute("liferay-ui:input-localized:maxLength"));
 String name = (String)request.getAttribute("liferay-ui:input-localized:name");
 String xml = (String)request.getAttribute("liferay-ui:input-localized:xml");
 String type = (String)request.getAttribute("liferay-ui:input-localized:type");
 
-Locale defaultLocale = LocaleUtil.getDefault();
-String defaultLanguageId = LocaleUtil.toLanguageId(defaultLocale);
+Locale defaultLocale = null;
+
+if (Validator.isNotNull(defaultLanguageId)) {
+	defaultLocale = LocaleUtil.fromLanguageId(defaultLanguageId);
+}
+else {
+	defaultLocale = LocaleUtil.getDefault();
+	defaultLanguageId = LocaleUtil.toLanguageId(defaultLocale);
+}
+
 Locale[] locales = LanguageUtil.getAvailableLocales();
 
 String mainLanguageId = defaultLanguageId;
@@ -38,18 +50,37 @@ if (Validator.isNotNull(languageId)) {
 	mainLanguageId = languageId;
 }
 
-String mainLanguageValue = ParamUtil.getString(request, name + StringPool.UNDERLINE + mainLanguageId, LocalizationUtil.getLocalization(xml, mainLanguageId));
+String mainLanguageValue = LocalizationUtil.getLocalization(xml, mainLanguageId, false);
+
+if (!ignoreRequestValue) {
+	mainLanguageValue = ParamUtil.getString(request, name + StringPool.UNDERLINE + mainLanguageId, mainLanguageValue);
+}
+
+if (Validator.isNull(mainLanguageValue)) {
+	mainLanguageValue = LocalizationUtil.getLocalization(xml, defaultLanguageId, true);
+}
 %>
 
 <span class="taglib-input-localized">
 	<c:choose>
 		<c:when test='<%= type.equals("input") %>'>
-			<input class="language-value <%= cssClass %>" <%= disabled ? "disabled=\"disabled\"" : "" %> id="<portlet:namespace /><%= name + StringPool.UNDERLINE + mainLanguageId %>" name="<portlet:namespace /><%= name + StringPool.UNDERLINE + mainLanguageId %>" type="text" value="<%= HtmlUtil.escape(mainLanguageValue) %>" <%= InlineUtil.buildDynamicAttributes(dynamicAttributes) %> />
+			<input class="language-value <%= cssClass %>" <%= disabled ? "disabled=\"disabled\"" : "" %> id="<portlet:namespace /><%= id + StringPool.UNDERLINE + mainLanguageId %>" name="<portlet:namespace /><%= name + StringPool.UNDERLINE + mainLanguageId %>" type="text" value="<%= HtmlUtil.escape(mainLanguageValue) %>" <%= InlineUtil.buildDynamicAttributes(dynamicAttributes) %> />
 		</c:when>
 		<c:when test='<%= type.equals("textarea") %>'>
-			<textarea class="language-value <%= cssClass %>" <%= disabled ? "disabled=\"disabled\"" : "" %> id="<portlet:namespace /><%= name + StringPool.UNDERLINE + mainLanguageId %>" name="<portlet:namespace /><%= name + StringPool.UNDERLINE + mainLanguageId %>" <%= InlineUtil.buildDynamicAttributes(dynamicAttributes) %>><%= HtmlUtil.escape(mainLanguageValue) %></textarea>
+			<textarea class="language-value <%= cssClass %>" <%= disabled ? "disabled=\"disabled\"" : "" %> id="<portlet:namespace /><%= id + StringPool.UNDERLINE + mainLanguageId %>" name="<portlet:namespace /><%= name + StringPool.UNDERLINE + mainLanguageId %>" <%= InlineUtil.buildDynamicAttributes(dynamicAttributes) %>><%= HtmlUtil.escape(mainLanguageValue) %></textarea>
 		</c:when>
 	</c:choose>
+
+	<c:if test="<%= Validator.isNotNull(maxLength) %>">
+		<aui:script use="aui-char-counter">
+			new A.CharCounter(
+				{
+					input: '#<portlet:namespace /><%= id + StringPool.UNDERLINE + mainLanguageId %>',
+					maxLength: <%= maxLength %>
+				}
+			);
+		</aui:script>
+	</c:if>
 
 	<c:if test="<%= Validator.isNull(languageId) %>">
 		<span class="flag-selector nobr">
@@ -67,7 +98,7 @@ String mainLanguageValue = ParamUtil.getString(request, name + StringPool.UNDERL
 					String selLanguageId = LocaleUtil.toLanguageId(locales[i]);
 					String languageValue = LocalizationUtil.getLocalization(xml, selLanguageId, false);
 
-					if (Validator.isNotNull(languageValue) || (request.getParameter(name + StringPool.UNDERLINE + selLanguageId) != null)) {
+					if (Validator.isNotNull(languageValue) || (!ignoreRequestValue && (request.getParameter(name + StringPool.UNDERLINE + selLanguageId) != null))) {
 						languageIds.add(selLanguageId);
 					}
 				}
@@ -116,7 +147,7 @@ String mainLanguageValue = ParamUtil.getString(request, name + StringPool.UNDERL
 										String selLanguageId = LocaleUtil.toLanguageId(curLocale);
 										String languageValue = LocalizationUtil.getLocalization(xml, selLanguageId, false);
 
-										if ((Validator.isNotNull(xml)) && Validator.isNotNull(languageValue)) {
+										if (Validator.isNotNull(xml) && Validator.isNotNull(languageValue)) {
 											optionStyle = "style=\"font-weight: bold\"";
 										}
 									%>
@@ -130,21 +161,36 @@ String mainLanguageValue = ParamUtil.getString(request, name + StringPool.UNDERL
 								</select>
 
 								<%
-								String languageValue = ParamUtil.getString(request, name + StringPool.UNDERLINE + curLanguageId);
+								String languageValue = StringPool.BLANK;
 
-								if (Validator.isNotNull(xml) && Validator.isNull(languageValue)) {
+								if (Validator.isNotNull(xml)) {
 									languageValue = LocalizationUtil.getLocalization(xml, curLanguageId, false);
+								}
+
+								if (!ignoreRequestValue){
+									languageValue = ParamUtil.getString(request, name + StringPool.UNDERLINE + curLanguageId, languageValue);
 								}
 								%>
 
 								<c:choose>
 									<c:when test='<%= type.equals("input") %>'>
-										<input class="language-value" <%= disabled ? "disabled=\"disabled\"" : "" %> name="<portlet:namespace /><%= name + StringPool.UNDERLINE + curLanguageId %>" type="text" value="<%= HtmlUtil.escape(languageValue) %>" />
+										<input class="language-value" <%= disabled ? "disabled=\"disabled\"" : "" %> id="<portlet:namespace /><%= id + StringPool.UNDERLINE + curLanguageId %>" name="<portlet:namespace /><%= name + StringPool.UNDERLINE + curLanguageId %>" type="text" value="<%= HtmlUtil.escape(languageValue) %>" />
 									</c:when>
 									<c:when test='<%= type.equals("textarea") %>'>
-										<textarea class="language-value" <%= disabled ? "disabled=\"disabled\"" : "" %> name="<portlet:namespace /><%= name + StringPool.UNDERLINE + curLanguageId %>"><%= HtmlUtil.escape(languageValue) %></textarea>
+										<textarea class="language-value" <%= disabled ? "disabled=\"disabled\"" : "" %> id="<portlet:namespace /><%= id + StringPool.UNDERLINE + curLanguageId %>" name="<portlet:namespace /><%= name + StringPool.UNDERLINE + curLanguageId %>"><%= HtmlUtil.escape(languageValue) %></textarea>
 									</c:when>
 								</c:choose>
+
+								<c:if test="<%= Validator.isNotNull(maxLength) %>">
+									<aui:script use="aui-char-counter">
+										new A.CharCounter(
+											{
+												input: '#<portlet:namespace /><%= id + StringPool.UNDERLINE + curLanguageId %>',
+												maxLength: <%= maxLength %>
+											}
+										);
+									</aui:script>
+								</c:if>
 							</div>
 						</div>
 
@@ -166,6 +212,7 @@ String mainLanguageValue = ParamUtil.getString(request, name + StringPool.UNDERL
 			var selectedValue = target.val();
 
 			var newName = '<portlet:namespace /><%= name %>_';
+			var newId = '<portlet:namespace /><%= id %>_';
 
 			var currentRow = target.ancestor('.lfr-form-row');
 
@@ -174,6 +221,7 @@ String mainLanguageValue = ParamUtil.getString(request, name + StringPool.UNDERL
 
 			if (selectedValue) {
 				newName ='<portlet:namespace /><%= name %>_' + selectedValue;
+				newId ='<portlet:namespace /><%= id %>_' + selectedValue;
 
 				imgSrc = 'language/' + selectedValue;
 			}
@@ -182,7 +230,7 @@ String mainLanguageValue = ParamUtil.getString(request, name + StringPool.UNDERL
 
 			if (inputField) {
 				inputField.attr('name', newName);
-				inputField.attr('id', newName);
+				inputField.attr('id', newId);
 			}
 
 			if (img) {

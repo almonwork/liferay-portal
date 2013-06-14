@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -41,19 +41,17 @@ if (Validator.isNotNull(oldCategoryPath)) {
 	newCategoryPath = oldCategoryPath + ":" + newCategoryPath;
 }
 
-List categories = ListUtil.fromCollection(portletCategory.getCategories());
+List<PortletCategory> categories = ListUtil.fromCollection(portletCategory.getCategories());
 
 categories = ListUtil.sort(categories, new PortletCategoryComparator(locale));
 
-List portlets = new ArrayList();
+List<Portlet> portlets = new ArrayList<Portlet>();
 
-Iterator itr = portletCategory.getPortletIds().iterator();
+Set<String> portletIds = portletCategory.getPortletIds();
 
 String externalPortletCategory = null;
 
-while (itr.hasNext()) {
-	String portletId = (String)itr.next();
-
+for (String portletId : portletIds) {
 	Portlet portlet = PortletLocalServiceUtil.getPortletById(user.getCompanyId(), portletId);
 
 	if ((portlet != null) && PortletPermissionUtil.contains(permissionChecker, layout, portlet, ActionKeys.ADD_TO_PAGE)) {
@@ -84,10 +82,8 @@ if (!categories.isEmpty() || !portlets.isEmpty()) {
 		<div class="lfr-content-category <%= layout.isTypePortlet() ? "aui-helper-hidden" : "" %>">
 
 			<%
-			itr = categories.iterator();
-
-			while (itr.hasNext()) {
-				request.setAttribute(WebKeys.PORTLET_CATEGORY, itr.next());
+			for (PortletCategory category : categories) {
+				request.setAttribute(WebKeys.PORTLET_CATEGORY, category);
 				request.setAttribute(WebKeys.PORTLET_CATEGORY_INDEX, String.valueOf(portletCategoryIndex));
 				request.setAttribute(WebKeys.PORTLET_CATEGORY_PATH, newCategoryPath);
 			%>
@@ -100,11 +96,9 @@ if (!categories.isEmpty() || !portlets.isEmpty()) {
 				portletCategoryIndex++;
 			}
 
-			itr = portlets.iterator();
+			String[] runtimePortletIds = StringUtil.split(ParamUtil.getString(request, "runtimePortletIds"));
 
-			while (itr.hasNext()) {
-				Portlet portlet = (Portlet)itr.next();
-
+			for (Portlet portlet : portlets) {
 				divId.setIndex(0);
 
 				divId.append(newCategoryPath);
@@ -117,7 +111,19 @@ if (!categories.isEmpty() || !portlets.isEmpty()) {
 				}
 
 				boolean portletInstanceable = portlet.isInstanceable();
+
 				boolean portletUsed = layoutTypePortlet.hasPortletId(portlet.getPortletId());
+
+				for (String runtimePortletId : runtimePortletIds) {
+					String portletId = portlet.getPortletId();
+
+					if (runtimePortletId.equals(portletId) ||
+						runtimePortletId.startsWith(portletId.concat(PortletConstants.INSTANCE_SEPARATOR))) {
+
+						portletUsed = true;
+					}
+				}
+
 				boolean portletLocked = (!portletInstanceable && portletUsed);
 
 				if (portletInstanceable && layout.isTypePanel()) {

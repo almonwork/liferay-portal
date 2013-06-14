@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -92,7 +92,7 @@ public class DeterminateKeyGenerator {
 		return (seed % 127773) * 16807 - (seed / 127773) * 2836;
 	}
 
-	private static char[] _CHARACTERS =
+	private static final char[] _CHARACTERS =
 		"abcdefghijklmnopqrstuvwxyz".toCharArray();
 
 	private static final int _DEFAULT_LENGTH = 4;

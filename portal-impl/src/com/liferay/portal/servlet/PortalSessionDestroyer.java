@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -15,6 +15,8 @@
 package com.liferay.portal.servlet;
 
 import com.liferay.portal.events.EventsProcessorUtil;
+import com.liferay.portal.kernel.cluster.ClusterExecutorUtil;
+import com.liferay.portal.kernel.cluster.ClusterNode;
 import com.liferay.portal.kernel.events.ActionException;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
@@ -26,9 +28,9 @@ import com.liferay.portal.kernel.servlet.PortalSessionContext;
 import com.liferay.portal.kernel.servlet.PortletSessionTracker;
 import com.liferay.portal.kernel.util.BasePortalLifecycle;
 import com.liferay.portal.kernel.util.PropsKeys;
-import com.liferay.portal.model.User;
-import com.liferay.portal.service.UserLocalServiceUtil;
-import com.liferay.portal.util.PortalInstances;
+import com.liferay.portal.kernel.util.Validator;
+import com.liferay.portal.security.auth.AuthenticatedUserUUIDStoreUtil;
+import com.liferay.portal.service.CompanyLocalServiceUtil;
 import com.liferay.portal.util.PropsValues;
 import com.liferay.portal.util.WebKeys;
 
@@ -82,19 +84,35 @@ public class PortalSessionDestroyer extends BasePortalLifecycle {
 			// Live users
 
 			if (PropsValues.LIVE_USERS_ENABLED) {
-				long userId = userIdObj.longValue();
-				long companyId = getCompanyId(userId);
-				String sessionId = session.getId();
-
 				JSONObject jsonObject = JSONFactoryUtil.createJSONObject();
 
+				ClusterNode clusterNode =
+					ClusterExecutorUtil.getLocalClusterNode();
+
+				if (clusterNode != null) {
+					jsonObject.put(
+						"clusterNodeId", clusterNode.getClusterNodeId());
+				}
+
 				jsonObject.put("command", "signOut");
+
+				long userId = userIdObj.longValue();
+
+				long companyId = CompanyLocalServiceUtil.getCompanyIdByUserId(
+					userId);
+
 				jsonObject.put("companyId", companyId);
+				jsonObject.put("sessionId", session.getId());
 				jsonObject.put("userId", userId);
-				jsonObject.put("sessionId", sessionId);
 
 				MessageBusUtil.sendMessage(
 					DestinationNames.LIVE_USERS, jsonObject.toString());
+			}
+
+			String userUUID = (String)session.getAttribute(WebKeys.USER_UUID);
+
+			if (Validator.isNotNull(userUUID)) {
+				AuthenticatedUserUUIDStoreUtil.unregister(userUUID);
 			}
 		}
 		catch (IllegalStateException ise) {
@@ -134,31 +152,6 @@ public class PortalSessionDestroyer extends BasePortalLifecycle {
 		catch (ActionException ae) {
 			_log.error(ae, ae);
 		}
-	}
-
-	protected long getCompanyId(long userId) throws Exception {
-		long[] companyIds = PortalInstances.getCompanyIds();
-
-		long companyId = 0;
-
-		if (companyIds.length == 1) {
-			companyId = companyIds[0];
-		}
-		else if (companyIds.length > 1) {
-			try {
-				User user = UserLocalServiceUtil.getUserById(userId);
-
-				companyId = user.getCompanyId();
-			}
-			catch (Exception e) {
-				if (_log.isWarnEnabled()) {
-					_log.warn(
-						"Unable to set the company id for user " + userId, e);
-				}
-			}
-		}
-
-		return companyId;
 	}
 
 	private static Log _log = LogFactoryUtil.getLog(

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,6 +14,12 @@
 
 package com.liferay.portlet.journal.model;
 
+import com.liferay.portal.model.ModelWrapper;
+
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * <p>
  * This class is a wrapper for {@link JournalArticle}.
@@ -23,7 +29,8 @@ package com.liferay.portlet.journal.model;
  * @see       JournalArticle
  * @generated
  */
-public class JournalArticleWrapper implements JournalArticle {
+public class JournalArticleWrapper implements JournalArticle,
+	ModelWrapper<JournalArticle> {
 	public JournalArticleWrapper(JournalArticle journalArticle) {
 		_journalArticle = journalArticle;
 	}
@@ -34,6 +41,246 @@ public class JournalArticleWrapper implements JournalArticle {
 
 	public String getModelClassName() {
 		return JournalArticle.class.getName();
+	}
+
+	public Map<String, Object> getModelAttributes() {
+		Map<String, Object> attributes = new HashMap<String, Object>();
+
+		attributes.put("uuid", getUuid());
+		attributes.put("id", getId());
+		attributes.put("resourcePrimKey", getResourcePrimKey());
+		attributes.put("groupId", getGroupId());
+		attributes.put("companyId", getCompanyId());
+		attributes.put("userId", getUserId());
+		attributes.put("userName", getUserName());
+		attributes.put("createDate", getCreateDate());
+		attributes.put("modifiedDate", getModifiedDate());
+		attributes.put("folderId", getFolderId());
+		attributes.put("classNameId", getClassNameId());
+		attributes.put("classPK", getClassPK());
+		attributes.put("articleId", getArticleId());
+		attributes.put("version", getVersion());
+		attributes.put("title", getTitle());
+		attributes.put("urlTitle", getUrlTitle());
+		attributes.put("description", getDescription());
+		attributes.put("content", getContent());
+		attributes.put("type", getType());
+		attributes.put("structureId", getStructureId());
+		attributes.put("templateId", getTemplateId());
+		attributes.put("layoutUuid", getLayoutUuid());
+		attributes.put("displayDate", getDisplayDate());
+		attributes.put("expirationDate", getExpirationDate());
+		attributes.put("reviewDate", getReviewDate());
+		attributes.put("indexable", getIndexable());
+		attributes.put("smallImage", getSmallImage());
+		attributes.put("smallImageId", getSmallImageId());
+		attributes.put("smallImageURL", getSmallImageURL());
+		attributes.put("status", getStatus());
+		attributes.put("statusByUserId", getStatusByUserId());
+		attributes.put("statusByUserName", getStatusByUserName());
+		attributes.put("statusDate", getStatusDate());
+
+		return attributes;
+	}
+
+	public void setModelAttributes(Map<String, Object> attributes) {
+		String uuid = (String)attributes.get("uuid");
+
+		if (uuid != null) {
+			setUuid(uuid);
+		}
+
+		Long id = (Long)attributes.get("id");
+
+		if (id != null) {
+			setId(id);
+		}
+
+		Long resourcePrimKey = (Long)attributes.get("resourcePrimKey");
+
+		if (resourcePrimKey != null) {
+			setResourcePrimKey(resourcePrimKey);
+		}
+
+		Long groupId = (Long)attributes.get("groupId");
+
+		if (groupId != null) {
+			setGroupId(groupId);
+		}
+
+		Long companyId = (Long)attributes.get("companyId");
+
+		if (companyId != null) {
+			setCompanyId(companyId);
+		}
+
+		Long userId = (Long)attributes.get("userId");
+
+		if (userId != null) {
+			setUserId(userId);
+		}
+
+		String userName = (String)attributes.get("userName");
+
+		if (userName != null) {
+			setUserName(userName);
+		}
+
+		Date createDate = (Date)attributes.get("createDate");
+
+		if (createDate != null) {
+			setCreateDate(createDate);
+		}
+
+		Date modifiedDate = (Date)attributes.get("modifiedDate");
+
+		if (modifiedDate != null) {
+			setModifiedDate(modifiedDate);
+		}
+
+		Long folderId = (Long)attributes.get("folderId");
+
+		if (folderId != null) {
+			setFolderId(folderId);
+		}
+
+		Long classNameId = (Long)attributes.get("classNameId");
+
+		if (classNameId != null) {
+			setClassNameId(classNameId);
+		}
+
+		Long classPK = (Long)attributes.get("classPK");
+
+		if (classPK != null) {
+			setClassPK(classPK);
+		}
+
+		String articleId = (String)attributes.get("articleId");
+
+		if (articleId != null) {
+			setArticleId(articleId);
+		}
+
+		Double version = (Double)attributes.get("version");
+
+		if (version != null) {
+			setVersion(version);
+		}
+
+		String title = (String)attributes.get("title");
+
+		if (title != null) {
+			setTitle(title);
+		}
+
+		String urlTitle = (String)attributes.get("urlTitle");
+
+		if (urlTitle != null) {
+			setUrlTitle(urlTitle);
+		}
+
+		String description = (String)attributes.get("description");
+
+		if (description != null) {
+			setDescription(description);
+		}
+
+		String content = (String)attributes.get("content");
+
+		if (content != null) {
+			setContent(content);
+		}
+
+		String type = (String)attributes.get("type");
+
+		if (type != null) {
+			setType(type);
+		}
+
+		String structureId = (String)attributes.get("structureId");
+
+		if (structureId != null) {
+			setStructureId(structureId);
+		}
+
+		String templateId = (String)attributes.get("templateId");
+
+		if (templateId != null) {
+			setTemplateId(templateId);
+		}
+
+		String layoutUuid = (String)attributes.get("layoutUuid");
+
+		if (layoutUuid != null) {
+			setLayoutUuid(layoutUuid);
+		}
+
+		Date displayDate = (Date)attributes.get("displayDate");
+
+		if (displayDate != null) {
+			setDisplayDate(displayDate);
+		}
+
+		Date expirationDate = (Date)attributes.get("expirationDate");
+
+		if (expirationDate != null) {
+			setExpirationDate(expirationDate);
+		}
+
+		Date reviewDate = (Date)attributes.get("reviewDate");
+
+		if (reviewDate != null) {
+			setReviewDate(reviewDate);
+		}
+
+		Boolean indexable = (Boolean)attributes.get("indexable");
+
+		if (indexable != null) {
+			setIndexable(indexable);
+		}
+
+		Boolean smallImage = (Boolean)attributes.get("smallImage");
+
+		if (smallImage != null) {
+			setSmallImage(smallImage);
+		}
+
+		Long smallImageId = (Long)attributes.get("smallImageId");
+
+		if (smallImageId != null) {
+			setSmallImageId(smallImageId);
+		}
+
+		String smallImageURL = (String)attributes.get("smallImageURL");
+
+		if (smallImageURL != null) {
+			setSmallImageURL(smallImageURL);
+		}
+
+		Integer status = (Integer)attributes.get("status");
+
+		if (status != null) {
+			setStatus(status);
+		}
+
+		Long statusByUserId = (Long)attributes.get("statusByUserId");
+
+		if (statusByUserId != null) {
+			setStatusByUserId(statusByUserId);
+		}
+
+		String statusByUserName = (String)attributes.get("statusByUserName");
+
+		if (statusByUserName != null) {
+			setStatusByUserName(statusByUserName);
+		}
+
+		Date statusDate = (Date)attributes.get("statusDate");
+
+		if (statusDate != null) {
+			setStatusDate(statusDate);
+		}
 	}
 
 	/**
@@ -241,12 +488,34 @@ public class JournalArticleWrapper implements JournalArticle {
 	}
 
 	/**
+	* Returns the folder ID of this journal article.
+	*
+	* @return the folder ID of this journal article
+	*/
+	public long getFolderId() {
+		return _journalArticle.getFolderId();
+	}
+
+	/**
+	* Sets the folder ID of this journal article.
+	*
+	* @param folderId the folder ID of this journal article
+	*/
+	public void setFolderId(long folderId) {
+		_journalArticle.setFolderId(folderId);
+	}
+
+	/**
 	* Returns the fully qualified class name of this journal article.
 	*
 	* @return the fully qualified class name of this journal article
 	*/
 	public java.lang.String getClassName() {
 		return _journalArticle.getClassName();
+	}
+
+	public void setClassName(java.lang.String className) {
+		_journalArticle.setClassName(className);
 	}
 
 	/**
@@ -373,6 +642,14 @@ public class JournalArticleWrapper implements JournalArticle {
 		return _journalArticle.getTitle(languageId, useDefault);
 	}
 
+	public java.lang.String getTitleCurrentLanguageId() {
+		return _journalArticle.getTitleCurrentLanguageId();
+	}
+
+	public java.lang.String getTitleCurrentValue() {
+		return _journalArticle.getTitleCurrentValue();
+	}
+
 	/**
 	* Returns a map of the locales and localized titles of this journal article.
 	*
@@ -411,6 +688,10 @@ public class JournalArticleWrapper implements JournalArticle {
 	public void setTitle(java.lang.String title, java.util.Locale locale,
 		java.util.Locale defaultLocale) {
 		_journalArticle.setTitle(title, locale, defaultLocale);
+	}
+
+	public void setTitleCurrentLanguageId(java.lang.String languageId) {
+		_journalArticle.setTitleCurrentLanguageId(languageId);
 	}
 
 	/**
@@ -506,6 +787,14 @@ public class JournalArticleWrapper implements JournalArticle {
 		return _journalArticle.getDescription(languageId, useDefault);
 	}
 
+	public java.lang.String getDescriptionCurrentLanguageId() {
+		return _journalArticle.getDescriptionCurrentLanguageId();
+	}
+
+	public java.lang.String getDescriptionCurrentValue() {
+		return _journalArticle.getDescriptionCurrentValue();
+	}
+
 	/**
 	* Returns a map of the locales and localized descriptions of this journal article.
 	*
@@ -545,6 +834,10 @@ public class JournalArticleWrapper implements JournalArticle {
 	public void setDescription(java.lang.String description,
 		java.util.Locale locale, java.util.Locale defaultLocale) {
 		_journalArticle.setDescription(description, locale, defaultLocale);
+	}
+
+	public void setDescriptionCurrentLanguageId(java.lang.String languageId) {
+		_journalArticle.setDescriptionCurrentLanguageId(languageId);
 	}
 
 	/**
@@ -930,6 +1223,15 @@ public class JournalArticleWrapper implements JournalArticle {
 	}
 
 	/**
+	* Returns <code>true</code> if this journal article is in the Recycle Bin.
+	*
+	* @return <code>true</code> if this journal article is in the Recycle Bin; <code>false</code> otherwise
+	*/
+	public boolean isInTrash() {
+		return _journalArticle.isInTrash();
+	}
+
+	/**
 	* Returns <code>true</code> if this journal article is pending.
 	*
 	* @return <code>true</code> if this journal article is pending; <code>false</code> otherwise
@@ -956,10 +1258,6 @@ public class JournalArticleWrapper implements JournalArticle {
 
 	public boolean isEscapedModel() {
 		return _journalArticle.isEscapedModel();
-	}
-
-	public void setEscapedModel(boolean escapedModel) {
-		_journalArticle.setEscapedModel(escapedModel);
 	}
 
 	public java.io.Serializable getPrimaryKeyObj() {
@@ -1040,6 +1338,10 @@ public class JournalArticleWrapper implements JournalArticle {
 		return _journalArticle.getDefaultLocale();
 	}
 
+	public com.liferay.portlet.journal.model.JournalFolder getFolder() {
+		return _journalArticle.getFolder();
+	}
+
 	public java.lang.String getSmallImageType()
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException {
@@ -1054,7 +1356,14 @@ public class JournalArticleWrapper implements JournalArticle {
 		_journalArticle.setSmallImageType(smallImageType);
 	}
 
+	/**
+	 * @deprecated Renamed to {@link #getWrappedModel}
+	 */
 	public JournalArticle getWrappedJournalArticle() {
+		return _journalArticle;
+	}
+
+	public JournalArticle getWrappedModel() {
 		return _journalArticle;
 	}
 

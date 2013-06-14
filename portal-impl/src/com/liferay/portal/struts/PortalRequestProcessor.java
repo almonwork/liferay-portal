@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -50,6 +50,7 @@ import com.liferay.portal.service.PortletLocalServiceUtil;
 import com.liferay.portal.service.PortletPreferencesLocalServiceUtil;
 import com.liferay.portal.service.permission.PortletPermissionUtil;
 import com.liferay.portal.service.persistence.UserTrackerPathUtil;
+import com.liferay.portal.setup.SetupWizardUtil;
 import com.liferay.portal.theme.ThemeDisplay;
 import com.liferay.portal.util.PortalUtil;
 import com.liferay.portal.util.PrefsPropsUtil;
@@ -70,8 +71,6 @@ import java.io.IOException;
 
 import java.util.Date;
 import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Map.Entry;
 import java.util.Map;
 import java.util.Set;
 
@@ -120,10 +119,11 @@ public class PortalRequestProcessor extends TilesRequestProcessor {
 		_publicPaths = new HashSet<String>();
 
 		_publicPaths.add(_PATH_C);
-		_publicPaths.add(_PATH_PORTAL_EE_LICENSE);
+		_publicPaths.add(_PATH_PORTAL_API_JSONWS);
 		_publicPaths.add(_PATH_PORTAL_FLASH);
 		_publicPaths.add(_PATH_PORTAL_J_LOGIN);
 		_publicPaths.add(_PATH_PORTAL_LAYOUT);
+		_publicPaths.add(_PATH_PORTAL_LICENSE);
 		_publicPaths.add(_PATH_PORTAL_LOGIN);
 		_publicPaths.add(_PATH_PORTAL_RENDER_PORTLET);
 		_publicPaths.add(_PATH_PORTAL_TCK);
@@ -146,14 +146,16 @@ public class PortalRequestProcessor extends TilesRequestProcessor {
 		Boolean basicAuthEnabled = (Boolean)session.getAttribute(
 			WebKeys.BASIC_AUTH_ENABLED);
 
-		session.removeAttribute(WebKeys.BASIC_AUTH_ENABLED);
+		if (basicAuthEnabled != null) {
+			session.removeAttribute(WebKeys.BASIC_AUTH_ENABLED);
+		}
 
 		String path = super.processPath(request, response);
 
 		ActionMapping actionMapping =
 			(ActionMapping)moduleConfig.findActionConfig(path);
 
-		Action action = StrutsActionRegistry.getAction(path);
+		Action action = StrutsActionRegistryUtil.getAction(path);
 
 		if (((basicAuthEnabled != null) && basicAuthEnabled.booleanValue()) ||
 			((actionMapping == null) && (action == null))) {
@@ -343,12 +345,9 @@ public class PortalRequestProcessor extends TilesRequestProcessor {
 		PortletURLImpl portletURL = new PortletURLImpl(
 			request, portletId, plid, PortletRequest.RENDER_PHASE);
 
-		Iterator<Map.Entry<String, String[]>> itr =
-			request.getParameterMap().entrySet().iterator();
+		Map<String, String[]> parameterMap = request.getParameterMap();
 
-		while (itr.hasNext()) {
-			Entry<String, String[]> entry = itr.next();
-
+		for (Map.Entry<String, String[]> entry : parameterMap.entrySet()) {
 			String key = entry.getKey();
 
 			if (key.startsWith(namespace)) {
@@ -380,9 +379,9 @@ public class PortalRequestProcessor extends TilesRequestProcessor {
 
 		String portalURL = null;
 
-		if ((PropsValues.COMPANY_SECURITY_AUTH_REQUIRES_HTTPS) &&
-			(!PropsValues.SESSION_ENABLE_PHISHING_PROTECTION) &&
-			(httpsInitial != null) && (!httpsInitial.booleanValue())) {
+		if (PropsValues.COMPANY_SECURITY_AUTH_REQUIRES_HTTPS &&
+			!PropsValues.SESSION_ENABLE_PHISHING_PROTECTION &&
+			(httpsInitial != null) && !httpsInitial.booleanValue()) {
 
 			portalURL = PortalUtil.getPortalURL(request, false);
 		}
@@ -445,10 +444,10 @@ public class PortalRequestProcessor extends TilesRequestProcessor {
 
 	protected boolean isPortletPath(String path) {
 		if ((path != null) &&
-			(!path.equals(_PATH_C)) &&
-			(!path.startsWith(_PATH_COMMON)) &&
+			!path.equals(_PATH_C) &&
+			!path.startsWith(_PATH_COMMON) &&
 			(path.indexOf(_PATH_J_SECURITY_CHECK) == -1) &&
-			(!path.startsWith(_PATH_PORTAL))) {
+			!path.startsWith(_PATH_PORTAL)) {
 
 			return true;
 		}
@@ -476,7 +475,7 @@ public class PortalRequestProcessor extends TilesRequestProcessor {
 		throws IOException {
 
 		ActionAdapter actionAdapter =
-			(ActionAdapter)StrutsActionRegistry.getAction(
+			(ActionAdapter)StrutsActionRegistryUtil.getAction(
 				actionMapping.getPath());
 
 		if (actionAdapter != null) {
@@ -506,7 +505,7 @@ public class PortalRequestProcessor extends TilesRequestProcessor {
 			return null;
 		}
 
-		Action action = StrutsActionRegistry.getAction(path);
+		Action action = StrutsActionRegistryUtil.getAction(path);
 
 		if (action != null) {
 			ActionMapping actionMapping =
@@ -569,10 +568,10 @@ public class PortalRequestProcessor extends TilesRequestProcessor {
 		UserTracker userTracker = LiveUsers.getUserTracker(
 			themeDisplay.getCompanyId(), session.getId());
 
-		if ((userTracker != null) && (!path.equals(_PATH_C)) &&
+		if ((userTracker != null) && !path.equals(_PATH_C) &&
 			(path.indexOf(_PATH_J_SECURITY_CHECK) == -1) &&
 			(path.indexOf(_PATH_PORTAL_PROTECTED) == -1) &&
-			(!_trackerIgnorePaths.contains(path))) {
+			!_trackerIgnorePaths.contains(path)) {
 
 			String fullPath = null;
 
@@ -665,10 +664,23 @@ public class PortalRequestProcessor extends TilesRequestProcessor {
 			}
 		}
 
+		// Setup wizard
+
+		if (!SetupWizardUtil.isSetupFinished()) {
+			if (!path.equals(_PATH_PORTAL_LICENSE) &&
+				!path.equals(_PATH_PORTAL_STATUS)) {
+
+				return _PATH_PORTAL_SETUP_WIZARD;
+			}
+		}
+		else if (path.equals(_PATH_PORTAL_SETUP_WIZARD)) {
+			return _PATH_PORTAL_LAYOUT;
+		}
+
 		// Authenticated users can always log out
 
 		if (((remoteUser != null) || (user != null)) &&
-			(path.equals(_PATH_PORTAL_LOGOUT))) {
+			path.equals(_PATH_PORTAL_LOGOUT)) {
 
 			return path;
 		}
@@ -685,7 +697,7 @@ public class PortalRequestProcessor extends TilesRequestProcessor {
 		// Authenticated users can always agree to terms of use
 
 		if (((remoteUser != null) || (user != null)) &&
-			(path.equals(_PATH_PORTAL_UPDATE_TERMS_OF_USE))) {
+			path.equals(_PATH_PORTAL_UPDATE_TERMS_OF_USE)) {
 
 			return path;
 		}
@@ -706,7 +718,8 @@ public class PortalRequestProcessor extends TilesRequestProcessor {
 
 		if (!path.equals(_PATH_PORTAL_JSON_SERVICE) &&
 			!path.equals(_PATH_PORTAL_RENDER_PORTLET) &&
-			!ParamUtil.getBoolean(request, "wsrp")) {
+			!ParamUtil.getBoolean(request, "wsrp") &&
+			!themeDisplay.isImpersonated()) {
 
 			// Authenticated users should agree to Terms of Use
 
@@ -740,7 +753,8 @@ public class PortalRequestProcessor extends TilesRequestProcessor {
 			}
 
 			if ((user != null) && !user.isEmailAddressVerified() &&
-				emailAddressVerificationRequired) {
+				emailAddressVerificationRequired &&
+				!path.equals(_PATH_PORTAL_UPDATE_EMAIL_ADDRESS)) {
 
 				return _PATH_PORTAL_VERIFY_EMAIL_ADDRESS;
 			}
@@ -754,7 +768,9 @@ public class PortalRequestProcessor extends TilesRequestProcessor {
 			// Authenticated users must have an email address
 
 			if ((user != null) &&
-				Validator.isNull(user.getDisplayEmailAddress())) {
+				(Validator.isNull(user.getEmailAddress()) ||
+				 (PropsValues.USERS_EMAIL_ADDRESS_REQUIRED &&
+				  Validator.isNull(user.getDisplayEmailAddress())))) {
 
 				return _PATH_PORTAL_UPDATE_EMAIL_ADDRESS;
 			}
@@ -785,7 +801,7 @@ public class PortalRequestProcessor extends TilesRequestProcessor {
 			(ActionMapping)moduleConfig.findActionConfig(path);
 
 		if (actionMapping == null) {
-			Action strutsAction = StrutsActionRegistry.getAction(path);
+			Action strutsAction = StrutsActionRegistryUtil.getAction(path);
 
 			if (strutsAction == null) {
 				return null;
@@ -908,7 +924,7 @@ public class PortalRequestProcessor extends TilesRequestProcessor {
 						throw new PrincipalException();
 					}
 				}
-				else if (portlet != null && !portlet.isActive()) {
+				else if ((portlet != null) && !portlet.isActive()) {
 					SessionErrors.add(
 						request, PortletActiveException.class.getName());
 
@@ -923,8 +939,8 @@ public class PortalRequestProcessor extends TilesRequestProcessor {
 		}
 
 		if (!authorized) {
-			ForwardConfig forwardConfig =
-				actionMapping.findForward(_PATH_PORTAL_ERROR);
+			ForwardConfig forwardConfig = actionMapping.findForward(
+				_PATH_PORTAL_ERROR);
 
 			processForwardConfig(request, response, forwardConfig);
 
@@ -935,60 +951,69 @@ public class PortalRequestProcessor extends TilesRequestProcessor {
 		}
 	}
 
-	private static String _PATH_C = "/c";
+	private static final String _PATH_C = "/c";
 
-	private static String _PATH_COMMON = "/common";
+	private static final String _PATH_COMMON = "/common";
 
-	private static String _PATH_COMMON_ERROR = "/common/error";
+	private static final String _PATH_COMMON_ERROR = "/common/error";
 
-	private static String _PATH_J_SECURITY_CHECK = "/j_security_check";
+	private static final String _PATH_J_SECURITY_CHECK = "/j_security_check";
 
-	private static String _PATH_PORTAL = "/portal";
+	private static final String _PATH_PORTAL = "/portal";
 
-	private static String _PATH_PORTAL_EE_LICENSE = "/portal/ee/license";
+	private static final String _PATH_PORTAL_API_JSONWS = "/portal/api/jsonws";
 
-	private static String _PATH_PORTAL_ERROR = "/portal/error";
+	private static final String _PATH_PORTAL_ERROR = "/portal/error";
 
-	private static String _PATH_PORTAL_EXPIRE_SESSION =
+	private static final String _PATH_PORTAL_EXPIRE_SESSION =
 		"/portal/expire_session";
 
-	private static String _PATH_PORTAL_EXTEND_SESSION =
+	private static final String _PATH_PORTAL_EXTEND_SESSION =
 		"/portal/extend_session";
 
-	private static String _PATH_PORTAL_FLASH = "/portal/flash";
+	private static final String _PATH_PORTAL_FLASH = "/portal/flash";
 
-	private static String _PATH_PORTAL_J_LOGIN = "/portal/j_login";
+	private static final String _PATH_PORTAL_J_LOGIN = "/portal/j_login";
 
-	private static String _PATH_PORTAL_JSON_SERVICE = "/portal/json_service";
+	private static final String _PATH_PORTAL_JSON_SERVICE =
+		"/portal/json_service";
 
-	private static String _PATH_PORTAL_LAYOUT = "/portal/layout";
+	private static final String _PATH_PORTAL_LAYOUT = "/portal/layout";
 
-	private static String _PATH_PORTAL_LOGIN = "/portal/login";
+	private static final String _PATH_PORTAL_LICENSE = "/portal/license";
 
-	private static String _PATH_PORTAL_LOGOUT = "/portal/logout";
+	private static final String _PATH_PORTAL_LOGIN = "/portal/login";
 
-	private static String _PATH_PORTAL_PROTECTED = "/portal/protected";
+	private static final String _PATH_PORTAL_LOGOUT = "/portal/logout";
 
-	private static String _PATH_PORTAL_RENDER_PORTLET =
+	private static final String _PATH_PORTAL_PROTECTED = "/portal/protected";
+
+	private static final String _PATH_PORTAL_RENDER_PORTLET =
 		"/portal/render_portlet";
 
-	private static String _PATH_PORTAL_TCK = "/portal/tck";
+	private static final String _PATH_PORTAL_SETUP_WIZARD =
+		"/portal/setup_wizard";
 
-	private static String _PATH_PORTAL_TERMS_OF_USE = "/portal/terms_of_use";
+	private static final String _PATH_PORTAL_STATUS = "/portal/status";
 
-	private static String _PATH_PORTAL_UPDATE_EMAIL_ADDRESS =
+	private static final String _PATH_PORTAL_TCK = "/portal/tck";
+
+	private static final String _PATH_PORTAL_TERMS_OF_USE =
+		"/portal/terms_of_use";
+
+	private static final String _PATH_PORTAL_UPDATE_EMAIL_ADDRESS =
 		"/portal/update_email_address";
 
-	private static String _PATH_PORTAL_UPDATE_PASSWORD =
+	private static final String _PATH_PORTAL_UPDATE_PASSWORD =
 		"/portal/update_password";
 
-	private static String _PATH_PORTAL_UPDATE_REMINDER_QUERY =
+	private static final String _PATH_PORTAL_UPDATE_REMINDER_QUERY =
 		"/portal/update_reminder_query";
 
-	private static String _PATH_PORTAL_UPDATE_TERMS_OF_USE =
+	private static final String _PATH_PORTAL_UPDATE_TERMS_OF_USE =
 		"/portal/update_terms_of_use";
 
-	private static String _PATH_PORTAL_VERIFY_EMAIL_ADDRESS =
+	private static final String _PATH_PORTAL_VERIFY_EMAIL_ADDRESS =
 		"/portal/verify_email_address";
 
 	private static Log _log = LogFactoryUtil.getLog(

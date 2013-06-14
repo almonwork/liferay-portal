@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -38,7 +38,7 @@ public class RegExpToolkit extends BasicToolkit {
 
 	@Override
 	public String generate(PasswordPolicy passwordPolicy) {
-		return PwdGenerator.getPassword(_charset, _length);
+		return PwdGenerator.getSecurePassword(_charset, _length);
 	}
 
 	@Override
@@ -61,8 +61,8 @@ public class RegExpToolkit extends BasicToolkit {
 
 	private static Log _log = LogFactoryUtil.getLog(RegExpToolkit.class);
 
-	private String _pattern;
 	private String _charset;
 	private int _length;
+	private String _pattern;
 
 }

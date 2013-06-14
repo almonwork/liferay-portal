@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -19,9 +19,18 @@
 <%
 long layoutSetBranchId = ParamUtil.getLong(request, "layoutSetBranchId");
 
+LayoutRevision recentLayoutRevision = null;
+
 long currentLayoutRevisionId = StagingUtil.getRecentLayoutRevisionId(request, layoutSetBranchId, plid);
 
-LayoutRevision recentLayoutRevision = LayoutRevisionLocalServiceUtil.getLayoutRevision(currentLayoutRevisionId);
+if (currentLayoutRevisionId > 0) {
+	recentLayoutRevision = LayoutRevisionLocalServiceUtil.getLayoutRevision(currentLayoutRevisionId);
+}
+else {
+	recentLayoutRevision = LayoutStagingUtil.getLayoutRevision(layout);
+
+	currentLayoutRevisionId = recentLayoutRevision.getLayoutRevisionId();
+}
 
 List<LayoutRevision> rootLayoutRevisions = LayoutRevisionLocalServiceUtil.getChildLayoutRevisions(layoutSetBranchId, LayoutRevisionConstants.DEFAULT_PARENT_LAYOUT_REVISION_ID, plid, QueryUtil.ALL_POS, QueryUtil.ALL_POS, new LayoutRevisionIdComparator(true));
 %>
@@ -63,7 +72,7 @@ List<LayoutRevision> rootLayoutRevisions = LayoutRevisionLocalServiceUtil.getChi
 
 				<liferay-ui:search-container>
 					<liferay-ui:search-container-results
-						results="<%= LayoutRevisionLocalServiceUtil.getLayoutRevisions(rootLayoutRevision.getLayoutSetBranchId(), rootLayoutRevision.getLayoutBranchId(), rootLayoutRevision.getPlid(), searchContainer.getStart(), searchContainer.getEnd(), new LayoutRevisionIdComparator(false)) %>"
+						results="<%= LayoutRevisionLocalServiceUtil.getLayoutRevisions(rootLayoutRevision.getLayoutSetBranchId(), rootLayoutRevision.getLayoutBranchId(), rootLayoutRevision.getPlid(), QueryUtil.ALL_POS, QueryUtil.ALL_POS, new LayoutRevisionIdComparator(false)) %>"
 						total="<%= LayoutRevisionLocalServiceUtil.getLayoutRevisionsCount(rootLayoutRevision.getLayoutSetBranchId(), rootLayoutRevision.getLayoutBranchId(), rootLayoutRevision.getPlid()) %>"
 					/>
 
@@ -121,7 +130,6 @@ List<LayoutRevision> rootLayoutRevisions = LayoutRevisionLocalServiceUtil.getChi
 								statusMessage = WorkflowConstants.toLabel(status);
 
 								if (status == WorkflowConstants.STATUS_PENDING) {
-
 									StringBundler sb = new StringBundler(4);
 
 									try {
@@ -199,7 +207,7 @@ List<LayoutRevision> rootLayoutRevisions = LayoutRevisionLocalServiceUtil.getChi
 						/>
 					</liferay-ui:search-container-row>
 
-					<liferay-ui:search-iterator searchContainer="<%= searchContainer %>" />
+					<liferay-ui:search-iterator paginate="<%= false %>" searchContainer="<%= searchContainer %>" />
 				</liferay-ui:search-container>
 			</div>
 

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -16,6 +16,7 @@ package com.liferay.portal.dao.shard;
 
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.util.CentralizedThreadLocal;
 import com.liferay.portal.util.PropsValues;
 
 import java.util.Map;
@@ -57,8 +58,17 @@ public class ShardDataSourceTargetSource implements TargetSource {
 	public void releaseTarget(Object target) throws Exception {
 	}
 
+	public void resetDataSource() {
+		DataSource dataSource = _dataSources.get(
+			PropsValues.SHARD_DEFAULT_NAME);
+
+		_dataSource.set(dataSource);
+	}
+
 	public void setDataSource(String shardName) {
-		_dataSource.set(_dataSources.get(shardName));
+		DataSource dataSource = _dataSources.get(shardName);
+
+		_dataSource.set(dataSource);
 	}
 
 	public void setDataSources(Map<String, DataSource> dataSources) {
@@ -76,8 +86,13 @@ public class ShardDataSourceTargetSource implements TargetSource {
 		}
 	}
 
+	private static Log _log = LogFactoryUtil.getLog(
+		ShardDataSourceTargetSource.class);
+
+	private static String[] _availableShardNames;
+
 	private static ThreadLocal<DataSource> _dataSource =
-		new ThreadLocal<DataSource>() {
+		new CentralizedThreadLocal<DataSource>(false) {
 
 		@Override
 		protected DataSource initialValue() {
@@ -86,10 +101,6 @@ public class ShardDataSourceTargetSource implements TargetSource {
 
 	};
 
-	private static Log _log = LogFactoryUtil.getLog(
-		ShardDataSourceTargetSource.class);
-
-	private static String[] _availableShardNames;
 	private static Map<String, DataSource> _dataSources;
 
 }

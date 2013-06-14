@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -53,19 +53,6 @@ public class PortalHostConfig extends HostConfig {
 
 	public PortalHostConfig() {
 		super();
-	}
-
-	@Override
-	protected void deployDescriptor(
-		String contextPath, File contextXml, String file) {
-
-		if (_log.isDebugEnabled()) {
-			_log.debug(
-				"deployDescriptor " + contextPath + " " + contextXml + " " +
-					file);
-		}
-
-		super.deployDescriptor(contextPath, contextXml, file);
 	}
 
 	@Override

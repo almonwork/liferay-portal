@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -52,12 +52,8 @@ PortletURL portletURL = (PortletURL)request.getAttribute("edit_team_assignments.
 
 	LinkedHashMap userParams = new LinkedHashMap();
 
-	if (group.isOrganization()) {
-		userParams.put("usersOrgs", organization.getOrganizationId());
-	}
-	else {
-		userParams.put("usersGroups", team.getGroupId());
-	}
+	userParams.put("inherit", true);
+	userParams.put("usersGroups", team.getGroupId());
 
 	if (tabs2.equals("current")) {
 		userParams.put("usersTeams", team.getTeamId());
@@ -73,6 +69,7 @@ PortletURL portletURL = (PortletURL)request.getAttribute("edit_team_assignments.
 		escapedModel="<%= true %>"
 		keyProperty="userId"
 		modelVar="user2"
+		rowIdProperty="screenName"
 	>
 		<liferay-ui:search-container-column-text
 			name="name"

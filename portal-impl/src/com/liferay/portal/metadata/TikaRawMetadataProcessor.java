@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,174 +14,108 @@
 
 package com.liferay.portal.metadata;
 
+import com.liferay.portal.kernel.exception.SystemException;
+import com.liferay.portal.kernel.io.DummyWriter;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
-import com.liferay.portal.kernel.metadata.RawMetadataProcessor;
-import com.liferay.portlet.dynamicdatamapping.storage.Fields;
+import com.liferay.portal.kernel.util.StreamUtil;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
-import java.lang.reflect.Field;
-
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
-
-import org.apache.tika.Tika;
-import org.apache.tika.metadata.ClimateForcast;
-import org.apache.tika.metadata.CreativeCommons;
-import org.apache.tika.metadata.DublinCore;
-import org.apache.tika.metadata.Geographic;
-import org.apache.tika.metadata.HttpHeaders;
-import org.apache.tika.metadata.MSOffice;
-import org.apache.tika.metadata.Message;
 import org.apache.tika.metadata.Metadata;
-import org.apache.tika.metadata.Property;
-import org.apache.tika.metadata.TIFF;
-import org.apache.tika.metadata.TikaMetadataKeys;
-import org.apache.tika.metadata.TikaMimeKeys;
+import org.apache.tika.parser.ParseContext;
+import org.apache.tika.parser.Parser;
+import org.apache.tika.sax.WriteOutContentHandler;
+
+import org.xml.sax.ContentHandler;
 
 /**
  * @author Miguel Pastor
+ * @author Alexander Chow
+ * @author Shuyang Zhou
  */
-public class TikaRawMetadataProcessor implements RawMetadataProcessor {
+public class TikaRawMetadataProcessor extends XugglerRawMetadataProcessor {
 
-	public static Map<String, Field[]> getFields() {
-		return _fields;
+	public void setParser(Parser parser) {
+		_parser = parser;
 	}
 
-	public Map<String, Fields> getRawMetadataMap(InputStream inputStream) {
-		Metadata metadata = extractMetadata(inputStream);
+	protected Metadata extractMetadata(
+			InputStream inputStream, Metadata metadata)
+		throws IOException {
 
-		return createDDMFieldsMap(metadata, _fields);
-	}
-
-	public void setTika(Tika tika) {
-		_tika = tika;
-	}
-
-	protected Fields createDDMFields(Metadata metadata, Field[] fields) {
-		Fields ddmFields = new Fields();
-
-		for (Field field : fields) {
-			String value = getMetadataValue(metadata, field);
-
-			if (value == null) {
-				continue;
-			}
-
-			com.liferay.portlet.dynamicdatamapping.storage.Field ddmField =
-				new com.liferay.portlet.dynamicdatamapping.storage.Field(
-					field.getName(), value);
-
-			ddmFields.put(ddmField);
+		if (metadata == null) {
+			metadata = new Metadata();
 		}
 
-		return ddmFields;
-	}
+		ParseContext parserContext = new ParseContext();
 
-	protected Map<String, Fields> createDDMFieldsMap(
-		Metadata metadata, Map<String, Field[]> fieldsMap) {
+		parserContext.set(Parser.class, _parser);
 
-		Map<String, Fields> ddmFieldsMap = new HashMap<String, Fields>();
-
-		for (String key : fieldsMap.keySet()) {
-			Field[] fields = fieldsMap.get(key);
-
-			Fields ddmFields = createDDMFields(metadata, fields);
-
-			Set<String> names = ddmFields.getNames();
-
-			if (!names.isEmpty()) {
-				ddmFieldsMap.put(key, ddmFields);
-			}
-		}
-
-		return ddmFieldsMap;
-	}
-
-	protected Metadata extractMetadata(InputStream inputStream) {
-		Metadata metadata = new Metadata();
+		ContentHandler contentHandler = new WriteOutContentHandler(
+			new DummyWriter());
 
 		try {
-			_tika.parse(inputStream, metadata);
+			_parser.parse(inputStream, contentHandler, metadata, parserContext);
 		}
-		catch (IOException ioe) {
+		catch (Exception e) {
+			_log.error("Unable to parse", e);
 
+			throw new IOException(e.getMessage());
 		}
-		finally {
-			try {
-				inputStream.close();
-			}
-			catch (IOException ioe) {
-			}
-		}
+
+		// Remove potential security risks
+
+		metadata.remove(XMPDM.ABS_PEAK_AUDIO_FILE_PATH.getName());
+		metadata.remove(XMPDM.RELATIVE_PEAK_AUDIO_FILE_PATH.getName());
 
 		return metadata;
 	}
 
-	protected Object getFieldValue(Metadata metadata, Field field) {
-		Object fieldValue = null;
+	@Override
+	protected Metadata extractMetadata(
+			String extension, String mimeType, File file)
+		throws SystemException {
+
+		Metadata metadata = super.extractMetadata(extension, mimeType, file);
+
+		InputStream inputStream = null;
 
 		try {
-			fieldValue = field.get(metadata);
-		}
-		catch (IllegalAccessException iae) {
-			if (_log.isWarnEnabled()) {
-				_log.warn(
-					"The property " + field.getName() +
-						" will not be added to the metatada set");
-			}
-		}
+			inputStream = new FileInputStream(file);
 
-		return fieldValue;
+			return extractMetadata(inputStream, metadata);
+		}
+		catch (IOException ioe) {
+			throw new SystemException(ioe);
+		}
+		finally {
+			StreamUtil.cleanUp(inputStream);
+		}
 	}
 
-	protected String getMetadataValue(Metadata metadata, Field field) {
-		Object fieldValue = getFieldValue(metadata, field);
+	@Override
+	protected Metadata extractMetadata(
+			String extension, String mimeType, InputStream inputStream)
+		throws SystemException {
 
-		if (fieldValue instanceof String) {
-			return metadata.get((String)fieldValue);
+		Metadata metadata = super.extractMetadata(
+			extension, mimeType, inputStream);
+
+		try {
+			return extractMetadata(inputStream, metadata);
 		}
-		else {
-			Property property = (Property)fieldValue;
-
-			return metadata.get(property.getName());
+		catch (IOException ioe) {
+			throw new SystemException(ioe);
 		}
 	}
 
 	private static Log _log = LogFactoryUtil.getLog(
 		TikaRawMetadataProcessor.class);
 
-	private static Map<String, Field[]> _fields =
-		new HashMap<String, Field[]>();
-
-	private Tika _tika;
-
-	static {
-		_fields.put(
-			ClimateForcast.class.getSimpleName(),
-			ClimateForcast.class.getFields());
-		_fields.put(
-			CreativeCommons.class.getSimpleName(),
-			CreativeCommons.class.getFields());
-		_fields.put(
-			DublinCore.class.getSimpleName(), DublinCore.class.getFields());
-		_fields.put(
-			Geographic.class.getSimpleName(), Geographic.class.getFields());
-		_fields.put(
-			HttpHeaders.class.getSimpleName(), HttpHeaders.class.getFields());
-		_fields.put(
-			Message.class.getSimpleName(), Message.class.getFields());
-		_fields.put(
-			MSOffice.class.getSimpleName(), MSOffice.class.getFields());
-		_fields.put(TIFF.class.getSimpleName(), TIFF.class.getFields());
-		_fields.put(
-			TikaMetadataKeys.class.getSimpleName(),
-			TikaMetadataKeys.class.getFields());
-		_fields.put(
-			TikaMimeKeys.class.getSimpleName(), TikaMimeKeys.class.getFields());
-	}
+	private Parser _parser;
 
 }

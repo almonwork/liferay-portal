@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -16,14 +16,16 @@
 
 <%@ include file="/html/portlet/init.jsp" %>
 
-<%@ page import="com.liferay.portal.kernel.staging.StagingUtil" %>
-<%@ page import="com.liferay.portal.LayoutSetBranchNameException" %>
-<%@ page import="com.liferay.portal.NoSuchWorkflowInstanceLinkException" %>
-<%@ page import="com.liferay.portal.service.LayoutSetBranchLocalServiceUtil" %>
-<%@ page import="com.liferay.portal.service.permission.LayoutBranchPermissionUtil" %>
-<%@ page import="com.liferay.portal.service.permission.LayoutSetBranchPermissionUtil" %>
-<%@ page import="com.liferay.portal.util.comparator.LayoutRevisionCreateDateComparator" %>
-<%@ page import="com.liferay.portal.util.comparator.LayoutRevisionIdComparator" %>
+<%@ page import="com.liferay.portal.LayoutBranchNameException" %><%@
+page import="com.liferay.portal.LayoutSetBranchNameException" %><%@
+page import="com.liferay.portal.NoSuchWorkflowInstanceLinkException" %><%@
+page import="com.liferay.portal.kernel.staging.StagingUtil" %><%@
+page import="com.liferay.portal.kernel.workflow.WorkflowTask" %><%@
+page import="com.liferay.portal.service.LayoutSetBranchLocalServiceUtil" %><%@
+page import="com.liferay.portal.service.permission.LayoutBranchPermissionUtil" %><%@
+page import="com.liferay.portal.service.permission.LayoutSetBranchPermissionUtil" %><%@
+page import="com.liferay.portal.util.comparator.LayoutRevisionCreateDateComparator" %><%@
+page import="com.liferay.portal.util.comparator.LayoutRevisionIdComparator" %>
 
 <%
 Layout selLayout = layout;
@@ -68,3 +70,5 @@ if (group != null) {
 
 Format dateFormatDateTime = FastDateFormatFactoryUtil.getDateTime(locale, timeZone);
 %>
+
+<%@ include file="/html/portlet/staging_bar/init-ext.jsp" %>

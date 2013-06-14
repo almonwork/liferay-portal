@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -41,6 +41,7 @@ if (layoutSetBranchId > 0) {
 		<aui:input name="groupId" type="hidden" value="<%= stagingGroup.getGroupId() %>" />
 		<aui:input name="privateLayout" type="hidden" value="<%= privateLayout %>" />
 		<aui:input name="layoutSetBranchId" type="hidden" value="<%= layoutSetBranchId %>" />
+		<aui:input name="workflowAction" type="hidden" value="<%= WorkflowConstants.ACTION_SAVE_DRAFT%>" />
 
 		<aui:fieldset>
 			<aui:input name="name" />
@@ -53,23 +54,21 @@ if (layoutSetBranchId > 0) {
 				List<LayoutSetBranch> layoutSetBranches = LayoutSetBranchLocalServiceUtil.getLayoutSetBranches(stagingGroup.getGroupId(), privateLayout);
 				%>
 
-				<c:if test="<%= layoutSetBranches.size() > 1 %>">
-					<aui:select label='<%= privateLayout ? "copy-pages-from-private-pages-variation" : "copy-pages-from-public-pages-variation" %>' name="copyLayoutSetBranchId">
-						<aui:option label='<%= privateLayout ? "all-private-pages-variations" : "all-public-pages-variations" %>' selected="<%= true %>" value="<%= LayoutSetBranchConstants.ALL_BRANCHES %>" />
-						<aui:option label='<%= privateLayout ? "none-empty-private-pages-variation" : "none-empty-public-pages-variation" %>' value="<%= LayoutSetBranchConstants.NO_BRANCHES %>" />
+				<aui:select helpMessage="copy-pages-from-site-pages-variation-help" label="copy-pages-from-site-pages-variation" name="copyLayoutSetBranchId">
+					<aui:option label="all-site-pages-variations" selected="<%= true %>" value="<%= LayoutSetBranchConstants.ALL_BRANCHES %>" />
+					<aui:option label="none-empty-site-pages-variation" value="<%= LayoutSetBranchConstants.NO_BRANCHES %>" />
 
-						<%
-						for (LayoutSetBranch curLayoutSetBranch : layoutSetBranches) {
-						%>
+					<%
+					for (LayoutSetBranch curLayoutSetBranch : layoutSetBranches) {
+					%>
 
-							<aui:option label="<%= curLayoutSetBranch.getName() %>" value="<%= curLayoutSetBranch.getLayoutSetBranchId() %>" />
+						<aui:option label="<%= curLayoutSetBranch.getName() %>" value="<%= curLayoutSetBranch.getLayoutSetBranchId() %>" />
 
-						<%
-						}
-						%>
+					<%
+					}
+					%>
 
-					</aui:select>
-				</c:if>
+				</aui:select>
 			</c:if>
 		</aui:fieldset>
 

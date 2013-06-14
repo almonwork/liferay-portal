@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -30,6 +30,7 @@ import com.liferay.portal.util.PortalUtil;
 import com.liferay.taglib.util.ParamAndPropertyAncestorTagImpl;
 
 import java.util.Map;
+import java.util.Set;
 
 import javax.portlet.ActionRequest;
 import javax.portlet.PortletRequest;
@@ -49,10 +50,11 @@ public class ActionURLTag extends ParamAndPropertyAncestorTagImpl {
 			String lifecycle, String windowState, String portletMode,
 			String var, String varImpl, Boolean secure,
 			Boolean copyCurrentRenderParameters, Boolean escapeXml, String name,
-			String resourceID, String cacheability, long plid,
+			String resourceID, String cacheability, long plid, long refererPlid,
 			String portletName, Boolean anchor, Boolean encrypt,
 			long doAsGroupId, long doAsUserId, Boolean portletConfiguration,
-			Map<String, String[]> params, PageContext pageContext)
+			Map<String, String[]> parameterMap,
+			Set<String> removedParameterNames, PageContext pageContext)
 		throws Exception {
 
 		HttpServletRequest request =
@@ -113,6 +115,10 @@ public class ActionURLTag extends ParamAndPropertyAncestorTagImpl {
 			liferayPortletURL.setCacheability(cacheability);
 		}
 
+		if (refererPlid > LayoutConstants.DEFAULT_PLID) {
+			liferayPortletURL.setRefererPlid(refererPlid);
+		}
+
 		if (anchor != null) {
 			liferayPortletURL.setAnchor(anchor.booleanValue());
 		}
@@ -146,11 +152,13 @@ public class ActionURLTag extends ParamAndPropertyAncestorTagImpl {
 			liferayPortletURL.setParameter("previewWidth", previewWidth);
 		}
 
-		if (params != null) {
-			MapUtil.merge(liferayPortletURL.getParameterMap(), params);
+		if (parameterMap != null) {
+			MapUtil.merge(liferayPortletURL.getParameterMap(), parameterMap);
 
-			liferayPortletURL.setParameters(params);
+			liferayPortletURL.setParameters(parameterMap);
 		}
+
+		liferayPortletURL.setRemovedParameterNames(removedParameterNames);
 
 		String portletURLToString = liferayPortletURL.toString();
 
@@ -173,9 +181,10 @@ public class ActionURLTag extends ParamAndPropertyAncestorTagImpl {
 			doTag(
 				getLifecycle(), _windowState, _portletMode, _var, _varImpl,
 				_secure, _copyCurrentRenderParameters, _escapeXml, _name,
-				_resourceID, _cacheability, _plid, _portletName, _anchor,
-				_encrypt, _doAsGroupId, _doAsUserId, _portletConfiguration,
-				getParams(), pageContext);
+				_resourceID, _cacheability, _plid, _refererPlid, _portletName,
+				_anchor, _encrypt, _doAsGroupId, _doAsUserId,
+				_portletConfiguration, getParams(), getRemovedParameterNames(),
+				pageContext);
 
 			return EVAL_PAGE;
 		}
@@ -199,24 +208,12 @@ public class ActionURLTag extends ParamAndPropertyAncestorTagImpl {
 		return PortletRequest.ACTION_PHASE;
 	}
 
-	public void setWindowState(String windowState) {
-		_windowState = windowState;
+	public void setAnchor(boolean anchor) {
+		_anchor = Boolean.valueOf(anchor);
 	}
 
-	public void setPortletMode(String portletMode) {
-		_portletMode = portletMode;
-	}
-
-	public void setVar(String var) {
-		_var = var;
-	}
-
-	public void setVarImpl(String varImpl) {
-		_varImpl = varImpl;
-	}
-
-	public void setSecure(boolean secure) {
-		_secure = Boolean.valueOf(secure);
+	public void setCacheability(String cacheability) {
+		_cacheability = cacheability;
 	}
 
 	public void setCopyCurrentRenderParameters(
@@ -224,38 +221,6 @@ public class ActionURLTag extends ParamAndPropertyAncestorTagImpl {
 
 		_copyCurrentRenderParameters = Boolean.valueOf(
 			copyCurrentRenderParameters);
-	}
-
-	public void setEscapeXml(boolean escapeXml) {
-		_escapeXml = Boolean.valueOf(escapeXml);
-	}
-
-	public void setName(String name) {
-		_name = name;
-	}
-
-	public void setId(String resourceID) {
-		_resourceID = resourceID;
-	}
-
-	public void setCacheability(String cacheability) {
-		_cacheability = cacheability;
-	}
-
-	public void setPlid(long plid) {
-		_plid = plid;
-	}
-
-	public void setPortletName(String portletName) {
-		_portletName = portletName;
-	}
-
-	public void setAnchor(boolean anchor) {
-		_anchor = Boolean.valueOf(anchor);
-	}
-
-	public void setEncrypt(boolean encrypt) {
-		_encrypt = Boolean.valueOf(encrypt);
 	}
 
 	public void setDoAsGroupId(long doAsGroupId) {
@@ -266,8 +231,56 @@ public class ActionURLTag extends ParamAndPropertyAncestorTagImpl {
 		_doAsUserId = doAsUserId;
 	}
 
+	public void setEncrypt(boolean encrypt) {
+		_encrypt = Boolean.valueOf(encrypt);
+	}
+
+	public void setEscapeXml(boolean escapeXml) {
+		_escapeXml = Boolean.valueOf(escapeXml);
+	}
+
+	public void setId(String resourceID) {
+		_resourceID = resourceID;
+	}
+
+	public void setName(String name) {
+		_name = name;
+	}
+
+	public void setPlid(long plid) {
+		_plid = plid;
+	}
+
 	public void setPortletConfiguration(boolean portletConfiguration) {
 		_portletConfiguration = Boolean.valueOf(portletConfiguration);
+	}
+
+	public void setPortletMode(String portletMode) {
+		_portletMode = portletMode;
+	}
+
+	public void setPortletName(String portletName) {
+		_portletName = portletName;
+	}
+
+	public void setRefererPlid(long refererPlid) {
+		_refererPlid = refererPlid;
+	}
+
+	public void setSecure(boolean secure) {
+		_secure = Boolean.valueOf(secure);
+	}
+
+	public void setVar(String var) {
+		_var = var;
+	}
+
+	public void setVarImpl(String varImpl) {
+		_varImpl = varImpl;
+	}
+
+	public void setWindowState(String windowState) {
+		_windowState = windowState;
 	}
 
 	private static LiferayPortletURL _getLiferayPortletURL(
@@ -308,22 +321,23 @@ public class ActionURLTag extends ParamAndPropertyAncestorTagImpl {
 
 	private static Log _log = LogFactoryUtil.getLog(ActionURLTag.class);
 
-	private String _windowState;
-	private String _portletMode;
-	private String _var;
-	private String _varImpl;
-	private Boolean _secure;
-	private Boolean _copyCurrentRenderParameters;
-	private Boolean _escapeXml;
-	private String  _name;
-	private String _resourceID;
-	private String _cacheability;
-	private long _plid = LayoutConstants.DEFAULT_PLID;
-	private String _portletName;
 	private Boolean _anchor;
-	private Boolean _encrypt;
+	private String _cacheability;
+	private Boolean _copyCurrentRenderParameters;
 	private long _doAsGroupId;
 	private long _doAsUserId;
+	private Boolean _encrypt;
+	private Boolean _escapeXml;
+	private String _name;
+	private long _plid = LayoutConstants.DEFAULT_PLID;
 	private Boolean _portletConfiguration;
+	private String _portletMode;
+	private String _portletName;
+	private long _refererPlid = LayoutConstants.DEFAULT_PLID;
+	private String _resourceID;
+	private Boolean _secure;
+	private String _var;
+	private String _varImpl;
+	private String _windowState;
 
 }

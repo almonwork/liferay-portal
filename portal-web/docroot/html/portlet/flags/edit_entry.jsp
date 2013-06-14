@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -92,7 +92,7 @@ long reportedUserId = ParamUtil.getLong(request, "reportedUserId");
 		if (reason == 'other') {
 			var otherReasonNode = A.one('#<portlet:namespace />otherReason');
 
-			reason = (otherReasonNode && otherReasonNode.val()) || '<liferay-ui:message key="no-reason-specified" />';
+			reason = (otherReasonNode && otherReasonNode.val()) || '<%= UnicodeLanguageUtil.get(pageContext, "no-reason-specified") %>';
 		}
 
 		var reporterEmailAddressNode = A.one('#<portlet:namespace />reporterEmailAddress');

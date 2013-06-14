@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -20,6 +20,8 @@ import com.liferay.portal.model.CacheModel;
 
 import com.liferay.portlet.asset.model.AssetEntry;
 
+import java.io.Serializable;
+
 import java.util.Date;
 
 /**
@@ -29,10 +31,11 @@ import java.util.Date;
  * @see AssetEntry
  * @generated
  */
-public class AssetEntryCacheModel implements CacheModel<AssetEntry> {
+public class AssetEntryCacheModel implements CacheModel<AssetEntry>,
+	Serializable {
 	@Override
 	public String toString() {
-		StringBundler sb = new StringBundler(51);
+		StringBundler sb = new StringBundler(53);
 
 		sb.append("{entryId=");
 		sb.append(entryId);
@@ -54,6 +57,8 @@ public class AssetEntryCacheModel implements CacheModel<AssetEntry> {
 		sb.append(classPK);
 		sb.append(", classUuid=");
 		sb.append(classUuid);
+		sb.append(", classTypeId=");
+		sb.append(classTypeId);
 		sb.append(", visible=");
 		sb.append(visible);
 		sb.append(", startDate=");
@@ -128,6 +133,7 @@ public class AssetEntryCacheModel implements CacheModel<AssetEntry> {
 			assetEntryImpl.setClassUuid(classUuid);
 		}
 
+		assetEntryImpl.setClassTypeId(classTypeId);
 		assetEntryImpl.setVisible(visible);
 
 		if (startDate == Long.MIN_VALUE) {
@@ -220,6 +226,7 @@ public class AssetEntryCacheModel implements CacheModel<AssetEntry> {
 	public long classNameId;
 	public long classPK;
 	public String classUuid;
+	public long classTypeId;
 	public boolean visible;
 	public long startDate;
 	public long endDate;

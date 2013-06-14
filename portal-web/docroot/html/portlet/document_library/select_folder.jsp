@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -22,7 +22,7 @@ Folder folder = (Folder)request.getAttribute(WebKeys.DOCUMENT_LIBRARY_FOLDER);
 long folderId = BeanParamUtil.getLong(folder, request, "folderId", DLFolderConstants.DEFAULT_PARENT_FOLDER_ID);
 
 long repositoryId = scopeGroupId;
-String folderName = LanguageUtil.get(pageContext, "documents-home");
+String folderName = LanguageUtil.get(pageContext, "home");
 
 if (folder != null) {
 	repositoryId = folder.getRepositoryId();
@@ -34,7 +34,7 @@ if (folder != null) {
 
 <aui:form method="post" name="fm">
 	<liferay-ui:header
-		title="documents-home"
+		title="home"
 	/>
 
 	<liferay-ui:breadcrumb showGuestGroup="<%= false %>" showLayout="<%= false %>" showParentGroups="<%= false %>" />
@@ -82,42 +82,75 @@ if (folder != null) {
 
 		sb.append("<img align=\"left\" border=\"0\" src=\"");
 		sb.append(themeDisplay.getPathThemeImages());
-		sb.append("/common/folder.png\">");
+
+		int foldersCount = 0;
+		int fileEntriesCount = 0;
+
+		try {
+			List<Long> subfolderIds = DLAppServiceUtil.getSubfolderIds(curFolder.getRepositoryId(), curFolder.getFolderId(), false);
+
+			foldersCount = subfolderIds.size();
+
+			subfolderIds.clear();
+			subfolderIds.add(curFolder.getFolderId());
+
+			fileEntriesCount = DLAppServiceUtil.getFoldersFileEntriesCount(curFolder.getRepositoryId(), subfolderIds, WorkflowConstants.STATUS_APPROVED);
+		}
+		catch (com.liferay.portal.kernel.repository.RepositoryException re) {
+			rowURL = null;
+		}
+		catch (com.liferay.portal.security.auth.PrincipalException pe) {
+			rowURL = null;
+		}
+
+		if (curFolder.isMountPoint()) {
+			if (rowURL != null) {
+				sb.append("/common/drive.png\">");
+			}
+			else {
+				sb.append("/common/drive_error.png\">");
+			}
+		}
+		else {
+			if ((foldersCount + fileEntriesCount) > 0) {
+				sb.append("/common/folder_full_document.png\">");
+			}
+			else {
+				sb.append("/common/folder_empty.png\">");
+			}
+		}
+
 		sb.append(curFolder.getName());
 
 		row.addText(sb.toString(), rowURL);
 
 		// Statistics
 
-		List<Long> subfolderIds = DLAppServiceUtil.getSubfolderIds(repositoryId, curFolder.getFolderId(), false);
-
-		int foldersCount = subfolderIds.size();
-
-		subfolderIds.clear();
-		subfolderIds.add(curFolder.getFolderId());
-
-		int fileEntriesCount = DLAppServiceUtil.getFoldersFileEntriesCount(repositoryId, subfolderIds, WorkflowConstants.STATUS_APPROVED);
-
 		row.addText(String.valueOf(foldersCount), rowURL);
 		row.addText(String.valueOf(fileEntriesCount), rowURL);
 
 		// Action
 
-		sb.setIndex(0);
+		if (rowURL != null) {
+			sb.setIndex(0);
 
-		sb.append("opener.");
-		sb.append(renderResponse.getNamespace());
-		sb.append("selectFolder('");
-		sb.append(curFolder.getFolderId());
-		sb.append("', '");
-		sb.append(UnicodeFormatter.toString(curFolder.getName()));
-		sb.append("', '");
-		sb.append(curFolder.isSupportsMetadata());
-		sb.append("', '");
-		sb.append(curFolder.isSupportsSocial());
-		sb.append("'); window.close();");
+			sb.append("opener.");
+			sb.append(renderResponse.getNamespace());
+			sb.append("selectFolder('");
+			sb.append(curFolder.getFolderId());
+			sb.append("', '");
+			sb.append(UnicodeFormatter.toString(curFolder.getName()));
+			sb.append("', ");
+			sb.append(curFolder.isSupportsMetadata());
+			sb.append(", ");
+			sb.append(curFolder.isSupportsSocial());
+			sb.append("); window.close();");
 
-		row.addButton("right", SearchEntry.DEFAULT_VALIGN, LanguageUtil.get(pageContext, "choose"), sb.toString());
+			row.addButton("right", SearchEntry.DEFAULT_VALIGN, LanguageUtil.get(pageContext, "choose"), sb.toString());
+		}
+		else {
+			row.addText(StringPool.BLANK);
+		}
 
 		// Add result row
 
@@ -140,7 +173,7 @@ if (folder != null) {
 		</c:if>
 
 		<%
-		String taglibSelectOnClick = "opener." + renderResponse.getNamespace() + "selectFolder('" + folderId + "','" + folderName + "','" + ((folder != null) ? folder.isSupportsMetadata() : Boolean.TRUE.toString()) + "','" + ((folder != null) ? folder.isSupportsSocial() : Boolean.TRUE.toString()) + "');window.close();";
+		String taglibSelectOnClick = "opener." + renderResponse.getNamespace() + "selectFolder('" + folderId + "','" + folderName + "','" + ((folder != null) ? folder.isSupportsMetadata() : Boolean.TRUE.toString()) + "','" + ((folder != null) ? folder.isSupportsSocial() : Boolean.TRUE.toString()) + "'); window.close();";
 		%>
 
 		<aui:button onClick="<%= taglibSelectOnClick %>" value="choose-this-folder" />

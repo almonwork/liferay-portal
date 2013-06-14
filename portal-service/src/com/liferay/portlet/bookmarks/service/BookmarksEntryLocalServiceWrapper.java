@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,6 +14,8 @@
 
 package com.liferay.portlet.bookmarks.service;
 
+import com.liferay.portal.service.ServiceWrapper;
+
 /**
  * <p>
  * This class is a wrapper for {@link BookmarksEntryLocalService}.
@@ -24,7 +26,8 @@ package com.liferay.portlet.bookmarks.service;
  * @generated
  */
 public class BookmarksEntryLocalServiceWrapper
-	implements BookmarksEntryLocalService {
+	implements BookmarksEntryLocalService,
+		ServiceWrapper<BookmarksEntryLocalService> {
 	public BookmarksEntryLocalServiceWrapper(
 		BookmarksEntryLocalService bookmarksEntryLocalService) {
 		_bookmarksEntryLocalService = bookmarksEntryLocalService;
@@ -58,25 +61,32 @@ public class BookmarksEntryLocalServiceWrapper
 	* Deletes the bookmarks entry with the primary key from the database. Also notifies the appropriate model listeners.
 	*
 	* @param entryId the primary key of the bookmarks entry
+	* @return the bookmarks entry that was removed
 	* @throws PortalException if a bookmarks entry with the primary key could not be found
 	* @throws SystemException if a system exception occurred
 	*/
-	public void deleteBookmarksEntry(long entryId)
+	public com.liferay.portlet.bookmarks.model.BookmarksEntry deleteBookmarksEntry(
+		long entryId)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException {
-		_bookmarksEntryLocalService.deleteBookmarksEntry(entryId);
+		return _bookmarksEntryLocalService.deleteBookmarksEntry(entryId);
 	}
 
 	/**
 	* Deletes the bookmarks entry from the database. Also notifies the appropriate model listeners.
 	*
 	* @param bookmarksEntry the bookmarks entry
+	* @return the bookmarks entry that was removed
 	* @throws SystemException if a system exception occurred
 	*/
-	public void deleteBookmarksEntry(
+	public com.liferay.portlet.bookmarks.model.BookmarksEntry deleteBookmarksEntry(
 		com.liferay.portlet.bookmarks.model.BookmarksEntry bookmarksEntry)
 		throws com.liferay.portal.kernel.exception.SystemException {
-		_bookmarksEntryLocalService.deleteBookmarksEntry(bookmarksEntry);
+		return _bookmarksEntryLocalService.deleteBookmarksEntry(bookmarksEntry);
+	}
+
+	public com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery() {
+		return _bookmarksEntryLocalService.dynamicQuery();
 	}
 
 	/**
@@ -148,6 +158,12 @@ public class BookmarksEntryLocalServiceWrapper
 		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery)
 		throws com.liferay.portal.kernel.exception.SystemException {
 		return _bookmarksEntryLocalService.dynamicQueryCount(dynamicQuery);
+	}
+
+	public com.liferay.portlet.bookmarks.model.BookmarksEntry fetchBookmarksEntry(
+		long entryId)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return _bookmarksEntryLocalService.fetchBookmarksEntry(entryId);
 	}
 
 	/**
@@ -275,57 +291,24 @@ public class BookmarksEntryLocalServiceWrapper
 			name, url, description, serviceContext);
 	}
 
-	public void addEntryResources(
-		com.liferay.portlet.bookmarks.model.BookmarksEntry entry,
-		boolean addGroupPermissions, boolean addGuestPermissions)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
-		_bookmarksEntryLocalService.addEntryResources(entry,
-			addGroupPermissions, addGuestPermissions);
-	}
-
-	public void addEntryResources(
-		com.liferay.portlet.bookmarks.model.BookmarksEntry entry,
-		java.lang.String[] groupPermissions, java.lang.String[] guestPermissions)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
-		_bookmarksEntryLocalService.addEntryResources(entry, groupPermissions,
-			guestPermissions);
-	}
-
-	public void addEntryResources(long entryId, boolean addGroupPermissions,
-		boolean addGuestPermissions)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
-		_bookmarksEntryLocalService.addEntryResources(entryId,
-			addGroupPermissions, addGuestPermissions);
-	}
-
-	public void addEntryResources(long entryId,
-		java.lang.String[] groupPermissions, java.lang.String[] guestPermissions)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
-		_bookmarksEntryLocalService.addEntryResources(entryId,
-			groupPermissions, guestPermissions);
-	}
-
 	public void deleteEntries(long groupId, long folderId)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException {
 		_bookmarksEntryLocalService.deleteEntries(groupId, folderId);
 	}
 
-	public void deleteEntry(
+	public com.liferay.portlet.bookmarks.model.BookmarksEntry deleteEntry(
 		com.liferay.portlet.bookmarks.model.BookmarksEntry entry)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException {
-		_bookmarksEntryLocalService.deleteEntry(entry);
+		return _bookmarksEntryLocalService.deleteEntry(entry);
 	}
 
-	public void deleteEntry(long entryId)
+	public com.liferay.portlet.bookmarks.model.BookmarksEntry deleteEntry(
+		long entryId)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException {
-		_bookmarksEntryLocalService.deleteEntry(entryId);
+		return _bookmarksEntryLocalService.deleteEntry(entryId);
 	}
 
 	public java.util.List<com.liferay.portlet.bookmarks.model.BookmarksEntry> getEntries(
@@ -418,11 +401,26 @@ public class BookmarksEntryLocalServiceWrapper
 			groupId, folderId, name, url, description, serviceContext);
 	}
 
+	/**
+	 * @deprecated Renamed to {@link #getWrappedService}
+	 */
 	public BookmarksEntryLocalService getWrappedBookmarksEntryLocalService() {
 		return _bookmarksEntryLocalService;
 	}
 
+	/**
+	 * @deprecated Renamed to {@link #setWrappedService}
+	 */
 	public void setWrappedBookmarksEntryLocalService(
+		BookmarksEntryLocalService bookmarksEntryLocalService) {
+		_bookmarksEntryLocalService = bookmarksEntryLocalService;
+	}
+
+	public BookmarksEntryLocalService getWrappedService() {
+		return _bookmarksEntryLocalService;
+	}
+
+	public void setWrappedService(
 		BookmarksEntryLocalService bookmarksEntryLocalService) {
 		_bookmarksEntryLocalService = bookmarksEntryLocalService;
 	}

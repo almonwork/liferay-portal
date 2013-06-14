@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -33,6 +33,10 @@ public class AssetTagsSummaryTag extends IncludeTag {
 		return _portletURL;
 	}
 
+	public void setAssetTagNames(String assetTagNames) {
+		_assetTagNames = assetTagNames;
+	}
+
 	public void setClassName(String className) {
 		_className = className;
 	}
@@ -43,10 +47,6 @@ public class AssetTagsSummaryTag extends IncludeTag {
 
 	public void setMessage(String message) {
 		_message = message;
-	}
-
-	public void setAssetTagNames(String assetTagNames) {
-		_assetTagNames = assetTagNames;
 	}
 
 	public void setPortletURL(PortletURL portletURL) {

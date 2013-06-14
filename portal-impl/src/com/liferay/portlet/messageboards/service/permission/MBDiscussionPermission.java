@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -20,6 +20,7 @@ import com.liferay.portal.kernel.workflow.permission.WorkflowPermissionUtil;
 import com.liferay.portal.security.auth.PrincipalException;
 import com.liferay.portal.security.permission.PermissionChecker;
 import com.liferay.portal.security.permission.ResourceActionsUtil;
+import com.liferay.portal.util.PropsValues;
 import com.liferay.portlet.messageboards.model.MBMessage;
 import com.liferay.portlet.messageboards.service.MBBanLocalServiceUtil;
 import com.liferay.portlet.messageboards.service.MBMessageLocalServiceUtil;
@@ -64,8 +65,13 @@ public class MBDiscussionPermission {
 			String actionId)
 		throws PortalException, SystemException {
 
-		MBMessage message = MBMessageLocalServiceUtil.getMessage(
-			messageId);
+		MBMessage message = MBMessageLocalServiceUtil.getMessage(messageId);
+
+		if (PropsValues.DISCUSSION_COMMENTS_ALWAYS_EDITABLE_BY_OWNER &&
+			(permissionChecker.getUserId() == message.getUserId())) {
+
+			return true;
+		}
 
 		if (message.isPending()) {
 			Boolean hasPermission = WorkflowPermissionUtil.hasPermission(

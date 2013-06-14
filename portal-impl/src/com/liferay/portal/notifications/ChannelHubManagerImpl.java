@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -24,6 +24,7 @@ import com.liferay.portal.kernel.notifications.NotificationEvent;
 import com.liferay.portal.kernel.notifications.UnknownChannelHubException;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -36,12 +37,38 @@ import java.util.concurrent.ConcurrentMap;
 public class ChannelHubManagerImpl implements ChannelHubManager {
 
 	public void confirmDelivery(
-			long companyId, long userId, String notificationEventUuid)
+			long companyId, long userId,
+			Collection<String> notificationEventUuids)
+		throws ChannelException {
+
+		confirmDelivery(companyId, userId, notificationEventUuids, false);
+	}
+
+	public void confirmDelivery(
+			long companyId, long userId,
+			Collection<String> notificationEventUuids, boolean archive)
 		throws ChannelException {
 
 		ChannelHub channelHub = getChannelHub(companyId);
 
-		channelHub.confirmDelivery(userId, notificationEventUuid);
+		channelHub.confirmDelivery(userId, notificationEventUuids, archive);
+	}
+
+	public void confirmDelivery(
+			long companyId, long userId, String notificationEventUuid)
+		throws ChannelException {
+
+		confirmDelivery(companyId, userId, notificationEventUuid, false);
+	}
+
+	public void confirmDelivery(
+			long companyId, long userId, String notificationEventUuid,
+			boolean archive)
+		throws ChannelException {
+
+		ChannelHub channelHub = getChannelHub(companyId);
+
+		channelHub.confirmDelivery(userId, notificationEventUuid, archive);
 	}
 
 	public Channel createChannel(long companyId, long userId)
@@ -52,9 +79,7 @@ public class ChannelHubManagerImpl implements ChannelHubManager {
 		return channelHub.createChannel(userId);
 	}
 
-	public ChannelHub createChannelHub(long companyId)
-		throws ChannelException {
-
+	public ChannelHub createChannelHub(long companyId) throws ChannelException {
 		ChannelHub channelHub = _channelHub.clone(companyId);
 
 		if (_channelHubs.putIfAbsent(companyId, channelHub) != null) {
@@ -63,6 +88,26 @@ public class ChannelHubManagerImpl implements ChannelHubManager {
 		}
 
 		return channelHub;
+	}
+
+	public void deleteUserNotificiationEvent(
+			long companyId, long userId, String notificationEventUuid)
+		throws ChannelException {
+
+		ChannelHub channelHub = getChannelHub(companyId);
+
+		channelHub.deleteUserNotificiationEvent(userId, notificationEventUuid);
+	}
+
+	public void deleteUserNotificiationEvents(
+			long companyId, long userId,
+			Collection<String> notificationEventUuids)
+		throws ChannelException {
+
+		ChannelHub channelHub = getChannelHub(companyId);
+
+		channelHub.deleteUserNotificiationEvents(
+			userId, notificationEventUuids);
 	}
 
 	public void destroyChannel(long companyId, long userId)
@@ -81,6 +126,44 @@ public class ChannelHubManagerImpl implements ChannelHubManager {
 		}
 	}
 
+	public ChannelHub fetchChannelHub(long companyId) throws ChannelException {
+		return fetchChannelHub(companyId, false);
+	}
+
+	public ChannelHub fetchChannelHub(long companyId, boolean createIfAbsent)
+		throws ChannelException {
+
+		ChannelHub channelHub = _channelHubs.get(companyId);
+
+		if (channelHub == null) {
+			synchronized(_channelHubs) {
+				channelHub = _channelHubs.get(companyId);
+
+				if (channelHub == null) {
+					if (createIfAbsent) {
+						channelHub = createChannelHub(companyId);
+					}
+				}
+			}
+		}
+
+		return channelHub;
+	}
+
+	public List<NotificationEvent> fetchNotificationEvents(
+			long companyId, long userId, boolean flush)
+		throws ChannelException {
+
+		ChannelHub channelHub = fetchChannelHub(companyId);
+
+		if (channelHub == null) {
+			return Collections.emptyList();
+		}
+
+		return channelHub.fetchNotificationEvents(userId, flush);
+
+	}
+
 	public void flush() throws ChannelException {
 		for (ChannelHub channelHub : _channelHubs.values()) {
 			channelHub.flush();
@@ -88,17 +171,21 @@ public class ChannelHubManagerImpl implements ChannelHubManager {
 	}
 
 	public void flush(long companyId) throws ChannelException {
-		ChannelHub channelHub = getChannelHub(companyId);
+		ChannelHub channelHub = fetchChannelHub(companyId);
 
-		channelHub.flush();
+		if (channelHub != null) {
+			channelHub.flush();
+		}
 	}
 
 	public void flush(long companyId, long userId, long timestamp)
 		throws ChannelException {
 
-		ChannelHub channelHub = getChannelHub(companyId);
+		ChannelHub channelHub = fetchChannelHub(companyId);
 
-		channelHub.flush(userId, timestamp);
+		if (channelHub != null) {
+			channelHub.flush(userId, timestamp);
+		}
 	}
 
 	public Channel getChannel(long companyId, long userId)
@@ -123,22 +210,11 @@ public class ChannelHubManagerImpl implements ChannelHubManager {
 	public ChannelHub getChannelHub(long companyId, boolean createIfAbsent)
 		throws ChannelException {
 
-		ChannelHub channelHub = _channelHubs.get(companyId);
+		ChannelHub channelHub = fetchChannelHub(companyId, createIfAbsent);
 
 		if (channelHub == null) {
-			synchronized(_channelHubs) {
-				channelHub = _channelHubs.get(companyId);
-
-				if (channelHub == null) {
-					if (createIfAbsent) {
-						channelHub = createChannelHub(companyId);
-					}
-					else {
-						throw new UnknownChannelHubException(
-							"No channel exists with company id " + companyId);
-					}
-				}
-			}
+			throw new UnknownChannelHubException(
+				"No channel exists with company id " + companyId);
 		}
 
 		return channelHub;
@@ -154,10 +230,12 @@ public class ChannelHubManagerImpl implements ChannelHubManager {
 	}
 
 	public List<NotificationEvent> getNotificationEvents(
-			long compnayId, long userId, boolean flush)
+			long companyId, long userId, boolean flush)
 		throws ChannelException {
 
-		return getChannelHub(compnayId).getNotificationEvents(userId, flush);
+		ChannelHub channelHub = getChannelHub(companyId);
+
+		return channelHub.getNotificationEvents(userId, flush);
 	}
 
 	public Collection<Long> getUserIds(long companyId) throws ChannelException {
@@ -230,7 +308,7 @@ public class ChannelHubManagerImpl implements ChannelHubManager {
 	}
 
 	private ChannelHub _channelHub;
-	private final ConcurrentMap<Long, ChannelHub> _channelHubs =
+	private ConcurrentMap<Long, ChannelHub> _channelHubs =
 		new ConcurrentHashMap<Long, ChannelHub>();
 
 }

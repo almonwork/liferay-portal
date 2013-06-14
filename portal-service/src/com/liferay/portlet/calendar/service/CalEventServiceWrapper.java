@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,6 +14,8 @@
 
 package com.liferay.portlet.calendar.service;
 
+import com.liferay.portal.service.ServiceWrapper;
+
 /**
  * <p>
  * This class is a wrapper for {@link CalEventService}.
@@ -23,9 +25,28 @@ package com.liferay.portlet.calendar.service;
  * @see       CalEventService
  * @generated
  */
-public class CalEventServiceWrapper implements CalEventService {
+public class CalEventServiceWrapper implements CalEventService,
+	ServiceWrapper<CalEventService> {
 	public CalEventServiceWrapper(CalEventService calEventService) {
 		_calEventService = calEventService;
+	}
+
+	/**
+	* Returns the Spring bean ID for this bean.
+	*
+	* @return the Spring bean ID for this bean
+	*/
+	public java.lang.String getBeanIdentifier() {
+		return _calEventService.getBeanIdentifier();
+	}
+
+	/**
+	* Sets the Spring bean ID for this bean.
+	*
+	* @param beanIdentifier the Spring bean ID for this bean
+	*/
+	public void setBeanIdentifier(java.lang.String beanIdentifier) {
+		_calEventService.setBeanIdentifier(beanIdentifier);
 	}
 
 	public com.liferay.portlet.calendar.model.CalEvent addEvent(
@@ -129,10 +150,10 @@ public class CalEventServiceWrapper implements CalEventService {
 		return _calEventService.hasEvents(groupId, cal, types);
 	}
 
-	public void importICal4j(long groupId, java.io.File file)
+	public void importICal4j(long groupId, java.io.InputStream inputStream)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException {
-		_calEventService.importICal4j(groupId, file);
+		_calEventService.importICal4j(groupId, inputStream);
 	}
 
 	public com.liferay.portlet.calendar.model.CalEvent updateEvent(
@@ -155,11 +176,25 @@ public class CalEventServiceWrapper implements CalEventService {
 			firstReminder, secondReminder, serviceContext);
 	}
 
+	/**
+	 * @deprecated Renamed to {@link #getWrappedService}
+	 */
 	public CalEventService getWrappedCalEventService() {
 		return _calEventService;
 	}
 
+	/**
+	 * @deprecated Renamed to {@link #setWrappedService}
+	 */
 	public void setWrappedCalEventService(CalEventService calEventService) {
+		_calEventService = calEventService;
+	}
+
+	public CalEventService getWrappedService() {
+		return _calEventService;
+	}
+
+	public void setWrappedService(CalEventService calEventService) {
 		_calEventService = calEventService;
 	}
 

@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -64,7 +64,7 @@ catch (Exception e) {
 		<liferay-ui:message key="lower-case-letters" />
 	</td>
 	<td>
-		<liferay-ui:input-checkbox param="lowerCaseLetters" defaultValue="<%= lowerCaseLetters %>" />
+		<liferay-ui:input-checkbox defaultValue="<%= lowerCaseLetters %>" param="lowerCaseLetters" />
 	</td>
 </tr>
 <tr>
@@ -72,7 +72,7 @@ catch (Exception e) {
 		<liferay-ui:message key="upper-case-letters" />
 	</td>
 	<td>
-		<liferay-ui:input-checkbox param="upperCaseLetters" defaultValue="<%= upperCaseLetters %>" />
+		<liferay-ui:input-checkbox defaultValue="<%= upperCaseLetters %>" param="upperCaseLetters" />
 	</td>
 </tr>
 <tr>

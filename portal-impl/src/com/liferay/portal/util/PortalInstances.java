@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -112,6 +112,10 @@ public class PortalInstances {
 		return _instance._isVirtualHostsIgnorePath(path);
 	}
 
+	public static void reload(ServletContext servletContext) {
+		_instance._reload(servletContext);
+	}
+
 	private PortalInstances() {
 		_companyIds = new long[0];
 		_autoLoginIgnoreHosts = SetUtil.fromArray(
@@ -131,8 +135,7 @@ public class PortalInstances {
 
 		long[] companyIds = new long[_companyIds.length + 1];
 
-		System.arraycopy(
-			_companyIds, 0, companyIds, 0, _companyIds.length);
+		System.arraycopy(_companyIds, 0, companyIds, 0, _companyIds.length);
 
 		companyIds[_companyIds.length] = companyId;
 
@@ -162,7 +165,7 @@ public class PortalInstances {
 
 		if (companyId <= 0) {
 			long cookieCompanyId = GetterUtil.getLong(
-				CookieKeys.getCookie(request, CookieKeys.COMPANY_ID));
+				CookieKeys.getCookie(request, CookieKeys.COMPANY_ID, false));
 
 			if (cookieCompanyId > 0) {
 				try {
@@ -388,9 +391,8 @@ public class PortalInstances {
 			String xml = HttpUtil.URLtoString(servletContext.getResource(
 				"/WEB-INF/liferay-display.xml"));
 
-			PortletCategory portletCategory =
-				(PortletCategory)WebAppPool.get(
-					String.valueOf(companyId), WebKeys.PORTLET_CATEGORY);
+			PortletCategory portletCategory = (PortletCategory)WebAppPool.get(
+				companyId, WebKeys.PORTLET_CATEGORY);
 
 			if (portletCategory == null) {
 				portletCategory = new PortletCategory();
@@ -406,8 +408,7 @@ public class PortalInstances {
 
 				PortletCategory currentPortletCategory =
 					(PortletCategory)WebAppPool.get(
-						String.valueOf(currentCompanyId),
-						WebKeys.PORTLET_CATEGORY);
+						currentCompanyId, WebKeys.PORTLET_CATEGORY);
 
 				if (currentPortletCategory != null) {
 					portletCategory.merge(currentPortletCategory);
@@ -415,8 +416,7 @@ public class PortalInstances {
 			}
 
 			WebAppPool.put(
-				String.valueOf(companyId), WebKeys.PORTLET_CATEGORY,
-				portletCategory);
+				companyId, WebKeys.PORTLET_CATEGORY, portletCategory);
 		}
 		catch (Exception e) {
 			_log.error(e, e);
@@ -428,8 +428,9 @@ public class PortalInstances {
 			_log.debug("Check journal content search");
 		}
 
-		if (GetterUtil.getBoolean(PropsUtil.get(
-				PropsKeys.JOURNAL_SYNC_CONTENT_SEARCH_ON_STARTUP))) {
+		if (GetterUtil.getBoolean(
+				PropsUtil.get(
+					PropsKeys.JOURNAL_SYNC_CONTENT_SEARCH_ON_STARTUP))) {
 
 			try {
 				JournalContentSearchLocalServiceUtil.checkContentSearches(
@@ -490,7 +491,8 @@ public class PortalInstances {
 
 	private boolean _isCompanyActive(long companyId) {
 		try {
-			Company company = CompanyLocalServiceUtil.fetchCompany(companyId);
+			Company company = CompanyLocalServiceUtil.fetchCompanyById(
+				companyId);
 
 			if (company != null) {
 				return company.isActive();
@@ -511,6 +513,17 @@ public class PortalInstances {
 		return _virtualHostsIgnorePaths.contains(path);
 	}
 
+	private void _reload(ServletContext servletContext) {
+		_companyIds = new long[0];
+		_webIds = null;
+
+		String[] webIds = _getWebIds();
+
+		for (String webId : webIds) {
+			_initCompany(servletContext, webId);
+		}
+	}
+
 	private static final String _GET_COMPANY_IDS =
 		"select companyId from Company";
 
@@ -518,11 +531,11 @@ public class PortalInstances {
 
 	private static PortalInstances _instance = new PortalInstances();
 
-	private long[] _companyIds;
-	private String[] _webIds;
 	private Set<String> _autoLoginIgnoreHosts;
 	private Set<String> _autoLoginIgnorePaths;
+	private long[] _companyIds;
 	private Set<String> _virtualHostsIgnoreHosts;
 	private Set<String> _virtualHostsIgnorePaths;
+	private String[] _webIds;
 
 }

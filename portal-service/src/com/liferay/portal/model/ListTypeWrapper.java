@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,6 +14,9 @@
 
 package com.liferay.portal.model;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * <p>
  * This class is a wrapper for {@link ListType}.
@@ -23,7 +26,7 @@ package com.liferay.portal.model;
  * @see       ListType
  * @generated
  */
-public class ListTypeWrapper implements ListType {
+public class ListTypeWrapper implements ListType, ModelWrapper<ListType> {
 	public ListTypeWrapper(ListType listType) {
 		_listType = listType;
 	}
@@ -34,6 +37,36 @@ public class ListTypeWrapper implements ListType {
 
 	public String getModelClassName() {
 		return ListType.class.getName();
+	}
+
+	public Map<String, Object> getModelAttributes() {
+		Map<String, Object> attributes = new HashMap<String, Object>();
+
+		attributes.put("listTypeId", getListTypeId());
+		attributes.put("name", getName());
+		attributes.put("type", getType());
+
+		return attributes;
+	}
+
+	public void setModelAttributes(Map<String, Object> attributes) {
+		Integer listTypeId = (Integer)attributes.get("listTypeId");
+
+		if (listTypeId != null) {
+			setListTypeId(listTypeId);
+		}
+
+		String name = (String)attributes.get("name");
+
+		if (name != null) {
+			setName(name);
+		}
+
+		String type = (String)attributes.get("type");
+
+		if (type != null) {
+			setType(type);
+		}
 	}
 
 	/**
@@ -128,10 +161,6 @@ public class ListTypeWrapper implements ListType {
 		return _listType.isEscapedModel();
 	}
 
-	public void setEscapedModel(boolean escapedModel) {
-		_listType.setEscapedModel(escapedModel);
-	}
-
 	public java.io.Serializable getPrimaryKeyObj() {
 		return _listType.getPrimaryKeyObj();
 	}
@@ -180,7 +209,14 @@ public class ListTypeWrapper implements ListType {
 		return _listType.toXmlString();
 	}
 
+	/**
+	 * @deprecated Renamed to {@link #getWrappedModel}
+	 */
 	public ListType getWrappedListType() {
+		return _listType;
+	}
+
+	public ListType getWrappedModel() {
 		return _listType;
 	}
 

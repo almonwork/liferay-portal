@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,6 +14,12 @@
 
 package com.liferay.portlet.softwarecatalog.model;
 
+import com.liferay.portal.model.ModelWrapper;
+
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * <p>
  * This class is a wrapper for {@link SCProductVersion}.
@@ -23,7 +29,8 @@ package com.liferay.portlet.softwarecatalog.model;
  * @see       SCProductVersion
  * @generated
  */
-public class SCProductVersionWrapper implements SCProductVersion {
+public class SCProductVersionWrapper implements SCProductVersion,
+	ModelWrapper<SCProductVersion> {
 	public SCProductVersionWrapper(SCProductVersion scProductVersion) {
 		_scProductVersion = scProductVersion;
 	}
@@ -34,6 +41,99 @@ public class SCProductVersionWrapper implements SCProductVersion {
 
 	public String getModelClassName() {
 		return SCProductVersion.class.getName();
+	}
+
+	public Map<String, Object> getModelAttributes() {
+		Map<String, Object> attributes = new HashMap<String, Object>();
+
+		attributes.put("productVersionId", getProductVersionId());
+		attributes.put("companyId", getCompanyId());
+		attributes.put("userId", getUserId());
+		attributes.put("userName", getUserName());
+		attributes.put("createDate", getCreateDate());
+		attributes.put("modifiedDate", getModifiedDate());
+		attributes.put("productEntryId", getProductEntryId());
+		attributes.put("version", getVersion());
+		attributes.put("changeLog", getChangeLog());
+		attributes.put("downloadPageURL", getDownloadPageURL());
+		attributes.put("directDownloadURL", getDirectDownloadURL());
+		attributes.put("repoStoreArtifact", getRepoStoreArtifact());
+
+		return attributes;
+	}
+
+	public void setModelAttributes(Map<String, Object> attributes) {
+		Long productVersionId = (Long)attributes.get("productVersionId");
+
+		if (productVersionId != null) {
+			setProductVersionId(productVersionId);
+		}
+
+		Long companyId = (Long)attributes.get("companyId");
+
+		if (companyId != null) {
+			setCompanyId(companyId);
+		}
+
+		Long userId = (Long)attributes.get("userId");
+
+		if (userId != null) {
+			setUserId(userId);
+		}
+
+		String userName = (String)attributes.get("userName");
+
+		if (userName != null) {
+			setUserName(userName);
+		}
+
+		Date createDate = (Date)attributes.get("createDate");
+
+		if (createDate != null) {
+			setCreateDate(createDate);
+		}
+
+		Date modifiedDate = (Date)attributes.get("modifiedDate");
+
+		if (modifiedDate != null) {
+			setModifiedDate(modifiedDate);
+		}
+
+		Long productEntryId = (Long)attributes.get("productEntryId");
+
+		if (productEntryId != null) {
+			setProductEntryId(productEntryId);
+		}
+
+		String version = (String)attributes.get("version");
+
+		if (version != null) {
+			setVersion(version);
+		}
+
+		String changeLog = (String)attributes.get("changeLog");
+
+		if (changeLog != null) {
+			setChangeLog(changeLog);
+		}
+
+		String downloadPageURL = (String)attributes.get("downloadPageURL");
+
+		if (downloadPageURL != null) {
+			setDownloadPageURL(downloadPageURL);
+		}
+
+		String directDownloadURL = (String)attributes.get("directDownloadURL");
+
+		if (directDownloadURL != null) {
+			setDirectDownloadURL(directDownloadURL);
+		}
+
+		Boolean repoStoreArtifact = (Boolean)attributes.get("repoStoreArtifact");
+
+		if (repoStoreArtifact != null) {
+			setRepoStoreArtifact(repoStoreArtifact);
+		}
 	}
 
 	/**
@@ -319,10 +419,6 @@ public class SCProductVersionWrapper implements SCProductVersion {
 		return _scProductVersion.isEscapedModel();
 	}
 
-	public void setEscapedModel(boolean escapedModel) {
-		_scProductVersion.setEscapedModel(escapedModel);
-	}
-
 	public java.io.Serializable getPrimaryKeyObj() {
 		return _scProductVersion.getPrimaryKeyObj();
 	}
@@ -386,7 +482,14 @@ public class SCProductVersionWrapper implements SCProductVersion {
 		return _scProductVersion.getProductEntry();
 	}
 
+	/**
+	 * @deprecated Renamed to {@link #getWrappedModel}
+	 */
 	public SCProductVersion getWrappedSCProductVersion() {
+		return _scProductVersion;
+	}
+
+	public SCProductVersion getWrappedModel() {
 		return _scProductVersion;
 	}
 

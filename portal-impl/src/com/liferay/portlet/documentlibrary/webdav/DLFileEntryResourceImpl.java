@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -46,8 +46,20 @@ public class DLFileEntryResourceImpl extends BaseResourceImpl {
 	}
 
 	@Override
-	public boolean isCollection() {
-		return false;
+	public InputStream getContentAsStream() throws WebDAVException {
+		try {
+			String version = StringPool.BLANK;
+
+			return _fileEntry.getContentStream(version);
+		}
+		catch (Exception e) {
+			throw new WebDAVException(e);
+		}
+	}
+
+	@Override
+	public String getContentType() {
+		return _fileEntry.getMimeType();
 	}
 
 	@Override
@@ -62,6 +74,11 @@ public class DLFileEntryResourceImpl extends BaseResourceImpl {
 	}
 
 	@Override
+	public boolean isCollection() {
+		return false;
+	}
+
+	@Override
 	public boolean isLocked() {
 		try {
 			return _fileEntry.hasLock();
@@ -70,23 +87,6 @@ public class DLFileEntryResourceImpl extends BaseResourceImpl {
 		}
 
 		return false;
-	}
-
-	@Override
-	public String getContentType() {
-		return _fileEntry.getMimeType();
-	}
-
-	@Override
-	public InputStream getContentAsStream() throws WebDAVException {
-		try {
-			String version = StringPool.BLANK;
-
-			return _fileEntry.getContentStream(version);
-		}
-		catch (Exception e) {
-			throw new WebDAVException(e);
-		}
 	}
 
 	private FileEntry _fileEntry;

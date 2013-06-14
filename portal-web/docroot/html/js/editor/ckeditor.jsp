@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -37,18 +37,11 @@ if (!ckEditorConfigFileName.equals("ckconfig.jsp")) {
 	useCustomDataProcessor = true;
 }
 
-StringBundler configParamsSB = new StringBundler();
+Map<String, String> configParamsMap = (Map<String, String>)request.getAttribute("liferay-ui:input-editor:configParams");
+Map<String, String> fileBrowserParamsMap = (Map<String, String>)request.getAttribute("liferay-ui:input-editor:fileBrowserParams");
 
-Map<String, String> configParams = (Map<String, String>)request.getAttribute("liferay-ui:input-editor:configParams");
-
-if (configParams != null) {
-	for (Map.Entry<String, String> configParam : configParams.entrySet()) {
-		configParamsSB.append(StringPool.AMPERSAND);
-		configParamsSB.append(configParam.getKey());
-		configParamsSB.append(StringPool.EQUAL);
-		configParamsSB.append(HttpUtil.encodeURL(configParam.getValue()));
-	}
-}
+String configParams = marshallParams(configParamsMap);
+String fileBrowserParams = marshallParams(fileBrowserParamsMap);
 
 String cssClass = GetterUtil.getString((String)request.getAttribute("liferay-ui:input-editor:cssClass"));
 String cssClasses = GetterUtil.getString((String)request.getAttribute("liferay-ui:input-editor:cssClasses"));
@@ -78,7 +71,7 @@ String toolbarSet = (String)request.getAttribute("liferay-ui:input-editor:toolba
 		long javaScriptLastModified = ServletContextUtil.getLastModified(application, "/html/js/", true);
 		%>
 
-		<script src="<%= HtmlUtil.escape(PortalUtil.getStaticResourceURL(request, themeDisplay.getPathJavaScript() + "/editor/ckeditor/ckeditor.js", javaScriptLastModified)) %>" type="text/javascript"></script>
+		<script src="<%= HtmlUtil.escape(PortalUtil.getStaticResourceURL(request, themeDisplay.getCDNHost() + themeDisplay.getPathJavaScript() + "/editor/ckeditor/ckeditor.js", javaScriptLastModified)) %>" type="text/javascript"></script>
 
 		<script type="text/javascript">
 			Liferay.namespace('EDITORS')['<%= editorImpl %>'] = true;
@@ -125,7 +118,7 @@ String toolbarSet = (String)request.getAttribute("liferay-ui:input-editor:toolba
 				var dirty = ckEditor.checkDirty();
 
 				if (dirty) {
-					<%= HtmlUtil.escape(onChangeMethod) %>(window['<%= name %>'].getText());
+					<%= HtmlUtil.escapeJS(onChangeMethod) %>(window['<%= name %>'].getText());
 
 					ckEditor.resetDirty();
 				}
@@ -149,21 +142,34 @@ String toolbarSet = (String)request.getAttribute("liferay-ui:input-editor:toolba
 	(function() {
 		function setData() {
 			<c:if test="<%= Validator.isNotNull(initMethod) %>">
-				ckEditor.setData(<%= HtmlUtil.escape(namespace + initMethod) %>());
+				ckEditor.setData(<%= HtmlUtil.escapeJS(namespace + initMethod) %>());
 			</c:if>
 		}
 
 		<%
-		String connectorURL = HttpUtil.encodeURL(mainPath + "/portal/fckeditor?p_l_id=" + plid + "&p_p_id=" + HttpUtil.encodeURL(portletId) + "&doAsUserId=" + HttpUtil.encodeURL(doAsUserId) + "&doAsGroupId=" + HttpUtil.encodeURL(String.valueOf(doAsGroupId)));
+		StringBundler sb = new StringBundler(10);
+
+		sb.append(mainPath);
+		sb.append("/portal/fckeditor?p_l_id=");
+		sb.append(plid);
+		sb.append("&p_p_id=");
+		sb.append(HttpUtil.encodeURL(portletId));
+		sb.append("&doAsUserId=");
+		sb.append(HttpUtil.encodeURL(doAsUserId));
+		sb.append("&doAsGroupId=");
+		sb.append(HttpUtil.encodeURL(String.valueOf(doAsGroupId)));
+		sb.append(fileBrowserParams);
+
+		String connectorURL = HttpUtil.encodeURL(sb.toString());
 		%>
 
 		CKEDITOR.replace(
 			'<%= name %>',
 			{
-				customConfig: '<%= PortalUtil.getPathContext() %>/html/js/editor/ckeditor/<%= ckEditorConfigFileName %>?p_l_id=<%= plid %>&p_p_id=<%= HttpUtil.encodeURL(portletId) %>&p_main_path=<%= HttpUtil.encodeURL(mainPath) %>&doAsUserId=<%= HttpUtil.encodeURL(doAsUserId) %>&doAsGroupId=<%= HttpUtil.encodeURL(String.valueOf(doAsGroupId)) %>&cssPath=<%= HttpUtil.encodeURL(themeDisplay.getPathThemeCss()) %>&cssClasses=<%= HttpUtil.encodeURL(cssClasses) %>&imagesPath=<%= HttpUtil.encodeURL(themeDisplay.getPathThemeImages()) %>&languageId=<%= HttpUtil.encodeURL(LocaleUtil.toLanguageId(locale)) %><%= configParamsSB.toString() %>',
-				filebrowserBrowseUrl: '<%= PortalUtil.getPathContext() %>/html/js/editor/ckeditor/editor/filemanager/browser/liferay/browser.html?Connector=<%= connectorURL %>',
+				customConfig: '<%= PortalUtil.getPathContext() %>/html/js/editor/ckeditor/<%= HtmlUtil.escapeJS(ckEditorConfigFileName) %>?p_l_id=<%= plid %>&p_p_id=<%= HttpUtil.encodeURL(portletId) %>&p_main_path=<%= HttpUtil.encodeURL(mainPath) %>&doAsUserId=<%= HttpUtil.encodeURL(doAsUserId) %>&doAsGroupId=<%= HttpUtil.encodeURL(String.valueOf(doAsGroupId)) %>&cssPath=<%= HttpUtil.encodeURL(themeDisplay.getPathThemeCss()) %>&cssClasses=<%= HttpUtil.encodeURL(cssClasses) %>&imagesPath=<%= HttpUtil.encodeURL(themeDisplay.getPathThemeImages()) %>&languageId=<%= HttpUtil.encodeURL(LocaleUtil.toLanguageId(locale)) %><%= configParams %>',
+				filebrowserBrowseUrl: '<%= PortalUtil.getPathContext() %>/html/js/editor/ckeditor/editor/filemanager/browser/liferay/browser.html?Connector=<%= connectorURL %><%= fileBrowserParams %>',
 				filebrowserUploadUrl: null,
-				toolbar: '<%= TextFormatter.format(HtmlUtil.escape(toolbarSet), TextFormatter.M) %>'
+				toolbar: '<%= TextFormatter.format(HtmlUtil.escapeJS(toolbarSet), TextFormatter.M) %>'
 			}
 		);
 
@@ -237,4 +243,22 @@ String toolbarSet = (String)request.getAttribute("liferay-ui:input-editor:toolba
 			}
 		);
 	})();
+
 </aui:script>
+
+<%!
+public String marshallParams(Map<String, String> params) {
+	StringBundler sb = new StringBundler();
+
+	if (params != null) {
+		for (Map.Entry<String, String> configParam : params.entrySet()) {
+			sb.append(StringPool.AMPERSAND);
+			sb.append(configParam.getKey());
+			sb.append(StringPool.EQUAL);
+			sb.append(HttpUtil.encodeURL(configParam.getValue()));
+		}
+	}
+
+	return sb.toString();
+}
+%>

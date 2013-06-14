@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -15,7 +15,6 @@
 package com.liferay.portal.service;
 
 import com.liferay.portal.kernel.bean.PortalBeanLocatorUtil;
-import com.liferay.portal.kernel.util.MethodCache;
 import com.liferay.portal.kernel.util.ReferenceRegistry;
 
 /**
@@ -66,25 +65,32 @@ public class ClassNameLocalServiceUtil {
 	* Deletes the class name with the primary key from the database. Also notifies the appropriate model listeners.
 	*
 	* @param classNameId the primary key of the class name
+	* @return the class name that was removed
 	* @throws PortalException if a class name with the primary key could not be found
 	* @throws SystemException if a system exception occurred
 	*/
-	public static void deleteClassName(long classNameId)
+	public static com.liferay.portal.model.ClassName deleteClassName(
+		long classNameId)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException {
-		getService().deleteClassName(classNameId);
+		return getService().deleteClassName(classNameId);
 	}
 
 	/**
 	* Deletes the class name from the database. Also notifies the appropriate model listeners.
 	*
 	* @param className the class name
+	* @return the class name that was removed
 	* @throws SystemException if a system exception occurred
 	*/
-	public static void deleteClassName(
+	public static com.liferay.portal.model.ClassName deleteClassName(
 		com.liferay.portal.model.ClassName className)
 		throws com.liferay.portal.kernel.exception.SystemException {
-		getService().deleteClassName(className);
+		return getService().deleteClassName(className);
+	}
+
+	public static com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery() {
+		return getService().dynamicQuery();
 	}
 
 	/**
@@ -156,6 +162,12 @@ public class ClassNameLocalServiceUtil {
 		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery)
 		throws com.liferay.portal.kernel.exception.SystemException {
 		return getService().dynamicQueryCount(dynamicQuery);
+	}
+
+	public static com.liferay.portal.model.ClassName fetchClassName(
+		long classNameId)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getService().fetchClassName(classNameId);
 	}
 
 	/**
@@ -279,26 +291,29 @@ public class ClassNameLocalServiceUtil {
 		return getService().getClassNameId(value);
 	}
 
+	public static java.lang.String getRegistryName() {
+		return getService().getRegistryName();
+	}
+
+	public static void invalidate() {
+		getService().invalidate();
+	}
+
 	public static ClassNameLocalService getService() {
 		if (_service == null) {
 			_service = (ClassNameLocalService)PortalBeanLocatorUtil.locate(ClassNameLocalService.class.getName());
 
 			ReferenceRegistry.registerReference(ClassNameLocalServiceUtil.class,
 				"_service");
-			MethodCache.remove(ClassNameLocalService.class);
 		}
 
 		return _service;
 	}
 
+	/**
+	 * @deprecated
+	 */
 	public void setService(ClassNameLocalService service) {
-		MethodCache.remove(ClassNameLocalService.class);
-
-		_service = service;
-
-		ReferenceRegistry.registerReference(ClassNameLocalServiceUtil.class,
-			"_service");
-		MethodCache.remove(ClassNameLocalService.class);
 	}
 
 	private static ClassNameLocalService _service;

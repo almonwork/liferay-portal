@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,6 +14,9 @@
 
 package com.liferay.portal.model;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * <p>
  * This class is a wrapper for {@link UserGroupRole}.
@@ -23,7 +26,8 @@ package com.liferay.portal.model;
  * @see       UserGroupRole
  * @generated
  */
-public class UserGroupRoleWrapper implements UserGroupRole {
+public class UserGroupRoleWrapper implements UserGroupRole,
+	ModelWrapper<UserGroupRole> {
 	public UserGroupRoleWrapper(UserGroupRole userGroupRole) {
 		_userGroupRole = userGroupRole;
 	}
@@ -34,6 +38,36 @@ public class UserGroupRoleWrapper implements UserGroupRole {
 
 	public String getModelClassName() {
 		return UserGroupRole.class.getName();
+	}
+
+	public Map<String, Object> getModelAttributes() {
+		Map<String, Object> attributes = new HashMap<String, Object>();
+
+		attributes.put("userId", getUserId());
+		attributes.put("groupId", getGroupId());
+		attributes.put("roleId", getRoleId());
+
+		return attributes;
+	}
+
+	public void setModelAttributes(Map<String, Object> attributes) {
+		Long userId = (Long)attributes.get("userId");
+
+		if (userId != null) {
+			setUserId(userId);
+		}
+
+		Long groupId = (Long)attributes.get("groupId");
+
+		if (groupId != null) {
+			setGroupId(groupId);
+		}
+
+		Long roleId = (Long)attributes.get("roleId");
+
+		if (roleId != null) {
+			setRoleId(roleId);
+		}
 	}
 
 	/**
@@ -149,10 +183,6 @@ public class UserGroupRoleWrapper implements UserGroupRole {
 		return _userGroupRole.isEscapedModel();
 	}
 
-	public void setEscapedModel(boolean escapedModel) {
-		_userGroupRole.setEscapedModel(escapedModel);
-	}
-
 	public java.io.Serializable getPrimaryKeyObj() {
 		return _userGroupRole.getPrimaryKeyObj();
 	}
@@ -224,7 +254,14 @@ public class UserGroupRoleWrapper implements UserGroupRole {
 		return _userGroupRole.getUser();
 	}
 
+	/**
+	 * @deprecated Renamed to {@link #getWrappedModel}
+	 */
 	public UserGroupRole getWrappedUserGroupRole() {
+		return _userGroupRole;
+	}
+
+	public UserGroupRole getWrappedModel() {
 		return _userGroupRole;
 	}
 

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,6 +14,10 @@
 
 package com.liferay.portal.model;
 
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * <p>
  * This class is a wrapper for {@link Subscription}.
@@ -23,7 +27,8 @@ package com.liferay.portal.model;
  * @see       Subscription
  * @generated
  */
-public class SubscriptionWrapper implements Subscription {
+public class SubscriptionWrapper implements Subscription,
+	ModelWrapper<Subscription> {
 	public SubscriptionWrapper(Subscription subscription) {
 		_subscription = subscription;
 	}
@@ -34,6 +39,78 @@ public class SubscriptionWrapper implements Subscription {
 
 	public String getModelClassName() {
 		return Subscription.class.getName();
+	}
+
+	public Map<String, Object> getModelAttributes() {
+		Map<String, Object> attributes = new HashMap<String, Object>();
+
+		attributes.put("subscriptionId", getSubscriptionId());
+		attributes.put("companyId", getCompanyId());
+		attributes.put("userId", getUserId());
+		attributes.put("userName", getUserName());
+		attributes.put("createDate", getCreateDate());
+		attributes.put("modifiedDate", getModifiedDate());
+		attributes.put("classNameId", getClassNameId());
+		attributes.put("classPK", getClassPK());
+		attributes.put("frequency", getFrequency());
+
+		return attributes;
+	}
+
+	public void setModelAttributes(Map<String, Object> attributes) {
+		Long subscriptionId = (Long)attributes.get("subscriptionId");
+
+		if (subscriptionId != null) {
+			setSubscriptionId(subscriptionId);
+		}
+
+		Long companyId = (Long)attributes.get("companyId");
+
+		if (companyId != null) {
+			setCompanyId(companyId);
+		}
+
+		Long userId = (Long)attributes.get("userId");
+
+		if (userId != null) {
+			setUserId(userId);
+		}
+
+		String userName = (String)attributes.get("userName");
+
+		if (userName != null) {
+			setUserName(userName);
+		}
+
+		Date createDate = (Date)attributes.get("createDate");
+
+		if (createDate != null) {
+			setCreateDate(createDate);
+		}
+
+		Date modifiedDate = (Date)attributes.get("modifiedDate");
+
+		if (modifiedDate != null) {
+			setModifiedDate(modifiedDate);
+		}
+
+		Long classNameId = (Long)attributes.get("classNameId");
+
+		if (classNameId != null) {
+			setClassNameId(classNameId);
+		}
+
+		Long classPK = (Long)attributes.get("classPK");
+
+		if (classPK != null) {
+			setClassPK(classPK);
+		}
+
+		String frequency = (String)attributes.get("frequency");
+
+		if (frequency != null) {
+			setFrequency(frequency);
+		}
 	}
 
 	/**
@@ -191,6 +268,10 @@ public class SubscriptionWrapper implements Subscription {
 		return _subscription.getClassName();
 	}
 
+	public void setClassName(java.lang.String className) {
+		_subscription.setClassName(className);
+	}
+
 	/**
 	* Returns the class name ID of this subscription.
 	*
@@ -265,10 +346,6 @@ public class SubscriptionWrapper implements Subscription {
 		return _subscription.isEscapedModel();
 	}
 
-	public void setEscapedModel(boolean escapedModel) {
-		_subscription.setEscapedModel(escapedModel);
-	}
-
 	public java.io.Serializable getPrimaryKeyObj() {
 		return _subscription.getPrimaryKeyObj();
 	}
@@ -322,7 +399,14 @@ public class SubscriptionWrapper implements Subscription {
 		_subscription.persist();
 	}
 
+	/**
+	 * @deprecated Renamed to {@link #getWrappedModel}
+	 */
 	public Subscription getWrappedSubscription() {
+		return _subscription;
+	}
+
+	public Subscription getWrappedModel() {
 		return _subscription;
 	}
 

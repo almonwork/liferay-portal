@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,22 +14,23 @@
 
 package com.liferay.portlet.documentlibrary.messaging;
 
-import com.liferay.portal.kernel.messaging.BaseMessageListener;
-import com.liferay.portal.kernel.messaging.Message;
 import com.liferay.portal.kernel.repository.model.FileVersion;
-import com.liferay.portlet.documentlibrary.util.VideoProcessor;
+import com.liferay.portlet.documentlibrary.util.VideoProcessorUtil;
 
 /**
  * @author Juan González
  * @author Sergio González
  */
-public class VideoProcessorMessageListener extends BaseMessageListener {
+public class VideoProcessorMessageListener
+	extends BaseProcessorMessageListener {
 
 	@Override
-	protected void doReceive(Message message) throws Exception {
-		FileVersion fileVersion = (FileVersion)message.getPayload();
+	protected void generate(
+			FileVersion sourceFileVersion, FileVersion destinationFileVersion)
+		throws Exception {
 
-		VideoProcessor.generateVideo(fileVersion);
+		VideoProcessorUtil.generateVideo(
+			sourceFileVersion, destinationFileVersion);
 	}
 
 }

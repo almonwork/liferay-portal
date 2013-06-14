@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -29,6 +29,7 @@ import com.liferay.portal.kernel.xml.Element;
 import com.liferay.portal.kernel.xml.SAXReaderUtil;
 import com.liferay.portal.model.Layout;
 import com.liferay.portal.service.LayoutLocalServiceUtil;
+import com.liferay.portlet.documentlibrary.lar.DLPortletDataHandlerImpl;
 import com.liferay.portlet.journal.NoSuchArticleException;
 import com.liferay.portlet.journal.lar.JournalPortletDataHandlerImpl;
 import com.liferay.portlet.journal.model.JournalArticle;
@@ -49,15 +50,42 @@ public class RSSPortletDataHandlerImpl extends JournalPortletDataHandlerImpl {
 	@Override
 	public PortletDataHandlerControl[] getExportControls() {
 		return new PortletDataHandlerControl[] {
-			_selectedArticles, _embeddedAssets, _images, _comments, _ratings,
-			_tags
+			_selectedArticles, _embeddedAssets
+		};
+	}
+
+	@Override
+	public PortletDataHandlerControl[] getExportMetadataControls() {
+		return new PortletDataHandlerControl[] {
+			new PortletDataHandlerBoolean(
+				_NAMESPACE, "web-content", true,
+				JournalPortletDataHandlerImpl.getMetadataControls()
+			),
+			new PortletDataHandlerBoolean(
+				_NAMESPACE, "folders-and-documents", true,
+				DLPortletDataHandlerImpl.getMetadataControls()
+			)
 		};
 	}
 
 	@Override
 	public PortletDataHandlerControl[] getImportControls() {
 		return new PortletDataHandlerControl[] {
-			_selectedArticles, _images, _comments, _ratings, _tags
+			_selectedArticles
+		};
+	}
+
+	@Override
+	public PortletDataHandlerControl[] getImportMetadataControls() {
+		return new PortletDataHandlerControl[] {
+			new PortletDataHandlerBoolean(
+				_NAMESPACE, "web-content", true,
+				JournalPortletDataHandlerImpl.getMetadataControls()
+			),
+			new PortletDataHandlerBoolean(
+				_NAMESPACE, "folders-and-documents", true,
+				DLPortletDataHandlerImpl.getMetadataControls()
+			)
 		};
 	}
 
@@ -68,7 +96,7 @@ public class RSSPortletDataHandlerImpl extends JournalPortletDataHandlerImpl {
 
 	@Override
 	public boolean isPublishToLiveByDefault() {
-		return 	_PUBLISH_TO_LIVE_BY_DEFAULT;
+		return _PUBLISH_TO_LIVE_BY_DEFAULT;
 	}
 
 	@Override
@@ -85,8 +113,7 @@ public class RSSPortletDataHandlerImpl extends JournalPortletDataHandlerImpl {
 		portletPreferences.setValue(
 			"expandedItemsPerChannel", StringPool.BLANK);
 		portletPreferences.setValue("showFeedTitle", StringPool.BLANK);
-		portletPreferences.setValue(
-			"showFeedPublishedDate", StringPool.BLANK);
+		portletPreferences.setValue("showFeedPublishedDate", StringPool.BLANK);
 		portletPreferences.setValue("showFeedDescription", StringPool.BLANK);
 		portletPreferences.setValue("showFeedImage", StringPool.BLANK);
 		portletPreferences.setValue("feedImageAlignment", StringPool.BLANK);
@@ -180,11 +207,15 @@ public class RSSPortletDataHandlerImpl extends JournalPortletDataHandlerImpl {
 
 		Element rootElement = document.addElement("journal-content-data");
 
+		Element dlFileEntryTypesElement = rootElement.addElement(
+			"dl-file-entry-types");
 		Element dlFoldersElement = rootElement.addElement("dl-folders");
 		Element dlFilesElement = rootElement.addElement("dl-file-entries");
 		Element dlFileRanksElement = rootElement.addElement("dl-file-ranks");
-		Element igFoldersElement = rootElement.addElement("ig-folders");
-		Element igImagesElement = rootElement.addElement("ig-images");
+		Element dlRepositoriesElement = rootElement.addElement(
+			"dl-repositories");
+		Element dlRepositoryEntriesElement = rootElement.addElement(
+			"dl-repository-entries");
 
 		for (JournalArticle article : articles) {
 			String path = JournalPortletDataHandlerImpl.getArticlePath(
@@ -203,8 +234,9 @@ public class RSSPortletDataHandlerImpl extends JournalPortletDataHandlerImpl {
 
 			JournalPortletDataHandlerImpl.exportArticle(
 				portletDataContext, rootElement, rootElement, rootElement,
-				dlFoldersElement, dlFilesElement, dlFileRanksElement,
-				igFoldersElement, igImagesElement, article, false);
+				dlFileEntryTypesElement, dlFoldersElement, dlFilesElement,
+				dlFileRanksElement, dlRepositoriesElement,
+				dlRepositoryEntriesElement, article, null, false);
 		}
 
 		return document.formattedString();
@@ -316,23 +348,11 @@ public class RSSPortletDataHandlerImpl extends JournalPortletDataHandlerImpl {
 	private static Log _log = LogFactoryUtil.getLog(
 		RSSPortletDataHandlerImpl.class);
 
-	private static PortletDataHandlerBoolean _comments =
-		new PortletDataHandlerBoolean(_NAMESPACE, "comments");
-
 	private static PortletDataHandlerBoolean _embeddedAssets =
 		new PortletDataHandlerBoolean(_NAMESPACE, "embedded-assets");
-
-	private static PortletDataHandlerBoolean _images =
-		new PortletDataHandlerBoolean(_NAMESPACE, "images");
-
-	private static PortletDataHandlerBoolean _ratings =
-		new PortletDataHandlerBoolean(_NAMESPACE, "ratings");
 
 	private static PortletDataHandlerBoolean _selectedArticles =
 		new PortletDataHandlerBoolean(
 			_NAMESPACE, "selected-web-content", true, true);
-
-	private static PortletDataHandlerBoolean _tags =
-		new PortletDataHandlerBoolean(_NAMESPACE, "tags");
 
 }

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,7 +14,6 @@
 
 package com.liferay.portlet.softwarecatalog.service.persistence;
 
-import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.service.persistence.BasePersistence;
 
 import com.liferay.portlet.softwarecatalog.model.SCProductScreenshot;
@@ -377,9 +376,11 @@ public interface SCProductScreenshotPersistence extends BasePersistence<SCProduc
 	* Removes the s c product screenshot where thumbnailId = &#63; from the database.
 	*
 	* @param thumbnailId the thumbnail ID
+	* @return the s c product screenshot that was removed
 	* @throws SystemException if a system exception occurred
 	*/
-	public void removeByThumbnailId(long thumbnailId)
+	public com.liferay.portlet.softwarecatalog.model.SCProductScreenshot removeByThumbnailId(
+		long thumbnailId)
 		throws com.liferay.portal.kernel.exception.SystemException,
 			com.liferay.portlet.softwarecatalog.NoSuchProductScreenshotException;
 
@@ -387,9 +388,11 @@ public interface SCProductScreenshotPersistence extends BasePersistence<SCProduc
 	* Removes the s c product screenshot where fullImageId = &#63; from the database.
 	*
 	* @param fullImageId the full image ID
+	* @return the s c product screenshot that was removed
 	* @throws SystemException if a system exception occurred
 	*/
-	public void removeByFullImageId(long fullImageId)
+	public com.liferay.portlet.softwarecatalog.model.SCProductScreenshot removeByFullImageId(
+		long fullImageId)
 		throws com.liferay.portal.kernel.exception.SystemException,
 			com.liferay.portlet.softwarecatalog.NoSuchProductScreenshotException;
 
@@ -398,9 +401,11 @@ public interface SCProductScreenshotPersistence extends BasePersistence<SCProduc
 	*
 	* @param productEntryId the product entry ID
 	* @param priority the priority
+	* @return the s c product screenshot that was removed
 	* @throws SystemException if a system exception occurred
 	*/
-	public void removeByP_P(long productEntryId, int priority)
+	public com.liferay.portlet.softwarecatalog.model.SCProductScreenshot removeByP_P(
+		long productEntryId, int priority)
 		throws com.liferay.portal.kernel.exception.SystemException,
 			com.liferay.portlet.softwarecatalog.NoSuchProductScreenshotException;
 
@@ -461,7 +466,4 @@ public interface SCProductScreenshotPersistence extends BasePersistence<SCProduc
 	*/
 	public int countAll()
 		throws com.liferay.portal.kernel.exception.SystemException;
-
-	public SCProductScreenshot remove(SCProductScreenshot scProductScreenshot)
-		throws SystemException;
 }

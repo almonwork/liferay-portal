@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -30,6 +30,13 @@ public class WebXML24Descriptor extends SimpleXMLDescriptor {
 
 	public WebXML24Descriptor() {
 		_orderedChildren.put(
+			"servlet",
+			new String[] {
+				"icon", "servlet-name", "display-name", "description",
+				"servlet-class", "jsp-file", "init-param", "load-on-startup",
+				"run-as", "security-role-ref"
+			});
+		_orderedChildren.put(
 			"jsp-config", new String[] {"taglib", "jsp-property-group"});
 	}
 
@@ -44,19 +51,16 @@ public class WebXML24Descriptor extends SimpleXMLDescriptor {
 	}
 
 	@Override
-	public String[] getRootChildrenOrder() {
-		return _ROOT_ORDERED_CHILDREN;
-	}
-
-	@Override
 	public String[] getChildrenOrder(Element parentElement) {
 		String parentName = parentElement.getQName().getName();
 
-		if (_orderedChildren.containsKey(parentName)) {
-			return _orderedChildren.get(parentName);
+		String[] childrenOrder = _orderedChildren.get(parentName);
+
+		if (childrenOrder == null) {
+			childrenOrder = new String[0];
 		}
 
-		return new String[0];
+		return childrenOrder;
 	}
 
 	@Override
@@ -70,22 +74,19 @@ public class WebXML24Descriptor extends SimpleXMLDescriptor {
 	}
 
 	@Override
-	public String[] getUniqueElements() {
-		return _UNIQUE_ELEMENTS;
-	}
-
-	@Override
 	public String[] getJoinableElements() {
 		return _JOINABLE_ELEMENTS;
 	}
 
-	private static final String[] _ROOT_ORDERED_CHILDREN = {
-		"icon", "display-name", "description", "distributable", "context-param",
-		"filter", "filter-mapping", "listener", "servlet", "servlet-mapping",
-		"session-config", "mime-mapping", "welcome-file-list", "error-page",
-		"jsp-config", "resource-env-ref", "resource-ref", "security-constraint",
-		"login-config", "security-role", "env-entry", "ejb-ref", "ejb-local-ref"
-	};
+	@Override
+	public String[] getRootChildrenOrder() {
+		return _ROOT_ORDERED_CHILDREN;
+	}
+
+	@Override
+	public String[] getUniqueElements() {
+		return _UNIQUE_ELEMENTS;
+	}
 
 	private static final ElementIdentifier[] _ELEMENTS_IDENTIFIED_BY_ATTR = {
 	};
@@ -103,13 +104,21 @@ public class WebXML24Descriptor extends SimpleXMLDescriptor {
 		new ElementIdentifier("ejb-local-ref", "ejb-ref-name")
 	};
 
+	private static final String[] _JOINABLE_ELEMENTS = {
+		"welcome-file-list", "jsp-config"
+	};
+
+	private static final String[] _ROOT_ORDERED_CHILDREN = {
+		"icon", "display-name", "description", "distributable", "context-param",
+		"filter", "filter-mapping", "listener", "servlet", "servlet-mapping",
+		"session-config", "mime-mapping", "welcome-file-list", "error-page",
+		"jsp-config", "resource-env-ref", "resource-ref", "security-constraint",
+		"login-config", "security-role", "env-entry", "ejb-ref", "ejb-local-ref"
+	};
+
 	private static final String[] _UNIQUE_ELEMENTS = {
 		"icon", "display-name", "description", "distributable",
 		"session-config", "welcome-file-list", "jsp-config", "login-config"
-	};
-
-	private static final String[] _JOINABLE_ELEMENTS = {
-		"welcome-file-list", "jsp-config"
 	};
 
 	private Map<String, String[]> _orderedChildren =

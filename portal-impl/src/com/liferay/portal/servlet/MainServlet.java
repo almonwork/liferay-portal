@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -15,6 +15,7 @@
 package com.liferay.portal.servlet;
 
 import com.liferay.portal.NoSuchLayoutException;
+import com.liferay.portal.dao.shard.ShardDataSourceTargetSource;
 import com.liferay.portal.events.EventsProcessorUtil;
 import com.liferay.portal.events.StartupAction;
 import com.liferay.portal.kernel.cache.Lifecycle;
@@ -26,12 +27,7 @@ import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.plugin.PluginPackage;
-import com.liferay.portal.kernel.scheduler.SchedulerEngineUtil;
-import com.liferay.portal.kernel.scheduler.SchedulerEntry;
-import com.liferay.portal.kernel.scheduler.SchedulerEntryImpl;
-import com.liferay.portal.kernel.scheduler.StorageType;
-import com.liferay.portal.kernel.scheduler.TimeUnit;
-import com.liferay.portal.kernel.scheduler.TriggerType;
+import com.liferay.portal.kernel.servlet.DynamicServletRequest;
 import com.liferay.portal.kernel.servlet.PortalSessionThreadLocal;
 import com.liferay.portal.kernel.servlet.PortletSessionTracker;
 import com.liferay.portal.kernel.servlet.ProtectedServletRequest;
@@ -39,13 +35,13 @@ import com.liferay.portal.kernel.servlet.ServletContextPool;
 import com.liferay.portal.kernel.util.ContentTypes;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.HttpUtil;
+import com.liferay.portal.kernel.util.InfrastructureUtil;
+import com.liferay.portal.kernel.util.InstanceFactory;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
-import com.liferay.portal.kernel.util.PortalClassLoaderUtil;
 import com.liferay.portal.kernel.util.PortalLifecycleUtil;
 import com.liferay.portal.kernel.util.PropsKeys;
 import com.liferay.portal.kernel.util.ReleaseInfo;
-import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
@@ -63,20 +59,23 @@ import com.liferay.portal.model.PortletFilter;
 import com.liferay.portal.model.PortletURLListener;
 import com.liferay.portal.model.User;
 import com.liferay.portal.plugin.PluginPackageUtil;
+import com.liferay.portal.security.auth.CompanyThreadLocal;
 import com.liferay.portal.security.auth.PrincipalException;
 import com.liferay.portal.security.auth.PrincipalThreadLocal;
+import com.liferay.portal.security.pacl.PACLClassLoaderUtil;
 import com.liferay.portal.security.permission.ResourceActionsUtil;
+import com.liferay.portal.server.capabilities.ServerCapabilitiesUtil;
 import com.liferay.portal.service.CompanyLocalServiceUtil;
 import com.liferay.portal.service.GroupLocalServiceUtil;
 import com.liferay.portal.service.LayoutLocalServiceUtil;
 import com.liferay.portal.service.LayoutTemplateLocalServiceUtil;
 import com.liferay.portal.service.PortletLocalServiceUtil;
 import com.liferay.portal.service.ResourceActionLocalServiceUtil;
-import com.liferay.portal.service.ResourceCodeLocalServiceUtil;
 import com.liferay.portal.service.ThemeLocalServiceUtil;
 import com.liferay.portal.service.UserLocalServiceUtil;
 import com.liferay.portal.servlet.filters.absoluteredirects.AbsoluteRedirectsResponse;
 import com.liferay.portal.servlet.filters.i18n.I18nFilter;
+import com.liferay.portal.setup.SetupWizardUtil;
 import com.liferay.portal.struts.PortletRequestProcessor;
 import com.liferay.portal.struts.StrutsUtil;
 import com.liferay.portal.util.ExtRegistry;
@@ -93,14 +92,12 @@ import com.liferay.portlet.PortletConfigFactoryUtil;
 import com.liferay.portlet.PortletFilterFactory;
 import com.liferay.portlet.PortletInstanceFactoryUtil;
 import com.liferay.portlet.PortletURLListenerFactory;
-import com.liferay.portlet.social.messaging.CheckEquityLogMessageListener;
+import com.liferay.portlet.social.util.SocialConfigurationUtil;
 import com.liferay.util.ContentUtil;
-import com.liferay.util.servlet.DynamicServletRequest;
 import com.liferay.util.servlet.EncryptedServletRequest;
 
 import java.io.IOException;
 
-import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Set;
@@ -188,7 +185,20 @@ public class MainServlet extends ActionServlet {
 			_log.debug("Initialize");
 		}
 
+		ServletContext servletContext = getServletContext();
+
 		callParentInit();
+
+		if (_log.isDebugEnabled()) {
+			_log.debug("Initialize servlet context pool");
+		}
+
+		try {
+			initServletContextPool();
+		}
+		catch (Exception e) {
+			_log.error(e, e);
+		}
 
 		if (_log.isDebugEnabled()) {
 			_log.debug("Process startup events");
@@ -207,11 +217,11 @@ public class MainServlet extends ActionServlet {
 		}
 
 		if (_log.isDebugEnabled()) {
-			_log.debug("Initialize servlet context pool");
+			_log.debug("Initialize server detector");
 		}
 
 		try {
-			initServletContextPool();
+			initServerDetector();
 		}
 		catch (Exception e) {
 			_log.error(e, e);
@@ -255,6 +265,17 @@ public class MainServlet extends ActionServlet {
 		}
 
 		if (_log.isDebugEnabled()) {
+			_log.debug("Initialize social");
+		}
+
+		try {
+			initSocial(pluginPackage);
+		}
+		catch (Exception e) {
+			_log.error(e, e);
+		}
+
+		if (_log.isDebugEnabled()) {
 			_log.debug("Initialize themes");
 		}
 
@@ -263,19 +284,6 @@ public class MainServlet extends ActionServlet {
 		}
 		catch (Exception e) {
 			_log.error(e, e);
-		}
-
-		if (PropsValues.SOCIAL_EQUITY_EQUITY_LOG_ENABLED) {
-			if (_log.isDebugEnabled()) {
-				_log.debug("Initialize social equity log scheduler");
-			}
-
-			try {
-				initSocialEquityLogScheduler();
-			}
-			catch (Exception e) {
-				_log.error(e, e);
-			}
 		}
 
 		if (_log.isDebugEnabled()) {
@@ -323,17 +331,6 @@ public class MainServlet extends ActionServlet {
 		}
 
 		if (_log.isDebugEnabled()) {
-			_log.debug("Initialize resource codes");
-		}
-
-		try {
-			initResourceCodes(portlets);
-		}
-		catch (Exception e) {
-			_log.error(e, e);
-		}
-
-		if (_log.isDebugEnabled()) {
 			_log.debug("Initialize companies");
 		}
 
@@ -342,10 +339,6 @@ public class MainServlet extends ActionServlet {
 		}
 		catch (Exception e) {
 			_log.error(e, e);
-		}
-
-		if (_log.isDebugEnabled()) {
-			_log.debug("Initialize message resources");
 		}
 
 		if (_log.isDebugEnabled()) {
@@ -358,6 +351,10 @@ public class MainServlet extends ActionServlet {
 		catch (Exception e) {
 			_log.error(e, e);
 		}
+
+		servletContext.setAttribute(WebKeys.STARTUP_FINISHED, true);
+
+		ThreadLocalCacheManager.clearAll(Lifecycle.REQUEST);
 	}
 
 	@Override
@@ -397,6 +394,19 @@ public class MainServlet extends ActionServlet {
 			}
 
 			return;
+		}
+
+		try {
+			if (processGroupInactiveRequest(request, response)) {
+				if (_log.isDebugEnabled()) {
+					_log.debug("Processed site inactive request");
+				}
+
+				return;
+			}
+		}
+		catch (Exception e) {
+			_log.error(e, e);
 		}
 
 		if (_log.isDebugEnabled()) {
@@ -539,8 +549,8 @@ public class MainServlet extends ActionServlet {
 		if (portletReqProcessor == null) {
 			ModuleConfig moduleConfig = getModuleConfig(request);
 
-			portletReqProcessor =
-				PortletRequestProcessor.getInstance(this, moduleConfig);
+			portletReqProcessor = PortletRequestProcessor.getInstance(
+				this, moduleConfig);
 
 			servletContext.setAttribute(
 				WebKeys.PORTLET_STRUTS_PROCESSOR, portletReqProcessor);
@@ -610,8 +620,8 @@ public class MainServlet extends ActionServlet {
 	protected void destroyCompanies() throws Exception {
 		long[] companyIds = PortalInstances.getCompanyIds();
 
-		for (int i = 0; i < companyIds.length; i++) {
-			destroyCompany(companyIds[i]);
+		for (long companyId : companyIds) {
+			destroyCompany(companyId);
 		}
 	}
 
@@ -632,11 +642,7 @@ public class MainServlet extends ActionServlet {
 	}
 
 	protected void destroyPortlets(List<Portlet> portlets) throws Exception {
-		Iterator<Portlet> itr = portlets.iterator();
-
-		while (itr.hasNext()) {
-			Portlet portlet = itr.next();
-
+		for (Portlet portlet : portlets) {
 			PortletInstanceFactoryUtil.destroy(portlet);
 		}
 	}
@@ -651,11 +657,9 @@ public class MainServlet extends ActionServlet {
 		}
 
 		try {
-			Company company = CompanyLocalServiceUtil.getCompanyById(
-				companyId);
+			Company company = CompanyLocalServiceUtil.getCompanyById(companyId);
 
-			request = new EncryptedServletRequest(
-				request, company.getKeyObj());
+			request = new EncryptedServletRequest(request, company.getKeyObj());
 		}
 		catch (Exception e) {
 		}
@@ -671,9 +675,7 @@ public class MainServlet extends ActionServlet {
 		return PortalUtil.getUserPassword(request);
 	}
 
-	protected String getRemoteUser(
-		HttpServletRequest request, long userId) {
-
+	protected String getRemoteUser(HttpServletRequest request, long userId) {
 		String remoteUser = request.getRemoteUser();
 
 		if (!PropsValues.PORTAL_JAAS_ENABLE) {
@@ -704,31 +706,29 @@ public class MainServlet extends ActionServlet {
 
 		String key = Globals.REQUEST_PROCESSOR_KEY + moduleConfig.getPrefix();
 
-		RequestProcessor processor =
+		RequestProcessor requestProcessor =
 			(RequestProcessor)servletContext.getAttribute(key);
 
-		if (processor == null) {
+		if (requestProcessor == null) {
 			ControllerConfig controllerConfig =
 				moduleConfig.getControllerConfig();
 
-			String processorClass = controllerConfig.getProcessorClass();
-
-			ClassLoader classLoader = PortalClassLoaderUtil.getClassLoader();
-
 			try {
-				processor = (RequestProcessor)classLoader.loadClass(
-					processorClass).newInstance();
+				requestProcessor =
+					(RequestProcessor)InstanceFactory.newInstance(
+						PACLClassLoaderUtil.getPortalClassLoader(),
+						controllerConfig.getProcessorClass());
 			}
 			catch (Exception e) {
 				throw new ServletException(e);
 			}
 
-			processor.init(this, moduleConfig);
+			requestProcessor.init(this, moduleConfig);
 
-			servletContext.setAttribute(key, processor);
+			servletContext.setAttribute(key, requestProcessor);
 		}
 
-		return processor;
+		return requestProcessor;
 	}
 
 	protected long getUserId(HttpServletRequest request) {
@@ -758,10 +758,24 @@ public class MainServlet extends ActionServlet {
 	protected void initCompanies() throws Exception {
 		ServletContext servletContext = getServletContext();
 
-		String[] webIds = PortalInstances.getWebIds();
+		try {
+			String[] webIds = PortalInstances.getWebIds();
 
-		for (int i = 0; i < webIds.length; i++) {
-			PortalInstances.initCompany(servletContext, webIds[i]);
+			for (String webId : webIds) {
+				PortalInstances.initCompany(servletContext, webId);
+			}
+		}
+		finally {
+			CompanyThreadLocal.setCompanyId(
+				PortalInstances.getDefaultCompanyId());
+
+			ShardDataSourceTargetSource shardDataSourceTargetSource =
+				(ShardDataSourceTargetSource)
+					InfrastructureUtil.getShardDataSourceTargetSource();
+
+			if (shardDataSourceTargetSource != null) {
+				shardDataSourceTargetSource.resetDataSource();
+			}
 		}
 	}
 
@@ -797,14 +811,19 @@ public class MainServlet extends ActionServlet {
 			servletContext);
 	}
 
+	/**
+	 * @see {@link SetupWizardUtil#_initPlugins}
+	 */
 	protected void initPlugins() throws Exception {
 
 		// See LEP-2885. Don't flush hot deploy events until after the portal
 		// has initialized.
 
-		HotDeployUtil.setCapturePrematureEvents(false);
+		if (SetupWizardUtil.isSetupFinished()) {
+			HotDeployUtil.setCapturePrematureEvents(false);
 
-		PortalLifecycleUtil.flushInits();
+			PortalLifecycleUtil.flushInits();
+		}
 	}
 
 	protected void initPortletApp(
@@ -856,7 +875,7 @@ public class MainServlet extends ActionServlet {
 		PortletBagFactory portletBagFactory = new PortletBagFactory();
 
 		portletBagFactory.setClassLoader(
-			PortalClassLoaderUtil.getClassLoader());
+			PACLClassLoaderUtil.getPortalClassLoader());
 		portletBagFactory.setServletContext(servletContext);
 		portletBagFactory.setWARFile(false);
 
@@ -878,30 +897,7 @@ public class MainServlet extends ActionServlet {
 	protected void initResourceActions(List<Portlet> portlets)
 		throws Exception {
 
-		if (PropsValues.PERMISSIONS_USER_CHECK_ALGORITHM < 6) {
-			if (_log.isWarnEnabled()) {
-				StringBundler sb = new StringBundler(8);
-
-				sb.append("Liferay is configured to use permission algorithm ");
-				sb.append(PropsValues.PERMISSIONS_USER_CHECK_ALGORITHM);
-				sb.append(". Versions after 6.1 will only support algorithm ");
-				sb.append("6 and above. Please sign in as an administrator, ");
-				sb.append("go to the Control Panel, select \"Server ");
-				sb.append("Administration\", select the \"Data Migration\" ");
-				sb.append("tab, and convert from this legacy permission ");
-				sb.append("algorithm as soon as possible.");
-
-				_log.warn(sb.toString());
-			}
-
-			return;
-		}
-
-		Iterator<Portlet> itr = portlets.iterator();
-
-		while (itr.hasNext()) {
-			Portlet portlet = itr.next();
-
+		for (Portlet portlet : portlets) {
 			List<String> portletActions =
 				ResourceActionsUtil.getPortletResourceActions(portlet);
 
@@ -922,28 +918,8 @@ public class MainServlet extends ActionServlet {
 		}
 	}
 
-	protected void initResourceCodes(List<Portlet> portlets) throws Exception {
-		long[] companyIds = PortalInstances.getCompanyIdsBySQL();
-
-		Iterator<Portlet> itr = portlets.iterator();
-
-		while (itr.hasNext()) {
-			Portlet portlet = itr.next();
-
-			List<String> modelNames =
-				ResourceActionsUtil.getPortletModelResources(
-					portlet.getPortletId());
-
-			for (long companyId : companyIds) {
-				ResourceCodeLocalServiceUtil.checkResourceCodes(
-					companyId, portlet.getPortletId());
-
-				for (String modelName : modelNames) {
-					ResourceCodeLocalServiceUtil.checkResourceCodes(
-						companyId, modelName);
-				}
-			}
-		}
+	protected void initServerDetector() throws Exception {
+		ServerCapabilitiesUtil.determineServerCapabilities(getServletContext());
 	}
 
 	protected void initServletContextPool() throws Exception {
@@ -954,19 +930,19 @@ public class MainServlet extends ActionServlet {
 		ServletContextPool.put(contextPath, servletContext);
 	}
 
-	protected void initSocialEquityLogScheduler() throws Exception {
-		SchedulerEntry socialEquityLogSchedulerEntry = new SchedulerEntryImpl();
+	protected void initSocial(PluginPackage pluginPackage) throws Exception {
+		ClassLoader classLoader = PACLClassLoaderUtil.getPortalClassLoader();
 
-		socialEquityLogSchedulerEntry.setEventListenerClass(
-			CheckEquityLogMessageListener.class.getName());
-		socialEquityLogSchedulerEntry.setTimeUnit(TimeUnit.MINUTE);
-		socialEquityLogSchedulerEntry.setTriggerType(TriggerType.SIMPLE);
-		socialEquityLogSchedulerEntry.setTriggerValue(
-			PropsValues.SOCIAL_EQUITY_EQUITY_LOG_CHECK_INTERVAL);
+		ServletContext servletContext = getServletContext();
 
-		SchedulerEngineUtil.schedule(
-			socialEquityLogSchedulerEntry, StorageType.MEMORY_CLUSTERED,
-			PortalClassLoaderUtil.getClassLoader(), 0);
+		String[] xmls = new String[] {
+			HttpUtil.URLtoString(
+				servletContext.getResource("/WEB-INF/liferay-social.xml")),
+			HttpUtil.URLtoString(
+				servletContext.getResource("/WEB-INF/liferay-social-ext.xml"))
+		};
+
+		SocialConfigurationUtil.read(classLoader, xmls);
 	}
 
 	protected void initThemes(
@@ -1021,12 +997,13 @@ public class MainServlet extends ActionServlet {
 
 		HttpSession session = request.getSession();
 
+		session.setAttribute(WebKeys.USER, user);
 		session.setAttribute(WebKeys.USER_ID, new Long(userId));
 		session.setAttribute(Globals.LOCALE_KEY, user.getLocale());
 
 		EventsProcessorUtil.process(
-			PropsKeys.LOGIN_EVENTS_POST, PropsValues.LOGIN_EVENTS_POST,
-			request, response);
+			PropsKeys.LOGIN_EVENTS_POST, PropsValues.LOGIN_EVENTS_POST, request,
+			response);
 
 		return userId;
 	}
@@ -1040,23 +1017,9 @@ public class MainServlet extends ActionServlet {
 			return false;
 		}
 
-		response.setContentType(ContentTypes.TEXT_HTML_UTF8);
-
-		Locale locale = LocaleUtil.getDefault();
-
-		String companyInactiveMessage = LanguageUtil.get(
-			locale,
+		processInactiveRequest(
+			request, response,
 			"this-instance-is-inactive-please-contact-the-administrator");
-
-		String html = ContentUtil.get(
-			"com/liferay/portal/dependencies/company_inactive.html");
-
-		html = StringUtil.replace(
-			html, "[$COMPANY_INACTIVE_MESSAGE$]", companyInactiveMessage);
-
-		ServletOutputStream servletOutputStream = response.getOutputStream();
-
-		servletOutputStream.print(html);
 
 		return true;
 	}
@@ -1072,6 +1035,52 @@ public class MainServlet extends ActionServlet {
 	protected void processGlobalStartupEvents() throws Exception {
 		EventsProcessorUtil.process(
 			PropsKeys.GLOBAL_STARTUP_EVENTS, PropsValues.GLOBAL_STARTUP_EVENTS);
+	}
+
+	protected boolean processGroupInactiveRequest(
+			HttpServletRequest request, HttpServletResponse response)
+		throws IOException, PortalException, SystemException {
+
+		long plid = ParamUtil.getLong(request, "p_l_id");
+
+		if (plid <= 0) {
+			return false;
+		}
+
+		Layout layout = LayoutLocalServiceUtil.getLayout(plid);
+
+		Group group = layout.getGroup();
+
+		if (group.isActive()) {
+			return false;
+		}
+
+		processInactiveRequest(
+			request, response,
+			"this-site-is-inactive-please-contact-the-administrator");
+
+		return true;
+	}
+
+	protected void processInactiveRequest(
+			HttpServletRequest request, HttpServletResponse response,
+			String messageKey)
+		throws IOException {
+
+		response.setContentType(ContentTypes.TEXT_HTML_UTF8);
+
+		Locale locale = LocaleUtil.getDefault();
+
+		String message = LanguageUtil.get(locale, messageKey);
+
+		String html = ContentUtil.get(
+			"com/liferay/portal/dependencies/inactive.html");
+
+		html = StringUtil.replace(html, "[$MESSAGE$]", message);
+
+		ServletOutputStream servletOutputStream = response.getOutputStream();
+
+		servletOutputStream.print(html);
 	}
 
 	protected boolean processMaintenanceRequest(
@@ -1102,7 +1111,9 @@ public class MainServlet extends ActionServlet {
 			_log.error(e, e);
 		}
 
-		if (_HTTP_HEADER_VERSION_VERBOSITY_PARTIAL) {
+		if (_HTTP_HEADER_VERSION_VERBOSITY_DEFAULT) {
+		}
+		else if (_HTTP_HEADER_VERSION_VERBOSITY_PARTIAL) {
 			response.addHeader(
 				_LIFERAY_PORTAL_REQUEST_HEADER, ReleaseInfo.getName());
 		}
@@ -1110,8 +1121,6 @@ public class MainServlet extends ActionServlet {
 			response.addHeader(
 				_LIFERAY_PORTAL_REQUEST_HEADER, ReleaseInfo.getReleaseInfo());
 		}
-
-		ThreadLocalCacheManager.clearAll(Lifecycle.REQUEST);
 	}
 
 	protected boolean processServicePre(
@@ -1208,26 +1217,13 @@ public class MainServlet extends ActionServlet {
 			return false;
 		}
 
-		response.setContentType(ContentTypes.TEXT_HTML_UTF8);
+		String messageKey = ShutdownUtil.getMessage();
 
-		String shutdownMessage = ShutdownUtil.getMessage();
-
-		if (Validator.isNull(shutdownMessage)) {
-			Locale locale = LocaleUtil.getDefault();
-
-			shutdownMessage = LanguageUtil.get(
-				locale, "the-system-is-shutdown-please-try-again-later");
+		if (Validator.isNull(messageKey)) {
+			messageKey = "the-system-is-shutdown-please-try-again-later";
 		}
 
-		String html = ContentUtil.get(
-			"com/liferay/portal/dependencies/shutdown.html");
-
-		html = StringUtil.replace(
-			html, "[$SHUTDOWN_MESSAGE$]", shutdownMessage);
-
-		ServletOutputStream servletOutputStream = response.getOutputStream();
-
-		servletOutputStream.print(html);
+		processInactiveRequest(request, response, messageKey);
 
 		return true;
 	}
@@ -1258,9 +1254,13 @@ public class MainServlet extends ActionServlet {
 		DynamicServletRequest dynamicRequest = new DynamicServletRequest(
 			request);
 
-		// Reset p_l_id or there will be an infinite loop
+		// Reset layout params or there will be an infinite loop
 
 		dynamicRequest.setParameter("p_l_id", StringPool.BLANK);
+
+		dynamicRequest.setParameter("groupId", StringPool.BLANK);
+		dynamicRequest.setParameter("layoutId", StringPool.BLANK);
+		dynamicRequest.setParameter("privateLayout", StringPool.BLANK);
 
 		PortalUtil.sendError(status, (Exception)t, dynamicRequest, response);
 	}
@@ -1288,6 +1288,10 @@ public class MainServlet extends ActionServlet {
 
 		PrincipalThreadLocal.setPassword(password);
 	}
+
+	private static final boolean _HTTP_HEADER_VERSION_VERBOSITY_DEFAULT =
+		PropsValues.HTTP_HEADER_VERSION_VERBOSITY.equalsIgnoreCase(
+			ReleaseInfo.getName());
 
 	private static final boolean _HTTP_HEADER_VERSION_VERBOSITY_PARTIAL =
 		PropsValues.HTTP_HEADER_VERSION_VERBOSITY.equalsIgnoreCase("partial");

@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,17 +14,7 @@
  */
 --%>
 
-<%@ include file="/html/taglib/init.jsp" %>
-
-<%@ page import="com.liferay.taglib.aui.ToolTag" %>
-
-<%
-boolean collapsed = GetterUtil.getBoolean((String)request.getAttribute("aui:panel:collapsed"));
-boolean collapsible = GetterUtil.getBoolean((String)request.getAttribute("aui:panel:collapsible"));
-String label = GetterUtil.getString((String)request.getAttribute("aui:panel:label"));
-String id = namespace + GetterUtil.getString((String)request.getAttribute("aui:panel:id"));
-List<ToolTag> toolTags = (List<ToolTag>)request.getAttribute("aui:panel:toolTags");
-%>
+<%@ include file="/html/taglib/aui/panel/init.jsp" %>
 
 </div>
 

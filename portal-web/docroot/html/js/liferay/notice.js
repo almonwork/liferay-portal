@@ -1,4 +1,4 @@
-AUI().add(
+AUI.add(
 	'liferay-notice',
 	function(A) {
 
@@ -20,7 +20,10 @@ AUI().add(
 
 		var Notice = function(options) {
 			var instance = this;
+
 			options = options || {};
+
+			instance._node = options.node;
 			instance._noticeType = options.type || 'notice';
 			instance._noticeClass = 'popup-alert-notice';
 			instance._useCloseButton = true;
@@ -60,6 +63,20 @@ AUI().add(
 		};
 
 		Notice.prototype = {
+			close: function() {
+				var instance = this;
+
+				var notice = instance._notice;
+
+				notice.hide();
+
+				instance._body.removeClass('has-alerts');
+
+				if (instance._onClose) {
+					instance._onClose();
+				}
+			},
+
 			setClosing: function() {
 				var instance = this;
 
@@ -81,14 +98,24 @@ AUI().add(
 			_createHTML: function() {
 				var instance = this;
 
-				var notice = A.Node.create('<div class="' + instance._noticeClass + '" dynamic="true"><div class="popup-alert-content"></div></div>');
+				var content = instance._content;
+				var node = A.one(instance._node);
 
-				notice.html(instance._content);
+				var notice = node || A.Node.create('<div dynamic="true"></div>');
+
+				if (content) {
+					notice.html(content);
+				}
+
+				notice.addClass(instance._noticeClass);
 
 				instance._addCloseButton(notice);
 				instance._addToggleButton(notice);
 
-				instance._body.append(notice);
+				if (!node || (node && !node.inDoc())) {
+					instance._body.append(notice);
+				}
+
 				instance._body.addClass('has-alerts');
 
 				instance._notice = notice;
@@ -112,18 +139,7 @@ AUI().add(
 
 					var closeButton = notice.one('.popup-alert-close');
 
-					closeButton.on(
-						'click',
-						function() {
-							notice.hide();
-							notice.remove(true);
-							instance._body.removeClass('has-alerts');
-
-							if (instance._onClose) {
-								instance._onClose();
-							}
-						}
-					);
+					closeButton.on('click', instance.close, instance);
 				}
 			},
 

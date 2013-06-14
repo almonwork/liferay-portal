@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -19,6 +19,7 @@ import com.liferay.portal.kernel.io.unsync.UnsyncBufferedReader;
 import com.liferay.portal.kernel.io.unsync.UnsyncStringReader;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.util.CharPool;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.PortalClassLoaderUtil;
@@ -38,7 +39,9 @@ import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.SQLException;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
@@ -72,120 +75,7 @@ public class CustomSQL {
 		"CONVERT(VARCHAR,?) IS NULL";
 
 	public CustomSQL() throws SQLException {
-		Connection con = DataAccess.getConnection();
-
-		String functionIsNull = PortalUtil.getCustomSQLFunctionIsNull();
-		String functionIsNotNull = PortalUtil.getCustomSQLFunctionIsNotNull();
-
-		try {
-			if (Validator.isNotNull(functionIsNull) &&
-				Validator.isNotNull(functionIsNotNull)) {
-
-				_functionIsNull = functionIsNull;
-				_functionIsNotNull = functionIsNotNull;
-
-				if (_log.isDebugEnabled()) {
-					_log.info(
-						"functionIsNull is manually set to " + functionIsNull);
-					_log.info(
-						"functionIsNotNull is manually set to " +
-							functionIsNotNull);
-				}
-			}
-			else if (con != null) {
-				DatabaseMetaData metaData = con.getMetaData();
-
-				String dbName = GetterUtil.getString(
-					metaData.getDatabaseProductName());
-
-				if (_log.isInfoEnabled()) {
-					_log.info("Database name " + dbName);
-				}
-
-				if (dbName.startsWith("DB2")) {
-					_vendorDB2 = true;
-					_functionIsNull = DB2_FUNCTION_IS_NULL;
-					_functionIsNotNull = DB2_FUNCTION_IS_NOT_NULL;
-
-					if (_log.isInfoEnabled()) {
-						_log.info("Detected DB2 with database name " + dbName);
-					}
-				}
-				else if (dbName.startsWith("Informix")) {
-					_vendorInformix = true;
-					_functionIsNull = INFORMIX_FUNCTION_IS_NULL;
-					_functionIsNotNull = INFORMIX_FUNCTION_IS_NOT_NULL;
-
-					if (_log.isInfoEnabled()) {
-						_log.info(
-							"Detected Informix with database name " + dbName);
-					}
-				}
-				else if (dbName.startsWith("MySQL")) {
-					_vendorMySQL = true;
-					//_functionIsNull = MYSQL_FUNCTION_IS_NULL;
-					//_functionIsNotNull = MYSQL_FUNCTION_IS_NOT_NULL;
-
-					if (_log.isInfoEnabled()) {
-						_log.info(
-							"Detected MySQL with database name " + dbName);
-					}
-				}
-				else if (dbName.startsWith("Sybase") || dbName.equals("ASE")) {
-					_vendorSybase = true;
-					_functionIsNull = SYBASE_FUNCTION_IS_NULL;
-					_functionIsNotNull = SYBASE_FUNCTION_IS_NOT_NULL;
-
-					if (_log.isInfoEnabled()) {
-						_log.info(
-							"Detected Sybase with database name " + dbName);
-					}
-				}
-				else if (dbName.startsWith("Oracle")) {
-					_vendorOracle = true;
-
-					if (_log.isInfoEnabled()) {
-						_log.info(
-							"Detected Oracle with database name " + dbName);
-					}
-				}
-				else if (dbName.startsWith("PostgreSQL")) {
-					_vendorPostgreSQL = true;
-
-					if (_log.isInfoEnabled()) {
-						_log.info(
-							"Detected PostgreSQL with database name " + dbName);
-					}
-				}
-				else {
-					if (_log.isDebugEnabled()) {
-						_log.debug(
-							"Unable to detect database with name " + dbName);
-					}
-				}
-			}
-		}
-		catch (Exception e) {
-			_log.error(e, e);
-		}
-		finally {
-			DataAccess.cleanUp(con);
-		}
-
-		_sqlPool = new HashMap<String, String>();
-
-		try {
-			ClassLoader classLoader = getClass().getClassLoader();
-
-			String[] configs = getConfigs();
-
-			for (String _config : configs) {
-				read(classLoader, _config);
-			}
-		}
-		catch (Exception e) {
-			_log.error(e, e);
-		}
+		reloadCustomSQL();
 	}
 
 	public String appendCriteria(String sql, String criteria) {
@@ -301,16 +191,53 @@ public class CustomSQL {
 
 		keywords = keywords.trim();
 
-		String[] keywordsArray = keywords.split("\\s+");
+		List<String> keywordsList = new ArrayList<String>();
 
-		for (int i = 0; i < keywordsArray.length; i++) {
-			String keyword = keywordsArray[i];
+		for (int i = 0; i < keywords.length(); i++) {
+			char c = keywords.charAt(i);
 
-			keywordsArray[i] =
-				StringPool.PERCENT + keyword + StringPool.PERCENT;
+			if (c == CharPool.QUOTE) {
+				int pos = i + 1;
+
+				i = keywords.indexOf(CharPool.QUOTE, pos);
+
+				if (i == -1) {
+					i = keywords.length();
+				}
+
+				if (i > pos) {
+					String keyword = keywords.substring(pos, i);
+
+					keywordsList.add(
+						StringUtil.quote(keyword, StringPool.PERCENT));
+				}
+			}
+			else {
+				while (Character.isWhitespace(c)) {
+					i++;
+
+					c = keywords.charAt(i);
+				}
+
+				int pos = i;
+
+				while (!Character.isWhitespace(c)) {
+					i++;
+
+					if (i == keywords.length()) {
+						break;
+					}
+
+					c = keywords.charAt(i);
+				}
+
+				String keyword = keywords.substring(pos, i);
+
+				keywordsList.add(StringUtil.quote(keyword, StringPool.PERCENT));
+			}
 		}
 
-		return keywordsArray;
+		return keywordsList.toArray(new String[keywordsList.size()]);
 	}
 
 	public String[] keywords(String[] keywordsArray) {
@@ -329,6 +256,132 @@ public class CustomSQL {
 		}
 
 		return keywordsArray;
+	}
+
+	public void reloadCustomSQL() throws SQLException {
+		PortalUtil.initCustomSQL();
+
+		Connection con = DataAccess.getConnection();
+
+		String functionIsNull = PortalUtil.getCustomSQLFunctionIsNull();
+		String functionIsNotNull = PortalUtil.getCustomSQLFunctionIsNotNull();
+
+		try {
+			if (Validator.isNotNull(functionIsNull) &&
+				Validator.isNotNull(functionIsNotNull)) {
+
+				_functionIsNull = functionIsNull;
+				_functionIsNotNull = functionIsNotNull;
+
+				if (_log.isDebugEnabled()) {
+					_log.info(
+						"functionIsNull is manually set to " + functionIsNull);
+					_log.info(
+						"functionIsNotNull is manually set to " +
+							functionIsNotNull);
+				}
+			}
+			else if (con != null) {
+				DatabaseMetaData metaData = con.getMetaData();
+
+				String dbName = GetterUtil.getString(
+					metaData.getDatabaseProductName());
+
+				if (_log.isInfoEnabled()) {
+					_log.info("Database name " + dbName);
+				}
+
+				if (dbName.startsWith("DB2")) {
+					_vendorDB2 = true;
+					_functionIsNull = DB2_FUNCTION_IS_NULL;
+					_functionIsNotNull = DB2_FUNCTION_IS_NOT_NULL;
+
+					if (_log.isInfoEnabled()) {
+						_log.info("Detected DB2 with database name " + dbName);
+					}
+				}
+				else if (dbName.startsWith("Informix")) {
+					_vendorInformix = true;
+					_functionIsNull = INFORMIX_FUNCTION_IS_NULL;
+					_functionIsNotNull = INFORMIX_FUNCTION_IS_NOT_NULL;
+
+					if (_log.isInfoEnabled()) {
+						_log.info(
+							"Detected Informix with database name " + dbName);
+					}
+				}
+				else if (dbName.startsWith("MySQL")) {
+					_vendorMySQL = true;
+					//_functionIsNull = MYSQL_FUNCTION_IS_NULL;
+					//_functionIsNotNull = MYSQL_FUNCTION_IS_NOT_NULL;
+
+					if (_log.isInfoEnabled()) {
+						_log.info(
+							"Detected MySQL with database name " + dbName);
+					}
+				}
+				else if (dbName.startsWith("Sybase") || dbName.equals("ASE")) {
+					_vendorSybase = true;
+					_functionIsNull = SYBASE_FUNCTION_IS_NULL;
+					_functionIsNotNull = SYBASE_FUNCTION_IS_NOT_NULL;
+
+					if (_log.isInfoEnabled()) {
+						_log.info(
+							"Detected Sybase with database name " + dbName);
+					}
+				}
+				else if (dbName.startsWith("Oracle")) {
+					_vendorOracle = true;
+
+					if (_log.isInfoEnabled()) {
+						_log.info(
+							"Detected Oracle with database name " + dbName);
+					}
+				}
+				else if (dbName.startsWith("PostgreSQL")) {
+					_vendorPostgreSQL = true;
+
+					if (_log.isInfoEnabled()) {
+						_log.info(
+							"Detected PostgreSQL with database name " + dbName);
+					}
+				}
+				else {
+					if (_log.isDebugEnabled()) {
+						_log.debug(
+							"Unable to detect database with name " + dbName);
+					}
+				}
+			}
+		}
+		catch (Exception e) {
+			_log.error(e, e);
+		}
+		finally {
+			DataAccess.cleanUp(con);
+		}
+
+		if (_sqlPool == null) {
+			_sqlPool = new HashMap<String, String>();
+		}
+		else {
+			 _sqlPool.clear();
+		}
+
+		try {
+			Class<?> clazz = getClass();
+
+			ClassLoader classLoader = clazz.getClassLoader();
+
+			String[] configs = getConfigs();
+
+			for (String _config : configs) {
+				read(classLoader, _config);
+			}
+		}
+		catch (Exception e) {
+			_log.error(e, e);
+		}
 	}
 
 	public String removeGroupBy(String sql) {
@@ -381,8 +434,7 @@ public class CustomSQL {
 				sql,
 				new String[] {
 					"Date >= ? AND ? IS NOT NULL",
-					"Date <= ? AND ? IS NOT NULL",
-					"Date >= ? OR ? IS NULL",
+					"Date <= ? AND ? IS NOT NULL", "Date >= ? OR ? IS NULL",
 					"Date <= ? OR ? IS NULL"
 				},
 				new String[] {
@@ -398,6 +450,46 @@ public class CustomSQL {
 		return sql;
 	}
 
+	public String replaceGroupBy(String sql, String groupBy) {
+		if (groupBy == null) {
+			return sql;
+		}
+
+		int x = sql.indexOf(_GROUP_BY_CLAUSE);
+
+		if (x != -1) {
+			int y = sql.indexOf(_ORDER_BY_CLAUSE);
+
+			if (y == -1) {
+				sql = sql.substring(0, x + _GROUP_BY_CLAUSE.length()).concat(
+					groupBy);
+			}
+			else {
+				sql = sql.substring(0, x + _GROUP_BY_CLAUSE.length()).concat(
+					groupBy).concat(sql.substring(y));
+			}
+		}
+		else {
+			int y = sql.indexOf(_ORDER_BY_CLAUSE);
+
+			if (y == -1) {
+				sql = sql.concat(_GROUP_BY_CLAUSE).concat(groupBy);
+			}
+			else {
+				StringBundler sb = new StringBundler();
+
+				sb.append(sql.substring(0, y));
+				sb.append(_GROUP_BY_CLAUSE);
+				sb.append(groupBy);
+				sb.append(sql.substring(y));
+
+				sql = sb.toString();
+			}
+		}
+
+		return sql;
+	}
+
 	public String replaceIsNull(String sql) {
 		if (Validator.isNotNull(_functionIsNull)) {
 			sql = StringUtil.replace(
@@ -406,8 +498,7 @@ public class CustomSQL {
 					"? IS NULL", "? IS NOT NULL"
 				},
 				new String[] {
-					_functionIsNull,
-					_functionIsNotNull
+					_functionIsNull, _functionIsNotNull
 				});
 		}
 
@@ -545,46 +636,6 @@ public class CustomSQL {
 		}
 
 		return StringUtil.replace(sql, oldSql.toString(), newSql.toString());
-	}
-
-	public String replaceGroupBy(String sql, String groupBy) {
-		if (groupBy == null) {
-			return sql;
-		}
-
-		int x = sql.indexOf(_GROUP_BY_CLAUSE);
-
-		if (x != -1) {
-			int y = sql.indexOf(_ORDER_BY_CLAUSE);
-
-			if (y == -1) {
-				sql = sql.substring(0, x + _GROUP_BY_CLAUSE.length()).concat(
-					groupBy);
-			}
-			else {
-				sql = sql.substring(0, x + _GROUP_BY_CLAUSE.length()).concat(
-					groupBy).concat(sql.substring(y));
-			}
-		}
-		else {
-			int y = sql.indexOf(_ORDER_BY_CLAUSE);
-
-			if (y == -1) {
-				sql = sql.concat(_GROUP_BY_CLAUSE).concat(groupBy);
-			}
-			else {
-				StringBundler sb = new StringBundler();
-
-				sb.append(sql.substring(0, y));
-				sb.append(_GROUP_BY_CLAUSE);
-				sb.append(groupBy);
-				sb.append(sql.substring(y));
-
-				sql = sb.toString();
-			}
-		}
-
-		return sql;
 	}
 
 	public String replaceOrderBy(String sql, OrderByComparator obc) {

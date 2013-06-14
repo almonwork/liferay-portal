@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -38,9 +38,10 @@ public class ListTypeConstants {
 	public static final String ACCOUNT_ADDRESS =
 		Account.class.getName() + ADDRESS;
 
-	public static final int ACCOUNT_ADDRESS_DEFAULT =
-		GetterUtil.getInteger(PropsUtil.get(PropsKeys.
-			SQL_DATA_COM_LIFERAY_PORTAL_MODEL_LISTTYPE_ACCOUNT_ADDRESS));
+	public static final int ACCOUNT_ADDRESS_DEFAULT = GetterUtil.getInteger(
+		PropsUtil.get(
+			PropsKeys.
+				SQL_DATA_COM_LIFERAY_PORTAL_MODEL_LISTTYPE_ACCOUNT_ADDRESS));
 
 	public static final String ACCOUNT_EMAIL_ADDRESS =
 		Account.class.getName() + EMAIL_ADDRESS;
@@ -49,8 +50,7 @@ public class ListTypeConstants {
 		GetterUtil.getInteger(PropsUtil.get(PropsKeys.
 			SQL_DATA_COM_LIFERAY_PORTAL_MODEL_LISTTYPE_ACCOUNT_EMAIL_ADDRESS));
 
-	public static final String ACCOUNT_PHONE =
-		Account.class.getName() + PHONE;
+	public static final String ACCOUNT_PHONE = Account.class.getName() + PHONE;
 
 	public static final String ACCOUNT_WEBSITE =
 		Account.class.getName() + WEBSITE;
@@ -67,8 +67,7 @@ public class ListTypeConstants {
 		GetterUtil.getInteger(PropsUtil.get(PropsKeys.
 			SQL_DATA_COM_LIFERAY_PORTAL_MODEL_LISTTYPE_CONTACT_EMAIL_ADDRESS));
 
-	public static final String CONTACT_PHONE =
-		Contact.class.getName() + PHONE;
+	public static final String CONTACT_PHONE = Contact.class.getName() + PHONE;
 
 	public static final String CONTACT_PREFIX =
 		Contact.class.getName() + ".prefix";

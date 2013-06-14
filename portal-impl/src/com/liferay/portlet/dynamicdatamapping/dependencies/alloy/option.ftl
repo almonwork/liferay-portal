@@ -1,13 +1,21 @@
 <#include "../init.ftl">
 
-<#if fieldValue != "">
-	<#assign selected = (field.value == fieldValue)>
-<#else>
-	<#assign selected = (field.value == parentField.predefinedValue)>
+<#if !(fields?? && fields.get(fieldName)??) && (fieldRawValue == "")>
+	<#assign fieldRawValue = predefinedValue>
 </#if>
 
+<#if fieldRawValue == "">
+	<#assign fieldRawValue = "[]">
+</#if>
+
+<#assign selected = jsonFactoryUtil.looseDeserialize(fieldRawValue)?seq_contains(fieldStructure.value)>
+
 <#if parentType == "select">
-	<@aui.option cssClass=cssClass label=field.label selected=selected value=field.value />
+	<@aui.option cssClass=cssClass label=fieldStructure.label selected=selected value=fieldStructure.value />
 <#else>
-	<@aui.input checked=selected cssClass=cssClass label=field.label name=parentName type="radio" value=field.value />
+	<@aui.input checked=selected cssClass=cssClass label=fieldStructure.label name=namespacedParentName type="radio" value=fieldStructure.value>
+		<#if parentFieldStructure.required?? && (parentFieldStructure.required == "true")>
+			<@aui.validator name="required" />
+		</#if>
+	</@aui.input>
 </#if>

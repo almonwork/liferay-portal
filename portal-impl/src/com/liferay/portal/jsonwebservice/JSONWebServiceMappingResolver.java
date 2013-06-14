@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -16,7 +16,7 @@ package com.liferay.portal.jsonwebservice;
 
 import com.liferay.portal.kernel.jsonwebservice.JSONWebService;
 import com.liferay.portal.kernel.servlet.HttpMethods;
-import com.liferay.portal.kernel.util.CharPool;
+import com.liferay.portal.kernel.util.CamelCaseUtil;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
 
@@ -58,9 +58,8 @@ public class JSONWebServiceMappingResolver {
 			path = jsonWebServiceAnnotation.value().trim();
 		}
 
-		if (path == null || path.length() == 0) {
-			path = jodd.util.StringUtil.camelCaseToWords(
-				method.getName(), CharPool.DASH);
+		if ((path == null) || (path.length() == 0)) {
+			path = CamelCaseUtil.fromCamelCase(method.getName());
 		}
 
 		if (!path.startsWith(StringPool.SLASH)) {
@@ -75,7 +74,7 @@ public class JSONWebServiceMappingResolver {
 				pathFromClass = jsonWebServiceAnnotation.value().trim();
 			}
 
-			if (pathFromClass == null || pathFromClass.length() == 0) {
+			if ((pathFromClass == null) || (pathFromClass.length() == 0)) {
 				pathFromClass = _classNameToPath(clazz);
 			}
 
@@ -84,8 +83,8 @@ public class JSONWebServiceMappingResolver {
 			}
 
 			path = pathFromClass + path;
-
 		}
+
 		return path;
 	}
 
@@ -123,7 +122,7 @@ public class JSONWebServiceMappingResolver {
 	}
 
 	private static final String[] _GET_PREFIXES = new String[] {
-		"get", "is",
+		"get", "has", "is",
 	};
 
 }

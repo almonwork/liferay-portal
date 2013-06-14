@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,8 +14,12 @@
 
 package com.liferay.portal.sharepoint.methods;
 
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.servlet.ServletResponseUtil;
+import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
+import com.liferay.portal.sharepoint.Property;
 import com.liferay.portal.sharepoint.ResponseElement;
 import com.liferay.portal.sharepoint.SharepointException;
 import com.liferay.portal.sharepoint.SharepointRequest;
@@ -43,25 +47,33 @@ public abstract class BaseMethodImpl implements Method {
 		}
 	}
 
-	protected abstract List<ResponseElement> getElements(
-			SharepointRequest sharepointRequest)
-		throws Exception;
-
 	protected void doProcess(SharepointRequest sharepointRequest)
 		throws Exception {
 
 		ServletResponseUtil.write(
 			sharepointRequest.getHttpServletResponse(),
-			getResponseBuffer(sharepointRequest).toString());
+			getResponse(sharepointRequest, false));
 	}
 
-	protected StringBuilder getResponseBuffer(
+	protected abstract List<ResponseElement> getElements(
 			SharepointRequest sharepointRequest)
+		throws Exception;
+
+	protected String getResponse(
+			SharepointRequest sharepointRequest, boolean appendNewline)
 		throws Exception {
 
-		StringBuilder sb = new StringBuilder();
+		StringBundler sb = new StringBundler();
 
-		SharepointUtil.addTop(sb, getMethodName());
+		sb.append("<html><head><title>vermeer RPC packet</title></head>");
+		sb.append(StringPool.NEW_LINE);
+		sb.append("<body>");
+		sb.append(StringPool.NEW_LINE);
+
+		Property property = new Property(
+			"method", getMethodName() + ":" + SharepointUtil.VERSION);
+
+		sb.append(property.parse());
 
 		List<ResponseElement> elements = getElements(sharepointRequest);
 
@@ -69,9 +81,23 @@ public abstract class BaseMethodImpl implements Method {
 			sb.append(element.parse());
 		}
 
-		SharepointUtil.addBottom(sb);
+		sb.append("</body>");
+		sb.append(StringPool.NEW_LINE);
+		sb.append("</html>");
 
-		return sb;
+		if (appendNewline) {
+			sb.append(StringPool.NEW_LINE);
+		}
+
+		String html = sb.toString();
+
+		if (_log.isDebugEnabled()) {
+			_log.debug("Response HTML\n" + html);
+		}
+
+		return html;
 	}
+
+	private static Log _log = LogFactoryUtil.getLog(BaseMethodImpl.class);
 
 }

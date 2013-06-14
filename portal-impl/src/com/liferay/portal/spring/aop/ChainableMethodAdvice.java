@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -41,9 +41,7 @@ public abstract class ChainableMethodAdvice implements MethodInterceptor {
 	public void duringFinally(MethodInvocation methodInvocation) {
 	}
 
-	public final Object invoke(MethodInvocation methodInvocation)
-		throws Throwable {
-
+	public Object invoke(MethodInvocation methodInvocation) throws Throwable {
 		Object returnValue = before(methodInvocation);
 
 		if (returnValue != null) {
@@ -56,12 +54,7 @@ public abstract class ChainableMethodAdvice implements MethodInterceptor {
 		}
 
 		try {
-			if (nextMethodInterceptor != null) {
-				returnValue = nextMethodInterceptor.invoke(methodInvocation);
-			}
-			else {
-				returnValue = methodInvocation.proceed();
-			}
+			returnValue = methodInvocation.proceed();
 
 			afterReturning(methodInvocation, returnValue);
 		}

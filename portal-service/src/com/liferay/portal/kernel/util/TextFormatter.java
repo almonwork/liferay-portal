@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -147,15 +147,21 @@ public class TextFormatter {
 		}
 	}
 
+	/**
+	 * @deprecated {@link #formatStorageSize(double, Locale)}
+	 */
 	public static String formatKB(double size, Locale locale) {
 		NumberFormat numberFormat = NumberFormat.getInstance(locale);
 
 		numberFormat.setMaximumFractionDigits(1);
 		numberFormat.setMinimumFractionDigits(1);
 
-		return numberFormat.format(size / 1024.0);
+		return numberFormat.format(size / _STORAGE_SIZE_DENOMINATOR);
 	}
 
+	/**
+	 * @deprecated {@link #formatStorageSize(int, Locale)}
+	 */
 	public static String formatKB(int size, Locale locale) {
 		return formatKB((double)size, locale);
 	}
@@ -196,6 +202,41 @@ public class TextFormatter {
 		}
 
 		return s;
+	}
+
+	public static String formatStorageSize(double size, Locale locale) {
+		String suffix = _STORAGE_SIZE_SUFFIX_KB;
+
+		size = size / _STORAGE_SIZE_DENOMINATOR;
+
+		if (size > _STORAGE_SIZE_DENOMINATOR) {
+			suffix = _STORAGE_SIZE_SUFFIX_MB;
+
+			size = size / _STORAGE_SIZE_DENOMINATOR;
+		}
+
+		if (size > _STORAGE_SIZE_DENOMINATOR) {
+			suffix = _STORAGE_SIZE_SUFFIX_GB;
+
+			size = size / _STORAGE_SIZE_DENOMINATOR;
+		}
+
+		NumberFormat numberFormat = NumberFormat.getInstance(locale);
+
+		if (suffix.equals(_STORAGE_SIZE_SUFFIX_KB)) {
+			numberFormat.setMaximumFractionDigits(0);
+		}
+		else {
+			numberFormat.setMaximumFractionDigits(1);
+		}
+
+		numberFormat.setMinimumFractionDigits(0);
+
+		return numberFormat.format(size) + suffix;
+	}
+
+	public static String formatStorageSize(int size, Locale locale) {
+		return formatStorageSize((double)size, locale);
 	}
 
 	private static String _formatA(String s) {
@@ -274,7 +315,7 @@ public class TextFormatter {
 		StringBuilder sb = new StringBuilder(s);
 
 		for (int i = 0; i < s.length(); i++) {
-			if ((i + 1 != s.length()) &&
+			if (((i + 1) != s.length()) &&
 				(Character.isLowerCase(s.charAt(i + 1)))) {
 
 				break;
@@ -359,9 +400,7 @@ public class TextFormatter {
 		for (int i = 0; i < s.length(); i++) {
 			char c = s.charAt(i);
 
-			if (Character.isUpperCase(c) && (i > 0) &&
-				((i + 1) < s.length())) {
-
+			if (Character.isUpperCase(c) && (i > 0) && ((i + 1) < s.length())) {
 				int delta = sb.length() - s.length();
 
 				if (Character.isLowerCase(s.charAt(i + 1))) {
@@ -375,5 +414,13 @@ public class TextFormatter {
 
 		return sb.toString();
 	}
+
+	private static final double _STORAGE_SIZE_DENOMINATOR = 1024.0;
+
+	private static final String _STORAGE_SIZE_SUFFIX_GB = "GB";
+
+	private static final String _STORAGE_SIZE_SUFFIX_KB = "k";
+
+	private static final String _STORAGE_SIZE_SUFFIX_MB = "MB";
 
 }

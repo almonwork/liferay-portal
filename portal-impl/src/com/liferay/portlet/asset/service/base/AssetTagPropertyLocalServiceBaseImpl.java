@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -21,22 +21,18 @@ import com.liferay.portal.kernel.bean.IdentifiableBean;
 import com.liferay.portal.kernel.dao.jdbc.SqlUpdate;
 import com.liferay.portal.kernel.dao.jdbc.SqlUpdateFactoryUtil;
 import com.liferay.portal.kernel.dao.orm.DynamicQuery;
+import com.liferay.portal.kernel.dao.orm.DynamicQueryFactoryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
-import com.liferay.portal.kernel.search.Indexer;
-import com.liferay.portal.kernel.search.IndexerRegistryUtil;
-import com.liferay.portal.kernel.search.SearchException;
+import com.liferay.portal.kernel.search.Indexable;
+import com.liferay.portal.kernel.search.IndexableType;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.model.PersistedModel;
+import com.liferay.portal.service.BaseLocalServiceImpl;
 import com.liferay.portal.service.PersistedModelLocalServiceRegistry;
 import com.liferay.portal.service.ResourceLocalService;
-import com.liferay.portal.service.ResourceService;
 import com.liferay.portal.service.UserLocalService;
 import com.liferay.portal.service.UserService;
-import com.liferay.portal.service.persistence.ResourceFinder;
-import com.liferay.portal.service.persistence.ResourcePersistence;
 import com.liferay.portal.service.persistence.UserFinder;
 import com.liferay.portal.service.persistence.UserPersistence;
 
@@ -61,6 +57,7 @@ import com.liferay.portlet.asset.service.persistence.AssetCategoryPropertyFinder
 import com.liferay.portlet.asset.service.persistence.AssetCategoryPropertyPersistence;
 import com.liferay.portlet.asset.service.persistence.AssetEntryFinder;
 import com.liferay.portlet.asset.service.persistence.AssetEntryPersistence;
+import com.liferay.portlet.asset.service.persistence.AssetLinkFinder;
 import com.liferay.portlet.asset.service.persistence.AssetLinkPersistence;
 import com.liferay.portlet.asset.service.persistence.AssetTagFinder;
 import com.liferay.portlet.asset.service.persistence.AssetTagPersistence;
@@ -68,6 +65,7 @@ import com.liferay.portlet.asset.service.persistence.AssetTagPropertyFinder;
 import com.liferay.portlet.asset.service.persistence.AssetTagPropertyKeyFinder;
 import com.liferay.portlet.asset.service.persistence.AssetTagPropertyPersistence;
 import com.liferay.portlet.asset.service.persistence.AssetTagStatsPersistence;
+import com.liferay.portlet.asset.service.persistence.AssetVocabularyFinder;
 import com.liferay.portlet.asset.service.persistence.AssetVocabularyPersistence;
 
 import java.io.Serializable;
@@ -89,7 +87,8 @@ import javax.sql.DataSource;
  * @generated
  */
 public abstract class AssetTagPropertyLocalServiceBaseImpl
-	implements AssetTagPropertyLocalService, IdentifiableBean {
+	extends BaseLocalServiceImpl implements AssetTagPropertyLocalService,
+		IdentifiableBean {
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
@@ -103,27 +102,12 @@ public abstract class AssetTagPropertyLocalServiceBaseImpl
 	 * @return the asset tag property that was added
 	 * @throws SystemException if a system exception occurred
 	 */
+	@Indexable(type = IndexableType.REINDEX)
 	public AssetTagProperty addAssetTagProperty(
 		AssetTagProperty assetTagProperty) throws SystemException {
 		assetTagProperty.setNew(true);
 
-		assetTagProperty = assetTagPropertyPersistence.update(assetTagProperty,
-				false);
-
-		Indexer indexer = IndexerRegistryUtil.getIndexer(getModelClassName());
-
-		if (indexer != null) {
-			try {
-				indexer.reindex(assetTagProperty);
-			}
-			catch (SearchException se) {
-				if (_log.isWarnEnabled()) {
-					_log.warn(se, se);
-				}
-			}
-		}
-
-		return assetTagProperty;
+		return assetTagPropertyPersistence.update(assetTagProperty, false);
 	}
 
 	/**
@@ -140,49 +124,34 @@ public abstract class AssetTagPropertyLocalServiceBaseImpl
 	 * Deletes the asset tag property with the primary key from the database. Also notifies the appropriate model listeners.
 	 *
 	 * @param tagPropertyId the primary key of the asset tag property
+	 * @return the asset tag property that was removed
 	 * @throws PortalException if a asset tag property with the primary key could not be found
 	 * @throws SystemException if a system exception occurred
 	 */
-	public void deleteAssetTagProperty(long tagPropertyId)
+	@Indexable(type = IndexableType.DELETE)
+	public AssetTagProperty deleteAssetTagProperty(long tagPropertyId)
 		throws PortalException, SystemException {
-		AssetTagProperty assetTagProperty = assetTagPropertyPersistence.remove(tagPropertyId);
-
-		Indexer indexer = IndexerRegistryUtil.getIndexer(getModelClassName());
-
-		if (indexer != null) {
-			try {
-				indexer.delete(assetTagProperty);
-			}
-			catch (SearchException se) {
-				if (_log.isWarnEnabled()) {
-					_log.warn(se, se);
-				}
-			}
-		}
+		return assetTagPropertyPersistence.remove(tagPropertyId);
 	}
 
 	/**
 	 * Deletes the asset tag property from the database. Also notifies the appropriate model listeners.
 	 *
 	 * @param assetTagProperty the asset tag property
+	 * @return the asset tag property that was removed
 	 * @throws SystemException if a system exception occurred
 	 */
-	public void deleteAssetTagProperty(AssetTagProperty assetTagProperty)
-		throws SystemException {
-		assetTagPropertyPersistence.remove(assetTagProperty);
+	@Indexable(type = IndexableType.DELETE)
+	public AssetTagProperty deleteAssetTagProperty(
+		AssetTagProperty assetTagProperty) throws SystemException {
+		return assetTagPropertyPersistence.remove(assetTagProperty);
+	}
 
-		Indexer indexer = IndexerRegistryUtil.getIndexer(getModelClassName());
+	public DynamicQuery dynamicQuery() {
+		Class<?> clazz = getClass();
 
-		if (indexer != null) {
-			try {
-				indexer.delete(assetTagProperty);
-			}
-			catch (SearchException se) {
-				if (_log.isWarnEnabled()) {
-					_log.warn(se, se);
-				}
-			}
-		}
+		return DynamicQueryFactoryUtil.forClass(AssetTagProperty.class,
+			clazz.getClassLoader());
 	}
 
 	/**
@@ -251,6 +220,11 @@ public abstract class AssetTagPropertyLocalServiceBaseImpl
 		return assetTagPropertyPersistence.countWithDynamicQuery(dynamicQuery);
 	}
 
+	public AssetTagProperty fetchAssetTagProperty(long tagPropertyId)
+		throws SystemException {
+		return assetTagPropertyPersistence.fetchByPrimaryKey(tagPropertyId);
+	}
+
 	/**
 	 * Returns the asset tag property with the primary key.
 	 *
@@ -303,6 +277,7 @@ public abstract class AssetTagPropertyLocalServiceBaseImpl
 	 * @return the asset tag property that was updated
 	 * @throws SystemException if a system exception occurred
 	 */
+	@Indexable(type = IndexableType.REINDEX)
 	public AssetTagProperty updateAssetTagProperty(
 		AssetTagProperty assetTagProperty) throws SystemException {
 		return updateAssetTagProperty(assetTagProperty, true);
@@ -316,28 +291,13 @@ public abstract class AssetTagPropertyLocalServiceBaseImpl
 	 * @return the asset tag property that was updated
 	 * @throws SystemException if a system exception occurred
 	 */
+	@Indexable(type = IndexableType.REINDEX)
 	public AssetTagProperty updateAssetTagProperty(
 		AssetTagProperty assetTagProperty, boolean merge)
 		throws SystemException {
 		assetTagProperty.setNew(false);
 
-		assetTagProperty = assetTagPropertyPersistence.update(assetTagProperty,
-				merge);
-
-		Indexer indexer = IndexerRegistryUtil.getIndexer(getModelClassName());
-
-		if (indexer != null) {
-			try {
-				indexer.reindex(assetTagProperty);
-			}
-			catch (SearchException se) {
-				if (_log.isWarnEnabled()) {
-					_log.warn(se, se);
-				}
-			}
-		}
-
-		return assetTagProperty;
+		return assetTagPropertyPersistence.update(assetTagProperty, merge);
 	}
 
 	/**
@@ -604,6 +564,24 @@ public abstract class AssetTagPropertyLocalServiceBaseImpl
 	}
 
 	/**
+	 * Returns the asset link finder.
+	 *
+	 * @return the asset link finder
+	 */
+	public AssetLinkFinder getAssetLinkFinder() {
+		return assetLinkFinder;
+	}
+
+	/**
+	 * Sets the asset link finder.
+	 *
+	 * @param assetLinkFinder the asset link finder
+	 */
+	public void setAssetLinkFinder(AssetLinkFinder assetLinkFinder) {
+		this.assetLinkFinder = assetLinkFinder;
+	}
+
+	/**
 	 * Returns the asset tag local service.
 	 *
 	 * @return the asset tag local service
@@ -867,6 +845,25 @@ public abstract class AssetTagPropertyLocalServiceBaseImpl
 	}
 
 	/**
+	 * Returns the asset vocabulary finder.
+	 *
+	 * @return the asset vocabulary finder
+	 */
+	public AssetVocabularyFinder getAssetVocabularyFinder() {
+		return assetVocabularyFinder;
+	}
+
+	/**
+	 * Sets the asset vocabulary finder.
+	 *
+	 * @param assetVocabularyFinder the asset vocabulary finder
+	 */
+	public void setAssetVocabularyFinder(
+		AssetVocabularyFinder assetVocabularyFinder) {
+		this.assetVocabularyFinder = assetVocabularyFinder;
+	}
+
+	/**
 	 * Returns the counter local service.
 	 *
 	 * @return the counter local service
@@ -901,60 +898,6 @@ public abstract class AssetTagPropertyLocalServiceBaseImpl
 	public void setResourceLocalService(
 		ResourceLocalService resourceLocalService) {
 		this.resourceLocalService = resourceLocalService;
-	}
-
-	/**
-	 * Returns the resource remote service.
-	 *
-	 * @return the resource remote service
-	 */
-	public ResourceService getResourceService() {
-		return resourceService;
-	}
-
-	/**
-	 * Sets the resource remote service.
-	 *
-	 * @param resourceService the resource remote service
-	 */
-	public void setResourceService(ResourceService resourceService) {
-		this.resourceService = resourceService;
-	}
-
-	/**
-	 * Returns the resource persistence.
-	 *
-	 * @return the resource persistence
-	 */
-	public ResourcePersistence getResourcePersistence() {
-		return resourcePersistence;
-	}
-
-	/**
-	 * Sets the resource persistence.
-	 *
-	 * @param resourcePersistence the resource persistence
-	 */
-	public void setResourcePersistence(ResourcePersistence resourcePersistence) {
-		this.resourcePersistence = resourcePersistence;
-	}
-
-	/**
-	 * Returns the resource finder.
-	 *
-	 * @return the resource finder
-	 */
-	public ResourceFinder getResourceFinder() {
-		return resourceFinder;
-	}
-
-	/**
-	 * Sets the resource finder.
-	 *
-	 * @param resourceFinder the resource finder
-	 */
-	public void setResourceFinder(ResourceFinder resourceFinder) {
-		this.resourceFinder = resourceFinder;
 	}
 
 	/**
@@ -1112,6 +1055,8 @@ public abstract class AssetTagPropertyLocalServiceBaseImpl
 	protected AssetLinkLocalService assetLinkLocalService;
 	@BeanReference(type = AssetLinkPersistence.class)
 	protected AssetLinkPersistence assetLinkPersistence;
+	@BeanReference(type = AssetLinkFinder.class)
+	protected AssetLinkFinder assetLinkFinder;
 	@BeanReference(type = AssetTagLocalService.class)
 	protected AssetTagLocalService assetTagLocalService;
 	@BeanReference(type = AssetTagService.class)
@@ -1140,16 +1085,12 @@ public abstract class AssetTagPropertyLocalServiceBaseImpl
 	protected AssetVocabularyService assetVocabularyService;
 	@BeanReference(type = AssetVocabularyPersistence.class)
 	protected AssetVocabularyPersistence assetVocabularyPersistence;
+	@BeanReference(type = AssetVocabularyFinder.class)
+	protected AssetVocabularyFinder assetVocabularyFinder;
 	@BeanReference(type = CounterLocalService.class)
 	protected CounterLocalService counterLocalService;
 	@BeanReference(type = ResourceLocalService.class)
 	protected ResourceLocalService resourceLocalService;
-	@BeanReference(type = ResourceService.class)
-	protected ResourceService resourceService;
-	@BeanReference(type = ResourcePersistence.class)
-	protected ResourcePersistence resourcePersistence;
-	@BeanReference(type = ResourceFinder.class)
-	protected ResourceFinder resourceFinder;
 	@BeanReference(type = UserLocalService.class)
 	protected UserLocalService userLocalService;
 	@BeanReference(type = UserService.class)
@@ -1160,6 +1101,5 @@ public abstract class AssetTagPropertyLocalServiceBaseImpl
 	protected UserFinder userFinder;
 	@BeanReference(type = PersistedModelLocalServiceRegistry.class)
 	protected PersistedModelLocalServiceRegistry persistedModelLocalServiceRegistry;
-	private static Log _log = LogFactoryUtil.getLog(AssetTagPropertyLocalServiceBaseImpl.class);
 	private String _beanIdentifier;
 }

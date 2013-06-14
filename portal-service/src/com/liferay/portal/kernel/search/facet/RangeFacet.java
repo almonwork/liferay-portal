@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -51,7 +51,9 @@ public class RangeFacet extends BaseFacet {
 		if (isStatic() && dataJSONObject.has("ranges")) {
 			JSONArray rangesJSONArray = dataJSONObject.getJSONArray("ranges");
 
-			String rangeString = rangesJSONArray.getString(0);
+			JSONObject rangeJSONObject = rangesJSONArray.getJSONObject(0);
+
+			String rangeString = rangeJSONObject.getString("range");
 
 			String[] range = RangeParserUtil.parserRange(rangeString);
 
@@ -98,7 +100,8 @@ public class RangeFacet extends BaseFacet {
 			searchContext, fieldName, startString, endString, true, true);
 
 		return BooleanClauseFactoryUtil.create(
-			facetTermRangeQuery, BooleanClauseOccur.MUST.getName());
+			searchContext, facetTermRangeQuery,
+			BooleanClauseOccur.MUST.getName());
 	}
 
 }

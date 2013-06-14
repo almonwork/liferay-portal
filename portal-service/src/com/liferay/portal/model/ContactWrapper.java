@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,6 +14,10 @@
 
 package com.liferay.portal.model;
 
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * <p>
  * This class is a wrapper for {@link Contact}.
@@ -23,7 +27,7 @@ package com.liferay.portal.model;
  * @see       Contact
  * @generated
  */
-public class ContactWrapper implements Contact {
+public class ContactWrapper implements Contact, ModelWrapper<Contact> {
 	public ContactWrapper(Contact contact) {
 		_contact = contact;
 	}
@@ -34,6 +38,246 @@ public class ContactWrapper implements Contact {
 
 	public String getModelClassName() {
 		return Contact.class.getName();
+	}
+
+	public Map<String, Object> getModelAttributes() {
+		Map<String, Object> attributes = new HashMap<String, Object>();
+
+		attributes.put("contactId", getContactId());
+		attributes.put("companyId", getCompanyId());
+		attributes.put("userId", getUserId());
+		attributes.put("userName", getUserName());
+		attributes.put("createDate", getCreateDate());
+		attributes.put("modifiedDate", getModifiedDate());
+		attributes.put("classNameId", getClassNameId());
+		attributes.put("classPK", getClassPK());
+		attributes.put("accountId", getAccountId());
+		attributes.put("parentContactId", getParentContactId());
+		attributes.put("emailAddress", getEmailAddress());
+		attributes.put("firstName", getFirstName());
+		attributes.put("middleName", getMiddleName());
+		attributes.put("lastName", getLastName());
+		attributes.put("prefixId", getPrefixId());
+		attributes.put("suffixId", getSuffixId());
+		attributes.put("male", getMale());
+		attributes.put("birthday", getBirthday());
+		attributes.put("smsSn", getSmsSn());
+		attributes.put("aimSn", getAimSn());
+		attributes.put("facebookSn", getFacebookSn());
+		attributes.put("icqSn", getIcqSn());
+		attributes.put("jabberSn", getJabberSn());
+		attributes.put("msnSn", getMsnSn());
+		attributes.put("mySpaceSn", getMySpaceSn());
+		attributes.put("skypeSn", getSkypeSn());
+		attributes.put("twitterSn", getTwitterSn());
+		attributes.put("ymSn", getYmSn());
+		attributes.put("employeeStatusId", getEmployeeStatusId());
+		attributes.put("employeeNumber", getEmployeeNumber());
+		attributes.put("jobTitle", getJobTitle());
+		attributes.put("jobClass", getJobClass());
+		attributes.put("hoursOfOperation", getHoursOfOperation());
+
+		return attributes;
+	}
+
+	public void setModelAttributes(Map<String, Object> attributes) {
+		Long contactId = (Long)attributes.get("contactId");
+
+		if (contactId != null) {
+			setContactId(contactId);
+		}
+
+		Long companyId = (Long)attributes.get("companyId");
+
+		if (companyId != null) {
+			setCompanyId(companyId);
+		}
+
+		Long userId = (Long)attributes.get("userId");
+
+		if (userId != null) {
+			setUserId(userId);
+		}
+
+		String userName = (String)attributes.get("userName");
+
+		if (userName != null) {
+			setUserName(userName);
+		}
+
+		Date createDate = (Date)attributes.get("createDate");
+
+		if (createDate != null) {
+			setCreateDate(createDate);
+		}
+
+		Date modifiedDate = (Date)attributes.get("modifiedDate");
+
+		if (modifiedDate != null) {
+			setModifiedDate(modifiedDate);
+		}
+
+		Long classNameId = (Long)attributes.get("classNameId");
+
+		if (classNameId != null) {
+			setClassNameId(classNameId);
+		}
+
+		Long classPK = (Long)attributes.get("classPK");
+
+		if (classPK != null) {
+			setClassPK(classPK);
+		}
+
+		Long accountId = (Long)attributes.get("accountId");
+
+		if (accountId != null) {
+			setAccountId(accountId);
+		}
+
+		Long parentContactId = (Long)attributes.get("parentContactId");
+
+		if (parentContactId != null) {
+			setParentContactId(parentContactId);
+		}
+
+		String emailAddress = (String)attributes.get("emailAddress");
+
+		if (emailAddress != null) {
+			setEmailAddress(emailAddress);
+		}
+
+		String firstName = (String)attributes.get("firstName");
+
+		if (firstName != null) {
+			setFirstName(firstName);
+		}
+
+		String middleName = (String)attributes.get("middleName");
+
+		if (middleName != null) {
+			setMiddleName(middleName);
+		}
+
+		String lastName = (String)attributes.get("lastName");
+
+		if (lastName != null) {
+			setLastName(lastName);
+		}
+
+		Integer prefixId = (Integer)attributes.get("prefixId");
+
+		if (prefixId != null) {
+			setPrefixId(prefixId);
+		}
+
+		Integer suffixId = (Integer)attributes.get("suffixId");
+
+		if (suffixId != null) {
+			setSuffixId(suffixId);
+		}
+
+		Boolean male = (Boolean)attributes.get("male");
+
+		if (male != null) {
+			setMale(male);
+		}
+
+		Date birthday = (Date)attributes.get("birthday");
+
+		if (birthday != null) {
+			setBirthday(birthday);
+		}
+
+		String smsSn = (String)attributes.get("smsSn");
+
+		if (smsSn != null) {
+			setSmsSn(smsSn);
+		}
+
+		String aimSn = (String)attributes.get("aimSn");
+
+		if (aimSn != null) {
+			setAimSn(aimSn);
+		}
+
+		String facebookSn = (String)attributes.get("facebookSn");
+
+		if (facebookSn != null) {
+			setFacebookSn(facebookSn);
+		}
+
+		String icqSn = (String)attributes.get("icqSn");
+
+		if (icqSn != null) {
+			setIcqSn(icqSn);
+		}
+
+		String jabberSn = (String)attributes.get("jabberSn");
+
+		if (jabberSn != null) {
+			setJabberSn(jabberSn);
+		}
+
+		String msnSn = (String)attributes.get("msnSn");
+
+		if (msnSn != null) {
+			setMsnSn(msnSn);
+		}
+
+		String mySpaceSn = (String)attributes.get("mySpaceSn");
+
+		if (mySpaceSn != null) {
+			setMySpaceSn(mySpaceSn);
+		}
+
+		String skypeSn = (String)attributes.get("skypeSn");
+
+		if (skypeSn != null) {
+			setSkypeSn(skypeSn);
+		}
+
+		String twitterSn = (String)attributes.get("twitterSn");
+
+		if (twitterSn != null) {
+			setTwitterSn(twitterSn);
+		}
+
+		String ymSn = (String)attributes.get("ymSn");
+
+		if (ymSn != null) {
+			setYmSn(ymSn);
+		}
+
+		String employeeStatusId = (String)attributes.get("employeeStatusId");
+
+		if (employeeStatusId != null) {
+			setEmployeeStatusId(employeeStatusId);
+		}
+
+		String employeeNumber = (String)attributes.get("employeeNumber");
+
+		if (employeeNumber != null) {
+			setEmployeeNumber(employeeNumber);
+		}
+
+		String jobTitle = (String)attributes.get("jobTitle");
+
+		if (jobTitle != null) {
+			setJobTitle(jobTitle);
+		}
+
+		String jobClass = (String)attributes.get("jobClass");
+
+		if (jobClass != null) {
+			setJobClass(jobClass);
+		}
+
+		String hoursOfOperation = (String)attributes.get("hoursOfOperation");
+
+		if (hoursOfOperation != null) {
+			setHoursOfOperation(hoursOfOperation);
+		}
 	}
 
 	/**
@@ -183,6 +427,55 @@ public class ContactWrapper implements Contact {
 	}
 
 	/**
+	* Returns the fully qualified class name of this contact.
+	*
+	* @return the fully qualified class name of this contact
+	*/
+	public java.lang.String getClassName() {
+		return _contact.getClassName();
+	}
+
+	public void setClassName(java.lang.String className) {
+		_contact.setClassName(className);
+	}
+
+	/**
+	* Returns the class name ID of this contact.
+	*
+	* @return the class name ID of this contact
+	*/
+	public long getClassNameId() {
+		return _contact.getClassNameId();
+	}
+
+	/**
+	* Sets the class name ID of this contact.
+	*
+	* @param classNameId the class name ID of this contact
+	*/
+	public void setClassNameId(long classNameId) {
+		_contact.setClassNameId(classNameId);
+	}
+
+	/**
+	* Returns the class p k of this contact.
+	*
+	* @return the class p k of this contact
+	*/
+	public long getClassPK() {
+		return _contact.getClassPK();
+	}
+
+	/**
+	* Sets the class p k of this contact.
+	*
+	* @param classPK the class p k of this contact
+	*/
+	public void setClassPK(long classPK) {
+		_contact.setClassPK(classPK);
+	}
+
+	/**
 	* Returns the account ID of this contact.
 	*
 	* @return the account ID of this contact
@@ -216,6 +509,24 @@ public class ContactWrapper implements Contact {
 	*/
 	public void setParentContactId(long parentContactId) {
 		_contact.setParentContactId(parentContactId);
+	}
+
+	/**
+	* Returns the email address of this contact.
+	*
+	* @return the email address of this contact
+	*/
+	public java.lang.String getEmailAddress() {
+		return _contact.getEmailAddress();
+	}
+
+	/**
+	* Sets the email address of this contact.
+	*
+	* @param emailAddress the email address of this contact
+	*/
+	public void setEmailAddress(java.lang.String emailAddress) {
+		_contact.setEmailAddress(emailAddress);
 	}
 
 	/**
@@ -643,10 +954,6 @@ public class ContactWrapper implements Contact {
 		return _contact.isEscapedModel();
 	}
 
-	public void setEscapedModel(boolean escapedModel) {
-		_contact.setEscapedModel(escapedModel);
-	}
-
 	public java.io.Serializable getPrimaryKeyObj() {
 		return _contact.getPrimaryKeyObj();
 	}
@@ -704,7 +1011,18 @@ public class ContactWrapper implements Contact {
 		return _contact.getFullName();
 	}
 
+	public boolean isUser() {
+		return _contact.isUser();
+	}
+
+	/**
+	 * @deprecated Renamed to {@link #getWrappedModel}
+	 */
 	public Contact getWrappedContact() {
+		return _contact;
+	}
+
+	public Contact getWrappedModel() {
 		return _contact;
 	}
 

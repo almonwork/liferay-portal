@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -24,6 +24,20 @@ import org.apache.tools.ant.Task;
  */
 public class XMLMergerTask extends Task {
 
+	@Override
+	public void execute() throws BuildException {
+		_validateAttributes();
+
+		try {
+			XMLMergerRunner runner = new XMLMergerRunner(_type);
+
+			runner.mergeAndSave(_masterFile, _slaveFile, _outputFile);
+		}
+		catch (Exception e) {
+			throw new BuildException(e);
+		}
+	}
+
 	public void setMasterFile(File masterFile) {
 		_masterFile = masterFile;
 	}
@@ -40,20 +54,6 @@ public class XMLMergerTask extends Task {
 		_type = type;
 	}
 
-	@Override
-	public void execute() throws BuildException {
-		_validateAttributes();
-
-		try {
-			XMLMergerRunner runner = new XMLMergerRunner(_type);
-
-			runner.mergeAndSave(_masterFile, _slaveFile, _outputFile);
-		}
-		catch (Exception e) {
-			throw new BuildException(e);
-		}
-	}
-
 	private void _validateAttributes() {
 		_validateMandatoryAttribute(_masterFile, "masterFile");
 		_validateMandatoryAttribute(_slaveFile, "slaveFile");
@@ -66,9 +66,9 @@ public class XMLMergerTask extends Task {
 		}
 	}
 
- 	private File _masterFile;
- 	private File _slaveFile;
- 	private File _outputFile;
- 	private String _type;
+	private File _masterFile;
+	private File _outputFile;
+	private File _slaveFile;
+	private String _type;
 
 }

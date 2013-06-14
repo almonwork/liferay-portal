@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -28,8 +28,7 @@ public class ConditionFactoryImpl implements ConditionFactory {
 	}
 
 	public Condition eq(String name, Object value) {
-		return new FieldConditionImpl(
-			name, value, ComparisonOperator.EQUALS);
+		return new FieldConditionImpl(name, value, ComparisonOperator.EQUALS);
 	}
 
 	public Condition gt(String name, Object value) {
@@ -43,13 +42,11 @@ public class ConditionFactoryImpl implements ConditionFactory {
 	}
 
 	public Condition in(String name, Object value) {
-		return new FieldConditionImpl(
-			name, value, ComparisonOperator.IN);
+		return new FieldConditionImpl(name, value, ComparisonOperator.IN);
 	}
 
 	public Condition like(String name, Object value) {
-		return new FieldConditionImpl(
-			name, value, ComparisonOperator.LIKE);
+		return new FieldConditionImpl(name, value, ComparisonOperator.LIKE);
 	}
 
 	public Condition lt(String name, Object value) {
@@ -68,8 +65,7 @@ public class ConditionFactoryImpl implements ConditionFactory {
 	}
 
 	public Condition notIn(String name, Object value) {
-		return new FieldConditionImpl(
-			name, value, ComparisonOperator.NOT_IN);
+		return new FieldConditionImpl(name, value, ComparisonOperator.NOT_IN);
 	}
 
 }

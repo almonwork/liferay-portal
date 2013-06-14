@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,6 +14,12 @@
 
 package com.liferay.portlet.messageboards.model;
 
+import com.liferay.portal.model.ModelWrapper;
+
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * <p>
  * This class is a wrapper for {@link MBStatsUser}.
@@ -23,7 +29,8 @@ package com.liferay.portlet.messageboards.model;
  * @see       MBStatsUser
  * @generated
  */
-public class MBStatsUserWrapper implements MBStatsUser {
+public class MBStatsUserWrapper implements MBStatsUser,
+	ModelWrapper<MBStatsUser> {
 	public MBStatsUserWrapper(MBStatsUser mbStatsUser) {
 		_mbStatsUser = mbStatsUser;
 	}
@@ -34,6 +41,50 @@ public class MBStatsUserWrapper implements MBStatsUser {
 
 	public String getModelClassName() {
 		return MBStatsUser.class.getName();
+	}
+
+	public Map<String, Object> getModelAttributes() {
+		Map<String, Object> attributes = new HashMap<String, Object>();
+
+		attributes.put("statsUserId", getStatsUserId());
+		attributes.put("groupId", getGroupId());
+		attributes.put("userId", getUserId());
+		attributes.put("messageCount", getMessageCount());
+		attributes.put("lastPostDate", getLastPostDate());
+
+		return attributes;
+	}
+
+	public void setModelAttributes(Map<String, Object> attributes) {
+		Long statsUserId = (Long)attributes.get("statsUserId");
+
+		if (statsUserId != null) {
+			setStatsUserId(statsUserId);
+		}
+
+		Long groupId = (Long)attributes.get("groupId");
+
+		if (groupId != null) {
+			setGroupId(groupId);
+		}
+
+		Long userId = (Long)attributes.get("userId");
+
+		if (userId != null) {
+			setUserId(userId);
+		}
+
+		Integer messageCount = (Integer)attributes.get("messageCount");
+
+		if (messageCount != null) {
+			setMessageCount(messageCount);
+		}
+
+		Date lastPostDate = (Date)attributes.get("lastPostDate");
+
+		if (lastPostDate != null) {
+			setLastPostDate(lastPostDate);
+		}
 	}
 
 	/**
@@ -204,10 +255,6 @@ public class MBStatsUserWrapper implements MBStatsUser {
 		return _mbStatsUser.isEscapedModel();
 	}
 
-	public void setEscapedModel(boolean escapedModel) {
-		_mbStatsUser.setEscapedModel(escapedModel);
-	}
-
 	public java.io.Serializable getPrimaryKeyObj() {
 		return _mbStatsUser.getPrimaryKeyObj();
 	}
@@ -262,7 +309,14 @@ public class MBStatsUserWrapper implements MBStatsUser {
 		_mbStatsUser.persist();
 	}
 
+	/**
+	 * @deprecated Renamed to {@link #getWrappedModel}
+	 */
 	public MBStatsUser getWrappedMBStatsUser() {
+		return _mbStatsUser;
+	}
+
+	public MBStatsUser getWrappedModel() {
 		return _mbStatsUser;
 	}
 

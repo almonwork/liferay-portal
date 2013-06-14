@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -31,7 +31,7 @@ ShoppingItemField[] itemFields = null;
 
 int fieldsCount = ParamUtil.getInteger(request, "fieldsCount");
 String fieldsCountParam = request.getParameter("fieldsCount");
-if ((fieldsCountParam == null) || (fieldsCountParam.equals(StringPool.NULL))) {
+if ((fieldsCountParam == null) || fieldsCountParam.equals(StringPool.NULL)) {
 	if (item != null) {
 		itemFields = (ShoppingItemField[])ShoppingItemFieldLocalServiceUtil.getItemFields(itemId).toArray(new ShoppingItemField[0]);
 		fieldsCount = itemFields.length;
@@ -58,7 +58,7 @@ ShoppingItemPrice[] itemPrices = null;
 
 int pricesCount = ParamUtil.getInteger(request, "pricesCount", 1);
 String pricesCountParam = request.getParameter("pricesCount");
-if ((pricesCountParam == null) || (pricesCountParam.equals(StringPool.NULL))) {
+if ((pricesCountParam == null) || pricesCountParam.equals(StringPool.NULL)) {
 	if (item != null) {
 		itemPrices = (ShoppingItemPrice[])ShoppingItemPriceLocalServiceUtil.getItemPrices(itemId).toArray(new ShoppingItemPrice[0]);
 		pricesCount = itemPrices.length;
@@ -175,8 +175,8 @@ int priceId = ParamUtil.getInteger(request, "priceId", -1);
 		<aui:button href="<%= redirect %>" type="cancel" />
 	</aui:button-row>
 
-	<liferay-ui:panel-container extended="<%= true %>" persistState="<%= true %>">
-		<liferay-ui:panel collapsible="<%= true %>" extended="<%= true %>" persistState="<%= true %>" title="fields">
+	<liferay-ui:panel-container extended="<%= true %>" id="shoppingEditItemPanelContainer" persistState="<%= true %>">
+		<liferay-ui:panel collapsible="<%= true %>" extended="<%= true %>" id="shoppingEditItemFieldsPanel"  persistState="<%= true %>" title="fields">
 			<aui:input name="fields" type="hidden" />
 
 			<liferay-ui:message key="fields-are-added-if-you-need-to-distinguish-items-based-on-criteria-chosen-by-the-user" />
@@ -195,7 +195,7 @@ int priceId = ParamUtil.getInteger(request, "priceId", -1);
 
 				String fieldName = ParamUtil.getString(request, "fieldName" + curFieldId);
 				String fieldNameParam = request.getParameter("fieldName" + curFieldId);
-				if ((fieldNameParam == null) || (fieldNameParam.equals(StringPool.NULL))) {
+				if ((fieldNameParam == null) || fieldNameParam.equals(StringPool.NULL)) {
 					if (itemFields[curFieldId] != null) {
 						fieldName = itemFields[curFieldId].getName();
 					}
@@ -203,7 +203,7 @@ int priceId = ParamUtil.getInteger(request, "priceId", -1);
 
 				String[] fieldValues = StringUtil.split(ParamUtil.getString(request, "fieldValues" + curFieldId));
 				String fieldValuesParam = request.getParameter("fieldValues" + curFieldId);
-				if ((fieldValuesParam == null) || (fieldValuesParam.equals(StringPool.NULL))) {
+				if ((fieldValuesParam == null) || fieldValuesParam.equals(StringPool.NULL)) {
 					if (itemFields[curFieldId] != null) {
 						fieldValues = itemFields[curFieldId].getValuesArray();
 					}
@@ -211,7 +211,7 @@ int priceId = ParamUtil.getInteger(request, "priceId", -1);
 
 				String fieldDescription = ParamUtil.getString(request, "fieldDescription" + curFieldId);
 				String fieldDescriptionParam = request.getParameter("fieldDescription" + curFieldId);
-				if ((fieldDescriptionParam == null) || (fieldDescriptionParam.equals(StringPool.NULL))) {
+				if ((fieldDescriptionParam == null) || fieldDescriptionParam.equals(StringPool.NULL)) {
 					if (itemFields[curFieldId] != null) {
 						fieldDescription = itemFields[curFieldId].getDescription();
 					}
@@ -256,7 +256,7 @@ int priceId = ParamUtil.getInteger(request, "priceId", -1);
 
 		</liferay-ui:panel>
 
-		<liferay-ui:panel collapsible="<%= true %>" extended="<%= true %>" persistState="<%= true %>" title="prices">
+		<liferay-ui:panel collapsible="<%= true %>" extended="<%= true %>"  id="shoppingEditItemPricesPanel"  persistState="<%= true %>" title="prices">
 			<aui:input name="prices" type="hidden" />
 
 			<aui:fieldset>
@@ -266,13 +266,13 @@ int priceId = ParamUtil.getInteger(request, "priceId", -1);
 				for (int i = 0; i < pricesCount; i++) {
 					int curPriceId = i;
 
-					if (priceId > -1 && i >= priceId) {
+					if ((priceId > -1) && (i >= priceId)) {
 						curPriceId++;
 					}
 
 					int minQuantity = ParamUtil.getInteger(request, "minQuantity" + curPriceId, 0);
 					String minQuantityParam = request.getParameter("minQuantity" + curPriceId);
-					if ((minQuantityParam == null) || (minQuantityParam.equals(StringPool.NULL))) {
+					if ((minQuantityParam == null) || minQuantityParam.equals(StringPool.NULL)) {
 						if (itemPrices[curPriceId] != null) {
 							minQuantity = itemPrices[curPriceId].getMinQuantity();
 						}
@@ -280,7 +280,7 @@ int priceId = ParamUtil.getInteger(request, "priceId", -1);
 
 					int maxQuantity = ParamUtil.getInteger(request, "maxQuantity" + curPriceId);
 					String maxQuantityParam = request.getParameter("maxQuantity" + curPriceId);
-					if ((maxQuantityParam == null) || (maxQuantityParam.equals(StringPool.NULL))) {
+					if ((maxQuantityParam == null) || maxQuantityParam.equals(StringPool.NULL)) {
 						if (itemPrices[curPriceId] != null) {
 							maxQuantity = itemPrices[curPriceId].getMaxQuantity();
 						}
@@ -288,7 +288,7 @@ int priceId = ParamUtil.getInteger(request, "priceId", -1);
 
 					double price = ParamUtil.getDouble(request, "price" + curPriceId);
 					String priceParam = request.getParameter("price" + curPriceId);
-					if ((priceParam == null) || (priceParam.equals(StringPool.NULL))) {
+					if ((priceParam == null) || priceParam.equals(StringPool.NULL)) {
 						if (itemPrices[curPriceId] != null) {
 							price = itemPrices[curPriceId].getPrice();
 						}
@@ -296,7 +296,7 @@ int priceId = ParamUtil.getInteger(request, "priceId", -1);
 
 					double discount = ParamUtil.getDouble(request, "discount" + curPriceId) / 100;
 					String discountParam = request.getParameter("discount" + curPriceId);
-					if ((discountParam == null) || (discountParam.equals(StringPool.NULL))) {
+					if ((discountParam == null) || discountParam.equals(StringPool.NULL)) {
 						if (itemPrices[curPriceId] != null) {
 							discount = itemPrices[curPriceId].getDiscount();
 						}
@@ -304,7 +304,7 @@ int priceId = ParamUtil.getInteger(request, "priceId", -1);
 
 					boolean taxable = ParamUtil.getBoolean(request, "taxable" + curPriceId, true);
 					String taxableParam = request.getParameter("taxable" + curPriceId);
-					if ((taxableParam == null) || (taxableParam.equals(StringPool.NULL))) {
+					if ((taxableParam == null) || taxableParam.equals(StringPool.NULL)) {
 						if (itemPrices[curPriceId] != null) {
 							taxable = itemPrices[curPriceId].isTaxable();
 						}
@@ -312,7 +312,7 @@ int priceId = ParamUtil.getInteger(request, "priceId", -1);
 
 					double shipping = ParamUtil.getDouble(request, "shipping" + curPriceId);
 					String shippingParam = request.getParameter("shipping" + curPriceId);
-					if ((shippingParam == null) || (shippingParam.equals(StringPool.NULL))) {
+					if ((shippingParam == null) || shippingParam.equals(StringPool.NULL)) {
 						if (itemPrices[curPriceId] != null) {
 							shipping = itemPrices[curPriceId].getShipping();
 						}
@@ -320,7 +320,7 @@ int priceId = ParamUtil.getInteger(request, "priceId", -1);
 
 					boolean useShippingFormula = ParamUtil.getBoolean(request, "useShippingFormula" + curPriceId, true);
 					String useShippingFormulaParam = request.getParameter("useShippingFormula" + curPriceId);
-					if ((useShippingFormulaParam == null) || (useShippingFormulaParam.equals(StringPool.NULL))) {
+					if ((useShippingFormulaParam == null) || useShippingFormulaParam.equals(StringPool.NULL)) {
 						if (itemPrices[curPriceId] != null) {
 							useShippingFormula = itemPrices[curPriceId].isUseShippingFormula();
 						}
@@ -328,11 +328,11 @@ int priceId = ParamUtil.getInteger(request, "priceId", -1);
 
 					boolean active = ParamUtil.getBoolean(request, "active" + curPriceId, true);
 					String activeParam = request.getParameter("active" + curPriceId);
-					if ((activeParam == null) || (activeParam.equals(StringPool.NULL))) {
+					if ((activeParam == null) || activeParam.equals(StringPool.NULL)) {
 						if (itemPrices[curPriceId] != null) {
 							int status = itemPrices[curPriceId].getStatus();
 
-							if (status == ShoppingItemPriceConstants.STATUS_ACTIVE_DEFAULT || status == ShoppingItemPriceConstants.STATUS_ACTIVE) {
+							if ((status == ShoppingItemPriceConstants.STATUS_ACTIVE_DEFAULT) || (status == ShoppingItemPriceConstants.STATUS_ACTIVE)) {
 								active = true;
 							}
 							else {
@@ -426,7 +426,7 @@ int priceId = ParamUtil.getInteger(request, "priceId", -1);
 			<aui:button onClick='<%= renderResponse.getNamespace() + "addPrice();" %>' value="add-price" />
 		</liferay-ui:panel>
 
-		<liferay-ui:panel collapsible="<%= true %>" extended="<%= true %>" persistState="<%= true %>" title="images">
+		<liferay-ui:panel collapsible="<%= true %>" extended="<%= true %>"  id="shoppingEditItemImagesPanel" persistState="<%= true %>" title="images">
 			<liferay-ui:error exception="<%= ItemLargeImageNameException.class %>">
 
 				<%

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -20,6 +20,7 @@ import com.liferay.portal.util.PropsValues;
 
 import java.net.URL;
 
+import java.util.List;
 import java.util.Map;
 
 import net.sf.ehcache.config.CacheConfiguration.CacheEventListenerFactoryConfiguration;
@@ -33,9 +34,7 @@ import net.sf.ehcache.config.ConfigurationFactory;
  */
 public class EhcacheConfigurationUtil {
 
-	public static Configuration getConfiguration(
-		String configurationPath) {
-
+	public static Configuration getConfiguration(String configurationPath) {
 		return getConfiguration(configurationPath, false);
 	}
 
@@ -46,8 +45,7 @@ public class EhcacheConfigurationUtil {
 	}
 
 	public static Configuration getConfiguration(
-		String configurationPath, boolean clusterAware,
-		boolean usingDefault) {
+		String configurationPath, boolean clusterAware, boolean usingDefault) {
 
 		if (Validator.isNull(configurationPath)) {
 			return null;
@@ -95,12 +93,43 @@ public class EhcacheConfigurationUtil {
 		return configuration;
 	}
 
-	private static void _clearCacheEventListenerConfigurations(
+	private static String _clearCacheEventListenerConfigurations(
 		CacheConfiguration cacheConfiguration) {
 
 		cacheConfiguration.addBootstrapCacheLoaderFactory(null);
 
-		cacheConfiguration.getCacheEventListenerConfigurations().clear();
+		List<?> cacheEventListenerConfigurations =
+			cacheConfiguration.getCacheEventListenerConfigurations();
+
+		String cacheEventListenerProperties = null;
+
+		for (Object cacheEventListenerConfiguration :
+				cacheEventListenerConfigurations) {
+
+			CacheEventListenerFactoryConfiguration
+				cacheEventListenerFactoryConfiguration =
+					(CacheEventListenerFactoryConfiguration)
+						cacheEventListenerConfiguration;
+
+			String fullyQualifiedClassPath =
+				cacheEventListenerFactoryConfiguration.
+					getFullyQualifiedClassPath();
+
+			if (fullyQualifiedClassPath.contains(
+					"LiferayCacheEventListenerFactory") ||
+				fullyQualifiedClassPath.contains(
+					"net.sf.ehcache.distribution")) {
+
+				cacheEventListenerProperties =
+					cacheEventListenerFactoryConfiguration.getProperties();
+
+				break;
+			}
+		}
+
+		cacheEventListenerConfigurations.clear();
+
+		return cacheEventListenerProperties;
 	}
 
 	private static void _configureCacheEventListeners(
@@ -112,19 +141,45 @@ public class EhcacheConfigurationUtil {
 			return;
 		}
 
-		if (clearCachePeerProviderConfigurations ||
-			(!usingDefault && !cacheConfiguration.isTerracottaClustered())) {
+		List<CacheEventListenerFactoryConfiguration>
+			cacheEventListenerFactoryConfigurations =
+				cacheConfiguration.getCacheEventListenerConfigurations();
 
-			_clearCacheEventListenerConfigurations(cacheConfiguration);
+		boolean usingLiferayCacheEventListenerFactory = false;
+
+		for (CacheEventListenerFactoryConfiguration
+				cacheEventListenerFactoryConfiguration :
+					cacheEventListenerFactoryConfigurations) {
+
+			String className =
+				cacheEventListenerFactoryConfiguration.
+					getFullyQualifiedClassPath();
+
+			if (className.equals(
+					LiferayCacheEventListenerFactory.class.getName())) {
+
+				usingLiferayCacheEventListenerFactory = true;
+
+				break;
+			}
+		}
+
+		if (clearCachePeerProviderConfigurations ||
+			(!usingDefault && usingLiferayCacheEventListenerFactory)) {
+
+			String cacheEventListenerProperties =
+				_clearCacheEventListenerConfigurations(cacheConfiguration);
 
 			if (enableClusterLinkReplication) {
-				_enableClusterLinkReplication(cacheConfiguration);
+				_enableClusterLinkReplication(
+					cacheConfiguration, cacheEventListenerProperties);
 			}
 		}
 	}
 
 	private static void _enableClusterLinkReplication(
-		CacheConfiguration cacheConfiguration) {
+		CacheConfiguration cacheConfiguration,
+		String cacheEventListenerProperties) {
 
 		CacheEventListenerFactoryConfiguration
 			cacheEventListenerFactoryConfiguration =
@@ -132,6 +187,8 @@ public class EhcacheConfigurationUtil {
 
 		cacheEventListenerFactoryConfiguration.setClass(
 			EhcachePortalCacheClusterReplicatorFactory.class.getName());
+		cacheEventListenerFactoryConfiguration.setProperties(
+			cacheEventListenerProperties);
 
 		cacheConfiguration.addCacheEventListenerFactory(
 			cacheEventListenerFactoryConfiguration);
@@ -143,8 +200,8 @@ public class EhcacheConfigurationUtil {
 
 		boolean clearCachePeerProviderConfigurations = false;
 
-		if (((usingDefault && enableClusterLinkReplication) ||
-			(usingDefault && !PropsValues.CLUSTER_LINK_ENABLED))) {
+		if ((usingDefault && enableClusterLinkReplication) ||
+			(usingDefault && !PropsValues.CLUSTER_LINK_ENABLED)) {
 
 			clearCachePeerProviderConfigurations = true;
 		}

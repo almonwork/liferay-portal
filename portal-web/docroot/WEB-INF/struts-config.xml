@@ -3,12 +3,6 @@
 
 <struts-config>
 
-	<!-- Forms Beans -->
-
-	<form-beans>
-		<form-bean name="mapsMapsForm" type="com.liferay.portlet.maps.form.MapsForm" />
-	</form-beans>
-
 	<!-- Global Forwards -->
 
 	<global-forwards>
@@ -30,6 +24,8 @@
 	<action-mappings>
 
 		<!-- Portal -->
+
+		<action path="/portal/api/jsonws" forward="portal.api.jsonws" />
 
 		<action path="/portal/emoticons" forward="/portal/emoticons.jsp" />
 
@@ -53,6 +49,10 @@
 			<forward name="portal.layout" path="portal.layout" />
 		</action>
 
+		<action path="/portal/license" type="com.liferay.portal.action.UpdateLicenseAction">
+			<forward name="portal.license" path="portal.license" />
+		</action>
+
 		<action path="/portal/login" type="com.liferay.portal.action.LoginAction" />
 
 		<action path="/portal/login_disabled" forward="portal.login_disabled" />
@@ -60,6 +60,8 @@
 		<action path="/portal/logout" type="com.liferay.portal.action.LogoutAction" />
 
 		<action path="/portal/portlet_url" type="com.liferay.portal.action.PortletURLAction" />
+
+		<action path="/portal/progress_poller" forward="portal.progress_poller" />
 
 		<action path="/portal/render_portlet" type="com.liferay.portal.action.RenderPortletAction">
 			<forward name="/portal/render_portlet" path="/portal/render_portlet.jsp" />
@@ -70,6 +72,10 @@
 		<action path="/portal/session_click" type="com.liferay.portal.action.SessionClickAction" />
 
 		<action path="/portal/session_tree_js_click" type="com.liferay.portal.action.SessionTreeJSClickAction" />
+
+		<action path="/portal/setup_wizard" type="com.liferay.portal.action.SetupWizardAction">
+			<forward name="portal.setup_wizard" path="portal.setup_wizard" />
+		</action>
 
 		<action path="/portal/status" forward="portal.status" />
 
@@ -103,13 +109,13 @@
 
 		<action path="/portal/update_terms_of_use" type="com.liferay.portal.action.UpdateTermsOfUseAction" />
 
-		<action path="/portal/upload_progress_poller" forward="portal.upload_progress_poller" />
-
 		<action path="/portal/verify_email_address" type="com.liferay.portal.action.VerifyEmailAddressAction">
 			<forward name="portal.verify_email_address" path="portal.verify_email_address" />
 		</action>
 
 		<!-- Activities -->
+
+		<action path="/activities/rss" type="com.liferay.portlet.activities.action.RSSAction" />
 
 		<action path="/activities/view" forward="portlet.activities.view" />
 
@@ -145,11 +151,6 @@
 
 		<!-- Admin Server -->
 
-		<action path="/admin_server/edit_site" type="com.liferay.portlet.sites.action.EditGroupAction">
-			<forward name="portlet.sites_admin.edit_site" path="portlet.sites_admin.edit_site" />
-			<forward name="portlet.sites_admin.error" path="portlet.sites_admin.error" />
-		</action>
-
 		<action path="/admin_server/edit_document_library_extra_settings" type="com.liferay.portal.convert.action.EditDocumentLibraryExtraSettingsAction">
 			<forward name="portlet.admin.edit_document_library_extra_settings" path="portlet.admin.edit_document_library_extra_settings" />
 			<forward name="portlet.admin.error" path="portlet.admin.error" />
@@ -158,11 +159,6 @@
 		<action path="/admin_server/edit_organization" type="com.liferay.portlet.usersadmin.action.EditOrganizationAction">
 			<forward name="portlet.users_admin.edit_organization" path="portlet.directory.view_organization" />
 			<forward name="portlet.users_admin.error" path="portlet.directory.error" />
-		</action>
-
-		<action path="/admin_server/edit_permissions" type="com.liferay.portal.convert.action.EditPermissionsAction">
-			<forward name="portlet.admin.edit_permissions" path="portlet.admin.edit_permissions" />
-			<forward name="portlet.admin.error" path="portlet.admin.error" />
 		</action>
 
 		<action path="/admin_server/edit_role_permissions" type="com.liferay.portlet.rolesadmin.action.EditRolePermissionsAction">
@@ -175,12 +171,19 @@
 			<forward name="portlet.admin.error" path="portlet.admin.error" />
 		</action>
 
+		<action path="/admin_server/edit_site" type="com.liferay.portlet.sites.action.EditGroupAction">
+			<forward name="portlet.sites_admin.edit_site" path="portlet.sites_admin.edit_site" />
+			<forward name="portlet.sites_admin.error" path="portlet.sites_admin.error" />
+		</action>
+
 		<action path="/admin_server/edit_user" type="com.liferay.portlet.usersadmin.action.EditUserAction">
 			<forward name="portlet.users_admin.edit_user" path="portlet.directory.view_user" />
 			<forward name="portlet.users_admin.error" path="portlet.directory.error" />
 		</action>
 
 		<action path="/admin_server/view" forward="portlet.admin.view" />
+
+		<action path="/admin_server/view_chart" type="com.liferay.portlet.admin.action.ViewChartAction" />
 
 		<!-- Alerts -->
 
@@ -222,6 +225,10 @@
 
 		<action path="/asset_browser/view" forward="portlet.asset_browser.view" />
 
+		<!-- Asset Categories Navigation -->
+
+		<action path="/asset_categories_navigation/view" forward="portlet.asset_categories_navigation.view" />
+
 		<!-- Asset Category Admin -->
 
 		<action path="/asset_category_admin/edit_category" type="com.liferay.portlet.assetcategoryadmin.action.EditCategoryAction">
@@ -235,10 +242,6 @@
 		<action path="/asset_category_admin/view" forward="portlet.asset_category_admin.view" />
 
 		<action path="/asset_category_admin/view_category" forward="portlet.asset_category_admin.view_category" />
-
-		<!-- Asset Categories Navigation -->
-
-		<action path="/asset_categories_navigation/view" forward="portlet.asset_categories_navigation.view" />
 
 		<!-- Asset Publisher -->
 
@@ -366,15 +369,17 @@
 
 		<!-- Bookmarks -->
 
+		<action path="/bookmarks/edit_entry" type="com.liferay.portlet.bookmarks.action.EditEntryAction">
+			<forward name="portlet.bookmarks.edit_entry" path="portlet.bookmarks.edit_entry" />
+			<forward name="portlet.bookmarks.error" path="portlet.bookmarks.error" />
+		</action>
+
 		<action path="/bookmarks/edit_folder" type="com.liferay.portlet.bookmarks.action.EditFolderAction">
 			<forward name="portlet.bookmarks.edit_folder" path="portlet.bookmarks.edit_folder" />
 			<forward name="portlet.bookmarks.error" path="portlet.bookmarks.error" />
 		</action>
 
-		<action path="/bookmarks/edit_entry" type="com.liferay.portlet.bookmarks.action.EditEntryAction">
-			<forward name="portlet.bookmarks.edit_entry" path="portlet.bookmarks.edit_entry" />
-			<forward name="portlet.bookmarks.error" path="portlet.bookmarks.error" />
-		</action>
+		<action path="/bookmarks/find_entry" type="com.liferay.portlet.bookmarks.action.FindEntryAction" />
 
 		<action path="/bookmarks/open_entry" type="com.liferay.portlet.bookmarks.action.OpenEntryAction" />
 
@@ -441,6 +446,8 @@
 
 		<action path="/directory/find_user" type="com.liferay.portlet.usersadmin.action.FindUserAction" />
 
+		<action path="/directory/view" forward="portlet.directory.view" />
+
 		<action path="/directory/view_organization" type="com.liferay.portlet.usersadmin.action.EditOrganizationAction">
 			<forward name="portlet.users_admin.edit_organization" path="portlet.directory.view_organization" />
 			<forward name="portlet.users_admin.error" path="portlet.directory.error" />
@@ -450,8 +457,6 @@
 			<forward name="portlet.users_admin.edit_user" path="portlet.directory.view_user" />
 			<forward name="portlet.users_admin.error" path="portlet.directory.error" />
 		</action>
-
-		<action path="/directory/view" forward="portlet.directory.view" />
 
 		<!-- Dockbar -->
 
@@ -503,8 +508,6 @@
 
 		<action path="/document_library/get_file" type="com.liferay.portlet.documentlibrary.action.GetFileAction" />
 
-		<action path="/document_library/get_folders" type="com.liferay.portlet.documentlibrary.action.GetFoldersAction" />
-
 		<action path="/document_library/move_entry" type="com.liferay.portlet.documentlibrary.action.EditEntryAction">
 			<forward name="portlet.document_library.edit_entry" path="portlet.document_library.move_entries" />
 			<forward name="portlet.document_library.error" path="portlet.document_library.error" />
@@ -520,7 +523,13 @@
 			<forward name="portlet.document_library.error" path="portlet.document_library.error" />
 		</action>
 
-		<action path="/document_library/search" type="com.liferay.portlet.documentlibrary.action.SearchAction" />
+		<action path="/document_library/restore_entry" type="com.liferay.portlet.trash.action.EditEntryAction">
+			<forward name="portlet.document_library.view" path="portlet.document_library.view" />
+		</action>
+
+		<action path="/document_library/search" type="com.liferay.portlet.documentlibrary.action.SearchAction">
+			<forward name="portlet.document_library.view" path="portlet.document_library.view" />
+		</action>
 
 		<action path="/document_library/select_file_entry" type="com.liferay.portlet.documentlibrary.action.ViewAction">
 			<forward name="portlet.document_library.error" path="portlet.document_library.error" />
@@ -553,11 +562,6 @@
 
 		<action path="/document_library/view_file_entry_type" forward="portlet.document_library.view_file_entry_type" />
 
-		<action path="/document_library/view_file_shortcut" type="com.liferay.portlet.documentlibrary.action.EditFileShortcutAction">
-			<forward name="portlet.document_library.edit_file_shortcut" path="portlet.document_library.view_file_shortcut" />
-			<forward name="portlet.document_library.error" path="portlet.document_library.error" />
-		</action>
-
 		<!-- Document Library Display -->
 
 		<action path="/document_library_display/search" forward="portlet.document_library_display.search" />
@@ -576,6 +580,8 @@
 			<forward name="portlet.dynamic_data_lists.error" path="portlet.dynamic_data_lists.error" />
 		</action>
 
+		<action path="/dynamic_data_list_display/edit_record_file" type="com.liferay.portlet.dynamicdatalists.action.EditRecordFileAction" />
+
 		<action path="/dynamic_data_list_display/view" forward="portlet.dynamic_data_list_display.view" />
 
 		<action path="/dynamic_data_list_display/view_record" type="com.liferay.portlet.dynamicdatalists.action.EditRecordAction">
@@ -588,12 +594,19 @@
 			<forward name="portlet.dynamic_data_lists.error" path="portlet.dynamic_data_lists.error" />
 		</action>
 
+		<action path="/dynamic_data_list_display/view_record_set" type="com.liferay.portlet.dynamicdatalists.action.EditRecordSetAction">
+			<forward name="portlet.dynamic_data_lists.edit_record_set" path="portlet.dynamic_data_lists.view_record_set" />
+			<forward name="portlet.dynamic_data_lists.error" path="portlet.dynamic_data_lists.error" />
+		</action>
+
 		<!-- Dynamic Data Lists -->
 
 		<action path="/dynamic_data_lists/edit_record" type="com.liferay.portlet.dynamicdatalists.action.EditRecordAction">
 			<forward name="portlet.dynamic_data_lists.edit_record" path="portlet.dynamic_data_lists.edit_record" />
 			<forward name="portlet.dynamic_data_lists.error" path="portlet.dynamic_data_lists.error" />
 		</action>
+
+		<action path="/dynamic_data_lists/edit_record_file" type="com.liferay.portlet.dynamicdatalists.action.EditRecordFileAction" />
 
 		<action path="/dynamic_data_lists/edit_record_set" type="com.liferay.portlet.dynamicdatalists.action.EditRecordSetAction">
 			<forward name="portlet.dynamic_data_lists.edit_record_set" path="portlet.dynamic_data_lists.edit_record_set" />
@@ -621,6 +634,11 @@
 
 		<!-- Dynamic Data Mapping -->
 
+		<action path="/dynamic_data_mapping/copy_structure" type="com.liferay.portlet.dynamicdatamapping.action.CopyStructureAction">
+			<forward name="portlet.dynamic_data_mapping.copy_structure" path="portlet.dynamic_data_mapping.copy_structure" />
+			<forward name="portlet.dynamic_data_mapping.error" path="portlet.dynamic_data_mapping.error" />
+		</action>
+
 		<action path="/dynamic_data_mapping/edit_structure" type="com.liferay.portlet.dynamicdatamapping.action.EditStructureAction">
 			<forward name="portlet.dynamic_data_mapping.edit_structure" path="portlet.dynamic_data_mapping.edit_structure" />
 			<forward name="portlet.dynamic_data_mapping.error" path="portlet.dynamic_data_mapping.error" />
@@ -630,8 +648,6 @@
 			<forward name="portlet.dynamic_data_mapping.edit_template" path="portlet.dynamic_data_mapping.edit_template" />
 			<forward name="portlet.dynamic_data_mapping.error" path="portlet.dynamic_data_mapping.error" />
 		</action>
-
-		<action path="/dynamic_data_mapping/edit_template_script" forward="portlet.dynamic_data_mapping.edit_template_script" />
 
 		<action path="/dynamic_data_mapping/select_structure" forward="portlet.dynamic_data_mapping.select_structure" />
 
@@ -720,42 +736,51 @@
 			<forward name="portlet.iframe.view" path="portlet.iframe.view" />
 		</action>
 
-		<!-- Image Gallery -->
+		<!-- Image Gallery Display -->
 
-		<action path="/image_gallery/edit_folder" type="com.liferay.portlet.imagegallery.action.EditFolderAction">
-			<forward name="portlet.image_gallery.edit_folder" path="portlet.image_gallery.edit_folder" />
-			<forward name="portlet.image_gallery.error" path="portlet.image_gallery.error" />
+		<action path="/image_gallery_display/edit_folder" type="com.liferay.portlet.documentlibrary.action.EditFolderAction">
+			<forward name="portlet.document_library.edit_folder" path="portlet.document_library.edit_folder" />
+			<forward name="portlet.document_library.error" path="portlet.document_library.error" />
 		</action>
 
-		<action path="/image_gallery/edit_image" type="com.liferay.portlet.imagegallery.action.EditImageAction">
-			<forward name="portlet.image_gallery.edit_image" path="portlet.image_gallery.edit_image" />
-			<forward name="portlet.image_gallery.error" path="portlet.image_gallery.error" />
+		<action path="/image_gallery_display/edit_image" type="com.liferay.portlet.documentlibrary.action.EditFileEntryAction">
+			<forward name="portlet.document_library.edit_file_entry" path="portlet.document_library.edit_file_entry" />
+			<forward name="portlet.document_library.error" path="portlet.document_library.error" />
 		</action>
 
-		<action path="/image_gallery/find_folder" type="com.liferay.portlet.imagegallery.action.FindFolderAction" />
-
-		<action path="/image_gallery/find_image" type="com.liferay.portlet.imagegallery.action.FindImageAction" />
-
-		<action path="/image_gallery/search" forward="portlet.image_gallery.search" />
-
-		<action path="/image_gallery/select_folder" type="com.liferay.portlet.imagegallery.action.EditFolderAction">
-			<forward name="portlet.image_gallery.edit_folder" path="portlet.image_gallery.select_folder" />
-			<forward name="portlet.image_gallery.error" path="portlet.image_gallery.error" />
+		<action path="/image_gallery_display/edit_shortcut" type="com.liferay.portlet.documentlibrary.action.EditFileShortcutAction">
+			<forward name="portlet.document_library.edit_file_shortcut" path="portlet.document_library.edit_file_shortcut" />
+			<forward name="portlet.document_library.error" path="portlet.document_library.error" />
 		</action>
 
-		<action path="/image_gallery/view" type="com.liferay.portlet.imagegallery.action.ViewAction">
-			<forward name="portlet.image_gallery.error" path="portlet.image_gallery.error" />
-			<forward name="portlet.image_gallery.view" path="portlet.image_gallery.view" />
+		<action path="/image_gallery_display/embedded_player" forward="portlet.image_gallery_display.embedded_player" />
+
+		<action path="/image_gallery_display/find_folder" type="com.liferay.portlet.documentlibrary.action.FindFolderAction" />
+
+		<action path="/image_gallery_display/find_image" type="com.liferay.portlet.imagegallerydisplay.action.FindImageAction" />
+
+		<action path="/image_gallery_display/search" forward="portlet.image_gallery_display.search" />
+
+		<action path="/image_gallery_display/select_file_entry_type" forward="portlet.document_library_display.select_file_entry_type" />
+
+		<action path="/image_gallery_display/select_folder" type="com.liferay.portlet.documentlibrary.action.EditFolderAction">
+			<forward name="portlet.document_library.edit_folder" path="portlet.document_library.select_folder" />
+			<forward name="portlet.document_library.error" path="portlet.document_library.error" />
 		</action>
 
-		<action path="/image_gallery/view_image" type="com.liferay.portlet.imagegallery.action.EditImageAction">
-			<forward name="portlet.image_gallery.edit_image" path="portlet.image_gallery.view_image" />
-			<forward name="portlet.image_gallery.error" path="portlet.image_gallery.error" />
+		<action path="/image_gallery_display/view" type="com.liferay.portlet.imagegallerydisplay.action.ViewAction">
+			<forward name="portlet.image_gallery_display.error" path="portlet.document_library.error" />
+			<forward name="portlet.image_gallery_display.view" path="portlet.image_gallery_display.view" />
 		</action>
 
-		<action path="/image_gallery/view_slide_show" type="com.liferay.portlet.imagegallery.action.ViewSlideShowAction">
-			<forward name="portlet.image_gallery.error" path="portlet.image_gallery.error" />
-			<forward name="portlet.image_gallery.view_slide_show" path="portlet.image_gallery.view_slide_show" />
+		<action path="/image_gallery_display/view_image" type="com.liferay.portlet.documentlibrary.action.EditFileEntryAction">
+			<forward name="portlet.document_library.edit_file_entry" path="portlet.document_library.view_file_entry" />
+			<forward name="portlet.document_library.error" path="portlet.document_library.error" />
+		</action>
+
+		<action path="/image_gallery_display/view_slide_show" type="com.liferay.portlet.imagegallerydisplay.action.ViewSlideShowAction">
+			<forward name="portlet.image_gallery_display.error" path="portlet.document_library.error" />
+			<forward name="portlet.image_gallery_display.view_slide_show" path="portlet.image_gallery_display.view_slide_show" />
 		</action>
 
 		<!-- Invitation -->
@@ -796,12 +821,15 @@
 			<forward name="portlet.journal.error" path="portlet.journal.error" />
 		</action>
 
+		<action path="/journal/edit_folder" type="com.liferay.portlet.journal.action.EditFolderAction">
+			<forward name="portlet.journal.edit_folder" path="portlet.journal.edit_folder" />
+			<forward name="portlet.journal.error" path="portlet.journal.error" />
+		</action>
+
 		<action path="/journal/edit_structure" type="com.liferay.portlet.journal.action.EditStructureAction">
 			<forward name="portlet.journal.edit_structure" path="portlet.journal.edit_structure" />
 			<forward name="portlet.journal.error" path="portlet.journal.error" />
 		</action>
-
-		<action path="/journal/edit_structure_xsd" forward="portlet.journal.edit_structure_xsd" />
 
 		<action path="/journal/edit_template" type="com.liferay.portlet.journal.action.EditTemplateAction">
 			<forward name="portlet.journal.edit_template" path="portlet.journal.edit_template" />
@@ -826,17 +854,21 @@
 
 		<action path="/journal/get_template_content" type="com.liferay.portlet.journal.action.GetTemplateContentAction" />
 
+		<action path="/journal/move_folder" type="com.liferay.portlet.journal.action.EditFolderAction">
+			<forward name="portlet.journal.edit_folder" path="portlet.journal.move_folder" />
+			<forward name="portlet.journal.error" path="portlet.journal.error" />
+		</action>
+
 		<action path="/journal/rss" type="com.liferay.portlet.journal.action.RSSAction" />
+
+		<action path="/journal/select_display_page" type="com.liferay.portlet.layoutsadmin.action.EditLayoutsAction" />
 
 		<action path="/journal/select_document_library" type="com.liferay.portlet.documentlibrary.action.ViewAction">
 			<forward name="portlet.document_library.error" path="portlet.document_library.error" />
 			<forward name="portlet.document_library.view" path="portlet.journal.select_document_library" />
 		</action>
 
-		<action path="/journal/select_image_gallery" type="com.liferay.portlet.imagegallery.action.ViewAction">
-			<forward name="portlet.image_gallery.error" path="portlet.image_gallery.error" />
-			<forward name="portlet.image_gallery.view" path="portlet.journal.select_image_gallery" />
-		</action>
+		<action path="/journal/select_folder" forward="portlet.journal.select_folder" />
 
 		<action path="/journal/select_structure" forward="portlet.journal.select_structure" />
 
@@ -858,6 +890,14 @@
 			<forward name="portlet.journal.error" path="portlet.journal.error" />
 			<forward name="portlet.journal.edit_article" path="portlet.journal.view_article_history" />
 		</action>
+
+		<action path="/journal/view_feeds" forward="portlet.journal.view_feeds" />
+
+		<action path="/journal/view_recent" forward="portlet.journal.view_recent" />
+
+		<action path="/journal/view_structures" forward="portlet.journal.view_structures" />
+
+		<action path="/journal/view_templates" forward="portlet.journal.view_templates" />
 
 		<!-- Journal Articles -->
 
@@ -911,6 +951,17 @@
 		<action path="/layout_prototypes/edit_layouts" type="com.liferay.portlet.layoutsadmin.action.EditLayoutsAction">
 			<forward name="portlet.layouts_admin.edit_layouts" path="portlet.layouts_admin.edit_layouts" />
 			<forward name="portlet.layouts_admin.error" path="portlet.layout_prototypes.error" />
+		</action>
+
+		<action path="/layout_prototypes/export_layouts" type="com.liferay.portlet.layoutsadmin.action.ExportLayoutsAction">
+			<forward name="portlet.layouts_admin.error" path="portlet.layout_prototypes.error" />
+			<forward name="portlet.layouts_admin.export_layouts" path="portlet.layouts_admin.export_layouts" />
+		</action>
+
+		<action path="/layout_prototypes/import_layouts" type="com.liferay.portlet.layoutsadmin.action.ImportLayoutsAction">
+			<forward name="portlet.layouts_admin.edit_layouts" path="portlet.layouts_admin.edit_layouts" />
+			<forward name="portlet.layouts_admin.error" path="portlet.layouts_admin.error" />
+			<forward name="portlet.layouts_admin.export_layouts" path="portlet.layouts_admin.export_layouts" />
 		</action>
 
 		<action path="/layout_prototypes/view" forward="portlet.layout_prototypes.view" />
@@ -1008,21 +1059,22 @@
 
 		<action path="/login/create_account" type="com.liferay.portlet.login.action.CreateAccountAction">
 			<forward name="portlet.login.create_account" path="portlet.login.create_account" />
+			<forward name="portlet.login.login" path="portlet.login.login" />
 			<forward name="portlet.login.update_account" path="portlet.login.update_account" />
 		</action>
 
 		<action path="/login/create_anonymous_account" type="com.liferay.portlet.login.action.CreateAnonymousAccountAction">
 			<forward name="portlet.login.create_anonymous_account" path="portlet.login.create_anonymous_account" />
+			<forward name="portlet.login.login" path="portlet.login.login" />
 		</action>
 
-		<action path="/login/facebook_connect" type="com.liferay.portlet.login.action.FacebookConnectAction">
-			<forward name="portlet.login.facebook_login" path="portlet.login.facebook_login" />
+		<action path="/login/facebook_connect_oauth" type="com.liferay.portlet.login.action.FacebookConnectAction">
+			<forward name="portlet.login.login" path="portlet.login.login" />
 		</action>
-
-		<action path="/login/facebook_connect_oauth" type="com.liferay.portlet.login.action.FacebookConnectAction" />
 
 		<action path="/login/forgot_password" type="com.liferay.portlet.login.action.ForgotPasswordAction">
 			<forward name="portlet.login.forgot_password" path="portlet.login.forgot_password" />
+			<forward name="portlet.login.login" path="portlet.login.login" />
 		</action>
 
 		<action path="/login/login" type="com.liferay.portlet.login.action.LoginAction">
@@ -1034,6 +1086,7 @@
 
 		<action path="/login/open_id" type="com.liferay.portlet.login.action.OpenIdAction">
 			<forward name="portlet.login.open_id" path="portlet.login.open_id" />
+			<forward name="portlet.login.login" path="portlet.login.login" />
 		</action>
 
 		<!-- Maps -->
@@ -1166,6 +1219,42 @@
 			<forward name="portlet.message_boards.view_message" path="portlet.message_boards.view_message" />
 		</action>
 
+		<!-- Mobile Device Rules -->
+
+		<action path="/mobile_device_rules/edit_action" type="com.liferay.portlet.mobiledevicerules.action.EditActionAction">
+			<forward name="portlet.mobile_device_rules.edit_action" path="portlet.mobile_device_rules.edit_action" />
+			<forward name="portlet.mobile_device_rules.error" path="portlet.mobile_device_rules.error" />
+		</action>
+
+		<action path="/mobile_device_rules/edit_action_editor" type="com.liferay.portlet.mobiledevicerules.action.EditActionAction" />
+
+		<action path="/mobile_device_rules/edit_rule" type="com.liferay.portlet.mobiledevicerules.action.EditRuleAction">
+			<forward name="portlet.mobile_device_rules.edit_rule" path="portlet.mobile_device_rules.edit_rule" />
+			<forward name="portlet.mobile_device_rules.error" path="portlet.mobile_device_rules.error" />
+		</action>
+
+		<action path="/mobile_device_rules/edit_rule_editor" type="com.liferay.portlet.mobiledevicerules.action.EditRuleAction" />
+
+		<action path="/mobile_device_rules/edit_rule_group" type="com.liferay.portlet.mobiledevicerules.action.EditRuleGroupAction">
+			<forward name="portlet.mobile_device_rules.edit_rule_group" path="portlet.mobile_device_rules.edit_rule_group" />
+			<forward name="portlet.mobile_device_rules.error" path="portlet.mobile_device_rules.error" />
+		</action>
+
+		<action path="/mobile_device_rules/edit_rule_group_instance" type="com.liferay.portlet.mobiledevicerules.action.EditRuleGroupInstanceAction">
+			<forward name="portlet.mobile_device_rules.edit_rule_group_instance_priorities" path="portlet.mobile_device_rules.edit_rule_group_instance_priorities" />
+			<forward name="portlet.mobile_device_rules.error" path="portlet.mobile_device_rules.error" />
+		</action>
+
+		<action path="/mobile_device_rules/edit_rule_group_instance_editor" type="com.liferay.portlet.mobiledevicerules.action.EditRuleGroupInstanceAction" />
+
+		<action path="/mobile_device_rules/site_url_layouts" type="com.liferay.portlet.mobiledevicerules.action.SiteURLLayoutsAction" />
+
+		<action path="/mobile_device_rules/view" forward="portlet.mobile_device_rules.view" />
+
+		<action path="/mobile_device_rules/view_actions" forward="portlet.mobile_device_rules.view_actions" />
+
+		<action path="/mobile_device_rules/view_rules" forward="portlet.mobile_device_rules.view_rules" />
+
 		<!-- Monitoring -->
 
 		<action path="/monitoring/edit_session" type="com.liferay.portlet.monitoring.action.EditSessionAction">
@@ -1197,11 +1286,11 @@
 			<forward name="portlet.users_admin.error" path="portlet.users_admin.error" />
 		</action>
 
-		<action path="/my_account/select_site" forward="portlet.sites_admin.select_site" />
-
 		<action path="/my_account/select_organization" forward="portlet.users_admin.select_organization" />
 
 		<action path="/my_account/select_regular_role" forward="portlet.roles_admin.select_regular_role" />
+
+		<action path="/my_account/select_site" forward="portlet.sites_admin.select_site" />
 
 		<action path="/my_account/view" type="com.liferay.portlet.myaccount.action.ViewAction">
 			<forward name="portlet.my_account.edit_user" path="portlet.users_admin.edit_user" />
@@ -1369,8 +1458,16 @@
 
 		<!-- Polls Display -->
 
+		<action path="/polls_display/add_question_redirect" forward="portlet.polls_display.add_question_redirect" />
+
 		<action path="/polls_display/view" type="com.liferay.portlet.pollsdisplay.action.ViewAction">
 			<forward name="portlet.polls_display.error" path="portlet.polls_display.error" />
+			<forward name="portlet.polls_display.view" path="portlet.polls_display.view" />
+		</action>
+
+		<action path="/polls_display/vote_question" type="com.liferay.portlet.polls.action.ViewQuestionAction" >
+			<forward name="portlet.polls.edit_question" path="portlet.polls_display.view" />
+			<forward name="portlet.polls.error" path="portlet.polls_display.error" />
 			<forward name="portlet.polls_display.view" path="portlet.polls_display.view" />
 		</action>
 
@@ -1391,11 +1488,11 @@
 			<forward name="portlet.portal_settings.error" path="portlet.portal_settings.error" />
 		</action>
 
+		<action path="/portal_settings/test_cas_configuration" forward="portlet.portal_settings.test_cas_configuration" />
+
 		<action path="/portal_settings/test_ldap_connection" forward="portlet.portal_settings.test_ldap_connection" />
 
 		<action path="/portal_settings/test_ldap_groups" forward="portlet.portal_settings.test_ldap_groups" />
-
-		<action path="/portal_settings/test_cas_configuration" forward="portlet.portal_settings.test_cas_configuration" />
 
 		<action path="/portal_settings/test_ldap_users" forward="portlet.portal_settings.test_ldap_users" />
 
@@ -1406,6 +1503,10 @@
 		<!-- Portlet Configuration -->
 
 		<action path="/portlet_configuration/add_asset_redirect" forward="portlet.asset_publisher.add_asset_redirect" />
+
+		<action path="/portlet_configuration/add_group_statistics_activity_counter" forward="portlet.group_statistics.add_activity_counter" />
+
+		<action path="/portlet_configuration/add_user_statistics_activity_counter" forward="portlet.user_statistics.add_activity_counter" />
 
 		<action path="/portlet_configuration/edit_archived_setups" type="com.liferay.portlet.portletconfiguration.action.EditArchivedSetupsAction">
 			<forward name="portlet.portlet_configuration.edit_archived_setups" path="portlet.portlet_configuration.edit_archived_setups" />
@@ -1510,6 +1611,11 @@
 			<forward name="portlet.roles_admin.error" path="portlet.roles_admin.error" />
 		</action>
 
+		<action path="/roles_admin/edit_user" type="com.liferay.portlet.usersadmin.action.EditUserAction">
+			<forward name="portlet.users_admin.edit_user" path="portlet.users_admin.edit_user" />
+			<forward name="portlet.users_admin.error" path="portlet.users_admin.error" />
+		</action>
+
 		<action path="/roles_admin/select_organization_role" forward="portlet.roles_admin.select_organization_role" />
 
 		<action path="/roles_admin/select_regular_role" forward="portlet.roles_admin.select_regular_role" />
@@ -1519,6 +1625,8 @@
 		<action path="/roles_admin/select_site_role" forward="portlet.roles_admin.select_site_role" />
 
 		<action path="/roles_admin/view" forward="portlet.roles_admin.view" />
+
+		<action path="/roles_admin/view_users" forward="portlet.users_admin.view" />
 
 		<!-- RSS -->
 
@@ -1611,16 +1719,6 @@
 
 		<!-- Sites Admin -->
 
-		<action path="/sites_admin/edit_site" type="com.liferay.portlet.sites.action.EditGroupAction">
-			<forward name="portlet.sites_admin.edit_site" path="portlet.sites_admin.edit_site" />
-			<forward name="portlet.sites_admin.error" path="portlet.sites_admin.error" />
-		</action>
-
-		<action path="/sites_admin/edit_site_assignments" type="com.liferay.portlet.sites.action.EditGroupAssignmentsAction">
-			<forward name="portlet.sites_admin.edit_site_assignments" path="portlet.sites_admin.edit_site_assignments" />
-			<forward name="portlet.sites_admin.error" path="portlet.sites_admin.error" />
-		</action>
-
 		<action path="/sites_admin/edit_layout_set" type="com.liferay.portlet.layoutsadmin.action.EditLayoutSetAction">
 			<forward name="portlet.layouts_admin.edit_layouts" path="portlet.layouts_admin.edit_layouts" />
 			<forward name="portlet.layouts_admin.error" path="portlet.layouts_admin.error" />
@@ -1629,6 +1727,16 @@
 		<action path="/sites_admin/edit_layouts" type="com.liferay.portlet.layoutsadmin.action.EditLayoutsAction">
 			<forward name="portlet.layouts_admin.edit_layouts" path="portlet.layouts_admin.edit_layouts" />
 			<forward name="portlet.layouts_admin.error" path="portlet.layouts_admin.error" />
+		</action>
+
+		<action path="/sites_admin/edit_site" type="com.liferay.portlet.sites.action.EditGroupAction">
+			<forward name="portlet.sites_admin.edit_site" path="portlet.sites_admin.edit_site" />
+			<forward name="portlet.sites_admin.error" path="portlet.sites_admin.error" />
+		</action>
+
+		<action path="/sites_admin/edit_site_assignments" type="com.liferay.portlet.sites.action.EditGroupAssignmentsAction">
+			<forward name="portlet.sites_admin.edit_site_assignments" path="portlet.sites_admin.edit_site_assignments" />
+			<forward name="portlet.sites_admin.error" path="portlet.sites_admin.error" />
 		</action>
 
 		<action path="/sites_admin/edit_team" type="com.liferay.portlet.sites.action.EditTeamAction">
@@ -1689,10 +1797,10 @@
 
 		<action path="/sites_admin/view_teams" forward="portlet.sites_admin.view_teams" />
 
-		<!-- Social Equity Admin -->
+		<!-- Social Activity -->
 
-		<action path="/social_equity_admin/view" type="com.liferay.portlet.socialequityadmin.action.ViewAction">
-			<forward name="portlet.social_equity_admin.view" path="portlet.social_equity_admin.view" />
+		<action path="/social_activity/view" type="com.liferay.portlet.socialactivity.action.ViewAction">
+			<forward name="portlet.social_activity.view" path="portlet.social_activity.view" />
 		</action>
 
 		<!-- Software Catalog -->
@@ -1735,26 +1843,42 @@
 			<forward name="portlet.staging_bar.error" path="portlet.staging_bar.error" />
 		</action>
 
-		<action path="/staging_bar/edit_layouts" type="com.liferay.portlet.layoutsadmin.action.EditLayoutsAction">
-			<forward name="portlet.layouts_admin.error" path="portlet.staging_bar.view" />
-		</action>
-
 		<action path="/staging_bar/edit_layout_set_branch" type="com.liferay.portlet.stagingbar.action.EditLayoutSetBranchAction">
 			<forward name="portlet.staging_bar.edit_layout_set_branch" path="portlet.staging_bar.edit_layout_set_branch" />
 			<forward name="portlet.staging_bar.error" path="portlet.staging_bar.error" />
+		</action>
+
+		<action path="/staging_bar/edit_layouts" type="com.liferay.portlet.layoutsadmin.action.EditLayoutsAction">
+			<forward name="portlet.layouts_admin.error" path="portlet.staging_bar.view" />
 		</action>
 
 		<action path="/staging_bar/merge_layout_set_branch" forward="portlet.staging_bar.merge_layout_set_branch" />
 
 		<action path="/staging_bar/view" forward="portlet.staging_bar.view" />
 
+		<action path="/staging_bar/view_layout_branches" forward="portlet.staging_bar.view_layout_branches" />
+
 		<action path="/staging_bar/view_layout_revision_details" forward="portlet.staging_bar.view_layout_revision_details" />
 
 		<action path="/staging_bar/view_layout_revisions" forward="portlet.staging_bar.view_layout_revisions" />
 
-		<action path="/staging_bar/view_layout_branches" forward="portlet.staging_bar.view_layout_branches" />
-
 		<action path="/staging_bar/view_layout_set_branches" forward="portlet.staging_bar.view_layout_set_branches" />
+
+		<!-- Trash -->
+
+		<action path="/trash/edit_discussion" type="com.liferay.portlet.messageboards.action.EditDiscussionAction">
+			<forward name="portlet.message_boards.error" path="portlet.trash.error" />
+		</action>
+
+		<action path="/trash/edit_entry" type="com.liferay.portlet.trash.action.EditEntryAction">
+			<forward name="portlet.trash.view" path="portlet.trash.view" />
+		</action>
+
+		<action path="/trash/restore_entry" forward="portlet.trash.restore_entry" />
+
+		<action path="/trash/view" forward="portlet.trash.view" />
+
+		<action path="/trash/view_content" forward="portlet.trash.view_content" />
 
 		<!-- Update Manager -->
 
@@ -1764,7 +1888,60 @@
 
 		<action path="/update_manager/view" forward="portlet.update_manager.view" />
 
+		<!-- User Groups Admin -->
+
+		<action path="/user_groups_admin/edit_layout_set" type="com.liferay.portlet.layoutsadmin.action.EditLayoutSetAction">
+			<forward name="portlet.layouts_admin.edit_layouts" path="portlet.layouts_admin.edit_layouts" />
+			<forward name="portlet.layouts_admin.error" path="portlet.layouts_admin.error" />
+		</action>
+
+		<action path="/user_groups_admin/edit_layouts" type="com.liferay.portlet.layoutsadmin.action.EditLayoutsAction">
+			<forward name="portlet.layouts_admin.edit_layouts" path="portlet.layouts_admin.edit_layouts" />
+			<forward name="portlet.layouts_admin.error" path="portlet.layouts_admin.error" />
+		</action>
+
+		<action path="/user_groups_admin/edit_user" type="com.liferay.portlet.usersadmin.action.EditUserAction">
+			<forward name="portlet.users_admin.edit_user" path="portlet.users_admin.edit_user" />
+			<forward name="portlet.users_admin.error" path="portlet.users_admin.error" />
+		</action>
+
+		<action path="/user_groups_admin/edit_user_group" type="com.liferay.portlet.usergroupsadmin.action.EditUserGroupAction">
+			<forward name="portlet.user_groups_admin.edit_user_group" path="portlet.user_groups_admin.edit_user_group" />
+			<forward name="portlet.user_groups_admin.error" path="portlet.user_groups_admin.error" />
+		</action>
+
+		<action path="/user_groups_admin/edit_user_group_assignments" type="com.liferay.portlet.usergroupsadmin.action.EditUserGroupAssignmentsAction">
+			<forward name="portlet.user_groups_admin.edit_user_group_assignments" path="portlet.user_groups_admin.edit_user_group_assignments" />
+			<forward name="portlet.user_groups_admin.error" path="portlet.user_groups_admin.error" />
+		</action>
+
+		<action path="/user_groups_admin/export_layouts" type="com.liferay.portlet.layoutsadmin.action.ExportLayoutsAction">
+			<forward name="portlet.layouts_admin.error" path="portlet.layouts_admin.error" />
+			<forward name="portlet.layouts_admin.export_layouts" path="portlet.layouts_admin.export_layouts" />
+		</action>
+
+		<action path="/user_groups_admin/get_users_count" type="com.liferay.portlet.usersadmin.action.GetUsersCountAction" />
+
+		<action path="/user_groups_admin/import_layouts" type="com.liferay.portlet.layoutsadmin.action.ImportLayoutsAction">
+			<forward name="portlet.layouts_admin.edit_layouts" path="portlet.layouts_admin.edit_layouts" />
+			<forward name="portlet.layouts_admin.error" path="portlet.layouts_admin.error" />
+			<forward name="portlet.layouts_admin.export_layouts" path="portlet.layouts_admin.export_layouts" />
+		</action>
+
+		<action path="/user_groups_admin/page" type="com.liferay.portlet.myplaces.action.ViewAction" />
+
+		<action path="/user_groups_admin/select_user_group" forward="portlet.user_groups_admin.select_user_group" />
+
+		<action path="/user_groups_admin/view" forward="portlet.user_groups_admin.view" />
+
+		<action path="/user_groups_admin/view_users" forward="portlet.users_admin.view" />
+
 		<!-- Users Admin -->
+
+		<action path="/users_admin/edit_layout_set" type="com.liferay.portlet.layoutsadmin.action.EditLayoutSetAction">
+			<forward name="portlet.layouts_admin.edit_layouts" path="portlet.layouts_admin.edit_layouts" />
+			<forward name="portlet.layouts_admin.error" path="portlet.layouts_admin.error" />
+		</action>
 
 		<action path="/users_admin/edit_layouts" type="com.liferay.portlet.layoutsadmin.action.EditLayoutsAction">
 			<forward name="portlet.layouts_admin.edit_layouts" path="portlet.layouts_admin.edit_layouts" />
@@ -1791,16 +1968,6 @@
 			<forward name="portlet.users_admin.error" path="portlet.users_admin.error" />
 		</action>
 
-		<action path="/users_admin/edit_user_group" type="com.liferay.portlet.usersadmin.action.EditUserGroupAction">
-			<forward name="portlet.users_admin.edit_user_group" path="portlet.users_admin.edit_user_group" />
-			<forward name="portlet.users_admin.error" path="portlet.users_admin.error" />
-		</action>
-
-		<action path="/users_admin/edit_user_group_assignments" type="com.liferay.portlet.usersadmin.action.EditUserGroupAssignmentsAction">
-			<forward name="portlet.users_admin.edit_user_group_assignments" path="portlet.users_admin.edit_user_group_assignments" />
-			<forward name="portlet.users_admin.error" path="portlet.users_admin.error" />
-		</action>
-
 		<action path="/users_admin/edit_user_portrait" type="com.liferay.portlet.usersadmin.action.EditUserPortraitAction">
 			<forward name="portlet.users_admin.edit_user_portrait" path="portlet.users_admin.edit_user_portrait" />
 			<forward name="portlet.users_admin.error" path="portlet.users_admin.error" />
@@ -1811,11 +1978,22 @@
 			<forward name="portlet.sites_admin.error" path="portlet.sites_admin.error" />
 		</action>
 
+		<action path="/users_admin/export_layouts" type="com.liferay.portlet.layoutsadmin.action.ExportLayoutsAction">
+			<forward name="portlet.layouts_admin.error" path="portlet.layouts_admin.error" />
+			<forward name="portlet.layouts_admin.export_layouts" path="portlet.layouts_admin.export_layouts" />
+		</action>
+
 		<action path="/users_admin/export_users" type="com.liferay.portlet.usersadmin.action.ExportUsersAction">
 			<forward name="portlet.users_admin.error" path="portlet.users_admin.error" />
 		</action>
 
 		<action path="/users_admin/get_users_count" type="com.liferay.portlet.usersadmin.action.GetUsersCountAction" />
+
+		<action path="/users_admin/import_layouts" type="com.liferay.portlet.layoutsadmin.action.ImportLayoutsAction">
+			<forward name="portlet.layouts_admin.edit_layouts" path="portlet.layouts_admin.edit_layouts" />
+			<forward name="portlet.layouts_admin.error" path="portlet.layouts_admin.error" />
+			<forward name="portlet.layouts_admin.export_layouts" path="portlet.layouts_admin.export_layouts" />
+		</action>
 
 		<action path="/users_admin/select_organization" forward="portlet.users_admin.select_organization" />
 
@@ -1827,11 +2005,13 @@
 
 		<action path="/users_admin/select_site_role" forward="portlet.roles_admin.select_site_role" />
 
-		<action path="/users_admin/select_user_group" forward="portlet.users_admin.select_user_group" />
+		<action path="/users_admin/select_user_group" forward="portlet.user_groups_admin.select_user_group" />
 
 		<action path="/users_admin/view" forward="portlet.users_admin.view" />
 
 		<action path="/users_admin/view_teams" forward="portlet.sites_admin.view_teams" />
+
+		<action path="/users_admin/view_users" forward="portlet.users_admin.view" />
 
 		<!-- Wiki -->
 
@@ -1901,8 +2081,8 @@
 		<action path="/wiki/view" type="com.liferay.portlet.wiki.action.ViewPageAction">
 			<forward name="portlet.wiki.error" path="portlet.wiki.error" />
 			<forward name="portlet.wiki.view_categorized_pages" path="portlet.wiki.view_categorized_pages" />
-			<forward name="portlet.wiki.view_tagged_pages" path="portlet.wiki.view_tagged_pages" />
 			<forward name="portlet.wiki.view_page" path="portlet.wiki.view" />
+			<forward name="portlet.wiki.view_tagged_pages" path="portlet.wiki.view_tagged_pages" />
 		</action>
 
 		<action path="/wiki/view_all_pages" type="com.liferay.portlet.wiki.action.ViewNodeAction">
@@ -1941,6 +2121,7 @@
 		<action path="/wiki/view_page_details" type="com.liferay.portlet.wiki.action.ViewPageAction">
 			<forward name="portlet.wiki.error" path="portlet.wiki.error" />
 			<forward name="portlet.wiki.view_categorized_pages" path="portlet.wiki.view_categorized_pages" />
+			<forward name="portlet.wiki.view_tagged_pages" path="portlet.wiki.view_tagged_pages" />
 			<forward name="portlet.wiki.view_page" path="portlet.wiki.view_page_details" />
 		</action>
 
@@ -2095,6 +2276,11 @@
 			<forward name="portlet.wiki.error" path="portlet.wiki.error" />
 		</action>
 
+		<action path="/wiki_display/edit_node" type="com.liferay.portlet.wiki.action.EditNodeAction">
+			<forward name="portlet.wiki.edit_node" path="portlet.wiki.edit_node" />
+			<forward name="portlet.wiki.error" path="portlet.wiki.error" />
+		</action>
+
 		<action path="/wiki_display/edit_page" type="com.liferay.portlet.wiki.action.EditPageAction">
 			<forward name="portlet.wiki.edit_page" path="portlet.wiki.edit_page" />
 			<forward name="portlet.wiki.error" path="portlet.wiki.error" />
@@ -2188,11 +2374,13 @@
 			<forward name="portlet.wiki.view_node" path="portlet.wiki.view_tagged_pages" />
 		</action>
 
-		<!-- Words -->
+		<!-- Workflow Definition Links -->
 
-		<action path="/words/view" type="com.liferay.portlet.words.action.ViewAction">
-			<forward name="portlet.words.view" path="portlet.words.view" />
+		<action path="/workflow_definition_links/edit_workflow_definition_link" type="com.liferay.portlet.workflowdefinitionlinks.action.EditWorkflowDefinitionLinkAction">
+			<forward name="portlet.workflow_definition_links.error" path="portlet.workflow_definition_links.error" />
 		</action>
+
+		<action path="/workflow_definition_links/view" forward="portlet.workflow_definition_links.view" />
 
 		<!-- Workflow Definitions -->
 
@@ -2221,14 +2409,6 @@
 		<action path="/workflow_definitions/view" forward="portlet.workflow_definitions.view" />
 
 		<action path="/workflow_definitions/view_content" forward="portlet.asset_publisher.view_content" />
-
-		<!-- Workflow Definition Links -->
-
-		<action path="/workflow_definition_links/edit_workflow_definition_link" type="com.liferay.portlet.workflowdefinitionlinks.action.EditWorkflowDefinitionLinkAction">
-			<forward name="portlet.workflow_definition_links.error" path="portlet.workflow_definition_links.error" />
-		</action>
-
-		<action path="/workflow_definition_links/view" forward="portlet.workflow_definition_links.view" />
 
 		<!-- Workflow Instances -->
 

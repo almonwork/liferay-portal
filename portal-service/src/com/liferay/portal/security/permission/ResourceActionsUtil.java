@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -16,16 +16,15 @@ package com.liferay.portal.security.permission;
 
 import com.liferay.portal.NoSuchResourceActionException;
 import com.liferay.portal.kernel.exception.SystemException;
+import com.liferay.portal.kernel.security.pacl.permission.PortalRuntimePermission;
 import com.liferay.portal.model.Group;
 import com.liferay.portal.model.Organization;
 import com.liferay.portal.model.PasswordPolicy;
-import com.liferay.portal.model.Permission;
 import com.liferay.portal.model.Portlet;
 import com.liferay.portal.model.Role;
 import com.liferay.portal.model.User;
 import com.liferay.portal.model.UserGroup;
 import com.liferay.portlet.expando.model.ExpandoColumn;
-import com.liferay.portlet.social.model.SocialEquityActionMapping;
 
 import java.io.InputStream;
 
@@ -83,10 +82,6 @@ public class ResourceActionsUtil {
 
 	public static String getActionNamePrefix() {
 		return getResourceActions().getActionNamePrefix();
-	}
-
-	public static List<String> getActions(List<Permission> permissions) {
-		return getResourceActions().getActions(permissions);
 	}
 
 	public static List<String> getActionsNames(
@@ -208,6 +203,8 @@ public class ResourceActionsUtil {
 	}
 
 	public static ResourceActions getResourceActions() {
+		PortalRuntimePermission.checkGetBeanProperty(ResourceActionsUtil.class);
+
 		return _resourceActions;
 	}
 
@@ -251,23 +248,6 @@ public class ResourceActionsUtil {
 			companyId, group, modelResource, roleTypes);
 	}
 
-	public static SocialEquityActionMapping getSocialEquityActionMapping(
-		String name, String actionId) {
-
-		return getResourceActions().getSocialEquityActionMapping(
-			name, actionId);
-	}
-
-	public static List<SocialEquityActionMapping> getSocialEquityActionMappings(
-		String name) {
-
-		return getResourceActions().getSocialEquityActionMappings(name);
-	}
-
-	public static String[] getSocialEquityClassNames() {
-		return getResourceActions().getSocialEquityClassNames();
-	}
-
 	public static boolean hasModelResourceActions(String name) {
 		return getResourceActions().hasModelResourceActions(name);
 	}
@@ -300,6 +280,8 @@ public class ResourceActionsUtil {
 	}
 
 	public void setResourceActions(ResourceActions resourceActions) {
+		PortalRuntimePermission.checkSetBeanProperty(getClass());
+
 		_resourceActions = resourceActions;
 	}
 

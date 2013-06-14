@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -16,19 +16,23 @@ package com.liferay.portal.convert;
 
 import com.liferay.mail.model.CyrusUser;
 import com.liferay.mail.model.CyrusVirtual;
+import com.liferay.portal.events.StartupHelper;
 import com.liferay.portal.kernel.dao.db.DB;
 import com.liferay.portal.kernel.dao.db.DBFactoryUtil;
 import com.liferay.portal.kernel.dao.jdbc.DataAccess;
 import com.liferay.portal.kernel.dao.jdbc.DataSourceFactoryUtil;
+import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
-import com.liferay.portal.kernel.servlet.PortletServlet;
+import com.liferay.portal.kernel.servlet.PluginContextListener;
 import com.liferay.portal.kernel.servlet.ServletContextPool;
-import com.liferay.portal.kernel.util.PortalClassLoaderUtil;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Tuple;
 import com.liferay.portal.model.ModelHintsUtil;
+import com.liferay.portal.model.ServiceComponent;
+import com.liferay.portal.security.pacl.PACLClassLoaderUtil;
+import com.liferay.portal.service.ServiceComponentLocalServiceUtil;
 import com.liferay.portal.spring.hibernate.DialectDetector;
 import com.liferay.portal.upgrade.util.Table;
 import com.liferay.portal.util.MaintenanceUtil;
@@ -38,8 +42,11 @@ import java.lang.reflect.Field;
 
 import java.sql.Connection;
 
-import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import javax.servlet.ServletContext;
 
@@ -85,7 +92,7 @@ public class ConvertDatabase extends ConvertProcess {
 
 		List<String> modelNames = ModelHintsUtil.getModels();
 
-		List<Tuple> tableDetails = new ArrayList<Tuple>();
+		Map<String, Tuple> tableDetails = new LinkedHashMap<String, Tuple>();
 
 		Connection connection = dataSource.getConnection();
 
@@ -120,42 +127,64 @@ public class ConvertDatabase extends ConvertProcess {
 
 					String fieldName = field.getName();
 
-					if (fieldName.equals("TABLE_NAME")) {
-						tuple = getTableDetails(implClass, field, fieldName);
-					}
-					else if (fieldName.startsWith("MAPPING_TABLE_") &&
-							 fieldName.endsWith("_NAME")) {
+					if (fieldName.equals("TABLE_NAME") ||
+						(fieldName.startsWith("MAPPING_TABLE_") &&
+						 fieldName.endsWith("_NAME"))) {
 
 						tuple = getTableDetails(implClass, field, fieldName);
 					}
 
 					if (tuple != null) {
-						tableDetails.add(tuple);
+						String table = (String)tuple.getObject(0);
+
+						tableDetails.put(table, tuple);
 					}
 				}
 			}
 
 			for (Tuple tuple : _UNMAPPED_TABLES) {
-				tableDetails.add(tuple);
+				String table = (String)tuple.getObject(0);
+
+				tableDetails.put(table, tuple);
 			}
 
 			if (_log.isDebugEnabled()) {
 				_log.debug("Migrating database tables");
 			}
 
-			for (int i = 0; i < tableDetails.size(); i++) {
+			int i = 0;
+
+			for (Tuple tuple : tableDetails.values()) {
 				if ((i > 0) && (i % (tableDetails.size() / 4) == 0)) {
 					MaintenanceUtil.appendStatus(
-						 (i * 100 / tableDetails.size()) + "%");
+						(i * 100 / tableDetails.size()) + "%");
 				}
-
-				Tuple tuple = tableDetails.get(i);
 
 				String table = (String)tuple.getObject(0);
 				Object[][] columns = (Object[][])tuple.getObject(1);
 				String sqlCreate = (String)tuple.getObject(2);
 
 				migrateTable(db, connection, table, columns, sqlCreate);
+
+				i++;
+			}
+
+			if (_log.isDebugEnabled()) {
+				_log.debug("Migrating database indexes");
+			}
+
+			StartupHelper.updateIndexes(db, connection, false);
+
+			List<ServiceComponent> serviceComponents =
+				ServiceComponentLocalServiceUtil.getServiceComponents(
+					QueryUtil.ALL_POS, QueryUtil.ALL_POS);
+
+			Set<String> validIndexNames = new HashSet<String>();
+
+			for (ServiceComponent serviceComponent : serviceComponents) {
+				String indexesSQL = serviceComponent.getIndexesSQL();
+
+				db.addIndexes(connection, indexesSQL, validIndexNames);
 			}
 		}
 		finally {
@@ -180,9 +209,10 @@ public class ConvertDatabase extends ConvertProcess {
 			driverClassName, url, userName, password);
 	}
 
-	public Class<?> getImplClass(String implClassName) throws Exception {
+	protected Class<?> getImplClass(String implClassName) throws Exception {
 		try {
-			ClassLoader classLoader = PortalClassLoaderUtil.getClassLoader();
+			ClassLoader classLoader =
+				PACLClassLoaderUtil.getPortalClassLoader();
 
 			return classLoader.loadClass(implClassName);
 		}
@@ -196,7 +226,7 @@ public class ConvertDatabase extends ConvertProcess {
 
 				ClassLoader classLoader =
 					(ClassLoader)servletContext.getAttribute(
-						PortletServlet.PORTLET_CLASS_LOADER);
+						PluginContextListener.PLUGIN_CLASS_LOADER);
 
 				return classLoader.loadClass(implClassName);
 			}

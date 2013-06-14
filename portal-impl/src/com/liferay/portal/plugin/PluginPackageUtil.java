@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -34,6 +34,7 @@ import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.HtmlUtil;
 import com.liferay.portal.kernel.util.Http;
 import com.liferay.portal.kernel.util.HttpUtil;
+import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.PropertiesUtil;
 import com.liferay.portal.kernel.util.PropsKeys;
 import com.liferay.portal.kernel.util.ReleaseInfo;
@@ -66,7 +67,6 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -91,8 +91,7 @@ import org.apache.commons.lang.time.StopWatch;
  */
 public class PluginPackageUtil {
 
-	public static final String REPOSITORY_XML_FILENAME_EXTENSION =
-		"xml";
+	public static final String REPOSITORY_XML_FILENAME_EXTENSION = "xml";
 
 	public static final String REPOSITORY_XML_FILENAME_PREFIX =
 		"liferay-plugin-repository";
@@ -109,6 +108,10 @@ public class PluginPackageUtil {
 
 	public static Collection<String> getAvailableTags() {
 		return _instance._getAvailableTags();
+	}
+
+	public static PluginPackage getInstalledPluginPackage(String context) {
+		return _instance._getInstalledPluginPackage(context);
 	}
 
 	public static List<PluginPackage> getInstalledPluginPackages() {
@@ -152,14 +155,14 @@ public class PluginPackageUtil {
 		return _instance._getRepository(repositoryURL);
 	}
 
+	public static String[] getRepositoryURLs() throws SystemException {
+		return _instance._getRepositoryURLs();
+	}
+
 	public static String[] getStatusAndInstalledVersion(
 		PluginPackage pluginPackage) {
 
 		return _instance._getStatusAndInstalledVersion(pluginPackage);
-	}
-
-	public static String[] getRepositoryURLs() throws SystemException {
-		return _instance._getRepositoryURLs();
 	}
 
 	public static String[] getSupportedTypes() {
@@ -178,6 +181,10 @@ public class PluginPackageUtil {
 
 	public static boolean isInstallationInProcess(String context) {
 		return _instance._isInstallationInProcess(context);
+	}
+
+	public static boolean isInstalled(String context) {
+		return _instance._isInstalled(context);
 	}
 
 	public static boolean isTrusted(String repositoryURL)
@@ -296,7 +303,7 @@ public class PluginPackageUtil {
 
 		for (PluginPackage pluginPackage : pluginPackages) {
 			if ((latestPluginPackage == null) ||
-				(pluginPackage.isLaterVersionThan(latestPluginPackage))) {
+				pluginPackage.isLaterVersionThan(latestPluginPackage)) {
 
 				latestPluginPackage = pluginPackage;
 			}
@@ -314,8 +321,8 @@ public class PluginPackageUtil {
 
 		for (int i = 0; i < repositoryURLs.length; i++) {
 			try {
-				RemotePluginPackageRepository repository =
-					_getRepository(repositoryURLs[i]);
+				RemotePluginPackageRepository repository = _getRepository(
+					repositoryURLs[i]);
 
 				pluginPackages.addAll(repository.getPluginPackages());
 			}
@@ -345,8 +352,8 @@ public class PluginPackageUtil {
 		String[] repositoryURLs = _getRepositoryURLs();
 
 		for (int i = 0; i < repositoryURLs.length; i++) {
-			RemotePluginPackageRepository repository =
-				_getRepository(repositoryURLs[i]);
+			RemotePluginPackageRepository repository = _getRepository(
+				repositoryURLs[i]);
 
 			List<PluginPackage> curPluginPackages =
 				repository.findPluginsByGroupIdAndArtifactId(
@@ -362,6 +369,10 @@ public class PluginPackageUtil {
 
 	private Collection<String> _getAvailableTags() {
 		return _availableTagsCache;
+	}
+
+	private PluginPackage _getInstalledPluginPackage(String context) {
+		return _installedPluginPackages.getPluginPackage(context);
 	}
 
 	private List<PluginPackage> _getInstalledPluginPackages() {
@@ -408,21 +419,20 @@ public class PluginPackageUtil {
 			String repositoryURL = repositoryURLs[i];
 
 			try {
-				RemotePluginPackageRepository repository =
-					_getRepository(repositoryURL);
+				RemotePluginPackageRepository repository = _getRepository(
+					repositoryURL);
 
 				return repository.findPluginByArtifactURL(url);
 			}
-			catch (PluginPackageException pe) {
-				_log.error("Unable to load repository " + repositoryURL, pe);
+			catch (PluginPackageException ppe) {
+				_log.error("Unable to load repository " + repositoryURL, ppe);
 			}
 		}
 
 		return null;
 	}
 
-	private RemotePluginPackageRepository _getRepository(
-			String repositoryURL)
+	private RemotePluginPackageRepository _getRepository(String repositoryURL)
 		throws PortalException, SystemException {
 
 		RemotePluginPackageRepository repository = _repositoryCache.get(
@@ -545,6 +555,18 @@ public class PluginPackageUtil {
 		if (_installedPluginPackages.getInstallingPluginPackage(
 				context) != null) {
 
+			return true;
+		}
+		else {
+			return false;
+		}
+	}
+
+	private boolean _isInstalled(String context) {
+		PluginPackage pluginPackage = _installedPluginPackages.getPluginPackage(
+			context);
+
+		if (pluginPackage != null) {
 			return true;
 		}
 		else {
@@ -694,11 +716,11 @@ public class PluginPackageUtil {
 				throw new PluginPackageException("Download returned 0 bytes");
 			}
 		}
-		catch (MalformedURLException mue) {
+		catch (MalformedURLException murle) {
 			_repositoryCache.remove(repositoryURL);
 
 			throw new PluginPackageException(
-				"Invalid URL " + pluginsXmlURL, mue);
+				"Invalid URL " + pluginsXmlURL, murle);
 		}
 		catch (IOException ioe) {
 			_repositoryCache.remove(repositoryURL);
@@ -733,20 +755,19 @@ public class PluginPackageUtil {
 			return pluginPackageRepository;
 		}
 
-		Document doc = SAXReaderUtil.read(xml);
+		Document document = SAXReaderUtil.read(xml);
 
-		Element root = doc.getRootElement();
+		Element rootElement = document.getRootElement();
 
 		Properties settings = _readProperties(
-			root.element("settings"), "setting");
+			rootElement.element("settings"), "setting");
 
 		pluginPackageRepository.setSettings(settings);
 
-		Iterator<Element> itr1 = root.elements("plugin-package").iterator();
+		List<Element> pluginPackageElements = rootElement.elements(
+			"plugin-package");
 
-		while (itr1.hasNext()) {
-			Element pluginPackageElement = itr1.next();
-
+		for (Element pluginPackageElement : pluginPackageElements) {
 			PluginPackage pluginPackage = _readPluginPackageXml(
 				pluginPackageElement);
 
@@ -756,14 +777,12 @@ public class PluginPackageUtil {
 				continue;
 			}
 
-			Iterator<String> itr2 = pluginPackage.getTypes().iterator();
-
 			boolean containsSupportedTypes = false;
 
-			while (itr2.hasNext()) {
-				String type = itr2.next();
+			List<String> pluginTypes = pluginPackage.getTypes();
 
-				if (supportedPluginTypes.contains(type)) {
+			for (String pluginType : pluginTypes) {
+				if (supportedPluginTypes.contains(pluginType)) {
 					containsSupportedTypes = true;
 
 					break;
@@ -969,6 +988,9 @@ public class PluginPackageUtil {
 			properties.getProperty("page-url"));
 		String downloadURL = GetterUtil.getString(
 			properties.getProperty("download-url"));
+		List<String> requiredDeploymentContexts = ListUtil.fromArray(
+			StringUtil.split(
+				properties.getProperty("required-deployment-contexts")));
 
 		PluginPackage pluginPackage = new PluginPackageImpl(moduleId);
 
@@ -987,6 +1009,74 @@ public class PluginPackageUtil {
 		pluginPackage.setPageURL(pageURL);
 		pluginPackage.setDownloadURL(downloadURL);
 		//pluginPackage.setDeploymentSettings(null);
+		pluginPackage.setRequiredDeploymentContexts(requiredDeploymentContexts);
+
+		return pluginPackage;
+	}
+
+	private PluginPackage _readPluginPackageServletContext(
+			ServletContext servletContext)
+		throws DocumentException, IOException {
+
+		String servletContextName = servletContext.getServletContextName();
+
+		String xml = HttpUtil.URLtoString(
+			servletContext.getResource("/WEB-INF/liferay-plugin-package.xml"));
+
+		if (_log.isInfoEnabled()) {
+			if (servletContextName == null) {
+				_log.info("Reading plugin package for the root context");
+			}
+			else {
+				_log.info("Reading plugin package for " + servletContextName);
+			}
+		}
+
+		PluginPackage pluginPackage = null;
+
+		if (xml == null) {
+			String propertiesString = HttpUtil.URLtoString(
+				servletContext.getResource(
+					"/WEB-INF/liferay-plugin-package.properties"));
+
+			if (propertiesString != null) {
+				if (_log.isDebugEnabled()) {
+					_log.debug(
+						"Reading plugin package from " +
+							"liferay-plugin-package.properties");
+				}
+
+				Properties properties = PropertiesUtil.load(propertiesString);
+
+				String displayName = servletContextName;
+
+				if (displayName.startsWith(StringPool.SLASH)) {
+					displayName = displayName.substring(1);
+				}
+
+				pluginPackage = _readPluginPackageProperties(
+					displayName, properties);
+			}
+
+			if (pluginPackage == null) {
+				if (_log.isDebugEnabled()) {
+					_log.debug("Reading plugin package from MANIFEST.MF");
+				}
+
+				pluginPackage =_readPluginPackageServletManifest(
+					servletContext);
+			}
+		}
+		else {
+			if (_log.isDebugEnabled()) {
+				_log.debug(
+					"Reading plugin package from liferay-plugin-package.xml");
+			}
+
+			pluginPackage = _readPluginPackageXml(xml);
+		}
+
+		pluginPackage.setContext(servletContextName);
 
 		return pluginPackage;
 	}
@@ -1060,73 +1150,6 @@ public class PluginPackageUtil {
 		if (Validator.isNotNull(pageURL)) {
 			pluginPackage.setPageURL(pageURL);
 		}
-
-		return pluginPackage;
-	}
-
-	private PluginPackage _readPluginPackageServletContext(
-			ServletContext servletContext)
-		throws DocumentException, IOException {
-
-		String servletContextName = servletContext.getServletContextName();
-
-		String xml = HttpUtil.URLtoString(
-			servletContext.getResource("/WEB-INF/liferay-plugin-package.xml"));
-
-		if (_log.isInfoEnabled()) {
-			if (servletContextName == null) {
-				_log.info("Reading plugin package for the root context");
-			}
-			else {
-				_log.info("Reading plugin package for " + servletContextName);
-			}
-		}
-
-		PluginPackage pluginPackage = null;
-
-		if (xml == null) {
-			String propertiesString = HttpUtil.URLtoString(
-				servletContext.getResource(
-					"/WEB-INF/liferay-plugin-package.properties"));
-
-			if (propertiesString != null) {
-				if (_log.isDebugEnabled()) {
-					_log.debug(
-						"Reading plugin package from " +
-							"liferay-plugin-package.properties");
-				}
-
-				Properties properties = PropertiesUtil.load(propertiesString);
-
-				String displayName = servletContextName;
-
-				if (displayName.startsWith(StringPool.SLASH)) {
-					displayName = displayName.substring(1);
-				}
-
-				pluginPackage = _readPluginPackageProperties(
-					displayName, properties);
-			}
-
-			if (pluginPackage == null) {
-				if (_log.isDebugEnabled()) {
-					_log.debug("Reading plugin package from MANIFEST.MF");
-				}
-
-				pluginPackage =_readPluginPackageServletManifest(
-					servletContext);
-			}
-		}
-		else {
-			if (_log.isDebugEnabled()) {
-				_log.debug(
-					"Reading plugin package from liferay-plugin-package.xml");
-			}
-
-			pluginPackage = _readPluginPackageXml(xml);
-		}
-
-		pluginPackage.setContext(servletContextName);
 
 		return pluginPackage;
 	}
@@ -1274,12 +1297,12 @@ public class PluginPackageUtil {
 
 				repositoryReport.addSuccess(repositoryURL);
 			}
-			catch (PluginPackageException pe) {
-				repositoryReport.addError(repositoryURL, pe);
+			catch (PluginPackageException ppe) {
+				repositoryReport.addError(repositoryURL, ppe);
 
 				_log.error(
 					"Unable to load repository " + repositoryURL + " " +
-						pe.toString());
+						ppe.toString());
 			}
 
 		}
@@ -1298,6 +1321,8 @@ public class PluginPackageUtil {
 
 		_checkRepositories(repositoryURL);
 
+		SearchContext searchContext = new SearchContext();
+
 		Map<String, Serializable> attributes =
 			new HashMap<String, Serializable>();
 
@@ -1307,9 +1332,8 @@ public class PluginPackageUtil {
 		attributes.put("tag", tag);
 		attributes.put("type", type);
 
-		SearchContext searchContext = new SearchContext();
-
 		searchContext.setAttributes(attributes);
+
 		searchContext.setCompanyId(CompanyConstants.SYSTEM);
 		searchContext.setEnd(end);
 		searchContext.setKeywords(keywords);
@@ -1328,8 +1352,7 @@ public class PluginPackageUtil {
 		return indexer.search(searchContext);
 	}
 
-	private void _unregisterInstalledPluginPackage(
-			PluginPackage pluginPackage)
+	private void _unregisterInstalledPluginPackage(PluginPackage pluginPackage)
 		throws PortalException, SystemException {
 
 		_installedPluginPackages.removePluginPackage(pluginPackage);

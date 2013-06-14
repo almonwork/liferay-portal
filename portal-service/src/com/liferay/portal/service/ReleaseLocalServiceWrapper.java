@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -23,7 +23,8 @@ package com.liferay.portal.service;
  * @see       ReleaseLocalService
  * @generated
  */
-public class ReleaseLocalServiceWrapper implements ReleaseLocalService {
+public class ReleaseLocalServiceWrapper implements ReleaseLocalService,
+	ServiceWrapper<ReleaseLocalService> {
 	public ReleaseLocalServiceWrapper(ReleaseLocalService releaseLocalService) {
 		_releaseLocalService = releaseLocalService;
 	}
@@ -55,24 +56,31 @@ public class ReleaseLocalServiceWrapper implements ReleaseLocalService {
 	* Deletes the release with the primary key from the database. Also notifies the appropriate model listeners.
 	*
 	* @param releaseId the primary key of the release
+	* @return the release that was removed
 	* @throws PortalException if a release with the primary key could not be found
 	* @throws SystemException if a system exception occurred
 	*/
-	public void deleteRelease(long releaseId)
+	public com.liferay.portal.model.Release deleteRelease(long releaseId)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException {
-		_releaseLocalService.deleteRelease(releaseId);
+		return _releaseLocalService.deleteRelease(releaseId);
 	}
 
 	/**
 	* Deletes the release from the database. Also notifies the appropriate model listeners.
 	*
 	* @param release the release
+	* @return the release that was removed
 	* @throws SystemException if a system exception occurred
 	*/
-	public void deleteRelease(com.liferay.portal.model.Release release)
+	public com.liferay.portal.model.Release deleteRelease(
+		com.liferay.portal.model.Release release)
 		throws com.liferay.portal.kernel.exception.SystemException {
-		_releaseLocalService.deleteRelease(release);
+		return _releaseLocalService.deleteRelease(release);
+	}
+
+	public com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery() {
+		return _releaseLocalService.dynamicQuery();
 	}
 
 	/**
@@ -144,6 +152,11 @@ public class ReleaseLocalServiceWrapper implements ReleaseLocalService {
 		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery)
 		throws com.liferay.portal.kernel.exception.SystemException {
 		return _releaseLocalService.dynamicQueryCount(dynamicQuery);
+	}
+
+	public com.liferay.portal.model.Release fetchRelease(long releaseId)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return _releaseLocalService.fetchRelease(releaseId);
 	}
 
 	/**
@@ -273,12 +286,26 @@ public class ReleaseLocalServiceWrapper implements ReleaseLocalService {
 			buildDate, verified);
 	}
 
+	/**
+	 * @deprecated Renamed to {@link #getWrappedService}
+	 */
 	public ReleaseLocalService getWrappedReleaseLocalService() {
 		return _releaseLocalService;
 	}
 
+	/**
+	 * @deprecated Renamed to {@link #setWrappedService}
+	 */
 	public void setWrappedReleaseLocalService(
 		ReleaseLocalService releaseLocalService) {
+		_releaseLocalService = releaseLocalService;
+	}
+
+	public ReleaseLocalService getWrappedService() {
+		return _releaseLocalService;
+	}
+
+	public void setWrappedService(ReleaseLocalService releaseLocalService) {
 		_releaseLocalService = releaseLocalService;
 	}
 

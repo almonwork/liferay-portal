@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -25,7 +25,7 @@ public class StringPool {
 
 	public static final String APOSTROPHE = "'";
 
-	public static String[] ASCII_TABLE = new String[128];
+	public static final String[] ASCII_TABLE = new String[128];
 
 	public static final String AT = "@";
 
@@ -61,6 +61,8 @@ public class StringPool {
 
 	public static final String DOUBLE_APOSTROPHE = "''";
 
+	public static final String DOUBLE_BACK_SLASH = "\\\\";
+
 	public static final String DOUBLE_CLOSE_BRACKET = "]]";
 
 	public static final String DOUBLE_CLOSE_CURLY_BRACE = "}}";
@@ -81,9 +83,9 @@ public class StringPool {
 
 	public static final String DOUBLE_UNDERLINE = "__";
 
-	public static final String EXCLAMATION = "!";
-
 	public static final String EQUAL = "=";
+
+	public static final String EXCLAMATION = "!";
 
 	public static final String FALSE = "false";
 
@@ -160,6 +162,8 @@ public class StringPool {
 	public static final String STAR = "*";
 
 	public static final String TAB = "\t";
+
+	public static final String THREE_SPACES = "   ";
 
 	public static final String TILDE = "~";
 

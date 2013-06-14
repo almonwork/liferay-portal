@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -20,8 +20,8 @@ import com.liferay.portal.kernel.atom.AtomEntryContent;
 import com.liferay.portal.kernel.atom.AtomRequestContext;
 import com.liferay.portal.kernel.atom.BaseAtomCollectionAdapter;
 import com.liferay.portal.kernel.dao.search.SearchContainer;
-import com.liferay.portal.kernel.util.FileUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.StreamUtil;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
@@ -33,7 +33,8 @@ import com.liferay.portal.util.PortletKeys;
 import com.liferay.portlet.blogs.model.BlogsEntry;
 import com.liferay.portlet.blogs.service.BlogsEntryServiceUtil;
 
-import java.io.File;
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -126,14 +127,15 @@ public class BlogsEntryAtomCollectionAdapter
 			}
 
 			int count = BlogsEntryServiceUtil.getGroupEntriesCount(
-				groupId, status);
+				groupId, new Date(), status);
 
 			AtomPager atomPager = new AtomPager(page, max, count);
 
 			AtomUtil.saveAtomPagerInRequest(atomRequestContext, atomPager);
 
 			return BlogsEntryServiceUtil.getGroupEntries(
-				groupId, status, atomPager.getStart(), atomPager.getEnd() + 1);
+				groupId, new Date(), status, atomPager.getStart(),
+				atomPager.getEnd() + 1);
 		}
 
 		long organizationId = atomRequestContext.getLongParameter(
@@ -141,14 +143,14 @@ public class BlogsEntryAtomCollectionAdapter
 
 		if (organizationId > 0) {
 			return BlogsEntryServiceUtil.getOrganizationEntries(
-				organizationId, status, max);
+				organizationId, new Date(), status, max);
 		}
 
 		long companyId = CompanyThreadLocal.getCompanyId();
 
 		if (companyId > 0) {
 			return BlogsEntryServiceUtil.getCompanyEntries(
-				companyId, status, max);
+				companyId, new Date(), status, max);
 		}
 
 		return Collections.emptyList();
@@ -184,8 +186,8 @@ public class BlogsEntryAtomCollectionAdapter
 
 		return BlogsEntryServiceUtil.addEntry(
 			title, summary, content, displayDateMonth, displayDateDay,
-			displayDateYear, displayDateHour, displayDateMinute,
-			allowPingbacks, allowTrackbacks, trackbacks, false, null, null,
+			displayDateYear, displayDateHour, displayDateMinute, allowPingbacks,
+			allowTrackbacks, trackbacks, false, null, null, null,
 			serviceContext);
 	}
 
@@ -207,36 +209,42 @@ public class BlogsEntryAtomCollectionAdapter
 
 		String[] trackbacks = StringUtil.split(blogsEntry.getTrackbacks());
 
-		long smallImageId = blogsEntry.getSmallImageId();
+		String smallImageFileName = null;
+		InputStream smallImageInputStream = null;
 
-		File smallImageFile = null;
+		try {
+			long smallImageId = blogsEntry.getSmallImageId();
 
-		if (smallImageId != 0) {
-			Image smallImage = ImageLocalServiceUtil.getImage(smallImageId);
+			if (smallImageId != 0) {
+				Image smallImage = ImageLocalServiceUtil.getImage(smallImageId);
 
-			if (smallImage != null) {
-				byte[] smallImageBytes = smallImage.getTextObj();
+				if (smallImage != null) {
+					smallImageFileName =
+						smallImageId + StringPool.PERIOD +
+							blogsEntry.getSmallImageType();
 
-				smallImageFile = FileUtil.createTempFile(
-					smallImageId + StringPool.PERIOD +
-						blogsEntry.getSmallImageType());
+					byte[] smallImageBytes = smallImage.getTextObj();
 
-				FileUtil.write(smallImageFile, smallImageBytes);
+					smallImageInputStream = new ByteArrayInputStream(
+						smallImageBytes);
+				}
 			}
+
+			ServiceContext serviceContext = new ServiceContext();
+
+			BlogsEntryServiceUtil.updateEntry(
+				blogsEntry.getEntryId(), title, summary, content,
+				displayDateMonth, displayDateDay, displayDateYear,
+				displayDateHour, displayDateMinute,
+				blogsEntry.getAllowPingbacks(), blogsEntry.isAllowTrackbacks(),
+				trackbacks, blogsEntry.isSmallImage(),
+				blogsEntry.getSmallImageURL(), smallImageFileName,
+				smallImageInputStream, serviceContext);
+		}
+		finally {
+			StreamUtil.cleanUp(smallImageInputStream);
 		}
 
-		ServiceContext serviceContext = new ServiceContext();
-
-		BlogsEntryServiceUtil.updateEntry(
-			blogsEntry.getEntryId(), title, summary, content, displayDateMonth,
-			displayDateDay, displayDateYear, displayDateHour, displayDateMinute,
-			blogsEntry.getAllowPingbacks(), blogsEntry.isAllowTrackbacks(),
-			trackbacks, blogsEntry.isSmallImage(),
-			blogsEntry.getSmallImageURL(), smallImageFile, serviceContext);
-
-		if (smallImageFile != null) {
-			smallImageFile.delete();
-		}
 	}
 
 	private static final String _COLLECTION_NAME = "blogs";

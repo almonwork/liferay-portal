@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -29,8 +29,8 @@ import com.liferay.portlet.dynamicdatalists.NoSuchRecordSetException;
 import com.liferay.portlet.dynamicdatalists.RecordSetDDMStructureIdException;
 import com.liferay.portlet.dynamicdatalists.RecordSetNameException;
 import com.liferay.portlet.dynamicdatalists.model.DDLRecordSet;
+import com.liferay.portlet.dynamicdatalists.model.DDLRecordSetConstants;
 import com.liferay.portlet.dynamicdatalists.service.DDLRecordSetServiceUtil;
-import com.liferay.portlet.dynamicdatalists.util.DDLConstants;
 
 import java.util.Locale;
 import java.util.Map;
@@ -75,14 +75,14 @@ public class EditRecordSetAction extends PortletAction {
 			if (e instanceof NoSuchRecordSetException ||
 				e instanceof PrincipalException) {
 
-				SessionErrors.add(actionRequest, e.getClass().getName());
+				SessionErrors.add(actionRequest, e.getClass());
 
 				setForward(actionRequest, "portlet.dynamic_data_lists.error");
 			}
 			else if (e instanceof RecordSetDDMStructureIdException ||
 					 e instanceof RecordSetNameException) {
 
-				SessionErrors.add(actionRequest, e.getClass().getName());
+				SessionErrors.add(actionRequest, e.getClass());
 			}
 			else {
 				throw e;
@@ -103,7 +103,7 @@ public class EditRecordSetAction extends PortletAction {
 				ActionUtil.getRecordSet(renderRequest);
 			}
 		}
-		catch (NoSuchRecordSetException nsee) {
+		catch (NoSuchRecordSetException nsrse) {
 
 			// Let this slide because the user can manually input an record set
 			// key for a new record set that does not yet exist
@@ -111,7 +111,7 @@ public class EditRecordSetAction extends PortletAction {
 		}
 		catch (Exception e) {
 			if (e instanceof PrincipalException) {
-				SessionErrors.add(renderRequest, e.getClass().getName());
+				SessionErrors.add(renderRequest, e.getClass());
 
 				return mapping.findForward("portlet.dynamic_data_lists.error");
 			}
@@ -147,6 +147,7 @@ public class EditRecordSetAction extends PortletAction {
 			actionRequest, "name");
 		Map<Locale, String> descriptionMap =
 			LocalizationUtil.getLocalizationMap(actionRequest, "description");
+		int scope = ParamUtil.getInteger(actionRequest, "scope");
 
 		ServiceContext serviceContext = ServiceContextFactory.getInstance(
 			DDLRecordSet.class.getName(), actionRequest);
@@ -156,12 +157,13 @@ public class EditRecordSetAction extends PortletAction {
 		if (cmd.equals(Constants.ADD)) {
 			recordSet = DDLRecordSetServiceUtil.addRecordSet(
 				groupId, ddmStructureId, null, nameMap, descriptionMap,
-				DDLConstants.MIN_DISPLAY_ROWS_DEFAULT, serviceContext);
+				DDLRecordSetConstants.MIN_DISPLAY_ROWS_DEFAULT, scope,
+				serviceContext);
 		}
 		else {
 			recordSet = DDLRecordSetServiceUtil.updateRecordSet(
 				recordSetId, ddmStructureId, nameMap, descriptionMap,
-				DDLConstants.MIN_DISPLAY_ROWS_DEFAULT, serviceContext);
+				DDLRecordSetConstants.MIN_DISPLAY_ROWS_DEFAULT, serviceContext);
 		}
 
 		String workflowDefinition = ParamUtil.getString(

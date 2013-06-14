@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -22,11 +22,11 @@ import com.liferay.portal.model.Organization;
  */
 public class OrganizationTypeComparator extends OrderByComparator {
 
-	public static String ORDER_BY_ASC = "orgType ASC, orgName ASC";
+	public static final String ORDER_BY_ASC = "orgType ASC, orgName ASC";
 
-	public static String ORDER_BY_DESC = "orgType DESC, orgName DESC";
+	public static final String ORDER_BY_DESC = "orgType DESC, orgName DESC";
 
-	public static String[] ORDER_BY_FIELDS = {"type", "name"};
+	public static final String[] ORDER_BY_FIELDS = {"type", "name"};
 
 	public OrganizationTypeComparator() {
 		this(false);
@@ -47,7 +47,10 @@ public class OrganizationTypeComparator extends OrderByComparator {
 		int value = typeOrder1 - typeOrder2;
 
 		if (value == 0) {
-			value = organization1.getName().compareTo(organization2.getName());
+			String name1 = organization1.getName();
+			String name2 = organization2.getName();
+
+			value = name1.compareTo(name2);
 		}
 
 		if (_ascending) {

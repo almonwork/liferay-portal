@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,6 +14,8 @@
 
 package com.liferay.portlet.softwarecatalog.service;
 
+import com.liferay.portal.service.ServiceWrapper;
+
 /**
  * <p>
  * This class is a wrapper for {@link SCProductScreenshotLocalService}.
@@ -24,7 +26,8 @@ package com.liferay.portlet.softwarecatalog.service;
  * @generated
  */
 public class SCProductScreenshotLocalServiceWrapper
-	implements SCProductScreenshotLocalService {
+	implements SCProductScreenshotLocalService,
+		ServiceWrapper<SCProductScreenshotLocalService> {
 	public SCProductScreenshotLocalServiceWrapper(
 		SCProductScreenshotLocalService scProductScreenshotLocalService) {
 		_scProductScreenshotLocalService = scProductScreenshotLocalService;
@@ -58,25 +61,32 @@ public class SCProductScreenshotLocalServiceWrapper
 	* Deletes the s c product screenshot with the primary key from the database. Also notifies the appropriate model listeners.
 	*
 	* @param productScreenshotId the primary key of the s c product screenshot
+	* @return the s c product screenshot that was removed
 	* @throws PortalException if a s c product screenshot with the primary key could not be found
 	* @throws SystemException if a system exception occurred
 	*/
-	public void deleteSCProductScreenshot(long productScreenshotId)
+	public com.liferay.portlet.softwarecatalog.model.SCProductScreenshot deleteSCProductScreenshot(
+		long productScreenshotId)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException {
-		_scProductScreenshotLocalService.deleteSCProductScreenshot(productScreenshotId);
+		return _scProductScreenshotLocalService.deleteSCProductScreenshot(productScreenshotId);
 	}
 
 	/**
 	* Deletes the s c product screenshot from the database. Also notifies the appropriate model listeners.
 	*
 	* @param scProductScreenshot the s c product screenshot
+	* @return the s c product screenshot that was removed
 	* @throws SystemException if a system exception occurred
 	*/
-	public void deleteSCProductScreenshot(
+	public com.liferay.portlet.softwarecatalog.model.SCProductScreenshot deleteSCProductScreenshot(
 		com.liferay.portlet.softwarecatalog.model.SCProductScreenshot scProductScreenshot)
 		throws com.liferay.portal.kernel.exception.SystemException {
-		_scProductScreenshotLocalService.deleteSCProductScreenshot(scProductScreenshot);
+		return _scProductScreenshotLocalService.deleteSCProductScreenshot(scProductScreenshot);
+	}
+
+	public com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery() {
+		return _scProductScreenshotLocalService.dynamicQuery();
 	}
 
 	/**
@@ -149,6 +159,12 @@ public class SCProductScreenshotLocalServiceWrapper
 		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery)
 		throws com.liferay.portal.kernel.exception.SystemException {
 		return _scProductScreenshotLocalService.dynamicQueryCount(dynamicQuery);
+	}
+
+	public com.liferay.portlet.softwarecatalog.model.SCProductScreenshot fetchSCProductScreenshot(
+		long productScreenshotId)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return _scProductScreenshotLocalService.fetchSCProductScreenshot(productScreenshotId);
 	}
 
 	/**
@@ -291,11 +307,26 @@ public class SCProductScreenshotLocalServiceWrapper
 		return _scProductScreenshotLocalService.getProductScreenshots(productEntryId);
 	}
 
+	/**
+	 * @deprecated Renamed to {@link #getWrappedService}
+	 */
 	public SCProductScreenshotLocalService getWrappedSCProductScreenshotLocalService() {
 		return _scProductScreenshotLocalService;
 	}
 
+	/**
+	 * @deprecated Renamed to {@link #setWrappedService}
+	 */
 	public void setWrappedSCProductScreenshotLocalService(
+		SCProductScreenshotLocalService scProductScreenshotLocalService) {
+		_scProductScreenshotLocalService = scProductScreenshotLocalService;
+	}
+
+	public SCProductScreenshotLocalService getWrappedService() {
+		return _scProductScreenshotLocalService;
+	}
+
+	public void setWrappedService(
 		SCProductScreenshotLocalService scProductScreenshotLocalService) {
 		_scProductScreenshotLocalService = scProductScreenshotLocalService;
 	}

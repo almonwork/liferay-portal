@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -43,7 +43,7 @@ public class UpgradeNestedPortlets extends UpgradeProcess {
 		ResultSet rs = null;
 
 		try {
-			con = DataAccess.getConnection();
+			con = DataAccess.getUpgradeOptimizedConnection();
 
 			ps = con.prepareStatement(_GET_LAYOUT);
 
@@ -73,7 +73,7 @@ public class UpgradeNestedPortlets extends UpgradeProcess {
 				}
 
 				if (!newTypeSettings.equals(typeSettings)) {
-					updateTypeSettings(plid, newTypeSettings);
+					updateLayout(plid, newTypeSettings);
 				}
 			}
 		}
@@ -82,14 +82,14 @@ public class UpgradeNestedPortlets extends UpgradeProcess {
 		}
 	}
 
-	protected void updateTypeSettings(long plid, String typeSettings)
+	protected void updateLayout(long plid, String typeSettings)
 		throws Exception {
 
 		Connection con = null;
 		PreparedStatement ps = null;
 
 		try {
-			con = DataAccess.getConnection();
+			con = DataAccess.getUpgradeOptimizedConnection();
 
 			ps = con.prepareStatement(
 				"update Layout set typeSettings = ? where plid = " + plid);

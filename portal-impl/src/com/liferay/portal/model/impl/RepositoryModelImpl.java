@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -15,10 +15,13 @@
 package com.liferay.portal.model.impl;
 
 import com.liferay.portal.kernel.bean.AutoEscapeBeanHandler;
+import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.json.JSON;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.ProxyUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
+import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.model.CacheModel;
 import com.liferay.portal.model.Repository;
 import com.liferay.portal.model.RepositoryModel;
@@ -31,13 +34,13 @@ import com.liferay.portlet.expando.util.ExpandoBridgeFactoryUtil;
 
 import java.io.Serializable;
 
-import java.lang.reflect.Proxy;
-
 import java.sql.Types;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * The base model implementation for the Repository service. Represents a row in the &quot;Repository&quot; database table, with each column mapped to a property of this class.
@@ -62,9 +65,12 @@ public class RepositoryModelImpl extends BaseModelImpl<Repository>
 	 */
 	public static final String TABLE_NAME = "Repository";
 	public static final Object[][] TABLE_COLUMNS = {
+			{ "uuid_", Types.VARCHAR },
 			{ "repositoryId", Types.BIGINT },
 			{ "groupId", Types.BIGINT },
 			{ "companyId", Types.BIGINT },
+			{ "userId", Types.BIGINT },
+			{ "userName", Types.VARCHAR },
 			{ "createDate", Types.TIMESTAMP },
 			{ "modifiedDate", Types.TIMESTAMP },
 			{ "classNameId", Types.BIGINT },
@@ -74,7 +80,7 @@ public class RepositoryModelImpl extends BaseModelImpl<Repository>
 			{ "typeSettings", Types.CLOB },
 			{ "dlFolderId", Types.BIGINT }
 		};
-	public static final String TABLE_SQL_CREATE = "create table Repository (repositoryId LONG not null primary key,groupId LONG,companyId LONG,createDate DATE null,modifiedDate DATE null,classNameId LONG,name VARCHAR(75) null,description STRING null,portletId VARCHAR(75) null,typeSettings TEXT null,dlFolderId LONG)";
+	public static final String TABLE_SQL_CREATE = "create table Repository (uuid_ VARCHAR(75) null,repositoryId LONG not null primary key,groupId LONG,companyId LONG,userId LONG,userName VARCHAR(75) null,createDate DATE null,modifiedDate DATE null,classNameId LONG,name VARCHAR(75) null,description STRING null,portletId VARCHAR(75) null,typeSettings TEXT null,dlFolderId LONG)";
 	public static final String TABLE_SQL_DROP = "drop table Repository";
 	public static final String DATA_SOURCE = "liferayDataSource";
 	public static final String SESSION_FACTORY = "liferaySessionFactory";
@@ -85,6 +91,12 @@ public class RepositoryModelImpl extends BaseModelImpl<Repository>
 	public static final boolean FINDER_CACHE_ENABLED = GetterUtil.getBoolean(com.liferay.portal.util.PropsUtil.get(
 				"value.object.finder.cache.enabled.com.liferay.portal.model.Repository"),
 			true);
+	public static final boolean COLUMN_BITMASK_ENABLED = GetterUtil.getBoolean(com.liferay.portal.util.PropsUtil.get(
+				"value.object.column.bitmask.enabled.com.liferay.portal.model.Repository"),
+			true);
+	public static long COMPANYID_COLUMN_BITMASK = 1L;
+	public static long GROUPID_COLUMN_BITMASK = 2L;
+	public static long UUID_COLUMN_BITMASK = 4L;
 
 	/**
 	 * Converts the soap model instance into a normal model instance.
@@ -95,9 +107,12 @@ public class RepositoryModelImpl extends BaseModelImpl<Repository>
 	public static Repository toModel(RepositorySoap soapModel) {
 		Repository model = new RepositoryImpl();
 
+		model.setUuid(soapModel.getUuid());
 		model.setRepositoryId(soapModel.getRepositoryId());
 		model.setGroupId(soapModel.getGroupId());
 		model.setCompanyId(soapModel.getCompanyId());
+		model.setUserId(soapModel.getUserId());
+		model.setUserName(soapModel.getUserName());
 		model.setCreateDate(soapModel.getCreateDate());
 		model.setModifiedDate(soapModel.getModifiedDate());
 		model.setClassNameId(soapModel.getClassNameId());
@@ -126,14 +141,6 @@ public class RepositoryModelImpl extends BaseModelImpl<Repository>
 		return models;
 	}
 
-	public Class<?> getModelClass() {
-		return Repository.class;
-	}
-
-	public String getModelClassName() {
-		return Repository.class.getName();
-	}
-
 	public static final long LOCK_EXPIRATION_TIME = GetterUtil.getLong(com.liferay.portal.util.PropsUtil.get(
 				"lock.expiration.time.com.liferay.portal.model.Repository"));
 
@@ -156,6 +163,145 @@ public class RepositoryModelImpl extends BaseModelImpl<Repository>
 		setPrimaryKey(((Long)primaryKeyObj).longValue());
 	}
 
+	public Class<?> getModelClass() {
+		return Repository.class;
+	}
+
+	public String getModelClassName() {
+		return Repository.class.getName();
+	}
+
+	@Override
+	public Map<String, Object> getModelAttributes() {
+		Map<String, Object> attributes = new HashMap<String, Object>();
+
+		attributes.put("uuid", getUuid());
+		attributes.put("repositoryId", getRepositoryId());
+		attributes.put("groupId", getGroupId());
+		attributes.put("companyId", getCompanyId());
+		attributes.put("userId", getUserId());
+		attributes.put("userName", getUserName());
+		attributes.put("createDate", getCreateDate());
+		attributes.put("modifiedDate", getModifiedDate());
+		attributes.put("classNameId", getClassNameId());
+		attributes.put("name", getName());
+		attributes.put("description", getDescription());
+		attributes.put("portletId", getPortletId());
+		attributes.put("typeSettings", getTypeSettings());
+		attributes.put("dlFolderId", getDlFolderId());
+
+		return attributes;
+	}
+
+	@Override
+	public void setModelAttributes(Map<String, Object> attributes) {
+		String uuid = (String)attributes.get("uuid");
+
+		if (uuid != null) {
+			setUuid(uuid);
+		}
+
+		Long repositoryId = (Long)attributes.get("repositoryId");
+
+		if (repositoryId != null) {
+			setRepositoryId(repositoryId);
+		}
+
+		Long groupId = (Long)attributes.get("groupId");
+
+		if (groupId != null) {
+			setGroupId(groupId);
+		}
+
+		Long companyId = (Long)attributes.get("companyId");
+
+		if (companyId != null) {
+			setCompanyId(companyId);
+		}
+
+		Long userId = (Long)attributes.get("userId");
+
+		if (userId != null) {
+			setUserId(userId);
+		}
+
+		String userName = (String)attributes.get("userName");
+
+		if (userName != null) {
+			setUserName(userName);
+		}
+
+		Date createDate = (Date)attributes.get("createDate");
+
+		if (createDate != null) {
+			setCreateDate(createDate);
+		}
+
+		Date modifiedDate = (Date)attributes.get("modifiedDate");
+
+		if (modifiedDate != null) {
+			setModifiedDate(modifiedDate);
+		}
+
+		Long classNameId = (Long)attributes.get("classNameId");
+
+		if (classNameId != null) {
+			setClassNameId(classNameId);
+		}
+
+		String name = (String)attributes.get("name");
+
+		if (name != null) {
+			setName(name);
+		}
+
+		String description = (String)attributes.get("description");
+
+		if (description != null) {
+			setDescription(description);
+		}
+
+		String portletId = (String)attributes.get("portletId");
+
+		if (portletId != null) {
+			setPortletId(portletId);
+		}
+
+		String typeSettings = (String)attributes.get("typeSettings");
+
+		if (typeSettings != null) {
+			setTypeSettings(typeSettings);
+		}
+
+		Long dlFolderId = (Long)attributes.get("dlFolderId");
+
+		if (dlFolderId != null) {
+			setDlFolderId(dlFolderId);
+		}
+	}
+
+	@JSON
+	public String getUuid() {
+		if (_uuid == null) {
+			return StringPool.BLANK;
+		}
+		else {
+			return _uuid;
+		}
+	}
+
+	public void setUuid(String uuid) {
+		if (_originalUuid == null) {
+			_originalUuid = _uuid;
+		}
+
+		_uuid = uuid;
+	}
+
+	public String getOriginalUuid() {
+		return GetterUtil.getString(_originalUuid);
+	}
+
 	@JSON
 	public long getRepositoryId() {
 		return _repositoryId;
@@ -171,7 +317,19 @@ public class RepositoryModelImpl extends BaseModelImpl<Repository>
 	}
 
 	public void setGroupId(long groupId) {
+		_columnBitmask |= GROUPID_COLUMN_BITMASK;
+
+		if (!_setOriginalGroupId) {
+			_setOriginalGroupId = true;
+
+			_originalGroupId = _groupId;
+		}
+
 		_groupId = groupId;
+	}
+
+	public long getOriginalGroupId() {
+		return _originalGroupId;
 	}
 
 	@JSON
@@ -180,7 +338,50 @@ public class RepositoryModelImpl extends BaseModelImpl<Repository>
 	}
 
 	public void setCompanyId(long companyId) {
+		_columnBitmask |= COMPANYID_COLUMN_BITMASK;
+
+		if (!_setOriginalCompanyId) {
+			_setOriginalCompanyId = true;
+
+			_originalCompanyId = _companyId;
+		}
+
 		_companyId = companyId;
+	}
+
+	public long getOriginalCompanyId() {
+		return _originalCompanyId;
+	}
+
+	@JSON
+	public long getUserId() {
+		return _userId;
+	}
+
+	public void setUserId(long userId) {
+		_userId = userId;
+	}
+
+	public String getUserUuid() throws SystemException {
+		return PortalUtil.getUserValue(getUserId(), "uuid", _userUuid);
+	}
+
+	public void setUserUuid(String userUuid) {
+		_userUuid = userUuid;
+	}
+
+	@JSON
+	public String getUserName() {
+		if (_userName == null) {
+			return StringPool.BLANK;
+		}
+		else {
+			return _userName;
+		}
+	}
+
+	public void setUserName(String userName) {
+		_userName = userName;
 	}
 
 	@JSON
@@ -207,6 +408,16 @@ public class RepositoryModelImpl extends BaseModelImpl<Repository>
 		}
 
 		return PortalUtil.getClassName(getClassNameId());
+	}
+
+	public void setClassName(String className) {
+		long classNameId = 0;
+
+		if (Validator.isNotNull(className)) {
+			classNameId = PortalUtil.getClassNameId(className);
+		}
+
+		setClassNameId(classNameId);
 	}
 
 	@JSON
@@ -283,44 +494,44 @@ public class RepositoryModelImpl extends BaseModelImpl<Repository>
 		_dlFolderId = dlFolderId;
 	}
 
+	public long getColumnBitmask() {
+		return _columnBitmask;
+	}
+
 	@Override
 	public Repository toEscapedModel() {
-		if (isEscapedModel()) {
-			return (Repository)this;
+		if (_escapedModelProxy == null) {
+			_escapedModelProxy = (Repository)ProxyUtil.newProxyInstance(_classLoader,
+					_escapedModelProxyInterfaces,
+					new AutoEscapeBeanHandler(this));
 		}
-		else {
-			if (_escapedModelProxy == null) {
-				_escapedModelProxy = (Repository)Proxy.newProxyInstance(_classLoader,
-						_escapedModelProxyInterfaces,
-						new AutoEscapeBeanHandler(this));
-			}
 
-			return _escapedModelProxy;
-		}
+		return _escapedModelProxy;
 	}
 
 	@Override
 	public ExpandoBridge getExpandoBridge() {
-		if (_expandoBridge == null) {
-			_expandoBridge = ExpandoBridgeFactoryUtil.getExpandoBridge(getCompanyId(),
-					Repository.class.getName(), getPrimaryKey());
-		}
-
-		return _expandoBridge;
+		return ExpandoBridgeFactoryUtil.getExpandoBridge(getCompanyId(),
+			Repository.class.getName(), getPrimaryKey());
 	}
 
 	@Override
 	public void setExpandoBridgeAttributes(ServiceContext serviceContext) {
-		getExpandoBridge().setAttributes(serviceContext);
+		ExpandoBridge expandoBridge = getExpandoBridge();
+
+		expandoBridge.setAttributes(serviceContext);
 	}
 
 	@Override
 	public Object clone() {
 		RepositoryImpl repositoryImpl = new RepositoryImpl();
 
+		repositoryImpl.setUuid(getUuid());
 		repositoryImpl.setRepositoryId(getRepositoryId());
 		repositoryImpl.setGroupId(getGroupId());
 		repositoryImpl.setCompanyId(getCompanyId());
+		repositoryImpl.setUserId(getUserId());
+		repositoryImpl.setUserName(getUserName());
 		repositoryImpl.setCreateDate(getCreateDate());
 		repositoryImpl.setModifiedDate(getModifiedDate());
 		repositoryImpl.setClassNameId(getClassNameId());
@@ -381,17 +592,48 @@ public class RepositoryModelImpl extends BaseModelImpl<Repository>
 
 	@Override
 	public void resetOriginalValues() {
+		RepositoryModelImpl repositoryModelImpl = this;
+
+		repositoryModelImpl._originalUuid = repositoryModelImpl._uuid;
+
+		repositoryModelImpl._originalGroupId = repositoryModelImpl._groupId;
+
+		repositoryModelImpl._setOriginalGroupId = false;
+
+		repositoryModelImpl._originalCompanyId = repositoryModelImpl._companyId;
+
+		repositoryModelImpl._setOriginalCompanyId = false;
+
+		repositoryModelImpl._columnBitmask = 0;
 	}
 
 	@Override
 	public CacheModel<Repository> toCacheModel() {
 		RepositoryCacheModel repositoryCacheModel = new RepositoryCacheModel();
 
+		repositoryCacheModel.uuid = getUuid();
+
+		String uuid = repositoryCacheModel.uuid;
+
+		if ((uuid != null) && (uuid.length() == 0)) {
+			repositoryCacheModel.uuid = null;
+		}
+
 		repositoryCacheModel.repositoryId = getRepositoryId();
 
 		repositoryCacheModel.groupId = getGroupId();
 
 		repositoryCacheModel.companyId = getCompanyId();
+
+		repositoryCacheModel.userId = getUserId();
+
+		repositoryCacheModel.userName = getUserName();
+
+		String userName = repositoryCacheModel.userName;
+
+		if ((userName != null) && (userName.length() == 0)) {
+			repositoryCacheModel.userName = null;
+		}
 
 		Date createDate = getCreateDate();
 
@@ -452,14 +694,20 @@ public class RepositoryModelImpl extends BaseModelImpl<Repository>
 
 	@Override
 	public String toString() {
-		StringBundler sb = new StringBundler(23);
+		StringBundler sb = new StringBundler(29);
 
-		sb.append("{repositoryId=");
+		sb.append("{uuid=");
+		sb.append(getUuid());
+		sb.append(", repositoryId=");
 		sb.append(getRepositoryId());
 		sb.append(", groupId=");
 		sb.append(getGroupId());
 		sb.append(", companyId=");
 		sb.append(getCompanyId());
+		sb.append(", userId=");
+		sb.append(getUserId());
+		sb.append(", userName=");
+		sb.append(getUserName());
 		sb.append(", createDate=");
 		sb.append(getCreateDate());
 		sb.append(", modifiedDate=");
@@ -482,12 +730,16 @@ public class RepositoryModelImpl extends BaseModelImpl<Repository>
 	}
 
 	public String toXmlString() {
-		StringBundler sb = new StringBundler(37);
+		StringBundler sb = new StringBundler(46);
 
 		sb.append("<model><model-name>");
 		sb.append("com.liferay.portal.model.Repository");
 		sb.append("</model-name>");
 
+		sb.append(
+			"<column><column-name>uuid</column-name><column-value><![CDATA[");
+		sb.append(getUuid());
+		sb.append("]]></column-value></column>");
 		sb.append(
 			"<column><column-name>repositoryId</column-name><column-value><![CDATA[");
 		sb.append(getRepositoryId());
@@ -499,6 +751,14 @@ public class RepositoryModelImpl extends BaseModelImpl<Repository>
 		sb.append(
 			"<column><column-name>companyId</column-name><column-value><![CDATA[");
 		sb.append(getCompanyId());
+		sb.append("]]></column-value></column>");
+		sb.append(
+			"<column><column-name>userId</column-name><column-value><![CDATA[");
+		sb.append(getUserId());
+		sb.append("]]></column-value></column>");
+		sb.append(
+			"<column><column-name>userName</column-name><column-value><![CDATA[");
+		sb.append(getUserName());
 		sb.append("]]></column-value></column>");
 		sb.append(
 			"<column><column-name>createDate</column-name><column-value><![CDATA[");
@@ -542,9 +802,18 @@ public class RepositoryModelImpl extends BaseModelImpl<Repository>
 	private static Class<?>[] _escapedModelProxyInterfaces = new Class[] {
 			Repository.class
 		};
+	private String _uuid;
+	private String _originalUuid;
 	private long _repositoryId;
 	private long _groupId;
+	private long _originalGroupId;
+	private boolean _setOriginalGroupId;
 	private long _companyId;
+	private long _originalCompanyId;
+	private boolean _setOriginalCompanyId;
+	private long _userId;
+	private String _userUuid;
+	private String _userName;
 	private Date _createDate;
 	private Date _modifiedDate;
 	private long _classNameId;
@@ -553,6 +822,6 @@ public class RepositoryModelImpl extends BaseModelImpl<Repository>
 	private String _portletId;
 	private String _typeSettings;
 	private long _dlFolderId;
-	private transient ExpandoBridge _expandoBridge;
+	private long _columnBitmask;
 	private Repository _escapedModelProxy;
 }

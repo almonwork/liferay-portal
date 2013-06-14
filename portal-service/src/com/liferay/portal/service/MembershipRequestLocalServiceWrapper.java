@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -24,7 +24,8 @@ package com.liferay.portal.service;
  * @generated
  */
 public class MembershipRequestLocalServiceWrapper
-	implements MembershipRequestLocalService {
+	implements MembershipRequestLocalService,
+		ServiceWrapper<MembershipRequestLocalService> {
 	public MembershipRequestLocalServiceWrapper(
 		MembershipRequestLocalService membershipRequestLocalService) {
 		_membershipRequestLocalService = membershipRequestLocalService;
@@ -58,25 +59,32 @@ public class MembershipRequestLocalServiceWrapper
 	* Deletes the membership request with the primary key from the database. Also notifies the appropriate model listeners.
 	*
 	* @param membershipRequestId the primary key of the membership request
+	* @return the membership request that was removed
 	* @throws PortalException if a membership request with the primary key could not be found
 	* @throws SystemException if a system exception occurred
 	*/
-	public void deleteMembershipRequest(long membershipRequestId)
+	public com.liferay.portal.model.MembershipRequest deleteMembershipRequest(
+		long membershipRequestId)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException {
-		_membershipRequestLocalService.deleteMembershipRequest(membershipRequestId);
+		return _membershipRequestLocalService.deleteMembershipRequest(membershipRequestId);
 	}
 
 	/**
 	* Deletes the membership request from the database. Also notifies the appropriate model listeners.
 	*
 	* @param membershipRequest the membership request
+	* @return the membership request that was removed
 	* @throws SystemException if a system exception occurred
 	*/
-	public void deleteMembershipRequest(
+	public com.liferay.portal.model.MembershipRequest deleteMembershipRequest(
 		com.liferay.portal.model.MembershipRequest membershipRequest)
 		throws com.liferay.portal.kernel.exception.SystemException {
-		_membershipRequestLocalService.deleteMembershipRequest(membershipRequest);
+		return _membershipRequestLocalService.deleteMembershipRequest(membershipRequest);
+	}
+
+	public com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery() {
+		return _membershipRequestLocalService.dynamicQuery();
 	}
 
 	/**
@@ -149,6 +157,12 @@ public class MembershipRequestLocalServiceWrapper
 		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery)
 		throws com.liferay.portal.kernel.exception.SystemException {
 		return _membershipRequestLocalService.dynamicQueryCount(dynamicQuery);
+	}
+
+	public com.liferay.portal.model.MembershipRequest fetchMembershipRequest(
+		long membershipRequestId)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return _membershipRequestLocalService.fetchMembershipRequest(membershipRequestId);
 	}
 
 	/**
@@ -250,11 +264,12 @@ public class MembershipRequestLocalServiceWrapper
 	}
 
 	public com.liferay.portal.model.MembershipRequest addMembershipRequest(
-		long userId, long groupId, java.lang.String comments)
+		long userId, long groupId, java.lang.String comments,
+		com.liferay.portal.service.ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException {
 		return _membershipRequestLocalService.addMembershipRequest(userId,
-			groupId, comments);
+			groupId, comments, serviceContext);
 	}
 
 	public void deleteMembershipRequests(long groupId)
@@ -298,18 +313,35 @@ public class MembershipRequestLocalServiceWrapper
 	}
 
 	public void updateStatus(long replierUserId, long membershipRequestId,
-		java.lang.String replyComments, int statusId, boolean addUserToGroup)
+		java.lang.String replyComments, int statusId, boolean addUserToGroup,
+		com.liferay.portal.service.ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException {
 		_membershipRequestLocalService.updateStatus(replierUserId,
-			membershipRequestId, replyComments, statusId, addUserToGroup);
+			membershipRequestId, replyComments, statusId, addUserToGroup,
+			serviceContext);
 	}
 
+	/**
+	 * @deprecated Renamed to {@link #getWrappedService}
+	 */
 	public MembershipRequestLocalService getWrappedMembershipRequestLocalService() {
 		return _membershipRequestLocalService;
 	}
 
+	/**
+	 * @deprecated Renamed to {@link #setWrappedService}
+	 */
 	public void setWrappedMembershipRequestLocalService(
+		MembershipRequestLocalService membershipRequestLocalService) {
+		_membershipRequestLocalService = membershipRequestLocalService;
+	}
+
+	public MembershipRequestLocalService getWrappedService() {
+		return _membershipRequestLocalService;
+	}
+
+	public void setWrappedService(
 		MembershipRequestLocalService membershipRequestLocalService) {
 		_membershipRequestLocalService = membershipRequestLocalService;
 	}

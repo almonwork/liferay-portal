@@ -18,6 +18,12 @@
 		<put name="selectable" value="false" />
 	</definition>
 
+	<definition name="portal.api.jsonws" extends="portal">
+		<put name="pop_up" value="true" />
+		<put name="title" value="json-web-services-api" />
+		<put name="content" value="/portal/api/jsonws/index.jsp" />
+	</definition>
+
 	<definition name="portal.error" extends="portal">
 		<put name="title" value="error" />
 		<put name="content" value="/portal/error.jsp" />
@@ -31,6 +37,11 @@
 	<definition name="portal.layout" extends="portal">
 		<put name="content" value="/portal/layout.jsp" />
 		<put name="selectable" value="true" />
+	</definition>
+
+	<definition name="portal.license" extends="portal">
+		<put name="title" value="license" />
+		<put name="content" value="/portal/license.jsp" />
 	</definition>
 
 	<definition name="portal.login_disabled" extends="portal">
@@ -48,6 +59,14 @@
 
 	<definition name="portal.portlet_not_setup" extends="portlet">
 		<put name="portlet_content" value="/portal/portlet_not_setup.jsp" />
+	</definition>
+
+	<definition name="portal.progress_poller" path="/portal/progress_poller.jsp" />
+
+	<definition name="portal.setup_wizard" extends="portal">
+		<put name="pop_up" value="true" />
+		<put name="title" value="basic-configuration" />
+		<put name="content" value="/portal/setup_wizard.jsp" />
 	</definition>
 
 	<definition name="portal.status" extends="portal">
@@ -80,8 +99,6 @@
 		<put name="content" value="/portal/update_reminder_query.jsp" />
 	</definition>
 
-	<definition name="portal.upload_progress_poller" path="/portal/upload_progress_poller.jsp" />
-
 	<definition name="portal.verify_email_address" extends="portal">
 		<put name="title" value="verify-email-address" />
 		<put name="content" value="/portal/verify_email_address.jsp" />
@@ -105,10 +122,6 @@
 
 	<definition name="portlet.admin.edit_instance" extends="portlet.admin">
 		<put name="portlet_content" value="/portlet/admin/edit_instance.jsp" />
-	</definition>
-
-	<definition name="portlet.admin.edit_permissions" extends="portlet.admin">
-		<put name="portlet_content" value="/portlet/admin/edit_permissions.jsp" />
 	</definition>
 
 	<definition name="portlet.admin.error" extends="portlet.admin">
@@ -155,7 +168,15 @@
 		<put name="portlet_content" value="/portlet/asset_browser/view.jsp" />
 	</definition>
 
-	<!-- Asset Categories Admin -->
+	<!-- Asset Categories Navigation -->
+
+	<definition name="portlet.asset_categories_navigation" extends="portlet" />
+
+	<definition name="portlet.asset_categories_navigation.view" extends="portlet.asset_categories_navigation">
+		<put name="portlet_content" value="/portlet/asset_categories_navigation/view.jsp" />
+	</definition>
+
+	<!-- Asset Category Admin -->
 
 	<definition name="portlet.asset_category_admin" extends="portlet" />
 
@@ -173,14 +194,6 @@
 
 	<definition name="portlet.asset_category_admin.view_category" extends="portlet.asset_category_admin">
 		<put name="portlet_content" value="/portlet/asset_category_admin/view_category.jsp" />
-	</definition>
-
-	<!-- Asset Categories Navigation -->
-
-	<definition name="portlet.asset_categories_navigation" extends="portlet" />
-
-	<definition name="portlet.asset_categories_navigation.view" extends="portlet.asset_categories_navigation">
-		<put name="portlet_content" value="/portlet/asset_categories_navigation/view.jsp" />
 	</definition>
 
 	<!-- Asset Publisher -->
@@ -273,12 +286,12 @@
 
 	<definition name="portlet.bookmarks" extends="portlet" />
 
-	<definition name="portlet.bookmarks.edit_folder" extends="portlet.bookmarks">
-		<put name="portlet_content" value="/portlet/bookmarks/edit_folder.jsp" />
-	</definition>
-
 	<definition name="portlet.bookmarks.edit_entry" extends="portlet.bookmarks">
 		<put name="portlet_content" value="/portlet/bookmarks/edit_entry.jsp" />
+	</definition>
+
+	<definition name="portlet.bookmarks.edit_folder" extends="portlet.bookmarks">
+		<put name="portlet_content" value="/portlet/bookmarks/edit_folder.jsp" />
 	</definition>
 
 	<definition name="portlet.bookmarks.error" extends="portlet.bookmarks">
@@ -355,20 +368,20 @@
 
 	<definition name="portlet.directory" extends="portlet" />
 
-	<definition name="portlet.directory.view_organization" extends="portlet.directory">
-		<put name="portlet_content" value="/portlet/directory/view_organization.jsp" />
-	</definition>
-
-	<definition name="portlet.directory.view_user" extends="portlet.directory">
-		<put name="portlet_content" value="/portlet/directory/view_user.jsp" />
-	</definition>
-
 	<definition name="portlet.directory.error" extends="portlet.directory">
 		<put name="portlet_content" value="/portlet/directory/error.jsp" />
 	</definition>
 
 	<definition name="portlet.directory.view" extends="portlet.directory">
 		<put name="portlet_content" value="/portlet/directory/view.jsp" />
+	</definition>
+
+	<definition name="portlet.directory.view_organization" extends="portlet.directory">
+		<put name="portlet_content" value="/portlet/directory/view_organization.jsp" />
+	</definition>
+
+	<definition name="portlet.directory.view_user" extends="portlet.directory">
+		<put name="portlet_content" value="/portlet/directory/view_user.jsp" />
 	</definition>
 
 	<!-- Dockbar -->
@@ -459,10 +472,6 @@
 		<put name="portlet_content" value="/portlet/document_library/view_file_entry_type.jsp" />
 	</definition>
 
-	<definition name="portlet.document_library.view_file_shortcut" extends="portlet.document_library">
-		<put name="portlet_content" value="/portlet/document_library/view_file_shortcut.jsp" />
-	</definition>
-
 	<!-- Document Library Display-->
 
 	<definition name="portlet.document_library_display" extends="portlet" />
@@ -527,16 +536,16 @@
 
 	<definition name="portlet.dynamic_data_mapping" extends="portlet" />
 
+	<definition name="portlet.dynamic_data_mapping.copy_structure" extends="portlet.dynamic_data_mapping">
+		<put name="portlet_content" value="/portlet/dynamic_data_mapping/copy_structure.jsp" />
+	</definition>
+
 	<definition name="portlet.dynamic_data_mapping.edit_structure" extends="portlet.dynamic_data_mapping">
 		<put name="portlet_content" value="/portlet/dynamic_data_mapping/edit_structure.jsp" />
 	</definition>
 
 	<definition name="portlet.dynamic_data_mapping.edit_template" extends="portlet.dynamic_data_mapping">
 		<put name="portlet_content" value="/portlet/dynamic_data_mapping/edit_template.jsp" />
-	</definition>
-
-	<definition name="portlet.dynamic_data_mapping.edit_template_script" extends="portlet.dynamic_data_mapping">
-		<put name="portlet_content" value="/portlet/dynamic_data_mapping/edit_template_script.jsp" />
 	</definition>
 
 	<definition name="portlet.dynamic_data_mapping.error" extends="portlet.dynamic_data_mapping">
@@ -575,6 +584,14 @@
 
 	<definition name="portlet.flags.edit_entry" path="/portlet/flags/edit_entry.jsp" />
 
+	<!-- Group Statistics -->
+
+	<definition name="portlet.group_statistics" extends="portlet" />
+
+	<definition name="portlet.group_statistics.add_activity_counter" extends="portlet.group_statistics">
+		<put name="portlet_content" value="/portlet/group_statistics/add_activity_counter.jsp" />
+	</definition>
+
 	<!-- IFrame -->
 
 	<definition name="portlet.iframe" extends="portlet" />
@@ -583,40 +600,28 @@
 		<put name="portlet_content" value="/portlet/iframe/view.jsp" />
 	</definition>
 
-	<!-- Image Gallery -->
+	<!-- Image Gallery Display -->
 
-	<definition name="portlet.image_gallery" extends="portlet" />
+	<definition name="portlet.image_gallery_display" extends="portlet" />
 
-	<definition name="portlet.image_gallery.edit_folder" extends="portlet.image_gallery">
-		<put name="portlet_content" value="/portlet/image_gallery/edit_folder.jsp" />
+	<definition name="portlet.image_gallery_display.embedded_player" extends="portlet.image_gallery_display">
+		<put name="portlet_content" value="/portlet/image_gallery_display/embedded_player.jsp" />
 	</definition>
 
-	<definition name="portlet.image_gallery.edit_image" extends="portlet.image_gallery">
-		<put name="portlet_content" value="/portlet/image_gallery/edit_image.jsp" />
+	<definition name="portlet.image_gallery_display.search" extends="portlet.image_gallery_display">
+		<put name="portlet_content" value="/portlet/image_gallery_display/search.jsp" />
 	</definition>
 
-	<definition name="portlet.image_gallery.error" extends="portlet.image_gallery">
-		<put name="portlet_content" value="/portlet/image_gallery/error.jsp" />
+	<definition name="portlet.image_gallery_display.select_folder" extends="portlet.image_gallery_display">
+		<put name="portlet_content" value="/portlet/image_gallery_display/select_folder.jsp" />
 	</definition>
 
-	<definition name="portlet.image_gallery.search" extends="portlet.image_gallery">
-		<put name="portlet_content" value="/portlet/image_gallery/search.jsp" />
+	<definition name="portlet.image_gallery_display.view" extends="portlet.image_gallery_display">
+		<put name="portlet_content" value="/portlet/image_gallery_display/view.jsp" />
 	</definition>
 
-	<definition name="portlet.image_gallery.select_folder" extends="portlet.image_gallery">
-		<put name="portlet_content" value="/portlet/image_gallery/select_folder.jsp" />
-	</definition>
-
-	<definition name="portlet.image_gallery.view" extends="portlet.image_gallery">
-		<put name="portlet_content" value="/portlet/image_gallery/view.jsp" />
-	</definition>
-
-	<definition name="portlet.image_gallery.view_image" extends="portlet.image_gallery">
-		<put name="portlet_content" value="/portlet/image_gallery/view_image.jsp" />
-	</definition>
-
-	<definition name="portlet.image_gallery.view_slide_show" extends="portlet.image_gallery">
-		<put name="portlet_content" value="/portlet/image_gallery/view_slide_show.jsp" />
+	<definition name="portlet.image_gallery_display.view_slide_show" extends="portlet.image_gallery_display">
+		<put name="portlet_content" value="/portlet/image_gallery_display/view_slide_show.jsp" />
 	</definition>
 
 	<!-- Invitation -->
@@ -651,12 +656,12 @@
 		<put name="portlet_content" value="/portlet/journal/edit_feed.jsp" />
 	</definition>
 
-	<definition name="portlet.journal.edit_structure" extends="portlet.journal">
-		<put name="portlet_content" value="/portlet/journal/edit_structure.jsp" />
+	<definition name="portlet.journal.edit_folder" extends="portlet.journal">
+		<put name="portlet_content" value="/portlet/journal/edit_folder.jsp" />
 	</definition>
 
-	<definition name="portlet.journal.edit_structure_xsd" extends="portlet.journal">
-		<put name="portlet_content" value="/portlet/journal/edit_structure_xsd.jsp" />
+	<definition name="portlet.journal.edit_structure" extends="portlet.journal">
+		<put name="portlet_content" value="/portlet/journal/edit_structure.jsp" />
 	</definition>
 
 	<definition name="portlet.journal.edit_template" extends="portlet.journal">
@@ -671,6 +676,10 @@
 		<put name="portlet_content" value="/portlet/journal/error.jsp" />
 	</definition>
 
+	<definition name="portlet.journal.move_folder" extends="portlet.journal">
+		<put name="portlet_content" value="/portlet/journal/move_folder.jsp" />
+	</definition>
+
 	<definition name="portlet.journal.raw_article_content" extends="portlet.journal">
 		<put name="portlet_content" value="/portlet/journal/raw_article_content.jsp" />
 	</definition>
@@ -679,8 +688,8 @@
 		<put name="portlet_content" value="/portlet/journal/select_document_library.jsp" />
 	</definition>
 
-	<definition name="portlet.journal.select_image_gallery" extends="portlet.journal">
-		<put name="portlet_content" value="/portlet/journal/select_image_gallery.jsp" />
+	<definition name="portlet.journal.select_folder" extends="portlet.journal">
+		<put name="portlet_content" value="/portlet/journal/select_folder.jsp" />
 	</definition>
 
 	<definition name="portlet.journal.select_structure" extends="portlet.journal">
@@ -709,6 +718,22 @@
 
 	<definition name="portlet.journal.view_article_history" extends="portlet.journal">
 		<put name="portlet_content" value="/portlet/journal/view_article_history.jsp" />
+	</definition>
+
+	<definition name="portlet.journal.view_feeds" extends="portlet.journal">
+		<put name="portlet_content" value="/portlet/journal/view_feeds.jsp" />
+	</definition>
+
+	<definition name="portlet.journal.view_recent" extends="portlet.journal">
+		<put name="portlet_content" value="/portlet/journal/view_recent.jsp" />
+	</definition>
+
+	<definition name="portlet.journal.view_structures" extends="portlet.journal">
+		<put name="portlet_content" value="/portlet/journal/view_structures.jsp" />
+	</definition>
+
+	<definition name="portlet.journal.view_templates" extends="portlet.journal">
+		<put name="portlet_content" value="/portlet/journal/view_templates.jsp" />
 	</definition>
 
 	<!-- Journal Articles -->
@@ -801,12 +826,12 @@
 		<put name="portlet_content" value="/portlet/layouts_admin/view.jsp" />
 	</definition>
 
-	<definition name="portlet.layouts_admin.export_layouts" extends="portlet.layouts_admin">
-		<put name="portlet_content" value="/portlet/layouts_admin/export_import.jsp" />
-	</definition>
-
 	<definition name="portlet.layouts_admin.error" extends="portlet.layouts_admin">
 		<put name="portlet_content" value="/portlet/layouts_admin/error.jsp" />
+	</definition>
+
+	<definition name="portlet.layouts_admin.export_layouts" extends="portlet.layouts_admin">
+		<put name="portlet_content" value="/portlet/layouts_admin/export_import.jsp" />
 	</definition>
 
 	<definition name="portlet.layouts_admin.publish_layouts" extends="portlet.layouts_admin">
@@ -823,10 +848,6 @@
 
 	<definition name="portlet.login.create_anonymous_account" extends="portlet.login">
 		<put name="portlet_content" value="/portlet/login/create_anonymous_account.jsp" />
-	</definition>
-
-	<definition name="portlet.login.facebook_login" extends="portlet.login">
-		<put name="portlet_content" value="/portlet/login/facebook_login.jsp" />
 	</definition>
 
 	<definition name="portlet.login.forgot_password" extends="portlet.login">
@@ -909,6 +930,38 @@
 
 	<definition name="portlet.message_boards_admin.view" extends="portlet.message_boards_admin">
 		<put name="portlet_content" value="/portlet/message_boards_admin/view.jsp" />
+	</definition>
+
+	<!-- Mobile Device Rules -->
+
+	<definition name="portlet.mobile_device_rules" extends="portlet" />
+
+	<definition name="portlet.mobile_device_rules.edit_action" extends="portlet.mobile_device_rules">
+		<put name="portlet_content" value="/portlet/mobile_device_rules/edit_action.jsp" />
+	</definition>
+
+	<definition name="portlet.mobile_device_rules.edit_rule" extends="portlet.mobile_device_rules">
+		<put name="portlet_content" value="/portlet/mobile_device_rules/edit_rule.jsp" />
+	</definition>
+
+	<definition name="portlet.mobile_device_rules.edit_rule_group" extends="portlet.mobile_device_rules">
+		<put name="portlet_content" value="/portlet/mobile_device_rules/edit_rule_group.jsp" />
+	</definition>
+
+	<definition name="portlet.mobile_device_rules.edit_rule_group_instance_priorities" extends="portlet.mobile_device_rules">
+		<put name="portlet_content" value="/portlet/mobile_device_rules/edit_rule_group_instance_priorities.jsp" />
+	</definition>
+
+	<definition name="portlet.mobile_device_rules.view" extends="portlet.mobile_device_rules">
+		<put name="portlet_content" value="/portlet/mobile_device_rules/view.jsp" />
+	</definition>
+
+	<definition name="portlet.mobile_device_rules.view_actions" extends="portlet.mobile_device_rules">
+		<put name="portlet_content" value="/portlet/mobile_device_rules/view_actions.jsp" />
+	</definition>
+
+	<definition name="portlet.mobile_device_rules.view_rules" extends="portlet.mobile_device_rules">
+		<put name="portlet_content" value="/portlet/mobile_device_rules/view_rules.jsp" />
 	</definition>
 
 	<!-- Monitoring -->
@@ -1083,6 +1136,10 @@
 
 	<definition name="portlet.polls_display" extends="portlet" />
 
+	<definition name="portlet.polls_display.add_question_redirect" extends="portlet.polls_display">
+		<put name="portlet_content" value="/portlet/polls_display/add_question_redirect.jsp" />
+	</definition>
+
 	<definition name="portlet.polls_display.error" extends="portlet.polls_display">
 		<put name="portlet_content" value="/portlet/polls_display/error.jsp" />
 	</definition>
@@ -1200,6 +1257,14 @@
 		<put name="portlet_decorate" value="false" />
 	</definition>
 
+	<!-- Recent Documents -->
+
+	<definition name="portlet.recent_documents" extends="portlet" />
+
+	<definition name="portlet.recent_documents.view" extends="portlet.recent_documents">
+		<put name="portlet_content" value="/portlet/recent_documents/view.jsp" />
+	</definition>
+
 	<!-- Requests -->
 
 	<definition name="portlet.requests" extends="portlet" />
@@ -1246,6 +1311,110 @@
 
 	<definition name="portlet.roles_admin.view" extends="portlet.roles_admin">
 		<put name="portlet_content" value="/portlet/roles_admin/view.jsp" />
+	</definition>
+
+	<!-- RSS -->
+
+	<definition name="portlet.rss" extends="portlet" />
+
+	<definition name="portlet.rss.article" extends="portlet.rss">
+		<put name="portlet_content" value="/portlet/rss/article.jsp" />
+	</definition>
+
+	<definition name="portlet.rss.view" extends="portlet.rss">
+		<put name="portlet_content" value="/portlet/rss/view.jsp" />
+	</definition>
+
+	<definition name="portlet.rss.view_channel" extends="portlet.rss">
+		<put name="portlet_content" value="/portlet/rss/view_channel.jsp" />
+	</definition>
+
+	<!-- Search -->
+
+	<definition name="portlet.search" extends="portlet" />
+
+	<definition name="portlet.search.search" extends="portlet.search">
+		<put name="portlet_content" value="/portlet/search/search.jsp" />
+	</definition>
+
+	<definition name="portlet.search.view" extends="portlet.search">
+		<put name="portlet_content" value="/portlet/search/view.jsp" />
+	</definition>
+
+	<!-- Shopping -->
+
+	<definition name="portlet.shopping" extends="portlet" />
+
+	<definition name="portlet.shopping.add_book_items" extends="portlet.shopping">
+		<put name="portlet_content" value="/portlet/shopping/add_book_items.jsp" />
+	</definition>
+
+	<definition name="portlet.shopping.cart" extends="portlet.shopping">
+		<put name="portlet_content" value="/portlet/shopping/cart.jsp" />
+	</definition>
+
+	<definition name="portlet.shopping.checkout_first" extends="portlet.shopping">
+		<put name="portlet_content" value="/portlet/shopping/checkout_first.jsp" />
+	</definition>
+
+	<definition name="portlet.shopping.checkout_second" extends="portlet.shopping">
+		<put name="portlet_content" value="/portlet/shopping/checkout_second.jsp" />
+	</definition>
+
+	<definition name="portlet.shopping.checkout_third" extends="portlet.shopping">
+		<put name="portlet_content" value="/portlet/shopping/checkout_third.jsp" />
+	</definition>
+
+	<definition name="portlet.shopping.edit_category" extends="portlet.shopping">
+		<put name="portlet_content" value="/portlet/shopping/edit_category.jsp" />
+	</definition>
+
+	<definition name="portlet.shopping.edit_coupon" extends="portlet.shopping">
+		<put name="portlet_content" value="/portlet/shopping/edit_coupon.jsp" />
+	</definition>
+
+	<definition name="portlet.shopping.edit_item" extends="portlet.shopping">
+		<put name="portlet_content" value="/portlet/shopping/edit_item.jsp" />
+	</definition>
+
+	<definition name="portlet.shopping.edit_item_quantities" extends="portlet.shopping">
+		<put name="portlet_content" value="/portlet/shopping/edit_item_quantities.jsp" />
+	</definition>
+
+	<definition name="portlet.shopping.edit_order" extends="portlet.shopping">
+		<put name="portlet_content" value="/portlet/shopping/edit_order.jsp" />
+	</definition>
+
+	<definition name="portlet.shopping.error" extends="portlet.shopping">
+		<put name="portlet_content" value="/portlet/shopping/error.jsp" />
+	</definition>
+
+	<definition name="portlet.shopping.search" extends="portlet.shopping">
+		<put name="portlet_content" value="/portlet/shopping/search.jsp" />
+	</definition>
+
+	<definition name="portlet.shopping.select_category" extends="portlet.shopping">
+		<put name="portlet_content" value="/portlet/shopping/select_category.jsp" />
+	</definition>
+
+	<definition name="portlet.shopping.view" extends="portlet.shopping">
+		<put name="portlet_content" value="/portlet/shopping/view.jsp" />
+	</definition>
+
+	<definition name="portlet.shopping.view_coupon" extends="portlet.shopping">
+		<put name="portlet_content" value="/portlet/shopping/view_coupon.jsp" />
+	</definition>
+
+	<definition name="portlet.shopping.view_item" extends="portlet.shopping">
+		<put name="portlet_content" value="/portlet/shopping/view_item.jsp" />
+	</definition>
+
+	<!-- Site Map -->
+
+	<definition name="portlet.site_map" extends="portlet" />
+
+	<definition name="portlet.site_map.view" extends="portlet.site_map">
+		<put name="portlet_content" value="/portlet/site_map/view.jsp" />
 	</definition>
 
 	<!-- Site Settings -->
@@ -1308,6 +1477,14 @@
 		<put name="portlet_content" value="/portlet/sites_admin/view_teams.jsp" />
 	</definition>
 
+	<!-- Social Activity -->
+
+	<definition name="portlet.social_activity" extends="portlet" />
+
+	<definition name="portlet.social_activity.view" extends="portlet.social_activity">
+		<put name="portlet_content" value="/portlet/social_activity/view.jsp" />
+	</definition>
+
 	<!-- Software Catalog -->
 
 	<definition name="portlet.software_catalog" extends="portlet" />
@@ -1344,126 +1521,6 @@
 		<put name="portlet_content" value="/portlet/software_catalog/view_product_entry.jsp" />
 	</definition>
 
-	<!-- Recent Documents -->
-
-	<definition name="portlet.recent_documents" extends="portlet" />
-
-	<definition name="portlet.recent_documents.view" extends="portlet.recent_documents">
-		<put name="portlet_content" value="/portlet/recent_documents/view.jsp" />
-	</definition>
-
-	<!-- RSS -->
-
-	<definition name="portlet.rss" extends="portlet" />
-
-	<definition name="portlet.rss.article" extends="portlet.rss">
-		<put name="portlet_content" value="/portlet/rss/article.jsp" />
-	</definition>
-
-	<definition name="portlet.rss.view" extends="portlet.rss">
-		<put name="portlet_content" value="/portlet/rss/view.jsp" />
-	</definition>
-
-	<definition name="portlet.rss.view_channel" extends="portlet.rss">
-		<put name="portlet_content" value="/portlet/rss/view_channel.jsp" />
-	</definition>
-
-	<!-- Search -->
-
-	<definition name="portlet.search" extends="portlet" />
-
-	<definition name="portlet.search.search" extends="portlet.search">
-		<put name="portlet_content" value="/portlet/search/search.jsp" />
-	</definition>
-
-	<definition name="portlet.search.view" extends="portlet.search">
-		<put name="portlet_content" value="/portlet/search/view.jsp" />
-	</definition>
-
-	<!-- Site Map -->
-
-	<definition name="portlet.site_map" extends="portlet" />
-
-	<definition name="portlet.site_map.view" extends="portlet.site_map">
-		<put name="portlet_content" value="/portlet/site_map/view.jsp" />
-	</definition>
-
-	<!-- Shopping -->
-
-	<definition name="portlet.shopping" extends="portlet" />
-
-	<definition name="portlet.shopping.add_book_items" extends="portlet.shopping">
-		<put name="portlet_content" value="/portlet/shopping/add_book_items.jsp" />
-	</definition>
-
-	<definition name="portlet.shopping.cart" extends="portlet.shopping">
-		<put name="portlet_content" value="/portlet/shopping/cart.jsp" />
-	</definition>
-
-	<definition name="portlet.shopping.edit_category" extends="portlet.shopping">
-		<put name="portlet_content" value="/portlet/shopping/edit_category.jsp" />
-	</definition>
-
-	<definition name="portlet.shopping.checkout_first" extends="portlet.shopping">
-		<put name="portlet_content" value="/portlet/shopping/checkout_first.jsp" />
-	</definition>
-
-	<definition name="portlet.shopping.checkout_second" extends="portlet.shopping">
-		<put name="portlet_content" value="/portlet/shopping/checkout_second.jsp" />
-	</definition>
-
-	<definition name="portlet.shopping.checkout_third" extends="portlet.shopping">
-		<put name="portlet_content" value="/portlet/shopping/checkout_third.jsp" />
-	</definition>
-
-	<definition name="portlet.shopping.edit_coupon" extends="portlet.shopping">
-		<put name="portlet_content" value="/portlet/shopping/edit_coupon.jsp" />
-	</definition>
-
-	<definition name="portlet.shopping.edit_item" extends="portlet.shopping">
-		<put name="portlet_content" value="/portlet/shopping/edit_item.jsp" />
-	</definition>
-
-	<definition name="portlet.shopping.edit_item_quantities" extends="portlet.shopping">
-		<put name="portlet_content" value="/portlet/shopping/edit_item_quantities.jsp" />
-	</definition>
-
-	<definition name="portlet.shopping.edit_order" extends="portlet.shopping">
-		<put name="portlet_content" value="/portlet/shopping/edit_order.jsp" />
-	</definition>
-
-	<definition name="portlet.shopping.error" extends="portlet.shopping">
-		<put name="portlet_content" value="/portlet/shopping/error.jsp" />
-	</definition>
-
-	<definition name="portlet.shopping.search" extends="portlet.shopping">
-		<put name="portlet_content" value="/portlet/shopping/search.jsp" />
-	</definition>
-
-	<definition name="portlet.shopping.select_category" extends="portlet.shopping">
-		<put name="portlet_content" value="/portlet/shopping/select_category.jsp" />
-	</definition>
-
-	<definition name="portlet.shopping.view" extends="portlet.shopping">
-		<put name="portlet_content" value="/portlet/shopping/view.jsp" />
-	</definition>
-
-	<definition name="portlet.shopping.view_coupon" extends="portlet.shopping">
-		<put name="portlet_content" value="/portlet/shopping/view_coupon.jsp" />
-	</definition>
-
-	<definition name="portlet.shopping.view_item" extends="portlet.shopping">
-		<put name="portlet_content" value="/portlet/shopping/view_item.jsp" />
-	</definition>
-
-	<!-- Social Equity Admin -->
-
-	<definition name="portlet.social_equity_admin" extends="portlet" />
-
-	<definition name="portlet.social_equity_admin.view" extends="portlet.social_equity_admin">
-		<put name="portlet_content" value="/portlet/social_equity_admin/view.jsp" />
-	</definition>
-
 	<!-- Staging Bar -->
 
 	<definition name="portlet.staging_bar.edit_layout_branch" path="/portlet/staging_bar/edit_layout_branch.jsp" />
@@ -1476,13 +1533,33 @@
 
 	<definition name="portlet.staging_bar.view" path="/portlet/staging_bar/view.jsp" />
 
+	<definition name="portlet.staging_bar.view_layout_branches" path="/portlet/staging_bar/view_layout_branches.jsp" />
+
 	<definition name="portlet.staging_bar.view_layout_revision_details" path="/portlet/staging_bar/view_layout_revision_details.jsp" />
 
 	<definition name="portlet.staging_bar.view_layout_revisions" path="/portlet/staging_bar/view_layout_revisions.jsp" />
 
-	<definition name="portlet.staging_bar.view_layout_branches" path="/portlet/staging_bar/view_layout_branches.jsp" />
-
 	<definition name="portlet.staging_bar.view_layout_set_branches" path="/portlet/staging_bar/view_layout_set_branches.jsp" />
+
+	<!-- Trash -->
+
+	<definition name="portlet.trash" extends="portlet" />
+
+	<definition name="portlet.trash.error" extends="portlet.trash">
+		<put name="portlet_content" value="/portlet/trash/error.jsp" />
+	</definition>
+
+	<definition name="portlet.trash.restore_entry" extends="portlet.trash">
+		<put name="portlet_content" value="/portlet/trash/restore_entry.jsp" />
+	</definition>
+
+	<definition name="portlet.trash.view" extends="portlet.trash">
+		<put name="portlet_content" value="/portlet/trash/view.jsp" />
+	</definition>
+
+	<definition name="portlet.trash.view_content" extends="portlet.trash">
+		<put name="portlet_content" value="/portlet/trash/view_content.jsp" />
+	</definition>
 
 	<!-- Update Manager -->
 
@@ -1490,6 +1567,38 @@
 
 	<definition name="portlet.update_manager.view" extends="portlet.update_manager">
 		<put name="portlet_content" value="/portlet/update_manager/view.jsp" />
+	</definition>
+
+	<!-- User Groups Admin -->
+
+	<definition name="portlet.user_groups_admin" extends="portlet" />
+
+	<definition name="portlet.user_groups_admin.edit_user_group" extends="portlet.user_groups_admin">
+		<put name="portlet_content" value="/portlet/user_groups_admin/edit_user_group.jsp" />
+	</definition>
+
+	<definition name="portlet.user_groups_admin.edit_user_group_assignments" extends="portlet.user_groups_admin">
+		<put name="portlet_content" value="/portlet/user_groups_admin/edit_user_group_assignments.jsp" />
+	</definition>
+
+	<definition name="portlet.user_groups_admin.error" extends="portlet.user_groups_admin">
+		<put name="portlet_content" value="/portlet/users_admin/error.jsp" />
+	</definition>
+
+	<definition name="portlet.user_groups_admin.select_user_group" extends="portlet.user_groups_admin">
+		<put name="portlet_content" value="/portlet/user_groups_admin/select_user_group.jsp" />
+	</definition>
+
+	<definition name="portlet.user_groups_admin.view" extends="portlet.user_groups_admin">
+		<put name="portlet_content" value="/portlet/user_groups_admin/view.jsp" />
+	</definition>
+
+	<!-- User Statistics -->
+
+	<definition name="portlet.user_statistics" extends="portlet" />
+
+	<definition name="portlet.user_statistics.add_activity_counter" extends="portlet.user_statistics">
+		<put name="portlet_content" value="/portlet/user_statistics/add_activity_counter.jsp" />
 	</definition>
 
 	<!-- Users Admin -->
@@ -1512,14 +1621,6 @@
 		<put name="portlet_content" value="/portlet/users_admin/edit_user.jsp" />
 	</definition>
 
-	<definition name="portlet.users_admin.edit_user_group" extends="portlet.users_admin">
-		<put name="portlet_content" value="/portlet/users_admin/edit_user_group.jsp" />
-	</definition>
-
-	<definition name="portlet.users_admin.edit_user_group_assignments" extends="portlet.users_admin">
-		<put name="portlet_content" value="/portlet/users_admin/edit_user_group_assignments.jsp" />
-	</definition>
-
 	<definition name="portlet.users_admin.edit_user_portrait" extends="portlet.users_admin">
 		<put name="portlet_content" value="/portlet/users_admin/edit_user_portrait.jsp" />
 	</definition>
@@ -1530,10 +1631,6 @@
 
 	<definition name="portlet.users_admin.select_organization" extends="portlet.users_admin">
 		<put name="portlet_content" value="/portlet/users_admin/select_organization.jsp" />
-	</definition>
-
-	<definition name="portlet.users_admin.select_user_group" extends="portlet.users_admin">
-		<put name="portlet_content" value="/portlet/users_admin/select_user_group.jsp" />
 	</definition>
 
 	<definition name="portlet.users_admin.view" extends="portlet.users_admin">
@@ -1592,12 +1689,12 @@
 		<put name="portlet_content" value="/portlet/wiki/view_draft_pages.jsp" />
 	</definition>
 
-	<definition name="portlet.wiki.view_orphan_pages" extends="portlet.wiki">
-		<put name="portlet_content" value="/portlet/wiki/view_orphan_pages.jsp" />
-	</definition>
-
 	<definition name="portlet.wiki.view_nodes" extends="portlet.wiki">
 		<put name="portlet_content" value="/portlet/wiki/view_nodes.jsp" />
+	</definition>
+
+	<definition name="portlet.wiki.view_orphan_pages" extends="portlet.wiki">
+		<put name="portlet_content" value="/portlet/wiki/view_orphan_pages.jsp" />
 	</definition>
 
 	<definition name="portlet.wiki.view_page_attachments" extends="portlet.wiki">
@@ -1636,12 +1733,16 @@
 		<put name="portlet_content" value="/portlet/wiki_display/view.jsp" />
 	</definition>
 
-	<!-- Words -->
+	<!-- Workflow Definition Links -->
 
-	<definition name="portlet.words" extends="portlet" />
+	<definition name="portlet.workflow_definition_links" extends="portlet" />
 
-	<definition name="portlet.words.view" extends="portlet.words">
-		<put name="portlet_content" value="/portlet/words/view.jsp" />
+	<definition name="portlet.workflow_definition_links.error" extends="portlet.workflow_definition_links">
+		<put name="portlet_content" value="/portlet/workflow_definition_links/error.jsp" />
+	</definition>
+
+	<definition name="portlet.workflow_definition_links.view" extends="portlet.workflow_definition_links">
+		<put name="portlet_content" value="/portlet/workflow_definition_links/view.jsp" />
 	</definition>
 
 	<!-- Workflow Definitions -->
@@ -1658,18 +1759,6 @@
 
 	<definition name="portlet.workflow_definitions.view" extends="portlet.workflow_definitions">
 		<put name="portlet_content" value="/portlet/workflow_definitions/view.jsp" />
-	</definition>
-
-	<!-- Workflow Definition Links -->
-
-	<definition name="portlet.workflow_definition_links" extends="portlet" />
-
-	<definition name="portlet.workflow_definition_links.error" extends="portlet.workflow_definition_links">
-		<put name="portlet_content" value="/portlet/workflow_definition_links/error.jsp" />
-	</definition>
-
-	<definition name="portlet.workflow_definition_links.view" extends="portlet.workflow_definition_links">
-		<put name="portlet_content" value="/portlet/workflow_definition_links/view.jsp" />
 	</definition>
 
 	<!-- Workflow Instances -->

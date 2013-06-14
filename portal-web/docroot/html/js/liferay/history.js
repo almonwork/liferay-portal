@@ -1,4 +1,4 @@
-AUI().add(
+AUI.add(
 	'liferay-history',
 	function(A) {
 		var AObject = A.Object;
@@ -39,10 +39,14 @@ AUI().add(
 
 					_parse: A.cached(
 						function(str) {
-							return QueryString.parse(str);
+							return QueryString.parse(str, History.PAIR_SEPARATOR, History.VALUE_SEPARATOR);
 						}
 					)
-				}
+				},
+
+				PAIR_SEPARATOR: '&',
+
+				VALUE_SEPARATOR: '='
 			}
 		);
 

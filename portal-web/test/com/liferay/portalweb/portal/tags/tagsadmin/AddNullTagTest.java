@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -23,9 +23,10 @@ import com.liferay.portalweb.portal.util.RuntimeVariables;
 public class AddNullTagTest extends BaseTestCase {
 	public void testAddNullTag() throws Exception {
 		selenium.open("/web/guest/home/");
+		loadRequiredJavaScriptModules();
 
 		for (int second = 0;; second++) {
-			if (second >= 60) {
+			if (second >= 90) {
 				fail("timeout");
 			}
 
@@ -40,21 +41,23 @@ public class AddNullTagTest extends BaseTestCase {
 			Thread.sleep(1000);
 		}
 
-		selenium.saveScreenShotAndSource();
-		selenium.clickAt("link=Control Panel", RuntimeVariables.replace(""));
+		selenium.clickAt("link=Control Panel",
+			RuntimeVariables.replace("Control Panel"));
 		selenium.waitForPageToLoad("30000");
-		selenium.saveScreenShotAndSource();
-		selenium.clickAt("link=Tags", RuntimeVariables.replace(""));
+		loadRequiredJavaScriptModules();
+		selenium.clickAt("link=Tags", RuntimeVariables.replace("Tags"));
 		selenium.waitForPageToLoad("30000");
-		selenium.saveScreenShotAndSource();
+		loadRequiredJavaScriptModules();
+		selenium.clickAt("//input[@id='_99_addTagButton']",
+			RuntimeVariables.replace("Add Tag"));
 
 		for (int second = 0;; second++) {
-			if (second >= 60) {
+			if (second >= 90) {
 				fail("timeout");
 			}
 
 			try {
-				if (selenium.isElementPresent("add-tag-button")) {
+				if (selenium.isVisible("//input[@id='_99_name']")) {
 					break;
 				}
 			}
@@ -64,16 +67,17 @@ public class AddNullTagTest extends BaseTestCase {
 			Thread.sleep(1000);
 		}
 
-		selenium.saveScreenShotAndSource();
-		selenium.clickAt("add-tag-button", RuntimeVariables.replace(""));
+		selenium.type("//input[@id='_99_name']", RuntimeVariables.replace(""));
+		selenium.clickAt("//input[@value='Save']",
+			RuntimeVariables.replace("Save"));
 
 		for (int second = 0;; second++) {
-			if (second >= 60) {
+			if (second >= 90) {
 				fail("timeout");
 			}
 
 			try {
-				if (selenium.isElementPresent("new-tag-name")) {
+				if (selenium.isVisible("//div[@id='portletMessages']")) {
 					break;
 				}
 			}
@@ -83,11 +87,9 @@ public class AddNullTagTest extends BaseTestCase {
 			Thread.sleep(1000);
 		}
 
-		selenium.saveScreenShotAndSource();
-		selenium.type("new-tag-name", RuntimeVariables.replace(""));
-		selenium.saveScreenShotAndSource();
-		selenium.clickAt("//input[@value='Save']", RuntimeVariables.replace(""));
-		Thread.sleep(5000);
-		assertFalse(selenium.isElementPresent("//li[2]/span/a"));
+		assertEquals(RuntimeVariables.replace(
+				"Tag names cannot be an empty string or contain characters such as: \n , = > / < [ { % | + # ? \" ; / * ~."),
+			selenium.getText("//div[@id='portletMessages']"));
+		assertFalse(selenium.isElementPresent("//div[2]/ul/li[2]/div/span/a"));
 	}
 }

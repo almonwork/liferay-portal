@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -17,11 +17,11 @@ package com.liferay.portal.model.impl;
 import com.liferay.portal.kernel.bean.AutoEscapeBeanHandler;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.json.JSON;
-import com.liferay.portal.kernel.language.LanguageUtil;
+import com.liferay.portal.kernel.util.DateUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
-import com.liferay.portal.kernel.util.HtmlUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.LocalizationUtil;
+import com.liferay.portal.kernel.util.ProxyUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.Validator;
@@ -38,12 +38,11 @@ import com.liferay.portlet.expando.util.ExpandoBridgeFactoryUtil;
 
 import java.io.Serializable;
 
-import java.lang.reflect.Proxy;
-
 import java.sql.Types;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -105,8 +104,8 @@ public class LayoutRevisionModelImpl extends BaseModelImpl<LayoutRevision>
 		};
 	public static final String TABLE_SQL_CREATE = "create table LayoutRevision (layoutRevisionId LONG not null primary key,groupId LONG,companyId LONG,userId LONG,userName VARCHAR(75) null,createDate DATE null,modifiedDate DATE null,layoutSetBranchId LONG,layoutBranchId LONG,parentLayoutRevisionId LONG,head BOOLEAN,major BOOLEAN,plid LONG,privateLayout BOOLEAN,name STRING null,title STRING null,description STRING null,keywords STRING null,robots STRING null,typeSettings TEXT null,iconImage BOOLEAN,iconImageId LONG,themeId VARCHAR(75) null,colorSchemeId VARCHAR(75) null,wapThemeId VARCHAR(75) null,wapColorSchemeId VARCHAR(75) null,css STRING null,status INTEGER,statusByUserId LONG,statusByUserName VARCHAR(75) null,statusDate DATE null)";
 	public static final String TABLE_SQL_DROP = "drop table LayoutRevision";
-	public static final String ORDER_BY_JPQL = " ORDER BY layoutRevision.layoutRevisionId DESC";
-	public static final String ORDER_BY_SQL = " ORDER BY LayoutRevision.layoutRevisionId DESC";
+	public static final String ORDER_BY_JPQL = " ORDER BY layoutRevision.modifiedDate DESC";
+	public static final String ORDER_BY_SQL = " ORDER BY LayoutRevision.modifiedDate DESC";
 	public static final String DATA_SOURCE = "liferayDataSource";
 	public static final String SESSION_FACTORY = "liferaySessionFactory";
 	public static final String TX_MANAGER = "liferayTransactionManager";
@@ -116,6 +115,15 @@ public class LayoutRevisionModelImpl extends BaseModelImpl<LayoutRevision>
 	public static final boolean FINDER_CACHE_ENABLED = GetterUtil.getBoolean(com.liferay.portal.util.PropsUtil.get(
 				"value.object.finder.cache.enabled.com.liferay.portal.model.LayoutRevision"),
 			true);
+	public static final boolean COLUMN_BITMASK_ENABLED = GetterUtil.getBoolean(com.liferay.portal.util.PropsUtil.get(
+				"value.object.column.bitmask.enabled.com.liferay.portal.model.LayoutRevision"),
+			true);
+	public static long HEAD_COLUMN_BITMASK = 1L;
+	public static long LAYOUTBRANCHID_COLUMN_BITMASK = 2L;
+	public static long LAYOUTSETBRANCHID_COLUMN_BITMASK = 4L;
+	public static long PARENTLAYOUTREVISIONID_COLUMN_BITMASK = 8L;
+	public static long PLID_COLUMN_BITMASK = 16L;
+	public static long STATUS_COLUMN_BITMASK = 32L;
 
 	/**
 	 * Converts the soap model instance into a normal model instance.
@@ -177,14 +185,6 @@ public class LayoutRevisionModelImpl extends BaseModelImpl<LayoutRevision>
 		return models;
 	}
 
-	public Class<?> getModelClass() {
-		return LayoutRevision.class;
-	}
-
-	public String getModelClassName() {
-		return LayoutRevision.class.getName();
-	}
-
 	public static final long LOCK_EXPIRATION_TIME = GetterUtil.getLong(com.liferay.portal.util.PropsUtil.get(
 				"lock.expiration.time.com.liferay.portal.model.LayoutRevision"));
 
@@ -205,6 +205,243 @@ public class LayoutRevisionModelImpl extends BaseModelImpl<LayoutRevision>
 
 	public void setPrimaryKeyObj(Serializable primaryKeyObj) {
 		setPrimaryKey(((Long)primaryKeyObj).longValue());
+	}
+
+	public Class<?> getModelClass() {
+		return LayoutRevision.class;
+	}
+
+	public String getModelClassName() {
+		return LayoutRevision.class.getName();
+	}
+
+	@Override
+	public Map<String, Object> getModelAttributes() {
+		Map<String, Object> attributes = new HashMap<String, Object>();
+
+		attributes.put("layoutRevisionId", getLayoutRevisionId());
+		attributes.put("groupId", getGroupId());
+		attributes.put("companyId", getCompanyId());
+		attributes.put("userId", getUserId());
+		attributes.put("userName", getUserName());
+		attributes.put("createDate", getCreateDate());
+		attributes.put("modifiedDate", getModifiedDate());
+		attributes.put("layoutSetBranchId", getLayoutSetBranchId());
+		attributes.put("layoutBranchId", getLayoutBranchId());
+		attributes.put("parentLayoutRevisionId", getParentLayoutRevisionId());
+		attributes.put("head", getHead());
+		attributes.put("major", getMajor());
+		attributes.put("plid", getPlid());
+		attributes.put("privateLayout", getPrivateLayout());
+		attributes.put("name", getName());
+		attributes.put("title", getTitle());
+		attributes.put("description", getDescription());
+		attributes.put("keywords", getKeywords());
+		attributes.put("robots", getRobots());
+		attributes.put("typeSettings", getTypeSettings());
+		attributes.put("iconImage", getIconImage());
+		attributes.put("iconImageId", getIconImageId());
+		attributes.put("themeId", getThemeId());
+		attributes.put("colorSchemeId", getColorSchemeId());
+		attributes.put("wapThemeId", getWapThemeId());
+		attributes.put("wapColorSchemeId", getWapColorSchemeId());
+		attributes.put("css", getCss());
+		attributes.put("status", getStatus());
+		attributes.put("statusByUserId", getStatusByUserId());
+		attributes.put("statusByUserName", getStatusByUserName());
+		attributes.put("statusDate", getStatusDate());
+
+		return attributes;
+	}
+
+	@Override
+	public void setModelAttributes(Map<String, Object> attributes) {
+		Long layoutRevisionId = (Long)attributes.get("layoutRevisionId");
+
+		if (layoutRevisionId != null) {
+			setLayoutRevisionId(layoutRevisionId);
+		}
+
+		Long groupId = (Long)attributes.get("groupId");
+
+		if (groupId != null) {
+			setGroupId(groupId);
+		}
+
+		Long companyId = (Long)attributes.get("companyId");
+
+		if (companyId != null) {
+			setCompanyId(companyId);
+		}
+
+		Long userId = (Long)attributes.get("userId");
+
+		if (userId != null) {
+			setUserId(userId);
+		}
+
+		String userName = (String)attributes.get("userName");
+
+		if (userName != null) {
+			setUserName(userName);
+		}
+
+		Date createDate = (Date)attributes.get("createDate");
+
+		if (createDate != null) {
+			setCreateDate(createDate);
+		}
+
+		Date modifiedDate = (Date)attributes.get("modifiedDate");
+
+		if (modifiedDate != null) {
+			setModifiedDate(modifiedDate);
+		}
+
+		Long layoutSetBranchId = (Long)attributes.get("layoutSetBranchId");
+
+		if (layoutSetBranchId != null) {
+			setLayoutSetBranchId(layoutSetBranchId);
+		}
+
+		Long layoutBranchId = (Long)attributes.get("layoutBranchId");
+
+		if (layoutBranchId != null) {
+			setLayoutBranchId(layoutBranchId);
+		}
+
+		Long parentLayoutRevisionId = (Long)attributes.get(
+				"parentLayoutRevisionId");
+
+		if (parentLayoutRevisionId != null) {
+			setParentLayoutRevisionId(parentLayoutRevisionId);
+		}
+
+		Boolean head = (Boolean)attributes.get("head");
+
+		if (head != null) {
+			setHead(head);
+		}
+
+		Boolean major = (Boolean)attributes.get("major");
+
+		if (major != null) {
+			setMajor(major);
+		}
+
+		Long plid = (Long)attributes.get("plid");
+
+		if (plid != null) {
+			setPlid(plid);
+		}
+
+		Boolean privateLayout = (Boolean)attributes.get("privateLayout");
+
+		if (privateLayout != null) {
+			setPrivateLayout(privateLayout);
+		}
+
+		String name = (String)attributes.get("name");
+
+		if (name != null) {
+			setName(name);
+		}
+
+		String title = (String)attributes.get("title");
+
+		if (title != null) {
+			setTitle(title);
+		}
+
+		String description = (String)attributes.get("description");
+
+		if (description != null) {
+			setDescription(description);
+		}
+
+		String keywords = (String)attributes.get("keywords");
+
+		if (keywords != null) {
+			setKeywords(keywords);
+		}
+
+		String robots = (String)attributes.get("robots");
+
+		if (robots != null) {
+			setRobots(robots);
+		}
+
+		String typeSettings = (String)attributes.get("typeSettings");
+
+		if (typeSettings != null) {
+			setTypeSettings(typeSettings);
+		}
+
+		Boolean iconImage = (Boolean)attributes.get("iconImage");
+
+		if (iconImage != null) {
+			setIconImage(iconImage);
+		}
+
+		Long iconImageId = (Long)attributes.get("iconImageId");
+
+		if (iconImageId != null) {
+			setIconImageId(iconImageId);
+		}
+
+		String themeId = (String)attributes.get("themeId");
+
+		if (themeId != null) {
+			setThemeId(themeId);
+		}
+
+		String colorSchemeId = (String)attributes.get("colorSchemeId");
+
+		if (colorSchemeId != null) {
+			setColorSchemeId(colorSchemeId);
+		}
+
+		String wapThemeId = (String)attributes.get("wapThemeId");
+
+		if (wapThemeId != null) {
+			setWapThemeId(wapThemeId);
+		}
+
+		String wapColorSchemeId = (String)attributes.get("wapColorSchemeId");
+
+		if (wapColorSchemeId != null) {
+			setWapColorSchemeId(wapColorSchemeId);
+		}
+
+		String css = (String)attributes.get("css");
+
+		if (css != null) {
+			setCss(css);
+		}
+
+		Integer status = (Integer)attributes.get("status");
+
+		if (status != null) {
+			setStatus(status);
+		}
+
+		Long statusByUserId = (Long)attributes.get("statusByUserId");
+
+		if (statusByUserId != null) {
+			setStatusByUserId(statusByUserId);
+		}
+
+		String statusByUserName = (String)attributes.get("statusByUserName");
+
+		if (statusByUserName != null) {
+			setStatusByUserName(statusByUserName);
+		}
+
+		Date statusDate = (Date)attributes.get("statusDate");
+
+		if (statusDate != null) {
+			setStatusDate(statusDate);
+		}
 	}
 
 	@JSON
@@ -280,6 +517,8 @@ public class LayoutRevisionModelImpl extends BaseModelImpl<LayoutRevision>
 	}
 
 	public void setModifiedDate(Date modifiedDate) {
+		_columnBitmask = -1L;
+
 		_modifiedDate = modifiedDate;
 	}
 
@@ -289,6 +528,8 @@ public class LayoutRevisionModelImpl extends BaseModelImpl<LayoutRevision>
 	}
 
 	public void setLayoutSetBranchId(long layoutSetBranchId) {
+		_columnBitmask |= LAYOUTSETBRANCHID_COLUMN_BITMASK;
+
 		if (!_setOriginalLayoutSetBranchId) {
 			_setOriginalLayoutSetBranchId = true;
 
@@ -308,7 +549,19 @@ public class LayoutRevisionModelImpl extends BaseModelImpl<LayoutRevision>
 	}
 
 	public void setLayoutBranchId(long layoutBranchId) {
+		_columnBitmask |= LAYOUTBRANCHID_COLUMN_BITMASK;
+
+		if (!_setOriginalLayoutBranchId) {
+			_setOriginalLayoutBranchId = true;
+
+			_originalLayoutBranchId = _layoutBranchId;
+		}
+
 		_layoutBranchId = layoutBranchId;
+	}
+
+	public long getOriginalLayoutBranchId() {
+		return _originalLayoutBranchId;
 	}
 
 	@JSON
@@ -317,7 +570,19 @@ public class LayoutRevisionModelImpl extends BaseModelImpl<LayoutRevision>
 	}
 
 	public void setParentLayoutRevisionId(long parentLayoutRevisionId) {
+		_columnBitmask |= PARENTLAYOUTREVISIONID_COLUMN_BITMASK;
+
+		if (!_setOriginalParentLayoutRevisionId) {
+			_setOriginalParentLayoutRevisionId = true;
+
+			_originalParentLayoutRevisionId = _parentLayoutRevisionId;
+		}
+
 		_parentLayoutRevisionId = parentLayoutRevisionId;
+	}
+
+	public long getOriginalParentLayoutRevisionId() {
+		return _originalParentLayoutRevisionId;
 	}
 
 	@JSON
@@ -330,6 +595,8 @@ public class LayoutRevisionModelImpl extends BaseModelImpl<LayoutRevision>
 	}
 
 	public void setHead(boolean head) {
+		_columnBitmask |= HEAD_COLUMN_BITMASK;
+
 		if (!_setOriginalHead) {
 			_setOriginalHead = true;
 
@@ -362,6 +629,8 @@ public class LayoutRevisionModelImpl extends BaseModelImpl<LayoutRevision>
 	}
 
 	public void setPlid(long plid) {
+		_columnBitmask |= PLID_COLUMN_BITMASK;
+
 		if (!_setOriginalPlid) {
 			_setOriginalPlid = true;
 
@@ -411,26 +680,23 @@ public class LayoutRevisionModelImpl extends BaseModelImpl<LayoutRevision>
 	}
 
 	public String getName(String languageId) {
-		String value = LocalizationUtil.getLocalization(getName(), languageId);
-
-		if (isEscapedModel()) {
-			return HtmlUtil.escape(value);
-		}
-		else {
-			return value;
-		}
+		return LocalizationUtil.getLocalization(getName(), languageId);
 	}
 
 	public String getName(String languageId, boolean useDefault) {
-		String value = LocalizationUtil.getLocalization(getName(), languageId,
-				useDefault);
+		return LocalizationUtil.getLocalization(getName(), languageId,
+			useDefault);
+	}
 
-		if (isEscapedModel()) {
-			return HtmlUtil.escape(value);
-		}
-		else {
-			return value;
-		}
+	public String getNameCurrentLanguageId() {
+		return _nameCurrentLanguageId;
+	}
+
+	@JSON
+	public String getNameCurrentValue() {
+		Locale locale = getLocale(_nameCurrentLanguageId);
+
+		return getName(locale);
 	}
 
 	public Map<Locale, String> getNameMap() {
@@ -459,6 +725,10 @@ public class LayoutRevisionModelImpl extends BaseModelImpl<LayoutRevision>
 		}
 	}
 
+	public void setNameCurrentLanguageId(String languageId) {
+		_nameCurrentLanguageId = languageId;
+	}
+
 	public void setNameMap(Map<Locale, String> nameMap) {
 		setNameMap(nameMap, LocaleUtil.getDefault());
 	}
@@ -468,13 +738,8 @@ public class LayoutRevisionModelImpl extends BaseModelImpl<LayoutRevision>
 			return;
 		}
 
-		Locale[] locales = LanguageUtil.getAvailableLocales();
-
-		for (Locale locale : locales) {
-			String name = nameMap.get(locale);
-
-			setName(name, locale, defaultLocale);
-		}
+		setName(LocalizationUtil.updateLocalization(nameMap, getName(), "Name",
+				LocaleUtil.toLanguageId(defaultLocale)));
 	}
 
 	@JSON
@@ -500,26 +765,23 @@ public class LayoutRevisionModelImpl extends BaseModelImpl<LayoutRevision>
 	}
 
 	public String getTitle(String languageId) {
-		String value = LocalizationUtil.getLocalization(getTitle(), languageId);
-
-		if (isEscapedModel()) {
-			return HtmlUtil.escape(value);
-		}
-		else {
-			return value;
-		}
+		return LocalizationUtil.getLocalization(getTitle(), languageId);
 	}
 
 	public String getTitle(String languageId, boolean useDefault) {
-		String value = LocalizationUtil.getLocalization(getTitle(), languageId,
-				useDefault);
+		return LocalizationUtil.getLocalization(getTitle(), languageId,
+			useDefault);
+	}
 
-		if (isEscapedModel()) {
-			return HtmlUtil.escape(value);
-		}
-		else {
-			return value;
-		}
+	public String getTitleCurrentLanguageId() {
+		return _titleCurrentLanguageId;
+	}
+
+	@JSON
+	public String getTitleCurrentValue() {
+		Locale locale = getLocale(_titleCurrentLanguageId);
+
+		return getTitle(locale);
 	}
 
 	public Map<Locale, String> getTitleMap() {
@@ -548,6 +810,10 @@ public class LayoutRevisionModelImpl extends BaseModelImpl<LayoutRevision>
 		}
 	}
 
+	public void setTitleCurrentLanguageId(String languageId) {
+		_titleCurrentLanguageId = languageId;
+	}
+
 	public void setTitleMap(Map<Locale, String> titleMap) {
 		setTitleMap(titleMap, LocaleUtil.getDefault());
 	}
@@ -557,13 +823,8 @@ public class LayoutRevisionModelImpl extends BaseModelImpl<LayoutRevision>
 			return;
 		}
 
-		Locale[] locales = LanguageUtil.getAvailableLocales();
-
-		for (Locale locale : locales) {
-			String title = titleMap.get(locale);
-
-			setTitle(title, locale, defaultLocale);
-		}
+		setTitle(LocalizationUtil.updateLocalization(titleMap, getTitle(),
+				"Title", LocaleUtil.toLanguageId(defaultLocale)));
 	}
 
 	@JSON
@@ -589,27 +850,23 @@ public class LayoutRevisionModelImpl extends BaseModelImpl<LayoutRevision>
 	}
 
 	public String getDescription(String languageId) {
-		String value = LocalizationUtil.getLocalization(getDescription(),
-				languageId);
-
-		if (isEscapedModel()) {
-			return HtmlUtil.escape(value);
-		}
-		else {
-			return value;
-		}
+		return LocalizationUtil.getLocalization(getDescription(), languageId);
 	}
 
 	public String getDescription(String languageId, boolean useDefault) {
-		String value = LocalizationUtil.getLocalization(getDescription(),
-				languageId, useDefault);
+		return LocalizationUtil.getLocalization(getDescription(), languageId,
+			useDefault);
+	}
 
-		if (isEscapedModel()) {
-			return HtmlUtil.escape(value);
-		}
-		else {
-			return value;
-		}
+	public String getDescriptionCurrentLanguageId() {
+		return _descriptionCurrentLanguageId;
+	}
+
+	@JSON
+	public String getDescriptionCurrentValue() {
+		Locale locale = getLocale(_descriptionCurrentLanguageId);
+
+		return getDescription(locale);
 	}
 
 	public Map<Locale, String> getDescriptionMap() {
@@ -640,6 +897,10 @@ public class LayoutRevisionModelImpl extends BaseModelImpl<LayoutRevision>
 		}
 	}
 
+	public void setDescriptionCurrentLanguageId(String languageId) {
+		_descriptionCurrentLanguageId = languageId;
+	}
+
 	public void setDescriptionMap(Map<Locale, String> descriptionMap) {
 		setDescriptionMap(descriptionMap, LocaleUtil.getDefault());
 	}
@@ -650,13 +911,9 @@ public class LayoutRevisionModelImpl extends BaseModelImpl<LayoutRevision>
 			return;
 		}
 
-		Locale[] locales = LanguageUtil.getAvailableLocales();
-
-		for (Locale locale : locales) {
-			String description = descriptionMap.get(locale);
-
-			setDescription(description, locale, defaultLocale);
-		}
+		setDescription(LocalizationUtil.updateLocalization(descriptionMap,
+				getDescription(), "Description",
+				LocaleUtil.toLanguageId(defaultLocale)));
 	}
 
 	@JSON
@@ -682,27 +939,23 @@ public class LayoutRevisionModelImpl extends BaseModelImpl<LayoutRevision>
 	}
 
 	public String getKeywords(String languageId) {
-		String value = LocalizationUtil.getLocalization(getKeywords(),
-				languageId);
-
-		if (isEscapedModel()) {
-			return HtmlUtil.escape(value);
-		}
-		else {
-			return value;
-		}
+		return LocalizationUtil.getLocalization(getKeywords(), languageId);
 	}
 
 	public String getKeywords(String languageId, boolean useDefault) {
-		String value = LocalizationUtil.getLocalization(getKeywords(),
-				languageId, useDefault);
+		return LocalizationUtil.getLocalization(getKeywords(), languageId,
+			useDefault);
+	}
 
-		if (isEscapedModel()) {
-			return HtmlUtil.escape(value);
-		}
-		else {
-			return value;
-		}
+	public String getKeywordsCurrentLanguageId() {
+		return _keywordsCurrentLanguageId;
+	}
+
+	@JSON
+	public String getKeywordsCurrentValue() {
+		Locale locale = getLocale(_keywordsCurrentLanguageId);
+
+		return getKeywords(locale);
 	}
 
 	public Map<Locale, String> getKeywordsMap() {
@@ -731,6 +984,10 @@ public class LayoutRevisionModelImpl extends BaseModelImpl<LayoutRevision>
 		}
 	}
 
+	public void setKeywordsCurrentLanguageId(String languageId) {
+		_keywordsCurrentLanguageId = languageId;
+	}
+
 	public void setKeywordsMap(Map<Locale, String> keywordsMap) {
 		setKeywordsMap(keywordsMap, LocaleUtil.getDefault());
 	}
@@ -741,13 +998,9 @@ public class LayoutRevisionModelImpl extends BaseModelImpl<LayoutRevision>
 			return;
 		}
 
-		Locale[] locales = LanguageUtil.getAvailableLocales();
-
-		for (Locale locale : locales) {
-			String keywords = keywordsMap.get(locale);
-
-			setKeywords(keywords, locale, defaultLocale);
-		}
+		setKeywords(LocalizationUtil.updateLocalization(keywordsMap,
+				getKeywords(), "Keywords",
+				LocaleUtil.toLanguageId(defaultLocale)));
 	}
 
 	@JSON
@@ -773,26 +1026,23 @@ public class LayoutRevisionModelImpl extends BaseModelImpl<LayoutRevision>
 	}
 
 	public String getRobots(String languageId) {
-		String value = LocalizationUtil.getLocalization(getRobots(), languageId);
-
-		if (isEscapedModel()) {
-			return HtmlUtil.escape(value);
-		}
-		else {
-			return value;
-		}
+		return LocalizationUtil.getLocalization(getRobots(), languageId);
 	}
 
 	public String getRobots(String languageId, boolean useDefault) {
-		String value = LocalizationUtil.getLocalization(getRobots(),
-				languageId, useDefault);
+		return LocalizationUtil.getLocalization(getRobots(), languageId,
+			useDefault);
+	}
 
-		if (isEscapedModel()) {
-			return HtmlUtil.escape(value);
-		}
-		else {
-			return value;
-		}
+	public String getRobotsCurrentLanguageId() {
+		return _robotsCurrentLanguageId;
+	}
+
+	@JSON
+	public String getRobotsCurrentValue() {
+		Locale locale = getLocale(_robotsCurrentLanguageId);
+
+		return getRobots(locale);
 	}
 
 	public Map<Locale, String> getRobotsMap() {
@@ -821,6 +1071,10 @@ public class LayoutRevisionModelImpl extends BaseModelImpl<LayoutRevision>
 		}
 	}
 
+	public void setRobotsCurrentLanguageId(String languageId) {
+		_robotsCurrentLanguageId = languageId;
+	}
+
 	public void setRobotsMap(Map<Locale, String> robotsMap) {
 		setRobotsMap(robotsMap, LocaleUtil.getDefault());
 	}
@@ -830,13 +1084,8 @@ public class LayoutRevisionModelImpl extends BaseModelImpl<LayoutRevision>
 			return;
 		}
 
-		Locale[] locales = LanguageUtil.getAvailableLocales();
-
-		for (Locale locale : locales) {
-			String robots = robotsMap.get(locale);
-
-			setRobots(robots, locale, defaultLocale);
-		}
+		setRobots(LocalizationUtil.updateLocalization(robotsMap, getRobots(),
+				"Robots", LocaleUtil.toLanguageId(defaultLocale)));
 	}
 
 	@JSON
@@ -951,7 +1200,19 @@ public class LayoutRevisionModelImpl extends BaseModelImpl<LayoutRevision>
 	}
 
 	public void setStatus(int status) {
+		_columnBitmask |= STATUS_COLUMN_BITMASK;
+
+		if (!_setOriginalStatus) {
+			_setOriginalStatus = true;
+
+			_originalStatus = _status;
+		}
+
 		_status = status;
+	}
+
+	public int getOriginalStatus() {
+		return _originalStatus;
 	}
 
 	@JSON
@@ -1029,6 +1290,15 @@ public class LayoutRevisionModelImpl extends BaseModelImpl<LayoutRevision>
 		}
 	}
 
+	public boolean isInTrash() {
+		if (getStatus() == WorkflowConstants.STATUS_IN_TRASH) {
+			return true;
+		}
+		else {
+			return false;
+		}
+	}
+
 	public boolean isPending() {
 		if (getStatus() == WorkflowConstants.STATUS_PENDING) {
 			return true;
@@ -1038,35 +1308,32 @@ public class LayoutRevisionModelImpl extends BaseModelImpl<LayoutRevision>
 		}
 	}
 
+	public long getColumnBitmask() {
+		return _columnBitmask;
+	}
+
 	@Override
 	public LayoutRevision toEscapedModel() {
-		if (isEscapedModel()) {
-			return (LayoutRevision)this;
+		if (_escapedModelProxy == null) {
+			_escapedModelProxy = (LayoutRevision)ProxyUtil.newProxyInstance(_classLoader,
+					_escapedModelProxyInterfaces,
+					new AutoEscapeBeanHandler(this));
 		}
-		else {
-			if (_escapedModelProxy == null) {
-				_escapedModelProxy = (LayoutRevision)Proxy.newProxyInstance(_classLoader,
-						_escapedModelProxyInterfaces,
-						new AutoEscapeBeanHandler(this));
-			}
 
-			return _escapedModelProxy;
-		}
+		return _escapedModelProxy;
 	}
 
 	@Override
 	public ExpandoBridge getExpandoBridge() {
-		if (_expandoBridge == null) {
-			_expandoBridge = ExpandoBridgeFactoryUtil.getExpandoBridge(getCompanyId(),
-					LayoutRevision.class.getName(), getPrimaryKey());
-		}
-
-		return _expandoBridge;
+		return ExpandoBridgeFactoryUtil.getExpandoBridge(getCompanyId(),
+			LayoutRevision.class.getName(), getPrimaryKey());
 	}
 
 	@Override
 	public void setExpandoBridgeAttributes(ServiceContext serviceContext) {
-		getExpandoBridge().setAttributes(serviceContext);
+		ExpandoBridge expandoBridge = getExpandoBridge();
+
+		expandoBridge.setAttributes(serviceContext);
 	}
 
 	@Override
@@ -1113,15 +1380,8 @@ public class LayoutRevisionModelImpl extends BaseModelImpl<LayoutRevision>
 	public int compareTo(LayoutRevision layoutRevision) {
 		int value = 0;
 
-		if (getLayoutRevisionId() < layoutRevision.getLayoutRevisionId()) {
-			value = -1;
-		}
-		else if (getLayoutRevisionId() > layoutRevision.getLayoutRevisionId()) {
-			value = 1;
-		}
-		else {
-			value = 0;
-		}
+		value = DateUtil.compareTo(getModifiedDate(),
+				layoutRevision.getModifiedDate());
 
 		value = value * -1;
 
@@ -1170,6 +1430,14 @@ public class LayoutRevisionModelImpl extends BaseModelImpl<LayoutRevision>
 
 		layoutRevisionModelImpl._setOriginalLayoutSetBranchId = false;
 
+		layoutRevisionModelImpl._originalLayoutBranchId = layoutRevisionModelImpl._layoutBranchId;
+
+		layoutRevisionModelImpl._setOriginalLayoutBranchId = false;
+
+		layoutRevisionModelImpl._originalParentLayoutRevisionId = layoutRevisionModelImpl._parentLayoutRevisionId;
+
+		layoutRevisionModelImpl._setOriginalParentLayoutRevisionId = false;
+
 		layoutRevisionModelImpl._originalHead = layoutRevisionModelImpl._head;
 
 		layoutRevisionModelImpl._setOriginalHead = false;
@@ -1177,6 +1445,12 @@ public class LayoutRevisionModelImpl extends BaseModelImpl<LayoutRevision>
 		layoutRevisionModelImpl._originalPlid = layoutRevisionModelImpl._plid;
 
 		layoutRevisionModelImpl._setOriginalPlid = false;
+
+		layoutRevisionModelImpl._originalStatus = layoutRevisionModelImpl._status;
+
+		layoutRevisionModelImpl._setOriginalStatus = false;
+
+		layoutRevisionModelImpl._columnBitmask = 0;
 	}
 
 	@Override
@@ -1571,7 +1845,11 @@ public class LayoutRevisionModelImpl extends BaseModelImpl<LayoutRevision>
 	private long _originalLayoutSetBranchId;
 	private boolean _setOriginalLayoutSetBranchId;
 	private long _layoutBranchId;
+	private long _originalLayoutBranchId;
+	private boolean _setOriginalLayoutBranchId;
 	private long _parentLayoutRevisionId;
+	private long _originalParentLayoutRevisionId;
+	private boolean _setOriginalParentLayoutRevisionId;
 	private boolean _head;
 	private boolean _originalHead;
 	private boolean _setOriginalHead;
@@ -1581,10 +1859,15 @@ public class LayoutRevisionModelImpl extends BaseModelImpl<LayoutRevision>
 	private boolean _setOriginalPlid;
 	private boolean _privateLayout;
 	private String _name;
+	private String _nameCurrentLanguageId;
 	private String _title;
+	private String _titleCurrentLanguageId;
 	private String _description;
+	private String _descriptionCurrentLanguageId;
 	private String _keywords;
+	private String _keywordsCurrentLanguageId;
 	private String _robots;
+	private String _robotsCurrentLanguageId;
 	private String _typeSettings;
 	private boolean _iconImage;
 	private long _iconImageId;
@@ -1594,10 +1877,12 @@ public class LayoutRevisionModelImpl extends BaseModelImpl<LayoutRevision>
 	private String _wapColorSchemeId;
 	private String _css;
 	private int _status;
+	private int _originalStatus;
+	private boolean _setOriginalStatus;
 	private long _statusByUserId;
 	private String _statusByUserUuid;
 	private String _statusByUserName;
 	private Date _statusDate;
-	private transient ExpandoBridge _expandoBridge;
+	private long _columnBitmask;
 	private LayoutRevision _escapedModelProxy;
 }

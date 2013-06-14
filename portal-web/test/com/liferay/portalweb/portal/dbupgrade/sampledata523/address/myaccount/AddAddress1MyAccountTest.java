@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -23,9 +23,10 @@ import com.liferay.portalweb.portal.util.RuntimeVariables;
 public class AddAddress1MyAccountTest extends BaseTestCase {
 	public void testAddAddress1MyAccount() throws Exception {
 		selenium.open("/web/guest/home");
+		loadRequiredJavaScriptModules();
 
 		for (int second = 0;; second++) {
-			if (second >= 60) {
+			if (second >= 90) {
 				fail("timeout");
 			}
 
@@ -40,17 +41,16 @@ public class AddAddress1MyAccountTest extends BaseTestCase {
 			Thread.sleep(1000);
 		}
 
-		selenium.saveScreenShotAndSource();
 		selenium.clickAt("link=Control Panel", RuntimeVariables.replace(""));
 		selenium.waitForPageToLoad("30000");
-		selenium.saveScreenShotAndSource();
+		loadRequiredJavaScriptModules();
 		selenium.clickAt("link=My Account", RuntimeVariables.replace(""));
 		selenium.waitForPageToLoad("30000");
-		selenium.saveScreenShotAndSource();
+		loadRequiredJavaScriptModules();
 		selenium.clickAt("addressesLink", RuntimeVariables.replace(""));
 
 		for (int second = 0;; second++) {
-			if (second >= 60) {
+			if (second >= 90) {
 				fail("timeout");
 			}
 
@@ -65,27 +65,21 @@ public class AddAddress1MyAccountTest extends BaseTestCase {
 			Thread.sleep(1000);
 		}
 
-		selenium.saveScreenShotAndSource();
 		selenium.type("_2_addressStreet10",
 			RuntimeVariables.replace("1220 Brea Canyon Rd"));
-		selenium.saveScreenShotAndSource();
 		selenium.select("_2_addressTypeId0",
 			RuntimeVariables.replace("label=Business"));
 		selenium.type("_2_addressStreet20", RuntimeVariables.replace("Ste 12"));
-		selenium.saveScreenShotAndSource();
 		selenium.type("_2_addressZip0", RuntimeVariables.replace("91789"));
-		selenium.saveScreenShotAndSource();
 		selenium.type("_2_addressStreet30", RuntimeVariables.replace("Walnut"));
-		selenium.saveScreenShotAndSource();
 		selenium.type("_2_addressCity0", RuntimeVariables.replace("Los Angeles"));
-		selenium.saveScreenShotAndSource();
 		selenium.select("_2_addressCountryId0",
 			RuntimeVariables.replace("label=United States"));
 		selenium.click("_2_addressPrimary0");
 		selenium.click("_2_addressMailing0Checkbox");
 
 		for (int second = 0;; second++) {
-			if (second >= 60) {
+			if (second >= 90) {
 				fail("timeout");
 			}
 
@@ -103,16 +97,15 @@ public class AddAddress1MyAccountTest extends BaseTestCase {
 			Thread.sleep(1000);
 		}
 
-		selenium.saveScreenShotAndSource();
 		selenium.select("_2_addressRegionId0",
 			RuntimeVariables.replace("label=California"));
 		Thread.sleep(5000);
 		selenium.click(RuntimeVariables.replace("//input[@value='Save']"));
 		selenium.waitForPageToLoad("30000");
-		selenium.saveScreenShotAndSource();
+		loadRequiredJavaScriptModules();
 
 		for (int second = 0;; second++) {
-			if (second >= 60) {
+			if (second >= 90) {
 				fail("timeout");
 			}
 
@@ -128,10 +121,8 @@ public class AddAddress1MyAccountTest extends BaseTestCase {
 			Thread.sleep(1000);
 		}
 
-		selenium.saveScreenShotAndSource();
-
 		for (int second = 0;; second++) {
-			if (second >= 60) {
+			if (second >= 90) {
 				fail("timeout");
 			}
 
@@ -147,7 +138,6 @@ public class AddAddress1MyAccountTest extends BaseTestCase {
 			Thread.sleep(1000);
 		}
 
-		selenium.saveScreenShotAndSource();
 		assertEquals("1220 Brea Canyon Rd",
 			selenium.getValue("_2_addressStreet10"));
 		assertEquals(RuntimeVariables.replace(
@@ -161,9 +151,7 @@ public class AddAddress1MyAccountTest extends BaseTestCase {
 		assertEquals("United States",
 			selenium.getSelectedLabel("_2_addressCountryId0"));
 		assertTrue(selenium.isChecked("_2_addressPrimary0"));
-		selenium.saveScreenShotAndSource();
 		assertTrue(selenium.isChecked("_2_addressMailing0Checkbox"));
-		selenium.saveScreenShotAndSource();
 		assertEquals("California",
 			selenium.getSelectedLabel("_2_addressRegionId0"));
 	}

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -25,8 +25,8 @@ public class LiferayPortletMode extends PortletMode {
 
 	public static final PortletMode CONFIG = new PortletMode("config");
 
-	public static final PortletMode EDIT_DEFAULTS =
-		new PortletMode("edit_defaults");
+	public static final PortletMode EDIT_DEFAULTS = new PortletMode(
+		"edit_defaults");
 
 	public static final PortletMode EDIT_GUEST = new PortletMode("edit_guest");
 

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -23,9 +23,10 @@ import com.liferay.portalweb.portal.util.RuntimeVariables;
 public class RateWCWebContentAPTest extends BaseTestCase {
 	public void testRateWCWebContentAP() throws Exception {
 		selenium.open("/web/guest/home/");
+		loadRequiredJavaScriptModules();
 
 		for (int second = 0;; second++) {
-			if (second >= 60) {
+			if (second >= 90) {
 				fail("timeout");
 			}
 
@@ -40,14 +41,13 @@ public class RateWCWebContentAPTest extends BaseTestCase {
 			Thread.sleep(1000);
 		}
 
-		selenium.saveScreenShotAndSource();
 		selenium.clickAt("link=Asset Publisher Test Page",
 			RuntimeVariables.replace("Asset Publisher Test Page"));
 		selenium.waitForPageToLoad("30000");
-		selenium.saveScreenShotAndSource();
+		loadRequiredJavaScriptModules();
 
 		for (int second = 0;; second++) {
-			if (second >= 60) {
+			if (second >= 90) {
 				fail("timeout");
 			}
 
@@ -63,22 +63,20 @@ public class RateWCWebContentAPTest extends BaseTestCase {
 			Thread.sleep(1000);
 		}
 
-		selenium.saveScreenShotAndSource();
-
-		String voteCount = selenium.getFirstNumberIncrement(
-				"xPath=(//div[@class='aui-rating-label-element'])[2]");
-		RuntimeVariables.setValue("voteCount", voteCount);
+		assertEquals(RuntimeVariables.replace("Average (0 Votes)"),
+			selenium.getText(
+				"xPath=(//div[@class='aui-rating-label-element'])[2]"));
 		selenium.clickAt("//a[5]", RuntimeVariables.replace("5 Stars"));
 
 		for (int second = 0;; second++) {
-			if (second >= 60) {
+			if (second >= 90) {
 				fail("timeout");
 			}
 
 			try {
-				if (selenium.isPartialText(
-							"xPath=(//div[@class='aui-rating-label-element'])[2]",
-							RuntimeVariables.getValue("voteCount"))) {
+				if (RuntimeVariables.replace("Average (1 Vote)")
+										.equals(selenium.getText(
+								"xPath=(//div[@class='aui-rating-label-element'])[2]"))) {
 					break;
 				}
 			}
@@ -88,9 +86,8 @@ public class RateWCWebContentAPTest extends BaseTestCase {
 			Thread.sleep(1000);
 		}
 
-		selenium.saveScreenShotAndSource();
-		assertTrue(selenium.isPartialText(
-				"xPath=(//div[@class='aui-rating-label-element'])[2]",
-				RuntimeVariables.getValue("voteCount")));
+		assertEquals(RuntimeVariables.replace("Average (1 Vote)"),
+			selenium.getText(
+				"xPath=(//div[@class='aui-rating-label-element'])[2]"));
 	}
 }

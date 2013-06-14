@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -15,7 +15,6 @@
 package com.liferay.portal.service;
 
 import com.liferay.portal.kernel.bean.PortalBeanLocatorUtil;
-import com.liferay.portal.kernel.util.MethodCache;
 import com.liferay.portal.kernel.util.ReferenceRegistry;
 
 /**
@@ -103,12 +102,12 @@ public class LayoutTemplateLocalServiceUtil {
 	public static void readLayoutTemplate(java.lang.String servletContextName,
 		javax.servlet.ServletContext servletContext,
 		java.util.Set<com.liferay.portal.kernel.util.ObjectValuePair<java.lang.String, java.lang.Boolean>> layoutTemplateIds,
-		com.liferay.portal.kernel.xml.Element el, boolean standard,
+		com.liferay.portal.kernel.xml.Element element, boolean standard,
 		java.lang.String themeId,
 		com.liferay.portal.kernel.plugin.PluginPackage pluginPackage) {
 		getService()
 			.readLayoutTemplate(servletContextName, servletContext,
-			layoutTemplateIds, el, standard, themeId, pluginPackage);
+			layoutTemplateIds, element, standard, themeId, pluginPackage);
 	}
 
 	public static void uninstallLayoutTemplate(
@@ -126,20 +125,15 @@ public class LayoutTemplateLocalServiceUtil {
 
 			ReferenceRegistry.registerReference(LayoutTemplateLocalServiceUtil.class,
 				"_service");
-			MethodCache.remove(LayoutTemplateLocalService.class);
 		}
 
 		return _service;
 	}
 
+	/**
+	 * @deprecated
+	 */
 	public void setService(LayoutTemplateLocalService service) {
-		MethodCache.remove(LayoutTemplateLocalService.class);
-
-		_service = service;
-
-		ReferenceRegistry.registerReference(LayoutTemplateLocalServiceUtil.class,
-			"_service");
-		MethodCache.remove(LayoutTemplateLocalService.class);
 	}
 
 	private static LayoutTemplateLocalService _service;

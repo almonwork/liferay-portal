@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -35,7 +35,8 @@ import com.liferay.portal.kernel.transaction.Transactional;
  */
 @Transactional(isolation = Isolation.PORTAL, rollbackFor =  {
 	PortalException.class, SystemException.class})
-public interface SubscriptionLocalService extends PersistedModelLocalService {
+public interface SubscriptionLocalService extends BaseLocalService,
+	PersistedModelLocalService {
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
@@ -66,10 +67,12 @@ public interface SubscriptionLocalService extends PersistedModelLocalService {
 	* Deletes the subscription with the primary key from the database. Also notifies the appropriate model listeners.
 	*
 	* @param subscriptionId the primary key of the subscription
+	* @return the subscription that was removed
 	* @throws PortalException if a subscription with the primary key could not be found
 	* @throws SystemException if a system exception occurred
 	*/
-	public void deleteSubscription(long subscriptionId)
+	public com.liferay.portal.model.Subscription deleteSubscription(
+		long subscriptionId)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException;
 
@@ -77,13 +80,16 @@ public interface SubscriptionLocalService extends PersistedModelLocalService {
 	* Deletes the subscription from the database. Also notifies the appropriate model listeners.
 	*
 	* @param subscription the subscription
+	* @return the subscription that was removed
 	* @throws PortalException
 	* @throws SystemException if a system exception occurred
 	*/
-	public void deleteSubscription(
+	public com.liferay.portal.model.Subscription deleteSubscription(
 		com.liferay.portal.model.Subscription subscription)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException;
+
+	public com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery();
 
 	/**
 	* Performs a dynamic query on the database and returns the matching rows.
@@ -145,6 +151,11 @@ public interface SubscriptionLocalService extends PersistedModelLocalService {
 	*/
 	public long dynamicQueryCount(
 		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery)
+		throws com.liferay.portal.kernel.exception.SystemException;
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public com.liferay.portal.model.Subscription fetchSubscription(
+		long subscriptionId)
 		throws com.liferay.portal.kernel.exception.SystemException;
 
 	/**
@@ -269,7 +280,17 @@ public interface SubscriptionLocalService extends PersistedModelLocalService {
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public java.util.List<com.liferay.portal.model.Subscription> getUserSubscriptions(
+		long userId, int start, int end,
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
+		throws com.liferay.portal.kernel.exception.SystemException;
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public java.util.List<com.liferay.portal.model.Subscription> getUserSubscriptions(
 		long userId, java.lang.String className)
+		throws com.liferay.portal.kernel.exception.SystemException;
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public int getUserSubscriptionsCount(long userId)
 		throws com.liferay.portal.kernel.exception.SystemException;
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)

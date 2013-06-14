@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -84,18 +84,36 @@ public class MBActivityInterpreter extends BaseSocialActivityInterpreter {
 		String titlePattern = null;
 
 		if (activityType == MBActivityKeys.ADD_MESSAGE) {
-			titlePattern = "activity-message-boards-add-message";
+			if (activity.getReceiverUserId() == 0) {
+				if (Validator.isNull(groupName)) {
+					titlePattern = "activity-message-boards-add-message";
+				}
+				else {
+					titlePattern = "activity-message-boards-add-message-in";
+				}
+			}
+			else {
+				if (Validator.isNull(groupName)) {
+					titlePattern = "activity-message-boards-reply-message";
+				}
+				else {
+					titlePattern = "activity-message-boards-reply-message-in";
+				}
+			}
 		}
-		else if (activityType == MBActivityKeys.REPLY_MESSAGE) {
-			titlePattern = "activity-message-boards-reply-message";
-		}
+		else if ((activityType == MBActivityKeys.REPLY_MESSAGE) &&
+				 (activity.getReceiverUserId() > 0)) {
 
-		if (Validator.isNotNull(groupName)) {
-			titlePattern += "-in";
+			if (Validator.isNull(groupName)) {
+				titlePattern = "activity-message-boards-reply-message";
+			}
+			else {
+				titlePattern = "activity-message-boards-reply-message-in";
+			}
 		}
 
 		String messageSubject = wrapLink(
-			link, HtmlUtil.escape(cleanContent(message.getSubject())));
+			link, HtmlUtil.escape(message.getSubject()));
 
 		Object[] titleArguments = new Object[] {
 			groupName, creatorUserName, receiverUserName, messageSubject

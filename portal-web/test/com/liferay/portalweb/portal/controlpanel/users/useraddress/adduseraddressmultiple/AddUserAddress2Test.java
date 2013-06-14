@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -22,10 +22,11 @@ import com.liferay.portalweb.portal.util.RuntimeVariables;
  */
 public class AddUserAddress2Test extends BaseTestCase {
 	public void testAddUserAddress2() throws Exception {
-		selenium.open("/web/guest/home");
+		selenium.open("/web/guest/home/");
+		loadRequiredJavaScriptModules();
 
 		for (int second = 0;; second++) {
-			if (second >= 60) {
+			if (second >= 90) {
 				fail("timeout");
 			}
 
@@ -40,26 +41,47 @@ public class AddUserAddress2Test extends BaseTestCase {
 			Thread.sleep(1000);
 		}
 
-		selenium.saveScreenShotAndSource();
-		selenium.clickAt("link=Control Panel", RuntimeVariables.replace(""));
+		selenium.clickAt("link=Control Panel",
+			RuntimeVariables.replace("Control Panel"));
 		selenium.waitForPageToLoad("30000");
-		selenium.saveScreenShotAndSource();
-		selenium.clickAt("link=Users", RuntimeVariables.replace(""));
+		loadRequiredJavaScriptModules();
+		selenium.clickAt("link=Users and Organizations",
+			RuntimeVariables.replace("Users and Organizations"));
 		selenium.waitForPageToLoad("30000");
-		selenium.saveScreenShotAndSource();
-		selenium.type("_125_keywords", RuntimeVariables.replace("selen01"));
-		selenium.saveScreenShotAndSource();
+		loadRequiredJavaScriptModules();
+		selenium.type("//input[@id='_125_keywords']",
+			RuntimeVariables.replace("selen01"));
 		selenium.clickAt("//input[@value='Search']",
-			RuntimeVariables.replace(""));
+			RuntimeVariables.replace("Search"));
 		selenium.waitForPageToLoad("30000");
-		selenium.saveScreenShotAndSource();
+		loadRequiredJavaScriptModules();
 		selenium.clickAt("//td[2]/a", RuntimeVariables.replace("User Name"));
 		selenium.waitForPageToLoad("30000");
-		selenium.saveScreenShotAndSource();
-		selenium.clickAt("_125_addressesLink", RuntimeVariables.replace(""));
+		loadRequiredJavaScriptModules();
 
 		for (int second = 0;; second++) {
-			if (second >= 60) {
+			if (second >= 90) {
+				fail("timeout");
+			}
+
+			try {
+				if (selenium.isVisible("//a[@id='_125_addressesLink']")) {
+					break;
+				}
+			}
+			catch (Exception e) {
+			}
+
+			Thread.sleep(1000);
+		}
+
+		assertTrue(selenium.isPartialText("//a[@id='_125_addressesLink']",
+				"Addresses"));
+		selenium.clickAt("//a[@id='_125_addressesLink']",
+			RuntimeVariables.replace("Addresses"));
+
+		for (int second = 0;; second++) {
+			if (second >= 90) {
 				fail("timeout");
 			}
 
@@ -74,17 +96,16 @@ public class AddUserAddress2Test extends BaseTestCase {
 			Thread.sleep(1000);
 		}
 
-		selenium.saveScreenShotAndSource();
 		selenium.clickAt("//div[2]/div/span/span/button[1]",
-			RuntimeVariables.replace(""));
+			RuntimeVariables.replace("Add Row"));
 
 		for (int second = 0;; second++) {
-			if (second >= 60) {
+			if (second >= 90) {
 				fail("timeout");
 			}
 
 			try {
-				if (selenium.isVisible("_125_addressStreet1_2")) {
+				if (selenium.isVisible("//input[@id='_125_addressStreet1_2']")) {
 					break;
 				}
 			}
@@ -94,35 +115,29 @@ public class AddUserAddress2Test extends BaseTestCase {
 			Thread.sleep(1000);
 		}
 
-		selenium.saveScreenShotAndSource();
-		selenium.type("_125_addressStreet1_2",
+		selenium.type("//input[@id='_125_addressStreet1_2']",
 			RuntimeVariables.replace("123 Lets"));
-		selenium.saveScreenShotAndSource();
-		selenium.select("_125_addressTypeId2",
+		selenium.select("//select[@id='_125_addressTypeId2']",
 			RuntimeVariables.replace("label=Other"));
-		selenium.type("_125_addressStreet2_2",
+		selenium.type("//input[@id='_125_addressStreet2_2']",
 			RuntimeVariables.replace("897 Hope"));
-		selenium.saveScreenShotAndSource();
-		selenium.type("_125_addressZip2", RuntimeVariables.replace("00000"));
-		selenium.saveScreenShotAndSource();
-		selenium.type("_125_addressStreet3_2",
+		selenium.type("//input[@id='_125_addressZip2']",
+			RuntimeVariables.replace("00000"));
+		selenium.type("//input[@id='_125_addressStreet3_2']",
 			RuntimeVariables.replace("7896 This"));
-		selenium.saveScreenShotAndSource();
-		selenium.type("_125_addressCity2", RuntimeVariables.replace("Works"));
-		selenium.saveScreenShotAndSource();
-		selenium.select("_125_addressCountryId2",
+		selenium.type("//input[@id='_125_addressCity2']",
+			RuntimeVariables.replace("Works"));
+		selenium.select("//select[@id='_125_addressCountryId2']",
 			RuntimeVariables.replace("label=Canada"));
 
 		for (int second = 0;; second++) {
-			if (second >= 60) {
+			if (second >= 90) {
 				fail("timeout");
 			}
 
 			try {
-				if (RuntimeVariables.replace(
-							"AlbertaBritish ColumbiaManitobaNew BrunswickNewfoundland and LabradorNorthwest TerritoriesNova ScotiaNunavutOntarioPrince Edward IslandQuebecSaskatchewanYukon")
-										.equals(selenium.getText(
-								"_125_addressRegionId2"))) {
+				if (selenium.isPartialText(
+							"//select[@id='_125_addressRegionId2']", "Ontario")) {
 					break;
 				}
 			}
@@ -132,22 +147,36 @@ public class AddUserAddress2Test extends BaseTestCase {
 			Thread.sleep(1000);
 		}
 
-		selenium.saveScreenShotAndSource();
-		selenium.select("_125_addressRegionId2",
+		selenium.select("//select[@id='_125_addressRegionId2']",
 			RuntimeVariables.replace("label=Ontario"));
-		Thread.sleep(5000);
-		selenium.clickAt("//input[@value='Save']", RuntimeVariables.replace(""));
+		selenium.clickAt("//input[@value='Save']",
+			RuntimeVariables.replace("Save"));
 		selenium.waitForPageToLoad("30000");
-		selenium.saveScreenShotAndSource();
+		loadRequiredJavaScriptModules();
+		assertEquals(RuntimeVariables.replace(
+				"Your request completed successfully."),
+			selenium.getText("//div[@class='portlet-msg-success']"));
+		assertEquals("123 Lets",
+			selenium.getValue("//input[@id='_125_addressStreet1_1']"));
+		assertEquals("Other",
+			selenium.getSelectedLabel("//select[@id='_125_addressTypeId1']"));
+		assertEquals("897 Hope",
+			selenium.getValue("//input[@id='_125_addressStreet2_1']"));
+		assertEquals("00000",
+			selenium.getValue("//input[@id='_125_addressZip1']"));
+		assertEquals("7896 This",
+			selenium.getValue("//input[@id='_125_addressStreet3_1']"));
+		assertEquals("Works",
+			selenium.getValue("//input[@id='_125_addressCity1']"));
 
 		for (int second = 0;; second++) {
-			if (second >= 60) {
+			if (second >= 90) {
 				fail("timeout");
 			}
 
 			try {
 				if ("Canada".equals(selenium.getSelectedLabel(
-								"_125_addressCountryId1"))) {
+								"//select[@id='_125_addressCountryId1']"))) {
 					break;
 				}
 			}
@@ -157,16 +186,17 @@ public class AddUserAddress2Test extends BaseTestCase {
 			Thread.sleep(1000);
 		}
 
-		selenium.saveScreenShotAndSource();
+		assertEquals("Canada",
+			selenium.getSelectedLabel("//select[@id='_125_addressCountryId1']"));
 
 		for (int second = 0;; second++) {
-			if (second >= 60) {
+			if (second >= 90) {
 				fail("timeout");
 			}
 
 			try {
 				if ("Ontario".equals(selenium.getSelectedLabel(
-								"_125_addressRegionId1"))) {
+								"//select[@id='_125_addressRegionId1']"))) {
 					break;
 				}
 			}
@@ -176,19 +206,7 @@ public class AddUserAddress2Test extends BaseTestCase {
 			Thread.sleep(1000);
 		}
 
-		selenium.saveScreenShotAndSource();
-		assertEquals(RuntimeVariables.replace(
-				"Your request completed successfully."),
-			selenium.getText("//section/div/div/div/div[1]"));
-		assertEquals("123 Lets", selenium.getValue("_125_addressStreet1_1"));
-		assertEquals("Other", selenium.getSelectedLabel("_125_addressTypeId1"));
-		assertEquals("897 Hope", selenium.getValue("_125_addressStreet2_1"));
-		assertEquals("00000", selenium.getValue("_125_addressZip1"));
-		assertEquals("7896 This", selenium.getValue("_125_addressStreet3_1"));
-		assertEquals("Works", selenium.getValue("_125_addressCity1"));
-		assertEquals("Canada",
-			selenium.getSelectedLabel("_125_addressCountryId1"));
 		assertEquals("Ontario",
-			selenium.getSelectedLabel("_125_addressRegionId1"));
+			selenium.getSelectedLabel("//select[@id='_125_addressRegionId1']"));
 	}
 }

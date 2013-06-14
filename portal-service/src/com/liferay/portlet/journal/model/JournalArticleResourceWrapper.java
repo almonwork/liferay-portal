@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,6 +14,11 @@
 
 package com.liferay.portlet.journal.model;
 
+import com.liferay.portal.model.ModelWrapper;
+
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * <p>
  * This class is a wrapper for {@link JournalArticleResource}.
@@ -23,7 +28,8 @@ package com.liferay.portlet.journal.model;
  * @see       JournalArticleResource
  * @generated
  */
-public class JournalArticleResourceWrapper implements JournalArticleResource {
+public class JournalArticleResourceWrapper implements JournalArticleResource,
+	ModelWrapper<JournalArticleResource> {
 	public JournalArticleResourceWrapper(
 		JournalArticleResource journalArticleResource) {
 		_journalArticleResource = journalArticleResource;
@@ -35,6 +41,43 @@ public class JournalArticleResourceWrapper implements JournalArticleResource {
 
 	public String getModelClassName() {
 		return JournalArticleResource.class.getName();
+	}
+
+	public Map<String, Object> getModelAttributes() {
+		Map<String, Object> attributes = new HashMap<String, Object>();
+
+		attributes.put("uuid", getUuid());
+		attributes.put("resourcePrimKey", getResourcePrimKey());
+		attributes.put("groupId", getGroupId());
+		attributes.put("articleId", getArticleId());
+
+		return attributes;
+	}
+
+	public void setModelAttributes(Map<String, Object> attributes) {
+		String uuid = (String)attributes.get("uuid");
+
+		if (uuid != null) {
+			setUuid(uuid);
+		}
+
+		Long resourcePrimKey = (Long)attributes.get("resourcePrimKey");
+
+		if (resourcePrimKey != null) {
+			setResourcePrimKey(resourcePrimKey);
+		}
+
+		Long groupId = (Long)attributes.get("groupId");
+
+		if (groupId != null) {
+			setGroupId(groupId);
+		}
+
+		String articleId = (String)attributes.get("articleId");
+
+		if (articleId != null) {
+			setArticleId(articleId);
+		}
 	}
 
 	/**
@@ -147,10 +190,6 @@ public class JournalArticleResourceWrapper implements JournalArticleResource {
 		return _journalArticleResource.isEscapedModel();
 	}
 
-	public void setEscapedModel(boolean escapedModel) {
-		_journalArticleResource.setEscapedModel(escapedModel);
-	}
-
 	public java.io.Serializable getPrimaryKeyObj() {
 		return _journalArticleResource.getPrimaryKeyObj();
 	}
@@ -205,7 +244,14 @@ public class JournalArticleResourceWrapper implements JournalArticleResource {
 		_journalArticleResource.persist();
 	}
 
+	/**
+	 * @deprecated Renamed to {@link #getWrappedModel}
+	 */
 	public JournalArticleResource getWrappedJournalArticleResource() {
+		return _journalArticleResource;
+	}
+
+	public JournalArticleResource getWrappedModel() {
 		return _journalArticleResource;
 	}
 

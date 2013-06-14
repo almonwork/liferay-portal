@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -15,7 +15,6 @@
 package com.liferay.portlet.documentlibrary.service;
 
 import com.liferay.portal.kernel.bean.PortalBeanLocatorUtil;
-import com.liferay.portal.kernel.util.MethodCache;
 import com.liferay.portal.kernel.util.ReferenceRegistry;
 
 /**
@@ -37,6 +36,25 @@ public class DLFileEntryTypeServiceUtil {
 	 *
 	 * Never modify this class directly. Add custom service methods to {@link com.liferay.portlet.documentlibrary.service.impl.DLFileEntryTypeServiceImpl} and rerun ServiceBuilder to regenerate this class.
 	 */
+
+	/**
+	* Returns the Spring bean ID for this bean.
+	*
+	* @return the Spring bean ID for this bean
+	*/
+	public static java.lang.String getBeanIdentifier() {
+		return getService().getBeanIdentifier();
+	}
+
+	/**
+	* Sets the Spring bean ID for this bean.
+	*
+	* @param beanIdentifier the Spring bean ID for this bean
+	*/
+	public static void setBeanIdentifier(java.lang.String beanIdentifier) {
+		getService().setBeanIdentifier(beanIdentifier);
+	}
+
 	public static com.liferay.portlet.documentlibrary.model.DLFileEntryType addFileEntryType(
 		long groupId, java.lang.String name, java.lang.String description,
 		long[] ddmStructureIds,
@@ -62,14 +80,32 @@ public class DLFileEntryTypeServiceUtil {
 	}
 
 	public static java.util.List<com.liferay.portlet.documentlibrary.model.DLFileEntryType> getFileEntryTypes(
-		long groupId, int start, int end)
+		long[] groupIds)
 		throws com.liferay.portal.kernel.exception.SystemException {
-		return getService().getFileEntryTypes(groupId, start, end);
+		return getService().getFileEntryTypes(groupIds);
 	}
 
-	public static int getFileEntryTypesCount(long groupId)
+	public static int getFileEntryTypesCount(long[] groupIds)
 		throws com.liferay.portal.kernel.exception.SystemException {
-		return getService().getFileEntryTypesCount(groupId);
+		return getService().getFileEntryTypesCount(groupIds);
+	}
+
+	public static java.util.List<com.liferay.portlet.documentlibrary.model.DLFileEntryType> search(
+		long companyId, long[] groupIds, java.lang.String keywords,
+		boolean includeBasicFileEntryType, int start, int end,
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getService()
+				   .search(companyId, groupIds, keywords,
+			includeBasicFileEntryType, start, end, orderByComparator);
+	}
+
+	public static int searchCount(long companyId, long[] groupIds,
+		java.lang.String keywords, boolean includeBasicFileEntryType)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getService()
+				   .searchCount(companyId, groupIds, keywords,
+			includeBasicFileEntryType);
 	}
 
 	public static void updateFileEntryType(long fileEntryTypeId,
@@ -89,20 +125,15 @@ public class DLFileEntryTypeServiceUtil {
 
 			ReferenceRegistry.registerReference(DLFileEntryTypeServiceUtil.class,
 				"_service");
-			MethodCache.remove(DLFileEntryTypeService.class);
 		}
 
 		return _service;
 	}
 
+	/**
+	 * @deprecated
+	 */
 	public void setService(DLFileEntryTypeService service) {
-		MethodCache.remove(DLFileEntryTypeService.class);
-
-		_service = service;
-
-		ReferenceRegistry.registerReference(DLFileEntryTypeServiceUtil.class,
-			"_service");
-		MethodCache.remove(DLFileEntryTypeService.class);
 	}
 
 	private static DLFileEntryTypeService _service;

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -23,16 +23,49 @@ package com.liferay.portal.service;
  * @see       AccountService
  * @generated
  */
-public class AccountServiceWrapper implements AccountService {
+public class AccountServiceWrapper implements AccountService,
+	ServiceWrapper<AccountService> {
 	public AccountServiceWrapper(AccountService accountService) {
 		_accountService = accountService;
 	}
 
+	/**
+	* Returns the Spring bean ID for this bean.
+	*
+	* @return the Spring bean ID for this bean
+	*/
+	public java.lang.String getBeanIdentifier() {
+		return _accountService.getBeanIdentifier();
+	}
+
+	/**
+	* Sets the Spring bean ID for this bean.
+	*
+	* @param beanIdentifier the Spring bean ID for this bean
+	*/
+	public void setBeanIdentifier(java.lang.String beanIdentifier) {
+		_accountService.setBeanIdentifier(beanIdentifier);
+	}
+
+	/**
+	 * @deprecated Renamed to {@link #getWrappedService}
+	 */
 	public AccountService getWrappedAccountService() {
 		return _accountService;
 	}
 
+	/**
+	 * @deprecated Renamed to {@link #setWrappedService}
+	 */
 	public void setWrappedAccountService(AccountService accountService) {
+		_accountService = accountService;
+	}
+
+	public AccountService getWrappedService() {
+		return _accountService;
+	}
+
+	public void setWrappedService(AccountService accountService) {
 		_accountService = accountService;
 	}
 

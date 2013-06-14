@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -74,7 +74,7 @@ public class ToggleTag extends IncludeTag {
 		String clickValue = SessionClicks.get(request, id, null);
 
 		if (defaultShowContent) {
-			if ((clickValue != null) && (clickValue.equals("none"))) {
+			if ((clickValue != null) && clickValue.equals("none")) {
 				defaultStateValue = "none";
 				defaultImage = showImage;
 				defaultMessage = showMessage;
@@ -86,7 +86,7 @@ public class ToggleTag extends IncludeTag {
 			}
 		}
 		else {
-			if ((clickValue == null) || (clickValue.equals("none"))) {
+			if ((clickValue == null) || clickValue.equals("none")) {
 				defaultStateValue = "none";
 				defaultImage = showImage;
 				defaultMessage = showMessage;
@@ -124,9 +124,6 @@ public class ToggleTag extends IncludeTag {
 	@Override
 	public int doEndTag() throws JspException {
 		try {
-			ServletContext servletContext = getServletContext();
-			HttpServletRequest request = getServletRequest();
-
 			doTag(
 				getPage(), _id, _showImage, _hideImage, _showMessage,
 				_hideMessage, _defaultShowContent, _stateVar, servletContext,
@@ -139,6 +136,18 @@ public class ToggleTag extends IncludeTag {
 		}
 	}
 
+	public void setDefaultShowContent(boolean defaultShowContent) {
+		_defaultShowContent = defaultShowContent;
+	}
+
+	public void setHideImage(String hideImage) {
+		_hideImage = hideImage;
+	}
+
+	public void setHideMessage(String hideMessage) {
+		_hideMessage = hideMessage;
+	}
+
 	public void setId(String id) {
 		_id = id;
 	}
@@ -147,20 +156,8 @@ public class ToggleTag extends IncludeTag {
 		_showImage = showImage;
 	}
 
-	public void setHideImage(String hideImage) {
-		_hideImage = hideImage;
-	}
-
 	public void setShowMessage(String showMessage) {
 		_showMessage = showMessage;
-	}
-
-	public void setHideMessage(String hideMessage) {
-		_hideMessage = hideMessage;
-	}
-
-	public void setDefaultShowContent(boolean defaultShowContent) {
-		_defaultShowContent = defaultShowContent;
 	}
 
 	public void setStateVar(String stateVar) {
@@ -174,12 +171,12 @@ public class ToggleTag extends IncludeTag {
 
 	private static final String _PAGE = "/html/taglib/ui/toggle/page.jsp";
 
+	private boolean _defaultShowContent = true;
+	private String _hideImage;
+	private String _hideMessage;
 	private String _id;
 	private String _showImage;
-	private String _hideImage;
 	private String _showMessage;
-	private String _hideMessage;
-	private boolean _defaultShowContent = true;
 	private String _stateVar;
 
 }

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -20,6 +20,7 @@ import com.liferay.portal.ContactFullNameException;
 import com.liferay.portal.ContactLastNameException;
 import com.liferay.portal.DuplicateUserEmailAddressException;
 import com.liferay.portal.EmailAddressException;
+import com.liferay.portal.GroupFriendlyURLException;
 import com.liferay.portal.ReservedUserEmailAddressException;
 import com.liferay.portal.UserEmailAddressException;
 import com.liferay.portal.kernel.captcha.CaptchaTextException;
@@ -35,7 +36,9 @@ import com.liferay.portal.kernel.util.Constants;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
+import com.liferay.portal.model.Company;
 import com.liferay.portal.model.User;
+import com.liferay.portal.security.auth.PrincipalException;
 import com.liferay.portal.service.ServiceContext;
 import com.liferay.portal.service.ServiceContextFactory;
 import com.liferay.portal.service.UserLocalServiceUtil;
@@ -76,6 +79,12 @@ public class CreateAnonymousAccountAction extends PortletAction {
 		ThemeDisplay themeDisplay = (ThemeDisplay)actionRequest.getAttribute(
 			WebKeys.THEME_DISPLAY);
 
+		Company company = themeDisplay.getCompany();
+
+		if (!company.isStrangers()) {
+			throw new PrincipalException();
+		}
+
 		if (actionRequest.getRemoteUser() != null) {
 			actionResponse.sendRedirect(themeDisplay.getPathMain());
 
@@ -95,7 +104,7 @@ public class CreateAnonymousAccountAction extends PortletAction {
 
 		portletURL.setParameter("struts_action", "/login/login_redirect");
 		portletURL.setParameter("emailAddress", emailAddress);
-		portletURL.setParameter("anonymousAccount", Boolean.TRUE.toString());
+		portletURL.setParameter("anonymousUser", Boolean.TRUE.toString());
 
 		JSONObject jsonObject = JSONFactoryUtil.createJSONObject();
 
@@ -114,16 +123,17 @@ public class CreateAnonymousAccountAction extends PortletAction {
 			}
 		}
 		catch (Exception e) {
-			jsonObject.putException(e);
+			if (cmd.equals(Constants.UPDATE)) {
+				jsonObject.putException(e);
 
-			writeJSON(actionRequest, actionResponse, jsonObject);
-
-			if (e instanceof DuplicateUserEmailAddressException) {
+				writeJSON(actionRequest, actionResponse, jsonObject);
+			}
+			else if (e instanceof DuplicateUserEmailAddressException) {
 				User user = UserLocalServiceUtil.getUserByEmailAddress(
 					themeDisplay.getCompanyId(), emailAddress);
 
 				if (user.getStatus() != WorkflowConstants.STATUS_INCOMPLETE) {
-					SessionErrors.add(actionRequest, e.getClass().getName());
+					SessionErrors.add(actionRequest, e.getClass());
 				}
 				else {
 					sendRedirect(
@@ -136,10 +146,11 @@ public class CreateAnonymousAccountAction extends PortletAction {
 					 e instanceof ContactFullNameException ||
 					 e instanceof ContactLastNameException ||
 					 e instanceof EmailAddressException ||
+					 e instanceof GroupFriendlyURLException ||
 					 e instanceof ReservedUserEmailAddressException ||
 					 e instanceof UserEmailAddressException) {
 
-				SessionErrors.add(actionRequest, e.getClass().getName(), e);
+				SessionErrors.add(actionRequest, e.getClass(), e);
 			}
 			else {
 				_log.error("Unable to create anonymous account", e);
@@ -157,6 +168,12 @@ public class CreateAnonymousAccountAction extends PortletAction {
 
 		ThemeDisplay themeDisplay = (ThemeDisplay)renderRequest.getAttribute(
 			WebKeys.THEME_DISPLAY);
+
+		Company company = themeDisplay.getCompany();
+
+		if (!company.isStrangers()) {
+			return mapping.findForward("portlet.login.login");
+		}
 
 		renderResponse.setTitle(themeDisplay.translate("anonymous-account"));
 
@@ -200,6 +217,8 @@ public class CreateAnonymousAccountAction extends PortletAction {
 		ServiceContext serviceContext = ServiceContextFactory.getInstance(
 			User.class.getName(), actionRequest);
 
+		serviceContext.setAttribute("anonymousUser", true);
+
 		if (PropsValues.CAPTCHA_CHECK_PORTAL_CREATE_ACCOUNT) {
 			CaptchaUtil.check(actionRequest);
 		}
@@ -220,6 +239,18 @@ public class CreateAnonymousAccountAction extends PortletAction {
 		SessionMessages.add(request, "user_added", user.getEmailAddress());
 		SessionMessages.add(
 			request, "user_added_password", user.getPasswordUnencrypted());
+	}
+
+	@Override
+	protected void addSuccessMessage(
+		ActionRequest actionRequest, ActionResponse actionResponse) {
+
+		String portletId = (String)actionRequest.getAttribute(
+			WebKeys.PORTLET_ID);
+
+		if (!portletId.equals(PortletKeys.FAST_LOGIN)) {
+			super.addSuccessMessage(actionRequest, actionResponse);
+		}
 	}
 
 	@Override

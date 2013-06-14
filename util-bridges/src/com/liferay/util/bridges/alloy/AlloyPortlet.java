@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -34,12 +34,15 @@ import javax.portlet.ActionRequest;
 import javax.portlet.ActionResponse;
 import javax.portlet.GenericPortlet;
 import javax.portlet.PortletConfig;
+import javax.portlet.PortletContext;
 import javax.portlet.PortletException;
 import javax.portlet.PortletRequest;
 import javax.portlet.PortletRequestDispatcher;
 import javax.portlet.PortletResponse;
 import javax.portlet.RenderRequest;
 import javax.portlet.RenderResponse;
+import javax.portlet.ResourceRequest;
+import javax.portlet.ResourceResponse;
 
 /**
  * @author Brian Wing Shun Chan
@@ -81,6 +84,16 @@ public class AlloyPortlet extends GenericPortlet {
 		String path = getPath(renderRequest);
 
 		include(path, renderRequest, renderResponse);
+	}
+
+	@Override
+	public void serveResource(
+			ResourceRequest resourceRequest, ResourceResponse resourceResponse)
+		throws IOException, PortletException {
+
+		String path = getPath(resourceRequest);
+
+		include(path, resourceRequest, resourceResponse);
 	}
 
 	protected Map<String, String> getDefaultRouteParameters() {
@@ -128,8 +141,10 @@ public class AlloyPortlet extends GenericPortlet {
 			PortletResponse portletResponse)
 		throws IOException, PortletException {
 
+		PortletContext portletContext = getPortletContext();
+
 		PortletRequestDispatcher portletRequestDispatcher =
-			getPortletContext().getRequestDispatcher(path);
+			portletContext.getRequestDispatcher(path);
 
 		if (portletRequestDispatcher == null) {
 			_log.error(path + " is not a valid include");

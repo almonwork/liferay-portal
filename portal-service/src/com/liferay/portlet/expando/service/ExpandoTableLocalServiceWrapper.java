@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,6 +14,8 @@
 
 package com.liferay.portlet.expando.service;
 
+import com.liferay.portal.service.ServiceWrapper;
+
 /**
  * <p>
  * This class is a wrapper for {@link ExpandoTableLocalService}.
@@ -23,7 +25,8 @@ package com.liferay.portlet.expando.service;
  * @see       ExpandoTableLocalService
  * @generated
  */
-public class ExpandoTableLocalServiceWrapper implements ExpandoTableLocalService {
+public class ExpandoTableLocalServiceWrapper implements ExpandoTableLocalService,
+	ServiceWrapper<ExpandoTableLocalService> {
 	public ExpandoTableLocalServiceWrapper(
 		ExpandoTableLocalService expandoTableLocalService) {
 		_expandoTableLocalService = expandoTableLocalService;
@@ -57,25 +60,32 @@ public class ExpandoTableLocalServiceWrapper implements ExpandoTableLocalService
 	* Deletes the expando table with the primary key from the database. Also notifies the appropriate model listeners.
 	*
 	* @param tableId the primary key of the expando table
+	* @return the expando table that was removed
 	* @throws PortalException if a expando table with the primary key could not be found
 	* @throws SystemException if a system exception occurred
 	*/
-	public void deleteExpandoTable(long tableId)
+	public com.liferay.portlet.expando.model.ExpandoTable deleteExpandoTable(
+		long tableId)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException {
-		_expandoTableLocalService.deleteExpandoTable(tableId);
+		return _expandoTableLocalService.deleteExpandoTable(tableId);
 	}
 
 	/**
 	* Deletes the expando table from the database. Also notifies the appropriate model listeners.
 	*
 	* @param expandoTable the expando table
+	* @return the expando table that was removed
 	* @throws SystemException if a system exception occurred
 	*/
-	public void deleteExpandoTable(
+	public com.liferay.portlet.expando.model.ExpandoTable deleteExpandoTable(
 		com.liferay.portlet.expando.model.ExpandoTable expandoTable)
 		throws com.liferay.portal.kernel.exception.SystemException {
-		_expandoTableLocalService.deleteExpandoTable(expandoTable);
+		return _expandoTableLocalService.deleteExpandoTable(expandoTable);
+	}
+
+	public com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery() {
+		return _expandoTableLocalService.dynamicQuery();
 	}
 
 	/**
@@ -147,6 +157,12 @@ public class ExpandoTableLocalServiceWrapper implements ExpandoTableLocalService
 		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery)
 		throws com.liferay.portal.kernel.exception.SystemException {
 		return _expandoTableLocalService.dynamicQueryCount(dynamicQuery);
+	}
+
+	public com.liferay.portlet.expando.model.ExpandoTable fetchExpandoTable(
+		long tableId)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return _expandoTableLocalService.fetchExpandoTable(tableId);
 	}
 
 	/**
@@ -330,6 +346,25 @@ public class ExpandoTableLocalServiceWrapper implements ExpandoTableLocalService
 		_expandoTableLocalService.deleteTables(companyId, className);
 	}
 
+	public com.liferay.portlet.expando.model.ExpandoTable fetchDefaultTable(
+		long companyId, long classNameId)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return _expandoTableLocalService.fetchDefaultTable(companyId,
+			classNameId);
+	}
+
+	public com.liferay.portlet.expando.model.ExpandoTable fetchDefaultTable(
+		long companyId, java.lang.String className)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return _expandoTableLocalService.fetchDefaultTable(companyId, className);
+	}
+
+	public com.liferay.portlet.expando.model.ExpandoTable fetchTable(
+		long companyId, long classNameId, java.lang.String name)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return _expandoTableLocalService.fetchTable(companyId, classNameId, name);
+	}
+
 	public com.liferay.portlet.expando.model.ExpandoTable getDefaultTable(
 		long companyId, long classNameId)
 		throws com.liferay.portal.kernel.exception.PortalException,
@@ -403,11 +438,26 @@ public class ExpandoTableLocalServiceWrapper implements ExpandoTableLocalService
 		return _expandoTableLocalService.updateTable(tableId, name);
 	}
 
+	/**
+	 * @deprecated Renamed to {@link #getWrappedService}
+	 */
 	public ExpandoTableLocalService getWrappedExpandoTableLocalService() {
 		return _expandoTableLocalService;
 	}
 
+	/**
+	 * @deprecated Renamed to {@link #setWrappedService}
+	 */
 	public void setWrappedExpandoTableLocalService(
+		ExpandoTableLocalService expandoTableLocalService) {
+		_expandoTableLocalService = expandoTableLocalService;
+	}
+
+	public ExpandoTableLocalService getWrappedService() {
+		return _expandoTableLocalService;
+	}
+
+	public void setWrappedService(
 		ExpandoTableLocalService expandoTableLocalService) {
 		_expandoTableLocalService = expandoTableLocalService;
 	}

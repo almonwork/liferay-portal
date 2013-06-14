@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -17,6 +17,7 @@ package com.liferay.portal.service.impl;
 import com.liferay.portal.PhoneNumberException;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
+import com.liferay.portal.kernel.format.PhoneNumberFormatUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.model.Account;
 import com.liferay.portal.model.Contact;
@@ -26,10 +27,8 @@ import com.liferay.portal.model.Phone;
 import com.liferay.portal.model.User;
 import com.liferay.portal.service.base.PhoneLocalServiceBaseImpl;
 import com.liferay.portal.util.PortalUtil;
-import com.liferay.util.format.PhoneNumberUtil;
 
 import java.util.Date;
-import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -46,12 +45,9 @@ public class PhoneLocalServiceImpl extends PhoneLocalServiceBaseImpl {
 		long classNameId = PortalUtil.getClassNameId(className);
 		Date now = new Date();
 
-		number = PhoneNumberUtil.strip(number);
-		extension = PhoneNumberUtil.strip(extension);
-
 		validate(
-			0, user.getCompanyId(), classNameId, classPK, number, typeId,
-			primary);
+			0, user.getCompanyId(), classNameId, classPK, number, extension,
+			typeId, primary);
 
 		long phoneId = counterLocalService.increment();
 
@@ -74,20 +70,6 @@ public class PhoneLocalServiceImpl extends PhoneLocalServiceBaseImpl {
 		return phone;
 	}
 
-	@Override
-	public void deletePhone(long phoneId)
-		throws PortalException, SystemException {
-
-		Phone phone = phonePersistence.findByPrimaryKey(phoneId);
-
-		deletePhone(phone);
-	}
-
-	@Override
-	public void deletePhone(Phone phone) throws SystemException {
-		phonePersistence.remove(phone);
-	}
-
 	public void deletePhones(long companyId, String className, long classPK)
 		throws SystemException {
 
@@ -99,13 +81,6 @@ public class PhoneLocalServiceImpl extends PhoneLocalServiceBaseImpl {
 		for (Phone phone : phones) {
 			deletePhone(phone);
 		}
-	}
-
-	@Override
-	public Phone getPhone(long phoneId)
-		throws PortalException, SystemException {
-
-		return phonePersistence.findByPrimaryKey(phoneId);
 	}
 
 	public List<Phone> getPhones() throws SystemException {
@@ -125,10 +100,7 @@ public class PhoneLocalServiceImpl extends PhoneLocalServiceBaseImpl {
 			boolean primary)
 		throws PortalException, SystemException {
 
-		number = PhoneNumberUtil.strip(number);
-		extension = PhoneNumberUtil.strip(extension);
-
-		validate(phoneId, 0, 0, 0, number, typeId, primary);
+		validate(phoneId, 0, 0, 0, number, extension, typeId, primary);
 
 		Phone phone = phonePersistence.findByPrimaryKey(phoneId);
 
@@ -145,11 +117,41 @@ public class PhoneLocalServiceImpl extends PhoneLocalServiceBaseImpl {
 
 	protected void validate(
 			long phoneId, long companyId, long classNameId, long classPK,
-			String number, int typeId, boolean primary)
+			boolean primary)
+		throws SystemException {
+
+		// Check to make sure there isn't another phone with the same company
+		// id, class name, and class pk that also has primary set to true
+
+		if (primary) {
+			List<Phone> phones = phonePersistence.findByC_C_C_P(
+				companyId, classNameId, classPK, primary);
+
+			for (Phone phone : phones) {
+				if ((phoneId <= 0) || (phone.getPhoneId() != phoneId)) {
+					phone.setPrimary(false);
+
+					phonePersistence.update(phone, false);
+				}
+			}
+		}
+	}
+
+	protected void validate(
+			long phoneId, long companyId, long classNameId, long classPK,
+			String number, String extension, int typeId, boolean primary)
 		throws PortalException, SystemException {
 
-		if (Validator.isNull(number)) {
+		if (!PhoneNumberFormatUtil.validate(number)) {
 			throw new PhoneNumberException();
+		}
+
+		if (Validator.isNotNull(extension)) {
+			for (int i = 0;i < extension.length();i++) {
+				if (!Character.isDigit(extension.charAt(i))) {
+					throw new PhoneNumberException();
+				}
+			}
 		}
 
 		if (phoneId > 0) {
@@ -169,32 +171,6 @@ public class PhoneLocalServiceImpl extends PhoneLocalServiceBaseImpl {
 		}
 
 		validate(phoneId, companyId, classNameId, classPK, primary);
-	}
-
-	protected void validate(
-			long phoneId, long companyId, long classNameId, long classPK,
-			boolean primary)
-		throws SystemException {
-
-		// Check to make sure there isn't another phone with the same company
-		// id, class name, and class pk that also has primary set to true
-
-		if (primary) {
-			Iterator<Phone> itr = phonePersistence.findByC_C_C_P(
-				companyId, classNameId, classPK, primary).iterator();
-
-			while (itr.hasNext()) {
-				Phone phone = itr.next();
-
-				if ((phoneId <= 0) ||
-					(phone.getPhoneId() != phoneId)) {
-
-					phone.setPrimary(false);
-
-					phonePersistence.update(phone, false);
-				}
-			}
-		}
 	}
 
 }

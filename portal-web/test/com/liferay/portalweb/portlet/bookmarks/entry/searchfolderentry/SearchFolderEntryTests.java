@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,7 +14,10 @@
 
 package com.liferay.portalweb.portlet.bookmarks.entry.searchfolderentry;
 
-import com.liferay.portalweb.portal.BaseTests;
+import com.liferay.portalweb.portal.BaseTestSuite;
+import com.liferay.portalweb.portal.util.TearDownPageTest;
+import com.liferay.portalweb.portlet.bookmarks.portlet.addportletbookmarks.AddPageBookmarksTest;
+import com.liferay.portalweb.portlet.bookmarks.portlet.addportletbookmarks.AddPortletBookmarksTest;
 
 import junit.framework.Test;
 import junit.framework.TestSuite;
@@ -22,16 +25,15 @@ import junit.framework.TestSuite;
 /**
  * @author Brian Wing Shun Chan
  */
-public class SearchFolderEntryTests extends BaseTests {
-
+public class SearchFolderEntryTests extends BaseTestSuite {
 	public static Test suite() {
 		TestSuite testSuite = new TestSuite();
-
 		testSuite.addTestSuite(AddPageBookmarksTest.class);
 		testSuite.addTestSuite(AddPortletBookmarksTest.class);
 		testSuite.addTestSuite(AddFolderTest.class);
 		testSuite.addTestSuite(AddFolderEntryTest.class);
 		testSuite.addTestSuite(SearchFolderEntryTest.class);
+		testSuite.addTestSuite(SearchFolderEntryQuotesTest.class);
 		testSuite.addTestSuite(SearchNullFolderEntryTest.class);
 		testSuite.addTestSuite(TearDownBookmarksFolderTest.class);
 		testSuite.addTestSuite(TearDownBookmarksEntryTest.class);
@@ -39,5 +41,4 @@ public class SearchFolderEntryTests extends BaseTests {
 
 		return testSuite;
 	}
-
 }

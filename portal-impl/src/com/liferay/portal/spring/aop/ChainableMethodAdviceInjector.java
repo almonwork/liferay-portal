@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -20,22 +20,30 @@ package com.liferay.portal.spring.aop;
 public class ChainableMethodAdviceInjector {
 
 	public void afterPropertiesSet() {
-		if (_injectCondition) {
-			if (_newChainableMethodAdvice == null) {
-				throw new IllegalArgumentException(
-					"New ChainableMethodAdvice is null");
-			}
-
-			if (_parentChainableMethodAdvice == null) {
-				throw new IllegalArgumentException(
-					"Parent ChainableMethodAdvice is null");
-			}
-
-			_newChainableMethodAdvice.nextMethodInterceptor =
-				_parentChainableMethodAdvice.nextMethodInterceptor;
-			_parentChainableMethodAdvice.nextMethodInterceptor =
-				_newChainableMethodAdvice;
+		if (!isInjectCondition()) {
+			return;
 		}
+
+		ChainableMethodAdvice newChainableMethodAdvice =
+			getNewChainableMethodAdvice();
+
+		if (newChainableMethodAdvice == null) {
+			throw new IllegalArgumentException(
+				"New Chainable method advice is null");
+		}
+
+		ChainableMethodAdvice parentChainableMethodAdvice =
+			getParentChainableMethodAdvice();
+
+		if (parentChainableMethodAdvice == null) {
+			throw new IllegalArgumentException(
+				"Parent chainable method advice is null");
+		}
+
+		newChainableMethodAdvice.nextMethodInterceptor =
+			parentChainableMethodAdvice.nextMethodInterceptor;
+		parentChainableMethodAdvice.nextMethodInterceptor =
+			newChainableMethodAdvice;
 	}
 
 	public void setInjectCondition(boolean injectCondition) {
@@ -44,18 +52,30 @@ public class ChainableMethodAdviceInjector {
 
 	public void setNewChainableMethodAdvice(
 		ChainableMethodAdvice newChainableMethodAdvice) {
+
 		_newChainableMethodAdvice = newChainableMethodAdvice;
 	}
 
 	public void setParentChainableMethodAdvice(
 		ChainableMethodAdvice parentChainableMethodAdvice) {
+
 		_parentChainableMethodAdvice = parentChainableMethodAdvice;
 	}
 
+	protected ChainableMethodAdvice getNewChainableMethodAdvice() {
+		return _newChainableMethodAdvice;
+	}
+
+	protected ChainableMethodAdvice getParentChainableMethodAdvice() {
+		return _parentChainableMethodAdvice;
+	}
+
+	protected boolean isInjectCondition() {
+		return _injectCondition;
+	}
+
 	private boolean _injectCondition;
-
 	private ChainableMethodAdvice _newChainableMethodAdvice;
-
 	private ChainableMethodAdvice _parentChainableMethodAdvice;
 
 }

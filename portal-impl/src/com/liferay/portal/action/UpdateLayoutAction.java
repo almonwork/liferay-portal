@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -16,6 +16,7 @@ package com.liferay.portal.action;
 
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
+import com.liferay.portal.kernel.servlet.DynamicServletRequest;
 import com.liferay.portal.kernel.servlet.ServletResponseUtil;
 import com.liferay.portal.kernel.servlet.StringServletResponse;
 import com.liferay.portal.kernel.staging.StagingUtil;
@@ -54,7 +55,6 @@ import com.liferay.portal.util.LayoutCloneFactory;
 import com.liferay.portal.util.PortalUtil;
 import com.liferay.portal.util.WebKeys;
 import com.liferay.portlet.PortletPreferencesFactoryUtil;
-import com.liferay.util.servlet.DynamicServletRequest;
 
 import java.util.LinkedHashSet;
 import java.util.Set;
@@ -129,9 +129,7 @@ public class UpdateLayoutAction extends JSONAction {
 		}
 		else if (cmd.equals("drag")) {
 			if (LayoutPermissionUtil.contains(
-					permissionChecker, layout.getGroupId(),
-					layout.isPrivateLayout(), layout.getLayoutId(),
-					ActionKeys.UPDATE)) {
+					permissionChecker, layout, ActionKeys.UPDATE)) {
 
 				String height = ParamUtil.getString(request, "height");
 				String width = ParamUtil.getString(request, "width");
@@ -313,8 +311,8 @@ public class UpdateLayoutAction extends JSONAction {
 		DynamicServletRequest dynamicRequest = null;
 
 		if (portlet.isPrivateRequestAttributes()) {
-			String portletNamespace =
-				PortalUtil.getPortletNamespace(portlet.getPortletId());
+			String portletNamespace = PortalUtil.getPortletNamespace(
+				portlet.getPortletId());
 
 			dynamicRequest = new NamespaceServletRequest(
 				request, portletNamespace, portletNamespace);
@@ -407,7 +405,7 @@ public class UpdateLayoutAction extends JSONAction {
 			for (String footerPortalCss : portlet.getFooterPortalCss()) {
 				if (!HttpUtil.hasProtocol(footerPortalCss)) {
 					footerPortalCss =
-						portletApp.getContextPath() + footerPortalCss;
+						PortalUtil.getPathContext() + footerPortalCss;
 
 					footerPortalCss = PortalUtil.getStaticResourceURL(
 						request, footerPortalCss, rootPortlet.getTimestamp());
@@ -421,7 +419,7 @@ public class UpdateLayoutAction extends JSONAction {
 
 				if (!HttpUtil.hasProtocol(footerPortalJavaScript)) {
 					footerPortalJavaScript =
-						portletApp.getContextPath() + footerPortalJavaScript;
+						PortalUtil.getPathContext() + footerPortalJavaScript;
 
 					footerPortalJavaScript = PortalUtil.getStaticResourceURL(
 						request, footerPortalJavaScript,
@@ -461,7 +459,7 @@ public class UpdateLayoutAction extends JSONAction {
 			for (String headerPortalCss : portlet.getHeaderPortalCss()) {
 				if (!HttpUtil.hasProtocol(headerPortalCss)) {
 					headerPortalCss =
-						portletApp.getContextPath() + headerPortalCss;
+						PortalUtil.getPathContext() + headerPortalCss;
 
 					headerPortalCss = PortalUtil.getStaticResourceURL(
 						request, headerPortalCss, rootPortlet.getTimestamp());
@@ -475,7 +473,7 @@ public class UpdateLayoutAction extends JSONAction {
 
 				if (!HttpUtil.hasProtocol(headerPortalJavaScript)) {
 					headerPortalJavaScript =
-						portletApp.getContextPath() + headerPortalJavaScript;
+						PortalUtil.getPathContext() + headerPortalJavaScript;
 
 					headerPortalJavaScript = PortalUtil.getStaticResourceURL(
 						request, headerPortalJavaScript,

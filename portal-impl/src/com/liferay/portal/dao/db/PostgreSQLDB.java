@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -54,16 +54,13 @@ public class PostgreSQLDB extends BaseDB {
 	}
 
 	@Override
-	public List<Index> getIndexes() throws SQLException {
+	public List<Index> getIndexes(Connection con) throws SQLException {
 		List<Index> indexes = new ArrayList<Index>();
 
-		Connection con = null;
 		PreparedStatement ps = null;
 		ResultSet rs = null;
 
 		try {
-			con = DataAccess.getConnection();
-
 			StringBundler sb = new StringBundler(3);
 
 			sb.append("select indexname, tablename, indexdef from pg_indexes ");
@@ -91,7 +88,7 @@ public class PostgreSQLDB extends BaseDB {
 			}
 		}
 		finally {
-			DataAccess.cleanUp(con, ps, rs);
+			DataAccess.cleanUp(null, ps, rs);
 		}
 
 		return indexes;
@@ -179,6 +176,9 @@ public class PostgreSQLDB extends BaseDB {
 					"alter table @table@ drop constraint @table@_pkey;",
 					"@table@", tokens[2]);
 			}
+			else if (line.indexOf("\\\'") != -1) {
+				line = StringUtil.replace(line, "\\\'", "\'\'");
+			}
 
 			sb.append(line);
 			sb.append("\n");
@@ -189,13 +189,10 @@ public class PostgreSQLDB extends BaseDB {
 		return sb.toString();
 	}
 
-	private static String[] _POSTGRESQL = {
-		"--", "true", "false",
-		"'01/01/1970'", "current_timestamp",
-		" oid", " bool", " timestamp",
-		" double precision", " integer", " bigint",
-		" text", " text", " varchar",
-		"", "commit"
+	private static final String[] _POSTGRESQL = {
+		"--", "true", "false", "'01/01/1970'", "current_timestamp", " oid",
+		" bytea", " bool", " timestamp", " double precision", " integer",
+		" bigint", " text", " text", " varchar", "", "commit"
 	};
 
 	private static PostgreSQLDB _instance = new PostgreSQLDB();

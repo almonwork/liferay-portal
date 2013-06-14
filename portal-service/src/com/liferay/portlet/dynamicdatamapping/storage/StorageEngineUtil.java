@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,6 +14,7 @@
 
 package com.liferay.portlet.dynamicdatamapping.storage;
 
+import com.liferay.portal.kernel.security.pacl.permission.PortalRuntimePermission;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.service.ServiceContext;
 import com.liferay.portlet.dynamicdatamapping.StorageException;
@@ -60,8 +61,7 @@ public class StorageEngineUtil {
 			long ddmStructureId, List<String> fieldNames)
 		throws StorageException {
 
-		return getStorageEngine().getFieldsList(
-			ddmStructureId, fieldNames);
+		return getStorageEngine().getFieldsList(ddmStructureId, fieldNames);
 	}
 
 	public static List<Fields> getFieldsList(
@@ -95,8 +95,7 @@ public class StorageEngineUtil {
 			long ddmStructureId, long[] classPKs)
 		throws StorageException {
 
-		return getStorageEngine().getFieldsMap(
-			ddmStructureId, classPKs);
+		return getStorageEngine().getFieldsMap(ddmStructureId, classPKs);
 	}
 
 	public static Map<Long, Fields> getFieldsMap(
@@ -108,6 +107,8 @@ public class StorageEngineUtil {
 	}
 
 	public static StorageEngine getStorageEngine() {
+		PortalRuntimePermission.checkGetBeanProperty(StorageEngineUtil.class);
+
 		return _storageEngine;
 	}
 
@@ -142,6 +143,8 @@ public class StorageEngineUtil {
 	}
 
 	public void setStorageEngine(StorageEngine storageEngine) {
+		PortalRuntimePermission.checkSetBeanProperty(getClass());
+
 		_storageEngine = storageEngine;
 	}
 

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,7 +14,6 @@
 
 package com.liferay.portal.service.persistence;
 
-import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.model.Organization;
 
 /**
@@ -728,9 +727,11 @@ public interface OrganizationPersistence extends BasePersistence<Organization> {
 	*
 	* @param companyId the company ID
 	* @param name the name
+	* @return the organization that was removed
 	* @throws SystemException if a system exception occurred
 	*/
-	public void removeByC_N(long companyId, java.lang.String name)
+	public com.liferay.portal.model.Organization removeByC_N(long companyId,
+		java.lang.String name)
 		throws com.liferay.portal.NoSuchOrganizationException,
 			com.liferay.portal.kernel.exception.SystemException;
 
@@ -1201,20 +1202,4 @@ public interface OrganizationPersistence extends BasePersistence<Organization> {
 	public void setUsers(long pk,
 		java.util.List<com.liferay.portal.model.User> users)
 		throws com.liferay.portal.kernel.exception.SystemException;
-
-	/**
-	* Rebuilds the organizations tree for the scope using the modified pre-order tree traversal algorithm.
-	*
-	* <p>
-	* Only call this method if the tree has become stale through operations other than normal CRUD. Under normal circumstances the tree is automatically rebuilt whenver necessary.
-	* </p>
-	*
-	* @param companyId the ID of the scope
-	* @param force whether to force the rebuild even if the tree is not stale
-	*/
-	public void rebuildTree(long companyId, boolean force)
-		throws com.liferay.portal.kernel.exception.SystemException;
-
-	public Organization remove(Organization organization)
-		throws SystemException;
 }

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -19,6 +19,7 @@ import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.transaction.Isolation;
 import com.liferay.portal.kernel.transaction.Propagation;
 import com.liferay.portal.kernel.transaction.Transactional;
+import com.liferay.portal.service.BaseLocalService;
 import com.liferay.portal.service.PersistedModelLocalService;
 
 /**
@@ -36,7 +37,8 @@ import com.liferay.portal.service.PersistedModelLocalService;
  */
 @Transactional(isolation = Isolation.PORTAL, rollbackFor =  {
 	PortalException.class, SystemException.class})
-public interface JournalStructureLocalService extends PersistedModelLocalService {
+public interface JournalStructureLocalService extends BaseLocalService,
+	PersistedModelLocalService {
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
@@ -67,10 +69,12 @@ public interface JournalStructureLocalService extends PersistedModelLocalService
 	* Deletes the journal structure with the primary key from the database. Also notifies the appropriate model listeners.
 	*
 	* @param id the primary key of the journal structure
+	* @return the journal structure that was removed
 	* @throws PortalException if a journal structure with the primary key could not be found
 	* @throws SystemException if a system exception occurred
 	*/
-	public void deleteJournalStructure(long id)
+	public com.liferay.portlet.journal.model.JournalStructure deleteJournalStructure(
+		long id)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException;
 
@@ -78,11 +82,14 @@ public interface JournalStructureLocalService extends PersistedModelLocalService
 	* Deletes the journal structure from the database. Also notifies the appropriate model listeners.
 	*
 	* @param journalStructure the journal structure
+	* @return the journal structure that was removed
 	* @throws SystemException if a system exception occurred
 	*/
-	public void deleteJournalStructure(
+	public com.liferay.portlet.journal.model.JournalStructure deleteJournalStructure(
 		com.liferay.portlet.journal.model.JournalStructure journalStructure)
 		throws com.liferay.portal.kernel.exception.SystemException;
+
+	public com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery();
 
 	/**
 	* Performs a dynamic query on the database and returns the matching rows.
@@ -145,6 +152,10 @@ public interface JournalStructureLocalService extends PersistedModelLocalService
 	public long dynamicQueryCount(
 		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery)
 		throws com.liferay.portal.kernel.exception.SystemException;
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public com.liferay.portlet.journal.model.JournalStructure fetchJournalStructure(
+		long id) throws com.liferay.portal.kernel.exception.SystemException;
 
 	/**
 	* Returns the journal structure with the primary key.
@@ -249,7 +260,8 @@ public interface JournalStructureLocalService extends PersistedModelLocalService
 	public com.liferay.portlet.journal.model.JournalStructure addStructure(
 		long userId, long groupId, java.lang.String structureId,
 		boolean autoStructureId, java.lang.String parentStructureId,
-		java.lang.String name, java.lang.String description,
+		java.util.Map<java.util.Locale, java.lang.String> nameMap,
+		java.util.Map<java.util.Locale, java.lang.String> descriptionMap,
 		java.lang.String xsd,
 		com.liferay.portal.service.ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException,
@@ -315,6 +327,13 @@ public interface JournalStructureLocalService extends PersistedModelLocalService
 			com.liferay.portal.kernel.exception.SystemException;
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public com.liferay.portlet.journal.model.JournalStructure getStructure(
+		long groupId, java.lang.String structureId,
+		boolean includeGlobalStructures)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException;
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public java.util.List<com.liferay.portlet.journal.model.JournalStructure> getStructures()
 		throws com.liferay.portal.kernel.exception.SystemException;
 
@@ -359,8 +378,10 @@ public interface JournalStructureLocalService extends PersistedModelLocalService
 
 	public com.liferay.portlet.journal.model.JournalStructure updateStructure(
 		long groupId, java.lang.String structureId,
-		java.lang.String parentStructureId, java.lang.String name,
-		java.lang.String description, java.lang.String xsd,
+		java.lang.String parentStructureId,
+		java.util.Map<java.util.Locale, java.lang.String> nameMap,
+		java.util.Map<java.util.Locale, java.lang.String> descriptionMap,
+		java.lang.String xsd,
 		com.liferay.portal.service.ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException;

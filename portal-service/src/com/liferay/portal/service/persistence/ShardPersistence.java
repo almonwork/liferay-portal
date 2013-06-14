@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,7 +14,6 @@
 
 package com.liferay.portal.service.persistence;
 
-import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.model.Shard;
 
 /**
@@ -216,9 +215,10 @@ public interface ShardPersistence extends BasePersistence<Shard> {
 	* Removes the shard where name = &#63; from the database.
 	*
 	* @param name the name
+	* @return the shard that was removed
 	* @throws SystemException if a system exception occurred
 	*/
-	public void removeByName(java.lang.String name)
+	public com.liferay.portal.model.Shard removeByName(java.lang.String name)
 		throws com.liferay.portal.NoSuchShardException,
 			com.liferay.portal.kernel.exception.SystemException;
 
@@ -227,9 +227,11 @@ public interface ShardPersistence extends BasePersistence<Shard> {
 	*
 	* @param classNameId the class name ID
 	* @param classPK the class p k
+	* @return the shard that was removed
 	* @throws SystemException if a system exception occurred
 	*/
-	public void removeByC_C(long classNameId, long classPK)
+	public com.liferay.portal.model.Shard removeByC_C(long classNameId,
+		long classPK)
 		throws com.liferay.portal.NoSuchShardException,
 			com.liferay.portal.kernel.exception.SystemException;
 
@@ -270,6 +272,4 @@ public interface ShardPersistence extends BasePersistence<Shard> {
 	*/
 	public int countAll()
 		throws com.liferay.portal.kernel.exception.SystemException;
-
-	public Shard remove(Shard shard) throws SystemException;
 }

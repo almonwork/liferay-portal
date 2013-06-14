@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -36,13 +36,9 @@ if (folder != null) {
 	repositoryId = folder.getRepositoryId();
 }
 
-boolean viewAddButton = ParamUtil.getBoolean(request, "viewAddButton");
-boolean viewBreadcrumb = ParamUtil.getBoolean(request, "viewBreadcrumb");
-boolean viewDisplayStyleButtons = ParamUtil.getBoolean(request, "viewDisplayStyleButtons");
 boolean viewEntries = ParamUtil.getBoolean(request, "viewEntries");
-boolean viewFileEntrySearch = ParamUtil.getBoolean(request, "viewFileEntrySearch");
+boolean viewEntriesPage = ParamUtil.getBoolean(request, "viewEntriesPage");
 boolean viewFolders = ParamUtil.getBoolean(request, "viewFolders");
-boolean viewSortButton = ParamUtil.getBoolean(request, "viewSortButton");
 
 request.setAttribute("view.jsp-folder", folder);
 
@@ -51,44 +47,56 @@ request.setAttribute("view.jsp-folderId", String.valueOf(folderId));
 request.setAttribute("view.jsp-repositoryId", String.valueOf(repositoryId));
 %>
 
-<c:if test="<%= viewFolders %>">
-	<div id="<portlet:namespace />folders">
-		<liferay-util:include page="/html/portlet/document_library/view_folders.jsp" />
-	</div>
-</c:if>
+<div>
+	<c:if test="<%= viewEntries %>">
 
-<c:if test="<%= viewEntries %>">
-	<div id="<portlet:namespace />entries">
-		<liferay-util:include page="/html/portlet/document_library/view_entries.jsp" />
-	</div>
-</c:if>
+		<%
+		PortalUtil.addPortletBreadcrumbEntry(request, themeDisplay.getScopeGroup().getDescriptiveName(), null);
+		PortalUtil.addPortletBreadcrumbEntry(request, "Documents and Media", liferayPortletResponse.createRenderURL().toString());
+		%>
 
-<c:if test="<%= viewAddButton %>">
-	<span id="<portlet:namespace />addButton">
-		<liferay-util:include page="/html/portlet/document_library/add_button.jsp" />
-	</span>
-</c:if>
+		<div id="<portlet:namespace />entries">
+			<liferay-util:include page="/html/portlet/document_library/view_entries.jsp" />
+		</div>
 
-<c:if test="<%= viewDisplayStyleButtons %>">
-	<span id="<portlet:namespace />displayStyleButtons">
-		<liferay-util:include page="/html/portlet/document_library/display_style_buttons.jsp" />
-	</span>
-</c:if>
+		<span id="<portlet:namespace />addButton">
+			<liferay-util:include page="/html/portlet/document_library/add_button.jsp" />
+		</span>
 
-<c:if test="<%= viewFileEntrySearch %>">
-	<span id="<portlet:namespace />fileEntrySearch">
-		<liferay-util:include page="/html/portlet/document_library/file_entry_search.jsp" />
-	</span>
-</c:if>
+		<span id="<portlet:namespace />displayStyleButtons">
+			<liferay-util:include page="/html/portlet/document_library/display_style_buttons.jsp" />
+		</span>
 
-<c:if test="<%= viewSortButton %>">
-	<span id="<portlet:namespace />sortButton">
-		<liferay-util:include page="/html/portlet/document_library/sort_button.jsp" />
-	</span>
-</c:if>
+		<span id="<portlet:namespace />sortButton">
+			<liferay-util:include page="/html/portlet/document_library/sort_button.jsp" />
+		</span>
 
-<c:if test="<%= viewBreadcrumb %>">
-	<span id="<portlet:namespace />breadcrumb">
-		<liferay-util:include page="/html/portlet/document_library/breadcrumb.jsp" />
-	</span>
-</c:if>
+		<span id="<portlet:namespace />breadcrumb">
+			<div class="portlet-breadcrumb">
+				<liferay-util:include page="/html/portlet/document_library/breadcrumb.jsp" />
+			</div>
+
+			<c:if test="<%= layout.isTypeControlPanel() %>">
+				<div class="portal-breadcrumb">
+					<liferay-ui:breadcrumb showCurrentGroup="<%= true %>" showCurrentPortlet="<%= true %>" showGuestGroup="<%= false %>" showLayout="<%= true %>" showParentGroups="<%= false %>" showPortletBreadcrumb="<%= true %>" />
+				</div>
+			</c:if>
+		</span>
+	</c:if>
+
+	<c:if test="<%= viewEntriesPage %>">
+		<div id="<portlet:namespace />entries">
+			<liferay-util:include page="/html/portlet/document_library/view_entries.jsp" />
+		</div>
+
+		<span id="<portlet:namespace />sortButton">
+			<liferay-util:include page="/html/portlet/document_library/sort_button.jsp" />
+		</span>
+	</c:if>
+
+	<c:if test="<%= viewFolders %>">
+		<div id="<portlet:namespace />folders">
+			<liferay-util:include page="/html/portlet/document_library/view_folders.jsp" />
+		</div>
+	</c:if>
+</div>

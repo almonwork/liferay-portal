@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -20,6 +20,8 @@ import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.util.HttpUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.UnsyncPrintWriterPool;
+import com.liferay.portal.service.ServiceContext;
+import com.liferay.portal.service.ServiceContextFactory;
 import com.liferay.portal.util.PortalUtil;
 import com.liferay.portlet.shopping.NoSuchOrderException;
 import com.liferay.portlet.shopping.model.ShoppingOrder;
@@ -124,9 +126,12 @@ public class PayPalNotificationAction extends Action {
 			}
 
 			if (payPalStatus.equals("VERIFIED") && validate(request)) {
+				ServiceContext serviceContext =
+					ServiceContextFactory.getInstance(request);
+
 				ShoppingOrderLocalServiceUtil.completeOrder(
 					invoice, txnId, paymentStatus, paymentGross, receiverEmail,
-					payerEmail, true);
+					payerEmail, true, serviceContext);
 			}
 			else if (payPalStatus.equals("INVALID")) {
 			}
@@ -146,16 +151,14 @@ public class PayPalNotificationAction extends Action {
 
 		String ppInvoice = ParamUtil.getString(request, "invoice");
 
-		ShoppingOrder order = ShoppingOrderLocalServiceUtil.getOrder(
-			ppInvoice);
+		ShoppingOrder order = ShoppingOrderLocalServiceUtil.getOrder(ppInvoice);
 
 		ShoppingPreferences shoppingPrefs = ShoppingPreferences.getInstance(
 			order.getCompanyId(), order.getGroupId());
 
 		// Receiver email address
 
-		String ppReceiverEmail = ParamUtil.getString(
-			request, "receiver_email");
+		String ppReceiverEmail = ParamUtil.getString(request, "receiver_email");
 
 		String payPalEmailAddress = shoppingPrefs.getPayPalEmailAddress();
 

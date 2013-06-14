@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -21,43 +21,130 @@ String backURL = ParamUtil.getString(request, "backURL");
 
 String toolbarItem = ParamUtil.getString(request, "toolbarItem", "view-all");
 
-long structureId = ParamUtil.getLong(request, "structureId");
+long classNameId = ParamUtil.getLong(request, "classNameId");
+long classPK = ParamUtil.getLong(request, "classPK");
 %>
 
 <div class="lfr-portlet-toolbar">
-	<portlet:renderURL var="viewEntriesURL">
+	<portlet:renderURL var="viewTemplatesURL">
 		<portlet:param name="struts_action" value="/dynamic_data_mapping/view_template" />
 		<portlet:param name="backURL" value="<%= backURL %>" />
-		<portlet:param name="structureId" value="<%= String.valueOf(structureId) %>" />
+		<portlet:param name="classNameId" value="<%= String.valueOf(classNameId) %>" />
+		<portlet:param name="classPK" value="<%= String.valueOf(classPK) %>" />
 	</portlet:renderURL>
 
 	<span class="lfr-toolbar-button view-button <%= toolbarItem.equals("view-all") ? "current" : StringPool.BLANK %>">
-		<a href="<%= viewEntriesURL %>"><liferay-ui:message key="view-all" /></a>
+		<a href="<%= viewTemplatesURL %>"><liferay-ui:message key="view-all" /></a>
 	</span>
 
-	<c:if test="<%= DDMPermission.contains(permissionChecker, scopeGroupId, ActionKeys.ADD_STRUCTURE) %>">
-		<portlet:renderURL var="addEntryURL">
-			<portlet:param name="struts_action" value="/dynamic_data_mapping/edit_template" />
-			<portlet:param name="redirect" value="<%= currentURL %>" />
-			<portlet:param name="backURL" value="<%= currentURL %>" />
-			<portlet:param name="groupId" value="<%= String.valueOf(scopeGroupId) %>" />
-			<portlet:param name="structureId" value="<%= String.valueOf(structureId) %>" />
-			<portlet:param name="structureAvailableFields" value='<%= renderResponse.getNamespace() + "structureAvailableFields" %>' />
-		</portlet:renderURL>
+	<%
+	String message = "add";
+	%>
 
-		<span class="lfr-toolbar-button add-template <%= toolbarItem.equals("add-detail-template") ? "current" : StringPool.BLANK %>"><a href="<%= addEntryURL %>"><liferay-ui:message key="add-detail-template" /></a></span>
-	</c:if>
+	<c:choose>
+		<c:when test="<%= classNameId == PortalUtil.getClassNameId(DDMStructure.class) %>">
+			<c:if test="<%= DDMPermission.contains(permissionChecker, scopeGroupId, ddmResource, ActionKeys.ADD_TEMPLATE) && (Validator.isNull(templateTypeValue) || templateTypeValue.equals(DDMTemplateConstants.TEMPLATE_TYPE_DETAIL)) %>">
+				<portlet:renderURL var="addTemplateURL">
+					<portlet:param name="struts_action" value="/dynamic_data_mapping/edit_template" />
+					<portlet:param name="redirect" value="<%= viewTemplatesURL %>" />
+					<portlet:param name="backURL" value="<%= viewTemplatesURL %>" />
+					<portlet:param name="groupId" value="<%= String.valueOf(scopeGroupId) %>" />
+					<portlet:param name="classNameId" value="<%= String.valueOf(classNameId) %>" />
+					<portlet:param name="classPK" value="<%= String.valueOf(classPK) %>" />
+					<portlet:param name="structureAvailableFields" value='<%= renderResponse.getNamespace() + "structureAvailableFields" %>' />
+				</portlet:renderURL>
 
-	<c:if test="<%= DDMPermission.contains(permissionChecker, scopeGroupId, ActionKeys.ADD_STRUCTURE) %>">
-		<portlet:renderURL var="addEntryURL">
-			<portlet:param name="struts_action" value="/dynamic_data_mapping/edit_template" />
-			<portlet:param name="redirect" value="<%= currentURL %>" />
-			<portlet:param name="backURL" value="<%= currentURL %>" />
-			<portlet:param name="groupId" value="<%= String.valueOf(scopeGroupId) %>" />
-			<portlet:param name="structureId" value="<%= String.valueOf(structureId) %>" />
-			<portlet:param name="type" value="list" />
-		</portlet:renderURL>
+				<%
+				if (Validator.isNull(templateTypeValue)) {
+					message = "add-detail-template";
+				}
+				%>
 
-		<span class="lfr-toolbar-button view-templates <%= toolbarItem.equals("add-list-template") ? "current" : StringPool.BLANK %>"><a href="<%= addEntryURL %>"><liferay-ui:message key="add-list-template" /></a></span>
-	</c:if>
+				<span class="lfr-toolbar-button add-template <%= toolbarItem.equals("add-detail-template") ? "current" : StringPool.BLANK %>">
+					<a href="<%= addTemplateURL %>"><liferay-ui:message key="<%= message %>" /></a>
+				</span>
+			</c:if>
+
+			<c:if test="<%= DDMPermission.contains(permissionChecker, scopeGroupId, ddmResource, ActionKeys.ADD_TEMPLATE) && (Validator.isNull(templateTypeValue) || templateTypeValue.equals(DDMTemplateConstants.TEMPLATE_TYPE_LIST)) %>">
+				<portlet:renderURL var="addTemplateURL">
+					<portlet:param name="struts_action" value="/dynamic_data_mapping/edit_template" />
+					<portlet:param name="redirect" value="<%= viewTemplatesURL %>" />
+					<portlet:param name="backURL" value="<%= viewTemplatesURL %>" />
+					<portlet:param name="groupId" value="<%= String.valueOf(scopeGroupId) %>" />
+					<portlet:param name="classNameId" value="<%= String.valueOf(classNameId) %>" />
+					<portlet:param name="classPK" value="<%= String.valueOf(classPK) %>" />
+					<portlet:param name="type" value="list" />
+				</portlet:renderURL>
+
+				<%
+				if (Validator.isNull(templateTypeValue)) {
+					message = "add-list-template";
+				}
+				%>
+
+				<span class="lfr-toolbar-button add-template <%= toolbarItem.equals("add-list-template") ? "current" : StringPool.BLANK %>">
+					<a href="<%= addTemplateURL %>"><liferay-ui:message key="<%= message %>" /></a>
+				</span>
+			</c:if>
+		</c:when>
+		<c:otherwise>
+
+			<%
+			List<PortletDisplayTemplateHandler> portletDisplayTemplateHandlers = getPortletDisplayTemplateHandlers(permissionChecker, scopeGroupId);
+
+			if (!portletDisplayTemplateHandlers.isEmpty()) {
+			%>
+
+				<liferay-ui:icon-menu align="left" cssClass='<%= "lfr-toolbar-button add-button " + (toolbarItem.equals("add") ? "current" : StringPool.BLANK) %>' direction="down" extended="<%= false %>" icon='<%= themeDisplay.getPathThemeImages() + "/common/add.png" %>' message="add" showWhenSingleIcon="<%= true %>">
+
+					<liferay-portlet:renderURL varImpl="addPortletDisplayTemplateURL">
+						<portlet:param name="struts_action" value="/dynamic_data_mapping/edit_template" />
+						<portlet:param name="redirect" value="<%= viewTemplatesURL %>" />
+						<portlet:param name="backURL" value="<%= viewTemplatesURL %>" />
+						<portlet:param name="groupId" value="<%= String.valueOf(scopeGroupId) %>" />
+						<portlet:param name="type" value="list" />
+					</liferay-portlet:renderURL>
+
+					<%
+					for (PortletDisplayTemplateHandler portletDisplayTemplateHandler : portletDisplayTemplateHandlers) {
+						addPortletDisplayTemplateURL.setParameter("classNameId", String.valueOf(PortalUtil.getClassNameId(portletDisplayTemplateHandler.getClassName())));
+						addPortletDisplayTemplateURL.setParameter("classPK", String.valueOf(0));
+						addPortletDisplayTemplateURL.setParameter("ddmResource", portletDisplayTemplateHandler.getResourceName());
+					%>
+
+						<liferay-ui:icon
+							image="add_display_style"
+							message="<%= portletDisplayTemplateHandler.getName(locale) %>"
+							method="get"
+							url="<%= addPortletDisplayTemplateURL.toString() %>"
+						/>
+
+					<%
+					}
+					%>
+
+				</liferay-ui:icon-menu>
+
+				<%
+				}
+				%>
+
+		</c:otherwise>
+	</c:choose>
 </div>
+
+<%!
+public List<PortletDisplayTemplateHandler> getPortletDisplayTemplateHandlers(PermissionChecker permissionChecker, long scopeGroupId) {
+	List<PortletDisplayTemplateHandler> portletDisplayTemplateHandlers = PortletDisplayTemplateHandlerRegistryUtil.getPortletDisplayTemplateHandlers();
+
+	List<PortletDisplayTemplateHandler> allowedPortletDisplayTemplateHandlers = new ArrayList<PortletDisplayTemplateHandler>();
+
+	for (PortletDisplayTemplateHandler portletDisplayTemplateHandler : portletDisplayTemplateHandlers) {
+		if (DDMPermission.contains(permissionChecker, scopeGroupId, portletDisplayTemplateHandler.getResourceName(), ActionKeys.ADD_TEMPLATE)) {
+			allowedPortletDisplayTemplateHandlers.add(portletDisplayTemplateHandler);
+		}
+	}
+
+	return allowedPortletDisplayTemplateHandlers;
+}
+%>

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -15,7 +15,6 @@
 package com.liferay.portlet.shopping.service;
 
 import com.liferay.portal.kernel.bean.PortalBeanLocatorUtil;
-import com.liferay.portal.kernel.util.MethodCache;
 import com.liferay.portal.kernel.util.ReferenceRegistry;
 
 /**
@@ -66,25 +65,32 @@ public class ShoppingItemPriceLocalServiceUtil {
 	* Deletes the shopping item price with the primary key from the database. Also notifies the appropriate model listeners.
 	*
 	* @param itemPriceId the primary key of the shopping item price
+	* @return the shopping item price that was removed
 	* @throws PortalException if a shopping item price with the primary key could not be found
 	* @throws SystemException if a system exception occurred
 	*/
-	public static void deleteShoppingItemPrice(long itemPriceId)
+	public static com.liferay.portlet.shopping.model.ShoppingItemPrice deleteShoppingItemPrice(
+		long itemPriceId)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException {
-		getService().deleteShoppingItemPrice(itemPriceId);
+		return getService().deleteShoppingItemPrice(itemPriceId);
 	}
 
 	/**
 	* Deletes the shopping item price from the database. Also notifies the appropriate model listeners.
 	*
 	* @param shoppingItemPrice the shopping item price
+	* @return the shopping item price that was removed
 	* @throws SystemException if a system exception occurred
 	*/
-	public static void deleteShoppingItemPrice(
+	public static com.liferay.portlet.shopping.model.ShoppingItemPrice deleteShoppingItemPrice(
 		com.liferay.portlet.shopping.model.ShoppingItemPrice shoppingItemPrice)
 		throws com.liferay.portal.kernel.exception.SystemException {
-		getService().deleteShoppingItemPrice(shoppingItemPrice);
+		return getService().deleteShoppingItemPrice(shoppingItemPrice);
+	}
+
+	public static com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery() {
+		return getService().dynamicQuery();
 	}
 
 	/**
@@ -156,6 +162,12 @@ public class ShoppingItemPriceLocalServiceUtil {
 		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery)
 		throws com.liferay.portal.kernel.exception.SystemException {
 		return getService().dynamicQueryCount(dynamicQuery);
+	}
+
+	public static com.liferay.portlet.shopping.model.ShoppingItemPrice fetchShoppingItemPrice(
+		long itemPriceId)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getService().fetchShoppingItemPrice(itemPriceId);
 	}
 
 	/**
@@ -268,20 +280,15 @@ public class ShoppingItemPriceLocalServiceUtil {
 
 			ReferenceRegistry.registerReference(ShoppingItemPriceLocalServiceUtil.class,
 				"_service");
-			MethodCache.remove(ShoppingItemPriceLocalService.class);
 		}
 
 		return _service;
 	}
 
+	/**
+	 * @deprecated
+	 */
 	public void setService(ShoppingItemPriceLocalService service) {
-		MethodCache.remove(ShoppingItemPriceLocalService.class);
-
-		_service = service;
-
-		ReferenceRegistry.registerReference(ShoppingItemPriceLocalServiceUtil.class,
-			"_service");
-		MethodCache.remove(ShoppingItemPriceLocalService.class);
 	}
 
 	private static ShoppingItemPriceLocalService _service;

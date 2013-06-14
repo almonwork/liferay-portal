@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -17,6 +17,7 @@ package com.liferay.portal.model.impl;
 import com.liferay.portal.kernel.bean.AutoEscapeBeanHandler;
 import com.liferay.portal.kernel.json.JSON;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.ProxyUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.model.CacheModel;
@@ -30,12 +31,12 @@ import com.liferay.portlet.expando.util.ExpandoBridgeFactoryUtil;
 
 import java.io.Serializable;
 
-import java.lang.reflect.Proxy;
-
 import java.sql.Types;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * The base model implementation for the PortletPreferences service. Represents a row in the &quot;PortletPreferences&quot; database table, with each column mapped to a property of this class.
@@ -78,6 +79,13 @@ public class PortletPreferencesModelImpl extends BaseModelImpl<PortletPreference
 	public static final boolean FINDER_CACHE_ENABLED = GetterUtil.getBoolean(com.liferay.portal.util.PropsUtil.get(
 				"value.object.finder.cache.enabled.com.liferay.portal.model.PortletPreferences"),
 			true);
+	public static final boolean COLUMN_BITMASK_ENABLED = GetterUtil.getBoolean(com.liferay.portal.util.PropsUtil.get(
+				"value.object.column.bitmask.enabled.com.liferay.portal.model.PortletPreferences"),
+			true);
+	public static long OWNERID_COLUMN_BITMASK = 1L;
+	public static long OWNERTYPE_COLUMN_BITMASK = 2L;
+	public static long PLID_COLUMN_BITMASK = 4L;
+	public static long PORTLETID_COLUMN_BITMASK = 8L;
 
 	/**
 	 * Converts the soap model instance into a normal model instance.
@@ -115,14 +123,6 @@ public class PortletPreferencesModelImpl extends BaseModelImpl<PortletPreference
 		return models;
 	}
 
-	public Class<?> getModelClass() {
-		return PortletPreferences.class;
-	}
-
-	public String getModelClassName() {
-		return PortletPreferences.class.getName();
-	}
-
 	public static final long LOCK_EXPIRATION_TIME = GetterUtil.getLong(com.liferay.portal.util.PropsUtil.get(
 				"lock.expiration.time.com.liferay.portal.model.PortletPreferences"));
 
@@ -145,6 +145,67 @@ public class PortletPreferencesModelImpl extends BaseModelImpl<PortletPreference
 		setPrimaryKey(((Long)primaryKeyObj).longValue());
 	}
 
+	public Class<?> getModelClass() {
+		return PortletPreferences.class;
+	}
+
+	public String getModelClassName() {
+		return PortletPreferences.class.getName();
+	}
+
+	@Override
+	public Map<String, Object> getModelAttributes() {
+		Map<String, Object> attributes = new HashMap<String, Object>();
+
+		attributes.put("portletPreferencesId", getPortletPreferencesId());
+		attributes.put("ownerId", getOwnerId());
+		attributes.put("ownerType", getOwnerType());
+		attributes.put("plid", getPlid());
+		attributes.put("portletId", getPortletId());
+		attributes.put("preferences", getPreferences());
+
+		return attributes;
+	}
+
+	@Override
+	public void setModelAttributes(Map<String, Object> attributes) {
+		Long portletPreferencesId = (Long)attributes.get("portletPreferencesId");
+
+		if (portletPreferencesId != null) {
+			setPortletPreferencesId(portletPreferencesId);
+		}
+
+		Long ownerId = (Long)attributes.get("ownerId");
+
+		if (ownerId != null) {
+			setOwnerId(ownerId);
+		}
+
+		Integer ownerType = (Integer)attributes.get("ownerType");
+
+		if (ownerType != null) {
+			setOwnerType(ownerType);
+		}
+
+		Long plid = (Long)attributes.get("plid");
+
+		if (plid != null) {
+			setPlid(plid);
+		}
+
+		String portletId = (String)attributes.get("portletId");
+
+		if (portletId != null) {
+			setPortletId(portletId);
+		}
+
+		String preferences = (String)attributes.get("preferences");
+
+		if (preferences != null) {
+			setPreferences(preferences);
+		}
+	}
+
 	@JSON
 	public long getPortletPreferencesId() {
 		return _portletPreferencesId;
@@ -160,6 +221,8 @@ public class PortletPreferencesModelImpl extends BaseModelImpl<PortletPreference
 	}
 
 	public void setOwnerId(long ownerId) {
+		_columnBitmask |= OWNERID_COLUMN_BITMASK;
+
 		if (!_setOriginalOwnerId) {
 			_setOriginalOwnerId = true;
 
@@ -179,6 +242,8 @@ public class PortletPreferencesModelImpl extends BaseModelImpl<PortletPreference
 	}
 
 	public void setOwnerType(int ownerType) {
+		_columnBitmask |= OWNERTYPE_COLUMN_BITMASK;
+
 		if (!_setOriginalOwnerType) {
 			_setOriginalOwnerType = true;
 
@@ -198,6 +263,8 @@ public class PortletPreferencesModelImpl extends BaseModelImpl<PortletPreference
 	}
 
 	public void setPlid(long plid) {
+		_columnBitmask |= PLID_COLUMN_BITMASK;
+
 		if (!_setOriginalPlid) {
 			_setOriginalPlid = true;
 
@@ -222,6 +289,8 @@ public class PortletPreferencesModelImpl extends BaseModelImpl<PortletPreference
 	}
 
 	public void setPortletId(String portletId) {
+		_columnBitmask |= PORTLETID_COLUMN_BITMASK;
+
 		if (_originalPortletId == null) {
 			_originalPortletId = _portletId;
 		}
@@ -247,35 +316,32 @@ public class PortletPreferencesModelImpl extends BaseModelImpl<PortletPreference
 		_preferences = preferences;
 	}
 
+	public long getColumnBitmask() {
+		return _columnBitmask;
+	}
+
 	@Override
 	public PortletPreferences toEscapedModel() {
-		if (isEscapedModel()) {
-			return (PortletPreferences)this;
+		if (_escapedModelProxy == null) {
+			_escapedModelProxy = (PortletPreferences)ProxyUtil.newProxyInstance(_classLoader,
+					_escapedModelProxyInterfaces,
+					new AutoEscapeBeanHandler(this));
 		}
-		else {
-			if (_escapedModelProxy == null) {
-				_escapedModelProxy = (PortletPreferences)Proxy.newProxyInstance(_classLoader,
-						_escapedModelProxyInterfaces,
-						new AutoEscapeBeanHandler(this));
-			}
 
-			return _escapedModelProxy;
-		}
+		return _escapedModelProxy;
 	}
 
 	@Override
 	public ExpandoBridge getExpandoBridge() {
-		if (_expandoBridge == null) {
-			_expandoBridge = ExpandoBridgeFactoryUtil.getExpandoBridge(0,
-					PortletPreferences.class.getName(), getPrimaryKey());
-		}
-
-		return _expandoBridge;
+		return ExpandoBridgeFactoryUtil.getExpandoBridge(0,
+			PortletPreferences.class.getName(), getPrimaryKey());
 	}
 
 	@Override
 	public void setExpandoBridgeAttributes(ServiceContext serviceContext) {
-		getExpandoBridge().setAttributes(serviceContext);
+		ExpandoBridge expandoBridge = getExpandoBridge();
+
+		expandoBridge.setAttributes(serviceContext);
 	}
 
 	@Override
@@ -355,6 +421,8 @@ public class PortletPreferencesModelImpl extends BaseModelImpl<PortletPreference
 		portletPreferencesModelImpl._setOriginalPlid = false;
 
 		portletPreferencesModelImpl._originalPortletId = portletPreferencesModelImpl._portletId;
+
+		portletPreferencesModelImpl._columnBitmask = 0;
 	}
 
 	@Override
@@ -463,6 +531,6 @@ public class PortletPreferencesModelImpl extends BaseModelImpl<PortletPreference
 	private String _portletId;
 	private String _originalPortletId;
 	private String _preferences;
-	private transient ExpandoBridge _expandoBridge;
+	private long _columnBitmask;
 	private PortletPreferences _escapedModelProxy;
 }

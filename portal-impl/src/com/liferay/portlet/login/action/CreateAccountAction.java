@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -24,6 +24,7 @@ import com.liferay.portal.ContactLastNameException;
 import com.liferay.portal.DuplicateUserEmailAddressException;
 import com.liferay.portal.DuplicateUserScreenNameException;
 import com.liferay.portal.EmailAddressException;
+import com.liferay.portal.GroupFriendlyURLException;
 import com.liferay.portal.NoSuchCountryException;
 import com.liferay.portal.NoSuchLayoutException;
 import com.liferay.portal.NoSuchListTypeException;
@@ -101,6 +102,12 @@ public class CreateAccountAction extends PortletAction {
 		ThemeDisplay themeDisplay = (ThemeDisplay)actionRequest.getAttribute(
 			WebKeys.THEME_DISPLAY);
 
+		Company company = themeDisplay.getCompany();
+
+		if (!company.isStrangers()) {
+			throw new PrincipalException();
+		}
+
 		String cmd = ParamUtil.getString(actionRequest, Constants.CMD);
 
 		try {
@@ -132,8 +139,7 @@ public class CreateAccountAction extends PortletAction {
 					if (user.getStatus() !=
 							WorkflowConstants.STATUS_INCOMPLETE) {
 
-						SessionErrors.add(
-							actionRequest, e.getClass().getName(), e);
+						SessionErrors.add(actionRequest, e.getClass(), e);
 					}
 					else {
 						setForward(
@@ -141,38 +147,39 @@ public class CreateAccountAction extends PortletAction {
 					}
 				}
 				catch (NoSuchUserException nsue) {
-					SessionErrors.add(actionRequest, e.getClass().getName(), e);
+					SessionErrors.add(actionRequest, e.getClass(), e);
 				}
 			}
 			else if (e instanceof AddressCityException ||
-				e instanceof AddressStreetException ||
-				e instanceof AddressZipException ||
-				e instanceof CaptchaMaxChallengesException ||
-				e instanceof CaptchaTextException ||
-				e instanceof CompanyMaxUsersException ||
-				e instanceof ContactFirstNameException ||
-				e instanceof ContactFullNameException ||
-				e instanceof ContactLastNameException ||
-				e instanceof EmailAddressException ||
-				e instanceof NoSuchCountryException ||
-				e instanceof NoSuchListTypeException ||
-				e instanceof NoSuchOrganizationException ||
-				e instanceof NoSuchRegionException ||
-				e instanceof OrganizationParentException ||
-				e instanceof PhoneNumberException ||
-				e instanceof RequiredFieldException ||
-				e instanceof RequiredUserException ||
-				e instanceof ReservedUserEmailAddressException ||
-				e instanceof ReservedUserScreenNameException ||
-				e instanceof TermsOfUseException ||
-				e instanceof UserEmailAddressException ||
-				e instanceof UserIdException ||
-				e instanceof UserPasswordException ||
-				e instanceof UserScreenNameException ||
-				e instanceof UserSmsException ||
-				e instanceof WebsiteURLException) {
+					 e instanceof AddressStreetException ||
+					 e instanceof AddressZipException ||
+					 e instanceof CaptchaMaxChallengesException ||
+					 e instanceof CaptchaTextException ||
+					 e instanceof CompanyMaxUsersException ||
+					 e instanceof ContactFirstNameException ||
+					 e instanceof ContactFullNameException ||
+					 e instanceof ContactLastNameException ||
+					 e instanceof EmailAddressException ||
+					 e instanceof GroupFriendlyURLException ||
+					 e instanceof NoSuchCountryException ||
+					 e instanceof NoSuchListTypeException ||
+					 e instanceof NoSuchOrganizationException ||
+					 e instanceof NoSuchRegionException ||
+					 e instanceof OrganizationParentException ||
+					 e instanceof PhoneNumberException ||
+					 e instanceof RequiredFieldException ||
+					 e instanceof RequiredUserException ||
+					 e instanceof ReservedUserEmailAddressException ||
+					 e instanceof ReservedUserScreenNameException ||
+					 e instanceof TermsOfUseException ||
+					 e instanceof UserEmailAddressException ||
+					 e instanceof UserIdException ||
+					 e instanceof UserPasswordException ||
+					 e instanceof UserScreenNameException ||
+					 e instanceof UserSmsException ||
+					 e instanceof WebsiteURLException) {
 
-				SessionErrors.add(actionRequest, e.getClass().getName(), e);
+				SessionErrors.add(actionRequest, e.getClass(), e);
 			}
 			else {
 				throw e;
@@ -202,14 +209,14 @@ public class CreateAccountAction extends PortletAction {
 			RenderRequest renderRequest, RenderResponse renderResponse)
 		throws Exception {
 
-		Company company = PortalUtil.getCompany(renderRequest);
-
-		if (!company.isStrangers()) {
-			throw new PrincipalException();
-		}
-
 		ThemeDisplay themeDisplay = (ThemeDisplay)renderRequest.getAttribute(
 			WebKeys.THEME_DISPLAY);
+
+		Company company = themeDisplay.getCompany();
+
+		if (!company.isStrangers()) {
+			return mapping.findForward("portlet.login.login");
+		}
 
 		renderResponse.setTitle(themeDisplay.translate("create-account"));
 
@@ -244,7 +251,7 @@ public class CreateAccountAction extends PortletAction {
 		String lastName = ParamUtil.getString(actionRequest, "lastName");
 		int prefixId = ParamUtil.getInteger(actionRequest, "prefixId");
 		int suffixId = ParamUtil.getInteger(actionRequest, "suffixId");
-		boolean male = ParamUtil.get(actionRequest, "male", true);
+		boolean male = ParamUtil.getBoolean(actionRequest, "male", true);
 		int birthdayMonth = ParamUtil.getInteger(
 			actionRequest, "birthdayMonth");
 		int birthdayDay = ParamUtil.getInteger(actionRequest, "birthdayDay");
@@ -271,9 +278,8 @@ public class CreateAccountAction extends PortletAction {
 		Boolean openIdLoginPending = (Boolean)session.getAttribute(
 			WebKeys.OPEN_ID_LOGIN_PENDING);
 
-		if ((openIdLoginPending != null) &&
-			(openIdLoginPending.booleanValue()) &&
-			(Validator.isNotNull(openId))) {
+		if ((openIdLoginPending != null) && openIdLoginPending.booleanValue() &&
+			Validator.isNotNull(openId)) {
 
 			sendEmail = false;
 			openIdPending = true;
@@ -351,7 +357,7 @@ public class CreateAccountAction extends PortletAction {
 		User anonymousUser = UserLocalServiceUtil.getUserByEmailAddress(
 			themeDisplay.getCompanyId(), emailAddress);
 
-		UserServiceUtil.deleteUser(anonymousUser.getUserId());
+		UserLocalServiceUtil.deleteUser(anonymousUser.getUserId());
 
 		addUser(actionRequest, actionResponse);
 	}
@@ -409,7 +415,7 @@ public class CreateAccountAction extends PortletAction {
 		String lastName = ParamUtil.getString(actionRequest, "lastName");
 		int prefixId = ParamUtil.getInteger(actionRequest, "prefixId");
 		int suffixId = ParamUtil.getInteger(actionRequest, "suffixId");
-		boolean male = ParamUtil.get(actionRequest, "male", true);
+		boolean male = ParamUtil.getBoolean(actionRequest, "male", true);
 		int birthdayMonth = ParamUtil.getInteger(
 			actionRequest, "birthdayMonth");
 		int birthdayDay = ParamUtil.getInteger(actionRequest, "birthdayDay");
@@ -424,8 +430,8 @@ public class CreateAccountAction extends PortletAction {
 		User user = UserServiceUtil.updateIncompleteUser(
 			themeDisplay.getCompanyId(), autoPassword, password1, password2,
 			autoScreenName, screenName, emailAddress, facebookId, openId,
-			themeDisplay.getLocale(),firstName, middleName, lastName, prefixId,
-			suffixId, male,	birthdayMonth, birthdayDay, birthdayYear, jobTitle,
+			themeDisplay.getLocale(), firstName, middleName, lastName, prefixId,
+			suffixId, male, birthdayMonth, birthdayDay, birthdayYear, jobTitle,
 			sendEmail, updateUserInformation, serviceContext);
 
 		// Session messages

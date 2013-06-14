@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -82,8 +82,11 @@ public class InvokerFilterChain implements FilterChain {
 			if (filter instanceof LiferayFilter) {
 				LiferayFilter liferayFilter = (LiferayFilter)filter;
 
-				filterEnabled = liferayFilter.isFilterEnabled(
-					request, response);
+				if (!liferayFilter.isFilterEnabled() ||
+					!liferayFilter.isFilterEnabled(request, response)) {
+
+					filterEnabled = false;
+				}
 			}
 
 			if (filterEnabled) {
@@ -195,7 +198,7 @@ public class InvokerFilterChain implements FilterChain {
 
 		Thread currentThread = Thread.currentThread();
 
-		ClassLoader previousClassLoader = currentThread.getContextClassLoader();
+		ClassLoader contextClassLoader = currentThread.getContextClassLoader();
 
 		currentThread.setContextClassLoader(_contextClassLoader);
 
@@ -203,7 +206,7 @@ public class InvokerFilterChain implements FilterChain {
 			filter.doFilter(servletRequest, servletResponse, this);
 		}
 		finally {
-			currentThread.setContextClassLoader(previousClassLoader);
+			currentThread.setContextClassLoader(contextClassLoader);
 		}
 	}
 

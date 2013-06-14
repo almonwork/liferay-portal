@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,8 +14,9 @@
 
 package com.liferay.portalweb.portal;
 
-import com.liferay.portalweb.portal.dbupgrade.sampledata529.wiki.WikiTests;
-import com.liferay.portalweb.portal.login.Login52xTests;
+import com.liferay.portalweb.portal.dbupgrade.sampledata529.login.LoginTests;
+import com.liferay.portalweb.portal.dbupgrade.sampledata529.serveradministration.executegeneratecustomroles.ExecuteGenerateCustomRolesTests;
+import com.liferay.portalweb.portal.dbupgrade.sampledata529.wiki.WikiTestPlan;
 
 import junit.framework.Test;
 import junit.framework.TestSuite;
@@ -23,13 +24,14 @@ import junit.framework.TestSuite;
 /**
  * @author Brian Wing Shun Chan
  */
-public class DBUpgradeWiki529TestSuite extends BaseTests {
+public class DBUpgradeWiki529TestSuite extends BaseTestSuite {
 
 	public static Test suite() {
 		TestSuite testSuite = new TestSuite();
 
-		testSuite.addTest(Login52xTests.suite());
-		testSuite.addTest(WikiTests.suite());
+		testSuite.addTest(LoginTests.suite());
+		testSuite.addTest(WikiTestPlan.suite());
+		testSuite.addTest(ExecuteGenerateCustomRolesTests.suite());
 
 		testSuite.addTestSuite(StopSeleniumTest.class);
 

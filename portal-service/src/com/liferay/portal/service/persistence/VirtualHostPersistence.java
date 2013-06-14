@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,7 +14,6 @@
 
 package com.liferay.portal.service.persistence;
 
-import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.model.VirtualHost;
 
 /**
@@ -221,9 +220,11 @@ public interface VirtualHostPersistence extends BasePersistence<VirtualHost> {
 	* Removes the virtual host where hostname = &#63; from the database.
 	*
 	* @param hostname the hostname
+	* @return the virtual host that was removed
 	* @throws SystemException if a system exception occurred
 	*/
-	public void removeByHostname(java.lang.String hostname)
+	public com.liferay.portal.model.VirtualHost removeByHostname(
+		java.lang.String hostname)
 		throws com.liferay.portal.NoSuchVirtualHostException,
 			com.liferay.portal.kernel.exception.SystemException;
 
@@ -232,9 +233,11 @@ public interface VirtualHostPersistence extends BasePersistence<VirtualHost> {
 	*
 	* @param companyId the company ID
 	* @param layoutSetId the layout set ID
+	* @return the virtual host that was removed
 	* @throws SystemException if a system exception occurred
 	*/
-	public void removeByC_L(long companyId, long layoutSetId)
+	public com.liferay.portal.model.VirtualHost removeByC_L(long companyId,
+		long layoutSetId)
 		throws com.liferay.portal.NoSuchVirtualHostException,
 			com.liferay.portal.kernel.exception.SystemException;
 
@@ -275,7 +278,4 @@ public interface VirtualHostPersistence extends BasePersistence<VirtualHost> {
 	*/
 	public int countAll()
 		throws com.liferay.portal.kernel.exception.SystemException;
-
-	public VirtualHost remove(VirtualHost virtualHost)
-		throws SystemException;
 }

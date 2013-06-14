@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -24,11 +24,11 @@ public class CA_AnnouncementsRolesTest extends BaseTestCase {
 	public void testCA_AnnouncementsRoles() throws Exception {
 		selenium.clickAt("link=Define Permissions", RuntimeVariables.replace(""));
 		selenium.waitForPageToLoad("30000");
-		selenium.saveScreenShotAndSource();
+		loadRequiredJavaScriptModules();
 		selenium.select("_128_add-permissions",
 			RuntimeVariables.replace("label=Announcements"));
 		selenium.waitForPageToLoad("30000");
-		selenium.saveScreenShotAndSource();
+		loadRequiredJavaScriptModules();
 		selenium.check("_128_rowIds");
 		selenium.check(
 			"//input[@name='_128_rowIds' and @value='com.liferay.portlet.announcements.model.AnnouncementsEntryUPDATE']");
@@ -36,22 +36,21 @@ public class CA_AnnouncementsRolesTest extends BaseTestCase {
 			"//input[@name='_128_rowIds' and @value='com.liferay.portlet.announcements.model.AnnouncementsEntryVIEW']");
 		selenium.clickAt("//input[@value='Save']", RuntimeVariables.replace(""));
 		selenium.waitForPageToLoad("30000");
-		selenium.saveScreenShotAndSource();
+		loadRequiredJavaScriptModules();
 		assertTrue(selenium.isTextPresent("The role permissions were updated."));
 		selenium.typeKeys("_128_add-permissions",
 			RuntimeVariables.replace("aaaaa"));
-		selenium.saveScreenShotAndSource();
 		selenium.keyPress("_128_add-permissions",
 			RuntimeVariables.replace("\\13"));
 		selenium.waitForPageToLoad("30000");
-		selenium.saveScreenShotAndSource();
+		loadRequiredJavaScriptModules();
 		selenium.check("_128_rowIds");
 		selenium.check(
 			"//input[@name='_128_rowIds' and @value='84CONFIGURATION']");
 		selenium.check("//input[@name='_128_rowIds' and @value='84VIEW']");
 		selenium.clickAt("//input[@value='Save']", RuntimeVariables.replace(""));
 		selenium.waitForPageToLoad("30000");
-		selenium.saveScreenShotAndSource();
+		loadRequiredJavaScriptModules();
 		assertTrue(selenium.isTextPresent("The role permissions were updated."));
 	}
 }

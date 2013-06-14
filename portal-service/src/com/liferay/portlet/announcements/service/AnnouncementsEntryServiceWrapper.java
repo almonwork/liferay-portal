@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,6 +14,8 @@
 
 package com.liferay.portlet.announcements.service;
 
+import com.liferay.portal.service.ServiceWrapper;
+
 /**
  * <p>
  * This class is a wrapper for {@link AnnouncementsEntryService}.
@@ -24,10 +26,29 @@ package com.liferay.portlet.announcements.service;
  * @generated
  */
 public class AnnouncementsEntryServiceWrapper
-	implements AnnouncementsEntryService {
+	implements AnnouncementsEntryService,
+		ServiceWrapper<AnnouncementsEntryService> {
 	public AnnouncementsEntryServiceWrapper(
 		AnnouncementsEntryService announcementsEntryService) {
 		_announcementsEntryService = announcementsEntryService;
+	}
+
+	/**
+	* Returns the Spring bean ID for this bean.
+	*
+	* @return the Spring bean ID for this bean
+	*/
+	public java.lang.String getBeanIdentifier() {
+		return _announcementsEntryService.getBeanIdentifier();
+	}
+
+	/**
+	* Sets the Spring bean ID for this bean.
+	*
+	* @param beanIdentifier the Spring bean ID for this bean
+	*/
+	public void setBeanIdentifier(java.lang.String beanIdentifier) {
+		_announcementsEntryService.setBeanIdentifier(beanIdentifier);
 	}
 
 	public com.liferay.portlet.announcements.model.AnnouncementsEntry addEntry(
@@ -68,11 +89,26 @@ public class AnnouncementsEntryServiceWrapper
 			expirationDateMinute, priority);
 	}
 
+	/**
+	 * @deprecated Renamed to {@link #getWrappedService}
+	 */
 	public AnnouncementsEntryService getWrappedAnnouncementsEntryService() {
 		return _announcementsEntryService;
 	}
 
+	/**
+	 * @deprecated Renamed to {@link #setWrappedService}
+	 */
 	public void setWrappedAnnouncementsEntryService(
+		AnnouncementsEntryService announcementsEntryService) {
+		_announcementsEntryService = announcementsEntryService;
+	}
+
+	public AnnouncementsEntryService getWrappedService() {
+		return _announcementsEntryService;
+	}
+
+	public void setWrappedService(
 		AnnouncementsEntryService announcementsEntryService) {
 		_announcementsEntryService = announcementsEntryService;
 	}

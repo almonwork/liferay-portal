@@ -14,7 +14,7 @@
 #set ($accountId = $counter.get())
 #set ($virtualHostId = $counter.get())
 
-insert into Company (companyId, accountId, webId, mx, active_) values ($companyId, $accountId, 'liferay.com', 'liferay.com', TRUE);
+insert into Company (companyId, accountId, webId, mx, system, active_) values ($companyId, $accountId, 'liferay.com', 'liferay.com', FALSE, TRUE);
 insert into Account_ (accountId, companyId, userId, userName, createDate, modifiedDate, parentAccountId, name, legalName, legalId, legalType, sicCode, tickerSymbol, industry, type_, size_) values ($accountId, $companyId, $defaultUserId, '', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 0, 'Liferay', 'Liferay, Inc.', '', '', '', '', '', '', '');
 insert into VirtualHost (virtualHostId, companyId, layoutSetId, hostname) values ($virtualHostId, $companyId, 0, 'localhost');
 
@@ -60,7 +60,7 @@ insert into Role_ (roleId, companyId, classNameId, classPK, name, description, t
 
 #set ($guestGroupId = $counter.get())
 
-insert into Group_ (groupId, companyId, creatorUserId, classNameId, classPK, parentGroupId, liveGroupId, name, type_, friendlyURL, active_) values ($guestGroupId, $companyId, $defaultUserId, $groupClassNameId, $guestGroupId, 0, 0, 'Guest', 1, '/guest', TRUE);
+insert into Group_ (groupId, companyId, creatorUserId, classNameId, classPK, parentGroupId, liveGroupId, name, type_, friendlyURL, site, active_) values ($guestGroupId, $companyId, $defaultUserId, $groupClassNameId, $guestGroupId, 0, 0, 'Guest', 1, '/guest', TRUE, TRUE);
 insert into LayoutSet (layoutSetId, companyId, groupId, privateLayout, logo, themeId, colorSchemeId, pageCount) values ($counter.get(), $companyId, $guestGroupId, TRUE, FALSE, 'classic', '01', 0);
 insert into LayoutSet (layoutSetId, companyId, groupId, privateLayout, logo, themeId, colorSchemeId, pageCount) values ($counter.get(), $companyId, $guestGroupId, FALSE, FALSE, 'classic', '01', 0);
 
@@ -223,21 +223,21 @@ insert into LayoutSet (layoutSetId, companyId, groupId, privateLayout, logo, the
 ##
 
 insert into User_ (userId, companyId, createDate, modifiedDate, defaultUser, contactId, password_, passwordEncrypted, passwordReset, screenName, emailAddress, greeting, firstName, middleName, lastName, loginDate, failedLoginAttempts, agreedToTermsOfUse, status) values ($defaultUserId, $companyId, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, TRUE, $defaultContactId, 'password', FALSE, FALSE, '$defaultUserId', 'default@liferay.com', 'Welcome!', '', '', '', CURRENT_TIMESTAMP, 0, TRUE, 0);
-insert into Contact_ (contactId, companyId, userId, userName, createDate, modifiedDate, accountId, parentContactId, firstName, middleName, lastName, male, birthday) values ($defaultContactId, $companyId, $defaultUserId, '', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, $accountId, 0, '', '', '', TRUE, '01/01/1970');
+insert into Contact_ (contactId, companyId, userId, userName, createDate, modifiedDate, classNameId, classPK, accountId, parentContactId, emailAddress, firstName, middleName, lastName, male, birthday) values ($defaultContactId, $companyId, $defaultUserId, '', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, $userClassNameId, $defaultUserId, $accountId, 0, 'default@liferay.com', '', '', '', TRUE, '01/01/1970');
 
 ##
 ## User (test@liferay.com)
 ##
 
 insert into User_ (userId, companyId, createDate, modifiedDate, defaultUser, contactId, password_, passwordEncrypted, passwordReset, screenName, emailAddress, greeting, firstName, middleName, lastName, loginDate, lastLoginDate, failedLoginAttempts, agreedToTermsOfUse, status) values ($testUserId, $companyId, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, FALSE, $testContactId, 'test', FALSE, FALSE, 'joebloggs', 'test@liferay.com', 'Welcome Joe Bloggs!', 'Joe', '', 'Bloggs', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 0, FALSE, 0);
-insert into Contact_ (contactId, companyId, userId, userName, createDate, modifiedDate, accountId, parentContactId, firstName, middleName, lastName, male, birthday) values ($testContactId, $companyId, $testUserId, 'Joe Bloggs', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, $accountId, 0, 'Joe', '', 'Bloggs', TRUE, '01/01/1970');
+insert into Contact_ (contactId, companyId, userId, userName, createDate, modifiedDate, classNameId, classPK, accountId, parentContactId, emailAddress, firstName, middleName, lastName, male, birthday) values ($testContactId, $companyId, $testUserId, 'Joe Bloggs', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, $userClassNameId, $testUserId, $accountId, 0, 'test@liferay.com', 'Joe', '', 'Bloggs', TRUE, '01/01/1970');
 
 #set ($testGroupId = $counter.get())
 
 insert into Group_ (groupId, companyId, creatorUserId, classNameId, classPK, parentGroupId, liveGroupId, name, type_, friendlyURL, active_) values ($testGroupId, $companyId, $testUserId, $userClassNameId, $testUserId, 0, 0, '$testGroupId', 0, '/joebloggs', TRUE);
 insert into LayoutSet (layoutSetId, companyId, groupId, privateLayout, logo, themeId, colorSchemeId, pageCount) values ($counter.get(), $companyId, $testGroupId, TRUE, FALSE, 'classic', '01', 2);
 insert into LayoutSet (layoutSetId, companyId, groupId, privateLayout, logo, themeId, colorSchemeId, pageCount) values ($counter.get(), $companyId, $testGroupId, FALSE, FALSE, 'classic', '01', 0);
-insert into Layout (plid, groupId, companyId, privateLayout, layoutId, parentLayoutId, name, type_, typeSettings, hidden_, friendlyURL, priority) values ($counter.get(), $testGroupId, $companyId, TRUE, 1, 0, '<?xml version="1.0"?>\n\n<root>\n  <name>Home</name>\n</root>', 'portlet', 'column-1=71_INSTANCE_OY0d,82,23,61,\ncolumn-2=9,79,29,8,19,\nlayout-template-id=2_columns_ii\n', FALSE, '/home', 0);
+insert into Layout (plid, groupId, companyId, privateLayout, layoutId, parentLayoutId, name, type_, typeSettings, hidden_, friendlyURL, priority) values ($counter.get(), $testGroupId, $companyId, TRUE, 1, 0, '<?xml version="1.0"?>\n\n<root>\n  <name>Home</name>\n</root>', 'portlet', 'column-1=71_INSTANCE_OY0d,82,23,61,\ncolumn-2=29,8,19,\nlayout-template-id=2_columns_ii\n', FALSE, '/home', 0);
 insert into Layout (plid, groupId, companyId, privateLayout, layoutId, parentLayoutId, name, type_, typeSettings, hidden_, friendlyURL, priority) values ($counter.get(), $testGroupId, $companyId, TRUE, 2, 0, '<?xml version="1.0"?>\n\n<root>\n  <name>Plugins</name>\n</root>', 'portlet', 'column-1=\ncolumn-2=111,\nlayout-template-id=2_columns_ii\n', FALSE, '/plugins', 1);
 
 insert into Users_Groups values ($testUserId, $guestGroupId);
@@ -248,6 +248,8 @@ insert into Users_Orgs (userId, organizationId) values ($testUserId, $laxLocatio
 insert into Users_Roles values ($testUserId, $administratorRoleId);
 insert into Users_Roles values ($testUserId, $powerUserRoleId);
 insert into Users_Roles values ($testUserId, $userRoleId);
+
+insert into AssetEntry (entryId, groupId, companyId, userId, userName, createDate, modifiedDate, classNameId, classPK, classUuid, classTypeId, visible, startDate, endDate, publishDate, expirationDate, mimeType, title, description, summary, url, layoutUuid, height, width, priority, viewCount) VALUES ($counter.get(), $testGroupId, $companyId, $testUserId, 'Joe Blogs', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 13, $testUserId, '', 0, 0, NULL, NULL, NULL, NULL, '', 'Joe Bloggs', '', '', '', 0, 0, 0, 0, 0);
 
 ##
 ## Batch Users
@@ -260,7 +262,7 @@ insert into Users_Roles values ($testUserId, $userRoleId);
 	#set ($cur = $count - 99)
 
 	insert into User_ (userId, companyId, createDate, modifiedDate, defaultUser, contactId, password_, passwordEncrypted, passwordReset, screenName, emailAddress, greeting, firstName, middleName, lastName, loginDate, failedLoginAttempts, agreedToTermsOfUse, status) values ($batchUserId, $companyId, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, FALSE, $batchContactId, 'test', FALSE, FALSE, 'lax$cur', 'test.lax.$cur@liferay.com', 'Welcome Test LAX $cur!', 'Test', '', 'LAX $cur', CURRENT_TIMESTAMP, 0, TRUE, 0);
-	insert into Contact_ (contactId, companyId, userId, userName, createDate, modifiedDate, accountId, parentContactId, firstName, middleName, lastName, male, birthday) values ($batchContactId, $companyId, $testUserId, 'Test LAX $cur', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, $accountId, 0, 'Test', '', 'LAX $cur', TRUE, '01/01/1970');
+	insert into Contact_ (contactId, companyId, userId, userName, createDate, modifiedDate, classNameId, classPK, accountId, parentContactId, emailAddress, firstName, middleName, lastName, male, birthday) values ($batchContactId, $companyId, $testUserId, 'Test LAX $cur', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, $userClassNameId, $batchUserId, $accountId, 0, 'test.lax.$cur@liferay.com', 'Test', '', 'LAX $cur', TRUE, '01/01/1970');
 
 	insert into Group_ (groupId, companyId, creatorUserId, classNameId, classPK, parentGroupId, liveGroupId, name, type_, friendlyURL, active_) values ($batchGroupId, $companyId, $batchUserId, $userClassNameId, $batchUserId, 0, 0, '$batchGroupId', 0, '/lax$cur', TRUE);
 	insert into LayoutSet (layoutSetId, companyId, groupId, privateLayout, logo, themeId, colorSchemeId, pageCount) values ($counter.get(), $companyId, $batchGroupId, TRUE, FALSE, 'classic', '01', 0);
@@ -272,6 +274,8 @@ insert into Users_Roles values ($testUserId, $userRoleId);
 	insert into Users_Orgs (userId, organizationId) values ($batchUserId, $laxLocationId);
 
 	insert into Users_Roles values ($batchUserId, $userRoleId);
+
+	insert into AssetEntry (entryId, groupId, companyId, userId, userName, createDate, modifiedDate, classNameId, classPK, classUuid, classTypeId, visible, startDate, endDate, publishDate, expirationDate, mimeType, title, description, summary, url, layoutUuid, height, width, priority, viewCount) VALUES ($counter.get(), $batchGroupId, $companyId, $testUserId, 'Joe Blogs', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 13, $batchUserId, '', 0, 0, NULL, NULL, NULL, NULL, '', 'Test LAX $cur', '', '', '', 0, 0, 0, 0, 0);
 #end
 
 #foreach($count in [200..209])
@@ -281,7 +285,7 @@ insert into Users_Roles values ($testUserId, $userRoleId);
 	#set ($cur = $count - 199)
 
 	insert into User_ (userId, companyId, createDate, modifiedDate, defaultUser, contactId, password_, passwordEncrypted, passwordReset, screenName, emailAddress, greeting, firstName, middleName, lastName, loginDate, failedLoginAttempts, agreedToTermsOfUse, status) values ($batchUserId, $companyId, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, FALSE, $batchContactId, 'test', FALSE, FALSE, 'sfo$cur', 'test.sfo.$cur@liferay.com', 'Welcome Test SFO $cur!', 'Test', '', 'SFO $cur', CURRENT_TIMESTAMP, 0, TRUE, 0);
-	insert into Contact_ (contactId, companyId, userId, userName, createDate, modifiedDate, accountId, parentContactId, firstName, middleName, lastName, male, birthday) values ($batchContactId, $companyId, $testUserId, 'Test SFO $cur', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, $accountId, 0, 'Test', '', 'SFO $cur', TRUE, '01/01/1970');
+	insert into Contact_ (contactId, companyId, userId, userName, createDate, modifiedDate, classNameId, classPK, accountId, parentContactId, emailAddress, firstName, middleName, lastName, male, birthday) values ($batchContactId, $companyId, $testUserId, 'Test SFO $cur', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, $userClassNameId, $batchUserId, $accountId, 0, 'test.sfo.$cur@liferay.com', 'Test', '', 'SFO $cur', TRUE, '01/01/1970');
 
 	insert into Group_ (groupId, companyId, creatorUserId, classNameId, classPK, parentGroupId, liveGroupId, name, type_, friendlyURL, active_) values ($batchGroupId, $companyId, $batchUserId, $userClassNameId, $batchUserId, 0, 0, '$batchGroupId', 0, '/sfo$cur', TRUE);
 	insert into LayoutSet (layoutSetId, companyId, groupId, privateLayout, logo, themeId, colorSchemeId, pageCount) values ($counter.get(), $companyId, $batchGroupId, TRUE, FALSE, 'classic', '01', 0);
@@ -293,6 +297,8 @@ insert into Users_Roles values ($testUserId, $userRoleId);
 	insert into Users_Orgs (userId, organizationId) values ($batchUserId, $sfoLocationId);
 
 	insert into Users_Roles values ($batchUserId, $userRoleId);
+
+	insert into AssetEntry (entryId, groupId, companyId, userId, userName, createDate, modifiedDate, classNameId, classPK, classUuid, classTypeId, visible, startDate, endDate, publishDate, expirationDate, mimeType, title, description, summary, url, layoutUuid, height, width, priority, viewCount) VALUES ($counter.get(), $batchGroupId, $companyId, $testUserId, 'Joe Blogs', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 13, $batchUserId, '', 0, 0, NULL, NULL, NULL, NULL, '', 'Test SFO $cur', '', '', '', 0, 0, 0, 0, 0);
 #end
 
 #foreach($count in [300..309])
@@ -302,7 +308,7 @@ insert into Users_Roles values ($testUserId, $userRoleId);
 	#set ($cur = $count - 299)
 
 	insert into User_ (userId, companyId, createDate, modifiedDate, defaultUser, contactId, password_, passwordEncrypted, passwordReset, screenName, emailAddress, greeting, firstName, middleName, lastName, loginDate, failedLoginAttempts, agreedToTermsOfUse, status) values ($batchUserId, $companyId, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, FALSE, $batchContactId, 'test', FALSE, FALSE, 'ord$cur', 'test.ord.$cur@liferay.com', 'Welcome Test ORD $cur!', 'Test', '', 'ORD $cur', CURRENT_TIMESTAMP, 0, TRUE, 0);
-	insert into Contact_ (contactId, companyId, userId, userName, createDate, modifiedDate, accountId, parentContactId, firstName, middleName, lastName, male, birthday) values ($batchContactId, $companyId, $testUserId, 'Test ORD $cur', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, $accountId, 0, 'Test', '', 'ORD $cur', TRUE, '01/01/1970');
+	insert into Contact_ (contactId, companyId, userId, userName, createDate, modifiedDate, classNameId, classPK, accountId, parentContactId, emailAddress, firstName, middleName, lastName, male, birthday) values ($batchContactId, $companyId, $testUserId, 'Test ORD $cur', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, $userClassNameId, $batchUserId, $accountId, 0, 'test.ord.$cur@liferay.com', 'Test', '', 'ORD $cur', TRUE, '01/01/1970');
 
 	insert into Group_ (groupId, companyId, creatorUserId, classNameId, classPK, parentGroupId, liveGroupId, name, type_, friendlyURL, active_) values ($batchGroupId, $companyId, $batchUserId, $userClassNameId, $batchUserId, 0, 0, '$batchGroupId', 0, '/ord$cur', TRUE);
 	insert into LayoutSet (layoutSetId, companyId, groupId, privateLayout, logo, themeId, colorSchemeId, pageCount) values ($counter.get(), $companyId, $batchGroupId, TRUE, FALSE, 'classic', '01', 0);
@@ -314,6 +320,8 @@ insert into Users_Roles values ($testUserId, $userRoleId);
 	insert into Users_Orgs (userId, organizationId) values ($batchUserId, $ordLocationId);
 
 	insert into Users_Roles values ($batchUserId, $userRoleId);
+
+	insert into AssetEntry (entryId, groupId, companyId, userId, userName, createDate, modifiedDate, classNameId, classPK, classUuid, classTypeId, visible, startDate, endDate, publishDate, expirationDate, mimeType, title, description, summary, url, layoutUuid, height, width, priority, viewCount) VALUES ($counter.get(), $batchGroupId, $companyId, $testUserId, 'Joe Blogs', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 13, $batchUserId, '', 0, 0, NULL, NULL, NULL, NULL, '', 'Test ORD $cur', '', '', '', 0, 0, 0, 0, 0);
 #end
 
 #foreach($count in [400..409])
@@ -323,7 +331,7 @@ insert into Users_Roles values ($testUserId, $userRoleId);
 	#set ($cur = $count - 399)
 
 	insert into User_ (userId, companyId, createDate, modifiedDate, defaultUser, contactId, password_, passwordEncrypted, passwordReset, screenName, emailAddress, greeting, firstName, middleName, lastName, loginDate, failedLoginAttempts, agreedToTermsOfUse, status) values ($batchUserId, $companyId, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, FALSE, $batchContactId, 'test', FALSE, FALSE, 'nyc$cur', 'test.nyc.$cur@liferay.com', 'Welcome Test NYC $cur!', 'Test', '', 'NYC $cur', CURRENT_TIMESTAMP, 0, TRUE, 0);
-	insert into Contact_ (contactId, companyId, userId, userName, createDate, modifiedDate, accountId, parentContactId, firstName, middleName, lastName, male, birthday) values ($batchContactId, $companyId, $testUserId, 'Test NYC $cur', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, $accountId, 0, 'Test', '', 'NYC $cur', TRUE, '01/01/1970');
+	insert into Contact_ (contactId, companyId, userId, userName, createDate, modifiedDate, classNameId, classPK, accountId, parentContactId, emailAddress, firstName, middleName, lastName, male, birthday) values ($batchContactId, $companyId, $testUserId, 'Test NYC $cur', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, $userClassNameId, $batchUserId, $accountId, 0, 'test.nyc.$cur@liferay.com', 'Test', '', 'NYC $cur', TRUE, '01/01/1970');
 
 	insert into Group_ (groupId, companyId, creatorUserId, classNameId, classPK, parentGroupId, liveGroupId, name, type_, friendlyURL, active_) values ($batchGroupId, $companyId, $batchUserId, $userClassNameId, $batchUserId, 0, 0, '$batchGroupId', 0, '/nyc$cur', TRUE);
 	insert into LayoutSet (layoutSetId, companyId, groupId, privateLayout, logo, themeId, colorSchemeId, pageCount) values ($counter.get(), $companyId, $batchGroupId, TRUE, FALSE, 'classic', '01', 0);
@@ -335,6 +343,8 @@ insert into Users_Roles values ($testUserId, $userRoleId);
 	insert into Users_Orgs (userId, organizationId) values ($batchUserId, $nycLocationId);
 
 	insert into Users_Roles values ($batchUserId, $userRoleId);
+
+	insert into AssetEntry (entryId, groupId, companyId, userId, userName, createDate, modifiedDate, classNameId, classPK, classUuid, classTypeId, visible, startDate, endDate, publishDate, expirationDate, mimeType, title, description, summary, url, layoutUuid, height, width, priority, viewCount) VALUES ($counter.get(), $batchGroupId, $companyId, $testUserId, 'Joe Blogs', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 13, $batchUserId, '', 0, 0, NULL, NULL, NULL, NULL, '', 'Test NYC $cur', '', '', '', 0, 0, 0, 0, 0);
 #end
 
 #foreach($count in [500..509])
@@ -344,7 +354,7 @@ insert into Users_Roles values ($testUserId, $userRoleId);
 	#set ($cur = $count - 499)
 
 	insert into User_ (userId, companyId, createDate, modifiedDate, defaultUser, contactId, password_, passwordEncrypted, passwordReset, screenName, emailAddress, greeting, firstName, middleName, lastName, loginDate, failedLoginAttempts, agreedToTermsOfUse, status) values ($batchUserId, $companyId, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, FALSE, $batchContactId, 'test', FALSE, FALSE, 'gru$cur', 'test.gru.$cur@liferay.com', 'Welcome Test GRU $cur!', 'Test', '', 'GRU $cur', CURRENT_TIMESTAMP, 0, TRUE, 0);
-	insert into Contact_ (contactId, companyId, userId, userName, createDate, modifiedDate, accountId, parentContactId, firstName, middleName, lastName, male, birthday) values ($batchContactId, $companyId, $testUserId, 'Test GRU $cur', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, $accountId, 0, 'Test', '', 'GRU $cur', TRUE, '01/01/1970');
+	insert into Contact_ (contactId, companyId, userId, userName, createDate, modifiedDate, classNameId, classPK, accountId, parentContactId, emailAddress, firstName, middleName, lastName, male, birthday) values ($batchContactId, $companyId, $testUserId, 'Test GRU $cur', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, $userClassNameId, $batchUserId, $accountId, 0, 'test.gru.$cur@liferay.com', 'Test', '', 'GRU $cur', TRUE, '01/01/1970');
 
 	insert into Group_ (groupId, companyId, creatorUserId, classNameId, classPK, parentGroupId, liveGroupId, name, type_, friendlyURL, active_) values ($batchGroupId, $companyId, $batchUserId, $userClassNameId, $batchUserId, 0, 0, '$batchGroupId', 0, '/gru$cur', TRUE);
 	insert into LayoutSet (layoutSetId, companyId, groupId, privateLayout, logo, themeId, colorSchemeId, pageCount) values ($counter.get(), $companyId, $batchGroupId, TRUE, FALSE, 'classic', '01', 0);
@@ -356,6 +366,8 @@ insert into Users_Roles values ($testUserId, $userRoleId);
 	insert into Users_Orgs (userId, organizationId) values ($batchUserId, $gruLocationId);
 
 	insert into Users_Roles values ($batchUserId, $userRoleId);
+
+	insert into AssetEntry (entryId, groupId, companyId, userId, userName, createDate, modifiedDate, classNameId, classPK, classUuid, classTypeId, visible, startDate, endDate, publishDate, expirationDate, mimeType, title, description, summary, url, layoutUuid, height, width, priority, viewCount) VALUES ($counter.get(), $batchGroupId, $companyId, $testUserId, 'Joe Blogs', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 13, $batchUserId, '', 0, 0, NULL, NULL, NULL, NULL, '', 'Test GRU $cur', '', '', '', 0, 0, 0, 0, 0);
 #end
 
 #foreach($count in [600..609])
@@ -365,7 +377,7 @@ insert into Users_Roles values ($testUserId, $userRoleId);
 	#set ($cur = $count - 599)
 
 	insert into User_ (userId, companyId, createDate, modifiedDate, defaultUser, contactId, password_, passwordEncrypted, passwordReset, screenName, emailAddress, greeting, firstName, middleName, lastName, loginDate, failedLoginAttempts, agreedToTermsOfUse, status) values ($batchUserId, $companyId, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, FALSE, $batchContactId, 'test', FALSE, FALSE, 'fra$cur', 'test.fra.$cur@liferay.com', 'Welcome Test FRA $cur!', 'Test', '', 'FRA $cur', CURRENT_TIMESTAMP, 0, TRUE, 0);
-	insert into Contact_ (contactId, companyId, userId, userName, createDate, modifiedDate, accountId, parentContactId, firstName, middleName, lastName, male, birthday) values ($batchContactId, $companyId, $testUserId, 'Test FRA $cur', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, $accountId, 0, 'Test', '', 'FRA $cur', TRUE, '01/01/1970');
+	insert into Contact_ (contactId, companyId, userId, userName, createDate, modifiedDate, classNameId, classPK, accountId, parentContactId, emailAddress, firstName, middleName, lastName, male, birthday) values ($batchContactId, $companyId, $testUserId, 'Test FRA $cur', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, $userClassNameId, $batchUserId, $accountId, 0, 'test.fra.$cur@liferay.com', 'Test', '', 'FRA $cur', TRUE, '01/01/1970');
 
 	insert into Group_ (groupId, companyId, creatorUserId, classNameId, classPK, parentGroupId, liveGroupId, name, type_, friendlyURL, active_) values ($batchGroupId, $companyId, $batchUserId, $userClassNameId, $batchUserId, 0, 0, '$batchGroupId', 0, '/fra$cur', TRUE);
 	insert into LayoutSet (layoutSetId, companyId, groupId, privateLayout, logo, themeId, colorSchemeId, pageCount) values ($counter.get(), $companyId, $batchGroupId, TRUE, FALSE, 'classic', '01', 0);
@@ -377,6 +389,8 @@ insert into Users_Roles values ($testUserId, $userRoleId);
 	insert into Users_Orgs (userId, organizationId) values ($batchUserId, $fraLocationId);
 
 	insert into Users_Roles values ($batchUserId, $userRoleId);
+
+	insert into AssetEntry (entryId, groupId, companyId, userId, userName, createDate, modifiedDate, classNameId, classPK, classUuid, classTypeId, visible, startDate, endDate, publishDate, expirationDate, mimeType, title, description, summary, url, layoutUuid, height, width, priority, viewCount) VALUES ($counter.get(), $batchGroupId, $companyId, $testUserId, 'Joe Blogs', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 13, $batchUserId, '', 0, 0, NULL, NULL, NULL, NULL, '', 'Test FRA $cur', '', '', '', 0, 0, 0, 0, 0);
 #end
 
 #foreach($count in [700..709])
@@ -386,7 +400,7 @@ insert into Users_Roles values ($testUserId, $userRoleId);
 	#set ($cur = $count - 699)
 
 	insert into User_ (userId, companyId, createDate, modifiedDate, defaultUser, contactId, password_, passwordEncrypted, passwordReset, screenName, emailAddress, greeting, firstName, middleName, lastName, loginDate, failedLoginAttempts, agreedToTermsOfUse, status) values ($batchUserId, $companyId, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, FALSE, $batchContactId, 'test', FALSE, FALSE, 'mad$cur', 'test.mad.$cur@liferay.com', 'Welcome Test MAD $cur!', 'Test', '', 'MAD $cur', CURRENT_TIMESTAMP, 0, TRUE, 0);
-	insert into Contact_ (contactId, companyId, userId, userName, createDate, modifiedDate, accountId, parentContactId, firstName, middleName, lastName, male, birthday) values ($batchContactId, $companyId, $testUserId, 'Test MAD $cur', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, $accountId, 0, 'Test', '', 'MAD $cur', TRUE, '01/01/1970');
+	insert into Contact_ (contactId, companyId, userId, userName, createDate, modifiedDate, classNameId, classPK, accountId, parentContactId, emailAddress, firstName, middleName, lastName, male, birthday) values ($batchContactId, $companyId, $testUserId, 'Test MAD $cur', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, $userClassNameId, $batchUserId, $accountId, 0, 'test.mad.$cur@liferay.com', 'Test', '', 'MAD $cur', TRUE, '01/01/1970');
 
 	insert into Group_ (groupId, companyId, creatorUserId, classNameId, classPK, parentGroupId, liveGroupId, name, type_, friendlyURL, active_) values ($batchGroupId, $companyId, $batchUserId, $userClassNameId, $batchUserId, 0, 0, '$batchGroupId', 0, '/mad$cur', TRUE);
 	insert into LayoutSet (layoutSetId, companyId, groupId, privateLayout, logo, themeId, colorSchemeId, pageCount) values ($counter.get(), $companyId, $batchGroupId, TRUE, FALSE, 'classic', '01', 0);
@@ -398,6 +412,8 @@ insert into Users_Roles values ($testUserId, $userRoleId);
 	insert into Users_Orgs (userId, organizationId) values ($batchUserId, $madLocationId);
 
 	insert into Users_Roles values ($batchUserId, $userRoleId);
+
+	insert into AssetEntry (entryId, groupId, companyId, userId, userName, createDate, modifiedDate, classNameId, classPK, classUuid, classTypeId, visible, startDate, endDate, publishDate, expirationDate, mimeType, title, description, summary, url, layoutUuid, height, width, priority, viewCount) VALUES ($counter.get(), $batchGroupId, $companyId, $testUserId, 'Joe Blogs', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 13, $batchUserId, '', 0, 0, NULL, NULL, NULL, NULL, '', 'Test MAD $cur', '', '', '', 0, 0, 0, 0, 0);
 #end
 
 #foreach($count in [800..809])
@@ -407,7 +423,7 @@ insert into Users_Roles values ($testUserId, $userRoleId);
 	#set ($cur = $count - 799)
 
 	insert into User_ (userId, companyId, createDate, modifiedDate, defaultUser, contactId, password_, passwordEncrypted, passwordReset, screenName, emailAddress, greeting, firstName, middleName, lastName, loginDate, failedLoginAttempts, agreedToTermsOfUse, status) values ($batchUserId, $companyId, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, FALSE, $batchContactId, 'test', FALSE, FALSE, 'dlc$cur', 'test.dlc.$cur@liferay.com', 'Welcome Test DLC $cur!', 'Test', '', 'DLC $cur', CURRENT_TIMESTAMP, 0, TRUE, 0);
-	insert into Contact_ (contactId, companyId, userId, userName, createDate, modifiedDate, accountId, parentContactId, firstName, middleName, lastName, male, birthday) values ($batchContactId, $companyId, $testUserId, 'Test DLC $cur', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, $accountId, 0, 'Test', '', 'DLC $cur', TRUE, '01/01/1970');
+	insert into Contact_ (contactId, companyId, userId, userName, createDate, modifiedDate, classNameId, classPK, accountId, parentContactId, emailAddress, firstName, middleName, lastName, male, birthday) values ($batchContactId, $companyId, $testUserId, 'Test DLC $cur', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, $userClassNameId, $batchUserId, $accountId, 0, 'test.dlc.$cur@liferay.com', 'Test', '', 'DLC $cur', TRUE, '01/01/1970');
 
 	insert into Group_ (groupId, companyId, creatorUserId, classNameId, classPK, parentGroupId, liveGroupId, name, type_, friendlyURL, active_) values ($batchGroupId, $companyId, $batchUserId, $userClassNameId, $batchUserId, 0, 0, '$batchGroupId', 0, '/dlc$cur', TRUE);
 	insert into LayoutSet (layoutSetId, companyId, groupId, privateLayout, logo, themeId, colorSchemeId, pageCount) values ($counter.get(), $companyId, $batchGroupId, TRUE, FALSE, 'classic', '01', 0);
@@ -419,6 +435,8 @@ insert into Users_Roles values ($testUserId, $userRoleId);
 	insert into Users_Orgs (userId, organizationId) values ($batchUserId, $dlcLocationId);
 
 	insert into Users_Roles values ($batchUserId, $userRoleId);
+
+	insert into AssetEntry (entryId, groupId, companyId, userId, userName, createDate, modifiedDate, classNameId, classPK, classUuid, classTypeId, visible, startDate, endDate, publishDate, expirationDate, mimeType, title, description, summary, url, layoutUuid, height, width, priority, viewCount) VALUES ($counter.get(), $batchGroupId, $companyId, $testUserId, 'Joe Blogs', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 13, $batchUserId, '', 0, 0, NULL, NULL, NULL, NULL, '', 'Test DLC $cur', '', '', '', 0, 0, 0, 0, 0);
 #end
 
 #foreach($count in [900..909])
@@ -428,7 +446,7 @@ insert into Users_Roles values ($testUserId, $userRoleId);
 	#set ($cur = $count - 899)
 
 	insert into User_ (userId, companyId, createDate, modifiedDate, defaultUser, contactId, password_, passwordEncrypted, passwordReset, screenName, emailAddress, greeting, firstName, middleName, lastName, loginDate, failedLoginAttempts, agreedToTermsOfUse, status) values ($batchUserId, $companyId, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, FALSE, $batchContactId, 'test', FALSE, FALSE, 'hkg$cur', 'test.hkg.$cur@liferay.com', 'Welcome Test HKG $cur!', 'Test', '', 'HKG $cur', CURRENT_TIMESTAMP, 0, TRUE, 0);
-	insert into Contact_ (contactId, companyId, userId, userName, createDate, modifiedDate, accountId, parentContactId, firstName, middleName, lastName, male, birthday) values ($batchContactId, $companyId, $testUserId, 'Test HKG $cur', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, $accountId, 0, 'Test', '', 'HKG $cur', TRUE, '01/01/1970');
+	insert into Contact_ (contactId, companyId, userId, userName, createDate, modifiedDate, classNameId, classPK, accountId, parentContactId, emailAddress, firstName, middleName, lastName, male, birthday) values ($batchContactId, $companyId, $testUserId, 'Test HKG $cur', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, $userClassNameId, $batchUserId, $accountId, 0, 'test.hkg.$cur@liferay.com', 'Test', '', 'HKG $cur', TRUE, '01/01/1970');
 
 	insert into Group_ (groupId, companyId, creatorUserId, classNameId, classPK, parentGroupId, liveGroupId, name, type_, friendlyURL, active_) values ($batchGroupId, $companyId, $batchUserId, $userClassNameId, $batchUserId, 0, 0, '$batchGroupId', 0, '/hkg$cur', TRUE);
 	insert into LayoutSet (layoutSetId, companyId, groupId, privateLayout, logo, themeId, colorSchemeId, pageCount) values ($counter.get(), $companyId, $batchGroupId, TRUE, FALSE, 'classic', '01', 0);
@@ -440,6 +458,8 @@ insert into Users_Roles values ($testUserId, $userRoleId);
 	insert into Users_Orgs (userId, organizationId) values ($batchUserId, $hkgLocationId);
 
 	insert into Users_Roles values ($batchUserId, $userRoleId);
+
+	insert into AssetEntry (entryId, groupId, companyId, userId, userName, createDate, modifiedDate, classNameId, classPK, classUuid, classTypeId, visible, startDate, endDate, publishDate, expirationDate, mimeType, title, description, summary, url, layoutUuid, height, width, priority, viewCount) VALUES ($counter.get(), $batchGroupId, $companyId, $testUserId, 'Joe Blogs', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 13, $batchUserId, '', 0, 0, NULL, NULL, NULL, NULL, '', 'Test HKG $cur', '', '', '', 0, 0, 0, 0, 0);
 #end
 
 #foreach($count in [1000..1009])
@@ -449,7 +469,7 @@ insert into Users_Roles values ($testUserId, $userRoleId);
 	#set ($cur = $count - 999)
 
 	insert into User_ (userId, companyId, createDate, modifiedDate, defaultUser, contactId, password_, passwordEncrypted, passwordReset, screenName, emailAddress, greeting, firstName, middleName, lastName, loginDate, failedLoginAttempts, agreedToTermsOfUse, status) values ($batchUserId, $companyId, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, FALSE, $batchContactId, 'test', FALSE, FALSE, 'kul$cur', 'test.kul.$cur@liferay.com', 'Welcome Test KUL $cur!', 'Test', '', 'KUL $cur', CURRENT_TIMESTAMP, 0, TRUE, 0);
-	insert into Contact_ (contactId, companyId, userId, userName, createDate, modifiedDate, accountId, parentContactId, firstName, middleName, lastName, male, birthday) values ($batchContactId, $companyId, $testUserId, 'Test KUL $cur', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, $accountId, 0, 'Test', '', 'KUL $cur', TRUE, '01/01/1970');
+	insert into Contact_ (contactId, companyId, userId, userName, createDate, modifiedDate, classNameId, classPK, accountId, parentContactId, emailAddress, firstName, middleName, lastName, male, birthday) values ($batchContactId, $companyId, $testUserId, 'Test KUL $cur', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, $userClassNameId, $batchUserId, $accountId, 0, 'test.kul.$cur@liferay.com', 'Test', '', 'KUL $cur', TRUE, '01/01/1970');
 
 	insert into Group_ (groupId, companyId, creatorUserId, classNameId, classPK, parentGroupId, liveGroupId, name, type_, friendlyURL, active_) values ($batchGroupId, $companyId, $batchUserId, $userClassNameId, $batchUserId, 0, 0, '$batchGroupId', 0, '/kul$cur', TRUE);
 	insert into LayoutSet (layoutSetId, companyId, groupId, privateLayout, logo, themeId, colorSchemeId, pageCount) values ($counter.get(), $companyId, $batchGroupId, TRUE, FALSE, 'classic', '01', 0);
@@ -461,4 +481,6 @@ insert into Users_Roles values ($testUserId, $userRoleId);
 	insert into Users_Orgs (userId, organizationId) values ($batchUserId, $kulLocationId);
 
 	insert into Users_Roles values ($batchUserId, $userRoleId);
+
+	insert into AssetEntry (entryId, groupId, companyId, userId, userName, createDate, modifiedDate, classNameId, classPK, classUuid, classTypeId, visible, startDate, endDate, publishDate, expirationDate, mimeType, title, description, summary, url, layoutUuid, height, width, priority, viewCount) VALUES ($counter.get(), $batchGroupId, $companyId, $testUserId, 'Joe Blogs', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 13, $batchUserId, '', 0, 0, NULL, NULL, NULL, NULL, '', 'Test KUL $cur', '', '', '', 0, 0, 0, 0, 0);
 #end

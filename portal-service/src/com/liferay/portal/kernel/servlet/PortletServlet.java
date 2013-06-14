@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -42,7 +42,11 @@ public class PortletServlet extends HttpServlet {
 	public static final String PORTLET_APP =
 		"com.liferay.portal.model.PortletApp";
 
-	public static final String PORTLET_CLASS_LOADER = "PORTLET_CLASS_LOADER";
+	/**
+	 * @deprecated {@link PluginContextListener#PLUGIN_CLASS_LOADER}
+	 */
+	public static final String PORTLET_CLASS_LOADER =
+		PluginContextListener.PLUGIN_CLASS_LOADER;
 
 	public static final String PORTLET_SERVLET_CONFIG =
 		"com.liferay.portal.kernel.servlet.PortletServletConfig";
@@ -60,6 +64,20 @@ public class PortletServlet extends HttpServlet {
 	public void service(
 			HttpServletRequest request, HttpServletResponse response)
 		throws IOException, ServletException {
+
+		if (request.getAttribute(WebKeys.EXTEND_SESSION) != null) {
+			request.removeAttribute(WebKeys.EXTEND_SESSION);
+
+			HttpSession session = request.getSession(false);
+
+			if (session != null) {
+				session.setAttribute(WebKeys.EXTEND_SESSION, Boolean.TRUE);
+
+				session.removeAttribute(WebKeys.EXTEND_SESSION);
+			}
+
+			return;
+		}
 
 		String portletId = (String)request.getAttribute(WebKeys.PORTLET_ID);
 

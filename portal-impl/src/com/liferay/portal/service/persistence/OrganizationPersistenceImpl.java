@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -80,61 +80,88 @@ public class OrganizationPersistenceImpl extends BasePersistenceImpl<Organizatio
 	 * Never modify or reference this class directly. Always use {@link OrganizationUtil} to access the organization persistence. Modify <code>service.xml</code> and rerun ServiceBuilder to regenerate this class.
 	 */
 	public static final String FINDER_CLASS_NAME_ENTITY = OrganizationImpl.class.getName();
-	public static final String FINDER_CLASS_NAME_LIST = FINDER_CLASS_NAME_ENTITY +
-		".List";
-	public static final FinderPath FINDER_PATH_FIND_BY_COMPANYID = new FinderPath(OrganizationModelImpl.ENTITY_CACHE_ENABLED,
+	public static final String FINDER_CLASS_NAME_LIST_WITH_PAGINATION = FINDER_CLASS_NAME_ENTITY +
+		".List1";
+	public static final String FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION = FINDER_CLASS_NAME_ENTITY +
+		".List2";
+	public static final FinderPath FINDER_PATH_WITH_PAGINATION_FIND_BY_COMPANYID =
+		new FinderPath(OrganizationModelImpl.ENTITY_CACHE_ENABLED,
 			OrganizationModelImpl.FINDER_CACHE_ENABLED, OrganizationImpl.class,
-			FINDER_CLASS_NAME_LIST, "findByCompanyId",
+			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByCompanyId",
 			new String[] {
 				Long.class.getName(),
 				
 			"java.lang.Integer", "java.lang.Integer",
 				"com.liferay.portal.kernel.util.OrderByComparator"
 			});
+	public static final FinderPath FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_COMPANYID =
+		new FinderPath(OrganizationModelImpl.ENTITY_CACHE_ENABLED,
+			OrganizationModelImpl.FINDER_CACHE_ENABLED, OrganizationImpl.class,
+			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByCompanyId",
+			new String[] { Long.class.getName() },
+			OrganizationModelImpl.COMPANYID_COLUMN_BITMASK);
 	public static final FinderPath FINDER_PATH_COUNT_BY_COMPANYID = new FinderPath(OrganizationModelImpl.ENTITY_CACHE_ENABLED,
 			OrganizationModelImpl.FINDER_CACHE_ENABLED, Long.class,
-			FINDER_CLASS_NAME_LIST, "countByCompanyId",
+			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByCompanyId",
 			new String[] { Long.class.getName() });
-	public static final FinderPath FINDER_PATH_FIND_BY_LOCATIONS = new FinderPath(OrganizationModelImpl.ENTITY_CACHE_ENABLED,
+	public static final FinderPath FINDER_PATH_WITH_PAGINATION_FIND_BY_LOCATIONS =
+		new FinderPath(OrganizationModelImpl.ENTITY_CACHE_ENABLED,
 			OrganizationModelImpl.FINDER_CACHE_ENABLED, OrganizationImpl.class,
-			FINDER_CLASS_NAME_LIST, "findByLocations",
+			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByLocations",
 			new String[] {
 				Long.class.getName(),
 				
 			"java.lang.Integer", "java.lang.Integer",
 				"com.liferay.portal.kernel.util.OrderByComparator"
 			});
+	public static final FinderPath FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_LOCATIONS =
+		new FinderPath(OrganizationModelImpl.ENTITY_CACHE_ENABLED,
+			OrganizationModelImpl.FINDER_CACHE_ENABLED, OrganizationImpl.class,
+			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByLocations",
+			new String[] { Long.class.getName() },
+			OrganizationModelImpl.COMPANYID_COLUMN_BITMASK);
 	public static final FinderPath FINDER_PATH_COUNT_BY_LOCATIONS = new FinderPath(OrganizationModelImpl.ENTITY_CACHE_ENABLED,
 			OrganizationModelImpl.FINDER_CACHE_ENABLED, Long.class,
-			FINDER_CLASS_NAME_LIST, "countByLocations",
+			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByLocations",
 			new String[] { Long.class.getName() });
-	public static final FinderPath FINDER_PATH_FIND_BY_C_P = new FinderPath(OrganizationModelImpl.ENTITY_CACHE_ENABLED,
+	public static final FinderPath FINDER_PATH_WITH_PAGINATION_FIND_BY_C_P = new FinderPath(OrganizationModelImpl.ENTITY_CACHE_ENABLED,
 			OrganizationModelImpl.FINDER_CACHE_ENABLED, OrganizationImpl.class,
-			FINDER_CLASS_NAME_LIST, "findByC_P",
+			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByC_P",
 			new String[] {
 				Long.class.getName(), Long.class.getName(),
 				
 			"java.lang.Integer", "java.lang.Integer",
 				"com.liferay.portal.kernel.util.OrderByComparator"
 			});
+	public static final FinderPath FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_C_P = new FinderPath(OrganizationModelImpl.ENTITY_CACHE_ENABLED,
+			OrganizationModelImpl.FINDER_CACHE_ENABLED, OrganizationImpl.class,
+			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByC_P",
+			new String[] { Long.class.getName(), Long.class.getName() },
+			OrganizationModelImpl.COMPANYID_COLUMN_BITMASK |
+			OrganizationModelImpl.PARENTORGANIZATIONID_COLUMN_BITMASK);
 	public static final FinderPath FINDER_PATH_COUNT_BY_C_P = new FinderPath(OrganizationModelImpl.ENTITY_CACHE_ENABLED,
 			OrganizationModelImpl.FINDER_CACHE_ENABLED, Long.class,
-			FINDER_CLASS_NAME_LIST, "countByC_P",
+			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByC_P",
 			new String[] { Long.class.getName(), Long.class.getName() });
 	public static final FinderPath FINDER_PATH_FETCH_BY_C_N = new FinderPath(OrganizationModelImpl.ENTITY_CACHE_ENABLED,
 			OrganizationModelImpl.FINDER_CACHE_ENABLED, OrganizationImpl.class,
 			FINDER_CLASS_NAME_ENTITY, "fetchByC_N",
-			new String[] { Long.class.getName(), String.class.getName() });
+			new String[] { Long.class.getName(), String.class.getName() },
+			OrganizationModelImpl.COMPANYID_COLUMN_BITMASK |
+			OrganizationModelImpl.NAME_COLUMN_BITMASK);
 	public static final FinderPath FINDER_PATH_COUNT_BY_C_N = new FinderPath(OrganizationModelImpl.ENTITY_CACHE_ENABLED,
 			OrganizationModelImpl.FINDER_CACHE_ENABLED, Long.class,
-			FINDER_CLASS_NAME_LIST, "countByC_N",
+			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByC_N",
 			new String[] { Long.class.getName(), String.class.getName() });
-	public static final FinderPath FINDER_PATH_FIND_ALL = new FinderPath(OrganizationModelImpl.ENTITY_CACHE_ENABLED,
+	public static final FinderPath FINDER_PATH_WITH_PAGINATION_FIND_ALL = new FinderPath(OrganizationModelImpl.ENTITY_CACHE_ENABLED,
 			OrganizationModelImpl.FINDER_CACHE_ENABLED, OrganizationImpl.class,
-			FINDER_CLASS_NAME_LIST, "findAll", new String[0]);
+			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findAll", new String[0]);
+	public static final FinderPath FINDER_PATH_WITHOUT_PAGINATION_FIND_ALL = new FinderPath(OrganizationModelImpl.ENTITY_CACHE_ENABLED,
+			OrganizationModelImpl.FINDER_CACHE_ENABLED, OrganizationImpl.class,
+			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findAll", new String[0]);
 	public static final FinderPath FINDER_PATH_COUNT_ALL = new FinderPath(OrganizationModelImpl.ENTITY_CACHE_ENABLED,
 			OrganizationModelImpl.FINDER_CACHE_ENABLED, Long.class,
-			FINDER_CLASS_NAME_LIST, "countAll", new String[0]);
+			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countAll", new String[0]);
 
 	/**
 	 * Caches the organization in the entity cache if it is enabled.
@@ -164,9 +191,11 @@ public class OrganizationPersistenceImpl extends BasePersistenceImpl<Organizatio
 		for (Organization organization : organizations) {
 			if (EntityCacheUtil.getResult(
 						OrganizationModelImpl.ENTITY_CACHE_ENABLED,
-						OrganizationImpl.class, organization.getPrimaryKey(),
-						this) == null) {
+						OrganizationImpl.class, organization.getPrimaryKey()) == null) {
 				cacheResult(organization);
+			}
+			else {
+				organization.resetOriginalValues();
 			}
 		}
 	}
@@ -185,8 +214,10 @@ public class OrganizationPersistenceImpl extends BasePersistenceImpl<Organizatio
 		}
 
 		EntityCacheUtil.clearCache(OrganizationImpl.class.getName());
+
 		FinderCacheUtil.clearCache(FINDER_CLASS_NAME_ENTITY);
-		FinderCacheUtil.clearCache(FINDER_CLASS_NAME_LIST);
+		FinderCacheUtil.clearCache(FINDER_CLASS_NAME_LIST_WITH_PAGINATION);
+		FinderCacheUtil.clearCache(FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
 	}
 
 	/**
@@ -201,6 +232,26 @@ public class OrganizationPersistenceImpl extends BasePersistenceImpl<Organizatio
 		EntityCacheUtil.removeResult(OrganizationModelImpl.ENTITY_CACHE_ENABLED,
 			OrganizationImpl.class, organization.getPrimaryKey());
 
+		FinderCacheUtil.clearCache(FINDER_CLASS_NAME_LIST_WITH_PAGINATION);
+		FinderCacheUtil.clearCache(FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
+
+		clearUniqueFindersCache(organization);
+	}
+
+	@Override
+	public void clearCache(List<Organization> organizations) {
+		FinderCacheUtil.clearCache(FINDER_CLASS_NAME_LIST_WITH_PAGINATION);
+		FinderCacheUtil.clearCache(FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
+
+		for (Organization organization : organizations) {
+			EntityCacheUtil.removeResult(OrganizationModelImpl.ENTITY_CACHE_ENABLED,
+				OrganizationImpl.class, organization.getPrimaryKey());
+
+			clearUniqueFindersCache(organization);
+		}
+	}
+
+	protected void clearUniqueFindersCache(Organization organization) {
 		FinderCacheUtil.removeResult(FINDER_PATH_FETCH_BY_C_N,
 			new Object[] {
 				Long.valueOf(organization.getCompanyId()),
@@ -227,20 +278,6 @@ public class OrganizationPersistenceImpl extends BasePersistenceImpl<Organizatio
 	/**
 	 * Removes the organization with the primary key from the database. Also notifies the appropriate model listeners.
 	 *
-	 * @param primaryKey the primary key of the organization
-	 * @return the organization that was removed
-	 * @throws com.liferay.portal.NoSuchModelException if a organization with the primary key could not be found
-	 * @throws SystemException if a system exception occurred
-	 */
-	@Override
-	public Organization remove(Serializable primaryKey)
-		throws NoSuchModelException, SystemException {
-		return remove(((Long)primaryKey).longValue());
-	}
-
-	/**
-	 * Removes the organization with the primary key from the database. Also notifies the appropriate model listeners.
-	 *
 	 * @param organizationId the primary key of the organization
 	 * @return the organization that was removed
 	 * @throws com.liferay.portal.NoSuchOrganizationException if a organization with the primary key could not be found
@@ -248,25 +285,38 @@ public class OrganizationPersistenceImpl extends BasePersistenceImpl<Organizatio
 	 */
 	public Organization remove(long organizationId)
 		throws NoSuchOrganizationException, SystemException {
+		return remove(Long.valueOf(organizationId));
+	}
+
+	/**
+	 * Removes the organization with the primary key from the database. Also notifies the appropriate model listeners.
+	 *
+	 * @param primaryKey the primary key of the organization
+	 * @return the organization that was removed
+	 * @throws com.liferay.portal.NoSuchOrganizationException if a organization with the primary key could not be found
+	 * @throws SystemException if a system exception occurred
+	 */
+	@Override
+	public Organization remove(Serializable primaryKey)
+		throws NoSuchOrganizationException, SystemException {
 		Session session = null;
 
 		try {
 			session = openSession();
 
 			Organization organization = (Organization)session.get(OrganizationImpl.class,
-					Long.valueOf(organizationId));
+					primaryKey);
 
 			if (organization == null) {
 				if (_log.isWarnEnabled()) {
-					_log.warn(_NO_SUCH_ENTITY_WITH_PRIMARY_KEY +
-						organizationId);
+					_log.warn(_NO_SUCH_ENTITY_WITH_PRIMARY_KEY + primaryKey);
 				}
 
 				throw new NoSuchOrganizationException(_NO_SUCH_ENTITY_WITH_PRIMARY_KEY +
-					organizationId);
+					primaryKey);
 			}
 
-			return organizationPersistence.remove(organization);
+			return remove(organization);
 		}
 		catch (NoSuchOrganizationException nsee) {
 			throw nsee;
@@ -277,19 +327,6 @@ public class OrganizationPersistenceImpl extends BasePersistenceImpl<Organizatio
 		finally {
 			closeSession(session);
 		}
-	}
-
-	/**
-	 * Removes the organization from the database. Also notifies the appropriate model listeners.
-	 *
-	 * @param organization the organization
-	 * @return the organization that was removed
-	 * @throws SystemException if a system exception occurred
-	 */
-	@Override
-	public Organization remove(Organization organization)
-		throws SystemException {
-		return super.remove(organization);
 	}
 
 	@Override
@@ -317,8 +354,6 @@ public class OrganizationPersistenceImpl extends BasePersistenceImpl<Organizatio
 			FinderCacheUtil.clearCache(OrganizationModelImpl.MAPPING_TABLE_USERS_ORGS_NAME);
 		}
 
-		shrinkTree(organization);
-
 		Session session = null;
 
 		try {
@@ -333,19 +368,7 @@ public class OrganizationPersistenceImpl extends BasePersistenceImpl<Organizatio
 			closeSession(session);
 		}
 
-		FinderCacheUtil.clearCache(FINDER_CLASS_NAME_LIST);
-
-		OrganizationModelImpl organizationModelImpl = (OrganizationModelImpl)organization;
-
-		FinderCacheUtil.removeResult(FINDER_PATH_FETCH_BY_C_N,
-			new Object[] {
-				Long.valueOf(organizationModelImpl.getCompanyId()),
-				
-			organizationModelImpl.getName()
-			});
-
-		EntityCacheUtil.removeResult(OrganizationModelImpl.ENTITY_CACHE_ENABLED,
-			OrganizationImpl.class, organization.getPrimaryKey());
+		clearCache(organization);
 
 		return organization;
 	}
@@ -359,16 +382,6 @@ public class OrganizationPersistenceImpl extends BasePersistenceImpl<Organizatio
 		boolean isNew = organization.isNew();
 
 		OrganizationModelImpl organizationModelImpl = (OrganizationModelImpl)organization;
-
-		if (isNew) {
-			expandTree(organization);
-		}
-		else {
-			if (organization.getParentOrganizationId() != organizationModelImpl.getOriginalParentOrganizationId()) {
-				shrinkTree(organization);
-				expandTree(organization);
-			}
-		}
 
 		Session session = null;
 
@@ -386,33 +399,108 @@ public class OrganizationPersistenceImpl extends BasePersistenceImpl<Organizatio
 			closeSession(session);
 		}
 
-		FinderCacheUtil.clearCache(FINDER_CLASS_NAME_LIST);
+		FinderCacheUtil.clearCache(FINDER_CLASS_NAME_LIST_WITH_PAGINATION);
+
+		if (isNew || !OrganizationModelImpl.COLUMN_BITMASK_ENABLED) {
+			FinderCacheUtil.clearCache(FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
+		}
+
+		else {
+			if ((organizationModelImpl.getColumnBitmask() &
+					FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_COMPANYID.getColumnBitmask()) != 0) {
+				Object[] args = new Object[] {
+						Long.valueOf(organizationModelImpl.getOriginalCompanyId())
+					};
+
+				FinderCacheUtil.removeResult(FINDER_PATH_COUNT_BY_COMPANYID,
+					args);
+				FinderCacheUtil.removeResult(FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_COMPANYID,
+					args);
+
+				args = new Object[] {
+						Long.valueOf(organizationModelImpl.getCompanyId())
+					};
+
+				FinderCacheUtil.removeResult(FINDER_PATH_COUNT_BY_COMPANYID,
+					args);
+				FinderCacheUtil.removeResult(FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_COMPANYID,
+					args);
+			}
+
+			if ((organizationModelImpl.getColumnBitmask() &
+					FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_LOCATIONS.getColumnBitmask()) != 0) {
+				Object[] args = new Object[] {
+						Long.valueOf(organizationModelImpl.getOriginalCompanyId())
+					};
+
+				FinderCacheUtil.removeResult(FINDER_PATH_COUNT_BY_LOCATIONS,
+					args);
+				FinderCacheUtil.removeResult(FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_LOCATIONS,
+					args);
+
+				args = new Object[] {
+						Long.valueOf(organizationModelImpl.getCompanyId())
+					};
+
+				FinderCacheUtil.removeResult(FINDER_PATH_COUNT_BY_LOCATIONS,
+					args);
+				FinderCacheUtil.removeResult(FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_LOCATIONS,
+					args);
+			}
+
+			if ((organizationModelImpl.getColumnBitmask() &
+					FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_C_P.getColumnBitmask()) != 0) {
+				Object[] args = new Object[] {
+						Long.valueOf(organizationModelImpl.getOriginalCompanyId()),
+						Long.valueOf(organizationModelImpl.getOriginalParentOrganizationId())
+					};
+
+				FinderCacheUtil.removeResult(FINDER_PATH_COUNT_BY_C_P, args);
+				FinderCacheUtil.removeResult(FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_C_P,
+					args);
+
+				args = new Object[] {
+						Long.valueOf(organizationModelImpl.getCompanyId()),
+						Long.valueOf(organizationModelImpl.getParentOrganizationId())
+					};
+
+				FinderCacheUtil.removeResult(FINDER_PATH_COUNT_BY_C_P, args);
+				FinderCacheUtil.removeResult(FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_C_P,
+					args);
+			}
+		}
 
 		EntityCacheUtil.putResult(OrganizationModelImpl.ENTITY_CACHE_ENABLED,
 			OrganizationImpl.class, organization.getPrimaryKey(), organization);
 
-		if (!isNew &&
-				((organization.getCompanyId() != organizationModelImpl.getOriginalCompanyId()) ||
-				!Validator.equals(organization.getName(),
-					organizationModelImpl.getOriginalName()))) {
-			FinderCacheUtil.removeResult(FINDER_PATH_FETCH_BY_C_N,
-				new Object[] {
-					Long.valueOf(organizationModelImpl.getOriginalCompanyId()),
-					
-				organizationModelImpl.getOriginalName()
-				});
-		}
-
-		if (isNew ||
-				((organization.getCompanyId() != organizationModelImpl.getOriginalCompanyId()) ||
-				!Validator.equals(organization.getName(),
-					organizationModelImpl.getOriginalName()))) {
+		if (isNew) {
 			FinderCacheUtil.putResult(FINDER_PATH_FETCH_BY_C_N,
 				new Object[] {
 					Long.valueOf(organization.getCompanyId()),
 					
 				organization.getName()
 				}, organization);
+		}
+		else {
+			if ((organizationModelImpl.getColumnBitmask() &
+					FINDER_PATH_FETCH_BY_C_N.getColumnBitmask()) != 0) {
+				Object[] args = new Object[] {
+						Long.valueOf(organizationModelImpl.getOriginalCompanyId()),
+						
+						organizationModelImpl.getOriginalName()
+					};
+
+				FinderCacheUtil.removeResult(FINDER_PATH_COUNT_BY_C_N, args);
+
+				FinderCacheUtil.removeResult(FINDER_PATH_FETCH_BY_C_N, args);
+
+				FinderCacheUtil.putResult(FINDER_PATH_FETCH_BY_C_N,
+					new Object[] {
+						Long.valueOf(organization.getCompanyId()),
+						
+					organization.getName()
+					}, organization);
+			}
 		}
 
 		return organization;
@@ -431,8 +519,7 @@ public class OrganizationPersistenceImpl extends BasePersistenceImpl<Organizatio
 		organizationImpl.setOrganizationId(organization.getOrganizationId());
 		organizationImpl.setCompanyId(organization.getCompanyId());
 		organizationImpl.setParentOrganizationId(organization.getParentOrganizationId());
-		organizationImpl.setLeftOrganizationId(organization.getLeftOrganizationId());
-		organizationImpl.setRightOrganizationId(organization.getRightOrganizationId());
+		organizationImpl.setTreePath(organization.getTreePath());
 		organizationImpl.setName(organization.getName());
 		organizationImpl.setType(organization.getType());
 		organizationImpl.setRecursable(organization.isRecursable());
@@ -505,7 +592,7 @@ public class OrganizationPersistenceImpl extends BasePersistenceImpl<Organizatio
 	public Organization fetchByPrimaryKey(long organizationId)
 		throws SystemException {
 		Organization organization = (Organization)EntityCacheUtil.getResult(OrganizationModelImpl.ENTITY_CACHE_ENABLED,
-				OrganizationImpl.class, organizationId, this);
+				OrganizationImpl.class, organizationId);
 
 		if (organization == _nullOrganization) {
 			return null;
@@ -591,15 +678,31 @@ public class OrganizationPersistenceImpl extends BasePersistenceImpl<Organizatio
 	 */
 	public List<Organization> findByCompanyId(long companyId, int start,
 		int end, OrderByComparator orderByComparator) throws SystemException {
-		Object[] finderArgs = new Object[] {
-				companyId,
-				
-				String.valueOf(start), String.valueOf(end),
-				String.valueOf(orderByComparator)
-			};
+		FinderPath finderPath = null;
+		Object[] finderArgs = null;
 
-		List<Organization> list = (List<Organization>)FinderCacheUtil.getResult(FINDER_PATH_FIND_BY_COMPANYID,
+		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) &&
+				(orderByComparator == null)) {
+			finderPath = FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_COMPANYID;
+			finderArgs = new Object[] { companyId };
+		}
+		else {
+			finderPath = FINDER_PATH_WITH_PAGINATION_FIND_BY_COMPANYID;
+			finderArgs = new Object[] { companyId, start, end, orderByComparator };
+		}
+
+		List<Organization> list = (List<Organization>)FinderCacheUtil.getResult(finderPath,
 				finderArgs, this);
+
+		if ((list != null) && !list.isEmpty()) {
+			for (Organization organization : list) {
+				if ((companyId != organization.getCompanyId())) {
+					list = null;
+
+					break;
+				}
+			}
+		}
 
 		if (list == null) {
 			StringBundler query = null;
@@ -646,14 +749,12 @@ public class OrganizationPersistenceImpl extends BasePersistenceImpl<Organizatio
 			}
 			finally {
 				if (list == null) {
-					FinderCacheUtil.removeResult(FINDER_PATH_FIND_BY_COMPANYID,
-						finderArgs);
+					FinderCacheUtil.removeResult(finderPath, finderArgs);
 				}
 				else {
 					cacheResult(list);
 
-					FinderCacheUtil.putResult(FINDER_PATH_FIND_BY_COMPANYID,
-						finderArgs, list);
+					FinderCacheUtil.putResult(finderPath, finderArgs, list);
 				}
 
 				closeSession(session);
@@ -799,17 +900,17 @@ public class OrganizationPersistenceImpl extends BasePersistenceImpl<Organizatio
 		query.append(_FINDER_COLUMN_COMPANYID_COMPANYID_2);
 
 		if (orderByComparator != null) {
-			String[] orderByFields = orderByComparator.getOrderByFields();
+			String[] orderByConditionFields = orderByComparator.getOrderByConditionFields();
 
-			if (orderByFields.length > 0) {
+			if (orderByConditionFields.length > 0) {
 				query.append(WHERE_AND);
 			}
 
-			for (int i = 0; i < orderByFields.length; i++) {
+			for (int i = 0; i < orderByConditionFields.length; i++) {
 				query.append(_ORDER_BY_ENTITY_ALIAS);
-				query.append(orderByFields[i]);
+				query.append(orderByConditionFields[i]);
 
-				if ((i + 1) < orderByFields.length) {
+				if ((i + 1) < orderByConditionFields.length) {
 					if (orderByComparator.isAscending() ^ previous) {
 						query.append(WHERE_GREATER_THAN_HAS_NEXT);
 					}
@@ -828,6 +929,8 @@ public class OrganizationPersistenceImpl extends BasePersistenceImpl<Organizatio
 			}
 
 			query.append(ORDER_BY_CLAUSE);
+
+			String[] orderByFields = orderByComparator.getOrderByFields();
 
 			for (int i = 0; i < orderByFields.length; i++) {
 				query.append(_ORDER_BY_ENTITY_ALIAS);
@@ -868,7 +971,7 @@ public class OrganizationPersistenceImpl extends BasePersistenceImpl<Organizatio
 		qPos.add(companyId);
 
 		if (orderByComparator != null) {
-			Object[] values = orderByComparator.getOrderByValues(organization);
+			Object[] values = orderByComparator.getOrderByConditionValues(organization);
 
 			for (Object value : values) {
 				qPos.add(value);
@@ -1084,13 +1187,13 @@ public class OrganizationPersistenceImpl extends BasePersistenceImpl<Organizatio
 		}
 
 		if (orderByComparator != null) {
-			String[] orderByFields = orderByComparator.getOrderByFields();
+			String[] orderByConditionFields = orderByComparator.getOrderByConditionFields();
 
-			if (orderByFields.length > 0) {
+			if (orderByConditionFields.length > 0) {
 				query.append(WHERE_AND);
 			}
 
-			for (int i = 0; i < orderByFields.length; i++) {
+			for (int i = 0; i < orderByConditionFields.length; i++) {
 				if (getDB().isSupportsInlineDistinct()) {
 					query.append(_ORDER_BY_ENTITY_ALIAS);
 				}
@@ -1098,9 +1201,9 @@ public class OrganizationPersistenceImpl extends BasePersistenceImpl<Organizatio
 					query.append(_ORDER_BY_ENTITY_TABLE);
 				}
 
-				query.append(orderByFields[i]);
+				query.append(orderByConditionFields[i]);
 
-				if ((i + 1) < orderByFields.length) {
+				if ((i + 1) < orderByConditionFields.length) {
 					if (orderByComparator.isAscending() ^ previous) {
 						query.append(WHERE_GREATER_THAN_HAS_NEXT);
 					}
@@ -1119,6 +1222,8 @@ public class OrganizationPersistenceImpl extends BasePersistenceImpl<Organizatio
 			}
 
 			query.append(ORDER_BY_CLAUSE);
+
+			String[] orderByFields = orderByComparator.getOrderByFields();
 
 			for (int i = 0; i < orderByFields.length; i++) {
 				if (getDB().isSupportsInlineDistinct()) {
@@ -1179,7 +1284,7 @@ public class OrganizationPersistenceImpl extends BasePersistenceImpl<Organizatio
 		qPos.add(companyId);
 
 		if (orderByComparator != null) {
-			Object[] values = orderByComparator.getOrderByValues(organization);
+			Object[] values = orderByComparator.getOrderByConditionValues(organization);
 
 			for (Object value : values) {
 				qPos.add(value);
@@ -1243,15 +1348,31 @@ public class OrganizationPersistenceImpl extends BasePersistenceImpl<Organizatio
 	 */
 	public List<Organization> findByLocations(long companyId, int start,
 		int end, OrderByComparator orderByComparator) throws SystemException {
-		Object[] finderArgs = new Object[] {
-				companyId,
-				
-				String.valueOf(start), String.valueOf(end),
-				String.valueOf(orderByComparator)
-			};
+		FinderPath finderPath = null;
+		Object[] finderArgs = null;
 
-		List<Organization> list = (List<Organization>)FinderCacheUtil.getResult(FINDER_PATH_FIND_BY_LOCATIONS,
+		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) &&
+				(orderByComparator == null)) {
+			finderPath = FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_LOCATIONS;
+			finderArgs = new Object[] { companyId };
+		}
+		else {
+			finderPath = FINDER_PATH_WITH_PAGINATION_FIND_BY_LOCATIONS;
+			finderArgs = new Object[] { companyId, start, end, orderByComparator };
+		}
+
+		List<Organization> list = (List<Organization>)FinderCacheUtil.getResult(finderPath,
 				finderArgs, this);
+
+		if ((list != null) && !list.isEmpty()) {
+			for (Organization organization : list) {
+				if ((companyId != organization.getCompanyId())) {
+					list = null;
+
+					break;
+				}
+			}
+		}
 
 		if (list == null) {
 			StringBundler query = null;
@@ -1298,14 +1419,12 @@ public class OrganizationPersistenceImpl extends BasePersistenceImpl<Organizatio
 			}
 			finally {
 				if (list == null) {
-					FinderCacheUtil.removeResult(FINDER_PATH_FIND_BY_LOCATIONS,
-						finderArgs);
+					FinderCacheUtil.removeResult(finderPath, finderArgs);
 				}
 				else {
 					cacheResult(list);
 
-					FinderCacheUtil.putResult(FINDER_PATH_FIND_BY_LOCATIONS,
-						finderArgs, list);
+					FinderCacheUtil.putResult(finderPath, finderArgs, list);
 				}
 
 				closeSession(session);
@@ -1451,17 +1570,17 @@ public class OrganizationPersistenceImpl extends BasePersistenceImpl<Organizatio
 		query.append(_FINDER_COLUMN_LOCATIONS_COMPANYID_2);
 
 		if (orderByComparator != null) {
-			String[] orderByFields = orderByComparator.getOrderByFields();
+			String[] orderByConditionFields = orderByComparator.getOrderByConditionFields();
 
-			if (orderByFields.length > 0) {
+			if (orderByConditionFields.length > 0) {
 				query.append(WHERE_AND);
 			}
 
-			for (int i = 0; i < orderByFields.length; i++) {
+			for (int i = 0; i < orderByConditionFields.length; i++) {
 				query.append(_ORDER_BY_ENTITY_ALIAS);
-				query.append(orderByFields[i]);
+				query.append(orderByConditionFields[i]);
 
-				if ((i + 1) < orderByFields.length) {
+				if ((i + 1) < orderByConditionFields.length) {
 					if (orderByComparator.isAscending() ^ previous) {
 						query.append(WHERE_GREATER_THAN_HAS_NEXT);
 					}
@@ -1480,6 +1599,8 @@ public class OrganizationPersistenceImpl extends BasePersistenceImpl<Organizatio
 			}
 
 			query.append(ORDER_BY_CLAUSE);
+
+			String[] orderByFields = orderByComparator.getOrderByFields();
 
 			for (int i = 0; i < orderByFields.length; i++) {
 				query.append(_ORDER_BY_ENTITY_ALIAS);
@@ -1520,7 +1641,7 @@ public class OrganizationPersistenceImpl extends BasePersistenceImpl<Organizatio
 		qPos.add(companyId);
 
 		if (orderByComparator != null) {
-			Object[] values = orderByComparator.getOrderByValues(organization);
+			Object[] values = orderByComparator.getOrderByConditionValues(organization);
 
 			for (Object value : values) {
 				qPos.add(value);
@@ -1736,13 +1857,13 @@ public class OrganizationPersistenceImpl extends BasePersistenceImpl<Organizatio
 		}
 
 		if (orderByComparator != null) {
-			String[] orderByFields = orderByComparator.getOrderByFields();
+			String[] orderByConditionFields = orderByComparator.getOrderByConditionFields();
 
-			if (orderByFields.length > 0) {
+			if (orderByConditionFields.length > 0) {
 				query.append(WHERE_AND);
 			}
 
-			for (int i = 0; i < orderByFields.length; i++) {
+			for (int i = 0; i < orderByConditionFields.length; i++) {
 				if (getDB().isSupportsInlineDistinct()) {
 					query.append(_ORDER_BY_ENTITY_ALIAS);
 				}
@@ -1750,9 +1871,9 @@ public class OrganizationPersistenceImpl extends BasePersistenceImpl<Organizatio
 					query.append(_ORDER_BY_ENTITY_TABLE);
 				}
 
-				query.append(orderByFields[i]);
+				query.append(orderByConditionFields[i]);
 
-				if ((i + 1) < orderByFields.length) {
+				if ((i + 1) < orderByConditionFields.length) {
 					if (orderByComparator.isAscending() ^ previous) {
 						query.append(WHERE_GREATER_THAN_HAS_NEXT);
 					}
@@ -1771,6 +1892,8 @@ public class OrganizationPersistenceImpl extends BasePersistenceImpl<Organizatio
 			}
 
 			query.append(ORDER_BY_CLAUSE);
+
+			String[] orderByFields = orderByComparator.getOrderByFields();
 
 			for (int i = 0; i < orderByFields.length; i++) {
 				if (getDB().isSupportsInlineDistinct()) {
@@ -1831,7 +1954,7 @@ public class OrganizationPersistenceImpl extends BasePersistenceImpl<Organizatio
 		qPos.add(companyId);
 
 		if (orderByComparator != null) {
-			Object[] values = orderByComparator.getOrderByValues(organization);
+			Object[] values = orderByComparator.getOrderByConditionValues(organization);
 
 			for (Object value : values) {
 				qPos.add(value);
@@ -1900,15 +2023,36 @@ public class OrganizationPersistenceImpl extends BasePersistenceImpl<Organizatio
 	public List<Organization> findByC_P(long companyId,
 		long parentOrganizationId, int start, int end,
 		OrderByComparator orderByComparator) throws SystemException {
-		Object[] finderArgs = new Object[] {
-				companyId, parentOrganizationId,
-				
-				String.valueOf(start), String.valueOf(end),
-				String.valueOf(orderByComparator)
-			};
+		FinderPath finderPath = null;
+		Object[] finderArgs = null;
 
-		List<Organization> list = (List<Organization>)FinderCacheUtil.getResult(FINDER_PATH_FIND_BY_C_P,
+		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) &&
+				(orderByComparator == null)) {
+			finderPath = FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_C_P;
+			finderArgs = new Object[] { companyId, parentOrganizationId };
+		}
+		else {
+			finderPath = FINDER_PATH_WITH_PAGINATION_FIND_BY_C_P;
+			finderArgs = new Object[] {
+					companyId, parentOrganizationId,
+					
+					start, end, orderByComparator
+				};
+		}
+
+		List<Organization> list = (List<Organization>)FinderCacheUtil.getResult(finderPath,
 				finderArgs, this);
+
+		if ((list != null) && !list.isEmpty()) {
+			for (Organization organization : list) {
+				if ((companyId != organization.getCompanyId()) ||
+						(parentOrganizationId != organization.getParentOrganizationId())) {
+					list = null;
+
+					break;
+				}
+			}
+		}
 
 		if (list == null) {
 			StringBundler query = null;
@@ -1959,14 +2103,12 @@ public class OrganizationPersistenceImpl extends BasePersistenceImpl<Organizatio
 			}
 			finally {
 				if (list == null) {
-					FinderCacheUtil.removeResult(FINDER_PATH_FIND_BY_C_P,
-						finderArgs);
+					FinderCacheUtil.removeResult(finderPath, finderArgs);
 				}
 				else {
 					cacheResult(list);
 
-					FinderCacheUtil.putResult(FINDER_PATH_FIND_BY_C_P,
-						finderArgs, list);
+					FinderCacheUtil.putResult(finderPath, finderArgs, list);
 				}
 
 				closeSession(session);
@@ -2124,17 +2266,17 @@ public class OrganizationPersistenceImpl extends BasePersistenceImpl<Organizatio
 		query.append(_FINDER_COLUMN_C_P_PARENTORGANIZATIONID_2);
 
 		if (orderByComparator != null) {
-			String[] orderByFields = orderByComparator.getOrderByFields();
+			String[] orderByConditionFields = orderByComparator.getOrderByConditionFields();
 
-			if (orderByFields.length > 0) {
+			if (orderByConditionFields.length > 0) {
 				query.append(WHERE_AND);
 			}
 
-			for (int i = 0; i < orderByFields.length; i++) {
+			for (int i = 0; i < orderByConditionFields.length; i++) {
 				query.append(_ORDER_BY_ENTITY_ALIAS);
-				query.append(orderByFields[i]);
+				query.append(orderByConditionFields[i]);
 
-				if ((i + 1) < orderByFields.length) {
+				if ((i + 1) < orderByConditionFields.length) {
 					if (orderByComparator.isAscending() ^ previous) {
 						query.append(WHERE_GREATER_THAN_HAS_NEXT);
 					}
@@ -2153,6 +2295,8 @@ public class OrganizationPersistenceImpl extends BasePersistenceImpl<Organizatio
 			}
 
 			query.append(ORDER_BY_CLAUSE);
+
+			String[] orderByFields = orderByComparator.getOrderByFields();
 
 			for (int i = 0; i < orderByFields.length; i++) {
 				query.append(_ORDER_BY_ENTITY_ALIAS);
@@ -2195,7 +2339,7 @@ public class OrganizationPersistenceImpl extends BasePersistenceImpl<Organizatio
 		qPos.add(parentOrganizationId);
 
 		if (orderByComparator != null) {
-			Object[] values = orderByComparator.getOrderByValues(organization);
+			Object[] values = orderByComparator.getOrderByConditionValues(organization);
 
 			for (Object value : values) {
 				qPos.add(value);
@@ -2425,13 +2569,13 @@ public class OrganizationPersistenceImpl extends BasePersistenceImpl<Organizatio
 		}
 
 		if (orderByComparator != null) {
-			String[] orderByFields = orderByComparator.getOrderByFields();
+			String[] orderByConditionFields = orderByComparator.getOrderByConditionFields();
 
-			if (orderByFields.length > 0) {
+			if (orderByConditionFields.length > 0) {
 				query.append(WHERE_AND);
 			}
 
-			for (int i = 0; i < orderByFields.length; i++) {
+			for (int i = 0; i < orderByConditionFields.length; i++) {
 				if (getDB().isSupportsInlineDistinct()) {
 					query.append(_ORDER_BY_ENTITY_ALIAS);
 				}
@@ -2439,9 +2583,9 @@ public class OrganizationPersistenceImpl extends BasePersistenceImpl<Organizatio
 					query.append(_ORDER_BY_ENTITY_TABLE);
 				}
 
-				query.append(orderByFields[i]);
+				query.append(orderByConditionFields[i]);
 
-				if ((i + 1) < orderByFields.length) {
+				if ((i + 1) < orderByConditionFields.length) {
 					if (orderByComparator.isAscending() ^ previous) {
 						query.append(WHERE_GREATER_THAN_HAS_NEXT);
 					}
@@ -2460,6 +2604,8 @@ public class OrganizationPersistenceImpl extends BasePersistenceImpl<Organizatio
 			}
 
 			query.append(ORDER_BY_CLAUSE);
+
+			String[] orderByFields = orderByComparator.getOrderByFields();
 
 			for (int i = 0; i < orderByFields.length; i++) {
 				if (getDB().isSupportsInlineDistinct()) {
@@ -2522,7 +2668,7 @@ public class OrganizationPersistenceImpl extends BasePersistenceImpl<Organizatio
 		qPos.add(parentOrganizationId);
 
 		if (orderByComparator != null) {
-			Object[] values = orderByComparator.getOrderByValues(organization);
+			Object[] values = orderByComparator.getOrderByConditionValues(organization);
 
 			for (Object value : values) {
 				qPos.add(value);
@@ -2606,6 +2752,15 @@ public class OrganizationPersistenceImpl extends BasePersistenceImpl<Organizatio
 		if (retrieveFromCache) {
 			result = FinderCacheUtil.getResult(FINDER_PATH_FETCH_BY_C_N,
 					finderArgs, this);
+		}
+
+		if (result instanceof Organization) {
+			Organization organization = (Organization)result;
+
+			if ((companyId != organization.getCompanyId()) ||
+					!Validator.equals(name, organization.getName())) {
+				result = null;
+			}
 		}
 
 		if (result == null) {
@@ -2735,12 +2890,20 @@ public class OrganizationPersistenceImpl extends BasePersistenceImpl<Organizatio
 	 */
 	public List<Organization> findAll(int start, int end,
 		OrderByComparator orderByComparator) throws SystemException {
-		Object[] finderArgs = new Object[] {
-				String.valueOf(start), String.valueOf(end),
-				String.valueOf(orderByComparator)
-			};
+		FinderPath finderPath = null;
+		Object[] finderArgs = new Object[] { start, end, orderByComparator };
 
-		List<Organization> list = (List<Organization>)FinderCacheUtil.getResult(FINDER_PATH_FIND_ALL,
+		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) &&
+				(orderByComparator == null)) {
+			finderPath = FINDER_PATH_WITHOUT_PAGINATION_FIND_ALL;
+			finderArgs = FINDER_ARGS_EMPTY;
+		}
+		else {
+			finderPath = FINDER_PATH_WITH_PAGINATION_FIND_ALL;
+			finderArgs = new Object[] { start, end, orderByComparator };
+		}
+
+		List<Organization> list = (List<Organization>)FinderCacheUtil.getResult(finderPath,
 				finderArgs, this);
 
 		if (list == null) {
@@ -2785,14 +2948,12 @@ public class OrganizationPersistenceImpl extends BasePersistenceImpl<Organizatio
 			}
 			finally {
 				if (list == null) {
-					FinderCacheUtil.removeResult(FINDER_PATH_FIND_ALL,
-						finderArgs);
+					FinderCacheUtil.removeResult(finderPath, finderArgs);
 				}
 				else {
 					cacheResult(list);
 
-					FinderCacheUtil.putResult(FINDER_PATH_FIND_ALL, finderArgs,
-						list);
+					FinderCacheUtil.putResult(finderPath, finderArgs, list);
 				}
 
 				closeSession(session);
@@ -2810,7 +2971,7 @@ public class OrganizationPersistenceImpl extends BasePersistenceImpl<Organizatio
 	 */
 	public void removeByCompanyId(long companyId) throws SystemException {
 		for (Organization organization : findByCompanyId(companyId)) {
-			organizationPersistence.remove(organization);
+			remove(organization);
 		}
 	}
 
@@ -2822,7 +2983,7 @@ public class OrganizationPersistenceImpl extends BasePersistenceImpl<Organizatio
 	 */
 	public void removeByLocations(long companyId) throws SystemException {
 		for (Organization organization : findByLocations(companyId)) {
-			organizationPersistence.remove(organization);
+			remove(organization);
 		}
 	}
 
@@ -2837,7 +2998,7 @@ public class OrganizationPersistenceImpl extends BasePersistenceImpl<Organizatio
 		throws SystemException {
 		for (Organization organization : findByC_P(companyId,
 				parentOrganizationId)) {
-			organizationPersistence.remove(organization);
+			remove(organization);
 		}
 	}
 
@@ -2846,13 +3007,14 @@ public class OrganizationPersistenceImpl extends BasePersistenceImpl<Organizatio
 	 *
 	 * @param companyId the company ID
 	 * @param name the name
+	 * @return the organization that was removed
 	 * @throws SystemException if a system exception occurred
 	 */
-	public void removeByC_N(long companyId, String name)
+	public Organization removeByC_N(long companyId, String name)
 		throws NoSuchOrganizationException, SystemException {
 		Organization organization = findByC_N(companyId, name);
 
-		organizationPersistence.remove(organization);
+		return remove(organization);
 	}
 
 	/**
@@ -2862,7 +3024,7 @@ public class OrganizationPersistenceImpl extends BasePersistenceImpl<Organizatio
 	 */
 	public void removeAll() throws SystemException {
 		for (Organization organization : findAll()) {
-			organizationPersistence.remove(organization);
+			remove(organization);
 		}
 	}
 
@@ -3259,10 +3421,8 @@ public class OrganizationPersistenceImpl extends BasePersistenceImpl<Organizatio
 	 * @throws SystemException if a system exception occurred
 	 */
 	public int countAll() throws SystemException {
-		Object[] finderArgs = new Object[0];
-
 		Long count = (Long)FinderCacheUtil.getResult(FINDER_PATH_COUNT_ALL,
-				finderArgs, this);
+				FINDER_ARGS_EMPTY, this);
 
 		if (count == null) {
 			Session session = null;
@@ -3282,8 +3442,8 @@ public class OrganizationPersistenceImpl extends BasePersistenceImpl<Organizatio
 					count = Long.valueOf(0);
 				}
 
-				FinderCacheUtil.putResult(FINDER_PATH_COUNT_ALL, finderArgs,
-					count);
+				FinderCacheUtil.putResult(FINDER_PATH_COUNT_ALL,
+					FINDER_ARGS_EMPTY, count);
 
 				closeSession(session);
 			}
@@ -3331,6 +3491,10 @@ public class OrganizationPersistenceImpl extends BasePersistenceImpl<Organizatio
 				"com.liferay.portal.kernel.util.OrderByComparator"
 			});
 
+	static {
+		FINDER_PATH_GET_GROUPS.setCacheKeyGeneratorCacheName(null);
+	}
+
 	/**
 	 * Returns an ordered range of all the groups associated with the organization.
 	 *
@@ -3347,10 +3511,7 @@ public class OrganizationPersistenceImpl extends BasePersistenceImpl<Organizatio
 	 */
 	public List<com.liferay.portal.model.Group> getGroups(long pk, int start,
 		int end, OrderByComparator orderByComparator) throws SystemException {
-		Object[] finderArgs = new Object[] {
-				pk, String.valueOf(start), String.valueOf(end),
-				String.valueOf(orderByComparator)
-			};
+		Object[] finderArgs = new Object[] { pk, start, end, orderByComparator };
 
 		List<com.liferay.portal.model.Group> list = (List<com.liferay.portal.model.Group>)FinderCacheUtil.getResult(FINDER_PATH_GET_GROUPS,
 				finderArgs, this);
@@ -3409,6 +3570,10 @@ public class OrganizationPersistenceImpl extends BasePersistenceImpl<Organizatio
 			OrganizationModelImpl.FINDER_CACHE_ENABLED_GROUPS_ORGS, Long.class,
 			OrganizationModelImpl.MAPPING_TABLE_GROUPS_ORGS_NAME,
 			"getGroupsSize", new String[] { Long.class.getName() });
+
+	static {
+		FINDER_PATH_GET_GROUPS_SIZE.setCacheKeyGeneratorCacheName(null);
+	}
 
 	/**
 	 * Returns the number of groups associated with the organization.
@@ -3797,6 +3962,10 @@ public class OrganizationPersistenceImpl extends BasePersistenceImpl<Organizatio
 				"com.liferay.portal.kernel.util.OrderByComparator"
 			});
 
+	static {
+		FINDER_PATH_GET_USERS.setCacheKeyGeneratorCacheName(null);
+	}
+
 	/**
 	 * Returns an ordered range of all the users associated with the organization.
 	 *
@@ -3813,10 +3982,7 @@ public class OrganizationPersistenceImpl extends BasePersistenceImpl<Organizatio
 	 */
 	public List<com.liferay.portal.model.User> getUsers(long pk, int start,
 		int end, OrderByComparator orderByComparator) throws SystemException {
-		Object[] finderArgs = new Object[] {
-				pk, String.valueOf(start), String.valueOf(end),
-				String.valueOf(orderByComparator)
-			};
+		Object[] finderArgs = new Object[] { pk, start, end, orderByComparator };
 
 		List<com.liferay.portal.model.User> list = (List<com.liferay.portal.model.User>)FinderCacheUtil.getResult(FINDER_PATH_GET_USERS,
 				finderArgs, this);
@@ -3875,6 +4041,10 @@ public class OrganizationPersistenceImpl extends BasePersistenceImpl<Organizatio
 			OrganizationModelImpl.FINDER_CACHE_ENABLED_USERS_ORGS, Long.class,
 			OrganizationModelImpl.MAPPING_TABLE_USERS_ORGS_NAME,
 			"getUsersSize", new String[] { Long.class.getName() });
+
+	static {
+		FINDER_PATH_GET_USERS_SIZE.setCacheKeyGeneratorCacheName(null);
+	}
 
 	/**
 	 * Returns the number of users associated with the organization.
@@ -4222,188 +4392,6 @@ public class OrganizationPersistenceImpl extends BasePersistenceImpl<Organizatio
 	}
 
 	/**
-	 * Rebuilds the organizations tree for the scope using the modified pre-order tree traversal algorithm.
-	 *
-	 * <p>
-	 * Only call this method if the tree has become stale through operations other than normal CRUD. Under normal circumstances the tree is automatically rebuilt whenver necessary.
-	 * </p>
-	 *
-	 * @param companyId the ID of the scope
-	 * @param force whether to force the rebuild even if the tree is not stale
-	 */
-	public void rebuildTree(long companyId, boolean force)
-		throws SystemException {
-		if (force || (countOrphanTreeNodes(companyId) > 0)) {
-			rebuildTree(companyId, 0, 1);
-
-			CacheRegistryUtil.clear(OrganizationImpl.class.getName());
-			EntityCacheUtil.clearCache(OrganizationImpl.class.getName());
-			FinderCacheUtil.clearCache(FINDER_CLASS_NAME_ENTITY);
-			FinderCacheUtil.clearCache(FINDER_CLASS_NAME_LIST);
-		}
-	}
-
-	protected long countOrphanTreeNodes(long companyId)
-		throws SystemException {
-		Session session = null;
-
-		try {
-			session = openSession();
-
-			SQLQuery q = session.createSQLQuery(
-					"SELECT COUNT(*) AS COUNT_VALUE FROM Organization_ WHERE companyId = ? AND (leftOrganizationId = 0 OR leftOrganizationId IS NULL OR rightOrganizationId = 0 OR rightOrganizationId IS NULL)");
-
-			q.addScalar(COUNT_COLUMN_NAME,
-				com.liferay.portal.kernel.dao.orm.Type.LONG);
-
-			QueryPos qPos = QueryPos.getInstance(q);
-
-			qPos.add(companyId);
-
-			return (Long)q.uniqueResult();
-		}
-		catch (Exception e) {
-			throw processException(e);
-		}
-		finally {
-			closeSession(session);
-		}
-	}
-
-	protected void expandTree(Organization organization)
-		throws SystemException {
-		long companyId = organization.getCompanyId();
-
-		long lastRightOrganizationId = getLastRightOrganizationId(companyId,
-				organization.getParentOrganizationId());
-
-		long leftOrganizationId = 2;
-		long rightOrganizationId = 3;
-
-		if (lastRightOrganizationId > 0) {
-			leftOrganizationId = lastRightOrganizationId + 1;
-			rightOrganizationId = lastRightOrganizationId + 2;
-
-			expandTreeLeftOrganizationId.expand(companyId,
-				lastRightOrganizationId);
-			expandTreeRightOrganizationId.expand(companyId,
-				lastRightOrganizationId);
-
-			CacheRegistryUtil.clear(OrganizationImpl.class.getName());
-			EntityCacheUtil.clearCache(OrganizationImpl.class.getName());
-			FinderCacheUtil.clearCache(FINDER_CLASS_NAME_ENTITY);
-			FinderCacheUtil.clearCache(FINDER_CLASS_NAME_LIST);
-		}
-
-		organization.setLeftOrganizationId(leftOrganizationId);
-		organization.setRightOrganizationId(rightOrganizationId);
-	}
-
-	protected long getLastRightOrganizationId(long companyId,
-		long parentOrganizationId) throws SystemException {
-		Session session = null;
-
-		try {
-			session = openSession();
-
-			SQLQuery q = session.createSQLQuery(
-					"SELECT rightOrganizationId FROM Organization_ WHERE (companyId = ?) AND (parentOrganizationId = ?) ORDER BY rightOrganizationId DESC");
-
-			q.addScalar("rightOrganizationId",
-				com.liferay.portal.kernel.dao.orm.Type.LONG);
-
-			QueryPos qPos = QueryPos.getInstance(q);
-
-			qPos.add(companyId);
-			qPos.add(parentOrganizationId);
-
-			List<Long> list = (List<Long>)QueryUtil.list(q, getDialect(), 0, 1);
-
-			if (list.isEmpty()) {
-				if (parentOrganizationId > 0) {
-					Organization parentOrganization = findByPrimaryKey(parentOrganizationId);
-
-					return parentOrganization.getLeftOrganizationId();
-				}
-
-				return 0;
-			}
-			else {
-				return list.get(0);
-			}
-		}
-		catch (Exception e) {
-			throw processException(e);
-		}
-		finally {
-			closeSession(session);
-		}
-	}
-
-	protected long rebuildTree(long companyId, long parentOrganizationId,
-		long leftOrganizationId) throws SystemException {
-		List<Long> organizationIds = null;
-
-		Session session = null;
-
-		try {
-			session = openSession();
-
-			SQLQuery q = session.createSQLQuery(
-					"SELECT organizationId FROM Organization_ WHERE companyId = ? AND parentOrganizationId = ? ORDER BY organizationId ASC");
-
-			q.addScalar("organizationId",
-				com.liferay.portal.kernel.dao.orm.Type.LONG);
-
-			QueryPos qPos = QueryPos.getInstance(q);
-
-			qPos.add(companyId);
-			qPos.add(parentOrganizationId);
-
-			organizationIds = q.list();
-		}
-		catch (Exception e) {
-			throw processException(e);
-		}
-		finally {
-			closeSession(session);
-		}
-
-		long rightOrganizationId = leftOrganizationId + 1;
-
-		for (long organizationId : organizationIds) {
-			rightOrganizationId = rebuildTree(companyId, organizationId,
-					rightOrganizationId);
-		}
-
-		if (parentOrganizationId > 0) {
-			updateTree.update(parentOrganizationId, leftOrganizationId,
-				rightOrganizationId);
-		}
-
-		return rightOrganizationId + 1;
-	}
-
-	protected void shrinkTree(Organization organization) {
-		long companyId = organization.getCompanyId();
-
-		long leftOrganizationId = organization.getLeftOrganizationId();
-		long rightOrganizationId = organization.getRightOrganizationId();
-
-		long delta = (rightOrganizationId - leftOrganizationId) + 1;
-
-		shrinkTreeLeftOrganizationId.shrink(companyId, rightOrganizationId,
-			delta);
-		shrinkTreeRightOrganizationId.shrink(companyId, rightOrganizationId,
-			delta);
-
-		CacheRegistryUtil.clear(OrganizationImpl.class.getName());
-		EntityCacheUtil.clearCache(OrganizationImpl.class.getName());
-		FinderCacheUtil.clearCache(FINDER_CLASS_NAME_ENTITY);
-		FinderCacheUtil.clearCache(FINDER_CLASS_NAME_LIST);
-	}
-
-	/**
 	 * Initializes the organization persistence.
 	 */
 	public void afterPropertiesSet() {
@@ -4427,29 +4415,23 @@ public class OrganizationPersistenceImpl extends BasePersistenceImpl<Organizatio
 			}
 		}
 
-		containsGroup = new ContainsGroup(this);
+		containsGroup = new ContainsGroup();
 
-		addGroup = new AddGroup(this);
-		clearGroups = new ClearGroups(this);
-		removeGroup = new RemoveGroup(this);
+		addGroup = new AddGroup();
+		clearGroups = new ClearGroups();
+		removeGroup = new RemoveGroup();
 
-		containsUser = new ContainsUser(this);
+		containsUser = new ContainsUser();
 
-		addUser = new AddUser(this);
-		clearUsers = new ClearUsers(this);
-		removeUser = new RemoveUser(this);
-
-		expandTreeLeftOrganizationId = new ExpandTreeLeftOrganizationId();
-		expandTreeRightOrganizationId = new ExpandTreeRightOrganizationId();
-		shrinkTreeLeftOrganizationId = new ShrinkTreeLeftOrganizationId();
-		shrinkTreeRightOrganizationId = new ShrinkTreeRightOrganizationId();
-		updateTree = new UpdateTree();
+		addUser = new AddUser();
+		clearUsers = new ClearUsers();
+		removeUser = new RemoveUser();
 	}
 
 	public void destroy() {
 		EntityCacheUtil.removeCache(OrganizationImpl.class.getName());
 		FinderCacheUtil.removeCache(FINDER_CLASS_NAME_ENTITY);
-		FinderCacheUtil.removeCache(FINDER_CLASS_NAME_LIST);
+		FinderCacheUtil.removeCache(FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
 	}
 
 	@BeanReference(type = AccountPersistence.class)
@@ -4496,8 +4478,6 @@ public class OrganizationPersistenceImpl extends BasePersistenceImpl<Organizatio
 	protected MembershipRequestPersistence membershipRequestPersistence;
 	@BeanReference(type = OrganizationPersistence.class)
 	protected OrganizationPersistence organizationPersistence;
-	@BeanReference(type = OrgGroupPermissionPersistence.class)
-	protected OrgGroupPermissionPersistence orgGroupPermissionPersistence;
 	@BeanReference(type = OrgGroupRolePersistence.class)
 	protected OrgGroupRolePersistence orgGroupRolePersistence;
 	@BeanReference(type = OrgLaborPersistence.class)
@@ -4508,8 +4488,6 @@ public class OrganizationPersistenceImpl extends BasePersistenceImpl<Organizatio
 	protected PasswordPolicyRelPersistence passwordPolicyRelPersistence;
 	@BeanReference(type = PasswordTrackerPersistence.class)
 	protected PasswordTrackerPersistence passwordTrackerPersistence;
-	@BeanReference(type = PermissionPersistence.class)
-	protected PermissionPersistence permissionPersistence;
 	@BeanReference(type = PhonePersistence.class)
 	protected PhonePersistence phonePersistence;
 	@BeanReference(type = PluginSettingPersistence.class)
@@ -4530,14 +4508,16 @@ public class OrganizationPersistenceImpl extends BasePersistenceImpl<Organizatio
 	protected RepositoryPersistence repositoryPersistence;
 	@BeanReference(type = RepositoryEntryPersistence.class)
 	protected RepositoryEntryPersistence repositoryEntryPersistence;
-	@BeanReference(type = ResourcePersistence.class)
-	protected ResourcePersistence resourcePersistence;
 	@BeanReference(type = ResourceActionPersistence.class)
 	protected ResourceActionPersistence resourceActionPersistence;
-	@BeanReference(type = ResourceCodePersistence.class)
-	protected ResourceCodePersistence resourceCodePersistence;
+	@BeanReference(type = ResourceBlockPersistence.class)
+	protected ResourceBlockPersistence resourceBlockPersistence;
+	@BeanReference(type = ResourceBlockPermissionPersistence.class)
+	protected ResourceBlockPermissionPersistence resourceBlockPermissionPersistence;
 	@BeanReference(type = ResourcePermissionPersistence.class)
 	protected ResourcePermissionPersistence resourcePermissionPersistence;
+	@BeanReference(type = ResourceTypePermissionPersistence.class)
+	protected ResourceTypePermissionPersistence resourceTypePermissionPersistence;
 	@BeanReference(type = RolePersistence.class)
 	protected RolePersistence rolePersistence;
 	@BeanReference(type = ServiceComponentPersistence.class)
@@ -4590,9 +4570,7 @@ public class OrganizationPersistenceImpl extends BasePersistenceImpl<Organizatio
 	protected RemoveUser removeUser;
 
 	protected class ContainsGroup {
-		protected ContainsGroup(OrganizationPersistenceImpl persistenceImpl) {
-			super();
-
+		protected ContainsGroup() {
 			_mappingSqlQuery = MappingSqlQueryFactoryUtil.getMappingSqlQuery(getDataSource(),
 					_SQL_CONTAINSGROUP,
 					new int[] { java.sql.Types.BIGINT, java.sql.Types.BIGINT },
@@ -4619,16 +4597,15 @@ public class OrganizationPersistenceImpl extends BasePersistenceImpl<Organizatio
 	}
 
 	protected class AddGroup {
-		protected AddGroup(OrganizationPersistenceImpl persistenceImpl) {
+		protected AddGroup() {
 			_sqlUpdate = SqlUpdateFactoryUtil.getSqlUpdate(getDataSource(),
 					"INSERT INTO Groups_Orgs (organizationId, groupId) VALUES (?, ?)",
 					new int[] { java.sql.Types.BIGINT, java.sql.Types.BIGINT });
-			_persistenceImpl = persistenceImpl;
 		}
 
 		protected void add(long organizationId, long groupId)
 			throws SystemException {
-			if (!_persistenceImpl.containsGroup.contains(organizationId, groupId)) {
+			if (!containsGroup.contains(organizationId, groupId)) {
 				ModelListener<com.liferay.portal.model.Group>[] groupListeners = groupPersistence.getListeners();
 
 				for (ModelListener<Organization> listener : listeners) {
@@ -4658,11 +4635,10 @@ public class OrganizationPersistenceImpl extends BasePersistenceImpl<Organizatio
 		}
 
 		private SqlUpdate _sqlUpdate;
-		private OrganizationPersistenceImpl _persistenceImpl;
 	}
 
 	protected class ClearGroups {
-		protected ClearGroups(OrganizationPersistenceImpl persistenceImpl) {
+		protected ClearGroups() {
 			_sqlUpdate = SqlUpdateFactoryUtil.getSqlUpdate(getDataSource(),
 					"DELETE FROM Groups_Orgs WHERE organizationId = ?",
 					new int[] { java.sql.Types.BIGINT });
@@ -4712,16 +4688,15 @@ public class OrganizationPersistenceImpl extends BasePersistenceImpl<Organizatio
 	}
 
 	protected class RemoveGroup {
-		protected RemoveGroup(OrganizationPersistenceImpl persistenceImpl) {
+		protected RemoveGroup() {
 			_sqlUpdate = SqlUpdateFactoryUtil.getSqlUpdate(getDataSource(),
 					"DELETE FROM Groups_Orgs WHERE organizationId = ? AND groupId = ?",
 					new int[] { java.sql.Types.BIGINT, java.sql.Types.BIGINT });
-			_persistenceImpl = persistenceImpl;
 		}
 
 		protected void remove(long organizationId, long groupId)
 			throws SystemException {
-			if (_persistenceImpl.containsGroup.contains(organizationId, groupId)) {
+			if (containsGroup.contains(organizationId, groupId)) {
 				ModelListener<com.liferay.portal.model.Group>[] groupListeners = groupPersistence.getListeners();
 
 				for (ModelListener<Organization> listener : listeners) {
@@ -4751,13 +4726,10 @@ public class OrganizationPersistenceImpl extends BasePersistenceImpl<Organizatio
 		}
 
 		private SqlUpdate _sqlUpdate;
-		private OrganizationPersistenceImpl _persistenceImpl;
 	}
 
 	protected class ContainsUser {
-		protected ContainsUser(OrganizationPersistenceImpl persistenceImpl) {
-			super();
-
+		protected ContainsUser() {
 			_mappingSqlQuery = MappingSqlQueryFactoryUtil.getMappingSqlQuery(getDataSource(),
 					_SQL_CONTAINSUSER,
 					new int[] { java.sql.Types.BIGINT, java.sql.Types.BIGINT },
@@ -4784,16 +4756,15 @@ public class OrganizationPersistenceImpl extends BasePersistenceImpl<Organizatio
 	}
 
 	protected class AddUser {
-		protected AddUser(OrganizationPersistenceImpl persistenceImpl) {
+		protected AddUser() {
 			_sqlUpdate = SqlUpdateFactoryUtil.getSqlUpdate(getDataSource(),
 					"INSERT INTO Users_Orgs (organizationId, userId) VALUES (?, ?)",
 					new int[] { java.sql.Types.BIGINT, java.sql.Types.BIGINT });
-			_persistenceImpl = persistenceImpl;
 		}
 
 		protected void add(long organizationId, long userId)
 			throws SystemException {
-			if (!_persistenceImpl.containsUser.contains(organizationId, userId)) {
+			if (!containsUser.contains(organizationId, userId)) {
 				ModelListener<com.liferay.portal.model.User>[] userListeners = userPersistence.getListeners();
 
 				for (ModelListener<Organization> listener : listeners) {
@@ -4823,11 +4794,10 @@ public class OrganizationPersistenceImpl extends BasePersistenceImpl<Organizatio
 		}
 
 		private SqlUpdate _sqlUpdate;
-		private OrganizationPersistenceImpl _persistenceImpl;
 	}
 
 	protected class ClearUsers {
-		protected ClearUsers(OrganizationPersistenceImpl persistenceImpl) {
+		protected ClearUsers() {
 			_sqlUpdate = SqlUpdateFactoryUtil.getSqlUpdate(getDataSource(),
 					"DELETE FROM Users_Orgs WHERE organizationId = ?",
 					new int[] { java.sql.Types.BIGINT });
@@ -4877,16 +4847,15 @@ public class OrganizationPersistenceImpl extends BasePersistenceImpl<Organizatio
 	}
 
 	protected class RemoveUser {
-		protected RemoveUser(OrganizationPersistenceImpl persistenceImpl) {
+		protected RemoveUser() {
 			_sqlUpdate = SqlUpdateFactoryUtil.getSqlUpdate(getDataSource(),
 					"DELETE FROM Users_Orgs WHERE organizationId = ? AND userId = ?",
 					new int[] { java.sql.Types.BIGINT, java.sql.Types.BIGINT });
-			_persistenceImpl = persistenceImpl;
 		}
 
 		protected void remove(long organizationId, long userId)
 			throws SystemException {
-			if (_persistenceImpl.containsUser.contains(organizationId, userId)) {
+			if (containsUser.contains(organizationId, userId)) {
 				ModelListener<com.liferay.portal.model.User>[] userListeners = userPersistence.getListeners();
 
 				for (ModelListener<Organization> listener : listeners) {
@@ -4916,97 +4885,6 @@ public class OrganizationPersistenceImpl extends BasePersistenceImpl<Organizatio
 		}
 
 		private SqlUpdate _sqlUpdate;
-		private OrganizationPersistenceImpl _persistenceImpl;
-	}
-
-	protected ExpandTreeLeftOrganizationId expandTreeLeftOrganizationId;
-	protected ExpandTreeRightOrganizationId expandTreeRightOrganizationId;
-	protected ShrinkTreeLeftOrganizationId shrinkTreeLeftOrganizationId;
-	protected ShrinkTreeRightOrganizationId shrinkTreeRightOrganizationId;
-	protected UpdateTree updateTree;
-
-	protected class ExpandTreeLeftOrganizationId {
-		protected ExpandTreeLeftOrganizationId() {
-			_sqlUpdate = SqlUpdateFactoryUtil.getSqlUpdate(getDataSource(),
-					"UPDATE Organization_ SET leftOrganizationId = (leftOrganizationId + 2) WHERE (companyId = ?) AND (leftOrganizationId > ?)",
-					new int[] { java.sql.Types.BIGINT, java.sql.Types.BIGINT });
-		}
-
-		protected void expand(long companyId, long leftOrganizationId) {
-			_sqlUpdate.update(new Object[] { companyId, leftOrganizationId });
-		}
-
-		private SqlUpdate _sqlUpdate;
-	}
-
-	protected class ExpandTreeRightOrganizationId {
-		protected ExpandTreeRightOrganizationId() {
-			_sqlUpdate = SqlUpdateFactoryUtil.getSqlUpdate(getDataSource(),
-					"UPDATE Organization_ SET rightOrganizationId = (rightOrganizationId + 2) WHERE (companyId = ?) AND (rightOrganizationId > ?)",
-					new int[] { java.sql.Types.BIGINT, java.sql.Types.BIGINT });
-		}
-
-		protected void expand(long companyId, long rightOrganizationId) {
-			_sqlUpdate.update(new Object[] { companyId, rightOrganizationId });
-		}
-
-		private SqlUpdate _sqlUpdate;
-	}
-
-	protected class ShrinkTreeLeftOrganizationId {
-		protected ShrinkTreeLeftOrganizationId() {
-			_sqlUpdate = SqlUpdateFactoryUtil.getSqlUpdate(getDataSource(),
-					"UPDATE Organization_ SET leftOrganizationId = (leftOrganizationId - ?) WHERE (companyId = ?) AND (leftOrganizationId > ?)",
-					new int[] {
-						java.sql.Types.BIGINT, java.sql.Types.BIGINT,
-						java.sql.Types.BIGINT
-					});
-		}
-
-		protected void shrink(long companyId, long leftOrganizationId,
-			long delta) {
-			_sqlUpdate.update(new Object[] { delta, companyId, leftOrganizationId });
-		}
-
-		private SqlUpdate _sqlUpdate;
-	}
-
-	protected class ShrinkTreeRightOrganizationId {
-		protected ShrinkTreeRightOrganizationId() {
-			_sqlUpdate = SqlUpdateFactoryUtil.getSqlUpdate(getDataSource(),
-					"UPDATE Organization_ SET rightOrganizationId = (rightOrganizationId - ?) WHERE (companyId = ?) AND (rightOrganizationId > ?)",
-					new int[] {
-						java.sql.Types.BIGINT, java.sql.Types.BIGINT,
-						java.sql.Types.BIGINT
-					});
-		}
-
-		protected void shrink(long companyId, long rightOrganizationId,
-			long delta) {
-			_sqlUpdate.update(new Object[] { delta, companyId, rightOrganizationId });
-		}
-
-		private SqlUpdate _sqlUpdate;
-	}
-
-	protected class UpdateTree {
-		protected UpdateTree() {
-			_sqlUpdate = SqlUpdateFactoryUtil.getSqlUpdate(getDataSource(),
-					"UPDATE Organization_ SET leftOrganizationId = ?, rightOrganizationId = ? WHERE organizationId = ?",
-					new int[] {
-						java.sql.Types.BIGINT, java.sql.Types.BIGINT,
-						java.sql.Types.BIGINT
-					});
-		}
-
-		protected void update(long organizationId, long leftOrganizationId,
-			long rightOrganizationId) {
-			_sqlUpdate.update(new Object[] {
-					leftOrganizationId, rightOrganizationId, organizationId
-				});
-		}
-
-		private SqlUpdate _sqlUpdate;
 	}
 
 	private static final String _SQL_SELECT_ORGANIZATION = "SELECT organization FROM Organization organization";
@@ -5027,6 +4905,7 @@ public class OrganizationPersistenceImpl extends BasePersistenceImpl<Organizatio
 	private static final String _FINDER_COLUMN_C_N_NAME_1 = "organization.name IS NULL";
 	private static final String _FINDER_COLUMN_C_N_NAME_2 = "organization.name = ?";
 	private static final String _FINDER_COLUMN_C_N_NAME_3 = "(organization.name IS NULL OR organization.name = ?)";
+	private static final String _FILTER_ENTITY_TABLE_FILTER_PK_COLUMN = "organization.organizationId";
 	private static final String _FILTER_SQL_SELECT_ORGANIZATION_WHERE = "SELECT DISTINCT {organization.*} FROM Organization_ organization WHERE ";
 	private static final String _FILTER_SQL_SELECT_ORGANIZATION_NO_INLINE_DISTINCT_WHERE_1 =
 		"SELECT {Organization_.*} FROM (SELECT DISTINCT organization.organizationId FROM Organization_ organization WHERE ";
@@ -5035,7 +4914,6 @@ public class OrganizationPersistenceImpl extends BasePersistenceImpl<Organizatio
 	private static final String _FILTER_SQL_COUNT_ORGANIZATION_WHERE = "SELECT COUNT(DISTINCT organization.organizationId) AS COUNT_VALUE FROM Organization_ organization WHERE ";
 	private static final String _FILTER_ENTITY_ALIAS = "organization";
 	private static final String _FILTER_ENTITY_TABLE = "Organization_";
-	private static final String _FILTER_ENTITY_TABLE_FILTER_PK_COLUMN = "organization.organizationId";
 	private static final String _ORDER_BY_ENTITY_ALIAS = "organization.";
 	private static final String _ORDER_BY_ENTITY_TABLE = "Organization_.";
 	private static final String _NO_SUCH_ENTITY_WITH_PRIMARY_KEY = "No Organization exists with the primary key ";
@@ -5043,10 +4921,12 @@ public class OrganizationPersistenceImpl extends BasePersistenceImpl<Organizatio
 	private static final boolean _HIBERNATE_CACHE_USE_SECOND_LEVEL_CACHE = com.liferay.portal.util.PropsValues.HIBERNATE_CACHE_USE_SECOND_LEVEL_CACHE;
 	private static Log _log = LogFactoryUtil.getLog(OrganizationPersistenceImpl.class);
 	private static Organization _nullOrganization = new OrganizationImpl() {
+			@Override
 			public Object clone() {
 				return this;
 			}
 
+			@Override
 			public CacheModel<Organization> toCacheModel() {
 				return _nullOrganizationCacheModel;
 			}

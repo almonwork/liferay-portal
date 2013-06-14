@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -23,6 +23,8 @@ import com.liferay.portal.kernel.util.Constants;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.security.auth.PrincipalException;
+import com.liferay.portal.service.ServiceContext;
+import com.liferay.portal.service.ServiceContextFactory;
 import com.liferay.portal.service.UserServiceUtil;
 import com.liferay.portal.struts.ActionConstants;
 import com.liferay.portal.util.PortalUtil;
@@ -58,21 +60,21 @@ public class UpdateEmailAddressAction extends Action {
 		try {
 			updateEmailAddress(request);
 
-			return mapping.findForward(ActionConstants.COMMON_REFERER);
+			return mapping.findForward(ActionConstants.COMMON_REFERER_JSP);
 		}
 		catch (Exception e) {
 			if (e instanceof DuplicateUserEmailAddressException ||
 				e instanceof ReservedUserEmailAddressException ||
 				e instanceof UserEmailAddressException) {
 
-				SessionErrors.add(request, e.getClass().getName());
+				SessionErrors.add(request, e.getClass());
 
 				return mapping.findForward("portal.update_email_address");
 			}
 			else if (e instanceof NoSuchUserException ||
 					 e instanceof PrincipalException) {
 
-				SessionErrors.add(request, e.getClass().getName());
+				SessionErrors.add(request, e.getClass());
 
 				return mapping.findForward("portal.error");
 			}
@@ -92,8 +94,11 @@ public class UpdateEmailAddressAction extends Action {
 		String emailAddress1 = ParamUtil.getString(request, "emailAddress1");
 		String emailAddress2 = ParamUtil.getString(request, "emailAddress2");
 
+		ServiceContext serviceContext = ServiceContextFactory.getInstance(
+			request);
+
 		UserServiceUtil.updateEmailAddress(
-			userId, password, emailAddress1, emailAddress2);
+			userId, password, emailAddress1, emailAddress2, serviceContext);
 	}
 
 }

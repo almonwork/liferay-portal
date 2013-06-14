@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -26,7 +26,7 @@
 
 	<div id="portal_add_content">
 		<div class="portal-add-content">
-			<aui:form action='<%= themeDisplay.getPathMain() + "/portal/update_layout?p_l_id=" + plid %>' method="post" name="fm" useNamespace="<%= false %>">
+			<aui:form action='<%= themeDisplay.getPathMain() + "/portal/update_layout?p_auth=" + AuthTokenUtil.getToken(request) + "&p_l_id=" + plid + "&p_v_l_s_g_id=" + themeDisplay.getParentGroupId() %>' method="post" name="fm" useNamespace="<%= false %>">
 				<aui:input name="doAsUserId" type="hidden" value="<%= themeDisplay.getDoAsUserId() %>" />
 				<aui:input name="<%= Constants.CMD %>" type="hidden" value="template" />
 				<aui:input name="<%= WebKeys.REFERER %>" type="hidden" value="<%= refererURL.toString() %>" />
@@ -45,21 +45,17 @@
 
 				Set panelSelectedPortlets = SetUtil.fromArray(StringUtil.split(typeSettingsProperties.getProperty("panelSelectedPortlets")));
 
-				PortletCategory portletCategory = (PortletCategory)WebAppPool.get(String.valueOf(company.getCompanyId()), WebKeys.PORTLET_CATEGORY);
+				PortletCategory portletCategory = (PortletCategory)WebAppPool.get(company.getCompanyId(), WebKeys.PORTLET_CATEGORY);
 
 				portletCategory = _getRelevantPortletCategory(permissionChecker, portletCategory, panelSelectedPortlets, layoutTypePortlet, layout, user);
 
-				List categories = ListUtil.fromCollection(portletCategory.getCategories());
+				List<PortletCategory> categories = ListUtil.fromCollection(portletCategory.getCategories());
 
 				categories = ListUtil.sort(categories, new PortletCategoryComparator(locale));
 
 				int portletCategoryIndex = 0;
 
-				Iterator itr = categories.iterator();
-
-				while (itr.hasNext()) {
-					PortletCategory curPortletCategory = (PortletCategory)itr.next();
-
+				for (PortletCategory curPortletCategory : categories) {
 					if (curPortletCategory.isHidden()) {
 						continue;
 					}
@@ -81,21 +77,18 @@
 					</div>
 				</c:if>
 
-				<c:if test="<%= !layout.isTypePanel() && permissionChecker.isOmniadmin() %>">
+				<c:if test="<%= !layout.isTypePanel() && permissionChecker.isOmniadmin() && PortletLocalServiceUtil.hasPortlet(themeDisplay.getCompanyId(), PortletKeys.MARKETPLACE_STORE) %>">
 
 					<%
 					Group controlPanelGroup = GroupLocalServiceUtil.getGroup(company.getCompanyId(), GroupConstants.CONTROL_PANEL);
 
 					long controlPanelPlid = LayoutLocalServiceUtil.getDefaultPlid(controlPanelGroup.getGroupId(), true);
 
-					PortletURLImpl pluginsURL = new PortletURLImpl(request, PortletKeys.PLUGIN_INSTALLER, controlPanelPlid, PortletRequest.RENDER_PHASE);
-
-					pluginsURL.setPortletMode(PortletMode.VIEW);
-					pluginsURL.setRefererPlid(plid);
+					PortletURLImpl marketplaceURL = new PortletURLImpl(request, PortletKeys.MARKETPLACE_STORE, controlPanelPlid, PortletRequest.RENDER_PHASE);
 					%>
 
 					<p class="lfr-install-more">
-						<aui:a href="<%= pluginsURL.toString() %>" label="install-more-applications" />
+						<aui:a href="<%= marketplaceURL.toString() %>" label="install-more-applications" />
 					</p>
 				</c:if>
 			</aui:form>

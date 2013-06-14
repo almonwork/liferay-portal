@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,6 +14,8 @@
 
 package com.liferay.portlet.wiki.service;
 
+import com.liferay.portal.service.ServiceWrapper;
+
 /**
  * <p>
  * This class is a wrapper for {@link WikiNodeLocalService}.
@@ -23,7 +25,8 @@ package com.liferay.portlet.wiki.service;
  * @see       WikiNodeLocalService
  * @generated
  */
-public class WikiNodeLocalServiceWrapper implements WikiNodeLocalService {
+public class WikiNodeLocalServiceWrapper implements WikiNodeLocalService,
+	ServiceWrapper<WikiNodeLocalService> {
 	public WikiNodeLocalServiceWrapper(
 		WikiNodeLocalService wikiNodeLocalService) {
 		_wikiNodeLocalService = wikiNodeLocalService;
@@ -56,24 +59,31 @@ public class WikiNodeLocalServiceWrapper implements WikiNodeLocalService {
 	* Deletes the wiki node with the primary key from the database. Also notifies the appropriate model listeners.
 	*
 	* @param nodeId the primary key of the wiki node
+	* @return the wiki node that was removed
 	* @throws PortalException if a wiki node with the primary key could not be found
 	* @throws SystemException if a system exception occurred
 	*/
-	public void deleteWikiNode(long nodeId)
+	public com.liferay.portlet.wiki.model.WikiNode deleteWikiNode(long nodeId)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException {
-		_wikiNodeLocalService.deleteWikiNode(nodeId);
+		return _wikiNodeLocalService.deleteWikiNode(nodeId);
 	}
 
 	/**
 	* Deletes the wiki node from the database. Also notifies the appropriate model listeners.
 	*
 	* @param wikiNode the wiki node
+	* @return the wiki node that was removed
 	* @throws SystemException if a system exception occurred
 	*/
-	public void deleteWikiNode(com.liferay.portlet.wiki.model.WikiNode wikiNode)
+	public com.liferay.portlet.wiki.model.WikiNode deleteWikiNode(
+		com.liferay.portlet.wiki.model.WikiNode wikiNode)
 		throws com.liferay.portal.kernel.exception.SystemException {
-		_wikiNodeLocalService.deleteWikiNode(wikiNode);
+		return _wikiNodeLocalService.deleteWikiNode(wikiNode);
+	}
+
+	public com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery() {
+		return _wikiNodeLocalService.dynamicQuery();
 	}
 
 	/**
@@ -145,6 +155,11 @@ public class WikiNodeLocalServiceWrapper implements WikiNodeLocalService {
 		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery)
 		throws com.liferay.portal.kernel.exception.SystemException {
 		return _wikiNodeLocalService.dynamicQueryCount(dynamicQuery);
+	}
+
+	public com.liferay.portlet.wiki.model.WikiNode fetchWikiNode(long nodeId)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return _wikiNodeLocalService.fetchWikiNode(nodeId);
 	}
 
 	/**
@@ -282,20 +297,20 @@ public class WikiNodeLocalServiceWrapper implements WikiNodeLocalService {
 			addGuestPermissions);
 	}
 
-	public void addNodeResources(com.liferay.portlet.wiki.model.WikiNode node,
-		boolean addGroupPermissions, boolean addGuestPermissions)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
-		_wikiNodeLocalService.addNodeResources(node, addGroupPermissions,
-			addGuestPermissions);
-	}
-
 	public void addNodeResources(long nodeId,
 		java.lang.String[] groupPermissions, java.lang.String[] guestPermissions)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException {
 		_wikiNodeLocalService.addNodeResources(nodeId, groupPermissions,
 			guestPermissions);
+	}
+
+	public void addNodeResources(com.liferay.portlet.wiki.model.WikiNode node,
+		boolean addGroupPermissions, boolean addGuestPermissions)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException {
+		_wikiNodeLocalService.addNodeResources(node, addGroupPermissions,
+			addGuestPermissions);
 	}
 
 	public void addNodeResources(com.liferay.portlet.wiki.model.WikiNode node,
@@ -368,12 +383,12 @@ public class WikiNodeLocalServiceWrapper implements WikiNodeLocalService {
 	}
 
 	public void importPages(long userId, long nodeId,
-		java.lang.String importer, java.io.File[] files,
+		java.lang.String importer, java.io.InputStream[] inputStreams,
 		java.util.Map<java.lang.String, java.lang.String[]> options)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException {
-		_wikiNodeLocalService.importPages(userId, nodeId, importer, files,
-			options);
+		_wikiNodeLocalService.importPages(userId, nodeId, importer,
+			inputStreams, options);
 	}
 
 	public void subscribeNode(long userId, long nodeId)
@@ -397,12 +412,26 @@ public class WikiNodeLocalServiceWrapper implements WikiNodeLocalService {
 			serviceContext);
 	}
 
+	/**
+	 * @deprecated Renamed to {@link #getWrappedService}
+	 */
 	public WikiNodeLocalService getWrappedWikiNodeLocalService() {
 		return _wikiNodeLocalService;
 	}
 
+	/**
+	 * @deprecated Renamed to {@link #setWrappedService}
+	 */
 	public void setWrappedWikiNodeLocalService(
 		WikiNodeLocalService wikiNodeLocalService) {
+		_wikiNodeLocalService = wikiNodeLocalService;
+	}
+
+	public WikiNodeLocalService getWrappedService() {
+		return _wikiNodeLocalService;
+	}
+
+	public void setWrappedService(WikiNodeLocalService wikiNodeLocalService) {
 		_wikiNodeLocalService = wikiNodeLocalService;
 	}
 

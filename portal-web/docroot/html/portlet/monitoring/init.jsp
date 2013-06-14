@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -16,12 +16,9 @@
 
 <%@ include file="/html/portlet/init.jsp" %>
 
-<%@ page import="com.liferay.portal.NoSuchUserException" %>
-<%@ page import="com.liferay.portal.kernel.servlet.PortalSessionContext" %>
-<%@ page import="com.liferay.portal.liveusers.LiveUsers" %>
-<%@ page import="com.liferay.portal.util.comparator.UserTrackerModifiedDateComparator" %>
-
-<%@ page import="java.net.URL" %>
+<%@ page import="com.liferay.portal.kernel.servlet.PortalSessionContext" %><%@
+page import="com.liferay.portal.liveusers.LiveUsers" %><%@
+page import="com.liferay.portal.util.comparator.UserTrackerModifiedDateComparator" %>
 
 <%
 Format dateFormatDateTime = FastDateFormatFactoryUtil.getDateTime(locale, timeZone);

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -51,8 +51,8 @@ public class PollsQuestionPermission {
 			String actionId)
 		throws PortalException, SystemException {
 
-		PollsQuestion question =
-			PollsQuestionLocalServiceUtil.getQuestion(questionId);
+		PollsQuestion question = PollsQuestionLocalServiceUtil.getQuestion(
+			questionId);
 
 		return contains(permissionChecker, question, actionId);
 	}

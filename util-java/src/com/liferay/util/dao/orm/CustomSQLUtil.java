@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -17,6 +17,8 @@ package com.liferay.util.dao.orm;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.util.OrderByComparator;
+
+import java.sql.SQLException;
 
 /**
  * @author Brian Wing Shun Chan
@@ -66,8 +68,11 @@ public class CustomSQLUtil {
 	}
 
 	public static String[] keywords(String[] keywordsArray, boolean lowerCase) {
-		return _instance._customSQL.keywords(
-			keywordsArray, lowerCase);
+		return _instance._customSQL.keywords(keywordsArray, lowerCase);
+	}
+
+	public static void reloadCustomSQL() throws SQLException {
+		_instance._customSQL.reloadCustomSQL();
 	}
 
 	public static String removeGroupBy(String sql) {
@@ -79,8 +84,11 @@ public class CustomSQLUtil {
 	}
 
 	public static String replaceAndOperator(String sql, boolean andOperator) {
-		return _instance._customSQL.replaceAndOperator(
-			sql, andOperator);
+		return _instance._customSQL.replaceAndOperator(sql, andOperator);
+	}
+
+	public static String replaceGroupBy(String sql, String groupBy) {
+		return _instance._customSQL.replaceGroupBy(sql, groupBy);
 	}
 
 	public static String replaceIsNull(String sql) {
@@ -105,10 +113,6 @@ public class CustomSQLUtil {
 
 		return _instance._customSQL.replaceKeywords(
 			sql, field, operator, last, values);
-	}
-
-	public static String replaceGroupBy(String sql, String groupBy) {
-		return _instance._customSQL.replaceGroupBy(sql, groupBy);
 	}
 
 	public static String replaceOrderBy(String sql, OrderByComparator obc) {

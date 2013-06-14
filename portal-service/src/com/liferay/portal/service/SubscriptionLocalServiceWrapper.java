@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -23,7 +23,8 @@ package com.liferay.portal.service;
  * @see       SubscriptionLocalService
  * @generated
  */
-public class SubscriptionLocalServiceWrapper implements SubscriptionLocalService {
+public class SubscriptionLocalServiceWrapper implements SubscriptionLocalService,
+	ServiceWrapper<SubscriptionLocalService> {
 	public SubscriptionLocalServiceWrapper(
 		SubscriptionLocalService subscriptionLocalService) {
 		_subscriptionLocalService = subscriptionLocalService;
@@ -57,27 +58,34 @@ public class SubscriptionLocalServiceWrapper implements SubscriptionLocalService
 	* Deletes the subscription with the primary key from the database. Also notifies the appropriate model listeners.
 	*
 	* @param subscriptionId the primary key of the subscription
+	* @return the subscription that was removed
 	* @throws PortalException if a subscription with the primary key could not be found
 	* @throws SystemException if a system exception occurred
 	*/
-	public void deleteSubscription(long subscriptionId)
+	public com.liferay.portal.model.Subscription deleteSubscription(
+		long subscriptionId)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException {
-		_subscriptionLocalService.deleteSubscription(subscriptionId);
+		return _subscriptionLocalService.deleteSubscription(subscriptionId);
 	}
 
 	/**
 	* Deletes the subscription from the database. Also notifies the appropriate model listeners.
 	*
 	* @param subscription the subscription
+	* @return the subscription that was removed
 	* @throws PortalException
 	* @throws SystemException if a system exception occurred
 	*/
-	public void deleteSubscription(
+	public com.liferay.portal.model.Subscription deleteSubscription(
 		com.liferay.portal.model.Subscription subscription)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException {
-		_subscriptionLocalService.deleteSubscription(subscription);
+		return _subscriptionLocalService.deleteSubscription(subscription);
+	}
+
+	public com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery() {
+		return _subscriptionLocalService.dynamicQuery();
 	}
 
 	/**
@@ -149,6 +157,12 @@ public class SubscriptionLocalServiceWrapper implements SubscriptionLocalService
 		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery)
 		throws com.liferay.portal.kernel.exception.SystemException {
 		return _subscriptionLocalService.dynamicQueryCount(dynamicQuery);
+	}
+
+	public com.liferay.portal.model.Subscription fetchSubscription(
+		long subscriptionId)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return _subscriptionLocalService.fetchSubscription(subscriptionId);
 	}
 
 	/**
@@ -301,9 +315,22 @@ public class SubscriptionLocalServiceWrapper implements SubscriptionLocalService
 	}
 
 	public java.util.List<com.liferay.portal.model.Subscription> getUserSubscriptions(
+		long userId, int start, int end,
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return _subscriptionLocalService.getUserSubscriptions(userId, start,
+			end, orderByComparator);
+	}
+
+	public java.util.List<com.liferay.portal.model.Subscription> getUserSubscriptions(
 		long userId, java.lang.String className)
 		throws com.liferay.portal.kernel.exception.SystemException {
 		return _subscriptionLocalService.getUserSubscriptions(userId, className);
+	}
+
+	public int getUserSubscriptionsCount(long userId)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return _subscriptionLocalService.getUserSubscriptionsCount(userId);
 	}
 
 	public boolean isSubscribed(long companyId, long userId,
@@ -313,11 +340,26 @@ public class SubscriptionLocalServiceWrapper implements SubscriptionLocalService
 			className, classPK);
 	}
 
+	/**
+	 * @deprecated Renamed to {@link #getWrappedService}
+	 */
 	public SubscriptionLocalService getWrappedSubscriptionLocalService() {
 		return _subscriptionLocalService;
 	}
 
+	/**
+	 * @deprecated Renamed to {@link #setWrappedService}
+	 */
 	public void setWrappedSubscriptionLocalService(
+		SubscriptionLocalService subscriptionLocalService) {
+		_subscriptionLocalService = subscriptionLocalService;
+	}
+
+	public SubscriptionLocalService getWrappedService() {
+		return _subscriptionLocalService;
+	}
+
+	public void setWrappedService(
 		SubscriptionLocalService subscriptionLocalService) {
 		_subscriptionLocalService = subscriptionLocalService;
 	}

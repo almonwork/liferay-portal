@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -91,14 +91,6 @@ public class VirtualHostUtil {
 		return getPersistence()
 				   .findWithDynamicQuery(dynamicQuery, start, end,
 			orderByComparator);
-	}
-
-	/**
-	 * @see com.liferay.portal.service.persistence.BasePersistence#remove(com.liferay.portal.model.BaseModel)
-	 */
-	public static VirtualHost remove(VirtualHost virtualHost)
-		throws SystemException {
-		return getPersistence().remove(virtualHost);
 	}
 
 	/**
@@ -338,12 +330,14 @@ public class VirtualHostUtil {
 	* Removes the virtual host where hostname = &#63; from the database.
 	*
 	* @param hostname the hostname
+	* @return the virtual host that was removed
 	* @throws SystemException if a system exception occurred
 	*/
-	public static void removeByHostname(java.lang.String hostname)
+	public static com.liferay.portal.model.VirtualHost removeByHostname(
+		java.lang.String hostname)
 		throws com.liferay.portal.NoSuchVirtualHostException,
 			com.liferay.portal.kernel.exception.SystemException {
-		getPersistence().removeByHostname(hostname);
+		return getPersistence().removeByHostname(hostname);
 	}
 
 	/**
@@ -351,12 +345,14 @@ public class VirtualHostUtil {
 	*
 	* @param companyId the company ID
 	* @param layoutSetId the layout set ID
+	* @return the virtual host that was removed
 	* @throws SystemException if a system exception occurred
 	*/
-	public static void removeByC_L(long companyId, long layoutSetId)
+	public static com.liferay.portal.model.VirtualHost removeByC_L(
+		long companyId, long layoutSetId)
 		throws com.liferay.portal.NoSuchVirtualHostException,
 			com.liferay.portal.kernel.exception.SystemException {
-		getPersistence().removeByC_L(companyId, layoutSetId);
+		return getPersistence().removeByC_L(companyId, layoutSetId);
 	}
 
 	/**
@@ -416,11 +412,10 @@ public class VirtualHostUtil {
 		return _persistence;
 	}
 
+	/**
+	 * @deprecated
+	 */
 	public void setPersistence(VirtualHostPersistence persistence) {
-		_persistence = persistence;
-
-		ReferenceRegistry.registerReference(VirtualHostUtil.class,
-			"_persistence");
 	}
 
 	private static VirtualHostPersistence _persistence;

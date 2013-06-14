@@ -1,4 +1,4 @@
-AUI().add(
+AUI.add(
 	'liferay-workflow-tasks',
 	function(A) {
 		var WorkflowTasks = {
@@ -47,22 +47,22 @@ AUI().add(
 
 				var dialog = new A.Dialog(
 					{
+						align: Liferay.Util.Window.ALIGN_CENTER,
 						bodyContent: form,
 						buttons: [
 							{
 								handler: function() {
 									submitForm(form);
 								},
-								text: Liferay.Language.get('ok')
+								label: Liferay.Language.get('ok')
 							},
 							{
 								handler: function() {
 									this.close();
 								},
-								text: Liferay.Language.get('cancel')
+								label: Liferay.Language.get('cancel')
 							}
 						],
-						centered: true,
 						modal: true,
 						title: title,
 						width: 400

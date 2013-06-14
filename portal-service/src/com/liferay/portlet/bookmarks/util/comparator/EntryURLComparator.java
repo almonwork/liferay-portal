@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -22,11 +22,11 @@ import com.liferay.portlet.bookmarks.model.BookmarksEntry;
  */
 public class EntryURLComparator extends OrderByComparator {
 
-	public static String ORDER_BY_ASC = "url ASC";
+	public static final String ORDER_BY_ASC = "BookmarksEntry.url ASC";
 
-	public static String ORDER_BY_DESC = "url DESC";
+	public static final String ORDER_BY_DESC = "BookmarksEntry.url DESC";
 
-	public static String[] ORDER_BY_FIELDS = {"url"};
+	public static final String[] ORDER_BY_FIELDS = {"url"};
 
 	public EntryURLComparator() {
 		this(false);

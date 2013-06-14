@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -16,6 +16,7 @@ package com.liferay.portal.model.impl;
 
 import com.liferay.portal.kernel.bean.AutoEscapeBeanHandler;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.ProxyUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.model.CacheModel;
@@ -28,9 +29,10 @@ import com.liferay.portlet.expando.util.ExpandoBridgeFactoryUtil;
 
 import java.io.Serializable;
 
-import java.lang.reflect.Proxy;
-
 import java.sql.Types;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * The base model implementation for the VirtualHost service. Represents a row in the &quot;VirtualHost&quot; database table, with each column mapped to a property of this class.
@@ -70,15 +72,12 @@ public class VirtualHostModelImpl extends BaseModelImpl<VirtualHost>
 	public static final boolean FINDER_CACHE_ENABLED = GetterUtil.getBoolean(com.liferay.portal.util.PropsUtil.get(
 				"value.object.finder.cache.enabled.com.liferay.portal.model.VirtualHost"),
 			true);
-
-	public Class<?> getModelClass() {
-		return VirtualHost.class;
-	}
-
-	public String getModelClassName() {
-		return VirtualHost.class.getName();
-	}
-
+	public static final boolean COLUMN_BITMASK_ENABLED = GetterUtil.getBoolean(com.liferay.portal.util.PropsUtil.get(
+				"value.object.column.bitmask.enabled.com.liferay.portal.model.VirtualHost"),
+			true);
+	public static long COMPANYID_COLUMN_BITMASK = 1L;
+	public static long HOSTNAME_COLUMN_BITMASK = 2L;
+	public static long LAYOUTSETID_COLUMN_BITMASK = 4L;
 	public static final long LOCK_EXPIRATION_TIME = GetterUtil.getLong(com.liferay.portal.util.PropsUtil.get(
 				"lock.expiration.time.com.liferay.portal.model.VirtualHost"));
 
@@ -101,6 +100,53 @@ public class VirtualHostModelImpl extends BaseModelImpl<VirtualHost>
 		setPrimaryKey(((Long)primaryKeyObj).longValue());
 	}
 
+	public Class<?> getModelClass() {
+		return VirtualHost.class;
+	}
+
+	public String getModelClassName() {
+		return VirtualHost.class.getName();
+	}
+
+	@Override
+	public Map<String, Object> getModelAttributes() {
+		Map<String, Object> attributes = new HashMap<String, Object>();
+
+		attributes.put("virtualHostId", getVirtualHostId());
+		attributes.put("companyId", getCompanyId());
+		attributes.put("layoutSetId", getLayoutSetId());
+		attributes.put("hostname", getHostname());
+
+		return attributes;
+	}
+
+	@Override
+	public void setModelAttributes(Map<String, Object> attributes) {
+		Long virtualHostId = (Long)attributes.get("virtualHostId");
+
+		if (virtualHostId != null) {
+			setVirtualHostId(virtualHostId);
+		}
+
+		Long companyId = (Long)attributes.get("companyId");
+
+		if (companyId != null) {
+			setCompanyId(companyId);
+		}
+
+		Long layoutSetId = (Long)attributes.get("layoutSetId");
+
+		if (layoutSetId != null) {
+			setLayoutSetId(layoutSetId);
+		}
+
+		String hostname = (String)attributes.get("hostname");
+
+		if (hostname != null) {
+			setHostname(hostname);
+		}
+	}
+
 	public long getVirtualHostId() {
 		return _virtualHostId;
 	}
@@ -114,6 +160,8 @@ public class VirtualHostModelImpl extends BaseModelImpl<VirtualHost>
 	}
 
 	public void setCompanyId(long companyId) {
+		_columnBitmask |= COMPANYID_COLUMN_BITMASK;
+
 		if (!_setOriginalCompanyId) {
 			_setOriginalCompanyId = true;
 
@@ -132,6 +180,8 @@ public class VirtualHostModelImpl extends BaseModelImpl<VirtualHost>
 	}
 
 	public void setLayoutSetId(long layoutSetId) {
+		_columnBitmask |= LAYOUTSETID_COLUMN_BITMASK;
+
 		if (!_setOriginalLayoutSetId) {
 			_setOriginalLayoutSetId = true;
 
@@ -155,6 +205,8 @@ public class VirtualHostModelImpl extends BaseModelImpl<VirtualHost>
 	}
 
 	public void setHostname(String hostname) {
+		_columnBitmask |= HOSTNAME_COLUMN_BITMASK;
+
 		if (_originalHostname == null) {
 			_originalHostname = _hostname;
 		}
@@ -166,35 +218,32 @@ public class VirtualHostModelImpl extends BaseModelImpl<VirtualHost>
 		return GetterUtil.getString(_originalHostname);
 	}
 
+	public long getColumnBitmask() {
+		return _columnBitmask;
+	}
+
 	@Override
 	public VirtualHost toEscapedModel() {
-		if (isEscapedModel()) {
-			return (VirtualHost)this;
+		if (_escapedModelProxy == null) {
+			_escapedModelProxy = (VirtualHost)ProxyUtil.newProxyInstance(_classLoader,
+					_escapedModelProxyInterfaces,
+					new AutoEscapeBeanHandler(this));
 		}
-		else {
-			if (_escapedModelProxy == null) {
-				_escapedModelProxy = (VirtualHost)Proxy.newProxyInstance(_classLoader,
-						_escapedModelProxyInterfaces,
-						new AutoEscapeBeanHandler(this));
-			}
 
-			return _escapedModelProxy;
-		}
+		return _escapedModelProxy;
 	}
 
 	@Override
 	public ExpandoBridge getExpandoBridge() {
-		if (_expandoBridge == null) {
-			_expandoBridge = ExpandoBridgeFactoryUtil.getExpandoBridge(getCompanyId(),
-					VirtualHost.class.getName(), getPrimaryKey());
-		}
-
-		return _expandoBridge;
+		return ExpandoBridgeFactoryUtil.getExpandoBridge(getCompanyId(),
+			VirtualHost.class.getName(), getPrimaryKey());
 	}
 
 	@Override
 	public void setExpandoBridgeAttributes(ServiceContext serviceContext) {
-		getExpandoBridge().setAttributes(serviceContext);
+		ExpandoBridge expandoBridge = getExpandoBridge();
+
+		expandoBridge.setAttributes(serviceContext);
 	}
 
 	@Override
@@ -268,6 +317,8 @@ public class VirtualHostModelImpl extends BaseModelImpl<VirtualHost>
 		virtualHostModelImpl._setOriginalLayoutSetId = false;
 
 		virtualHostModelImpl._originalHostname = virtualHostModelImpl._hostname;
+
+		virtualHostModelImpl._columnBitmask = 0;
 	}
 
 	@Override
@@ -350,6 +401,6 @@ public class VirtualHostModelImpl extends BaseModelImpl<VirtualHost>
 	private boolean _setOriginalLayoutSetId;
 	private String _hostname;
 	private String _originalHostname;
-	private transient ExpandoBridge _expandoBridge;
+	private long _columnBitmask;
 	private VirtualHost _escapedModelProxy;
 }

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -16,6 +16,7 @@ package com.liferay.portal.model.impl;
 
 import com.liferay.portal.kernel.bean.AutoEscapeBeanHandler;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.ProxyUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.model.CacheModel;
 import com.liferay.portal.model.OrgGroupRole;
@@ -24,9 +25,10 @@ import com.liferay.portal.service.persistence.OrgGroupRolePK;
 
 import java.io.Serializable;
 
-import java.lang.reflect.Proxy;
-
 import java.sql.Types;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * The base model implementation for the OrgGroupRole service. Represents a row in the &quot;OrgGroupRole&quot; database table, with each column mapped to a property of this class.
@@ -65,15 +67,11 @@ public class OrgGroupRoleModelImpl extends BaseModelImpl<OrgGroupRole>
 	public static final boolean FINDER_CACHE_ENABLED = GetterUtil.getBoolean(com.liferay.portal.util.PropsUtil.get(
 				"value.object.finder.cache.enabled.com.liferay.portal.model.OrgGroupRole"),
 			true);
-
-	public Class<?> getModelClass() {
-		return OrgGroupRole.class;
-	}
-
-	public String getModelClassName() {
-		return OrgGroupRole.class.getName();
-	}
-
+	public static final boolean COLUMN_BITMASK_ENABLED = GetterUtil.getBoolean(com.liferay.portal.util.PropsUtil.get(
+				"value.object.column.bitmask.enabled.com.liferay.portal.model.OrgGroupRole"),
+			true);
+	public static long GROUPID_COLUMN_BITMASK = 1L;
+	public static long ROLEID_COLUMN_BITMASK = 2L;
 	public static final long LOCK_EXPIRATION_TIME = GetterUtil.getLong(com.liferay.portal.util.PropsUtil.get(
 				"lock.expiration.time.com.liferay.portal.model.OrgGroupRole"));
 
@@ -98,6 +96,46 @@ public class OrgGroupRoleModelImpl extends BaseModelImpl<OrgGroupRole>
 		setPrimaryKey((OrgGroupRolePK)primaryKeyObj);
 	}
 
+	public Class<?> getModelClass() {
+		return OrgGroupRole.class;
+	}
+
+	public String getModelClassName() {
+		return OrgGroupRole.class.getName();
+	}
+
+	@Override
+	public Map<String, Object> getModelAttributes() {
+		Map<String, Object> attributes = new HashMap<String, Object>();
+
+		attributes.put("organizationId", getOrganizationId());
+		attributes.put("groupId", getGroupId());
+		attributes.put("roleId", getRoleId());
+
+		return attributes;
+	}
+
+	@Override
+	public void setModelAttributes(Map<String, Object> attributes) {
+		Long organizationId = (Long)attributes.get("organizationId");
+
+		if (organizationId != null) {
+			setOrganizationId(organizationId);
+		}
+
+		Long groupId = (Long)attributes.get("groupId");
+
+		if (groupId != null) {
+			setGroupId(groupId);
+		}
+
+		Long roleId = (Long)attributes.get("roleId");
+
+		if (roleId != null) {
+			setRoleId(roleId);
+		}
+	}
+
 	public long getOrganizationId() {
 		return _organizationId;
 	}
@@ -111,7 +149,19 @@ public class OrgGroupRoleModelImpl extends BaseModelImpl<OrgGroupRole>
 	}
 
 	public void setGroupId(long groupId) {
+		_columnBitmask |= GROUPID_COLUMN_BITMASK;
+
+		if (!_setOriginalGroupId) {
+			_setOriginalGroupId = true;
+
+			_originalGroupId = _groupId;
+		}
+
 		_groupId = groupId;
+	}
+
+	public long getOriginalGroupId() {
+		return _originalGroupId;
 	}
 
 	public long getRoleId() {
@@ -119,23 +169,34 @@ public class OrgGroupRoleModelImpl extends BaseModelImpl<OrgGroupRole>
 	}
 
 	public void setRoleId(long roleId) {
+		_columnBitmask |= ROLEID_COLUMN_BITMASK;
+
+		if (!_setOriginalRoleId) {
+			_setOriginalRoleId = true;
+
+			_originalRoleId = _roleId;
+		}
+
 		_roleId = roleId;
+	}
+
+	public long getOriginalRoleId() {
+		return _originalRoleId;
+	}
+
+	public long getColumnBitmask() {
+		return _columnBitmask;
 	}
 
 	@Override
 	public OrgGroupRole toEscapedModel() {
-		if (isEscapedModel()) {
-			return (OrgGroupRole)this;
+		if (_escapedModelProxy == null) {
+			_escapedModelProxy = (OrgGroupRole)ProxyUtil.newProxyInstance(_classLoader,
+					_escapedModelProxyInterfaces,
+					new AutoEscapeBeanHandler(this));
 		}
-		else {
-			if (_escapedModelProxy == null) {
-				_escapedModelProxy = (OrgGroupRole)Proxy.newProxyInstance(_classLoader,
-						_escapedModelProxyInterfaces,
-						new AutoEscapeBeanHandler(this));
-			}
 
-			return _escapedModelProxy;
-		}
+		return _escapedModelProxy;
 	}
 
 	@Override
@@ -189,6 +250,17 @@ public class OrgGroupRoleModelImpl extends BaseModelImpl<OrgGroupRole>
 
 	@Override
 	public void resetOriginalValues() {
+		OrgGroupRoleModelImpl orgGroupRoleModelImpl = this;
+
+		orgGroupRoleModelImpl._originalGroupId = orgGroupRoleModelImpl._groupId;
+
+		orgGroupRoleModelImpl._setOriginalGroupId = false;
+
+		orgGroupRoleModelImpl._originalRoleId = orgGroupRoleModelImpl._roleId;
+
+		orgGroupRoleModelImpl._setOriginalRoleId = false;
+
+		orgGroupRoleModelImpl._columnBitmask = 0;
 	}
 
 	@Override
@@ -250,6 +322,11 @@ public class OrgGroupRoleModelImpl extends BaseModelImpl<OrgGroupRole>
 		};
 	private long _organizationId;
 	private long _groupId;
+	private long _originalGroupId;
+	private boolean _setOriginalGroupId;
 	private long _roleId;
+	private long _originalRoleId;
+	private boolean _setOriginalRoleId;
+	private long _columnBitmask;
 	private OrgGroupRole _escapedModelProxy;
 }

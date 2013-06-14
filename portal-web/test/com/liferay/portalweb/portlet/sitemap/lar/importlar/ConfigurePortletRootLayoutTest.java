@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -23,14 +23,15 @@ import com.liferay.portalweb.portal.util.RuntimeVariables;
 public class ConfigurePortletRootLayoutTest extends BaseTestCase {
 	public void testConfigurePortletRootLayout() throws Exception {
 		selenium.open("/web/guest/home/");
+		loadRequiredJavaScriptModules();
 
 		for (int second = 0;; second++) {
-			if (second >= 60) {
+			if (second >= 90) {
 				fail("timeout");
 			}
 
 			try {
-				if (selenium.isElementPresent("link=Site Map Test Page")) {
+				if (selenium.isVisible("link=Site Map Test Page")) {
 					break;
 				}
 			}
@@ -40,20 +41,22 @@ public class ConfigurePortletRootLayoutTest extends BaseTestCase {
 			Thread.sleep(1000);
 		}
 
-		selenium.saveScreenShotAndSource();
-		selenium.clickAt("link=Site Map Test Page", RuntimeVariables.replace(""));
+		selenium.clickAt("link=Site Map Test Page",
+			RuntimeVariables.replace("Site Map Test Page"));
 		selenium.waitForPageToLoad("30000");
-		selenium.saveScreenShotAndSource();
+		loadRequiredJavaScriptModules();
 		assertEquals(RuntimeVariables.replace("Welcome"),
-			selenium.getText("//section/div/div/div/ul/li[1]/a"));
+			selenium.getText("xPath=(//div[@class='portlet-body']/ul/li/a)[1]"));
 		assertEquals(RuntimeVariables.replace("Site Map Test Page"),
-			selenium.getText("//section/div/div/div/ul/li[2]/a"));
-		assertEquals(RuntimeVariables.replace("Child Test Page"),
-			selenium.getText("//div/ul/li[2]/ul/li/a"));
+			selenium.getText("xPath=(//div[@class='portlet-body']/ul/li/a)[2]"));
+		assertEquals(RuntimeVariables.replace("Site Map Test Child Page"),
+			selenium.getText("//div[@class='portlet-body']/ul/li/ul/li/a"));
+		Thread.sleep(5000);
+		selenium.clickAt("//strong/a", RuntimeVariables.replace("Options"));
 		selenium.clickAt("//strong/a", RuntimeVariables.replace("Options"));
 
 		for (int second = 0;; second++) {
-			if (second >= 60) {
+			if (second >= 90) {
 				fail("timeout");
 			}
 
@@ -69,19 +72,18 @@ public class ConfigurePortletRootLayoutTest extends BaseTestCase {
 			Thread.sleep(1000);
 		}
 
-		selenium.saveScreenShotAndSource();
 		assertEquals(RuntimeVariables.replace("Configuration"),
 			selenium.getText(
 				"//div[@class='lfr-component lfr-menu-list']/ul/li[2]/a"));
 		selenium.click("//div[@class='lfr-component lfr-menu-list']/ul/li[2]/a");
 
 		for (int second = 0;; second++) {
-			if (second >= 60) {
+			if (second >= 90) {
 				fail("timeout");
 			}
 
 			try {
-				if (selenium.isVisible("_86_rootLayoutUuid")) {
+				if (selenium.isVisible("//select[@id='_86_rootLayoutUuid']")) {
 					break;
 				}
 			}
@@ -91,25 +93,27 @@ public class ConfigurePortletRootLayoutTest extends BaseTestCase {
 			Thread.sleep(1000);
 		}
 
-		selenium.saveScreenShotAndSource();
-		selenium.select("_86_rootLayoutUuid",
-			RuntimeVariables.replace("label=regexp:-\\sSite Map Test Page"));
-		selenium.select("_86_displayDepth", RuntimeVariables.replace("label=1"));
-		selenium.clickAt("//input[@value='Save']", RuntimeVariables.replace(""));
+		selenium.select("//select[@id='_86_rootLayoutUuid']",
+			RuntimeVariables.replace("regexp:-\\sSite Map Test Page"));
+		selenium.select("//select[@id='_86_displayDepth']",
+			RuntimeVariables.replace("1"));
+		selenium.clickAt("//input[@value='Save']",
+			RuntimeVariables.replace("Save"));
 		selenium.waitForPageToLoad("30000");
-		selenium.saveScreenShotAndSource();
+		loadRequiredJavaScriptModules();
 		assertEquals(RuntimeVariables.replace(
 				"You have successfully updated the setup."),
 			selenium.getText("//div[@class='portlet-msg-success']"));
 		selenium.open("/web/guest/home/");
+		loadRequiredJavaScriptModules();
 
 		for (int second = 0;; second++) {
-			if (second >= 60) {
+			if (second >= 90) {
 				fail("timeout");
 			}
 
 			try {
-				if (selenium.isElementPresent("link=Site Map Test Page")) {
+				if (selenium.isVisible("link=Site Map Test Page")) {
 					break;
 				}
 			}
@@ -119,11 +123,11 @@ public class ConfigurePortletRootLayoutTest extends BaseTestCase {
 			Thread.sleep(1000);
 		}
 
-		selenium.saveScreenShotAndSource();
-		selenium.clickAt("link=Site Map Test Page", RuntimeVariables.replace(""));
+		selenium.clickAt("link=Site Map Test Page",
+			RuntimeVariables.replace("Site Map Test Page"));
 		selenium.waitForPageToLoad("30000");
-		selenium.saveScreenShotAndSource();
-		assertEquals(RuntimeVariables.replace("Child Test Page"),
-			selenium.getText("//section/div/div/div/ul/li[1]/a"));
+		loadRequiredJavaScriptModules();
+		assertEquals(RuntimeVariables.replace("Site Map Test Child Page"),
+			selenium.getText("//div[@class='portlet-body']/ul/li/a"));
 	}
 }

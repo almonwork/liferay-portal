@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -62,12 +62,8 @@ PortletURL portletURL = (PortletURL)request.getAttribute("edit_user_roles.jsp-po
 
 	LinkedHashMap userParams = new LinkedHashMap();
 
-	if (group.isOrganization()) {
-		userParams.put("usersOrgs", new Long(organization.getOrganizationId()));
-	}
-	else {
-		userParams.put("usersGroups", new Long(group.getGroupId()));
-	}
+	userParams.put("inherit", true);
+	userParams.put("usersGroups", new Long(group.getGroupId()));
 
 	if (tabs1.equals("current")) {
 		userParams.put("userGroupRole", new Long[] {new Long(group.getGroupId()), new Long(roleId)});
@@ -83,6 +79,7 @@ PortletURL portletURL = (PortletURL)request.getAttribute("edit_user_roles.jsp-po
 		escapedModel="<%= true %>"
 		keyProperty="userId"
 		modelVar="user2"
+		rowIdProperty="screenName"
 	>
 		<liferay-ui:search-container-column-text
 			name="name"

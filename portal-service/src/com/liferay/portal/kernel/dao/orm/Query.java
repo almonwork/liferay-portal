@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -35,11 +35,16 @@ public interface Query {
 	@SuppressWarnings("rawtypes")
 	public Iterator iterate(boolean modifiable) throws ORMException;
 
+	public Object iterateNext() throws ORMException;
+
 	@SuppressWarnings("rawtypes")
 	public List list() throws ORMException;
 
 	@SuppressWarnings("rawtypes")
 	public List list(boolean unmodifiable) throws ORMException;
+
+	@SuppressWarnings("rawtypes")
+	public List list(boolean copy, boolean unmodifiable) throws ORMException;
 
 	public ScrollableResults scroll() throws ORMException;
 
@@ -66,6 +71,8 @@ public interface Query {
 	public Query setInteger(int pos, int value);
 
 	public Query setInteger(String name, int value);
+
+	public Query setLockMode(String alias, LockMode lockMode);
 
 	public Query setLong(int pos, long value);
 

@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -17,8 +17,6 @@
 <%@ include file="/html/portlet/announcements/init.jsp" %>
 
 <%
-themeDisplay.setIncludeServiceJs(true);
-
 String tabs1 = ParamUtil.getString(request, "tabs1", "entries");
 
 PortletURL portletURL = renderResponse.createRenderURL();
@@ -27,7 +25,7 @@ portletURL.setParameter("struts_action", "/announcements/view");
 portletURL.setParameter("tabs1", tabs1);
 %>
 
-<c:if test="<%= !portletName.equals(PortletKeys.ALERTS) || (portletName.equals(PortletKeys.ALERTS) && PortletPermissionUtil.contains(permissionChecker, layout, PortletKeys.ANNOUNCEMENTS, ActionKeys.ADD_ENTRY)) %>">
+<c:if test="<%= !portletName.equals(PortletKeys.ALERTS) || (portletName.equals(PortletKeys.ALERTS) && AnnouncementsEntryPermission.contains(permissionChecker, layout, PortletKeys.ALERTS, ActionKeys.ADD_ENTRY)) %>">
 	<liferay-util:include page="/html/portlet/announcements/tabs1.jsp" />
 </c:if>
 

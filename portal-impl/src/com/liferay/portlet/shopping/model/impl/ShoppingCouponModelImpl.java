@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -19,6 +19,7 @@ import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.json.JSON;
 import com.liferay.portal.kernel.util.DateUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.ProxyUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.model.CacheModel;
@@ -34,13 +35,13 @@ import com.liferay.portlet.shopping.model.ShoppingCouponSoap;
 
 import java.io.Serializable;
 
-import java.lang.reflect.Proxy;
-
 import java.sql.Types;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * The base model implementation for the ShoppingCoupon service. Represents a row in the &quot;ShoppingCoupon&quot; database table, with each column mapped to a property of this class.
@@ -97,6 +98,11 @@ public class ShoppingCouponModelImpl extends BaseModelImpl<ShoppingCoupon>
 	public static final boolean FINDER_CACHE_ENABLED = GetterUtil.getBoolean(com.liferay.portal.util.PropsUtil.get(
 				"value.object.finder.cache.enabled.com.liferay.portlet.shopping.model.ShoppingCoupon"),
 			true);
+	public static final boolean COLUMN_BITMASK_ENABLED = GetterUtil.getBoolean(com.liferay.portal.util.PropsUtil.get(
+				"value.object.column.bitmask.enabled.com.liferay.portlet.shopping.model.ShoppingCoupon"),
+			true);
+	public static long CODE_COLUMN_BITMASK = 1L;
+	public static long GROUPID_COLUMN_BITMASK = 2L;
 
 	/**
 	 * Converts the soap model instance into a normal model instance.
@@ -145,14 +151,6 @@ public class ShoppingCouponModelImpl extends BaseModelImpl<ShoppingCoupon>
 		return models;
 	}
 
-	public Class<?> getModelClass() {
-		return ShoppingCoupon.class;
-	}
-
-	public String getModelClassName() {
-		return ShoppingCoupon.class.getName();
-	}
-
 	public static final long LOCK_EXPIRATION_TIME = GetterUtil.getLong(com.liferay.portal.util.PropsUtil.get(
 				"lock.expiration.time.com.liferay.portlet.shopping.model.ShoppingCoupon"));
 
@@ -175,6 +173,151 @@ public class ShoppingCouponModelImpl extends BaseModelImpl<ShoppingCoupon>
 		setPrimaryKey(((Long)primaryKeyObj).longValue());
 	}
 
+	public Class<?> getModelClass() {
+		return ShoppingCoupon.class;
+	}
+
+	public String getModelClassName() {
+		return ShoppingCoupon.class.getName();
+	}
+
+	@Override
+	public Map<String, Object> getModelAttributes() {
+		Map<String, Object> attributes = new HashMap<String, Object>();
+
+		attributes.put("couponId", getCouponId());
+		attributes.put("groupId", getGroupId());
+		attributes.put("companyId", getCompanyId());
+		attributes.put("userId", getUserId());
+		attributes.put("userName", getUserName());
+		attributes.put("createDate", getCreateDate());
+		attributes.put("modifiedDate", getModifiedDate());
+		attributes.put("code", getCode());
+		attributes.put("name", getName());
+		attributes.put("description", getDescription());
+		attributes.put("startDate", getStartDate());
+		attributes.put("endDate", getEndDate());
+		attributes.put("active", getActive());
+		attributes.put("limitCategories", getLimitCategories());
+		attributes.put("limitSkus", getLimitSkus());
+		attributes.put("minOrder", getMinOrder());
+		attributes.put("discount", getDiscount());
+		attributes.put("discountType", getDiscountType());
+
+		return attributes;
+	}
+
+	@Override
+	public void setModelAttributes(Map<String, Object> attributes) {
+		Long couponId = (Long)attributes.get("couponId");
+
+		if (couponId != null) {
+			setCouponId(couponId);
+		}
+
+		Long groupId = (Long)attributes.get("groupId");
+
+		if (groupId != null) {
+			setGroupId(groupId);
+		}
+
+		Long companyId = (Long)attributes.get("companyId");
+
+		if (companyId != null) {
+			setCompanyId(companyId);
+		}
+
+		Long userId = (Long)attributes.get("userId");
+
+		if (userId != null) {
+			setUserId(userId);
+		}
+
+		String userName = (String)attributes.get("userName");
+
+		if (userName != null) {
+			setUserName(userName);
+		}
+
+		Date createDate = (Date)attributes.get("createDate");
+
+		if (createDate != null) {
+			setCreateDate(createDate);
+		}
+
+		Date modifiedDate = (Date)attributes.get("modifiedDate");
+
+		if (modifiedDate != null) {
+			setModifiedDate(modifiedDate);
+		}
+
+		String code = (String)attributes.get("code");
+
+		if (code != null) {
+			setCode(code);
+		}
+
+		String name = (String)attributes.get("name");
+
+		if (name != null) {
+			setName(name);
+		}
+
+		String description = (String)attributes.get("description");
+
+		if (description != null) {
+			setDescription(description);
+		}
+
+		Date startDate = (Date)attributes.get("startDate");
+
+		if (startDate != null) {
+			setStartDate(startDate);
+		}
+
+		Date endDate = (Date)attributes.get("endDate");
+
+		if (endDate != null) {
+			setEndDate(endDate);
+		}
+
+		Boolean active = (Boolean)attributes.get("active");
+
+		if (active != null) {
+			setActive(active);
+		}
+
+		String limitCategories = (String)attributes.get("limitCategories");
+
+		if (limitCategories != null) {
+			setLimitCategories(limitCategories);
+		}
+
+		String limitSkus = (String)attributes.get("limitSkus");
+
+		if (limitSkus != null) {
+			setLimitSkus(limitSkus);
+		}
+
+		Double minOrder = (Double)attributes.get("minOrder");
+
+		if (minOrder != null) {
+			setMinOrder(minOrder);
+		}
+
+		Double discount = (Double)attributes.get("discount");
+
+		if (discount != null) {
+			setDiscount(discount);
+		}
+
+		String discountType = (String)attributes.get("discountType");
+
+		if (discountType != null) {
+			setDiscountType(discountType);
+		}
+	}
+
 	@JSON
 	public long getCouponId() {
 		return _couponId;
@@ -190,7 +333,19 @@ public class ShoppingCouponModelImpl extends BaseModelImpl<ShoppingCoupon>
 	}
 
 	public void setGroupId(long groupId) {
+		_columnBitmask |= GROUPID_COLUMN_BITMASK;
+
+		if (!_setOriginalGroupId) {
+			_setOriginalGroupId = true;
+
+			_originalGroupId = _groupId;
+		}
+
 		_groupId = groupId;
+	}
+
+	public long getOriginalGroupId() {
+		return _originalGroupId;
 	}
 
 	@JSON
@@ -239,6 +394,8 @@ public class ShoppingCouponModelImpl extends BaseModelImpl<ShoppingCoupon>
 	}
 
 	public void setCreateDate(Date createDate) {
+		_columnBitmask = -1L;
+
 		_createDate = createDate;
 	}
 
@@ -262,6 +419,8 @@ public class ShoppingCouponModelImpl extends BaseModelImpl<ShoppingCoupon>
 	}
 
 	public void setCode(String code) {
+		_columnBitmask |= CODE_COLUMN_BITMASK;
+
 		if (_originalCode == null) {
 			_originalCode = _code;
 		}
@@ -392,35 +551,32 @@ public class ShoppingCouponModelImpl extends BaseModelImpl<ShoppingCoupon>
 		_discountType = discountType;
 	}
 
+	public long getColumnBitmask() {
+		return _columnBitmask;
+	}
+
 	@Override
 	public ShoppingCoupon toEscapedModel() {
-		if (isEscapedModel()) {
-			return (ShoppingCoupon)this;
+		if (_escapedModelProxy == null) {
+			_escapedModelProxy = (ShoppingCoupon)ProxyUtil.newProxyInstance(_classLoader,
+					_escapedModelProxyInterfaces,
+					new AutoEscapeBeanHandler(this));
 		}
-		else {
-			if (_escapedModelProxy == null) {
-				_escapedModelProxy = (ShoppingCoupon)Proxy.newProxyInstance(_classLoader,
-						_escapedModelProxyInterfaces,
-						new AutoEscapeBeanHandler(this));
-			}
 
-			return _escapedModelProxy;
-		}
+		return _escapedModelProxy;
 	}
 
 	@Override
 	public ExpandoBridge getExpandoBridge() {
-		if (_expandoBridge == null) {
-			_expandoBridge = ExpandoBridgeFactoryUtil.getExpandoBridge(getCompanyId(),
-					ShoppingCoupon.class.getName(), getPrimaryKey());
-		}
-
-		return _expandoBridge;
+		return ExpandoBridgeFactoryUtil.getExpandoBridge(getCompanyId(),
+			ShoppingCoupon.class.getName(), getPrimaryKey());
 	}
 
 	@Override
 	public void setExpandoBridgeAttributes(ServiceContext serviceContext) {
-		getExpandoBridge().setAttributes(serviceContext);
+		ExpandoBridge expandoBridge = getExpandoBridge();
+
+		expandoBridge.setAttributes(serviceContext);
 	}
 
 	@Override
@@ -498,7 +654,13 @@ public class ShoppingCouponModelImpl extends BaseModelImpl<ShoppingCoupon>
 	public void resetOriginalValues() {
 		ShoppingCouponModelImpl shoppingCouponModelImpl = this;
 
+		shoppingCouponModelImpl._originalGroupId = shoppingCouponModelImpl._groupId;
+
+		shoppingCouponModelImpl._setOriginalGroupId = false;
+
 		shoppingCouponModelImpl._originalCode = shoppingCouponModelImpl._code;
+
+		shoppingCouponModelImpl._columnBitmask = 0;
 	}
 
 	@Override
@@ -750,6 +912,8 @@ public class ShoppingCouponModelImpl extends BaseModelImpl<ShoppingCoupon>
 		};
 	private long _couponId;
 	private long _groupId;
+	private long _originalGroupId;
+	private boolean _setOriginalGroupId;
 	private long _companyId;
 	private long _userId;
 	private String _userUuid;
@@ -768,6 +932,6 @@ public class ShoppingCouponModelImpl extends BaseModelImpl<ShoppingCoupon>
 	private double _minOrder;
 	private double _discount;
 	private String _discountType;
-	private transient ExpandoBridge _expandoBridge;
+	private long _columnBitmask;
 	private ShoppingCoupon _escapedModelProxy;
 }

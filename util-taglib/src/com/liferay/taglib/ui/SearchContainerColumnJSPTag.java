@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -39,10 +39,12 @@ public class SearchContainerColumnJSPTag<R> extends SearchContainerColumnTag {
 				(SearchContainerRowTag<R>)findAncestorWithClass(
 					this, SearchContainerRowTag.class);
 
-			ResultRow row = searchContainerRowTag.getRow();
+			ResultRow resultRow = searchContainerRowTag.getRow();
 
 			if (index <= -1) {
-				index = row.getEntries().size();
+				List<SearchEntry> searchEntries = resultRow.getEntries();
+
+				index = searchEntries.size();
 			}
 
 			JSPSearchEntry jspSearchEntry = new JSPSearchEntry();
@@ -58,7 +60,7 @@ public class SearchContainerColumnJSPTag<R> extends SearchContainerColumnTag {
 			jspSearchEntry.setServletContext(pageContext.getServletContext());
 			jspSearchEntry.setValign(getValign());
 
-			row.addSearchEntry(index, jspSearchEntry);
+			resultRow.addSearchEntry(index, jspSearchEntry);
 
 			return EVAL_PAGE;
 		}

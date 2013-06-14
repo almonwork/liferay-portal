@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -86,18 +86,16 @@ public interface UsersAdmin {
 
 	public List<Address> getAddresses(ActionRequest actionRequest);
 
+	public List<Address> getAddresses(
+		ActionRequest actionRequest, List<Address> defaultAddresses);
+
 	public List<EmailAddress> getEmailAddresses(ActionRequest actionRequest);
+
+	public List<EmailAddress> getEmailAddresses(
+		ActionRequest actionRequest, List<EmailAddress> defaultEmailAddresses);
 
 	public OrderByComparator getGroupOrderByComparator(
 		String orderByCol, String orderByType);
-
-	public Long[][] getLeftAndRightOrganizationIds(long organizationId)
-		throws PortalException, SystemException;
-
-	public Long[][] getLeftAndRightOrganizationIds(Organization organization);
-
-	public Long[][] getLeftAndRightOrganizationIds(
-		List<Organization> organizations);
 
 	public Long[] getOrganizationIds(List<Organization> organizations);
 
@@ -110,6 +108,9 @@ public interface UsersAdmin {
 	public List<OrgLabor> getOrgLabors(ActionRequest actionRequest);
 
 	public List<Phone> getPhones(ActionRequest actionRequest);
+
+	public List<Phone> getPhones(
+		ActionRequest actionRequest, List<Phone> defaultPhones);
 
 	public OrderByComparator getRoleOrderByComparator(
 		String orderByCol, String orderByType);
@@ -126,6 +127,9 @@ public interface UsersAdmin {
 	public Tuple getUsers(Hits hits) throws PortalException, SystemException;
 
 	public List<Website> getWebsites(ActionRequest actionRequest);
+
+	public List<Website> getWebsites(
+		ActionRequest actionRequest, List<Website> defaultWebsites);
 
 	public boolean hasUpdateEmailAddress(
 			PermissionChecker permissionChecker, User user)

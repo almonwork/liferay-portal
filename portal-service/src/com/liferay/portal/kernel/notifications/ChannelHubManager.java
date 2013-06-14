@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -23,7 +23,22 @@ import java.util.List;
 public interface ChannelHubManager {
 
 	public void confirmDelivery(
+			long companyId, long userId,
+			Collection<String> notificationEventUuids)
+		throws ChannelException;
+
+	public void confirmDelivery(
+			long companyId, long userId,
+			Collection<String> notificationEventUuids, boolean archive)
+		throws ChannelException;
+
+	public void confirmDelivery(
 			long companyId, long userId, String notificationEventUuid)
+		throws ChannelException;
+
+	public void confirmDelivery(
+			long companyId, long userId, String notificationEventUuid,
+			boolean archive)
 		throws ChannelException;
 
 	public Channel createChannel(long companyId, long userId)
@@ -31,10 +46,28 @@ public interface ChannelHubManager {
 
 	public ChannelHub createChannelHub(long companyId) throws ChannelException;
 
+	public void deleteUserNotificiationEvent(
+			long companyId, long userId, String notificationEventUuid)
+		throws ChannelException;
+
+	public void deleteUserNotificiationEvents(
+			long companyId, long userId,
+			Collection<String> notificationEventUuids)
+		throws ChannelException;
+
 	public void destroyChannel(long companyId, long userId)
 		throws ChannelException;
 
 	public void destroyChannelHub(long companyId) throws ChannelException;
+
+	public ChannelHub fetchChannelHub(long companyId) throws ChannelException;
+
+	public ChannelHub fetchChannelHub(long companyId, boolean createIfAbsent)
+		throws ChannelException;
+
+	public List<NotificationEvent> fetchNotificationEvents(
+			long companyId, long userId, boolean flush)
+		throws ChannelException;
 
 	public void flush() throws ChannelException;
 
@@ -56,11 +89,11 @@ public interface ChannelHubManager {
 		throws ChannelException;
 
 	public List<NotificationEvent> getNotificationEvents(
-			long compnayId, long userId)
+			long companyId, long userId)
 		throws ChannelException;
 
 	public List<NotificationEvent> getNotificationEvents(
-			long compnayId, long userId, boolean flush)
+			long companyId, long userId, boolean flush)
 		throws ChannelException;
 
 	public Collection<Long> getUserIds(long companyId) throws ChannelException;

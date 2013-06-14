@@ -1,17 +1,30 @@
 package ${packagePath}.service;
 
+<#assign entitiesHaveColumns = false>
+
 <#list entities as entity>
 	<#if entity.hasColumns()>
+		<#assign entitiesHaveColumns = true>
+
 		import ${packagePath}.model.${entity.name}Clp;
 	</#if>
 </#list>
 
+import com.liferay.portal.kernel.bean.PortletBeanLocatorUtil;
+import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.exception.SystemException;
+import com.liferay.portal.kernel.io.unsync.UnsyncByteArrayInputStream;
+import com.liferay.portal.kernel.io.unsync.UnsyncByteArrayOutputStream;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.util.ClassLoaderObjectInputStream;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.PropsUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.model.BaseModel;
+
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 
 import java.lang.reflect.Method;
 
@@ -45,8 +58,8 @@ public class ClpSerializer {
 				}
 			}
 			catch (Throwable t) {
-				if (_log.isWarnEnabled()) {
-					_log.warn("Unable to locate deployment context from portlet properties", t);
+				if (_log.isInfoEnabled()) {
+					_log.info("Unable to locate deployment context from portlet properties");
 				}
 			}
 
@@ -59,8 +72,8 @@ public class ClpSerializer {
 					}
 				}
 				catch (Throwable t) {
-					if (_log.isWarnEnabled()) {
-						_log.warn("Unable to locate deployment context from portal properties", t);
+					if (_log.isInfoEnabled()) {
+						_log.info("Unable to locate deployment context from portal properties");
 					}
 				}
 			}
@@ -73,22 +86,20 @@ public class ClpSerializer {
 		}
 	}
 
-	public static void setClassLoader(ClassLoader classLoader) {
-		_classLoader = classLoader;
-	}
-
 	public static Object translateInput(BaseModel<?> oldModel) {
-		Class<?> oldModelClass = oldModel.getClass();
+		<#if entitiesHaveColumns>
+			Class<?> oldModelClass = oldModel.getClass();
 
-		String oldModelClassName = oldModelClass.getName();
+			String oldModelClassName = oldModelClass.getName();
 
-		<#list entities as entity>
-			<#if entity.hasColumns()>
-				if (oldModelClassName.equals(${entity.name}Clp.class.getName())) {
-					return translateInput${entity.name}(oldModel);
-				}
-			</#if>
-		</#list>
+			<#list entities as entity>
+				<#if entity.hasColumns()>
+					if (oldModelClassName.equals(${entity.name}Clp.class.getName())) {
+						return translateInput${entity.name}(oldModel);
+					}
+				</#if>
+			</#list>
+		</#if>
 
 		return oldModel;
 	}
@@ -108,63 +119,13 @@ public class ClpSerializer {
 	<#list entities as entity>
 		<#if entity.hasColumns()>
 			public static Object translateInput${entity.name}(BaseModel<?> oldModel) {
-				${entity.name}Clp oldCplModel = (${entity.name}Clp)oldModel;
+				${entity.name}Clp oldClpModel = (${entity.name}Clp)oldModel;
 
-				Thread currentThread = Thread.currentThread();
+				BaseModel<?> newModel = oldClpModel.get${entity.name}RemoteModel();
 
-				ClassLoader contextClassLoader = currentThread.getContextClassLoader();
+				newModel.setModelAttributes(oldClpModel.getModelAttributes());
 
-				try {
-					currentThread.setContextClassLoader(_classLoader);
-
-					try {
-						Class<?> newModelClass = Class.forName("${packagePath}.model.impl.${entity.name}Impl", true, _classLoader);
-
-						Object newModel = newModelClass.newInstance();
-
-						<#list entity.regularColList as column>
-							Method method${column_index} = newModelClass.getMethod("set${column.methodName}", new Class[] {
-								<#if column.isPrimitiveType()>
-									${serviceBuilder.getPrimitiveObj(column.type)}.TYPE
-								<#else>
-									${column.type}.class
-								</#if>
-							});
-
-							<#if column.isPrimitiveType()>
-								${serviceBuilder.getPrimitiveObj(column.type)}
-							<#else>
-								${column.type}
-							</#if>
-
-							value${column_index} =
-
-							<#if column.isPrimitiveType()>
-								new ${serviceBuilder.getPrimitiveObj(column.type)}(
-							</#if>
-
-							oldCplModel.get${column.methodName}()
-
-							<#if column.isPrimitiveType()>
-								)
-							</#if>
-
-							;
-
-							method${column_index}.invoke(newModel, value${column_index});
-						</#list>
-
-						return newModel;
-					}
-					catch (Exception e) {
-						_log.error(e, e);
-					}
-				}
-				finally {
-					currentThread.setContextClassLoader(contextClassLoader);
-				}
-
-				return oldModel;
+				return newModel;
 			}
 		</#if>
 	</#list>
@@ -182,17 +143,19 @@ public class ClpSerializer {
 	}
 
 	public static Object translateOutput(BaseModel<?> oldModel) {
-		Class<?> oldModelClass = oldModel.getClass();
+		<#if entitiesHaveColumns>
+			Class<?> oldModelClass = oldModel.getClass();
 
-		String oldModelClassName = oldModelClass.getName();
+			String oldModelClassName = oldModelClass.getName();
 
-		<#list entities as entity>
-			<#if entity.hasColumns()>
-				if (oldModelClassName.equals("${packagePath}.model.impl.${entity.name}Impl")) {
-					return translateOutput${entity.name}(oldModel);
-				}
-			</#if>
-		</#list>
+			<#list entities as entity>
+				<#if entity.hasColumns()>
+					if (oldModelClassName.equals("${packagePath}.model.impl.${entity.name}Impl")) {
+						return translateOutput${entity.name}(oldModel);
+					}
+				</#if>
+			</#list>
+		</#if>
 
 		return oldModel;
 	}
@@ -221,66 +184,75 @@ public class ClpSerializer {
 		}
 	}
 
+	public static Throwable translateThrowable(Throwable throwable) {
+		if (_useReflectionToTranslateThrowable) {
+			try {
+				if (_classLoader == null) {
+					_classLoader = (ClassLoader)PortletBeanLocatorUtil.locate(_servletContextName, "portletClassLoader");
+				}
+
+				UnsyncByteArrayOutputStream unsyncByteArrayOutputStream = new UnsyncByteArrayOutputStream();
+				ObjectOutputStream objectOutputStream = new ObjectOutputStream(unsyncByteArrayOutputStream);
+
+				objectOutputStream.writeObject(throwable);
+
+				objectOutputStream.flush();
+				objectOutputStream.close();
+
+				UnsyncByteArrayInputStream unsyncByteArrayInputStream = new UnsyncByteArrayInputStream(unsyncByteArrayOutputStream.unsafeGetByteArray(), 0, unsyncByteArrayOutputStream.size());
+				ObjectInputStream objectInputStream = new ClassLoaderObjectInputStream(unsyncByteArrayInputStream, _classLoader);
+
+				throwable = (Throwable)objectInputStream.readObject();
+
+				objectInputStream.close();
+
+				return throwable;
+			}
+			catch (SecurityException se) {
+				if (_log.isInfoEnabled()) {
+					_log.info("Do not use reflection to translate throwable");
+				}
+
+				_useReflectionToTranslateThrowable = false;
+			}
+			catch (Throwable throwable2) {
+				_log.error(throwable2, throwable2);
+
+				return throwable2;
+			}
+		}
+
+		Class<?> clazz = throwable.getClass();
+
+		String className = clazz.getName();
+
+		if (className.equals(PortalException.class.getName())) {
+			return new PortalException();
+		}
+
+		if (className.equals(SystemException.class.getName())) {
+			return new SystemException();
+		}
+
+		<#list exceptions as exception>
+			if (className.equals("${packagePath}.${exception}Exception")) {
+				return new ${packagePath}.${exception}Exception();
+			}
+		</#list>
+
+		return throwable;
+	}
+
 	<#list entities as entity>
 		<#if entity.hasColumns()>
 			public static Object translateOutput${entity.name}(BaseModel<?> oldModel) {
-				Thread currentThread = Thread.currentThread();
+				${entity.name}Clp newModel = new ${entity.name}Clp();
 
-				ClassLoader contextClassLoader = currentThread.getContextClassLoader();
+				newModel.setModelAttributes(oldModel.getModelAttributes());
 
-				try {
-					currentThread.setContextClassLoader(_classLoader);
+				newModel.set${entity.name}RemoteModel(oldModel);
 
-					try {
-						${entity.name}Clp newModel = new ${entity.name}Clp();
-
-						Class<?> oldModelClass = oldModel.getClass();
-
-						<#list entity.regularColList as column>
-							Method method${column_index} = oldModelClass.getMethod("get${column.methodName}");
-
-							<#if column.isPrimitiveType()>
-								${serviceBuilder.getPrimitiveObj(column.type)}
-							<#else>
-								${column.type}
-							</#if>
-
-							value${column_index} =
-
-							(
-
-							<#if column.isPrimitiveType()>
-								${serviceBuilder.getPrimitiveObj(column.type)}
-							<#else>
-								${column.type}
-							</#if>
-
-							)
-
-							method${column_index}.invoke(oldModel, (Object[])null);
-
-							newModel.set${column.methodName}(value${column_index});
-
-							<#if (column.name == "resourcePrimKey") && entity.isResourcedModel()>
-								Method methodIsResourceMain = oldModelClass.getMethod("isResourceMain");
-
-								Boolean resourceMain = (Boolean)methodIsResourceMain.invoke(oldModel, (Object[])null);
-
-								newModel.setResourceMain(resourceMain);
-							</#if>
-						</#list>
-
-						return newModel;
-					}
-					catch (Exception e) {
-						_log.error(e, e);
-					}
-				}
-				finally {
-					currentThread.setContextClassLoader(contextClassLoader);
-				}
-
-				return oldModel;
+				return newModel;
 			}
 
 		</#if>
@@ -290,5 +262,6 @@ public class ClpSerializer {
 
 	private static ClassLoader _classLoader;
 	private static String _servletContextName;
+	private static boolean _useReflectionToTranslateThrowable = true;
 
 }

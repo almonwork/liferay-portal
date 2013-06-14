@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -16,6 +16,8 @@ package com.liferay.portal.search.lucene.cluster;
 
 import com.liferay.portal.kernel.cluster.Address;
 import com.liferay.portal.kernel.exception.SystemException;
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.search.lucene.LuceneHelperUtil;
 
 import java.io.IOException;
@@ -30,10 +32,7 @@ public class LuceneClusterUtil {
 	public static void loadIndexesFromCluster(long companyId)
 		throws SystemException {
 
-		Address bootupAddress = LuceneHelperUtil.selectBootupClusterAddress(
-			companyId, LuceneHelperUtil.getLastGeneration(companyId));
-
-		loadIndexesFromCluster(new long[] {companyId}, bootupAddress);
+		LuceneHelperUtil.loadIndexesFromCluster(companyId);
 	}
 
 	public static void loadIndexesFromCluster(
@@ -42,6 +41,12 @@ public class LuceneClusterUtil {
 
 		if (bootupAddress == null) {
 			return;
+		}
+
+		if (_log.isInfoEnabled()) {
+			_log.info(
+				"Start loading Lucene index files from cluster node " +
+					bootupAddress);
 		}
 
 		InputStream inputStream = null;
@@ -72,5 +77,7 @@ public class LuceneClusterUtil {
 			}
 		}
 	}
+
+	private static Log _log = LogFactoryUtil.getLog(LuceneClusterUtil.class);
 
 }

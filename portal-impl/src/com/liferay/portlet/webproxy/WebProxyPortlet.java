@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -23,6 +23,7 @@ import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.struts.StrutsUtil;
+import com.liferay.portal.util.PortalUtil;
 import com.liferay.portlet.RenderResponseImpl;
 
 import java.io.IOException;
@@ -40,27 +41,6 @@ import org.portletbridge.portlet.PortletBridgePortlet;
  * @author Brian Wing Shun Chan
  */
 public class WebProxyPortlet extends PortletBridgePortlet {
-
-	@Override
-	public void init() {
-		try {
-			super.init();
-
-			_enabled = true;
-		}
-		catch (Exception e) {
-			if (_log.isWarnEnabled()) {
-				_log.warn(e.getMessage());
-			}
-		}
-
-		if (!_enabled && ServerDetector.isWebLogic() && _log.isInfoEnabled()) {
-			_log.info(
-				"WebProxyPortlet will not be enabled unless Liferay's " +
-					"serializer.jar and xalan.jar files are copied to the " +
-						"JDK's endorsed directory");
-		}
-	}
 
 	@Override
 	public void doView(
@@ -95,9 +75,31 @@ public class WebProxyPortlet extends PortletBridgePortlet {
 
 			String output = stringResponse.getString();
 
-			output = StringUtil.replace(output, "//pbhs/", "/pbhs/");
+			output = StringUtil.replace(
+				output, "//pbhs/", PortalUtil.getPathContext() + "/pbhs/");
 
 			stringResponse.setString(output);
+		}
+	}
+
+	@Override
+	public void init() {
+		try {
+			super.init();
+
+			_enabled = true;
+		}
+		catch (Exception e) {
+			if (_log.isWarnEnabled()) {
+				_log.warn(e.getMessage());
+			}
+		}
+
+		if (!_enabled && ServerDetector.isWebLogic() && _log.isInfoEnabled()) {
+			_log.info(
+				"WebProxyPortlet will not be enabled unless Liferay's " +
+					"serializer.jar and xalan.jar files are copied to the " +
+						"JDK's endorsed directory");
 		}
 	}
 

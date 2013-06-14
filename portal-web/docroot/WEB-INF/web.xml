@@ -2,6 +2,10 @@
 
 <web-app id="Liferay_Portal" version="2.4" xmlns="http://java.sun.com/xml/ns/j2ee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee http://java.sun.com/xml/ns/j2ee/web-app_2_4.xsd">
 	<context-param>
+		<param-name>axis.servicesPath</param-name>
+		<param-value>/api/axis/</param-value>
+	</context-param>
+	<context-param>
 		<param-name>contextClass</param-name>
 		<param-value>com.liferay.portal.spring.context.PortalApplicationContext</param-value>
 	</context-param>
@@ -20,6 +24,10 @@
 			<param-name>dispatcher</param-name>
 			<param-value>ERROR</param-value>
 		</init-param>
+		<init-param>
+			<param-name>register-portal-lifecycle</param-name>
+			<param-value>false</param-value>
+		</init-param>
 	</filter>
 	<filter>
 		<filter-name>Invoker Filter - FORWARD</filter-name>
@@ -27,6 +35,10 @@
 		<init-param>
 			<param-name>dispatcher</param-name>
 			<param-value>FORWARD</param-value>
+		</init-param>
+		<init-param>
+			<param-name>register-portal-lifecycle</param-name>
+			<param-value>false</param-value>
 		</init-param>
 	</filter>
 	<filter>
@@ -36,6 +48,10 @@
 			<param-name>dispatcher</param-name>
 			<param-value>INCLUDE</param-value>
 		</init-param>
+		<init-param>
+			<param-name>register-portal-lifecycle</param-name>
+			<param-value>false</param-value>
+		</init-param>
 	</filter>
 	<filter>
 		<filter-name>Invoker Filter - REQUEST</filter-name>
@@ -43,6 +59,10 @@
 		<init-param>
 			<param-name>dispatcher</param-name>
 			<param-value>REQUEST</param-value>
+		</init-param>
+		<init-param>
+			<param-name>register-portal-lifecycle</param-name>
+			<param-value>false</param-value>
 		</init-param>
 	</filter>
 	<filter-mapping>
@@ -95,22 +115,37 @@
 			<param-name>detail</param-name>
 			<param-value>0</param-value>
 		</init-param>
+		<load-on-startup>0</load-on-startup>
+	</servlet>
+	<servlet>
+		<servlet-name>Atom Servlet</servlet-name>
+		<servlet-class>com.liferay.portal.servlet.AtomServlet</servlet-class>
+		<load-on-startup>1</load-on-startup>
+	</servlet>
+	<servlet>
+		<servlet-name>Axis Servlet</servlet-name>
+		<servlet-class>com.liferay.portal.servlet.AxisServlet</servlet-class>
 		<load-on-startup>1</load-on-startup>
 	</servlet>
 	<servlet>
 		<servlet-name>Combo Servlet</servlet-name>
 		<servlet-class>com.liferay.portal.servlet.ComboServlet</servlet-class>
-		<load-on-startup>2</load-on-startup>
+		<load-on-startup>1</load-on-startup>
 	</servlet>
 	<servlet>
 		<servlet-name>Display Chart</servlet-name>
 		<servlet-class>com.liferay.portal.servlet.DisplayChartServlet</servlet-class>
-		<load-on-startup>2</load-on-startup>
+		<load-on-startup>1</load-on-startup>
+	</servlet>
+	<servlet>
+		<servlet-name>Dynamic Resource Servlet</servlet-name>
+		<servlet-class>com.liferay.portal.webserver.DynamicResourceServlet</servlet-class>
+		<load-on-startup>1</load-on-startup>
 	</servlet>
 	<servlet>
 		<servlet-name>Facebook Servlet</servlet-name>
 		<servlet-class>com.liferay.portal.facebook.FacebookServlet</servlet-class>
-		<load-on-startup>2</load-on-startup>
+		<load-on-startup>1</load-on-startup>
 	</servlet>
 	<servlet>
 		<servlet-name>Friendly URL Servlet - Private Group</servlet-name>
@@ -123,7 +158,7 @@
 			<param-name>user</param-name>
 			<param-value>false</param-value>
 		</init-param>
-		<load-on-startup>2</load-on-startup>
+		<load-on-startup>1</load-on-startup>
 	</servlet>
 	<servlet>
 		<servlet-name>Friendly URL Servlet - Private User</servlet-name>
@@ -136,7 +171,7 @@
 			<param-name>user</param-name>
 			<param-value>true</param-value>
 		</init-param>
-		<load-on-startup>2</load-on-startup>
+		<load-on-startup>1</load-on-startup>
 	</servlet>
 	<servlet>
 		<servlet-name>Friendly URL Servlet - Public</servlet-name>
@@ -145,51 +180,52 @@
 			<param-name>private</param-name>
 			<param-value>false</param-value>
 		</init-param>
-		<load-on-startup>2</load-on-startup>
+		<load-on-startup>1</load-on-startup>
 	</servlet>
 	<servlet>
 		<servlet-name>Google Gadget Servlet</servlet-name>
 		<servlet-class>com.liferay.portal.servlet.GoogleGadgetServlet</servlet-class>
-		<load-on-startup>2</load-on-startup>
+		<load-on-startup>1</load-on-startup>
 	</servlet>
 	<servlet>
 		<servlet-name>I18n Servlet</servlet-name>
 		<servlet-class>com.liferay.portal.servlet.I18nServlet</servlet-class>
-		<load-on-startup>2</load-on-startup>
+		<load-on-startup>1</load-on-startup>
 	</servlet>
 	<servlet>
-		<servlet-name>Image Servlet</servlet-name>
-		<servlet-class>com.liferay.portal.servlet.ImageServlet</servlet-class>
-		<init-param>
-			<param-name>last_modified</param-name>
-			<param-value>true</param-value>
-		</init-param>
-		<load-on-startup>2</load-on-startup>
+		<servlet-name>JSON Servlet</servlet-name>
+		<servlet-class>com.liferay.portal.servlet.JSONServlet</servlet-class>
+		<load-on-startup>1</load-on-startup>
+	</servlet>
+	<servlet>
+		<servlet-name>JSON Web Service Servlet</servlet-name>
+		<servlet-class>com.liferay.portal.jsonwebservice.JSONWebServiceServlet</servlet-class>
+		<load-on-startup>1</load-on-startup>
 	</servlet>
 	<servlet>
 		<servlet-name>Language Servlet</servlet-name>
 		<servlet-class>com.liferay.portal.servlet.LanguageServlet</servlet-class>
-		<load-on-startup>2</load-on-startup>
+		<load-on-startup>1</load-on-startup>
 	</servlet>
 	<servlet>
 		<servlet-name>Lucene Servlet</servlet-name>
 		<servlet-class>com.liferay.portal.servlet.LuceneServlet</servlet-class>
-		<load-on-startup>2</load-on-startup>
+		<load-on-startup>1</load-on-startup>
 	</servlet>
 	<servlet>
 		<servlet-name>Netvibes Servlet</servlet-name>
 		<servlet-class>com.liferay.portal.servlet.NetvibesServlet</servlet-class>
-		<load-on-startup>2</load-on-startup>
+		<load-on-startup>1</load-on-startup>
 	</servlet>
 	<servlet>
 		<servlet-name>Poller Servlet</servlet-name>
 		<servlet-class>com.liferay.portal.poller.PollerServlet</servlet-class>
-		<load-on-startup>2</load-on-startup>
+		<load-on-startup>1</load-on-startup>
 	</servlet>
 	<servlet>
 		<servlet-name>Portal Delegator Servlet</servlet-name>
 		<servlet-class>com.liferay.portal.kernel.servlet.PortalDelegatorServlet</servlet-class>
-		<load-on-startup>2</load-on-startup>
+		<load-on-startup>1</load-on-startup>
 	</servlet>
 	<servlet>
 		<servlet-name>Portlet Bridge Servlet</servlet-name>
@@ -214,52 +250,71 @@
 			<param-name>ignorePostToGetRequestHeaders</param-name>
 			<param-value>content-type,content-length</param-value>
 		</init-param>
-		<load-on-startup>2</load-on-startup>
+		<load-on-startup>1</load-on-startup>
+	</servlet>
+	<servlet>
+		<servlet-name>Remoting Servlet</servlet-name>
+		<servlet-class>com.liferay.portal.spring.servlet.RemotingServlet</servlet-class>
+		<load-on-startup>1</load-on-startup>
 	</servlet>
 	<servlet>
 		<servlet-name>Robots Servlet</servlet-name>
 		<servlet-class>com.liferay.portal.servlet.RobotsServlet</servlet-class>
-		<load-on-startup>2</load-on-startup>
+		<load-on-startup>1</load-on-startup>
 	</servlet>
 	<servlet>
 		<servlet-name>Sharepoint Document Workspace Servlet</servlet-name>
 		<servlet-class>com.liferay.portal.sharepoint.SharepointDocumentWorkspaceServlet</servlet-class>
-		<load-on-startup>2</load-on-startup>
+		<load-on-startup>1</load-on-startup>
 	</servlet>
 	<servlet>
 		<servlet-name>Sharepoint Servlet</servlet-name>
 		<servlet-class>com.liferay.portal.sharepoint.SharepointServlet</servlet-class>
-		<load-on-startup>2</load-on-startup>
+		<load-on-startup>1</load-on-startup>
 	</servlet>
 	<servlet>
 		<servlet-name>Sharepoint Web Services Servlet</servlet-name>
 		<servlet-class>com.liferay.portal.sharepoint.SharepointWebServicesServlet</servlet-class>
-		<load-on-startup>2</load-on-startup>
+		<load-on-startup>1</load-on-startup>
 	</servlet>
 	<servlet>
 		<servlet-name>Sitemap Servlet</servlet-name>
 		<servlet-class>com.liferay.portal.servlet.SitemapServlet</servlet-class>
-		<load-on-startup>2</load-on-startup>
+		<load-on-startup>1</load-on-startup>
 	</servlet>
 	<servlet>
 		<servlet-name>Software Catalog Servlet</servlet-name>
 		<servlet-class>com.liferay.portal.servlet.SoftwareCatalogServlet</servlet-class>
-		<load-on-startup>2</load-on-startup>
+		<load-on-startup>1</load-on-startup>
+	</servlet>
+	<servlet>
+		<servlet-name>Tunnel Servlet</servlet-name>
+		<servlet-class>com.liferay.portal.servlet.TunnelServlet</servlet-class>
+		<load-on-startup>1</load-on-startup>
 	</servlet>
 	<servlet>
 		<servlet-name>Web Server Servlet</servlet-name>
 		<servlet-class>com.liferay.portal.webserver.WebServerServlet</servlet-class>
-		<load-on-startup>2</load-on-startup>
+		<init-param>
+			<param-name>last_modified</param-name>
+			<param-value>true</param-value>
+		</init-param>
+		<load-on-startup>1</load-on-startup>
+	</servlet>
+	<servlet>
+		<servlet-name>WebDAV Servlet</servlet-name>
+		<servlet-class>com.liferay.portal.webdav.WebDAVServlet</servlet-class>
+		<load-on-startup>1</load-on-startup>
 	</servlet>
 	<servlet>
 		<servlet-name>Widget Servlet</servlet-name>
 		<servlet-class>com.liferay.portal.servlet.WidgetServlet</servlet-class>
-		<load-on-startup>2</load-on-startup>
+		<load-on-startup>1</load-on-startup>
 	</servlet>
 	<servlet>
 		<servlet-name>XML-RPC Servlet</servlet-name>
 		<servlet-class>com.liferay.portal.xmlrpc.XmlRpcServlet</servlet-class>
-		<load-on-startup>2</load-on-startup>
+		<load-on-startup>1</load-on-startup>
 	</servlet>
 	<servlet>
 		<servlet-name>Clean Up Servlet</servlet-name>
@@ -277,6 +332,10 @@
 	<servlet-mapping>
 		<servlet-name>Display Chart</servlet-name>
 		<url-pattern>/display_chart/*</url-pattern>
+	</servlet-mapping>
+	<servlet-mapping>
+		<servlet-name>Dynamic Resource Servlet</servlet-name>
+		<url-pattern>/sprite/*</url-pattern>
 	</servlet-mapping>
 	<servlet-mapping>
 		<servlet-name>Facebook Servlet</servlet-name>
@@ -333,6 +392,14 @@
 	<servlet-mapping>
 		<servlet-name>I18n Servlet</servlet-name>
 		<url-pattern>/cs_CZ/*</url-pattern>
+	</servlet-mapping>
+	<servlet-mapping>
+		<servlet-name>I18n Servlet</servlet-name>
+		<url-pattern>/da/*</url-pattern>
+	</servlet-mapping>
+	<servlet-mapping>
+		<servlet-name>I18n Servlet</servlet-name>
+		<url-pattern>/da_DK/*</url-pattern>
 	</servlet-mapping>
 	<servlet-mapping>
 		<servlet-name>I18n Servlet</servlet-name>
@@ -405,6 +472,10 @@
 	<servlet-mapping>
 		<servlet-name>I18n Servlet</servlet-name>
 		<url-pattern>/fr/*</url-pattern>
+	</servlet-mapping>
+	<servlet-mapping>
+		<servlet-name>I18n Servlet</servlet-name>
+		<url-pattern>/fr_CA/*</url-pattern>
 	</servlet-mapping>
 	<servlet-mapping>
 		<servlet-name>I18n Servlet</servlet-name>
@@ -481,6 +552,14 @@
 	<servlet-mapping>
 		<servlet-name>I18n Servlet</servlet-name>
 		<url-pattern>/ko_KR/*</url-pattern>
+	</servlet-mapping>
+	<servlet-mapping>
+		<servlet-name>I18n Servlet</servlet-name>
+		<url-pattern>/lo/*</url-pattern>
+	</servlet-mapping>
+	<servlet-mapping>
+		<servlet-name>I18n Servlet</servlet-name>
+		<url-pattern>/lo_LA/*</url-pattern>
 	</servlet-mapping>
 	<servlet-mapping>
 		<servlet-name>I18n Servlet</servlet-name>
@@ -611,10 +690,6 @@
 		<url-pattern>/zh_TW/*</url-pattern>
 	</servlet-mapping>
 	<servlet-mapping>
-		<servlet-name>Image Servlet</servlet-name>
-		<url-pattern>/image/*</url-pattern>
-	</servlet-mapping>
-	<servlet-mapping>
 		<servlet-name>Language Servlet</servlet-name>
 		<url-pattern>/language/*</url-pattern>
 	</servlet-mapping>
@@ -679,12 +754,68 @@
 		<url-pattern>/documents/*</url-pattern>
 	</servlet-mapping>
 	<servlet-mapping>
+		<servlet-name>Web Server Servlet</servlet-name>
+		<url-pattern>/image/*</url-pattern>
+	</servlet-mapping>
+	<servlet-mapping>
 		<servlet-name>Widget Servlet</servlet-name>
 		<url-pattern>/widget/*</url-pattern>
 	</servlet-mapping>
 	<servlet-mapping>
 		<servlet-name>XML-RPC Servlet</servlet-name>
 		<url-pattern>/xmlrpc/*</url-pattern>
+	</servlet-mapping>
+	<servlet-mapping>
+		<servlet-name>Atom Servlet</servlet-name>
+		<url-pattern>/api/atom/*</url-pattern>
+	</servlet-mapping>
+	<servlet-mapping>
+		<servlet-name>Atom Servlet</servlet-name>
+		<url-pattern>/api/secure/atom/*</url-pattern>
+	</servlet-mapping>
+	<servlet-mapping>
+		<servlet-name>Axis Servlet</servlet-name>
+		<url-pattern>/api/axis/*</url-pattern>
+	</servlet-mapping>
+	<servlet-mapping>
+		<servlet-name>Axis Servlet</servlet-name>
+		<url-pattern>/api/secure/axis/*</url-pattern>
+	</servlet-mapping>
+	<servlet-mapping>
+		<servlet-name>JSON Servlet</servlet-name>
+		<url-pattern>/api/json/*</url-pattern>
+	</servlet-mapping>
+	<servlet-mapping>
+		<servlet-name>JSON Servlet</servlet-name>
+		<url-pattern>/api/secure/json/*</url-pattern>
+	</servlet-mapping>
+	<servlet-mapping>
+		<servlet-name>JSON Web Service Servlet</servlet-name>
+		<url-pattern>/api/jsonws/*</url-pattern>
+	</servlet-mapping>
+	<servlet-mapping>
+		<servlet-name>JSON Web Service Servlet</servlet-name>
+		<url-pattern>/api/secure/jsonws/*</url-pattern>
+	</servlet-mapping>
+	<servlet-mapping>
+		<servlet-name>Remoting Servlet</servlet-name>
+		<url-pattern>/api/spring/*</url-pattern>
+	</servlet-mapping>
+	<servlet-mapping>
+		<servlet-name>Remoting Servlet</servlet-name>
+		<url-pattern>/api/secure/spring/*</url-pattern>
+	</servlet-mapping>
+	<servlet-mapping>
+		<servlet-name>Tunnel Servlet</servlet-name>
+		<url-pattern>/api/liferay/*</url-pattern>
+	</servlet-mapping>
+	<servlet-mapping>
+		<servlet-name>Tunnel Servlet</servlet-name>
+		<url-pattern>/api/secure/liferay/*</url-pattern>
+	</servlet-mapping>
+	<servlet-mapping>
+		<servlet-name>WebDAV Servlet</servlet-name>
+		<url-pattern>/api/secure/webdav/*</url-pattern>
 	</servlet-mapping>
 	<session-config>
 		<session-timeout>30</session-timeout>
@@ -728,7 +859,7 @@
 		</taglib>
 		<taglib>
 			<taglib-uri>http://liferay.com/tld/aui</taglib-uri>
-			<taglib-location>/WEB-INF/tld/liferay-aui.tld</taglib-location>
+			<taglib-location>/WEB-INF/tld/aui.tld</taglib-location>
 		</taglib>
 		<taglib>
 			<taglib-uri>http://liferay.com/tld/portlet</taglib-uri>
@@ -800,6 +931,8 @@
 			<url-pattern>/ca_ES/c/portal/protected</url-pattern>
 			<url-pattern>/cs/c/portal/protected</url-pattern>
 			<url-pattern>/cs_CZ/c/portal/protected</url-pattern>
+			<url-pattern>/da/c/portal/protected</url-pattern>
+			<url-pattern>/da_DK/c/portal/protected</url-pattern>
 			<url-pattern>/de/c/portal/protected</url-pattern>
 			<url-pattern>/de_DE/c/portal/protected</url-pattern>
 			<url-pattern>/el/c/portal/protected</url-pattern>
@@ -818,6 +951,7 @@
 			<url-pattern>/fi/c/portal/protected</url-pattern>
 			<url-pattern>/fi_FI/c/portal/protected</url-pattern>
 			<url-pattern>/fr/c/portal/protected</url-pattern>
+			<url-pattern>/fr_CA/c/portal/protected</url-pattern>
 			<url-pattern>/fr_FR/c/portal/protected</url-pattern>
 			<url-pattern>/gl/c/portal/protected</url-pattern>
 			<url-pattern>/gl_ES/c/portal/protected</url-pattern>
@@ -837,6 +971,8 @@
 			<url-pattern>/ja_JP/c/portal/protected</url-pattern>
 			<url-pattern>/ko/c/portal/protected</url-pattern>
 			<url-pattern>/ko_KR/c/portal/protected</url-pattern>
+			<url-pattern>/lo/c/portal/protected</url-pattern>
+			<url-pattern>/lo_LA/c/portal/protected</url-pattern>
 			<url-pattern>/nb/c/portal/protected</url-pattern>
 			<url-pattern>/nb_NO/c/portal/protected</url-pattern>
 			<url-pattern>/nl/c/portal/protected</url-pattern>

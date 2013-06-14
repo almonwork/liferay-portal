@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -29,6 +29,10 @@ public class IndexerWrapper implements Indexer {
 		_indexer = indexer;
 	}
 
+	public void delete(long companyId, String uid) throws SearchException {
+		_indexer.delete(companyId, uid);
+	}
+
 	public void delete(Object obj) throws SearchException {
 		_indexer.delete(obj);
 	}
@@ -48,8 +52,18 @@ public class IndexerWrapper implements Indexer {
 		return _indexer.getFacetQuery(className, searchContext);
 	}
 
+	public BooleanQuery getFullQuery(SearchContext searchContext)
+		throws SearchException {
+
+		return _indexer.getFullQuery(searchContext);
+	}
+
 	public IndexerPostProcessor[] getIndexerPostProcessors() {
 		return _indexer.getIndexerPostProcessors();
+	}
+
+	public String getPortletId() {
+		return _indexer.getPortletId();
 	}
 
 	public String getSearchEngineId() {
@@ -69,16 +83,20 @@ public class IndexerWrapper implements Indexer {
 	}
 
 	public boolean hasPermission(
-			PermissionChecker permissionChecker, long entryClassPK,
-			String actionId)
+			PermissionChecker permissionChecker, String entryClassName,
+			long entryClassPK, String actionId)
 		throws Exception {
 
 		return _indexer.hasPermission(
-			permissionChecker, entryClassPK, actionId);
+			permissionChecker, entryClassName, entryClassPK, actionId);
 	}
 
 	public boolean isFilterSearch() {
 		return _indexer.isFilterSearch();
+	}
+
+	public boolean isPermissionAware() {
+		return _indexer.isPermissionAware();
 	}
 
 	public boolean isStagingAware() {

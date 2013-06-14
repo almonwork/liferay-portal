@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -26,9 +26,15 @@ public interface JSONObject {
 
 	public boolean getBoolean(String key);
 
+	public boolean getBoolean(String key, boolean defaultValue);
+
 	public double getDouble(String key);
 
+	public double getDouble(String key, double defaultValue);
+
 	public int getInt(String key);
+
+	public int getInt(String key, int defaultValue);
 
 	public JSONArray getJSONArray(String key);
 
@@ -36,7 +42,11 @@ public interface JSONObject {
 
 	public long getLong(String key);
 
+	public long getLong(String key, long defaultValue);
+
 	public String getString(String key);
+
+	public String getString(String key, String defaultValue);
 
 	public boolean has(String key);
 
@@ -50,17 +60,17 @@ public interface JSONObject {
 
 	public JSONObject put(String key, boolean value);
 
+	public JSONObject put(String key, Date value);
+
 	public JSONObject put(String key, double value);
 
 	public JSONObject put(String key, int value);
 
-	public JSONObject put(String key, long value);
-
-	public JSONObject put(String key, Date value);
-
 	public JSONObject put(String key, JSONArray value);
 
 	public JSONObject put(String key, JSONObject value);
+
+	public JSONObject put(String key, long value);
 
 	public JSONObject put(String key, String value);
 

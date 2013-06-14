@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -40,53 +40,11 @@ import javax.servlet.jsp.JspException;
 import javax.servlet.jsp.PageContext;
 
 /**
- * @author Brian Chan
- * @author Jorge Ferrer
+ * @author     Brian Chan
+ * @author     Jorge Ferrer
+ * @deprecated {@link com.liferay.taglib.ui.InputPermissionsParamsTag}
  */
 public class InputPermissionsParamsTagUtil {
-
-	public static String getDefaultViewRole(
-			String modelName, ThemeDisplay themeDisplay)
-		throws PortalException, SystemException {
-
-		Layout layout = themeDisplay.getLayout();
-
-		Group layoutGroup = layout.getGroup();
-
-		List<String> guestDefaultActions =
-			ResourceActionsUtil.getModelResourceGuestDefaultActions(
-				modelName);
-
-		if (layoutGroup.isControlPanel()) {
-			Group group = themeDisplay.getScopeGroup();
-
-			if (!group.hasPrivateLayouts() &&
-				guestDefaultActions.contains(ActionKeys.VIEW)) {
-
-				return RoleConstants.GUEST;
-			}
-		}
-		else if (layout.isPublicLayout() &&
-				 guestDefaultActions.contains(ActionKeys.VIEW)) {
-
-			return RoleConstants.GUEST;
-		}
-
-		List<String> groupDefaultActions =
-			ResourceActionsUtil.getModelResourceGroupDefaultActions(modelName);
-
-		if (groupDefaultActions.contains(ActionKeys.VIEW)) {
-			Group parentGroup = GroupLocalServiceUtil.getGroup(
-				themeDisplay.getParentGroupId());
-
-			Role defaultGroupRole = RoleLocalServiceUtil.getDefaultGroupRole(
-				parentGroup.getGroupId());
-
-			return defaultGroupRole.getName();
-		}
-
-		return RoleConstants.OWNER;
-	}
 
 	public static void doEndTag(String modelName, PageContext pageContext)
 		throws JspException {
@@ -179,6 +137,48 @@ public class InputPermissionsParamsTagUtil {
 		catch (Exception e) {
 			throw new JspException(e);
 		}
+	}
+
+	public static String getDefaultViewRole(
+			String modelName, ThemeDisplay themeDisplay)
+		throws PortalException, SystemException {
+
+		Layout layout = themeDisplay.getLayout();
+
+		Group layoutGroup = layout.getGroup();
+
+		List<String> guestDefaultActions =
+			ResourceActionsUtil.getModelResourceGuestDefaultActions(modelName);
+
+		if (layoutGroup.isControlPanel()) {
+			Group group = themeDisplay.getScopeGroup();
+
+			if (!group.hasPrivateLayouts() &&
+				guestDefaultActions.contains(ActionKeys.VIEW)) {
+
+				return RoleConstants.GUEST;
+			}
+		}
+		else if (layout.isPublicLayout() &&
+				 guestDefaultActions.contains(ActionKeys.VIEW)) {
+
+			return RoleConstants.GUEST;
+		}
+
+		List<String> groupDefaultActions =
+			ResourceActionsUtil.getModelResourceGroupDefaultActions(modelName);
+
+		if (groupDefaultActions.contains(ActionKeys.VIEW)) {
+			Group parentGroup = GroupLocalServiceUtil.getGroup(
+				themeDisplay.getParentGroupId());
+
+			Role defaultGroupRole = RoleLocalServiceUtil.getDefaultGroupRole(
+				parentGroup.getGroupId());
+
+			return defaultGroupRole.getName();
+		}
+
+		return RoleConstants.OWNER;
 	}
 
 }

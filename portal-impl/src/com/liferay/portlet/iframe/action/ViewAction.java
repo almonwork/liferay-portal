@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -17,6 +17,7 @@ package com.liferay.portlet.iframe.action;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.Http;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.Validator;
@@ -50,13 +51,27 @@ public class ViewAction extends PortletAction {
 
 		String src = transformSrc(renderRequest, renderResponse);
 
-		if (Validator.isNull(src)) {
+		if (Validator.isNull(src) || src.equals(Http.HTTP_WITH_SLASH) ||
+			src.equals(Http.HTTPS_WITH_SLASH)) {
+
 			return mapping.findForward("/portal/portlet_not_setup");
 		}
 
 		renderRequest.setAttribute(WebKeys.IFRAME_SRC, src);
 
 		return mapping.findForward("portlet.iframe.view");
+	}
+
+	protected String getPassword(
+			RenderRequest renderRequest, RenderResponse renderResponse)
+		throws PortalException, SystemException {
+
+		PortletPreferences preferences = renderRequest.getPreferences();
+
+		String password = preferences.getValue(
+			"basicPassword", StringPool.BLANK);
+
+		return IFrameUtil.getPassword(renderRequest, password);
 	}
 
 	protected String getSrc(
@@ -76,19 +91,11 @@ public class ViewAction extends PortletAction {
 		throws PortalException, SystemException {
 
 		PortletPreferences preferences = renderRequest.getPreferences();
-		String userName = preferences.getValue("user-name", StringPool.BLANK);
+
+		String userName = preferences.getValue(
+			"basicUserName", StringPool.BLANK);
 
 		return IFrameUtil.getUserName(renderRequest, userName);
-	}
-
-	protected String getPassword(
-			RenderRequest renderRequest, RenderResponse renderResponse)
-		throws PortalException, SystemException {
-
-		PortletPreferences preferences = renderRequest.getPreferences();
-		String password = preferences.getValue("password", StringPool.BLANK);
-
-		return IFrameUtil.getPassword(renderRequest, password);
 	}
 
 	protected String transformSrc(
@@ -101,20 +108,21 @@ public class ViewAction extends PortletAction {
 
 		boolean auth = GetterUtil.getBoolean(
 			preferences.getValue("auth", StringPool.BLANK));
-		String authType = preferences.getValue("auth-type", StringPool.BLANK);
-		String userName = getUserName(renderRequest, renderResponse);
-		String password = getPassword(renderRequest, renderResponse);
 
 		if (auth) {
+			String authType = preferences.getValue(
+				"authType", StringPool.BLANK);
+
 			if (authType.equals("basic")) {
+				String userName = getUserName(renderRequest, renderResponse);
+				String password = getPassword(renderRequest, renderResponse);
+
 				int pos = src.indexOf("://");
 
 				String protocol = src.substring(0, pos + 3);
-				String url = src.substring(pos + 3, src.length());
+				String url = src.substring(pos + 3);
 
-				src =
-					protocol + userName + ":" + password +
-					"@" + url;
+				src = protocol + userName + ":" + password + "@" + url;
 			}
 			else {
 				ThemeDisplay themeDisplay =

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -114,8 +114,7 @@ public class WAIAutoDeployer extends PortletAutoDeployer {
 			"liferay-display.xml", srcFile + "/WEB-INF", filterMap);
 		copyDependencyXml(
 			"liferay-portlet.xml", srcFile + "/WEB-INF", filterMap);
-		copyDependencyXml(
-			"portlet.xml", srcFile + "/WEB-INF", filterMap);
+		copyDependencyXml("portlet.xml", srcFile + "/WEB-INF", filterMap);
 		copyDependencyXml("iframe.jsp", srcFile + "/WEB-INF/jsp/liferay/wai");
 	}
 
@@ -143,12 +142,12 @@ public class WAIAutoDeployer extends PortletAutoDeployer {
 		}
 	}
 
-	private static String[] _INIT_PARAM_NAMES = new String[] {
-		"wai.connector.iframe.height.default"
+	private static final String[] _INIT_PARAM_DEFAULT_VALUES = new String[] {
+		"500"
 	};
 
-	private static String[] _INIT_PARAM_DEFAULT_VALUES = new String[] {
-		"500"
+	private static final String[] _INIT_PARAM_NAMES = new String[] {
+		"wai.connector.iframe.height.default"
 	};
 
 }

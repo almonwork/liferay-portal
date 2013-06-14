@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -46,20 +46,20 @@ public class ShortWrapper
 		}
 	}
 
-	public short getValue() {
-		return _value;
+	public short decrement() {
+		return --_value;
 	}
 
-	public void setValue(short value) {
-		_value = value;
+	public short getValue() {
+		return _value;
 	}
 
 	public short increment() {
 		return ++_value;
 	}
 
-	public short decrement() {
-		return --_value;
+	public void setValue(short value) {
+		_value = value;
 	}
 
 	private short _value;

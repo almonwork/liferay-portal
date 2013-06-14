@@ -1,3 +1,5 @@
+<#setting number_format = "0">
+
 <#assign parentPKColumn = "">
 
 <#if entity.isHierarchicalTree()>
@@ -30,9 +32,9 @@ import com.liferay.portal.kernel.json.JSON;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.util.DateUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
-import com.liferay.portal.kernel.util.HtmlUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.LocalizationUtil;
+import com.liferay.portal.kernel.util.ProxyUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.Validator;
@@ -46,13 +48,12 @@ import com.liferay.portlet.expando.util.ExpandoBridgeFactoryUtil;
 
 import java.io.Serializable;
 
-import java.lang.reflect.Proxy;
-
 import java.sql.Blob;
 import java.sql.Types;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -177,6 +178,32 @@ public class ${entity.name}ModelImpl extends BaseModelImpl<${entity.name}> imple
 		</#if>
 
 		);
+
+		<#assign columnBitmaskEnabled = true>
+
+		<#if entity.finderColumnsList?size == 0>
+			public static final boolean COLUMN_BITMASK_ENABLED = false;
+
+			<#assign columnBitmaskEnabled = false>
+		</#if>
+
+		<#if entity.finderColumnsList?size &gt; 64>
+			public static final boolean COLUMN_BITMASK_ENABLED = false;
+
+			<#assign columnBitmaskEnabled = false >
+		</#if>
+
+		<#if columnBitmaskEnabled>
+			public static final boolean COLUMN_BITMASK_ENABLED = GetterUtil.getBoolean(${propsUtil}.get("value.object.column.bitmask.enabled.${packagePath}.model.${entity.name}"), true);
+
+			<#assign columnBitmask = 1>
+
+			<#list entity.finderColumnsList as column>
+				public static long ${column.name?upper_case}_COLUMN_BITMASK = ${columnBitmask}L;
+
+				<#assign columnBitmask = columnBitmask * 2 >
+			</#list>
+		</#if>
 	</#if>
 
 	<#if entity.hasRemoteService()>
@@ -213,45 +240,29 @@ public class ${entity.name}ModelImpl extends BaseModelImpl<${entity.name}> imple
 		}
 	</#if>
 
-	public Class<?> getModelClass() {
-		return ${entity.name}.class;
-	}
-
-	public String getModelClassName() {
-		return ${entity.name}.class.getName();
-	}
-
 	<#list entity.columnList as column>
 		<#if column.mappingTable??>
 			<#assign entityShortName = stringUtil.shorten(entity.name, 9, "")>
 
-			<#if stringUtil.startsWith(column.mappingTable, entityShortName) || stringUtil.startsWith(column.mappingTable, portletShortName + "_" + entityShortName)>
-				public static final String MAPPING_TABLE_${stringUtil.upperCase(column.mappingTable)}_NAME = "${column.mappingTable}";
+			public static final String MAPPING_TABLE_${stringUtil.upperCase(column.mappingTable)}_NAME = "${column.mappingTable}";
 
-				<#compress>
-					public static final Object[][] MAPPING_TABLE_${stringUtil.upperCase(column.mappingTable)}_COLUMNS = {
-						<#list serviceBuilder.getMappingEntities(column.mappingTable) as mapColumn>
-							<#assign sqlType = serviceBuilder.getSqlType(mapColumn.getType())>
+			<#compress>
+				public static final Object[][] MAPPING_TABLE_${stringUtil.upperCase(column.mappingTable)}_COLUMNS = {
+					<#list serviceBuilder.getMappingEntities(column.mappingTable) as mapColumn>
+						<#assign sqlType = serviceBuilder.getSqlType(mapColumn.getType())>
 
-							{"${mapColumn.DBName}", Types.${sqlType}}
+						{"${mapColumn.DBName}", Types.${sqlType}}
 
-							<#if mapColumn_has_next>
-								,
-							</#if>
-						</#list>
-					};
-				</#compress>
+						<#if mapColumn_has_next>
+							,
+						</#if>
+					</#list>
+				};
+			</#compress>
 
-				public static final String MAPPING_TABLE_${stringUtil.upperCase(column.mappingTable)}_SQL_CREATE = "${serviceBuilder.getCreateMappingTableSQL(serviceBuilder.getEntityMapping(column.mappingTable))}";
+			public static final String MAPPING_TABLE_${stringUtil.upperCase(column.mappingTable)}_SQL_CREATE = "${serviceBuilder.getCreateMappingTableSQL(serviceBuilder.getEntityMapping(column.mappingTable))}";
 
-				public static final boolean FINDER_CACHE_ENABLED_${stringUtil.upperCase(column.mappingTable)} = GetterUtil.getBoolean(${propsUtil}.get("value.object.finder.cache.enabled.${column.mappingTable}"), true);
-			<#else>
-				<#assign tempEntity = serviceBuilder.getEntity(column.getEJBName())>
-
-				public static final String MAPPING_TABLE_${stringUtil.upperCase(column.mappingTable)}_NAME = ${tempEntity.packagePath}.model.impl.${tempEntity.name}ModelImpl.MAPPING_TABLE_${stringUtil.upperCase(column.mappingTable)}_NAME;
-
-				public static final boolean FINDER_CACHE_ENABLED_${stringUtil.upperCase(column.mappingTable)} = ${tempEntity.packagePath}.model.impl.${tempEntity.name}ModelImpl.FINDER_CACHE_ENABLED_${stringUtil.upperCase(column.mappingTable)};
-			</#if>
+			public static final boolean FINDER_CACHE_ENABLED_${stringUtil.upperCase(column.mappingTable)} = GetterUtil.getBoolean(${propsUtil}.get("value.object.finder.cache.enabled.${column.mappingTable}"), true);
 		</#if>
 	</#list>
 
@@ -336,6 +347,50 @@ public class ${entity.name}ModelImpl extends BaseModelImpl<${entity.name}> imple
 		);
 	}
 
+	public Class<?> getModelClass() {
+		return ${entity.name}.class;
+	}
+
+	public String getModelClassName() {
+		return ${entity.name}.class.getName();
+	}
+
+	@Override
+	public Map<String, Object> getModelAttributes() {
+		Map<String, Object> attributes = new HashMap<String, Object>();
+
+		<#list entity.regularColList as column>
+			attributes.put("${column.name}", get${column.methodName}());
+		</#list>
+
+		return attributes;
+	}
+
+	@Override
+	public void setModelAttributes(Map<String, Object> attributes) {
+		<#list entity.regularColList as column>
+			<#if column.isPrimitiveType()>
+				${serviceBuilder.getPrimitiveObj(column.type)}
+			<#else>
+				${column.type}
+			</#if>
+
+			${column.name} =
+
+			<#if column.isPrimitiveType()>
+				(${serviceBuilder.getPrimitiveObj(column.type)})
+			<#else>
+				(${column.type})
+			</#if>
+
+			attributes.get("${column.name}");
+
+			if (${column.name} != null) {
+				set${column.methodName}(${column.name});
+			}
+		</#list>
+	}
+
 	<#list entity.regularColList as column>
 		<#if column.name == "classNameId">
 			public String getClassName() {
@@ -344,6 +399,16 @@ public class ${entity.name}ModelImpl extends BaseModelImpl<${entity.name}> imple
 				}
 
 				return PortalUtil.getClassName(getClassNameId());
+			}
+
+			public void setClassName(String className) {
+				long classNameId = 0;
+
+				if (Validator.isNotNull(className)) {
+					classNameId = PortalUtil.getClassNameId(className);
+				}
+
+				setClassNameId(classNameId);
 			}
 		</#if>
 
@@ -366,16 +431,18 @@ public class ${entity.name}ModelImpl extends BaseModelImpl<${entity.name}> imple
 					if (_${column.name}BlobModel == null) {
 						try {
 							_${column.name}BlobModel = ${entity.name}LocalServiceUtil.get${column.methodName}BlobModel(getPrimaryKey());
-
-							if (_${column.name}BlobModel != null) {
-								return _${column.name}BlobModel.get${column.methodName}Blob();
-							}
 						}
 						catch (Exception e) {
 						}
 					}
 
-					return null;
+					Blob blob = null;
+
+					if (_${column.name}BlobModel != null) {
+						blob = _${column.name}BlobModel.get${column.methodName}Blob();
+					}
+
+					return blob;
 				<#else>
 					return _${column.name};
 				</#if>
@@ -396,25 +463,22 @@ public class ${entity.name}ModelImpl extends BaseModelImpl<${entity.name}> imple
 			}
 
 			public String get${column.methodName}(String languageId) {
-				String value = LocalizationUtil.getLocalization(get${column.methodName}(), languageId);
-
-				if (isEscapedModel()) {
-					return HtmlUtil.escape(value);
-				}
-				else {
-					return value;
-				}
+				return LocalizationUtil.getLocalization(get${column.methodName}(), languageId);
 			}
 
 			public String get${column.methodName}(String languageId, boolean useDefault) {
-				String value = LocalizationUtil.getLocalization(get${column.methodName}(), languageId, useDefault);
+				return LocalizationUtil.getLocalization(get${column.methodName}(), languageId, useDefault);
+			}
 
-				if (isEscapedModel()) {
-					return HtmlUtil.escape(value);
-				}
-				else {
-					return value;
-				}
+			public String get${column.methodName}CurrentLanguageId() {
+				return _${column.name}CurrentLanguageId;
+			}
+
+			@JSON
+			public String get${column.methodName}CurrentValue() {
+				Locale locale = getLocale(_${column.name}CurrentLanguageId);
+
+				return get${column.methodName}(locale);
 			}
 
 			public Map<Locale, String> get${column.methodName}Map() {
@@ -430,7 +494,7 @@ public class ${entity.name}ModelImpl extends BaseModelImpl<${entity.name}> imple
 
 		public void set${column.methodName}(${column.type} ${column.name}) {
 			<#if column.name == "uuid">
-				<#if column.isFetchFinderPath()>
+				<#if column.isFinderPath()>
 					if (_originalUuid == null) {
 						_originalUuid = _uuid;
 					}
@@ -438,7 +502,15 @@ public class ${entity.name}ModelImpl extends BaseModelImpl<${entity.name}> imple
 
 				_uuid = uuid;
 			<#else>
-				<#if column.isFetchFinderPath() || ((parentPKColumn != "") && (parentPKColumn.name == column.name))>
+				<#if column.isOrderColumn() && columnBitmaskEnabled>
+					_columnBitmask = -1L;
+				</#if>
+
+				<#if column.isFinderPath() || ((parentPKColumn != "") && (parentPKColumn.name == column.name))>
+					<#if !column.isOrderColumn() && columnBitmaskEnabled>
+						_columnBitmask |= ${column.name?upper_case}_COLUMN_BITMASK;
+					</#if>
+
 					<#if column.isPrimitiveType()>
 						if (!_setOriginal${column.methodName}) {
 							_setOriginal${column.methodName} = true;
@@ -480,6 +552,10 @@ public class ${entity.name}ModelImpl extends BaseModelImpl<${entity.name}> imple
 				}
 			}
 
+			public void set${column.methodName}CurrentLanguageId(String languageId) {
+				_${column.name}CurrentLanguageId = languageId;
+			}
+
 			public void set${column.methodName}Map(Map<Locale, String> ${column.name}Map) {
 				set${column.methodName}Map(${column.name}Map, LocaleUtil.getDefault());
 			}
@@ -489,13 +565,7 @@ public class ${entity.name}ModelImpl extends BaseModelImpl<${entity.name}> imple
 					return;
 				}
 
-				Locale[] locales = LanguageUtil.getAvailableLocales();
-
-				for (Locale locale : locales) {
-					String ${column.name} = ${column.name}Map.get(locale);
-
-					set${column.methodName}(${column.name}, locale, defaultLocale);
-				}
+				set${column.methodName}(LocalizationUtil.updateLocalization(${column.name}Map, get${column.methodName}(), "${column.methodName}", LocaleUtil.toLanguageId(defaultLocale)));
 			}
 		</#if>
 
@@ -515,7 +585,7 @@ public class ${entity.name}ModelImpl extends BaseModelImpl<${entity.name}> imple
 			}
 		</#if>
 
-		<#if column.isFetchFinderPath() || ((parentPKColumn != "") && (parentPKColumn.name == column.name))>
+		<#if column.isFinderPath() || ((parentPKColumn != "") && (parentPKColumn.name == column.name))>
 			public ${column.type} getOriginal${column.methodName}() {
 				<#if column.type == "String" && column.isConvertNull()>
 					return GetterUtil.getString(_original${column.methodName});
@@ -524,6 +594,27 @@ public class ${entity.name}ModelImpl extends BaseModelImpl<${entity.name}> imple
 				</#if>
 			}
 		</#if>
+	</#list>
+
+	<#list cacheFields as cacheField>
+		<#assign variableName = serviceBuilder.getVariableName(cacheField)>
+		<#assign methodName = textFormatter.format(variableName, 6)>
+		<#assign typeName = cacheField.getType().getGenericValue()>
+
+		public ${typeName} get${methodName}() {
+			<#if cacheField.getType().isPrimitive()>
+				<#if typeName == "boolean">
+					return false;
+				<#else>
+					return 0;
+				</#if>
+			<#else>
+				return null;
+			</#if>
+		}
+
+		public void set${methodName}(${typeName} ${variableName}) {
+		}
 	</#list>
 
 	<#if entity.isWorkflowEnabled()>
@@ -561,6 +652,15 @@ public class ${entity.name}ModelImpl extends BaseModelImpl<${entity.name}> imple
 			}
 		}
 
+		public boolean isInTrash() {
+			if (getStatus() == WorkflowConstants.STATUS_IN_TRASH) {
+				return true;
+			}
+			else {
+				return false;
+			}
+		}
+
 		public boolean isPending() {
 			if (getStatus() == WorkflowConstants.STATUS_PENDING) {
 				return true;
@@ -571,25 +671,25 @@ public class ${entity.name}ModelImpl extends BaseModelImpl<${entity.name}> imple
 		}
 	</#if>
 
+	<#if columnBitmaskEnabled>
+		public long getColumnBitmask() {
+			return _columnBitmask;
+		}
+	</#if>
+
 	@Override
 	public ${entity.name} toEscapedModel() {
-		if (isEscapedModel()) {
-			return (${entity.name})this;
+		if (_escapedModelProxy == null) {
+			_escapedModelProxy = (${entity.name})ProxyUtil.newProxyInstance(_classLoader, _escapedModelProxyInterfaces, new AutoEscapeBeanHandler(this));
 		}
-		else {
-			if (_escapedModelProxy == null) {
-				_escapedModelProxy = (${entity.name})Proxy.newProxyInstance(_classLoader, _escapedModelProxyInterfaces, new AutoEscapeBeanHandler(this));
-			}
 
-			return _escapedModelProxy;
-		}
+		return _escapedModelProxy;
 	}
 
 	<#if (entity.PKClassName == "long") && !stringUtil.startsWith(entity.name, "Expando")>
 		@Override
 		public ExpandoBridge getExpandoBridge() {
-			if (_expandoBridge == null) {
-				_expandoBridge = ExpandoBridgeFactoryUtil.getExpandoBridge(
+			return ExpandoBridgeFactoryUtil.getExpandoBridge(
 
 				<#if entity.hasColumn("companyId")>
 					getCompanyId(),
@@ -598,14 +698,13 @@ public class ${entity.name}ModelImpl extends BaseModelImpl<${entity.name}> imple
 				</#if>
 
 				${entity.name}.class.getName(), getPrimaryKey());
-			}
-
-			return _expandoBridge;
 		}
 
 		@Override
 		public void setExpandoBridgeAttributes(ServiceContext serviceContext) {
-			getExpandoBridge().setAttributes(serviceContext);
+			ExpandoBridge expandoBridge = getExpandoBridge();
+
+			expandoBridge.setAttributes(serviceContext);
 		}
 	</#if>
 
@@ -742,7 +841,7 @@ public class ${entity.name}ModelImpl extends BaseModelImpl<${entity.name}> imple
 	@Override
 	public void resetOriginalValues() {
 		<#list entity.regularColList as column>
-			<#if column.isFetchFinderPath() || ((parentPKColumn != "") && (parentPKColumn.name == column.name))>
+			<#if column.isFinderPath() || ((parentPKColumn != "") && (parentPKColumn.name == column.name))>
 				<#if !cloneCastModelImpl??>
 					<#assign cloneCastModelImpl = true>
 
@@ -757,9 +856,13 @@ public class ${entity.name}ModelImpl extends BaseModelImpl<${entity.name}> imple
 			</#if>
 
 			<#if (column.type == "Blob") && column.lazy>
-				_${column.name}BlobModel = null;
+				${entity.varName}ModelImpl._${column.name}BlobModel = null;
 			</#if>
 		</#list>
+
+		<#if columnBitmaskEnabled>
+			${entity.varName}ModelImpl._columnBitmask = 0;
+		</#if>
 	}
 
 	@Override
@@ -791,6 +894,12 @@ public class ${entity.name}ModelImpl extends BaseModelImpl<${entity.name}> imple
 			</#if>
 		</#list>
 
+		<#list cacheFields as cacheField>
+			<#assign methodName = textFormatter.format(serviceBuilder.getVariableName(cacheField), 6)>
+
+			${entity.varName}CacheModel.${cacheField.name} = get${methodName}();
+		</#list>
+
 		return ${entity.varName}CacheModel;
 	}
 
@@ -799,16 +908,18 @@ public class ${entity.name}ModelImpl extends BaseModelImpl<${entity.name}> imple
 		StringBundler sb = new StringBundler(${entity.regularColList?size * 2 + 1});
 
 		<#list entity.regularColList as column>
-			<#if column_index == 0>
-				sb.append("{${column.name}=");
-				sb.append(get${column.methodName}());
-			<#elseif column_has_next>
-				sb.append(", ${column.name}=");
-				sb.append(get${column.methodName}());
-			<#else>
-				sb.append(", ${column.name}=");
-				sb.append(get${column.methodName}());
-				sb.append("}");
+			<#if (column.type != "Blob") || !column.lazy>
+				<#if column_index == 0>
+					sb.append("{${column.name}=");
+					sb.append(get${column.methodName}());
+				<#elseif column_has_next>
+					sb.append(", ${column.name}=");
+					sb.append(get${column.methodName}());
+				<#else>
+					sb.append(", ${column.name}=");
+					sb.append(get${column.methodName}());
+					sb.append("}");
+				</#if>
 			</#if>
 		</#list>
 
@@ -823,9 +934,11 @@ public class ${entity.name}ModelImpl extends BaseModelImpl<${entity.name}> imple
 		sb.append("</model-name>");
 
 		<#list entity.regularColList as column>
-			sb.append("<column><column-name>${column.name}</column-name><column-value><![CDATA[");
-			sb.append(get${column.methodName}());
-			sb.append("]]></column-value></column>");
+			<#if (column.type != "Blob") || !column.lazy>
+				sb.append("<column><column-name>${column.name}</column-name><column-value><![CDATA[");
+				sb.append(get${column.methodName}());
+				sb.append("]]></column-value></column>");
+			</#if>
 		</#list>
 
 		sb.append("</model>");
@@ -843,11 +956,15 @@ public class ${entity.name}ModelImpl extends BaseModelImpl<${entity.name}> imple
 		<#else>
 			private ${column.type} _${column.name};
 
+			<#if column.localized>
+				private String _${column.name}CurrentLanguageId;
+			</#if>
+
 			<#if column.userUuid>
 				private String _${column.userUuidName};
 			</#if>
 
-			<#if column.isFetchFinderPath() || ((parentPKColumn != "") && (parentPKColumn.name == column.name))>
+			<#if column.isFinderPath() || ((parentPKColumn != "") && (parentPKColumn.name == column.name))>
 				private ${column.type} _original${column.methodName};
 
 				<#if column.isPrimitiveType()>
@@ -857,8 +974,8 @@ public class ${entity.name}ModelImpl extends BaseModelImpl<${entity.name}> imple
 		</#if>
 	</#list>
 
-	<#if (entity.PKClassName == "long") && !stringUtil.startsWith(entity.name, "Expando")>
-		private transient ExpandoBridge _expandoBridge;
+	<#if columnBitmaskEnabled>
+		private long _columnBitmask;
 	</#if>
 
 	private ${entity.name} _escapedModelProxy;

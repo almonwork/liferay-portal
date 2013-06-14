@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -19,13 +19,11 @@ int end = searchContainer.getEnd();
 int start = searchContainer.getStart();
 
 assetEntryQuery.setGroupIds(groupIds);
-assetEntryQuery.setEnd(end);
 assetEntryQuery.setExcludeZeroViewCount(excludeZeroViewCount);
 assetEntryQuery.setOrderByCol1(orderByColumn1);
 assetEntryQuery.setOrderByCol2(orderByColumn2);
 assetEntryQuery.setOrderByType1(orderByType1);
 assetEntryQuery.setOrderByType2(orderByType2);
-assetEntryQuery.setStart(start);
 
 List<AssetEntry> results = new ArrayList<AssetEntry>();
 int total = 0;
@@ -36,9 +34,7 @@ if (!portletName.equals(PortletKeys.RELATED_ASSETS) || (assetEntryQuery.getLinke
 
 		List<AssetCategory> assetCategories = AssetCategoryLocalServiceUtil.getVocabularyRootCategories(assetVocabulary.getVocabularyId(), QueryUtil.ALL_POS, QueryUtil.ALL_POS, null);
 
-		if (!anyAssetType) {
-			assetEntryQuery.setClassNameIds(classNameIds);
-		}
+		assetEntryQuery.setClassNameIds(classNameIds);
 
 		for (AssetCategory assetCategory : assetCategories) {
 			assetCategory = assetCategory.toEscapedModel();
@@ -53,19 +49,29 @@ if (!portletName.equals(PortletKeys.RELATED_ASSETS) || (assetEntryQuery.getLinke
 
 			total += groupTotal;
 
+			assetEntryQuery.setEnd(end);
+			assetEntryQuery.setStart(start);
+
 			results = AssetEntryServiceUtil.getEntries(assetEntryQuery);
 
 			if (!results.isEmpty()) {
 				searchContainer.setResults(results);
 
 				request.setAttribute("view.jsp-results", results);
-	%>
+%>
 
-				<h3 class="asset-entries-group-label"><%= assetCategory.getName() %></h3>
+				<h3 class="asset-entries-group-label"><%= assetCategory.getTitle(locale) %></h3>
 
-				<%@ include file="/html/portlet/asset_publisher/view_dynamic_list_asset.jspf" %>
+				<c:choose>
+					<c:when test="<%= assetPublisherDDMTemplateId > 0 %>">
+						<%= AssetPublisherUtil.renderDDMTemplate(renderRequest, renderResponse, assetPublisherDDMTemplateId, results) %>
+					</c:when>
+					<c:otherwise>
+						<%@ include file="/html/portlet/asset_publisher/view_dynamic_list_asset.jspf" %>
+					</c:otherwise>
+				</c:choose>
 
-	<%
+<%
 			}
 
 			if (groupTotal > 0) {
@@ -85,42 +91,47 @@ if (!portletName.equals(PortletKeys.RELATED_ASSETS) || (assetEntryQuery.getLinke
 			}
 
 			assetEntryQuery.setAllCategoryIds(oldAllCategoryIds);
-			assetEntryQuery.setEnd(end);
-			assetEntryQuery.setStart(start);
+			assetEntryQuery.setEnd(QueryUtil.ALL_POS);
+			assetEntryQuery.setStart(QueryUtil.ALL_POS);
 		}
 
 		searchContainer.setTotal(total);
 	}
 	else if (!groupByClass) {
-		if (!anyAssetType) {
-			assetEntryQuery.setClassNameIds(classNameIds);
-		}
+		assetEntryQuery.setClassNameIds(classNameIds);
 
 		total = AssetEntryServiceUtil.getEntriesCount(assetEntryQuery);
 
 		searchContainer.setTotal(total);
+
+		assetEntryQuery.setEnd(end);
+		assetEntryQuery.setStart(start);
 
 		results = AssetEntryServiceUtil.getEntries(assetEntryQuery);
 
 		searchContainer.setResults(results);
 
 		request.setAttribute("view.jsp-results", results);
-	%>
+%>
 
-		<%@ include file="/html/portlet/asset_publisher/view_dynamic_list_asset.jspf" %>
+		<c:choose>
+			<c:when test="<%= assetPublisherDDMTemplateId > 0 %>">
+				<%= AssetPublisherUtil.renderDDMTemplate(renderRequest, renderResponse, assetPublisherDDMTemplateId, results) %>
+			</c:when>
+			<c:otherwise>
+				<%@ include file="/html/portlet/asset_publisher/view_dynamic_list_asset.jspf" %>
+			</c:otherwise>
+		</c:choose>
 
-	<%
+<%
 	}
 	else {
-		int maxGroupTotal = 0;
-
 		for (long classNameId : classNameIds) {
+			long[] oldGroupClassNameIds = assetEntryQuery.getClassNameIds();
+
 			long[] groupClassNameIds = {classNameId};
 
 			assetEntryQuery.setClassNameIds(groupClassNameIds);
-
-			assetEntryQuery.setEnd(end);
-			assetEntryQuery.setStart(start);
 
 			String groupClassName = PortalUtil.getClassName(classNameId);
 
@@ -128,11 +139,10 @@ if (!portletName.equals(PortletKeys.RELATED_ASSETS) || (assetEntryQuery.getLinke
 
 			int groupTotal = AssetEntryServiceUtil.getEntriesCount(assetEntryQuery);
 
-			if (groupTotal > maxGroupTotal) {
-				maxGroupTotal = groupTotal;
-			}
-
 			total += groupTotal;
+
+			assetEntryQuery.setEnd(end);
+			assetEntryQuery.setStart(start);
 
 			results = AssetEntryServiceUtil.getEntries(assetEntryQuery);
 
@@ -141,27 +151,54 @@ if (!portletName.equals(PortletKeys.RELATED_ASSETS) || (assetEntryQuery.getLinke
 			request.setAttribute("view.jsp-results", results);
 
 			if (!results.isEmpty()) {
-	%>
+%>
 
 				<h3 class="asset-entries-group-label"><liferay-ui:message key="<%= groupAssetRendererFactory.getType() %>" /></h3>
 
-				<%@ include file="/html/portlet/asset_publisher/view_dynamic_list_asset.jspf" %>
+				<c:choose>
+					<c:when test="<%= assetPublisherDDMTemplateId > 0 %>">
+						<%= AssetPublisherUtil.renderDDMTemplate(renderRequest, renderResponse, assetPublisherDDMTemplateId, results) %>
+					</c:when>
+					<c:otherwise>
+						<%@ include file="/html/portlet/asset_publisher/view_dynamic_list_asset.jspf" %>
+					</c:otherwise>
+				</c:choose>
 
-	<%
+<%
 			}
+
+			if (groupTotal > 0) {
+				if ((end > 0) && (end > groupTotal)) {
+					end -= groupTotal;
+				}
+				else {
+					end = 0;
+				}
+
+				if ((start > 0) && (start > groupTotal)) {
+					start -= groupTotal;
+				}
+				else {
+					start = 0;
+				}
+			}
+
+			assetEntryQuery.setClassNameIds(oldGroupClassNameIds);
+			assetEntryQuery.setEnd(QueryUtil.ALL_POS);
+			assetEntryQuery.setStart(QueryUtil.ALL_POS);
 		}
 
-		searchContainer.setTotal(maxGroupTotal);
+		searchContainer.setTotal(total);
 	}
 }
 
 if (total == 0) {
-	if (!showPortletWithNoResults && !((assetCategoryId > 0) || Validator.isNotNull(assetTagName))) {
+	if (!showPortletWithNoResults && ((addPortletURLs == null) || addPortletURLs.isEmpty()) && !((assetCategoryId > 0) || Validator.isNotNull(assetTagName))) {
 		renderRequest.setAttribute(WebKeys.PORTLET_CONFIGURATOR_VISIBILITY, Boolean.TRUE);
 	}
 %>
 
-	<p>
+	<div class="portlet-msg-info">
 		<c:choose>
 			<c:when test="<%= !portletName.equals(PortletKeys.RELATED_ASSETS) %>">
 				<liferay-ui:message key="there-are-no-results" />
@@ -170,7 +207,7 @@ if (total == 0) {
 				<liferay-ui:message key="there-are-no-related-assets" />
 			</c:otherwise>
 		</c:choose>
-	</p>
+	</div>
 
 <%
 }

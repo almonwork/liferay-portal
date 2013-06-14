@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -50,9 +50,7 @@ if (Validator.isNotNull(target)) {
 			LinkedHashMap<String, Object> organizationParams = new LinkedHashMap<String, Object>();
 
 			if (filterManageableOrganizations) {
-				Long[][] leftAndRightOrganizationIds = UsersAdminUtil.getLeftAndRightOrganizationIds(user.getOrganizations());
-
-				organizationParams.put("organizationsTree", leftAndRightOrganizationIds);
+				organizationParams.put("organizationsTree", user.getOrganizations());
 			}
 
 			if (searchTerms.isAdvancedSearch()) {

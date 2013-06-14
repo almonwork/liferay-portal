@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -21,7 +21,6 @@
 <%
 Map<String, Object> dynamicAttributes = (Map<String, Object>)request.getAttribute("aui:button-row:dynamicAttributes");
 Map<String, Object> scopedAttributes = (Map<String, Object>)request.getAttribute("aui:button-row:scopedAttributes");
-CustomAttributes customAttributes = (CustomAttributes)request.getAttribute("aui:button-row:customAttributes");
 
 Map<String, Object> _options = new HashMap<String, Object>();
 
@@ -34,11 +33,13 @@ if ((dynamicAttributes != null) && !dynamicAttributes.isEmpty()) {
 }
 
 java.lang.String cssClass = GetterUtil.getString((java.lang.String)request.getAttribute("aui:button-row:cssClass"));
+java.lang.String id = GetterUtil.getString((java.lang.String)request.getAttribute("aui:button-row:id"));
 
 _updateOptions(_options, "cssClass", cssClass);
+_updateOptions(_options, "id", id);
 %>
 
-<%@ include file="init-ext.jspf" %>
+<%@ include file="/html/taglib/aui/button_row/init-ext.jspf" %>
 
 <%!
 private static final String _NAMESPACE = "aui:button-row:";

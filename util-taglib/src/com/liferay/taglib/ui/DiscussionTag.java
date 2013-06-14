@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -23,6 +23,10 @@ import javax.servlet.http.HttpServletRequest;
  * @author Charles May
  */
 public class DiscussionTag extends IncludeTag {
+
+	public void setAssetEntryVisible(boolean assetEntryVisible) {
+		_assetEntryVisible = assetEntryVisible;
+	}
 
 	public void setClassName(String className) {
 		_className = className;
@@ -70,6 +74,7 @@ public class DiscussionTag extends IncludeTag {
 
 	@Override
 	protected void cleanUp() {
+		_assetEntryVisible = true;
 		_className = null;
 		_classPK = 0;
 		_formAction = null;
@@ -102,6 +107,9 @@ public class DiscussionTag extends IncludeTag {
 			permissionClassPK = _classPK;
 		}
 
+		request.setAttribute(
+			"liferay-ui:discussion:assetEntryVisible",
+			String.valueOf(_assetEntryVisible));
 		request.setAttribute("liferay-ui:discussion:className", _className);
 		request.setAttribute(
 			"liferay-ui:discussion:classPK", String.valueOf(_classPK));
@@ -126,6 +134,7 @@ public class DiscussionTag extends IncludeTag {
 
 	private static final String _PAGE = "/html/taglib/ui/discussion/page.jsp";
 
+	private boolean _assetEntryVisible = true;
 	private String _className;
 	private long _classPK;
 	private String _formAction;

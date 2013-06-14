@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,6 +14,7 @@
 
 package com.liferay.portal.model;
 
+import com.liferay.portal.kernel.security.pacl.permission.PortalRuntimePermission;
 import com.liferay.portal.kernel.util.Tuple;
 import com.liferay.portal.kernel.xml.Element;
 
@@ -24,6 +25,10 @@ import java.util.Map;
  * @author Brian Wing Shun Chan
  */
 public class ModelHintsUtil {
+
+	public static String buildCustomValidatorName(String validatorName) {
+		return getModelHints().buildCustomValidatorName(validatorName);
+	}
 
 	public static Map<String, String> getDefaultHints(String model) {
 		return getModelHints().getDefaultHints(model);
@@ -38,6 +43,8 @@ public class ModelHintsUtil {
 	}
 
 	public static ModelHints getModelHints() {
+		PortalRuntimePermission.checkGetBeanProperty(ModelHintsUtil.class);
+
 		return _modelHints;
 	}
 
@@ -61,6 +68,10 @@ public class ModelHintsUtil {
 		return getModelHints().getValidators(model, field);
 	}
 
+	public static boolean isCustomValidator(String validatorName) {
+		return getModelHints().isCustomValidator(validatorName);
+	}
+
 	public static boolean isLocalized(String model, String field) {
 		return getModelHints().isLocalized(model, field);
 	}
@@ -76,6 +87,8 @@ public class ModelHintsUtil {
 	}
 
 	public void setModelHints(ModelHints modelHints) {
+		PortalRuntimePermission.checkSetBeanProperty(getClass());
+
 		_modelHints = modelHints;
 	}
 

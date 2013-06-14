@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -95,7 +95,7 @@ public class MediaWikiEngine implements WikiEngine {
 					}
 				}
 
-				outgoingLinks.put(title.toLowerCase(), existsObj);
+				outgoingLinks.put(title, existsObj);
 			}
 		}
 
@@ -113,7 +113,8 @@ public class MediaWikiEngine implements WikiEngine {
 	}
 
 	protected ParserInput getParserInput(long nodeId, String topicName) {
-		ParserInput parserInput = new ParserInput();
+		ParserInput parserInput = new ParserInput(
+			"Special:Node:" + nodeId, topicName);
 
 		// Dummy values
 
@@ -125,11 +126,6 @@ public class MediaWikiEngine implements WikiEngine {
 		// Useful values
 
 		parserInput.setAllowSectionEdit(false);
-		parserInput.setTopicName(topicName);
-
-		// Encode node id
-
-		parserInput.setVirtualWiki("Special:Node:" + nodeId);
 
 		// Table of contents
 
@@ -189,18 +185,24 @@ public class MediaWikiEngine implements WikiEngine {
 		String content, PortletURL viewPageURL, PortletURL editPageURL,
 		String attachmentURLPrefix) {
 
-		EditURLMatcher editURLMatcher = new EditURLMatcher(editPageURL);
+		if (editPageURL != null) {
+			EditURLMatcher editURLMatcher = new EditURLMatcher(editPageURL);
 
-		content = editURLMatcher.replaceMatches(content);
+			content = editURLMatcher.replaceMatches(content);
+		}
 
-		ImageURLMatcher imageURLMatcher = new ImageURLMatcher(
-			attachmentURLPrefix);
+		if (attachmentURLPrefix != null) {
+			ImageURLMatcher imageURLMatcher = new ImageURLMatcher(
+				attachmentURLPrefix);
 
-		content = imageURLMatcher.replaceMatches(content);
+			content = imageURLMatcher.replaceMatches(content);
+		}
 
-		ViewURLMatcher viewURLMatcher = new ViewURLMatcher(viewPageURL);
+		if (viewPageURL != null) {
+			ViewURLMatcher viewURLMatcher = new ViewURLMatcher(viewPageURL);
 
-		content = viewURLMatcher.replaceMatches(content);
+			content = viewURLMatcher.replaceMatches(content);
+		}
 
 		return content;
 	}

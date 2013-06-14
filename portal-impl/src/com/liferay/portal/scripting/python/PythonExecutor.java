@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -34,18 +34,14 @@ import org.python.util.InteractiveInterpreter;
  */
 public class PythonExecutor extends BaseScriptingExecutor {
 
-	public static final String CACHE_NAME = PythonExecutor.class.getName();
-
-	public static final String LANGUAGE = "python";
-
 	@Override
 	public void clearCache() {
-		SingleVMPoolUtil.clear(CACHE_NAME);
+		SingleVMPoolUtil.clear(_CACHE_NAME);
 	}
 
 	public Map<String, Object> eval(
 			Set<String> allowedClasses, Map<String, Object> inputObjects,
-			Set<String> outputNames, String script)
+			Set<String> outputNames, String script, ClassLoader... classLoaders)
 		throws ScriptingException {
 
 		if (allowedClasses != null) {
@@ -82,7 +78,7 @@ public class PythonExecutor extends BaseScriptingExecutor {
 	}
 
 	public String getLanguage() {
-		return LANGUAGE;
+		return _LANGUAGE;
 	}
 
 	protected PyCode getCompiledScript(String script) {
@@ -98,17 +94,21 @@ public class PythonExecutor extends BaseScriptingExecutor {
 
 		String key = String.valueOf(script.hashCode());
 
-		PyCode compiledScript = (PyCode)SingleVMPoolUtil.get(CACHE_NAME, key);
+		PyCode compiledScript = (PyCode)SingleVMPoolUtil.get(_CACHE_NAME, key);
 
 		if (compiledScript == null) {
 			compiledScript = Py.compile_flags(
 				script, "<string>", CompileMode.exec, Py.getCompilerFlags());
 
-			SingleVMPoolUtil.put(CACHE_NAME, key, compiledScript);
+			SingleVMPoolUtil.put(_CACHE_NAME, key, compiledScript);
 		}
 
 		return compiledScript;
 	}
+
+	private static final String _CACHE_NAME = PythonExecutor.class.getName();
+
+	private static final String _LANGUAGE = "python";
 
 	private volatile boolean _initialized;
 

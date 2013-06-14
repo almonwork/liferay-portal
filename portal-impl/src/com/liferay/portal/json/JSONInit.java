@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -19,10 +19,12 @@ import com.liferay.portal.json.transformer.JSONArrayJSONTransformer;
 import com.liferay.portal.json.transformer.JSONObjectJSONTransformer;
 import com.liferay.portal.json.transformer.JSONSerializableJSONTransformer;
 import com.liferay.portal.json.transformer.RepositoryModelJSONTransformer;
+import com.liferay.portal.json.transformer.UserJSONTransformer;
 import com.liferay.portal.kernel.json.JSONArray;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.json.JSONSerializable;
 import com.liferay.portal.kernel.repository.model.RepositoryModel;
+import com.liferay.portal.model.User;
 
 import flexjson.TransformerUtil;
 
@@ -110,6 +112,9 @@ public class JSONInit {
 		transformersMap.put(
 			RepositoryModel.class,
 			new TransformerWrapper(new RepositoryModelJSONTransformer()));
+
+		transformersMap.put(
+			User.class, new TransformerWrapper(new UserJSONTransformer()));
 	}
 
 	private static boolean _initalized = false;

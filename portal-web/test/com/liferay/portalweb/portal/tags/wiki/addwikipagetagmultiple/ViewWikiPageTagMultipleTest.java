@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -23,9 +23,10 @@ import com.liferay.portalweb.portal.util.RuntimeVariables;
 public class ViewWikiPageTagMultipleTest extends BaseTestCase {
 	public void testViewWikiPageTagMultiple() throws Exception {
 		selenium.open("/web/guest/home/");
+		loadRequiredJavaScriptModules();
 
 		for (int second = 0;; second++) {
-			if (second >= 60) {
+			if (second >= 90) {
 				fail("timeout");
 			}
 
@@ -40,21 +41,23 @@ public class ViewWikiPageTagMultipleTest extends BaseTestCase {
 			Thread.sleep(1000);
 		}
 
-		selenium.saveScreenShotAndSource();
-		selenium.clickAt("link=Wiki Test Page", RuntimeVariables.replace(""));
+		selenium.clickAt("link=Wiki Test Page",
+			RuntimeVariables.replace("Wiki Test Page"));
 		selenium.waitForPageToLoad("30000");
-		selenium.saveScreenShotAndSource();
-		selenium.clickAt("link=All Pages", RuntimeVariables.replace(""));
+		loadRequiredJavaScriptModules();
+		selenium.clickAt("link=All Pages", RuntimeVariables.replace("All Pages"));
 		selenium.waitForPageToLoad("30000");
-		selenium.saveScreenShotAndSource();
-		selenium.clickAt("link=Wiki1 Page1 Test1", RuntimeVariables.replace(""));
+		loadRequiredJavaScriptModules();
+		selenium.clickAt("link=Wiki Page1 Test",
+			RuntimeVariables.replace("Wiki Page1 Test"));
 		selenium.waitForPageToLoad("30000");
-		selenium.saveScreenShotAndSource();
-		selenium.clickAt("link=wiki tag multiple", RuntimeVariables.replace(""));
+		loadRequiredJavaScriptModules();
+		selenium.clickAt("link=wiki tag multiple",
+			RuntimeVariables.replace("wiki tag multiple"));
 		selenium.waitForPageToLoad("30000");
-		selenium.saveScreenShotAndSource();
-		assertTrue(selenium.isElementPresent("link=Wiki1 Page1 Test1"));
-		assertTrue(selenium.isElementPresent("link=Wiki2 Page2 Test2"));
-		assertTrue(selenium.isElementPresent("link=Wiki3 Page3 Test3"));
+		loadRequiredJavaScriptModules();
+		assertTrue(selenium.isVisible("link=Wiki Page1 Test"));
+		assertTrue(selenium.isVisible("link=Wiki Page2 Test"));
+		assertTrue(selenium.isVisible("link=Wiki Page3 Test"));
 	}
 }

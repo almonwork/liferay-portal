@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,6 +14,12 @@
 
 package com.liferay.portlet.polls.model;
 
+import com.liferay.portal.model.ModelWrapper;
+
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * <p>
  * This class is a wrapper for {@link PollsVote}.
@@ -23,7 +29,7 @@ package com.liferay.portlet.polls.model;
  * @see       PollsVote
  * @generated
  */
-public class PollsVoteWrapper implements PollsVote {
+public class PollsVoteWrapper implements PollsVote, ModelWrapper<PollsVote> {
 	public PollsVoteWrapper(PollsVote pollsVote) {
 		_pollsVote = pollsVote;
 	}
@@ -34,6 +40,78 @@ public class PollsVoteWrapper implements PollsVote {
 
 	public String getModelClassName() {
 		return PollsVote.class.getName();
+	}
+
+	public Map<String, Object> getModelAttributes() {
+		Map<String, Object> attributes = new HashMap<String, Object>();
+
+		attributes.put("voteId", getVoteId());
+		attributes.put("companyId", getCompanyId());
+		attributes.put("userId", getUserId());
+		attributes.put("userName", getUserName());
+		attributes.put("createDate", getCreateDate());
+		attributes.put("modifiedDate", getModifiedDate());
+		attributes.put("questionId", getQuestionId());
+		attributes.put("choiceId", getChoiceId());
+		attributes.put("voteDate", getVoteDate());
+
+		return attributes;
+	}
+
+	public void setModelAttributes(Map<String, Object> attributes) {
+		Long voteId = (Long)attributes.get("voteId");
+
+		if (voteId != null) {
+			setVoteId(voteId);
+		}
+
+		Long companyId = (Long)attributes.get("companyId");
+
+		if (companyId != null) {
+			setCompanyId(companyId);
+		}
+
+		Long userId = (Long)attributes.get("userId");
+
+		if (userId != null) {
+			setUserId(userId);
+		}
+
+		String userName = (String)attributes.get("userName");
+
+		if (userName != null) {
+			setUserName(userName);
+		}
+
+		Date createDate = (Date)attributes.get("createDate");
+
+		if (createDate != null) {
+			setCreateDate(createDate);
+		}
+
+		Date modifiedDate = (Date)attributes.get("modifiedDate");
+
+		if (modifiedDate != null) {
+			setModifiedDate(modifiedDate);
+		}
+
+		Long questionId = (Long)attributes.get("questionId");
+
+		if (questionId != null) {
+			setQuestionId(questionId);
+		}
+
+		Long choiceId = (Long)attributes.get("choiceId");
+
+		if (choiceId != null) {
+			setChoiceId(choiceId);
+		}
+
+		Date voteDate = (Date)attributes.get("voteDate");
+
+		if (voteDate != null) {
+			setVoteDate(voteDate);
+		}
 	}
 
 	/**
@@ -73,6 +151,24 @@ public class PollsVoteWrapper implements PollsVote {
 	}
 
 	/**
+	* Returns the company ID of this polls vote.
+	*
+	* @return the company ID of this polls vote
+	*/
+	public long getCompanyId() {
+		return _pollsVote.getCompanyId();
+	}
+
+	/**
+	* Sets the company ID of this polls vote.
+	*
+	* @param companyId the company ID of this polls vote
+	*/
+	public void setCompanyId(long companyId) {
+		_pollsVote.setCompanyId(companyId);
+	}
+
+	/**
 	* Returns the user ID of this polls vote.
 	*
 	* @return the user ID of this polls vote
@@ -108,6 +204,60 @@ public class PollsVoteWrapper implements PollsVote {
 	*/
 	public void setUserUuid(java.lang.String userUuid) {
 		_pollsVote.setUserUuid(userUuid);
+	}
+
+	/**
+	* Returns the user name of this polls vote.
+	*
+	* @return the user name of this polls vote
+	*/
+	public java.lang.String getUserName() {
+		return _pollsVote.getUserName();
+	}
+
+	/**
+	* Sets the user name of this polls vote.
+	*
+	* @param userName the user name of this polls vote
+	*/
+	public void setUserName(java.lang.String userName) {
+		_pollsVote.setUserName(userName);
+	}
+
+	/**
+	* Returns the create date of this polls vote.
+	*
+	* @return the create date of this polls vote
+	*/
+	public java.util.Date getCreateDate() {
+		return _pollsVote.getCreateDate();
+	}
+
+	/**
+	* Sets the create date of this polls vote.
+	*
+	* @param createDate the create date of this polls vote
+	*/
+	public void setCreateDate(java.util.Date createDate) {
+		_pollsVote.setCreateDate(createDate);
+	}
+
+	/**
+	* Returns the modified date of this polls vote.
+	*
+	* @return the modified date of this polls vote
+	*/
+	public java.util.Date getModifiedDate() {
+		return _pollsVote.getModifiedDate();
+	}
+
+	/**
+	* Sets the modified date of this polls vote.
+	*
+	* @param modifiedDate the modified date of this polls vote
+	*/
+	public void setModifiedDate(java.util.Date modifiedDate) {
+		_pollsVote.setModifiedDate(modifiedDate);
 	}
 
 	/**
@@ -184,10 +334,6 @@ public class PollsVoteWrapper implements PollsVote {
 		return _pollsVote.isEscapedModel();
 	}
 
-	public void setEscapedModel(boolean escapedModel) {
-		_pollsVote.setEscapedModel(escapedModel);
-	}
-
 	public java.io.Serializable getPrimaryKeyObj() {
 		return _pollsVote.getPrimaryKeyObj();
 	}
@@ -247,7 +393,14 @@ public class PollsVoteWrapper implements PollsVote {
 		return _pollsVote.getChoice();
 	}
 
+	/**
+	 * @deprecated Renamed to {@link #getWrappedModel}
+	 */
 	public PollsVote getWrappedPollsVote() {
+		return _pollsVote;
+	}
+
+	public PollsVote getWrappedModel() {
 		return _pollsVote;
 	}
 

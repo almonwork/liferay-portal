@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -95,8 +95,8 @@ public abstract class BaseStorageAdapter implements StorageAdapter {
 				DDMStorageLinkLocalServiceUtil.getClassStorageLink(classPK);
 
 			Map<Long, Fields> fieldsMapByClasses = getFieldsMap(
-				ddmStorageLink.getStructureId(),
-				new long[] {classPK}, fieldNames);
+				ddmStorageLink.getStructureId(), new long[] {classPK},
+				fieldNames);
 
 			return fieldsMapByClasses.get(classPK);
 		}
@@ -259,7 +259,7 @@ public abstract class BaseStorageAdapter implements StorageAdapter {
 			long ddmStructureId, long[] classPKs, List<String> fieldNames)
 		throws Exception;
 
-	protected abstract  List<Fields> doQuery(
+	protected abstract List<Fields> doQuery(
 			long ddmStructureId, List<String> fieldNames, Condition condition,
 			OrderByComparator orderByComparator)
 		throws Exception;

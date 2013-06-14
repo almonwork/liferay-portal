@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -47,12 +47,13 @@ public class UserNotificationEventLocalServiceImpl
 		return addUserNotificationEvent(
 			userId, notificationEvent.getType(),
 			notificationEvent.getTimestamp(), notificationEvent.getDeliverBy(),
-			payloadJSONObject.toString(), serviceContext);
+			payloadJSONObject.toString(), notificationEvent.isArchived(),
+			serviceContext);
 	}
 
 	public UserNotificationEvent addUserNotificationEvent(
 			long userId, String type, long timestamp, long deliverBy,
-			String payload, ServiceContext serviceContext)
+			String payload, boolean archived, ServiceContext serviceContext)
 		throws PortalException, SystemException {
 
 		User user = userPersistence.findByPrimaryKey(userId);
@@ -69,6 +70,7 @@ public class UserNotificationEventLocalServiceImpl
 		userNotificationEvent.setTimestamp(timestamp);
 		userNotificationEvent.setDeliverBy(deliverBy);
 		userNotificationEvent.setPayload(payload);
+		userNotificationEvent.setArchived(archived);
 
 		userNotificationEventPersistence.update(userNotificationEvent, false);
 
@@ -92,17 +94,18 @@ public class UserNotificationEventLocalServiceImpl
 		return userNotificationEvents;
 	}
 
-	public void deleteUserNotificationEvent(String uuid)
+	public void deleteUserNotificationEvent(String uuid, long companyId)
 		throws SystemException {
 
-		userNotificationEventPersistence.removeByUuid(uuid);
+		userNotificationEventPersistence.removeByUuid_C(uuid, companyId);
 	}
 
-	public void deleteUserNotificationEvents(Collection<String> uuids)
+	public void deleteUserNotificationEvents(
+			Collection<String> uuids, long companyId)
 		throws SystemException {
 
 		for (String uuid : uuids) {
-			deleteUserNotificationEvent(uuid);
+			deleteUserNotificationEvent(uuid, companyId);
 		}
 	}
 
@@ -110,6 +113,77 @@ public class UserNotificationEventLocalServiceImpl
 		throws SystemException {
 
 		return userNotificationEventPersistence.findByUserId(userId);
+	}
+
+	public List<UserNotificationEvent> getUserNotificationEvents(
+			long userId, boolean archived)
+		throws SystemException {
+
+		return userNotificationEventPersistence.findByU_A(userId, archived);
+	}
+
+	public List<UserNotificationEvent> getUserNotificationEvents(
+			long userId, boolean archived, int start, int end)
+		throws SystemException {
+
+		return userNotificationEventPersistence.findByU_A(
+			userId, archived, start, end);
+	}
+
+	public List<UserNotificationEvent> getUserNotificationEvents(
+			long userId, int start, int end)
+		throws SystemException {
+
+		return userNotificationEventPersistence.findByUserId(
+			userId, start, end);
+	}
+
+	public int getUserNotificationEventsCount(long userId)
+		throws SystemException {
+
+		return userNotificationEventPersistence.countByUserId(userId);
+	}
+
+	public int getUserNotificationEventsCount(long userId, boolean archived)
+		throws SystemException {
+
+		return userNotificationEventPersistence.countByU_A(userId, archived);
+	}
+
+	public UserNotificationEvent updateUserNotificationEvent(
+			String uuid, long companyId, boolean archive)
+		throws SystemException {
+
+		List<UserNotificationEvent> userNotificationEvents =
+			userNotificationEventPersistence.findByUuid_C(uuid, companyId);
+
+		if (userNotificationEvents.isEmpty()) {
+			return null;
+		}
+
+		UserNotificationEvent userNotificationEvent =
+			userNotificationEvents.get(0);
+
+		userNotificationEvent.setArchived(archive);
+
+		userNotificationEventPersistence.update(userNotificationEvent, false);
+
+		return userNotificationEvent;
+	}
+
+	public List<UserNotificationEvent> updateUserNotificationEvents(
+			Collection<String> uuids, long companyId, boolean archive)
+		throws SystemException {
+
+		List<UserNotificationEvent> userNotificationEvents =
+			new ArrayList<UserNotificationEvent>();
+
+		for (String uuid : uuids) {
+			userNotificationEvents.add(
+				updateUserNotificationEvent(uuid, companyId, archive));
+		}
+
+		return userNotificationEvents;
 	}
 
 }

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -147,13 +147,10 @@ public class IngresDB extends BaseDB {
 		return sb.toString();
 	}
 
-	private static String[] _INGRES = {
-		"--", "1", "0",
-		"'1970-01-01'", "date('now')",
-		" blob", " tinyint", " timestamp",
-		" float", " integer", " bigint",
-		" varchar(1000)", " long varchar", " varchar",
-		"", "commit;\\g"
+	private static final String[] _INGRES = {
+		"--", "1", "0", "'1970-01-01'", "date('now')", " blob", " blob",
+		" tinyint", " timestamp", " float", " integer", " bigint",
+		" varchar(1000)", " long varchar", " varchar", "", "commit;\\g"
 	};
 
 	private static final boolean _SUPPORTS_ALTER_COLUMN_NAME = false;

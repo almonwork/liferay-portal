@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -85,7 +85,8 @@ public class PortletURLAction extends Action {
 		String resourceId = ParamUtil.getString(request, "resourceId");
 		String returnToFullPageURL = ParamUtil.getString(
 			request, "returnToFullPageURL");
-		boolean secure = ParamUtil.getBoolean(request, "secure");
+		boolean secure = ParamUtil.getBoolean(
+			request, "secure", request.isSecure());
 		String windowState = ParamUtil.getString(request, "windowState");
 
 		PortletURLImpl portletURL = new PortletURLImpl(
@@ -164,7 +165,12 @@ public class PortletURLAction extends Action {
 					parameterMapString);
 
 			for (Map.Entry<String, String> entry : parameterMap.entrySet()) {
-				portletURL.setParameter(entry.getKey(), entry.getValue());
+				String key = entry.getKey();
+				String value = entry.getValue();
+
+				if ((key != null) && (value != null)) {
+					portletURL.setParameter(key, value);
+				}
 			}
 		}
 

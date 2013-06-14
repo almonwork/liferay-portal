@@ -27,17 +27,25 @@
 		<model-name>com.liferay.portlet.documentlibrary</model-name>
 		<portlet-ref>
 			<portlet-name>20</portlet-name>
+			<portlet-name>31</portlet-name>
+			<portlet-name>110</portlet-name>
 		</portlet-ref>
 		<permissions>
 			<supports>
 				<action-key>ADD_DOCUMENT</action-key>
 				<action-key>ADD_DOCUMENT_TYPE</action-key>
 				<action-key>ADD_FOLDER</action-key>
+				<action-key>ADD_REPOSITORY</action-key>
+				<action-key>ADD_STRUCTURE</action-key>
 				<action-key>ADD_SHORTCUT</action-key>
 				<action-key>PERMISSIONS</action-key>
+				<action-key>UPDATE</action-key>
 				<action-key>VIEW</action-key>
 			</supports>
 			<site-member-defaults>
+				<action-key>ADD_DOCUMENT</action-key>
+				<action-key>ADD_FOLDER</action-key>
+				<action-key>ADD_SHORTCUT</action-key>
 				<action-key>VIEW</action-key>
 			</site-member-defaults>
 			<guest-defaults>
@@ -47,8 +55,11 @@
 				<action-key>ADD_DOCUMENT</action-key>
 				<action-key>ADD_DOCUMENT_TYPE</action-key>
 				<action-key>ADD_FOLDER</action-key>
+				<action-key>ADD_REPOSITORY</action-key>
+				<action-key>ADD_STRUCTURE</action-key>
 				<action-key>ADD_SHORTCUT</action-key>
 				<action-key>PERMISSIONS</action-key>
+				<action-key>UPDATE</action-key>
 			</guest-unsupported>
 		</permissions>
 	</model-resource>
@@ -76,7 +87,9 @@
 				<action-key>VIEW</action-key>
 			</guest-defaults>
 			<guest-unsupported>
+				<action-key>DELETE</action-key>
 				<action-key>DELETE_DISCUSSION</action-key>
+				<action-key>PERMISSIONS</action-key>
 				<action-key>UPDATE</action-key>
 				<action-key>UPDATE_DISCUSSION</action-key>
 			</guest-unsupported>
@@ -132,7 +145,9 @@
 			</guest-defaults>
 			<guest-unsupported>
 				<action-key>ADD_DISCUSSION</action-key>
+				<action-key>DELETE</action-key>
 				<action-key>DELETE_DISCUSSION</action-key>
+				<action-key>PERMISSIONS</action-key>
 				<action-key>UPDATE</action-key>
 				<action-key>UPDATE_DISCUSSION</action-key>
 			</guest-unsupported>
@@ -167,6 +182,8 @@
 				<action-key>ADD_DOCUMENT</action-key>
 				<action-key>ADD_SHORTCUT</action-key>
 				<action-key>ADD_SUBFOLDER</action-key>
+				<action-key>DELETE</action-key>
+				<action-key>PERMISSIONS</action-key>
 				<action-key>UPDATE</action-key>
 			</guest-unsupported>
 		</permissions>

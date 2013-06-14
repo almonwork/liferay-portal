@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -18,22 +18,29 @@ import com.liferay.portal.AccountNameException;
 import com.liferay.portal.CompanyMxException;
 import com.liferay.portal.CompanyVirtualHostException;
 import com.liferay.portal.CompanyWebIdException;
+import com.liferay.portal.LocaleException;
 import com.liferay.portal.NoSuchShardException;
 import com.liferay.portal.NoSuchUserException;
 import com.liferay.portal.NoSuchVirtualHostException;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.language.LanguageUtil;
-import com.liferay.portal.kernel.search.BooleanClauseOccur;
-import com.liferay.portal.kernel.search.BooleanQuery;
-import com.liferay.portal.kernel.search.BooleanQueryFactoryUtil;
-import com.liferay.portal.kernel.search.Field;
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.search.FacetedSearcher;
 import com.liferay.portal.kernel.search.Hits;
+import com.liferay.portal.kernel.search.Indexer;
 import com.liferay.portal.kernel.search.SearchContext;
 import com.liferay.portal.kernel.search.SearchEngineUtil;
+import com.liferay.portal.kernel.search.facet.AssetEntriesFacet;
+import com.liferay.portal.kernel.search.facet.Facet;
+import com.liferay.portal.kernel.search.facet.ScopeFacet;
+import com.liferay.portal.kernel.util.ArrayUtil;
+import com.liferay.portal.kernel.util.Base64;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.PropsKeys;
 import com.liferay.portal.kernel.util.StringPool;
+import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.TimeZoneUtil;
 import com.liferay.portal.kernel.util.UnicodeProperties;
 import com.liferay.portal.kernel.util.Validator;
@@ -44,12 +51,10 @@ import com.liferay.portal.model.CompanyConstants;
 import com.liferay.portal.model.Contact;
 import com.liferay.portal.model.ContactConstants;
 import com.liferay.portal.model.Group;
-import com.liferay.portal.model.GroupConstants;
 import com.liferay.portal.model.Role;
 import com.liferay.portal.model.RoleConstants;
 import com.liferay.portal.model.User;
 import com.liferay.portal.model.VirtualHost;
-import com.liferay.portal.service.ServiceContext;
 import com.liferay.portal.service.base.CompanyLocalServiceBaseImpl;
 import com.liferay.portal.util.Portal;
 import com.liferay.portal.util.PortalInstances;
@@ -64,21 +69,41 @@ import java.io.IOException;
 import java.io.InputStream;
 
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.TimeZone;
 
 import javax.portlet.PortletException;
 import javax.portlet.PortletPreferences;
 
 /**
+ * The implementation of the company local service. Each company refers to a
+ * separate portal instance.
+ *
  * @author Brian Wing Shun Chan
  * @author Julio Camarero
  */
 public class CompanyLocalServiceImpl extends CompanyLocalServiceBaseImpl {
 
+	/**
+	 * Adds a company.
+	 *
+	 * @param  webId the the company's web domain
+	 * @param  virtualHostname the company's virtual host name
+	 * @param  mx the company's mail domain
+	 * @param  shardName the company's shard
+	 * @param  system whether the company is the very first company (i.e., the
+	 *         super company)
+	 * @param  maxUsers the max number of company users (optionally
+	 *         <code>0</code>)
+	 * @param  active whether the company is active
+	 * @return the company
+	 * @throws PortalException if the web domain, virtual host name, or mail
+	 *         domain was invalid
+	 * @throws SystemException if a system exception occurred
+	 */
 	public Company addCompany(
 			String webId, String virtualHostname, String mx, String shardName,
 			boolean system, int maxUsers, boolean active)
@@ -88,8 +113,8 @@ public class CompanyLocalServiceImpl extends CompanyLocalServiceBaseImpl {
 
 		virtualHostname = virtualHostname.trim().toLowerCase();
 
-		if ((Validator.isNull(webId)) ||
-			(webId.equals(PropsValues.COMPANY_DEFAULT_WEB_ID)) ||
+		if (Validator.isNull(webId) ||
+			webId.equals(PropsValues.COMPANY_DEFAULT_WEB_ID) ||
 			(companyPersistence.fetchByWebId(webId) != null)) {
 
 			throw new CompanyWebIdException();
@@ -113,6 +138,17 @@ public class CompanyLocalServiceImpl extends CompanyLocalServiceBaseImpl {
 		return company;
 	}
 
+	/**
+	 * Returns the company with the web domain.
+	 *
+	 * The method sets mail domain to the web domain, and the shard name to
+	 * the default name set in portal.properties
+	 *
+	 * @param  webId the company's web domain
+	 * @return the company with the web domain
+	 * @throws PortalException if a portal exception occurred
+	 * @throws SystemException if a system exception occurred
+	 */
 	public Company checkCompany(String webId)
 		throws PortalException, SystemException {
 
@@ -122,6 +158,20 @@ public class CompanyLocalServiceImpl extends CompanyLocalServiceBaseImpl {
 			webId, mx, PropsValues.SHARD_DEFAULT_NAME);
 	}
 
+	/**
+	 * Returns the company with the web domain, mail domain, and shard. If no
+	 * such company exits, the method will create a new company.
+	 *
+	 * The method goes through a series of checks to ensure that the company
+	 * contains default users, groups, etc.
+	 *
+	 * @param  webId the company's web domain
+	 * @param  mx the company's mail domain
+	 * @param  shardName the company's shard
+	 * @return the company with the web domain, mail domain, and shard
+	 * @throws PortalException if a portal exception occurred
+	 * @throws SystemException if a system exception occurred
+	 */
 	public Company checkCompany(String webId, String mx, String shardName)
 		throws PortalException, SystemException {
 
@@ -132,13 +182,6 @@ public class CompanyLocalServiceImpl extends CompanyLocalServiceBaseImpl {
 		Company company = companyPersistence.fetchByWebId(webId);
 
 		if (company == null) {
-			String virtualHostname = webId;
-
-			if (webId.equals(PropsValues.COMPANY_DEFAULT_WEB_ID)) {
-				virtualHostname = _DEFAULT_VIRTUAL_HOST;
-			}
-
-			String homeURL = null;
 			String name = webId;
 			String legalName = null;
 			String legalId = null;
@@ -154,7 +197,7 @@ public class CompanyLocalServiceImpl extends CompanyLocalServiceBaseImpl {
 			company = companyPersistence.create(companyId);
 
 			try {
-				company.setKeyObj(Encryptor.generateKey());
+				company.setKey(Base64.objectToString(Encryptor.generateKey()));
 			}
 			catch (EncryptorException ee) {
 				throw new SystemException(ee);
@@ -171,16 +214,17 @@ public class CompanyLocalServiceImpl extends CompanyLocalServiceBaseImpl {
 			shardLocalService.addShard(
 				Company.class.getName(), companyId, shardName);
 
-			// Company
+			// Account
 
-			updateCompany(
-				companyId, virtualHostname, mx, homeURL, name, legalName,
-				legalId, legalType, sicCode, tickerSymbol, industry, type,
-				size);
+			updateAccount(
+				company, name, legalName, legalId, legalType, sicCode,
+				tickerSymbol, industry, type, size);
 
 			// Virtual host
 
-			updateVirtualHost(companyId, virtualHostname);
+			if (webId.equals(PropsValues.COMPANY_DEFAULT_WEB_ID)) {
+				updateVirtualHost(companyId, _DEFAULT_VIRTUAL_HOST);
+			}
 
 			// Demo settings
 
@@ -255,8 +299,26 @@ public class CompanyLocalServiceImpl extends CompanyLocalServiceBaseImpl {
 			defaultUser.setPassword("password");
 			defaultUser.setScreenName(String.valueOf(defaultUser.getUserId()));
 			defaultUser.setEmailAddress("default@" + company.getMx());
-			defaultUser.setLanguageId(LocaleUtil.getDefault().toString());
-			defaultUser.setTimeZoneId(TimeZoneUtil.getDefault().getID());
+
+			if (Validator.isNotNull(PropsValues.COMPANY_DEFAULT_LOCALE)) {
+				defaultUser.setLanguageId(PropsValues.COMPANY_DEFAULT_LOCALE);
+			}
+			else {
+				Locale locale = LocaleUtil.getDefault();
+
+				defaultUser.setLanguageId(locale.toString());
+			}
+
+			if (Validator.isNotNull(PropsValues.COMPANY_DEFAULT_TIME_ZONE)) {
+				defaultUser.setTimeZoneId(
+					PropsValues.COMPANY_DEFAULT_TIME_ZONE);
+			}
+			else {
+				TimeZone timeZone = TimeZoneUtil.getDefault();
+
+				defaultUser.setTimeZoneId(timeZone.getID());
+			}
+
 			defaultUser.setGreeting(
 				LanguageUtil.format(
 					defaultUser.getLocale(), "welcome-x", StringPool.BLANK,
@@ -278,9 +340,12 @@ public class CompanyLocalServiceImpl extends CompanyLocalServiceBaseImpl {
 			defaultContact.setUserName(StringPool.BLANK);
 			defaultContact.setCreateDate(now);
 			defaultContact.setModifiedDate(now);
+			defaultContact.setClassName(User.class.getName());
+			defaultContact.setClassPK(defaultUser.getUserId());
 			defaultContact.setAccountId(company.getAccountId());
 			defaultContact.setParentContactId(
 				ContactConstants.DEFAULT_PARENT_CONTACT_ID);
+			defaultContact.setEmailAddress(defaultUser.getEmailAddress());
 			defaultContact.setFirstName(StringPool.BLANK);
 			defaultContact.setMiddleName(StringPool.BLANK);
 			defaultContact.setLastName(StringPool.BLANK);
@@ -317,62 +382,14 @@ public class CompanyLocalServiceImpl extends CompanyLocalServiceBaseImpl {
 		// Default admin
 
 		if (userPersistence.countByCompanyId(companyId) == 1) {
-			long creatorUserId = 0;
-			boolean autoPassword = false;
-			String password1 = PropsValues.DEFAULT_ADMIN_PASSWORD;
-			String password2 = password1;
-			boolean autoScreenName = false;
-			String screenName = PropsValues.DEFAULT_ADMIN_SCREEN_NAME;
 			String emailAddress =
 				PropsValues.DEFAULT_ADMIN_EMAIL_ADDRESS_PREFIX + "@" + mx;
-			long facebookId = 0;
-			String openId = StringPool.BLANK;
-			Locale locale = defaultUser.getLocale();
-			String firstName = PropsValues.DEFAULT_ADMIN_FIRST_NAME;
-			String middleName = PropsValues.DEFAULT_ADMIN_MIDDLE_NAME;
-			String lastName = PropsValues.DEFAULT_ADMIN_LAST_NAME;
-			int prefixId = 0;
-			int suffixId = 0;
-			boolean male = true;
-			int birthdayMonth = Calendar.JANUARY;
-			int birthdayDay = 1;
-			int birthdayYear = 1970;
-			String jobTitle = StringPool.BLANK;
 
-			Group guestGroup = groupLocalService.getGroup(
-				companyId, GroupConstants.GUEST);
-
-			long[] groupIds = new long[] {guestGroup.getGroupId()};
-
-			long[] organizationIds = null;
-
-			Role adminRole = roleLocalService.getRole(
-				companyId, RoleConstants.ADMINISTRATOR);
-
-			Role powerUserRole = roleLocalService.getRole(
-				companyId, RoleConstants.POWER_USER);
-
-			long[] roleIds = new long[] {
-				adminRole.getRoleId(), powerUserRole.getRoleId()
-			};
-
-			long[] userGroupIds = null;
-			boolean sendEmail = false;
-			ServiceContext serviceContext = new ServiceContext();
-
-			User defaultAdminUser = userLocalService.addUser(
-				creatorUserId, companyId, autoPassword, password1, password2,
-				autoScreenName, screenName, emailAddress, facebookId, openId,
-				locale, firstName, middleName, lastName, prefixId, suffixId,
-				male, birthdayMonth, birthdayDay, birthdayYear, jobTitle,
-				groupIds, organizationIds, roleIds, userGroupIds, sendEmail,
-				serviceContext);
-
-			userLocalService.updateLastLogin(
-				defaultAdminUser.getUserId(), defaultAdminUser.getLoginIP());
-
-			userLocalService.updatePasswordReset(
-				defaultAdminUser.getUserId(), false);
+			userLocalService.addDefaultAdminUser(
+				companyId, PropsValues.DEFAULT_ADMIN_SCREEN_NAME, emailAddress,
+				defaultUser.getLocale(), PropsValues.DEFAULT_ADMIN_FIRST_NAME,
+				PropsValues.DEFAULT_ADMIN_MIDDLE_NAME,
+				PropsValues.DEFAULT_ADMIN_LAST_NAME);
 		}
 
 		// Portlets
@@ -382,16 +399,25 @@ public class CompanyLocalServiceImpl extends CompanyLocalServiceBaseImpl {
 		return company;
 	}
 
+	/**
+	 * Checks if the company has an encryption key. It will create a key if one
+	 * does not exist.
+	 *
+	 * @param  companyId the primary key of the company
+	 * @throws PortalException if a company with the primary key could not be
+	 *         found
+	 * @throws SystemException if a system exception occurred
+	 */
 	public void checkCompanyKey(long companyId)
 		throws PortalException, SystemException {
 
 		Company company = companyPersistence.findByPrimaryKey(companyId);
 
-		if ((Validator.isNull(company.getKey())) &&
+		if (Validator.isNull(company.getKey()) &&
 			(company.getKeyObj() == null)) {
 
 			try {
-				company.setKeyObj(Encryptor.generateKey());
+				company.setKey(Base64.objectToString(Encryptor.generateKey()));
 			}
 			catch (EncryptorException ee) {
 				throw new SystemException(ee);
@@ -401,6 +427,14 @@ public class CompanyLocalServiceImpl extends CompanyLocalServiceBaseImpl {
 		}
 	}
 
+	/**
+	 * Deletes the company's logo.
+	 *
+	 * @param  companyId the primary key of the company
+	 * @throws PortalException if the company with the primary key could not be
+	 *         found or if the company's logo could not be found
+	 * @throws SystemException if a system exception occurred
+	 */
 	public void deleteLogo(long companyId)
 		throws PortalException, SystemException {
 
@@ -417,40 +451,129 @@ public class CompanyLocalServiceImpl extends CompanyLocalServiceBaseImpl {
 		}
 	}
 
-	public Company fetchCompany(long companyId) throws SystemException {
+	/**
+	 * Returns the company with the primary key.
+	 *
+	 * @param  companyId the primary key of the company
+	 * @return the company with the primary key, <code>null</code> if a company
+	 *         with the primary key could not be found
+	 * @throws SystemException if a system exception occurred
+	 */
+	public Company fetchCompanyById(long companyId) throws SystemException {
 		return companyPersistence.fetchByPrimaryKey(companyId);
 	}
 
+	/**
+	 * Returns the company with the virtual host name.
+	 *
+	 * @param  virtualHostname the virtual host name
+	 * @return the company with the virtual host name, <code>null</code> if a
+	 *         company with the virtual host could not be found
+	 * @throws SystemException if a system exception occurred
+	 */
+	public Company fetchCompanyByVirtualHost(String virtualHostname)
+		throws SystemException {
+
+		virtualHostname = virtualHostname.trim().toLowerCase();
+
+		VirtualHost virtualHost = virtualHostPersistence.fetchByHostname(
+			virtualHostname);
+
+		if ((virtualHost == null) || (virtualHost.getLayoutSetId() != 0)) {
+			return null;
+		}
+
+		return companyPersistence.fetchByPrimaryKey(virtualHost.getCompanyId());
+	}
+
+	/**
+	 * Returns all the companies.
+	 *
+	 * @return the companies
+	 * @throws SystemException if a system exception occurred
+	 */
 	public List<Company> getCompanies() throws SystemException {
 		return companyPersistence.findAll();
 	}
 
+	/**
+	 * Returns all the companies used by WSRP.
+	 *
+	 * @param  system whether the company is the very first company (i.e., the
+	 *         super company)
+	 * @return the companies used by WSRP
+	 * @throws SystemException if a system exception occurred
+	 */
 	public List<Company> getCompanies(boolean system) throws SystemException {
 		return companyPersistence.findBySystem(system);
 	}
 
+	/**
+	 * Returns the number of companies used by WSRP.
+	 *
+	 * @param  system whether the company is the very first company (i.e., the
+	 *         super company)
+	 * @return the number of companies used by WSRP
+	 * @throws SystemException if a system exception occurred
+	 */
 	public int getCompaniesCount(boolean system) throws SystemException {
 		return companyPersistence.countBySystem(system);
 	}
 
+	/**
+	 * Returns the company with the primary key.
+	 *
+	 * @param  companyId the primary key of the company
+	 * @return the company with the primary key
+	 * @throws PortalException if a company with the primary key could not be
+	 *         found
+	 * @throws SystemException if a system exception occurred
+	 */
 	public Company getCompanyById(long companyId)
 		throws PortalException, SystemException {
 
 		return companyPersistence.findByPrimaryKey(companyId);
 	}
 
+	/**
+	 * Returns the company with the logo.
+	 *
+	 * @param  logoId the ID of the company's logo
+	 * @return the company with the logo
+	 * @throws PortalException if the company with the logo could not be found
+	 * @throws SystemException if a system exception occurred
+	 */
 	public Company getCompanyByLogoId(long logoId)
 		throws PortalException, SystemException {
 
 		return companyPersistence.findByLogoId(logoId);
 	}
 
+	/**
+	 * Returns the company with the mail domain.
+	 *
+	 * @param  mx the company's mail domain
+	 * @return the company with the mail domain
+	 * @throws PortalException if the company with the mail domain could not be
+	 *         found
+	 * @throws SystemException if a system exception occurred
+	 */
 	public Company getCompanyByMx(String mx)
 		throws PortalException, SystemException {
 
 		return companyPersistence.findByMx(mx);
 	}
 
+	/**
+	 * Returns the company with the virtual host name.
+	 *
+	 * @param  virtualHostname the company's virtual host name
+	 * @return the company with the virtual host name
+	 * @throws PortalException if the company with the virtual host name could
+	 *         not be found or if the virtual host was not associated with a
+	 *         company
+	 * @throws SystemException if a system exception occurred
+	 */
 	public Company getCompanyByVirtualHost(String virtualHostname)
 		throws PortalException, SystemException {
 
@@ -474,12 +597,66 @@ public class CompanyLocalServiceImpl extends CompanyLocalServiceBaseImpl {
 		}
 	}
 
+	/**
+	 * Returns the company with the web domain.
+	 *
+	 * @param  webId the company's web domain
+	 * @return the company with the web domain
+	 * @throws PortalException if the company with the web domain could not be
+	 *         found
+	 * @throws SystemException if a system exception occurred
+	 */
 	public Company getCompanyByWebId(String webId)
 		throws PortalException, SystemException {
 
 		return companyPersistence.findByWebId(webId);
 	}
 
+	/**
+	 * Returns the user's company.
+	 *
+	 * @param  userId the primary key of the user
+	 * @return Returns the first company if there is only one company or the
+	 *         user's company if there are more than one company; <code>0</code>
+	 *         otherwise
+	 * @throws Exception if a user with the primary key could not be found
+	 */
+	public long getCompanyIdByUserId(long userId) throws Exception {
+		long[] companyIds = PortalInstances.getCompanyIds();
+
+		long companyId = 0;
+
+		if (companyIds.length == 1) {
+			companyId = companyIds[0];
+		}
+		else if (companyIds.length > 1) {
+			try {
+				User user = userPersistence.findByPrimaryKey(userId);
+
+				companyId = user.getCompanyId();
+			}
+			catch (Exception e) {
+				if (_log.isWarnEnabled()) {
+					_log.warn(
+						"Unable to get the company id for user " + userId, e);
+				}
+			}
+		}
+
+		return companyId;
+	}
+
+	/**
+	 * Removes the values that match the keys of the company's preferences.
+	 *
+	 * This method is called by {@link
+	 * com.liferay.portlet.portalsettings.action.EditLDAPServerAction} remotely
+	 * through {@link com.liferay.portal.service.CompanyService}.
+	 *
+	 * @param  companyId the primary key of the company
+	 * @param  keys the company's preferences keys to be remove
+	 * @throws SystemException if a system exception occurred
+	 */
 	public void removePreferences(long companyId, String[] keys)
 		throws SystemException {
 
@@ -498,6 +675,24 @@ public class CompanyLocalServiceImpl extends CompanyLocalServiceBaseImpl {
 		}
 	}
 
+	/**
+	 * Returns an ordered range of all assets that match the keywords in the
+	 * company.
+	 *
+	 * The method is called in {@link
+	 * com.liferay.portal.search.PortalOpenSearchImpl} which is not longer used
+	 * by the Search portlet.
+	 *
+	 * @param  companyId the primary key of the company
+	 * @param  userId the primary key of the user
+	 * @param  keywords the keywords (space separated),which may occur in assets
+	 *         in the company (optionally <code>null</code>)
+	 * @param  start the lower bound of the range of assets to return
+	 * @param  end the upper bound of the range of assets to return (not
+	 *         inclusive)
+	 * @return the matching assets in the company
+	 * @throws SystemException if a system exception occurred
+	 */
 	public Hits search(
 			long companyId, long userId, String keywords, int start, int end)
 		throws SystemException {
@@ -505,56 +700,94 @@ public class CompanyLocalServiceImpl extends CompanyLocalServiceBaseImpl {
 		return search(companyId, userId, null, 0, null, keywords, start, end);
 	}
 
+	/**
+	 * Returns an ordered range of all assets that match the keywords in the
+	 * portlet within the company.
+	 *
+	 * @param  companyId the primary key of the company
+	 * @param  userId the primary key of the user
+	 * @param  portletId the primary key of the portlet (optionally
+	 *         <code>null</code>)
+	 * @param  groupId the primary key of the group (optionally <code>0</code>)
+	 * @param  type the mime type of assets to return(optionally
+	 *         <code>null</code>)
+	 * @param  keywords the keywords (space separated), which may occur in any
+	 *         assets in the portlet (optionally <code>null</code>)
+	 * @param  start the lower bound of the range of assets to return
+	 * @param  end the upper bound of the range of assets to return (not
+	 *         inclusive)
+	 * @return the matching assets in the portlet within the company
+	 * @throws SystemException if a system exception occurred
+	 */
 	public Hits search(
 			long companyId, long userId, String portletId, long groupId,
 			String type, String keywords, int start, int end)
 		throws SystemException {
 
 		try {
+
+			// Search context
+
 			SearchContext searchContext = new SearchContext();
 
-			searchContext.setSearchEngineId(SearchEngineUtil.SYSTEM_ENGINE_ID);
-
-			BooleanQuery contextQuery = BooleanQueryFactoryUtil.create(
-				searchContext);
-
-			contextQuery.addRequiredTerm(Field.COMPANY_ID, companyId);
-
-			if (Validator.isNotNull(portletId)) {
-				contextQuery.addRequiredTerm(Field.PORTLET_ID, portletId);
-			}
+			searchContext.setCompanyId(companyId);
+			searchContext.setEnd(end);
+			searchContext.setEntryClassNames(
+				SearchEngineUtil.getEntryClassNames());
 
 			if (groupId > 0) {
-				contextQuery.addRequiredTerm(Field.GROUP_ID, groupId);
+				searchContext.setGroupIds(new long[]{groupId});
 			}
 
-			if (Validator.isNotNull(type)) {
-				contextQuery.addRequiredTerm(Field.TYPE, type);
+			searchContext.setKeywords(keywords);
+
+			if (Validator.isNotNull(portletId)) {
+				searchContext.setPortletIds(new String[] {portletId});
 			}
 
-			BooleanQuery searchQuery = BooleanQueryFactoryUtil.create(
-				searchContext);
+			searchContext.setStart(start);
+			searchContext.setUserId(userId);
 
-			searchQuery.addTerms(_KEYWORDS_FIELDS, keywords);
+			// Always add facets as late as possible so that the search context
+			// fields can be considered by the facets
 
-			BooleanQuery fullQuery = BooleanQueryFactoryUtil.create(
-				searchContext);
+			Facet assetEntriesFacet = new AssetEntriesFacet(searchContext);
 
-			fullQuery.add(contextQuery, BooleanClauseOccur.MUST);
+			assetEntriesFacet.setStatic(true);
 
-			if (searchQuery.clauses().size() > 0) {
-				fullQuery.add(searchQuery, BooleanClauseOccur.MUST);
-			}
+			searchContext.addFacet(assetEntriesFacet);
 
-			return SearchEngineUtil.search(
-				companyId, new long[] {groupId}, userId, null, fullQuery, start,
-				end);
+			Facet scopeFacet = new ScopeFacet(searchContext);
+
+			scopeFacet.setStatic(true);
+
+			searchContext.addFacet(scopeFacet);
+
+			// Search
+
+			Indexer indexer = FacetedSearcher.getInstance();
+
+			return indexer.search(searchContext);
 		}
 		catch (Exception e) {
 			throw new SystemException(e);
 		}
 	}
 
+	/**
+	 * Updates the company.
+	 *
+	 * @param  companyId the primary key of the company
+	 * @param  virtualHostname the company's virtual host name
+	 * @param  mx the company's mail domain
+	 * @param  maxUsers the max number of company users (optionally
+	 *         <code>0</code>)
+	 * @param  active whether the company is active
+	 * @return the company with the primary key
+	 * @throws PortalException if a company with primary key could not be found
+	 *         or if the new information was invalid
+	 * @throws SystemException if a system exception occurred
+	 */
 	public Company updateCompany(
 			long companyId, String virtualHostname, String mx, int maxUsers,
 			boolean active)
@@ -590,6 +823,33 @@ public class CompanyLocalServiceImpl extends CompanyLocalServiceBaseImpl {
 		return company;
 	}
 
+	/**
+	 * Update the company with additional account information.
+	 *
+	 * @param  companyId the primary key of the company
+	 * @param  virtualHostname the company's virtual host name
+	 * @param  mx the company's mail domain
+	 * @param  homeURL the company's home URL (optionally <code>null</code>)
+	 * @param  name the company's account name(optionally <code>null</code>)
+	 * @param  legalName the company's account legal name (optionally
+	 *         <code>null</code>)
+	 * @param  legalId the company's account legal ID (optionally
+	 *         <code>null</code>)
+	 * @param  legalType the company's account legal type (optionally
+	 *         <code>null</code>)
+	 * @param  sicCode the company's account SIC code (optionally
+	 *         <code>null</code>)
+	 * @param  tickerSymbol the company's account ticker symbol (optionally
+	 *         <code>null</code>)
+	 * @param  industry the company's account industry (optionally
+	 *         <code>null</code>)
+	 * @param  type the company's account type (optionally <code>null</code>)
+	 * @param  size the company's account size (optionally <code>null</code>)
+	 * @return the company with the primary key
+	 * @throws PortalException if a company with the primary key could not be
+	 *         found or if the new information was invalid
+	 * @throws SystemException if a system exception occurred
+	 */
 	public Company updateCompany(
 			long companyId, String virtualHostname, String mx, String homeURL,
 			String name, String legalName, String legalId, String legalType,
@@ -600,12 +860,11 @@ public class CompanyLocalServiceImpl extends CompanyLocalServiceBaseImpl {
 		// Company
 
 		virtualHostname = virtualHostname.trim().toLowerCase();
-		Date now = new Date();
 
 		Company company = companyPersistence.findByPrimaryKey(companyId);
 
 		validate(company.getWebId(), virtualHostname, mx);
-		validate(name);
+		validate(companyId, name);
 
 		if (PropsValues.MAIL_MX_UPDATE) {
 			company.setMx(mx);
@@ -617,36 +876,9 @@ public class CompanyLocalServiceImpl extends CompanyLocalServiceBaseImpl {
 
 		// Account
 
-		Account account = accountPersistence.fetchByPrimaryKey(
-			company.getAccountId());
-
-		if (account == null) {
-			long accountId = counterLocalService.increment();
-
-			account = accountPersistence.create(accountId);
-
-			account.setCreateDate(now);
-			account.setCompanyId(companyId);
-			account.setUserId(0);
-			account.setUserName(StringPool.BLANK);
-
-			company.setAccountId(accountId);
-
-			companyPersistence.update(company, false);
-		}
-
-		account.setModifiedDate(now);
-		account.setName(name);
-		account.setLegalName(legalName);
-		account.setLegalId(legalId);
-		account.setLegalType(legalType);
-		account.setSicCode(sicCode);
-		account.setTickerSymbol(tickerSymbol);
-		account.setIndustry(industry);
-		account.setType(type);
-		account.setSize(size);
-
-		accountPersistence.update(account, false);
+		updateAccount(
+			company, name, legalName, legalId, legalType, sicCode, tickerSymbol,
+			industry, type, size);
 
 		// Virtual host
 
@@ -655,6 +887,15 @@ public class CompanyLocalServiceImpl extends CompanyLocalServiceBaseImpl {
 		return company;
 	}
 
+	/**
+	 * Update the company's display.
+	 *
+	 * @param  companyId the primary key of the company
+	 * @param  languageId the ID of the company's default user's language
+	 * @param  timeZoneId the ID of the company's default user's time zone
+	 * @throws PortalException if the company's default user could not be found
+	 * @throws SystemException if a system exception occurred
+	 */
 	public void updateDisplay(
 			long companyId, String languageId, String timeZoneId)
 		throws PortalException, SystemException {
@@ -667,43 +908,93 @@ public class CompanyLocalServiceImpl extends CompanyLocalServiceBaseImpl {
 		userPersistence.update(user, false);
 	}
 
-	public void updateLogo(long companyId, byte[] bytes)
+	/**
+	 * Updates the company's logo.
+	 *
+	 * @param  companyId the primary key of the company
+	 * @param  bytes the bytes of the company's logo image
+	 * @return the company with the primary key
+	 * @throws PortalException if the company's logo ID could not be found or if
+	 *         the logo's image was corrupted
+	 * @throws SystemException if a system exception occurred
+	 */
+	public Company updateLogo(long companyId, byte[] bytes)
 		throws PortalException, SystemException {
 
-		long logoId = getLogoId(companyId);
+		Company company = checkLogo(companyId);
 
-		imageLocalService.updateImage(logoId, bytes);
+		imageLocalService.updateImage(company.getLogoId(), bytes);
+
+		return company;
 	}
 
-	public void updateLogo(long companyId, File file)
+	/**
+	 * Updates the company's logo.
+	 *
+	 * @param  companyId the primary key of the company
+	 * @param  file the file of the company's logo image
+	 * @return the company with the primary key
+	 * @throws PortalException the company's logo ID could not be found or if
+	 *         the logo's image was corrupted
+	 * @throws SystemException if a system exception occurred
+	 */
+	public Company updateLogo(long companyId, File file)
 		throws PortalException, SystemException {
 
-		long logoId = getLogoId(companyId);
+		Company company = checkLogo(companyId);
 
-		imageLocalService.updateImage(logoId, file);
+		imageLocalService.updateImage(company.getLogoId(), file);
+
+		return company;
 	}
 
-	public void updateLogo(long companyId, InputStream is)
+	/**
+	 * Update the company's logo.
+	 *
+	 * @param  companyId the primary key of the company
+	 * @param  is the input stream of the company's logo image
+	 * @return the company with the primary key
+	 * @throws PortalException if the company's logo ID could not be found or if
+	 *         the company's logo image was corrupted
+	 * @throws SystemException if a system exception occurred
+	 */
+	public Company updateLogo(long companyId, InputStream is)
 		throws PortalException, SystemException {
 
-		long logoId = getLogoId(companyId);
+		Company company = checkLogo(companyId);
 
-		imageLocalService.updateImage(logoId, is);
+		imageLocalService.updateImage(company.getLogoId(), is);
+
+		return company;
 	}
 
+	/**
+	 * Updates the company's preferences. The company's default properties are
+	 * found in portal.properties.
+	 *
+	 * @param  companyId the primary key of the company
+	 * @param  properties the company's properties. See {@link
+	 *         com.liferay.portal.kernel.util.UnicodeProperties}
+	 * @throws PortalException if the properties contained new locales that were
+	 *         not supported
+	 * @throws SystemException if a system exception occurred
+	 */
 	public void updatePreferences(long companyId, UnicodeProperties properties)
-		throws SystemException {
+		throws PortalException, SystemException {
 
 		PortletPreferences preferences = PrefsPropsUtil.getPreferences(
 			companyId);
 
 		try {
-			if (properties.containsKey(PropsKeys.LOCALES)) {
+			String newLocales = properties.getProperty(PropsKeys.LOCALES);
+
+			if (newLocales != null) {
 				String oldLocales = preferences.getValue(
 					PropsKeys.LOCALES, StringPool.BLANK);
-				String newLocales = properties.getProperty(PropsKeys.LOCALES);
 
 				if (!Validator.equals(oldLocales, newLocales)) {
+					validateLocales(newLocales);
+
 					LanguageUtil.resetAvailableLocales(companyId);
 				}
 			}
@@ -738,11 +1029,33 @@ public class CompanyLocalServiceImpl extends CompanyLocalServiceBaseImpl {
 
 			preferences.store();
 		}
+		catch (LocaleException le) {
+			throw le;
+		}
 		catch (Exception e) {
 			throw new SystemException(e);
 		}
 	}
 
+	/**
+	 * Updates the company's security properties.
+	 *
+	 * @param  companyId the primary key of the company
+	 * @param  authType the company's method of authenticating users
+	 * @param  autoLogin whether to allow users to select the "remember me"
+	 *         feature
+	 * @param  sendPassword whether to allow users to ask the company to send
+	 *         their password
+	 * @param  strangers whether to allow strangers to create accounts register
+	 *         themselves in the company
+	 * @param  strangersWithMx whether to allow strangers to create accounts
+	 *         with email addresses that match the company mail suffix
+	 * @param  strangersVerify whether to require strangers who create accounts
+	 *         to be verified via email
+	 * @param  siteLogo whether to allow site administrators to use their own
+	 *         logo instead of the enterprise logo
+	 * @throws SystemException if a system exception occurred
+	 */
 	public void updateSecurity(
 			long companyId, String authType, boolean autoLogin,
 			boolean sendPassword, boolean strangers, boolean strangersWithMx,
@@ -771,8 +1084,7 @@ public class CompanyLocalServiceImpl extends CompanyLocalServiceBaseImpl {
 				PropsKeys.COMPANY_SECURITY_STRANGERS_VERIFY,
 				String.valueOf(strangersVerify));
 			preferences.setValue(
-				PropsKeys.COMPANY_SECURITY_SITE_LOGO,
-				String.valueOf(siteLogo));
+				PropsKeys.COMPANY_SECURITY_SITE_LOGO, String.valueOf(siteLogo));
 
 			preferences.store();
 		}
@@ -784,7 +1096,7 @@ public class CompanyLocalServiceImpl extends CompanyLocalServiceBaseImpl {
 		}
 	}
 
-	protected long getLogoId(long companyId)
+	protected Company checkLogo(long companyId)
 		throws PortalException, SystemException {
 
 		Company company = companyPersistence.findByPrimaryKey(companyId);
@@ -796,10 +1108,50 @@ public class CompanyLocalServiceImpl extends CompanyLocalServiceBaseImpl {
 
 			company.setLogoId(logoId);
 
+			company = companyPersistence.update(company, false);
+		}
+
+		return company;
+	}
+
+	protected void updateAccount(
+			Company company, String name, String legalName, String legalId,
+			String legalType, String sicCode, String tickerSymbol,
+			String industry, String type, String size)
+		throws SystemException {
+
+		Date now = new Date();
+
+		Account account = accountPersistence.fetchByPrimaryKey(
+			company.getAccountId());
+
+		if (account == null) {
+			long accountId = counterLocalService.increment();
+
+			account = accountPersistence.create(accountId);
+
+			account.setCompanyId(company.getCompanyId());
+			account.setCreateDate(now);
+			account.setUserId(0);
+			account.setUserName(StringPool.BLANK);
+
+			company.setAccountId(accountId);
+
 			companyPersistence.update(company, false);
 		}
 
-		return logoId;
+		account.setModifiedDate(now);
+		account.setName(name);
+		account.setLegalName(legalName);
+		account.setLegalId(legalId);
+		account.setLegalType(legalType);
+		account.setSicCode(sicCode);
+		account.setTickerSymbol(tickerSymbol);
+		account.setIndustry(industry);
+		account.setType(type);
+		account.setSize(size);
+
+		accountPersistence.update(account, false);
 	}
 
 	protected void updateVirtualHost(long companyId, String virtualHostname)
@@ -830,8 +1182,12 @@ public class CompanyLocalServiceImpl extends CompanyLocalServiceBaseImpl {
 		}
 	}
 
-	protected void validate(String name) throws PortalException {
-		if (Validator.isNull(name)) {
+	protected void validate(long companyId, String name)
+		throws PortalException, SystemException {
+
+		Group group = groupLocalService.fetchGroup(companyId, name);
+
+		if ((group != null) || Validator.isNull(name)) {
 			throw new AccountNameException();
 		}
 	}
@@ -876,11 +1232,19 @@ public class CompanyLocalServiceImpl extends CompanyLocalServiceBaseImpl {
 		}
 	}
 
+	protected void validateLocales(String locales) throws PortalException {
+		String[] localesArray = StringUtil.split(locales, StringPool.COMMA);
+
+		for (String locale : localesArray) {
+			if (!ArrayUtil.contains(PropsValues.LOCALES, locale)) {
+				throw new LocaleException();
+			}
+		}
+	}
+
 	private static final String _DEFAULT_VIRTUAL_HOST = "localhost";
 
-	private static final String[] _KEYWORDS_FIELDS = {
-		Field.ASSET_TAG_NAMES, Field.CONTENT, Field.DESCRIPTION,
-		Field.PROPERTIES, Field.TITLE
-	};
+	private static Log _log = LogFactoryUtil.getLog(
+		CompanyLocalServiceImpl.class);
 
 }

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -73,64 +73,9 @@ public class BookmarksFolderLocalServiceImpl
 
 		// Resources
 
-		if (serviceContext.getAddGroupPermissions() ||
-			serviceContext.getAddGuestPermissions()) {
-
-			addFolderResources(
-				folder, serviceContext.getAddGroupPermissions(),
-				serviceContext.getAddGuestPermissions());
-		}
-		else {
-			addFolderResources(
-				folder, serviceContext.getGroupPermissions(),
-				serviceContext.getGuestPermissions());
-		}
+		resourceLocalService.addModelResources(folder, serviceContext);
 
 		return folder;
-	}
-
-	public void addFolderResources(
-			BookmarksFolder folder, boolean addGroupPermissions,
-			boolean addGuestPermissions)
-		throws PortalException, SystemException {
-
-		resourceLocalService.addResources(
-			folder.getCompanyId(), folder.getGroupId(), folder.getUserId(),
-			BookmarksFolder.class.getName(), folder.getFolderId(), false,
-			addGroupPermissions, addGuestPermissions);
-	}
-
-	public void addFolderResources(
-			BookmarksFolder folder, String[] groupPermissions,
-			String[] guestPermissions)
-		throws PortalException, SystemException {
-
-		resourceLocalService.addModelResources(
-			folder.getCompanyId(), folder.getGroupId(), folder.getUserId(),
-			BookmarksFolder.class.getName(), folder.getFolderId(),
-			groupPermissions, guestPermissions);
-	}
-
-	public void addFolderResources(
-			long folderId, boolean addGroupPermissions,
-			boolean addGuestPermissions)
-		throws PortalException, SystemException {
-
-		BookmarksFolder folder = bookmarksFolderPersistence.findByPrimaryKey(
-			folderId);
-
-		addFolderResources(
-			folder, addGroupPermissions, addGuestPermissions);
-	}
-
-	public void addFolderResources(
-			long folderId, String[] groupPermissions, String[] guestPermissions)
-		throws PortalException, SystemException {
-
-		BookmarksFolder folder = bookmarksFolderPersistence.findByPrimaryKey(
-			folderId);
-
-		addFolderResources(folder, groupPermissions, guestPermissions);
 	}
 
 	public void deleteFolder(BookmarksFolder folder)
@@ -152,8 +97,7 @@ public class BookmarksFolderLocalServiceImpl
 		// Resources
 
 		resourceLocalService.deleteResource(
-			folder.getCompanyId(), BookmarksFolder.class.getName(),
-			ResourceConstants.SCOPE_INDIVIDUAL, folder.getFolderId());
+			folder, ResourceConstants.SCOPE_INDIVIDUAL);
 
 		// Entries
 
@@ -246,9 +190,8 @@ public class BookmarksFolderLocalServiceImpl
 	}
 
 	public BookmarksFolder updateFolder(
-			long folderId, long parentFolderId, String name,
-			String description, boolean mergeWithParentFolder,
-			ServiceContext serviceContext)
+			long folderId, long parentFolderId, String name, String description,
+			boolean mergeWithParentFolder, ServiceContext serviceContext)
 		throws PortalException, SystemException {
 
 		// Merge folders
@@ -353,7 +296,7 @@ public class BookmarksFolderLocalServiceImpl
 
 			bookmarksEntryPersistence.update(entry, false);
 
-			Indexer indexer = IndexerRegistryUtil.getIndexer(
+			Indexer indexer = IndexerRegistryUtil.nullSafeGetIndexer(
 				BookmarksEntry.class);
 
 			indexer.reindex(entry);

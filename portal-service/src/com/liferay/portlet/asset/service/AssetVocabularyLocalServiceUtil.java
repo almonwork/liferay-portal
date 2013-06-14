@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -15,7 +15,6 @@
 package com.liferay.portlet.asset.service;
 
 import com.liferay.portal.kernel.bean.PortalBeanLocatorUtil;
-import com.liferay.portal.kernel.util.MethodCache;
 import com.liferay.portal.kernel.util.ReferenceRegistry;
 
 /**
@@ -66,25 +65,32 @@ public class AssetVocabularyLocalServiceUtil {
 	* Deletes the asset vocabulary with the primary key from the database. Also notifies the appropriate model listeners.
 	*
 	* @param vocabularyId the primary key of the asset vocabulary
+	* @return the asset vocabulary that was removed
 	* @throws PortalException if a asset vocabulary with the primary key could not be found
 	* @throws SystemException if a system exception occurred
 	*/
-	public static void deleteAssetVocabulary(long vocabularyId)
+	public static com.liferay.portlet.asset.model.AssetVocabulary deleteAssetVocabulary(
+		long vocabularyId)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException {
-		getService().deleteAssetVocabulary(vocabularyId);
+		return getService().deleteAssetVocabulary(vocabularyId);
 	}
 
 	/**
 	* Deletes the asset vocabulary from the database. Also notifies the appropriate model listeners.
 	*
 	* @param assetVocabulary the asset vocabulary
+	* @return the asset vocabulary that was removed
 	* @throws SystemException if a system exception occurred
 	*/
-	public static void deleteAssetVocabulary(
+	public static com.liferay.portlet.asset.model.AssetVocabulary deleteAssetVocabulary(
 		com.liferay.portlet.asset.model.AssetVocabulary assetVocabulary)
 		throws com.liferay.portal.kernel.exception.SystemException {
-		getService().deleteAssetVocabulary(assetVocabulary);
+		return getService().deleteAssetVocabulary(assetVocabulary);
+	}
+
+	public static com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery() {
+		return getService().dynamicQuery();
 	}
 
 	/**
@@ -156,6 +162,12 @@ public class AssetVocabularyLocalServiceUtil {
 		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery)
 		throws com.liferay.portal.kernel.exception.SystemException {
 		return getService().dynamicQueryCount(dynamicQuery);
+	}
+
+	public static com.liferay.portlet.asset.model.AssetVocabulary fetchAssetVocabulary(
+		long vocabularyId)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getService().fetchAssetVocabulary(vocabularyId);
 	}
 
 	/**
@@ -320,6 +332,12 @@ public class AssetVocabularyLocalServiceUtil {
 			guestPermissions);
 	}
 
+	public static void deleteVocabularies(long groupId)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException {
+		getService().deleteVocabularies(groupId);
+	}
+
 	public static void deleteVocabulary(
 		com.liferay.portlet.asset.model.AssetVocabulary vocabulary)
 		throws com.liferay.portal.kernel.exception.PortalException,
@@ -366,6 +384,13 @@ public class AssetVocabularyLocalServiceUtil {
 			com.liferay.portal.kernel.exception.SystemException {
 		return getService()
 				   .getGroupVocabularies(groupId, createDefaultVocabulary);
+	}
+
+	public static java.util.List<com.liferay.portlet.asset.model.AssetVocabulary> getGroupVocabularies(
+		long groupId, java.lang.String name, int start, int end,
+		com.liferay.portal.kernel.util.OrderByComparator obc)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getService().getGroupVocabularies(groupId, name, start, end, obc);
 	}
 
 	public static com.liferay.portlet.asset.model.AssetVocabulary getGroupVocabulary(
@@ -424,20 +449,15 @@ public class AssetVocabularyLocalServiceUtil {
 
 			ReferenceRegistry.registerReference(AssetVocabularyLocalServiceUtil.class,
 				"_service");
-			MethodCache.remove(AssetVocabularyLocalService.class);
 		}
 
 		return _service;
 	}
 
+	/**
+	 * @deprecated
+	 */
 	public void setService(AssetVocabularyLocalService service) {
-		MethodCache.remove(AssetVocabularyLocalService.class);
-
-		_service = service;
-
-		ReferenceRegistry.registerReference(AssetVocabularyLocalServiceUtil.class,
-			"_service");
-		MethodCache.remove(AssetVocabularyLocalService.class);
 	}
 
 	private static AssetVocabularyLocalService _service;

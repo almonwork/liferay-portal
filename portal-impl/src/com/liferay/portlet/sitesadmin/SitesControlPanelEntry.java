@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -27,6 +27,7 @@ import java.util.LinkedHashMap;
 /**
  * @author Jorge Ferrer
  * @author Sergio González
+ * @author Miguel Pastor
  */
 public class SitesControlPanelEntry extends BaseControlPanelEntry {
 
@@ -38,8 +39,8 @@ public class SitesControlPanelEntry extends BaseControlPanelEntry {
 			LinkedHashMap<String, Object> groupParams =
 				new LinkedHashMap<String, Object>();
 
-			groupParams.put(
-				"usersGroups", new Long(permissionChecker.getUserId()));
+			groupParams.put("site", true);
+			groupParams.put("usersGroups", permissionChecker.getUserId());
 
 			int count = GroupLocalServiceUtil.searchCount(
 				permissionChecker.getCompanyId(), null, null, groupParams);

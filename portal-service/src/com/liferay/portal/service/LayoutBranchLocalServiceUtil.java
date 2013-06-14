@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -15,7 +15,6 @@
 package com.liferay.portal.service;
 
 import com.liferay.portal.kernel.bean.PortalBeanLocatorUtil;
-import com.liferay.portal.kernel.util.MethodCache;
 import com.liferay.portal.kernel.util.ReferenceRegistry;
 
 /**
@@ -66,25 +65,32 @@ public class LayoutBranchLocalServiceUtil {
 	* Deletes the layout branch with the primary key from the database. Also notifies the appropriate model listeners.
 	*
 	* @param LayoutBranchId the primary key of the layout branch
+	* @return the layout branch that was removed
 	* @throws PortalException if a layout branch with the primary key could not be found
 	* @throws SystemException if a system exception occurred
 	*/
-	public static void deleteLayoutBranch(long LayoutBranchId)
+	public static com.liferay.portal.model.LayoutBranch deleteLayoutBranch(
+		long LayoutBranchId)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException {
-		getService().deleteLayoutBranch(LayoutBranchId);
+		return getService().deleteLayoutBranch(LayoutBranchId);
 	}
 
 	/**
 	* Deletes the layout branch from the database. Also notifies the appropriate model listeners.
 	*
 	* @param layoutBranch the layout branch
+	* @return the layout branch that was removed
 	* @throws SystemException if a system exception occurred
 	*/
-	public static void deleteLayoutBranch(
+	public static com.liferay.portal.model.LayoutBranch deleteLayoutBranch(
 		com.liferay.portal.model.LayoutBranch layoutBranch)
 		throws com.liferay.portal.kernel.exception.SystemException {
-		getService().deleteLayoutBranch(layoutBranch);
+		return getService().deleteLayoutBranch(layoutBranch);
+	}
+
+	public static com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery() {
+		return getService().dynamicQuery();
 	}
 
 	/**
@@ -156,6 +162,12 @@ public class LayoutBranchLocalServiceUtil {
 		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery)
 		throws com.liferay.portal.kernel.exception.SystemException {
 		return getService().dynamicQueryCount(dynamicQuery);
+	}
+
+	public static com.liferay.portal.model.LayoutBranch fetchLayoutBranch(
+		long LayoutBranchId)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getService().fetchLayoutBranch(LayoutBranchId);
 	}
 
 	/**
@@ -276,6 +288,13 @@ public class LayoutBranchLocalServiceUtil {
 			master, serviceContext);
 	}
 
+	public static void deleteLayoutSetBranchLayoutBranches(
+		long layoutSetBranchId)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException {
+		getService().deleteLayoutSetBranchLayoutBranches(layoutSetBranchId);
+	}
+
 	public static java.util.List<com.liferay.portal.model.LayoutBranch> getLayoutBranches(
 		long layoutSetBranchId, long plid, int start, int end,
 		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
@@ -283,6 +302,12 @@ public class LayoutBranchLocalServiceUtil {
 		return getService()
 				   .getLayoutBranches(layoutSetBranchId, plid, start, end,
 			orderByComparator);
+	}
+
+	public static java.util.List<com.liferay.portal.model.LayoutBranch> getLayoutSetBranchLayoutBranches(
+		long layoutSetBranchId)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getService().getLayoutSetBranchLayoutBranches(layoutSetBranchId);
 	}
 
 	public static com.liferay.portal.model.LayoutBranch getMasterLayoutBranch(
@@ -309,20 +334,15 @@ public class LayoutBranchLocalServiceUtil {
 
 			ReferenceRegistry.registerReference(LayoutBranchLocalServiceUtil.class,
 				"_service");
-			MethodCache.remove(LayoutBranchLocalService.class);
 		}
 
 		return _service;
 	}
 
+	/**
+	 * @deprecated
+	 */
 	public void setService(LayoutBranchLocalService service) {
-		MethodCache.remove(LayoutBranchLocalService.class);
-
-		_service = service;
-
-		ReferenceRegistry.registerReference(LayoutBranchLocalServiceUtil.class,
-			"_service");
-		MethodCache.remove(LayoutBranchLocalService.class);
 	}
 
 	private static LayoutBranchLocalService _service;

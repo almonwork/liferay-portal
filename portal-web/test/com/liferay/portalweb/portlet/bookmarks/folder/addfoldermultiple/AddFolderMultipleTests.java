@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,7 +14,10 @@
 
 package com.liferay.portalweb.portlet.bookmarks.folder.addfoldermultiple;
 
-import com.liferay.portalweb.portal.BaseTests;
+import com.liferay.portalweb.portal.BaseTestSuite;
+import com.liferay.portalweb.portal.util.TearDownPageTest;
+import com.liferay.portalweb.portlet.bookmarks.portlet.addportletbookmarks.AddPageBookmarksTest;
+import com.liferay.portalweb.portlet.bookmarks.portlet.addportletbookmarks.AddPortletBookmarksTest;
 
 import junit.framework.Test;
 import junit.framework.TestSuite;
@@ -22,11 +25,9 @@ import junit.framework.TestSuite;
 /**
  * @author Brian Wing Shun Chan
  */
-public class AddFolderMultipleTests extends BaseTests {
-
+public class AddFolderMultipleTests extends BaseTestSuite {
 	public static Test suite() {
 		TestSuite testSuite = new TestSuite();
-
 		testSuite.addTestSuite(AddPageBookmarksTest.class);
 		testSuite.addTestSuite(AddPortletBookmarksTest.class);
 		testSuite.addTestSuite(AddFolder1Test.class);
@@ -37,5 +38,4 @@ public class AddFolderMultipleTests extends BaseTests {
 
 		return testSuite;
 	}
-
 }

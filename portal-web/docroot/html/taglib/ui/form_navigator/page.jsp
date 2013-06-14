@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -53,7 +53,7 @@ if (Validator.isNotNull(historyKey)) {
 			<!-- Begin fragment <%= namespace + sectionId %> -->
 
 			<div class="form-section <%= (curSection.equals(section) || curSection.equals(sectionId)) ? "selected" : "aui-helper-hidden-accessible" %>" id="<%= namespace + sectionId %>">
-				<liferay-util:include page="<%= sectionJsp %>" />
+				<liferay-util:include page="<%= sectionJsp %>" portletId="<%= portletDisplay.getRootPortletId() %>" />
 			</div>
 
 			<!-- End fragment <%= namespace + sectionId %> -->
@@ -152,10 +152,10 @@ if (Validator.isNotNull(historyKey)) {
 					<aui:button type="submit" />
 
 					<%
-					String taglibOnClick = Validator.isNull(backURL) ? "location.href = '';" : backURL;
+					String taglibOnClick = "location.href = location.href.replace(location.hash, '');";
 					%>
 
-					<aui:button onClick="<%= taglibOnClick %>" type="cancel" />
+					<aui:button href="<%= backURL %>" onClick="<%= taglibOnClick %>" type="cancel" />
 				</aui:button-row>
 			</c:if>
 

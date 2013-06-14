@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -81,12 +81,12 @@ public class EditArchivedSetupsAction extends EditConfigurationAction {
 			if (e instanceof NoSuchPortletItemException ||
 				e instanceof PortletItemNameException) {
 
-				SessionErrors.add(actionRequest, e.getClass().getName());
+				SessionErrors.add(actionRequest, e.getClass());
 
 				sendRedirect(actionRequest, actionResponse);
 			}
 			else if (e instanceof PrincipalException) {
-				SessionErrors.add(actionRequest, e.getClass().getName());
+				SessionErrors.add(actionRequest, e.getClass());
 
 				setForward(
 					actionRequest, "portlet.portlet_configuration.error");
@@ -97,9 +97,19 @@ public class EditArchivedSetupsAction extends EditConfigurationAction {
 		}
 
 		if (SessionErrors.isEmpty(actionRequest)) {
+			String portletResource = ParamUtil.getString(
+				actionRequest, "portletResource");
+
 			SessionMessages.add(
 				actionRequest,
-				portletConfig.getPortletName() + ".doConfigure");
+				portletConfig.getPortletName() +
+					SessionMessages.KEY_SUFFIX_REFRESH_PORTLET,
+				portletResource);
+
+			SessionMessages.add(
+				actionRequest,
+				portletConfig.getPortletName() +
+					SessionMessages.KEY_SUFFIX_UPDATED_CONFIGURATION);
 
 			String redirect = PortalUtil.escapeRedirect(
 				ParamUtil.getString(actionRequest, "redirect"));
@@ -135,13 +145,13 @@ public class EditArchivedSetupsAction extends EditConfigurationAction {
 			"portlet.portlet_configuration.edit_archived_setups"));
 	}
 
-	private void deleteSetup(ActionRequest actionRequest) throws Exception {
+	protected void deleteSetup(ActionRequest actionRequest) throws Exception {
 		long portletItemId = ParamUtil.getLong(actionRequest, "portletItemId");
 
 		PortletPreferencesServiceUtil.deleteArchivedPreferences(portletItemId);
 	}
 
-	private void restoreSetup(ActionRequest actionRequest, Portlet portlet)
+	protected void restoreSetup(ActionRequest actionRequest, Portlet portlet)
 		throws Exception {
 
 		ThemeDisplay themeDisplay = (ThemeDisplay)actionRequest.getAttribute(
@@ -171,8 +181,8 @@ public class EditArchivedSetupsAction extends EditConfigurationAction {
 				actionRequest, portlet.getPortletId());
 
 		PortletPreferencesServiceUtil.updateArchivePreferences(
-			themeDisplay.getUserId(), themeDisplay.getScopeGroupId(),
-			name, portlet.getRootPortletId(), setup);
+			themeDisplay.getUserId(), themeDisplay.getScopeGroupId(), name,
+			portlet.getRootPortletId(), setup);
 	}
 
 }

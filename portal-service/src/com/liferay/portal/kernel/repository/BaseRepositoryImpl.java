@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -19,13 +19,27 @@ import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.repository.model.Folder;
+import com.liferay.portal.kernel.repository.search.RepositorySearchQueryBuilderUtil;
+import com.liferay.portal.kernel.search.BooleanQuery;
+import com.liferay.portal.kernel.search.Hits;
+import com.liferay.portal.kernel.search.SearchContext;
+import com.liferay.portal.kernel.search.SearchEngineUtil;
+import com.liferay.portal.kernel.search.SearchException;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.UnicodeProperties;
+import com.liferay.portal.model.Lock;
 import com.liferay.portal.model.RepositoryEntry;
 import com.liferay.portal.service.CompanyLocalService;
+import com.liferay.portal.service.ServiceContext;
 import com.liferay.portal.service.UserLocalService;
 import com.liferay.portal.service.persistence.RepositoryEntryUtil;
+import com.liferay.portlet.asset.service.AssetEntryLocalService;
 import com.liferay.portlet.documentlibrary.service.DLAppHelperLocalService;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -37,12 +51,47 @@ import java.util.List;
  */
 public abstract class BaseRepositoryImpl implements BaseRepository {
 
+	public FileEntry addFileEntry(
+			long folderId, String sourceFileName, String mimeType, String title,
+			String description, String changeLog, File file,
+			ServiceContext serviceContext)
+		throws PortalException, SystemException {
+
+		InputStream is = null;
+		long size = 0;
+
+		try {
+			is = new FileInputStream(file);
+			size = file.length();
+
+			return addFileEntry(
+				folderId, sourceFileName, mimeType, title, description,
+				changeLog, is, size, serviceContext);
+		}
+		catch (IOException ioe) {
+			throw new SystemException(ioe);
+		}
+		finally {
+			if (is != null) {
+				try {
+					is.close();
+				}
+				catch (IOException ioe) {
+				}
+			}
+		}
+	}
+
 	public void deleteFileEntry(long folderId, String title)
 		throws PortalException, SystemException {
 
 		FileEntry fileEntry = getFileEntry(folderId, title);
 
 		deleteFileEntry(fileEntry.getFileEntryId());
+	}
+
+	public void deleteFileVersion(long fileEntryId, String version) {
+		throw new UnsupportedOperationException();
 	}
 
 	public void deleteFolder(long parentFolderId, String title)
@@ -71,9 +120,29 @@ public abstract class BaseRepositoryImpl implements BaseRepository {
 		return getFileEntriesCount(folderId);
 	}
 
+	public int getFileEntriesAndFileShortcutsCount(
+			long folderId, int status, String[] mimeTypes)
+		throws PortalException, SystemException {
+
+		return getFileEntriesCount(folderId, mimeTypes);
+	}
+
+	public List<Folder> getFolders(
+			long parentFolderId, int status, boolean includeMountfolders,
+			int start, int end, OrderByComparator obc)
+		throws PortalException, SystemException {
+
+		return getFolders(parentFolderId, includeMountfolders, start, end, obc);
+	}
+
 	public abstract List<Object> getFoldersAndFileEntries(
 			long folderId, int start, int end, OrderByComparator obc)
 		throws SystemException;
+
+	public abstract List<Object> getFoldersAndFileEntries(
+			long folderId, String[] mimeTypes, int start, int end,
+			OrderByComparator obc)
+		throws PortalException, SystemException;
 
 	public List<Object> getFoldersAndFileEntriesAndFileShortcuts(
 			long folderId, int status, boolean includeMountFolders, int start,
@@ -83,6 +152,15 @@ public abstract class BaseRepositoryImpl implements BaseRepository {
 		return getFoldersAndFileEntries(folderId, start, end, obc);
 	}
 
+	public List<Object> getFoldersAndFileEntriesAndFileShortcuts(
+			long folderId, int status, String[] mimeTypes,
+			boolean includeMountFolders, int start, int end,
+			OrderByComparator obc)
+		throws PortalException, SystemException {
+
+		return getFoldersAndFileEntries(folderId, mimeTypes, start, end, obc);
+	}
+
 	public int getFoldersAndFileEntriesAndFileShortcutsCount(
 			long folderId, int status, boolean includeMountFolders)
 		throws SystemException {
@@ -90,8 +168,27 @@ public abstract class BaseRepositoryImpl implements BaseRepository {
 		return getFoldersAndFileEntriesCount(folderId);
 	}
 
+	public int getFoldersAndFileEntriesAndFileShortcutsCount(
+			long folderId, int status, String[] mimeTypes,
+			boolean includeMountFolders)
+		throws PortalException, SystemException {
+
+		return getFoldersAndFileEntriesCount(folderId, mimeTypes);
+	}
+
 	public abstract int getFoldersAndFileEntriesCount(long folderId)
 		throws SystemException;
+
+	public abstract int getFoldersAndFileEntriesCount(
+			long folderId, String[] mimeTypes)
+		throws PortalException, SystemException;
+
+	public int getFoldersCount(
+			long parentFolderId, int status, boolean includeMountfolders)
+		throws PortalException, SystemException {
+
+		return getFoldersCount(parentFolderId, includeMountfolders);
+	}
 
 	public long getGroupId() {
 		return _groupId;
@@ -120,8 +217,7 @@ public abstract class BaseRepositoryImpl implements BaseRepository {
 		}
 
 		return new Object[] {
-			repositoryEntry.getRepositoryEntryId(),
-			repositoryEntry.getUuid()
+			repositoryEntry.getRepositoryEntryId(), repositoryEntry.getUuid()
 		};
 	}
 
@@ -133,10 +229,25 @@ public abstract class BaseRepositoryImpl implements BaseRepository {
 		return getFileEntries(rootFolderId, start, end, obc);
 	}
 
+	public List<FileEntry> getRepositoryFileEntries(
+			long userId, long rootFolderId, String[] mimeTypes, int status,
+			int start, int end, OrderByComparator obc)
+		throws PortalException, SystemException {
+
+		return getFileEntries(rootFolderId, mimeTypes, start, end, obc);
+	}
+
 	public int getRepositoryFileEntriesCount(long userId, long rootFolderId)
 		throws SystemException {
 
 		return getFileEntriesCount(rootFolderId);
+	}
+
+	public int getRepositoryFileEntriesCount(
+			long userId, long rootFolderId, String[] mimeTypes, int status)
+		throws PortalException, SystemException {
+
+		return getFileEntriesCount(rootFolderId, mimeTypes);
 	}
 
 	public long getRepositoryId() {
@@ -149,6 +260,31 @@ public abstract class BaseRepositoryImpl implements BaseRepository {
 
 	public abstract void initRepository()
 		throws PortalException, SystemException;
+
+	public Lock lockFileEntry(long fileEntryId) {
+		throw new UnsupportedOperationException();
+	}
+
+	public Lock lockFileEntry(
+		long fileEntryId, String owner, long expirationTime) {
+
+		throw new UnsupportedOperationException();
+	}
+
+	public Hits search(SearchContext searchContext) throws SearchException {
+		searchContext.setSearchEngineId(SearchEngineUtil.GENERIC_ENGINE_ID);
+
+		BooleanQuery fullQuery = RepositorySearchQueryBuilderUtil.getFullQuery(
+			searchContext);
+
+		return search(searchContext, fullQuery);
+	}
+
+	public void setAssetEntryLocalService(
+		AssetEntryLocalService assetEntryLocalService) {
+
+		this.assetEntryLocalService = assetEntryLocalService;
+	}
 
 	public void setCompanyId(long companyId) {
 		_companyId = companyId;
@@ -190,6 +326,14 @@ public abstract class BaseRepositoryImpl implements BaseRepository {
 		this.userLocalService = userLocalService;
 	}
 
+	public void unlockFileEntry(long fileEntryId) {
+		throw new UnsupportedOperationException();
+	}
+
+	public void unlockFileEntry(long fileEntryId, String lockUuid) {
+		throw new UnsupportedOperationException();
+	}
+
 	public void unlockFolder(long parentFolderId, String title, String lockUuid)
 		throws PortalException, SystemException {
 
@@ -198,6 +342,42 @@ public abstract class BaseRepositoryImpl implements BaseRepository {
 		unlockFolder(folder.getFolderId(), lockUuid);
 	}
 
+	public FileEntry updateFileEntry(
+			long fileEntryId, String sourceFileName, String mimeType,
+			String title, String description, String changeLog,
+			boolean majorVersion, File file, ServiceContext serviceContext)
+		throws PortalException, SystemException {
+
+		InputStream is = null;
+		long size = 0;
+
+		try {
+			is = new FileInputStream(file);
+			size = file.length();
+
+			return updateFileEntry(
+				fileEntryId, sourceFileName, mimeType, title, description,
+				changeLog, majorVersion, is, size, serviceContext);
+		}
+		catch (IOException ioe) {
+			throw new SystemException(ioe);
+		}
+		finally {
+			if (is != null) {
+				try {
+					is.close();
+				}
+				catch (IOException ioe) {
+				}
+			}
+		}
+	}
+
+	public boolean verifyFileEntryLock(long fileEntryId, String lockUuid) {
+		throw new UnsupportedOperationException();
+	}
+
+	protected AssetEntryLocalService assetEntryLocalService;
 	protected CompanyLocalService companyLocalService;
 	protected CounterLocalService counterLocalService;
 	protected DLAppHelperLocalService dlAppHelperLocalService;
@@ -205,7 +385,7 @@ public abstract class BaseRepositoryImpl implements BaseRepository {
 
 	private long _companyId;
 	private long _groupId;
-	private LocalRepository _localRepository = new BaseLocalRepositoryImpl(
+	private LocalRepository _localRepository = new DefaultLocalRepositoryImpl(
 		this);
 	private long _repositoryId;
 	private UnicodeProperties _typeSettingsProperties;

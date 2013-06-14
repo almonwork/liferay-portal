@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -26,6 +26,7 @@ import com.liferay.portlet.documentlibrary.model.DLFileEntry;
 import com.liferay.portlet.documentlibrary.model.DLFileVersion;
 import com.liferay.portlet.documentlibrary.service.DLFileVersionLocalServiceUtil;
 import com.liferay.portlet.documentlibrary.service.permission.DLFileEntryPermission;
+import com.liferay.portlet.documentlibrary.util.DLAppUtil;
 import com.liferay.portlet.expando.model.ExpandoBridge;
 
 import java.io.InputStream;
@@ -88,6 +89,10 @@ public class LiferayFileEntry extends LiferayModel implements FileEntry {
 		return _dlFileEntry.getDescription();
 	}
 
+	public DLFileEntry getDLFileEntry() {
+		return _dlFileEntry;
+	}
+
 	@Override
 	public ExpandoBridge getExpandoBridge() {
 		return _dlFileEntry.getExpandoBridge();
@@ -138,7 +143,7 @@ public class LiferayFileEntry extends LiferayModel implements FileEntry {
 	public FileVersion getLatestFileVersion()
 		throws PortalException, SystemException {
 
-		return new LiferayFileVersion(_dlFileEntry.getLatestFileVersion());
+		return new LiferayFileVersion(_dlFileEntry.getLatestFileVersion(false));
 	}
 
 	public Lock getLock() {
@@ -202,7 +207,7 @@ public class LiferayFileEntry extends LiferayModel implements FileEntry {
 	}
 
 	public String getTitle() {
-		return _dlFileEntry.getTitle();
+		return DLAppUtil.stripTrashNamespace(_dlFileEntry.getTitle());
 	}
 
 	public long getUserId() {

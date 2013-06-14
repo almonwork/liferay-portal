@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,7 +14,6 @@
 
 package com.liferay.portal.service.persistence;
 
-import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.model.PluginSetting;
 
 /**
@@ -306,10 +305,11 @@ public interface PluginSettingPersistence extends BasePersistence<PluginSetting>
 	* @param companyId the company ID
 	* @param pluginId the plugin ID
 	* @param pluginType the plugin type
+	* @return the plugin setting that was removed
 	* @throws SystemException if a system exception occurred
 	*/
-	public void removeByC_I_T(long companyId, java.lang.String pluginId,
-		java.lang.String pluginType)
+	public com.liferay.portal.model.PluginSetting removeByC_I_T(
+		long companyId, java.lang.String pluginId, java.lang.String pluginType)
 		throws com.liferay.portal.NoSuchPluginSettingException,
 			com.liferay.portal.kernel.exception.SystemException;
 
@@ -352,7 +352,4 @@ public interface PluginSettingPersistence extends BasePersistence<PluginSetting>
 	*/
 	public int countAll()
 		throws com.liferay.portal.kernel.exception.SystemException;
-
-	public PluginSetting remove(PluginSetting pluginSetting)
-		throws SystemException;
 }

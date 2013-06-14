@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -20,6 +20,8 @@ import com.liferay.portal.model.CacheModel;
 
 import com.liferay.portlet.documentlibrary.model.DLSync;
 
+import java.io.Serializable;
+
 import java.util.Date;
 
 /**
@@ -29,10 +31,10 @@ import java.util.Date;
  * @see DLSync
  * @generated
  */
-public class DLSyncCacheModel implements CacheModel<DLSync> {
+public class DLSyncCacheModel implements CacheModel<DLSync>, Serializable {
 	@Override
 	public String toString() {
-		StringBundler sb = new StringBundler(17);
+		StringBundler sb = new StringBundler(27);
 
 		sb.append("{syncId=");
 		sb.append(syncId);
@@ -44,12 +46,22 @@ public class DLSyncCacheModel implements CacheModel<DLSync> {
 		sb.append(modifiedDate);
 		sb.append(", fileId=");
 		sb.append(fileId);
+		sb.append(", fileUuid=");
+		sb.append(fileUuid);
 		sb.append(", repositoryId=");
 		sb.append(repositoryId);
+		sb.append(", parentFolderId=");
+		sb.append(parentFolderId);
+		sb.append(", name=");
+		sb.append(name);
+		sb.append(", description=");
+		sb.append(description);
 		sb.append(", event=");
 		sb.append(event);
 		sb.append(", type=");
 		sb.append(type);
+		sb.append(", version=");
+		sb.append(version);
 		sb.append("}");
 
 		return sb.toString();
@@ -75,14 +87,31 @@ public class DLSyncCacheModel implements CacheModel<DLSync> {
 			dlSyncImpl.setModifiedDate(new Date(modifiedDate));
 		}
 
-		if (fileId == null) {
-			dlSyncImpl.setFileId(StringPool.BLANK);
+		dlSyncImpl.setFileId(fileId);
+
+		if (fileUuid == null) {
+			dlSyncImpl.setFileUuid(StringPool.BLANK);
 		}
 		else {
-			dlSyncImpl.setFileId(fileId);
+			dlSyncImpl.setFileUuid(fileUuid);
 		}
 
 		dlSyncImpl.setRepositoryId(repositoryId);
+		dlSyncImpl.setParentFolderId(parentFolderId);
+
+		if (name == null) {
+			dlSyncImpl.setName(StringPool.BLANK);
+		}
+		else {
+			dlSyncImpl.setName(name);
+		}
+
+		if (description == null) {
+			dlSyncImpl.setDescription(StringPool.BLANK);
+		}
+		else {
+			dlSyncImpl.setDescription(description);
+		}
 
 		if (event == null) {
 			dlSyncImpl.setEvent(StringPool.BLANK);
@@ -98,6 +127,13 @@ public class DLSyncCacheModel implements CacheModel<DLSync> {
 			dlSyncImpl.setType(type);
 		}
 
+		if (version == null) {
+			dlSyncImpl.setVersion(StringPool.BLANK);
+		}
+		else {
+			dlSyncImpl.setVersion(version);
+		}
+
 		dlSyncImpl.resetOriginalValues();
 
 		return dlSyncImpl;
@@ -107,8 +143,13 @@ public class DLSyncCacheModel implements CacheModel<DLSync> {
 	public long companyId;
 	public long createDate;
 	public long modifiedDate;
-	public String fileId;
+	public long fileId;
+	public String fileUuid;
 	public long repositoryId;
+	public long parentFolderId;
+	public String name;
+	public String description;
 	public String event;
 	public String type;
+	public String version;
 }

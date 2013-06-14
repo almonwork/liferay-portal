@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -38,8 +38,6 @@ public class MkcolMethodImpl implements Method {
 		HttpServletResponse response = webDavRequest.getHttpServletResponse();
 		long groupId = webDavRequest.getGroupId();
 
-		int statusCode = HttpServletResponse.SC_FORBIDDEN;
-
 		if (groupId != 0) {
 			Status status = storage.makeCollection(webDavRequest);
 
@@ -51,10 +49,10 @@ public class MkcolMethodImpl implements Method {
 							status.getObject());
 			}
 
-			statusCode = status.getCode();
+			return status.getCode();
 		}
 
-		return statusCode;
+		return HttpServletResponse.SC_FORBIDDEN;
 	}
 
 }

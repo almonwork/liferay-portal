@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,14 +14,19 @@
 
 package com.liferay.portlet.blogs.util;
 
+import com.liferay.portal.kernel.exception.SystemException;
+import com.liferay.portal.kernel.util.FriendlyURLNormalizerUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.LocalizationUtil;
 import com.liferay.portal.kernel.util.PropsKeys;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.Validator;
-import com.liferay.portal.util.FriendlyURLNormalizer;
+import com.liferay.portal.model.ModelHintsUtil;
+import com.liferay.portal.util.PortalUtil;
 import com.liferay.portal.util.PropsUtil;
+import com.liferay.portal.util.PropsValues;
+import com.liferay.portlet.blogs.model.BlogsEntry;
 import com.liferay.util.ContentUtil;
 
 import java.util.Locale;
@@ -153,31 +158,41 @@ public class BlogsUtil {
 		return map;
 	}
 
-	public static String getEmailFromAddress(PortletPreferences preferences) {
-		String emailFromAddress = PropsUtil.get(
-			PropsKeys.BLOGS_EMAIL_FROM_ADDRESS);
+	public static String getEmailFromAddress(
+			PortletPreferences preferences, long companyId)
+		throws SystemException {
 
-		return preferences.getValue("emailFromAddress", emailFromAddress);
+		return PortalUtil.getEmailFromAddress(
+			preferences, companyId, PropsValues.BLOGS_EMAIL_FROM_ADDRESS);
 	}
 
-	public static String getEmailFromName(PortletPreferences preferences) {
-		String emailFromName = PropsUtil.get(PropsKeys.BLOGS_EMAIL_FROM_NAME);
+	public static String getEmailFromName(
+			PortletPreferences preferences, long companyId)
+		throws SystemException {
 
-		return preferences.getValue("emailFromName", emailFromName);
+		return PortalUtil.getEmailFromName(
+			preferences, companyId, PropsValues.BLOGS_EMAIL_FROM_NAME);
 	}
 
 	public static String getUrlTitle(long entryId, String title) {
+		if (title == null) {
+			return String.valueOf(entryId);
+		}
+
 		title = title.trim().toLowerCase();
 
 		if (Validator.isNull(title) || Validator.isNumber(title) ||
 			title.equals("rss")) {
 
-			return String.valueOf(entryId);
+			title = String.valueOf(entryId);
 		}
 		else {
-			return FriendlyURLNormalizer.normalize(
+			title = FriendlyURLNormalizerUtil.normalize(
 				title, _URL_TITLE_REPLACE_CHARS);
 		}
+
+		return ModelHintsUtil.trimString(
+			BlogsEntry.class.getName(), "urlTitle", title);
 	}
 
 	private static final char[] _URL_TITLE_REPLACE_CHARS = new char[] {

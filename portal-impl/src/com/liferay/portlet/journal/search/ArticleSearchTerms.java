@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -33,6 +33,7 @@ public class ArticleSearchTerms extends ArticleDisplayTerms {
 		articleId = DAOParamUtil.getString(portletRequest, ARTICLE_ID);
 		content = DAOParamUtil.getString(portletRequest, CONTENT);
 		description = DAOParamUtil.getString(portletRequest, DESCRIPTION);
+		folderId = DAOParamUtil.getLong(portletRequest, FOLDER_ID);
 		status = ParamUtil.getString(portletRequest, STATUS);
 		structureId = DAOParamUtil.getString(portletRequest, STRUCTURE_ID);
 		templateId = DAOParamUtil.getString(portletRequest, TEMPLATE_ID);
@@ -81,6 +82,10 @@ public class ArticleSearchTerms extends ArticleDisplayTerms {
 
 	public void setArticleId(String articleId) {
 		this.articleId = articleId;
+	}
+
+	public void setFolderId(long folderId) {
+		this.folderId = folderId;
 	}
 
 	public void setGroupId(long groupId) {

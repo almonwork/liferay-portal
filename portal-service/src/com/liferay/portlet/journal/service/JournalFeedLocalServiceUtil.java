@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -15,7 +15,6 @@
 package com.liferay.portlet.journal.service;
 
 import com.liferay.portal.kernel.bean.PortalBeanLocatorUtil;
-import com.liferay.portal.kernel.util.MethodCache;
 import com.liferay.portal.kernel.util.ReferenceRegistry;
 
 /**
@@ -66,25 +65,32 @@ public class JournalFeedLocalServiceUtil {
 	* Deletes the journal feed with the primary key from the database. Also notifies the appropriate model listeners.
 	*
 	* @param id the primary key of the journal feed
+	* @return the journal feed that was removed
 	* @throws PortalException if a journal feed with the primary key could not be found
 	* @throws SystemException if a system exception occurred
 	*/
-	public static void deleteJournalFeed(long id)
+	public static com.liferay.portlet.journal.model.JournalFeed deleteJournalFeed(
+		long id)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException {
-		getService().deleteJournalFeed(id);
+		return getService().deleteJournalFeed(id);
 	}
 
 	/**
 	* Deletes the journal feed from the database. Also notifies the appropriate model listeners.
 	*
 	* @param journalFeed the journal feed
+	* @return the journal feed that was removed
 	* @throws SystemException if a system exception occurred
 	*/
-	public static void deleteJournalFeed(
+	public static com.liferay.portlet.journal.model.JournalFeed deleteJournalFeed(
 		com.liferay.portlet.journal.model.JournalFeed journalFeed)
 		throws com.liferay.portal.kernel.exception.SystemException {
-		getService().deleteJournalFeed(journalFeed);
+		return getService().deleteJournalFeed(journalFeed);
+	}
+
+	public static com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery() {
+		return getService().dynamicQuery();
 	}
 
 	/**
@@ -156,6 +162,11 @@ public class JournalFeedLocalServiceUtil {
 		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery)
 		throws com.liferay.portal.kernel.exception.SystemException {
 		return getService().dynamicQueryCount(dynamicQuery);
+	}
+
+	public static com.liferay.portlet.journal.model.JournalFeed fetchJournalFeed(
+		long id) throws com.liferay.portal.kernel.exception.SystemException {
+		return getService().fetchJournalFeed(id);
 	}
 
 	/**
@@ -289,14 +300,6 @@ public class JournalFeedLocalServiceUtil {
 			targetPortletId, contentField, feedType, feedVersion, serviceContext);
 	}
 
-	public static void addFeedResources(long feedId,
-		boolean addGroupPermissions, boolean addGuestPermissions)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
-		getService()
-			.addFeedResources(feedId, addGroupPermissions, addGuestPermissions);
-	}
-
 	public static void addFeedResources(
 		com.liferay.portlet.journal.model.JournalFeed feed,
 		boolean addGroupPermissions, boolean addGuestPermissions)
@@ -306,6 +309,22 @@ public class JournalFeedLocalServiceUtil {
 			.addFeedResources(feed, addGroupPermissions, addGuestPermissions);
 	}
 
+	public static void addFeedResources(
+		com.liferay.portlet.journal.model.JournalFeed feed,
+		java.lang.String[] groupPermissions, java.lang.String[] guestPermissions)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException {
+		getService().addFeedResources(feed, groupPermissions, guestPermissions);
+	}
+
+	public static void addFeedResources(long feedId,
+		boolean addGroupPermissions, boolean addGuestPermissions)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException {
+		getService()
+			.addFeedResources(feedId, addGroupPermissions, addGuestPermissions);
+	}
+
 	public static void addFeedResources(long feedId,
 		java.lang.String[] groupPermissions, java.lang.String[] guestPermissions)
 		throws com.liferay.portal.kernel.exception.PortalException,
@@ -313,12 +332,11 @@ public class JournalFeedLocalServiceUtil {
 		getService().addFeedResources(feedId, groupPermissions, guestPermissions);
 	}
 
-	public static void addFeedResources(
-		com.liferay.portlet.journal.model.JournalFeed feed,
-		java.lang.String[] groupPermissions, java.lang.String[] guestPermissions)
+	public static void deleteFeed(
+		com.liferay.portlet.journal.model.JournalFeed feed)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException {
-		getService().addFeedResources(feed, groupPermissions, guestPermissions);
+		getService().deleteFeed(feed);
 	}
 
 	public static void deleteFeed(long feedId)
@@ -331,13 +349,6 @@ public class JournalFeedLocalServiceUtil {
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException {
 		getService().deleteFeed(groupId, feedId);
-	}
-
-	public static void deleteFeed(
-		com.liferay.portlet.journal.model.JournalFeed feed)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
-		getService().deleteFeed(feed);
 	}
 
 	public static com.liferay.portlet.journal.model.JournalFeed getFeed(
@@ -434,20 +445,15 @@ public class JournalFeedLocalServiceUtil {
 
 			ReferenceRegistry.registerReference(JournalFeedLocalServiceUtil.class,
 				"_service");
-			MethodCache.remove(JournalFeedLocalService.class);
 		}
 
 		return _service;
 	}
 
+	/**
+	 * @deprecated
+	 */
 	public void setService(JournalFeedLocalService service) {
-		MethodCache.remove(JournalFeedLocalService.class);
-
-		_service = service;
-
-		ReferenceRegistry.registerReference(JournalFeedLocalServiceUtil.class,
-			"_service");
-		MethodCache.remove(JournalFeedLocalService.class);
 	}
 
 	private static JournalFeedLocalService _service;

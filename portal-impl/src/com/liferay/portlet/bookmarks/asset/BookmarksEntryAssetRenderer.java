@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -44,6 +44,10 @@ public class BookmarksEntryAssetRenderer extends BaseAssetRenderer {
 		_entry = entry;
 	}
 
+	public String getAssetRendererFactoryClassName() {
+		return BookmarksEntryAssetRendererFactory.CLASS_NAME;
+	}
+
 	public long getClassPK() {
 		return _entry.getEntryId();
 	}
@@ -73,7 +77,7 @@ public class BookmarksEntryAssetRenderer extends BaseAssetRenderer {
 		portletURL.setParameter("struts_action", "/bookmarks/edit_entry");
 		portletURL.setParameter(
 			"folderId", String.valueOf(_entry.getFolderId()));
- 		portletURL.setParameter("entryId", String.valueOf(_entry.getEntryId()));
+		portletURL.setParameter("entryId", String.valueOf(_entry.getEntryId()));
 
 		return portletURL;
 	}
@@ -84,16 +88,17 @@ public class BookmarksEntryAssetRenderer extends BaseAssetRenderer {
 		LiferayPortletResponse liferayPortletResponse,
 		String noSuchEntryRedirect) {
 
-		ThemeDisplay themeDisplay =
-			(ThemeDisplay)liferayPortletRequest.getAttribute(
-				WebKeys.THEME_DISPLAY);
-
-		return themeDisplay.getPathMain() + "/bookmarks/open_entry?entryId=" +
-			_entry.getEntryId();
+		return getURLViewInContext(
+			liferayPortletRequest, noSuchEntryRedirect, "/bookmarks/find_entry",
+			"entryId", _entry.getEntryId());
 	}
 
 	public long getUserId() {
 		return _entry.getUserId();
+	}
+
+	public String getUserName() {
+		return _entry.getUserName();
 	}
 
 	public String getUuid() {

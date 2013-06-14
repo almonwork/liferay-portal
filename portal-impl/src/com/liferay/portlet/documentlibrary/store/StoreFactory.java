@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -16,7 +16,11 @@ package com.liferay.portlet.documentlibrary.store;
 
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
-import com.liferay.portal.kernel.util.PortalClassLoaderUtil;
+import com.liferay.portal.kernel.util.PropsKeys;
+import com.liferay.portal.kernel.util.StringBundler;
+import com.liferay.portal.kernel.util.Validator;
+import com.liferay.portal.security.pacl.PACLClassLoaderUtil;
+import com.liferay.portal.util.PropsUtil;
 import com.liferay.portal.util.PropsValues;
 
 /**
@@ -24,13 +28,59 @@ import com.liferay.portal.util.PropsValues;
  */
 public class StoreFactory {
 
+	public static void checkProperties() {
+		if (_warned) {
+			return;
+		}
+
+		String dlHookImpl = PropsUtil.get("dl.hook.impl");
+
+		if (Validator.isNotNull(dlHookImpl)) {
+			boolean found = false;
+
+			for (String[] dlHookStoreParts : _DL_HOOK_STORES) {
+				if (dlHookImpl.equals(dlHookStoreParts[0])) {
+					PropsValues.DL_STORE_IMPL = dlHookStoreParts[1];
+
+					found = true;
+
+					break;
+				}
+			}
+
+			if (!found) {
+				PropsValues.DL_STORE_IMPL = dlHookImpl;
+			}
+
+			if (_log.isWarnEnabled()) {
+				StringBundler sb = new StringBundler(8);
+
+				sb.append("Liferay is configured with the legacy ");
+				sb.append("property \"dl.hook.impl=" + dlHookImpl + "\" ");
+				sb.append("in portal-ext.properties. Please reconfigure ");
+				sb.append("to use the new property \"");
+				sb.append(PropsKeys.DL_STORE_IMPL + "\". Liferay will ");
+				sb.append("attempt to temporarily set \"");
+				sb.append(PropsKeys.DL_STORE_IMPL + "=");
+				sb.append(PropsValues.DL_STORE_IMPL + "\".");
+
+				_log.warn(sb.toString());
+			}
+		}
+
+		_warned = true;
+	}
+
 	public static Store getInstance() {
 		if (_store == null) {
+			checkProperties();
+
 			if (_log.isDebugEnabled()) {
 				_log.debug("Instantiate " + PropsValues.DL_STORE_IMPL);
 			}
 
-			ClassLoader classLoader = PortalClassLoaderUtil.getClassLoader();
+			ClassLoader classLoader =
+				PACLClassLoaderUtil.getPortalClassLoader();
 
 			try {
 				_store = (Store)classLoader.loadClass(
@@ -56,8 +106,30 @@ public class StoreFactory {
 		_store = store;
 	}
 
+	private static final String[][] _DL_HOOK_STORES = new String[][] {
+		new String[] {
+			"com.liferay.documentlibrary.util.AdvancedFileSystemHook",
+			AdvancedFileSystemStore.class.getName()
+		},
+		new String[] {
+			"com.liferay.documentlibrary.util.CMISHook",
+			CMISStore.class.getName()
+		},
+		new String[] {
+			"com.liferay.documentlibrary.util.FileSystemHook",
+			FileSystemStore.class.getName()
+		},
+		new String[] {
+			"com.liferay.documentlibrary.util.JCRHook", JCRStore.class.getName()
+		},
+		new String[] {
+			"com.liferay.documentlibrary.util.S3Hook", S3Store.class.getName()
+		}
+	};
+
 	private static Log _log = LogFactoryUtil.getLog(StoreFactory.class);
 
 	private static Store _store;
+	private static boolean _warned;
 
 }

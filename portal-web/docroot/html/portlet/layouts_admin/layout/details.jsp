@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -21,7 +21,7 @@ Group group = (Group)request.getAttribute("edit_pages.jsp-group");
 boolean privateLayout = ((Boolean)request.getAttribute("edit_pages.jsp-privateLayout")).booleanValue();
 Layout selLayout = (Layout)request.getAttribute("edit_pages.jsp-selLayout");
 
-boolean locked = GetterUtil.getBoolean(selLayout.getTypeSettingsProperty("locked"));
+LayoutTypePortletImpl selLayoutTypePortlet = new LayoutTypePortletImpl(selLayout);
 
 Locale defaultLocale = LocaleUtil.getDefault();
 String defaultLanguageId = LocaleUtil.toLanguageId(defaultLocale);
@@ -42,7 +42,9 @@ StringBuilder friendlyURLBase = new StringBuilder();
 	<%
 	friendlyURLBase.append(themeDisplay.getPortalURL());
 
-	String virtualHostname = selLayout.getLayoutSet().getVirtualHostname();
+	LayoutSet layoutSet = selLayout.getLayoutSet();
+
+	String virtualHostname = layoutSet.getVirtualHostname();
 
 	if (Validator.isNull(virtualHostname) || (friendlyURLBase.indexOf(virtualHostname) == -1)) {
 		friendlyURLBase.append(group.getPathFriendlyURL(privateLayout, themeDisplay));
@@ -106,28 +108,51 @@ StringBuilder friendlyURLBase = new StringBuilder();
 					<aui:input helpMessage='<%= LanguageUtil.format(pageContext, "for-example-x", "<em>/news</em>") %>' label="friendly-url" name="friendlyURL" prefix="<%= friendlyURLBase.toString() %>" />
 				</c:when>
 				<c:otherwise>
-					<aui:input name="friendlyURL" size="30" type="hidden" value="<%= HtmlUtil.escape(selLayout.getFriendlyURL()) %>" />
+					<aui:input name="friendlyURL" type="hidden" value="<%= (selLayout != null) ? selLayout.getFriendlyURL() : StringPool.BLANK %>" />
 				</c:otherwise>
 			</c:choose>
 
 			<aui:input helpMessage="if-checked-this-page-wont-show-up-in-the-navigation-menu" name="hidden" />
 
 			<c:if test="<%= group.isLayoutSetPrototype() %>">
-				<aui:input helpMessage="if-checked-this-page-cannot-be-modified" name="locked" type="checkbox" value="<%= locked %>" />
+
+				<%
+				LayoutSetPrototype layoutSetPrototype = LayoutSetPrototypeLocalServiceUtil.getLayoutSetPrototype(group.getClassPK());
+
+				boolean layoutSetPrototypeUpdateable = GetterUtil.getBoolean(layoutSetPrototype.getSettingsProperty("layoutsUpdateable"), true);
+				boolean layoutUpdateable = GetterUtil.getBoolean(selLayoutTypePortlet.getTypeSettingsProperty("layoutUpdateable"), true);
+				%>
+
+				<aui:input disabled="<%= !layoutSetPrototypeUpdateable %>" helpMessage="allow-site-administrators-to-modify-this-page-for-their-site-help" label="allow-site-administrators-to-modify-this-page-for-their-site" name="layoutUpdateable" type="checkbox" value="<%= layoutUpdateable %>" />
 			</c:if>
 		</c:when>
 		<c:otherwise>
-			<aui:input name='<%= "name_" + defaultLanguageId %>' type="hidden" value="<%= HtmlUtil.escapeAttribute(selLayout.getName(defaultLocale)) %>" />
+			<aui:input name='<%= "name_" + defaultLanguageId %>' type="hidden" value="<%= selLayout.getName(defaultLocale) %>" />
+			<aui:input name="friendlyURL" type="hidden" value="<%= (selLayout != null) ? selLayout.getFriendlyURL() : StringPool.BLANK %>" />
 		</c:otherwise>
 	</c:choose>
+
+	<c:if test="<%= Validator.isNotNull(selLayout.getLayoutPrototypeUuid()) %>">
+
+		<%
+		LayoutPrototype layoutPrototype = LayoutPrototypeLocalServiceUtil.getLayoutPrototypeByUuidAndCompanyId(selLayout.getLayoutPrototypeUuid(), company.getCompanyId());
+		%>
+
+		<aui:input name="layoutPrototypeUuid" type="hidden" value="<%= selLayout.getLayoutPrototypeUuid() %>" />
+
+		<aui:input label='<%= LanguageUtil.format(pageContext, "automatically-apply-changes-done-to-the-page-template-x", HtmlUtil.escape(layoutPrototype.getName(user.getLocale()))) %>' name="layoutPrototypeLinkEnabled" type="checkbox" value="<%= selLayout.isLayoutPrototypeLinkEnabled() %>" />
+	</c:if>
 
 	<aui:select name="type">
 
 		<%
 		for (int i = 0; i < PropsValues.LAYOUT_TYPES.length; i++) {
+			if (PropsValues.LAYOUT_TYPES[i].equals("article") && (group.isLayoutPrototype() || group.isLayoutSetPrototype())) {
+				continue;
+			}
 		%>
 
-			<aui:option label='<%= "layout.types." + PropsValues.LAYOUT_TYPES[i] %>' selected="<%= selLayout.getType().equals(PropsValues.LAYOUT_TYPES[i]) %>" value="<%= PropsValues.LAYOUT_TYPES[i] %>" />
+			<aui:option disabled="<%= selLayout.isFirstParent() && !PortalUtil.isLayoutFirstPageable(PropsValues.LAYOUT_TYPES[i]) %>" label='<%= "layout.types." + PropsValues.LAYOUT_TYPES[i] %>' selected="<%= selLayout.getType().equals(PropsValues.LAYOUT_TYPES[i]) %>" value="<%= PropsValues.LAYOUT_TYPES[i] %>" />
 
 		<%
 		}
@@ -138,6 +163,10 @@ StringBuilder friendlyURLBase = new StringBuilder();
 	<%
 	for (int i = 0; i < PropsValues.LAYOUT_TYPES.length; i++) {
 		String curLayoutType = PropsValues.LAYOUT_TYPES[i];
+
+		if (PropsValues.LAYOUT_TYPES[i].equals("article") && (group.isLayoutPrototype() || group.isLayoutSetPrototype())) {
+			continue;
+		}
 	%>
 
 		<div class="layout-type-form layout-type-form-<%= curLayoutType %> <%= selLayout.getType().equals(PropsValues.LAYOUT_TYPES[i]) ? "" : "aui-helper-hidden" %>">
@@ -152,6 +181,7 @@ StringBuilder friendlyURLBase = new StringBuilder();
 	<%
 	}
 	%>
+
 </aui:fieldset>
 
 <aui:script use="aui-base">

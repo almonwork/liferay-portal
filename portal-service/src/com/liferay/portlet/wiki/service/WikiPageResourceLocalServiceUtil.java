@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -15,7 +15,6 @@
 package com.liferay.portlet.wiki.service;
 
 import com.liferay.portal.kernel.bean.PortalBeanLocatorUtil;
-import com.liferay.portal.kernel.util.MethodCache;
 import com.liferay.portal.kernel.util.ReferenceRegistry;
 
 /**
@@ -66,25 +65,32 @@ public class WikiPageResourceLocalServiceUtil {
 	* Deletes the wiki page resource with the primary key from the database. Also notifies the appropriate model listeners.
 	*
 	* @param resourcePrimKey the primary key of the wiki page resource
+	* @return the wiki page resource that was removed
 	* @throws PortalException if a wiki page resource with the primary key could not be found
 	* @throws SystemException if a system exception occurred
 	*/
-	public static void deleteWikiPageResource(long resourcePrimKey)
+	public static com.liferay.portlet.wiki.model.WikiPageResource deleteWikiPageResource(
+		long resourcePrimKey)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException {
-		getService().deleteWikiPageResource(resourcePrimKey);
+		return getService().deleteWikiPageResource(resourcePrimKey);
 	}
 
 	/**
 	* Deletes the wiki page resource from the database. Also notifies the appropriate model listeners.
 	*
 	* @param wikiPageResource the wiki page resource
+	* @return the wiki page resource that was removed
 	* @throws SystemException if a system exception occurred
 	*/
-	public static void deleteWikiPageResource(
+	public static com.liferay.portlet.wiki.model.WikiPageResource deleteWikiPageResource(
 		com.liferay.portlet.wiki.model.WikiPageResource wikiPageResource)
 		throws com.liferay.portal.kernel.exception.SystemException {
-		getService().deleteWikiPageResource(wikiPageResource);
+		return getService().deleteWikiPageResource(wikiPageResource);
+	}
+
+	public static com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery() {
+		return getService().dynamicQuery();
 	}
 
 	/**
@@ -156,6 +162,12 @@ public class WikiPageResourceLocalServiceUtil {
 		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery)
 		throws com.liferay.portal.kernel.exception.SystemException {
 		return getService().dynamicQueryCount(dynamicQuery);
+	}
+
+	public static com.liferay.portlet.wiki.model.WikiPageResource fetchWikiPageResource(
+		long resourcePrimKey)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getService().fetchWikiPageResource(resourcePrimKey);
 	}
 
 	/**
@@ -293,20 +305,15 @@ public class WikiPageResourceLocalServiceUtil {
 
 			ReferenceRegistry.registerReference(WikiPageResourceLocalServiceUtil.class,
 				"_service");
-			MethodCache.remove(WikiPageResourceLocalService.class);
 		}
 
 		return _service;
 	}
 
+	/**
+	 * @deprecated
+	 */
 	public void setService(WikiPageResourceLocalService service) {
-		MethodCache.remove(WikiPageResourceLocalService.class);
-
-		_service = service;
-
-		ReferenceRegistry.registerReference(WikiPageResourceLocalServiceUtil.class,
-			"_service");
-		MethodCache.remove(WikiPageResourceLocalService.class);
 	}
 
 	private static WikiPageResourceLocalService _service;

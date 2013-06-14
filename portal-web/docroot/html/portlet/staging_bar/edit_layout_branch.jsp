@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -42,7 +42,7 @@ long layoutRevisionId = ParamUtil.getLong(request, "layoutRevisionId");
 		<aui:input name="redirect" type="hidden" value="<%= redirect %>" />
 		<aui:input name="groupId" type="hidden"  value="<%= String.valueOf(scopeGroupId) %>" />
 		<aui:input name="layoutBranchId" type="hidden" value="<%= layoutBranchId %>" />
-		<aui:input name="mergeLayoutRevisionId" type="hidden" value="<%= String.valueOf(layoutRevisionId) %>" />
+		<aui:input name="copyLayoutRevisionId" type="hidden" value="<%= String.valueOf(layoutRevisionId) %>" />
 		<aui:input name="workflowAction" type="hidden" value="<%= String.valueOf(WorkflowConstants.ACTION_SAVE_DRAFT) %>" />
 
 		<aui:input name="name" />

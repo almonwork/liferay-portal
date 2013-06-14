@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -75,16 +75,6 @@ public class PasswordPolicyRelLocalServiceImpl
 		}
 	}
 
-	@Override
-	public void deletePasswordPolicyRel(long passwordPolicyRelId)
-		throws PortalException, SystemException {
-
-		PasswordPolicyRel passwordPolicyRel =
-			passwordPolicyRelPersistence.findByPrimaryKey(passwordPolicyRelId);
-
-		deletePasswordPolicyRel(passwordPolicyRel);
-	}
-
 	public void deletePasswordPolicyRel(
 			long passwordPolicyId, String className, long classPK)
 		throws SystemException {
@@ -100,13 +90,6 @@ public class PasswordPolicyRelLocalServiceImpl
 		}
 		catch (NoSuchPasswordPolicyRelException nsppre) {
 		}
-	}
-
-	@Override
-	public void deletePasswordPolicyRel(PasswordPolicyRel passwordPolicyRel)
-		throws SystemException {
-
-		passwordPolicyRelPersistence.remove(passwordPolicyRel);
 	}
 
 	public void deletePasswordPolicyRel(String className, long classPK)

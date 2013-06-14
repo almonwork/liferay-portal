@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -16,6 +16,7 @@ package com.liferay.portlet.expando.model.impl;
 
 import com.liferay.portal.kernel.bean.AutoEscapeBeanHandler;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.ProxyUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.model.CacheModel;
 import com.liferay.portal.model.impl.BaseModelImpl;
@@ -25,9 +26,10 @@ import com.liferay.portlet.expando.model.ExpandoRowModel;
 
 import java.io.Serializable;
 
-import java.lang.reflect.Proxy;
-
 import java.sql.Types;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * The base model implementation for the ExpandoRow service. Represents a row in the &quot;ExpandoRow&quot; database table, with each column mapped to a property of this class.
@@ -67,15 +69,11 @@ public class ExpandoRowModelImpl extends BaseModelImpl<ExpandoRow>
 	public static final boolean FINDER_CACHE_ENABLED = GetterUtil.getBoolean(com.liferay.portal.util.PropsUtil.get(
 				"value.object.finder.cache.enabled.com.liferay.portlet.expando.model.ExpandoRow"),
 			true);
-
-	public Class<?> getModelClass() {
-		return ExpandoRow.class;
-	}
-
-	public String getModelClassName() {
-		return ExpandoRow.class.getName();
-	}
-
+	public static final boolean COLUMN_BITMASK_ENABLED = GetterUtil.getBoolean(com.liferay.portal.util.PropsUtil.get(
+				"value.object.column.bitmask.enabled.com.liferay.portlet.expando.model.ExpandoRow"),
+			true);
+	public static long CLASSPK_COLUMN_BITMASK = 1L;
+	public static long TABLEID_COLUMN_BITMASK = 2L;
 	public static final long LOCK_EXPIRATION_TIME = GetterUtil.getLong(com.liferay.portal.util.PropsUtil.get(
 				"lock.expiration.time.com.liferay.portlet.expando.model.ExpandoRow"));
 
@@ -96,6 +94,53 @@ public class ExpandoRowModelImpl extends BaseModelImpl<ExpandoRow>
 
 	public void setPrimaryKeyObj(Serializable primaryKeyObj) {
 		setPrimaryKey(((Long)primaryKeyObj).longValue());
+	}
+
+	public Class<?> getModelClass() {
+		return ExpandoRow.class;
+	}
+
+	public String getModelClassName() {
+		return ExpandoRow.class.getName();
+	}
+
+	@Override
+	public Map<String, Object> getModelAttributes() {
+		Map<String, Object> attributes = new HashMap<String, Object>();
+
+		attributes.put("rowId", getRowId());
+		attributes.put("companyId", getCompanyId());
+		attributes.put("tableId", getTableId());
+		attributes.put("classPK", getClassPK());
+
+		return attributes;
+	}
+
+	@Override
+	public void setModelAttributes(Map<String, Object> attributes) {
+		Long rowId = (Long)attributes.get("rowId");
+
+		if (rowId != null) {
+			setRowId(rowId);
+		}
+
+		Long companyId = (Long)attributes.get("companyId");
+
+		if (companyId != null) {
+			setCompanyId(companyId);
+		}
+
+		Long tableId = (Long)attributes.get("tableId");
+
+		if (tableId != null) {
+			setTableId(tableId);
+		}
+
+		Long classPK = (Long)attributes.get("classPK");
+
+		if (classPK != null) {
+			setClassPK(classPK);
+		}
 	}
 
 	public long getRowId() {
@@ -119,6 +164,8 @@ public class ExpandoRowModelImpl extends BaseModelImpl<ExpandoRow>
 	}
 
 	public void setTableId(long tableId) {
+		_columnBitmask |= TABLEID_COLUMN_BITMASK;
+
 		if (!_setOriginalTableId) {
 			_setOriginalTableId = true;
 
@@ -137,6 +184,8 @@ public class ExpandoRowModelImpl extends BaseModelImpl<ExpandoRow>
 	}
 
 	public void setClassPK(long classPK) {
+		_columnBitmask |= CLASSPK_COLUMN_BITMASK;
+
 		if (!_setOriginalClassPK) {
 			_setOriginalClassPK = true;
 
@@ -150,20 +199,19 @@ public class ExpandoRowModelImpl extends BaseModelImpl<ExpandoRow>
 		return _originalClassPK;
 	}
 
+	public long getColumnBitmask() {
+		return _columnBitmask;
+	}
+
 	@Override
 	public ExpandoRow toEscapedModel() {
-		if (isEscapedModel()) {
-			return (ExpandoRow)this;
+		if (_escapedModelProxy == null) {
+			_escapedModelProxy = (ExpandoRow)ProxyUtil.newProxyInstance(_classLoader,
+					_escapedModelProxyInterfaces,
+					new AutoEscapeBeanHandler(this));
 		}
-		else {
-			if (_escapedModelProxy == null) {
-				_escapedModelProxy = (ExpandoRow)Proxy.newProxyInstance(_classLoader,
-						_escapedModelProxyInterfaces,
-						new AutoEscapeBeanHandler(this));
-			}
 
-			return _escapedModelProxy;
-		}
+		return _escapedModelProxy;
 	}
 
 	@Override
@@ -235,6 +283,8 @@ public class ExpandoRowModelImpl extends BaseModelImpl<ExpandoRow>
 		expandoRowModelImpl._originalClassPK = expandoRowModelImpl._classPK;
 
 		expandoRowModelImpl._setOriginalClassPK = false;
+
+		expandoRowModelImpl._columnBitmask = 0;
 	}
 
 	@Override
@@ -310,5 +360,6 @@ public class ExpandoRowModelImpl extends BaseModelImpl<ExpandoRow>
 	private long _classPK;
 	private long _originalClassPK;
 	private boolean _setOriginalClassPK;
+	private long _columnBitmask;
 	private ExpandoRow _escapedModelProxy;
 }

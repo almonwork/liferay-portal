@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -16,6 +16,7 @@ package com.liferay.portlet.dynamicdatamapping.model;
 
 import com.liferay.portal.kernel.bean.AutoEscape;
 import com.liferay.portal.kernel.exception.SystemException;
+import com.liferay.portal.model.AttachedModel;
 import com.liferay.portal.model.BaseModel;
 import com.liferay.portal.model.CacheModel;
 import com.liferay.portal.model.GroupedModel;
@@ -42,7 +43,8 @@ import java.util.Map;
  * @see com.liferay.portlet.dynamicdatamapping.model.impl.DDMTemplateModelImpl
  * @generated
  */
-public interface DDMTemplateModel extends BaseModel<DDMTemplate>, GroupedModel {
+public interface DDMTemplateModel extends AttachedModel, BaseModel<DDMTemplate>,
+	GroupedModel {
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
@@ -193,18 +195,56 @@ public interface DDMTemplateModel extends BaseModel<DDMTemplate>, GroupedModel {
 	public void setModifiedDate(Date modifiedDate);
 
 	/**
-	 * Returns the structure ID of this d d m template.
+	 * Returns the fully qualified class name of this d d m template.
 	 *
-	 * @return the structure ID of this d d m template
+	 * @return the fully qualified class name of this d d m template
 	 */
-	public long getStructureId();
+	public String getClassName();
+
+	public void setClassName(String className);
 
 	/**
-	 * Sets the structure ID of this d d m template.
+	 * Returns the class name ID of this d d m template.
 	 *
-	 * @param structureId the structure ID of this d d m template
+	 * @return the class name ID of this d d m template
 	 */
-	public void setStructureId(long structureId);
+	public long getClassNameId();
+
+	/**
+	 * Sets the class name ID of this d d m template.
+	 *
+	 * @param classNameId the class name ID of this d d m template
+	 */
+	public void setClassNameId(long classNameId);
+
+	/**
+	 * Returns the class p k of this d d m template.
+	 *
+	 * @return the class p k of this d d m template
+	 */
+	public long getClassPK();
+
+	/**
+	 * Sets the class p k of this d d m template.
+	 *
+	 * @param classPK the class p k of this d d m template
+	 */
+	public void setClassPK(long classPK);
+
+	/**
+	 * Returns the template key of this d d m template.
+	 *
+	 * @return the template key of this d d m template
+	 */
+	@AutoEscape
+	public String getTemplateKey();
+
+	/**
+	 * Sets the template key of this d d m template.
+	 *
+	 * @param templateKey the template key of this d d m template
+	 */
+	public void setTemplateKey(String templateKey);
 
 	/**
 	 * Returns the name of this d d m template.
@@ -219,6 +259,7 @@ public interface DDMTemplateModel extends BaseModel<DDMTemplate>, GroupedModel {
 	 * @param locale the locale of the language
 	 * @return the localized name of this d d m template
 	 */
+	@AutoEscape
 	public String getName(Locale locale);
 
 	/**
@@ -228,6 +269,7 @@ public interface DDMTemplateModel extends BaseModel<DDMTemplate>, GroupedModel {
 	 * @param useDefault whether to use the default language if no localization exists for the requested language
 	 * @return the localized name of this d d m template. If <code>useDefault</code> is <code>false</code> and no localization exists for the requested language, an empty string will be returned.
 	 */
+	@AutoEscape
 	public String getName(Locale locale, boolean useDefault);
 
 	/**
@@ -236,6 +278,7 @@ public interface DDMTemplateModel extends BaseModel<DDMTemplate>, GroupedModel {
 	 * @param languageId the ID of the language
 	 * @return the localized name of this d d m template
 	 */
+	@AutoEscape
 	public String getName(String languageId);
 
 	/**
@@ -245,7 +288,14 @@ public interface DDMTemplateModel extends BaseModel<DDMTemplate>, GroupedModel {
 	 * @param useDefault whether to use the default language if no localization exists for the requested language
 	 * @return the localized name of this d d m template
 	 */
+	@AutoEscape
 	public String getName(String languageId, boolean useDefault);
+
+	@AutoEscape
+	public String getNameCurrentLanguageId();
+
+	@AutoEscape
+	public String getNameCurrentValue();
 
 	/**
 	 * Returns a map of the locales and localized names of this d d m template.
@@ -278,6 +328,8 @@ public interface DDMTemplateModel extends BaseModel<DDMTemplate>, GroupedModel {
 	 */
 	public void setName(String name, Locale locale, Locale defaultLocale);
 
+	public void setNameCurrentLanguageId(String languageId);
+
 	/**
 	 * Sets the localized names of this d d m template from the map of locales and localized names.
 	 *
@@ -306,6 +358,7 @@ public interface DDMTemplateModel extends BaseModel<DDMTemplate>, GroupedModel {
 	 * @param locale the locale of the language
 	 * @return the localized description of this d d m template
 	 */
+	@AutoEscape
 	public String getDescription(Locale locale);
 
 	/**
@@ -315,6 +368,7 @@ public interface DDMTemplateModel extends BaseModel<DDMTemplate>, GroupedModel {
 	 * @param useDefault whether to use the default language if no localization exists for the requested language
 	 * @return the localized description of this d d m template. If <code>useDefault</code> is <code>false</code> and no localization exists for the requested language, an empty string will be returned.
 	 */
+	@AutoEscape
 	public String getDescription(Locale locale, boolean useDefault);
 
 	/**
@@ -323,6 +377,7 @@ public interface DDMTemplateModel extends BaseModel<DDMTemplate>, GroupedModel {
 	 * @param languageId the ID of the language
 	 * @return the localized description of this d d m template
 	 */
+	@AutoEscape
 	public String getDescription(String languageId);
 
 	/**
@@ -332,7 +387,14 @@ public interface DDMTemplateModel extends BaseModel<DDMTemplate>, GroupedModel {
 	 * @param useDefault whether to use the default language if no localization exists for the requested language
 	 * @return the localized description of this d d m template
 	 */
+	@AutoEscape
 	public String getDescription(String languageId, boolean useDefault);
+
+	@AutoEscape
+	public String getDescriptionCurrentLanguageId();
+
+	@AutoEscape
+	public String getDescriptionCurrentValue();
 
 	/**
 	 * Returns a map of the locales and localized descriptions of this d d m template.
@@ -366,6 +428,8 @@ public interface DDMTemplateModel extends BaseModel<DDMTemplate>, GroupedModel {
 	public void setDescription(String description, Locale locale,
 		Locale defaultLocale);
 
+	public void setDescriptionCurrentLanguageId(String languageId);
+
 	/**
 	 * Sets the localized descriptions of this d d m template from the map of locales and localized descriptions.
 	 *
@@ -396,6 +460,21 @@ public interface DDMTemplateModel extends BaseModel<DDMTemplate>, GroupedModel {
 	 * @param type the type of this d d m template
 	 */
 	public void setType(String type);
+
+	/**
+	 * Returns the mode of this d d m template.
+	 *
+	 * @return the mode of this d d m template
+	 */
+	@AutoEscape
+	public String getMode();
+
+	/**
+	 * Sets the mode of this d d m template.
+	 *
+	 * @param mode the mode of this d d m template
+	 */
+	public void setMode(String mode);
 
 	/**
 	 * Returns the language of this d d m template.
@@ -436,8 +515,6 @@ public interface DDMTemplateModel extends BaseModel<DDMTemplate>, GroupedModel {
 	public void setCachedModel(boolean cachedModel);
 
 	public boolean isEscapedModel();
-
-	public void setEscapedModel(boolean escapedModel);
 
 	public Serializable getPrimaryKeyObj();
 

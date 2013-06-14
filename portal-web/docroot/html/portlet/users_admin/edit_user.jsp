@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -17,8 +17,6 @@
 <%@ include file="/html/portlet/users_admin/init.jsp" %>
 
 <%
-themeDisplay.setIncludeServiceJs(true);
-
 String redirect = ParamUtil.getString(request, "redirect");
 String backURL = ParamUtil.getString(request, "backURL", redirect);
 
@@ -165,7 +163,7 @@ String[][] categorySections = {mainSections, identificationSections, miscellaneo
 
 <c:if test="<%= !portletName.equals(PortletKeys.MY_ACCOUNT) %>">
 	<liferay-util:include page="/html/portlet/users_admin/toolbar.jsp">
-		<liferay-util:param name="toolbarItem" value='<%= (selUser == null) ? "add-user" : "view" %>' />
+		<liferay-util:param name="toolbarItem" value='<%= (selUser == null) ? "add" : "view" %>' />
 	</liferay-util:include>
 </c:if>
 

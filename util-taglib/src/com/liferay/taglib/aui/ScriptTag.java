@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,6 +14,7 @@
 
 package com.liferay.taglib.aui;
 
+import com.liferay.portal.kernel.servlet.BodyContentWrapper;
 import com.liferay.portal.kernel.servlet.BrowserSnifferUtil;
 import com.liferay.portal.kernel.servlet.PortalIncludeUtil;
 import com.liferay.portal.kernel.servlet.taglib.FileAvailabilityUtil;
@@ -22,7 +23,8 @@ import com.liferay.portal.kernel.util.ServerDetector;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.WebKeys;
-import com.liferay.taglib.util.PositionTagSupport;
+import com.liferay.portal.model.Portlet;
+import com.liferay.taglib.aui.base.BaseScriptTag;
 
 import java.util.Set;
 
@@ -36,14 +38,22 @@ import javax.servlet.jsp.tagext.BodyContent;
  * @author Brian Wing Shun Chan
  * @author Shuyang Zhou
  */
-public class ScriptTag extends PositionTagSupport {
-
-	public static final String PAGE = "/html/taglib/aui/script/page.jsp";
+public class ScriptTag extends BaseScriptTag {
 
 	public static void doTag(
 			String position, String use, String bodyContentString,
-			PageContext pageContext)
+			BodyContent previousBodyContent, PageContext pageContext)
 		throws Exception {
+
+		String previousBodyContentString = null;
+
+		if ((previousBodyContent != null) &&
+			!(previousBodyContent instanceof BodyContentWrapper)) {
+
+			// LPS-22413
+
+			previousBodyContentString = previousBodyContent.getString();
+		}
 
 		ScriptTag scriptTag = new ScriptTag();
 
@@ -62,6 +72,15 @@ public class ScriptTag extends PositionTagSupport {
 		scriptTag.doEndTag();
 
 		scriptTag.release();
+
+		if (previousBodyContentString != null) {
+
+			// LPS-22413
+
+			previousBodyContent.clear();
+
+			previousBodyContent.append(previousBodyContentString);
+		}
 	}
 
 	public static void flushScriptData(PageContext pageContext)
@@ -99,19 +118,32 @@ public class ScriptTag extends PositionTagSupport {
 		boolean positionInline = isPositionInLine();
 
 		try {
+			String portletId = null;
+
+			Portlet portlet = (Portlet)request.getAttribute(
+				WebKeys.RENDER_PORTLET);
+
+			if (portlet != null) {
+				portletId = portlet.getPortletId();
+			}
+
 			StringBundler bodyContentSB = getBodyContentAsStringBundler();
+
+			String use = getUse();
 
 			if (positionInline) {
 				ScriptData scriptData = new ScriptData();
 
 				request.setAttribute(ScriptTag.class.getName(), scriptData);
 
-				scriptData.append(bodyContentSB, _use);
+				scriptData.append(portletId, bodyContentSB, use);
+
+				String page = getPage();
 
 				if (FileAvailabilityUtil.isAvailable(
-						pageContext.getServletContext(), PAGE)) {
+						pageContext.getServletContext(), page)) {
 
-					PortalIncludeUtil.include(pageContext, PAGE);
+					PortalIncludeUtil.include(pageContext, page);
 				}
 				else {
 					processEndTag(scriptData);
@@ -127,7 +159,7 @@ public class ScriptTag extends PositionTagSupport {
 					request.setAttribute(WebKeys.AUI_SCRIPT_DATA, scriptData);
 				}
 
-				scriptData.append(bodyContentSB, _use);
+				scriptData.append(portletId, bodyContentSB, use);
 			}
 
 			return EVAL_PAGE;
@@ -146,15 +178,10 @@ public class ScriptTag extends PositionTagSupport {
 		}
 	}
 
-	public void setUse(String use) {
-		_use = use;
-	}
-
 	@Override
 	protected void cleanUp() {
-		super.cleanUp();
-
-		_use = null;
+		setPosition(null);
+		setUse(null);
 	}
 
 	protected void processEndTag(ScriptData scriptData) throws Exception {
@@ -202,7 +229,5 @@ public class ScriptTag extends PositionTagSupport {
 
 		jspWriter.write("\n// ]]>\n</script>");
 	}
-
-	private String _use;
 
 }

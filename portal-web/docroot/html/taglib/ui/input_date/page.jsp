@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -24,7 +24,8 @@ if (GetterUtil.getBoolean((String)request.getAttribute("liferay-ui:input-date:di
 }
 
 String cssClass = GetterUtil.getString((String)request.getAttribute("liferay-ui:input-date:cssClass"));
-String formName = namespace + request.getAttribute("liferay-ui:input-date:formName");
+String formName = namespace + request.getAttribute("liferay-ui:input-date:name");
+String name = GetterUtil.getString((String)request.getAttribute("liferay-ui:input-date:name"));
 String monthParam = namespace + request.getAttribute("liferay-ui:input-date:monthParam");
 int monthValue = GetterUtil.getInteger((String)request.getAttribute("liferay-ui:input-date:monthValue"));
 boolean monthNullable = GetterUtil.getBoolean((String)request.getAttribute("liferay-ui:input-date:monthNullable"));
@@ -107,25 +108,25 @@ else if (yearNullable) {
 
 					<c:choose>
 						<c:when test="<%= dateFormatOrder.equals(_DATE_FORMAT_ORDER_MDY) %>">
-							<%@ include file="select_month.jspf" %>
+							<%@ include file="/html/taglib/ui/input_date/select_month.jspf" %>
 
-							<%@ include file="select_day.jspf" %>
+							<%@ include file="/html/taglib/ui/input_date/select_day.jspf" %>
 
-							<%@ include file="select_year.jspf" %>
+							<%@ include file="/html/taglib/ui/input_date/select_year.jspf" %>
 						</c:when>
 						<c:when test="<%= dateFormatOrder.equals(_DATE_FORMAT_ORDER_YMD) %>">
-							<%@ include file="select_year.jspf" %>
+							<%@ include file="/html/taglib/ui/input_date/select_year.jspf" %>
 
-							<%@ include file="select_month.jspf" %>
+							<%@ include file="/html/taglib/ui/input_date/select_month.jspf" %>
 
-							<%@ include file="select_day.jspf" %>
+							<%@ include file="/html/taglib/ui/input_date/select_day.jspf" %>
 						</c:when>
 						<c:otherwise>
-							<%@ include file="select_day.jspf" %>
+							<%@ include file="/html/taglib/ui/input_date/select_day.jspf" %>
 
-							<%@ include file="select_month.jspf" %>
+							<%@ include file="/html/taglib/ui/input_date/select_month.jspf" %>
 
-							<%@ include file="select_year.jspf" %>
+							<%@ include file="/html/taglib/ui/input_date/select_year.jspf" %>
 						</c:otherwise>
 					</c:choose>
 				</c:when>
@@ -144,10 +145,14 @@ else if (yearNullable) {
 <aui:script use="aui-datepicker-select">
 	var displayDateNode = A.one('#<%= randomNamespace %>displayDate');
 
-	var displayDatePickerHandle = displayDateNode.on(
-		['click', 'mousemove'],
-		function(event) {
-			new A.DatePickerSelect(
+	Liferay.component(
+		'<%= namespace + name %>datePicker',
+		function() {
+			if (handle) {
+				handle.detach();
+			}
+
+			return new A.DatePickerSelect(
 				{
 					after: {
 						render: function(event) {
@@ -212,8 +217,13 @@ else if (yearNullable) {
 					yearRange: [<%= yearRangeStart %>, <%= yearRangeEnd %>]
 				}
 			).render();
+		}
+	);
 
-			displayDatePickerHandle.detach();
+	var handle = displayDateNode.once(
+		['click', 'mousemove'],
+		function(event) {
+			Liferay.component('<%= namespace + name %>datePicker');
 		}
 	);
 </aui:script>

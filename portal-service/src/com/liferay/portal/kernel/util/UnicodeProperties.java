@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -23,6 +23,8 @@ import java.io.IOException;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
+import java.util.TreeSet;
 
 /**
  * <p>
@@ -119,7 +121,7 @@ public class UnicodeProperties extends HashMap<String, String> {
 		}
 	}
 
-	private void put(String line) {
+	public void put(String line) {
 		line = line.trim();
 
 		if (!_isComment(line)) {
@@ -178,6 +180,31 @@ public class UnicodeProperties extends HashMap<String, String> {
 		return put(key, value);
 	}
 
+	public String toSortedString() {
+		StringBuilder sb = new StringBuilder(_length);
+
+		Set<String> keys = new TreeSet<String>(keySet());
+
+		for (String key : keys) {
+			String value = get(key);
+
+			if (Validator.isNull(value)) {
+				continue;
+			}
+
+			if (_safe) {
+				value = _encode(value);
+			}
+
+			sb.append(key);
+			sb.append(StringPool.EQUAL);
+			sb.append(value);
+			sb.append(StringPool.NEW_LINE);
+		}
+
+		return sb.toString();
+	}
+
 	@Override
 	public String toString() {
 		StringBuilder sb = new StringBuilder(_length);
@@ -185,16 +212,18 @@ public class UnicodeProperties extends HashMap<String, String> {
 		for (Map.Entry<String, String> entry : entrySet()) {
 			String value = entry.getValue();
 
-			if (Validator.isNotNull(value)) {
-				if (_safe) {
-					value = _encode(value);
-				}
-
-				sb.append(entry.getKey());
-				sb.append(StringPool.EQUAL);
-				sb.append(value);
-				sb.append(StringPool.NEW_LINE);
+			if (Validator.isNull(value)) {
+				continue;
 			}
+
+			if (_safe) {
+				value = _encode(value);
+			}
+
+			sb.append(entry.getKey());
+			sb.append(StringPool.EQUAL);
+			sb.append(value);
+			sb.append(StringPool.NEW_LINE);
 		}
 
 		return sb.toString();
@@ -223,7 +252,7 @@ public class UnicodeProperties extends HashMap<String, String> {
 	}
 
 	private boolean _isComment(String line) {
-		return line.length() == 0 || line.startsWith(StringPool.POUND);
+		return (line.length() == 0) || line.startsWith(StringPool.POUND);
 	}
 
 	private static final String _SAFE_NEWLINE_CHARACTER =
@@ -231,7 +260,7 @@ public class UnicodeProperties extends HashMap<String, String> {
 
 	private static Log _log = LogFactoryUtil.getLog(UnicodeProperties.class);
 
-	private boolean _safe = false;
 	private int _length;
+	private boolean _safe = false;
 
 }

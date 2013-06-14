@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -23,14 +23,15 @@ import com.liferay.portalweb.portal.util.RuntimeVariables;
 public class VoteQuestionTest extends BaseTestCase {
 	public void testVoteQuestion() throws Exception {
 		selenium.open("/web/guest/home/");
+		loadRequiredJavaScriptModules();
 
 		for (int second = 0;; second++) {
-			if (second >= 60) {
+			if (second >= 90) {
 				fail("timeout");
 			}
 
 			try {
-				if (selenium.isElementPresent("link=Polls Display Test Page")) {
+				if (selenium.isVisible("link=Polls Display Test Page")) {
 					break;
 				}
 			}
@@ -40,41 +41,41 @@ public class VoteQuestionTest extends BaseTestCase {
 			Thread.sleep(1000);
 		}
 
-		selenium.saveScreenShotAndSource();
 		selenium.clickAt("link=Polls Display Test Page",
-			RuntimeVariables.replace(""));
+			RuntimeVariables.replace("Polls Display Test Page"));
 		selenium.waitForPageToLoad("30000");
-		selenium.saveScreenShotAndSource();
-		selenium.clickAt("//span[2]/span/span/input",
-			RuntimeVariables.replace(""));
-		selenium.clickAt("//input[@value='Vote']", RuntimeVariables.replace(""));
+		loadRequiredJavaScriptModules();
+		selenium.clickAt("//div/span[2]/span/span/input",
+			RuntimeVariables.replace("Choice B Radio Button"));
+		selenium.clickAt("//input[@value='Vote']",
+			RuntimeVariables.replace("Vote"));
 		selenium.waitForPageToLoad("30000");
-		selenium.saveScreenShotAndSource();
+		loadRequiredJavaScriptModules();
 		assertEquals(RuntimeVariables.replace("Thank you for your vote."),
 			selenium.getText("//div[@class='portlet-msg-success']"));
-		assertTrue(selenium.isTextPresent("Thank you for your vote."));
 		assertEquals(RuntimeVariables.replace("0%"),
 			selenium.getText("//tr[2]/td[1]"));
 		assertEquals(RuntimeVariables.replace("0"),
 			selenium.getText("//tr[2]/td[2]"));
-		assertEquals(RuntimeVariables.replace("Test Choice A"),
+		assertEquals(RuntimeVariables.replace("PD Question ChoiceA"),
 			selenium.getText("//tr[2]/td[5]"));
 		assertEquals(RuntimeVariables.replace("100%"),
 			selenium.getText("//tr[3]/td[1]"));
 		assertEquals(RuntimeVariables.replace("1"),
 			selenium.getText("//tr[3]/td[2]"));
-		assertEquals(RuntimeVariables.replace("Test Choice B"),
+		assertEquals(RuntimeVariables.replace("PD Question ChoiceB"),
 			selenium.getText("//tr[3]/td[7]"));
 		assertEquals(RuntimeVariables.replace("0%"),
 			selenium.getText("//tr[4]/td[1]"));
 		assertEquals(RuntimeVariables.replace("0"),
 			selenium.getText("//tr[4]/td[2]"));
-		assertEquals(RuntimeVariables.replace("Test Choice C"),
+		assertEquals(RuntimeVariables.replace("PD Question ChoiceC"),
 			selenium.getText("//tr[4]/td[5]"));
-		assertTrue(selenium.isTextPresent("Total Votes: 1"));
+		assertEquals(RuntimeVariables.replace("Total Votes: 1"),
+			selenium.getText("//form/div"));
 		assertFalse(selenium.isElementPresent("//input[@value='Vote']"));
-		assertFalse(selenium.isElementPresent("//span[1]/span/span/input"));
-		assertFalse(selenium.isElementPresent("//span[2]/span/span/input"));
-		assertFalse(selenium.isElementPresent("//span[3]/span/span/input"));
+		assertFalse(selenium.isElementPresent("//div/span[1]/span/span/input"));
+		assertFalse(selenium.isElementPresent("//div/span[2]/span/span/input"));
+		assertFalse(selenium.isElementPresent("//div/span[3]/span/span/input"));
 	}
 }

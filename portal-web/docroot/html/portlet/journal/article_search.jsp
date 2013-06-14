@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -23,14 +23,14 @@ ArticleDisplayTerms displayTerms = (ArticleDisplayTerms)searchContainer.getDispl
 %>
 
 <liferay-ui:search-toggle
-	id="toggle_id_journal_article_search"
-	displayTerms="<%= displayTerms %>"
 	buttonLabel="search"
+	displayTerms="<%= displayTerms %>"
+	id="toggle_id_journal_article_search"
 >
 	<aui:fieldset>
 		<aui:input label="id" name="<%= displayTerms.ARTICLE_ID %>" size="20" value="<%= displayTerms.getArticleId() %>" />
 
-		<aui:input label="name" name="<%= displayTerms.TITLE %>" size="20" type="text" value="<%= displayTerms.getTitle() %>" />
+		<aui:input name="<%= displayTerms.TITLE %>" size="20" type="text" value="<%= displayTerms.getTitle() %>" />
 
 		<aui:input name="<%= displayTerms.DESCRIPTION %>" size="20" type="text" value="<%= displayTerms.getDescription() %>" />
 
@@ -72,7 +72,7 @@ ArticleDisplayTerms displayTerms = (ArticleDisplayTerms)searchContainer.getDispl
 					}
 				%>
 
-					<aui:option label='<%= mySite.isUser() ? "my-site" : HtmlUtil.escape(mySite.getDescriptiveName()) %>' selected="<%= displayTerms.getGroupId() == mySite.getGroupId() %>" value="<%= mySite.getGroupId() %>" />
+					<aui:option label='<%= mySite.isUser() ? "my-site" : HtmlUtil.escape(mySite.getDescriptiveName(locale)) %>' selected="<%= displayTerms.getGroupId() == mySite.getGroupId() %>" value="<%= mySite.getGroupId() %>" />
 
 				<%
 				}
@@ -116,104 +116,7 @@ ArticleDisplayTerms displayTerms = (ArticleDisplayTerms)searchContainer.getDispl
 	</aui:fieldset>
 </liferay-ui:search-toggle>
 
-<%
-boolean showAddArticleButtonButton = false;
-boolean showPermissionsButton = false;
-boolean showSubscribeLink = false;
-
-if (portletName.equals(PortletKeys.JOURNAL)) {
-	showAddArticleButtonButton = JournalPermission.contains(permissionChecker, scopeGroupId, ActionKeys.ADD_ARTICLE);
-	showPermissionsButton = GroupPermissionUtil.contains(permissionChecker, scopeGroupId, ActionKeys.PERMISSIONS);
-	showSubscribeLink = JournalPermission.contains(permissionChecker, scopeGroupId, ActionKeys.SUBSCRIBE);
-}
-%>
-
-<c:if test="<%= showAddArticleButtonButton || showPermissionsButton %>">
-	<aui:button-row cssClass="add-permission-button-row">
-		<c:if test="<%= showAddArticleButtonButton %>">
-			<div class="add-article-selector">
-				<%@ include file="/html/portlet/journal/add_article.jspf" %>
-			</div>
-		</c:if>
-
-		<c:if test="<%= showPermissionsButton %>">
-			<liferay-security:permissionsURL
-				modelResource="com.liferay.portlet.journal"
-				modelResourceDescription="<%= HtmlUtil.escape(themeDisplay.getScopeGroupName()) %>"
-				resourcePrimKey="<%= String.valueOf(scopeGroupId) %>"
-				var="permissionsURL"
-			/>
-
-			<aui:button href="<%= permissionsURL %>" value="permissions" />
-		</c:if>
-	</aui:button-row>
-</c:if>
-
-<c:if test="<%= showSubscribeLink %>">
-	<c:choose>
-		<c:when test="<%= SubscriptionLocalServiceUtil.isSubscribed(company.getCompanyId(), user.getUserId(), JournalArticle.class.getName(), scopeGroupId) %>">
-			<portlet:actionURL var="unsubscribeURL">
-				<portlet:param name="struts_action" value="/journal/edit_article" />
-				<portlet:param name="<%= Constants.CMD %>" value="<%= Constants.UNSUBSCRIBE %>" />
-				<portlet:param name="redirect" value="<%= currentURL %>" />
-			</portlet:actionURL>
-
-			<liferay-ui:icon cssClass="subscribe-link" image="unsubscribe" label="<%= true %>" url="<%= unsubscribeURL %>" />
-		</c:when>
-		<c:otherwise>
-			<portlet:actionURL var="subscribeURL">
-				<portlet:param name="struts_action" value="/journal/edit_article" />
-				<portlet:param name="<%= Constants.CMD %>" value="<%= Constants.SUBSCRIBE %>" />
-				<portlet:param name="redirect" value="<%= currentURL %>" />
-			</portlet:actionURL>
-
-			<liferay-ui:icon cssClass="subscribe-link" image="subscribe" label="<%= true %>" url="<%= subscribeURL %>" />
-		</c:otherwise>
-	</c:choose>
-</c:if>
-
-<c:if test="<%= Validator.isNotNull(displayTerms.getStructureId()) %>">
-	<aui:input name="<%= displayTerms.STRUCTURE_ID %>" type="hidden" value="<%= displayTerms.getStructureId() %>" />
-
-	<div class="portlet-msg-info">
-
-		<%
-		JournalStructure structure = JournalStructureLocalServiceUtil.getStructure(scopeGroupId, displayTerms.getStructureId());
-		%>
-
-		<liferay-ui:message arguments="<%= structure.getName() %>" key="showing-content-filtered-by-structure-x" /> (<a href="javascript:<portlet:namespace />addArticle();"><liferay-ui:message key="add-new-web-content" /></a>)
-	</div>
-</c:if>
-
-<c:if test="<%= Validator.isNotNull(displayTerms.getTemplateId()) %>">
-	<aui:input name="<%= displayTerms.TEMPLATE_ID %>" type="hidden" value="<%= displayTerms.getTemplateId() %>" />
-
-	<div class="portlet-msg-info">
-
-		<%
-		JournalTemplate template = JournalTemplateLocalServiceUtil.getTemplate(scopeGroupId, displayTerms.getTemplateId());
-		%>
-
-		<liferay-ui:message arguments="<%= template.getName() %>" key="showing-content-filtered-by-template-x" /> (<a href="javascript:<portlet:namespace />addArticle();"><liferay-ui:message key="add-new-web-content" /></a>)
-	</div>
-</c:if>
-
 <aui:script>
-	function <portlet:namespace />addArticle() {
-		var url = '<liferay-portlet:renderURL windowState="<%= WindowState.MAXIMIZED.toString() %>" portletName="<%= PortletKeys.JOURNAL %>"><portlet:param name="struts_action" value="/journal/edit_article" /><portlet:param name="redirect" value="<%= currentURL %>" /><portlet:param name="backURL" value="<%= currentURL %>" /><portlet:param name="structureId" value="<%= displayTerms.getStructureId() %>" /><portlet:param name="templateId" value="<%= displayTerms.getTemplateId() %>" /></liferay-portlet:renderURL>';
-
-		if (toggle_id_journal_article_searchcurClickValue == 'basic') {
-			url += '&<portlet:namespace /><%= displayTerms.TITLE %>=' + document.<portlet:namespace />fm.<portlet:namespace /><%= displayTerms.KEYWORDS %>.value;
-
-			submitForm(document.hrefFm, url);
-		}
-		else {
-			document.<portlet:namespace />fm.method = 'post';
-
-			submitForm(document.<portlet:namespace />fm, url);
-		}
-	}
-
 	<c:if test="<%= windowState.equals(WindowState.MAXIMIZED) || windowState.equals(LiferayWindowState.POP_UP) %>">
 		Liferay.Util.focusFormField(document.<portlet:namespace />fm.<portlet:namespace /><%= displayTerms.ARTICLE_ID %>);
 		Liferay.Util.focusFormField(document.<portlet:namespace />fm.<portlet:namespace /><%= displayTerms.KEYWORDS %>);

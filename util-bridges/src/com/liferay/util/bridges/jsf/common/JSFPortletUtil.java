@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -81,8 +81,7 @@ public class JSFPortletUtil {
 			return (PortletRequest)request;
 		}
 		else if (request instanceof HttpServletRequest) {
-			HttpServletRequest httpServletRequest =
-				(HttpServletRequest)request;
+			HttpServletRequest httpServletRequest = (HttpServletRequest)request;
 
 			Object portletArtifactHack = httpServletRequest.getAttribute(
 				"com.icesoft.faces.portletHack");
@@ -121,16 +120,16 @@ public class JSFPortletUtil {
 	}
 
 	public static String getPreferenceValue(
-		PortletPreferences portletPreferences, String preferenceName) {
-
-		return getPreferenceValue(portletPreferences, preferenceName, null);
-	}
-
-	public static String getPreferenceValue(
 		FacesContext facesContext, String preferenceName, String defaultValue) {
 
 		return getPreferenceValue(
 			getPortletPreferences(facesContext), preferenceName, defaultValue);
+	}
+
+	public static String getPreferenceValue(
+		PortletPreferences portletPreferences, String preferenceName) {
+
+		return getPreferenceValue(portletPreferences, preferenceName, null);
 	}
 
 	public static String getPreferenceValue(

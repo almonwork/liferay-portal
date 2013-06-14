@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -29,6 +29,26 @@ import java.util.regex.Pattern;
  * @see    Pattern
  */
 public class StringParser {
+
+	/**
+	 * Escapes the special characters in the string so that they will have no
+	 * special meaning in a regular expression.
+	 *
+	 * <p>
+	 * This method differs from {@link Pattern#quote(String)} by escaping each
+	 * special character with a backslash, rather than enclosing the entire
+	 * string in special quote tags. This allows the escaped string to be
+	 * manipulated or have sections replaced with non-literal sequences.
+	 * </p>
+	 *
+	 * @param  s the string to escape
+	 * @return the escaped string
+	 */
+	public static String escapeRegex(String s) {
+		Matcher matcher = _escapeRegexPattern.matcher(s);
+
+		return matcher.replaceAll("\\\\$0");
+	}
 
 	/**
 	 * Constructs a new string parser from the pattern.
@@ -178,26 +198,6 @@ public class StringParser {
 	}
 
 	/**
-	 * Escapes the special characters in the string so that they will have no
-	 * special meaning in a regular expression.
-	 *
-	 * <p>
-	 * This method differs from {@link Pattern#quote(String)} by escaping each
-	 * special character with a backslash, rather than enclosing the entire
-	 * string in special quote tags. This allows the escaped string to be
-	 * manipulated or have sections replaced with non-literal sequences.
-	 * </p>
-	 *
-	 * @param  s the string to escape
-	 * @return the escaped string
-	 */
-	public static String escapeRegex(String s) {
-		Matcher matcher = _escapeRegexPattern.matcher(s);
-
-		return matcher.replaceAll("\\\\$0");
-	}
-
-	/**
 	 * Populates the parameter map with values parsed from the string if this
 	 * parser matches.
 	 *
@@ -251,9 +251,9 @@ public class StringParser {
 	private static Pattern _fragmentPattern = Pattern.compile("\\{.+?\\}");
 
 	private String _builder;
+	private Pattern _pattern;
 	private StringEncoder _stringEncoder;
 	private List<StringParserFragment> _stringParserFragments =
 		new ArrayList<StringParserFragment>();
-	private Pattern _pattern;
 
 }

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -32,19 +32,6 @@ import com.liferay.portlet.journal.model.JournalArticle;
  */
 public class JournalCreationStrategyImpl implements JournalCreationStrategy {
 
-	public long getAuthorUserId(PortletDataContext context, Object journalObj)
-		throws Exception {
-
-		return JournalCreationStrategy.USE_DEFAULT_USER_ID_STRATEGY;
-	}
-
-	public String getTransformedContent(
-			PortletDataContext context, JournalArticle newArticle)
-		throws Exception {
-
-		return JournalCreationStrategy.ARTICLE_CONTENT_UNCHANGED;
-	}
-
 	public boolean addGroupPermissions(
 			PortletDataContext context, Object journalObj)
 		throws Exception {
@@ -57,6 +44,19 @@ public class JournalCreationStrategyImpl implements JournalCreationStrategy {
 		throws Exception {
 
 		return true;
+	}
+
+	public long getAuthorUserId(PortletDataContext context, Object journalObj)
+		throws Exception {
+
+		return JournalCreationStrategy.USE_DEFAULT_USER_ID_STRATEGY;
+	}
+
+	public String getTransformedContent(
+			PortletDataContext context, JournalArticle newArticle)
+		throws Exception {
+
+		return JournalCreationStrategy.ARTICLE_CONTENT_UNCHANGED;
 	}
 
 }

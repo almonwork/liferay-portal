@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -20,9 +20,9 @@
 String redirect = ParamUtil.getString(request, "redirect");
 String backURL = ParamUtil.getString(request, "backURL", redirect);
 
-long groupId = ParamUtil.getLong(request, "groupId");
+Group group = ActionUtil.getGroup(renderRequest);
 
-Group group = GroupServiceUtil.getGroup(groupId);
+long groupId = group.getGroupId();
 
 Organization organization = null;
 
@@ -41,7 +41,7 @@ pageContext.setAttribute("portletURL", portletURL);
 <liferay-ui:header
 	backURL="<%= backURL %>"
 	localizeTitle="<%= false %>"
-	title='<%= group.getDescriptiveName() + StringPool.COLON + StringPool.SPACE + LanguageUtil.get(pageContext, "manage-memberships") %>'
+	title='<%= group.getDescriptiveName(locale) + StringPool.COLON + StringPool.SPACE + LanguageUtil.get(pageContext, "manage-memberships") %>'
 />
 
 <liferay-util:include page="/html/portlet/sites_admin/edit_site_assignments_toolbar.jsp">
@@ -124,7 +124,7 @@ pageContext.setAttribute("portletURL", portletURL);
 		<portlet:renderURL var="addTeamURL">
 			<portlet:param name="struts_action" value="/sites_admin/edit_team" />
 			<portlet:param name="redirect" value="<%= currentURL %>" />
-			<portlet:param name="groupId" value="<%= String.valueOf(group.getGroupId()) %>" />
+			<portlet:param name="groupId" value="<%= String.valueOf(groupId) %>" />
 		</portlet:renderURL>
 
 		<aui:button href='<%= addTeamURL %>' value="add-team" />
@@ -140,7 +140,7 @@ if (group.isOrganization()) {
 	UsersAdminUtil.addPortletBreadcrumbEntries(organization, request, renderResponse);
 }
 else {
-	PortalUtil.addPortletBreadcrumbEntry(request, group.getDescriptiveName(), null);
+	PortalUtil.addPortletBreadcrumbEntry(request, group.getDescriptiveName(locale), null);
 }
 
 PortalUtil.addPortletBreadcrumbEntry(request, LanguageUtil.get(pageContext, "manage-teams"), currentURL);

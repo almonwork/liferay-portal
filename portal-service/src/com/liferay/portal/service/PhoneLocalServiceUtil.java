@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -15,7 +15,6 @@
 package com.liferay.portal.service;
 
 import com.liferay.portal.kernel.bean.PortalBeanLocatorUtil;
-import com.liferay.portal.kernel.util.MethodCache;
 import com.liferay.portal.kernel.util.ReferenceRegistry;
 
 /**
@@ -65,24 +64,31 @@ public class PhoneLocalServiceUtil {
 	* Deletes the phone with the primary key from the database. Also notifies the appropriate model listeners.
 	*
 	* @param phoneId the primary key of the phone
+	* @return the phone that was removed
 	* @throws PortalException if a phone with the primary key could not be found
 	* @throws SystemException if a system exception occurred
 	*/
-	public static void deletePhone(long phoneId)
+	public static com.liferay.portal.model.Phone deletePhone(long phoneId)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException {
-		getService().deletePhone(phoneId);
+		return getService().deletePhone(phoneId);
 	}
 
 	/**
 	* Deletes the phone from the database. Also notifies the appropriate model listeners.
 	*
 	* @param phone the phone
+	* @return the phone that was removed
 	* @throws SystemException if a system exception occurred
 	*/
-	public static void deletePhone(com.liferay.portal.model.Phone phone)
+	public static com.liferay.portal.model.Phone deletePhone(
+		com.liferay.portal.model.Phone phone)
 		throws com.liferay.portal.kernel.exception.SystemException {
-		getService().deletePhone(phone);
+		return getService().deletePhone(phone);
+	}
+
+	public static com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery() {
+		return getService().dynamicQuery();
 	}
 
 	/**
@@ -154,6 +160,11 @@ public class PhoneLocalServiceUtil {
 		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery)
 		throws com.liferay.portal.kernel.exception.SystemException {
 		return getService().dynamicQueryCount(dynamicQuery);
+	}
+
+	public static com.liferay.portal.model.Phone fetchPhone(long phoneId)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getService().fetchPhone(phoneId);
 	}
 
 	/**
@@ -293,20 +304,15 @@ public class PhoneLocalServiceUtil {
 
 			ReferenceRegistry.registerReference(PhoneLocalServiceUtil.class,
 				"_service");
-			MethodCache.remove(PhoneLocalService.class);
 		}
 
 		return _service;
 	}
 
+	/**
+	 * @deprecated
+	 */
 	public void setService(PhoneLocalService service) {
-		MethodCache.remove(PhoneLocalService.class);
-
-		_service = service;
-
-		ReferenceRegistry.registerReference(PhoneLocalServiceUtil.class,
-			"_service");
-		MethodCache.remove(PhoneLocalService.class);
 	}
 
 	private static PhoneLocalService _service;

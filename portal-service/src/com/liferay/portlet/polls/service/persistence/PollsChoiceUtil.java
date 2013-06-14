@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -92,14 +92,6 @@ public class PollsChoiceUtil {
 		return getPersistence()
 				   .findWithDynamicQuery(dynamicQuery, start, end,
 			orderByComparator);
-	}
-
-	/**
-	 * @see com.liferay.portal.service.persistence.BasePersistence#remove(com.liferay.portal.model.BaseModel)
-	 */
-	public static PollsChoice remove(PollsChoice pollsChoice)
-		throws SystemException {
-		return getPersistence().remove(pollsChoice);
 	}
 
 	/**
@@ -559,12 +551,14 @@ public class PollsChoiceUtil {
 	*
 	* @param questionId the question ID
 	* @param name the name
+	* @return the polls choice that was removed
 	* @throws SystemException if a system exception occurred
 	*/
-	public static void removeByQ_N(long questionId, java.lang.String name)
+	public static com.liferay.portlet.polls.model.PollsChoice removeByQ_N(
+		long questionId, java.lang.String name)
 		throws com.liferay.portal.kernel.exception.SystemException,
 			com.liferay.portlet.polls.NoSuchChoiceException {
-		getPersistence().removeByQ_N(questionId, name);
+		return getPersistence().removeByQ_N(questionId, name);
 	}
 
 	/**
@@ -636,11 +630,10 @@ public class PollsChoiceUtil {
 		return _persistence;
 	}
 
+	/**
+	 * @deprecated
+	 */
 	public void setPersistence(PollsChoicePersistence persistence) {
-		_persistence = persistence;
-
-		ReferenceRegistry.registerReference(PollsChoiceUtil.class,
-			"_persistence");
 	}
 
 	private static PollsChoicePersistence _persistence;

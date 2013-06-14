@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -87,7 +87,7 @@ if (timeFormatPattern.indexOf("a") == -1) {
 
 	<c:choose>
 		<c:when test="<%= ! timeFormatAmPm %>">
-			<input type="hidden" name="<%= amPmParam %>" value="<%= Calendar.AM %>" />
+			<input name="<%= amPmParam %>" type="hidden" value="<%= Calendar.AM %>" />
 		</c:when>
 		<c:otherwise>
 			<select <%= disabled ? "disabled=\"disabled\"" : "" %> name="<%= amPmParam %>">

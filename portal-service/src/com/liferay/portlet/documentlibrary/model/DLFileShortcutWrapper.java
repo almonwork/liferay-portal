@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,6 +14,12 @@
 
 package com.liferay.portlet.documentlibrary.model;
 
+import com.liferay.portal.model.ModelWrapper;
+
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * <p>
  * This class is a wrapper for {@link DLFileShortcut}.
@@ -23,7 +29,8 @@ package com.liferay.portlet.documentlibrary.model;
  * @see       DLFileShortcut
  * @generated
  */
-public class DLFileShortcutWrapper implements DLFileShortcut {
+public class DLFileShortcutWrapper implements DLFileShortcut,
+	ModelWrapper<DLFileShortcut> {
 	public DLFileShortcutWrapper(DLFileShortcut dlFileShortcut) {
 		_dlFileShortcut = dlFileShortcut;
 	}
@@ -34,6 +41,127 @@ public class DLFileShortcutWrapper implements DLFileShortcut {
 
 	public String getModelClassName() {
 		return DLFileShortcut.class.getName();
+	}
+
+	public Map<String, Object> getModelAttributes() {
+		Map<String, Object> attributes = new HashMap<String, Object>();
+
+		attributes.put("uuid", getUuid());
+		attributes.put("fileShortcutId", getFileShortcutId());
+		attributes.put("groupId", getGroupId());
+		attributes.put("companyId", getCompanyId());
+		attributes.put("userId", getUserId());
+		attributes.put("userName", getUserName());
+		attributes.put("createDate", getCreateDate());
+		attributes.put("modifiedDate", getModifiedDate());
+		attributes.put("repositoryId", getRepositoryId());
+		attributes.put("folderId", getFolderId());
+		attributes.put("toFileEntryId", getToFileEntryId());
+		attributes.put("active", getActive());
+		attributes.put("status", getStatus());
+		attributes.put("statusByUserId", getStatusByUserId());
+		attributes.put("statusByUserName", getStatusByUserName());
+		attributes.put("statusDate", getStatusDate());
+
+		return attributes;
+	}
+
+	public void setModelAttributes(Map<String, Object> attributes) {
+		String uuid = (String)attributes.get("uuid");
+
+		if (uuid != null) {
+			setUuid(uuid);
+		}
+
+		Long fileShortcutId = (Long)attributes.get("fileShortcutId");
+
+		if (fileShortcutId != null) {
+			setFileShortcutId(fileShortcutId);
+		}
+
+		Long groupId = (Long)attributes.get("groupId");
+
+		if (groupId != null) {
+			setGroupId(groupId);
+		}
+
+		Long companyId = (Long)attributes.get("companyId");
+
+		if (companyId != null) {
+			setCompanyId(companyId);
+		}
+
+		Long userId = (Long)attributes.get("userId");
+
+		if (userId != null) {
+			setUserId(userId);
+		}
+
+		String userName = (String)attributes.get("userName");
+
+		if (userName != null) {
+			setUserName(userName);
+		}
+
+		Date createDate = (Date)attributes.get("createDate");
+
+		if (createDate != null) {
+			setCreateDate(createDate);
+		}
+
+		Date modifiedDate = (Date)attributes.get("modifiedDate");
+
+		if (modifiedDate != null) {
+			setModifiedDate(modifiedDate);
+		}
+
+		Long repositoryId = (Long)attributes.get("repositoryId");
+
+		if (repositoryId != null) {
+			setRepositoryId(repositoryId);
+		}
+
+		Long folderId = (Long)attributes.get("folderId");
+
+		if (folderId != null) {
+			setFolderId(folderId);
+		}
+
+		Long toFileEntryId = (Long)attributes.get("toFileEntryId");
+
+		if (toFileEntryId != null) {
+			setToFileEntryId(toFileEntryId);
+		}
+
+		Boolean active = (Boolean)attributes.get("active");
+
+		if (active != null) {
+			setActive(active);
+		}
+
+		Integer status = (Integer)attributes.get("status");
+
+		if (status != null) {
+			setStatus(status);
+		}
+
+		Long statusByUserId = (Long)attributes.get("statusByUserId");
+
+		if (statusByUserId != null) {
+			setStatusByUserId(statusByUserId);
+		}
+
+		String statusByUserName = (String)attributes.get("statusByUserName");
+
+		if (statusByUserName != null) {
+			setStatusByUserName(statusByUserName);
+		}
+
+		Date statusDate = (Date)attributes.get("statusDate");
+
+		if (statusDate != null) {
+			setStatusDate(statusDate);
+		}
 	}
 
 	/**
@@ -273,6 +401,33 @@ public class DLFileShortcutWrapper implements DLFileShortcut {
 	}
 
 	/**
+	* Returns the active of this document library file shortcut.
+	*
+	* @return the active of this document library file shortcut
+	*/
+	public boolean getActive() {
+		return _dlFileShortcut.getActive();
+	}
+
+	/**
+	* Returns <code>true</code> if this document library file shortcut is active.
+	*
+	* @return <code>true</code> if this document library file shortcut is active; <code>false</code> otherwise
+	*/
+	public boolean isActive() {
+		return _dlFileShortcut.isActive();
+	}
+
+	/**
+	* Sets whether this document library file shortcut is active.
+	*
+	* @param active the active of this document library file shortcut
+	*/
+	public void setActive(boolean active) {
+		_dlFileShortcut.setActive(active);
+	}
+
+	/**
 	* Returns the status of this document library file shortcut.
 	*
 	* @return the status of this document library file shortcut
@@ -399,6 +554,15 @@ public class DLFileShortcutWrapper implements DLFileShortcut {
 	}
 
 	/**
+	* Returns <code>true</code> if this document library file shortcut is in the Recycle Bin.
+	*
+	* @return <code>true</code> if this document library file shortcut is in the Recycle Bin; <code>false</code> otherwise
+	*/
+	public boolean isInTrash() {
+		return _dlFileShortcut.isInTrash();
+	}
+
+	/**
 	* Returns <code>true</code> if this document library file shortcut is pending.
 	*
 	* @return <code>true</code> if this document library file shortcut is pending; <code>false</code> otherwise
@@ -425,10 +589,6 @@ public class DLFileShortcutWrapper implements DLFileShortcut {
 
 	public boolean isEscapedModel() {
 		return _dlFileShortcut.isEscapedModel();
-	}
-
-	public void setEscapedModel(boolean escapedModel) {
-		_dlFileShortcut.setEscapedModel(escapedModel);
 	}
 
 	public java.io.Serializable getPrimaryKeyObj() {
@@ -493,7 +653,14 @@ public class DLFileShortcutWrapper implements DLFileShortcut {
 		return _dlFileShortcut.getToTitle();
 	}
 
+	/**
+	 * @deprecated Renamed to {@link #getWrappedModel}
+	 */
 	public DLFileShortcut getWrappedDLFileShortcut() {
+		return _dlFileShortcut;
+	}
+
+	public DLFileShortcut getWrappedModel() {
 		return _dlFileShortcut;
 	}
 

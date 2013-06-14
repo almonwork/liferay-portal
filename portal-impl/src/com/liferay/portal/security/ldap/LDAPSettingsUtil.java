@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -24,8 +24,6 @@ import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.util.PrefsPropsUtil;
 import com.liferay.portal.util.PropsValues;
-
-import java.io.IOException;
 
 import java.util.Properties;
 
@@ -56,8 +54,7 @@ public class LDAPSettingsUtil {
 				"@company_id@", "@email_address@", "@screen_name@", "@user_id@"
 			},
 			new String[] {
-				String.valueOf(companyId), emailAddress, screenName,
-				userId
+				String.valueOf(companyId), emailAddress, screenName, userId
 			});
 
 		if (_log.isDebugEnabled()) {
@@ -83,14 +80,14 @@ public class LDAPSettingsUtil {
 	}
 
 	public static Properties getContactMappings(
-		long ldapServerId, long companyId)
-		throws IOException, SystemException {
+			long ldapServerId, long companyId)
+		throws Exception {
 
 		String postfix = LDAPSettingsUtil.getPropertyPostfix(ldapServerId);
 
 		Properties contactMappings = PropertiesUtil.load(
-			PrefsPropsUtil.getString(companyId,
-				PropsKeys.LDAP_CONTACT_MAPPINGS + postfix));
+			PrefsPropsUtil.getString(
+				companyId, PropsKeys.LDAP_CONTACT_MAPPINGS + postfix));
 
 		LogUtil.debug(_log, contactMappings);
 

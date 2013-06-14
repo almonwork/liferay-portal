@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,7 +14,10 @@
 
 package com.liferay.portalweb.portlet.words.portlet.addportletwordsduplicate;
 
-import com.liferay.portalweb.portal.BaseTests;
+import com.liferay.portalweb.portal.BaseTestSuite;
+import com.liferay.portalweb.portal.util.TearDownPageTest;
+import com.liferay.portalweb.portlet.words.portlet.addportletwords.AddPageWordsTest;
+import com.liferay.portalweb.portlet.words.portlet.addportletwords.AddPortletWordsTest;
 
 import junit.framework.Test;
 import junit.framework.TestSuite;
@@ -22,11 +25,9 @@ import junit.framework.TestSuite;
 /**
  * @author Brian Wing Shun Chan
  */
-public class AddPortletWordsDuplicateTests extends BaseTests {
-
+public class AddPortletWordsDuplicateTests extends BaseTestSuite {
 	public static Test suite() {
 		TestSuite testSuite = new TestSuite();
-
 		testSuite.addTestSuite(AddPageWordsTest.class);
 		testSuite.addTestSuite(AddPortletWordsTest.class);
 		testSuite.addTestSuite(AddPortletWordsDuplicateTest.class);
@@ -34,5 +35,4 @@ public class AddPortletWordsDuplicateTests extends BaseTests {
 
 		return testSuite;
 	}
-
 }

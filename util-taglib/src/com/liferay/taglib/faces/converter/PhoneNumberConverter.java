@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -39,22 +39,6 @@ import javax.faces.convert.ConverterException;
  */
 public class PhoneNumberConverter implements Converter, StateHolder {
 
-	public boolean isTransient() {
-		return _transient;
-	}
-
-	public void setTransient(boolean value) {
-		_transient = value;
-	}
-
-	public String getUnitedStatesFormat() {
-		return _unitedStatesFormat;
-	}
-
-	public void setUnitedStatesFormat(String unitedStatesFormat) {
-		_unitedStatesFormat = unitedStatesFormat;
-	}
-
 	public Object getAsObject(
 		FacesContext facesContext, UIComponent uiComponent, String value) {
 
@@ -92,7 +76,7 @@ public class PhoneNumberConverter implements Converter, StateHolder {
 
 				throw new ConverterException(facesMessage);
 			}
-			else if ((integerChars.length() == 10)) {
+			else if (integerChars.length() == 10) {
 				StringBuilder unitedStatesPhoneNumber = new StringBuilder(
 					_unitedStatesFormat.length());
 
@@ -126,6 +110,14 @@ public class PhoneNumberConverter implements Converter, StateHolder {
 		return (String)value;
 	}
 
+	public String getUnitedStatesFormat() {
+		return _unitedStatesFormat;
+	}
+
+	public boolean isTransient() {
+		return _transient;
+	}
+
 	public void restoreState(FacesContext facesContext, Object obj) {
 		Object[] values = (Object[])obj;
 
@@ -138,6 +130,14 @@ public class PhoneNumberConverter implements Converter, StateHolder {
 		values[0] = _unitedStatesFormat;
 
 		return values;
+	}
+
+	public void setTransient(boolean value) {
+		_transient = value;
+	}
+
+	public void setUnitedStatesFormat(String unitedStatesFormat) {
+		_unitedStatesFormat = unitedStatesFormat;
 	}
 
 	private boolean _transient;

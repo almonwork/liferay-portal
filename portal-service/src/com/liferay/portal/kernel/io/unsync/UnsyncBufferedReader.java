@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -119,9 +119,7 @@ public class UnsyncBufferedReader extends Reader {
 	}
 
 	@Override
-	public int read(char[] chars, int offset, int length)
-		throws IOException {
-
+	public int read(char[] chars, int offset, int length) throws IOException {
 		if (reader == null) {
 			throw new IOException("Reader is null");
 		}
@@ -407,6 +405,6 @@ public class UnsyncBufferedReader extends Reader {
 	protected int markLimitIndex = -1;
 	protected Reader reader;
 
-	private static int _DEFAULT_BUFFER_SIZE = 8192;
+	private static final int _DEFAULT_BUFFER_SIZE = 8192;
 
 }

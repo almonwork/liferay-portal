@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -37,15 +37,18 @@ import com.liferay.portal.kernel.webdav.Status;
 import com.liferay.portal.kernel.webdav.WebDAVException;
 import com.liferay.portal.kernel.webdav.WebDAVRequest;
 import com.liferay.portal.kernel.webdav.WebDAVUtil;
+import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.portal.model.Lock;
 import com.liferay.portal.security.auth.PrincipalException;
 import com.liferay.portal.service.ServiceContext;
+import com.liferay.portal.service.ServiceContextFactory;
 import com.liferay.portal.webdav.LockException;
 import com.liferay.portlet.asset.service.AssetTagLocalServiceUtil;
 import com.liferay.portlet.documentlibrary.DuplicateFileException;
 import com.liferay.portlet.documentlibrary.DuplicateFolderNameException;
 import com.liferay.portlet.documentlibrary.NoSuchFileEntryException;
 import com.liferay.portlet.documentlibrary.NoSuchFolderException;
+import com.liferay.portlet.documentlibrary.model.DLFileEntryConstants;
 import com.liferay.portlet.documentlibrary.model.DLFolderConstants;
 import com.liferay.portlet.documentlibrary.service.DLAppServiceUtil;
 
@@ -162,12 +165,9 @@ public class DLWebDAVStorageImpl extends BaseWebDAVStorageImpl {
 			String description = fileEntry.getDescription();
 			String changeLog = StringPool.BLANK;
 
-			file = FileUtil.createTempFile(
-				FileUtil.getExtension(fileEntry.getTitle()));
-
 			InputStream is = fileEntry.getContentStream();
 
-			FileUtil.write(file, is);
+			file = FileUtil.createTempFile(is);
 
 			ServiceContext serviceContext = new ServiceContext();
 
@@ -208,9 +208,7 @@ public class DLWebDAVStorageImpl extends BaseWebDAVStorageImpl {
 			throw new WebDAVException(e);
 		}
 		finally {
-			if (file != null) {
-				file.delete();
-			}
+			FileUtil.delete(file);
 		}
 	}
 
@@ -240,7 +238,9 @@ public class DLWebDAVStorageImpl extends BaseWebDAVStorageImpl {
 			else {
 				FileEntry fileEntry = (FileEntry)model;
 
-				if (isLocked(fileEntry, webDavRequest.getLockUuid())) {
+				if (!hasLock(fileEntry, webDavRequest.getLockUuid()) &&
+					(fileEntry.getLock() != null)) {
+
 					return WebDAVUtil.SC_LOCKED;
 				}
 
@@ -391,10 +391,8 @@ public class DLWebDAVStorageImpl extends BaseWebDAVStorageImpl {
 			if (resource instanceof DLFileEntryResourceImpl) {
 				FileEntry fileEntry = (FileEntry)resource.getModel();
 
-				fileEntry = DLAppServiceUtil.checkOutFileEntry(
+				lock = DLAppServiceUtil.lockFileEntry(
 					fileEntry.getFileEntryId(), owner, timeout);
-
-				lock = fileEntry.getLock();
 			}
 			else {
 				boolean inheritable = false;
@@ -539,13 +537,17 @@ public class DLWebDAVStorageImpl extends BaseWebDAVStorageImpl {
 			boolean overwrite)
 		throws WebDAVException {
 
+		File file = null;
+
 		try {
 			String[] destinationArray = WebDAVUtil.getPathArray(
 				destination, true);
 
 			FileEntry fileEntry = (FileEntry)resource.getModel();
 
-			if (isLocked(fileEntry, webDavRequest.getLockUuid())) {
+			if (!hasLock(fileEntry, webDavRequest.getLockUuid()) &&
+				(fileEntry.getLock() != null)) {
+
 				return WebDAVUtil.SC_LOCKED;
 			}
 
@@ -558,10 +560,10 @@ public class DLWebDAVStorageImpl extends BaseWebDAVStorageImpl {
 			String title = WebDAVUtil.getResourceName(destinationArray);
 			String description = fileEntry.getDescription();
 			String changeLog = StringPool.BLANK;
-			byte[] bytes = null;
 
 			String[] assetTagNames = AssetTagLocalServiceUtil.getTagNames(
-				FileEntry.class.getName(), fileEntry.getFileEntryId());
+				DLFileEntryConstants.getClassName(),
+				fileEntry.getFileEntryId());
 
 			ServiceContext serviceContext = new ServiceContext();
 
@@ -582,19 +584,18 @@ public class DLWebDAVStorageImpl extends BaseWebDAVStorageImpl {
 
 			if (webDavRequest.isMac()) {
 				try {
-					FileEntry destFileEntry =
-						DLAppServiceUtil.getFileEntry(
-							groupId, newParentFolderId, title);
+					FileEntry destFileEntry = DLAppServiceUtil.getFileEntry(
+						groupId, newParentFolderId, title);
 
 					InputStream is = fileEntry.getContentStream();
 
-					bytes = FileUtil.getBytes(is);
+					file = FileUtil.createTempFile(is);
 
 					DLAppServiceUtil.updateFileEntry(
 						destFileEntry.getFileEntryId(),
 						destFileEntry.getTitle(), destFileEntry.getMimeType(),
 						destFileEntry.getTitle(),
-						destFileEntry.getDescription(), changeLog, false, bytes,
+						destFileEntry.getDescription(), changeLog, false, file,
 						serviceContext);
 
 					DLAppServiceUtil.deleteFileEntry(
@@ -609,7 +610,7 @@ public class DLWebDAVStorageImpl extends BaseWebDAVStorageImpl {
 			DLAppServiceUtil.updateFileEntry(
 				fileEntry.getFileEntryId(), sourceFileName,
 				fileEntry.getMimeType(), title, description, changeLog, false,
-				bytes, serviceContext);
+				file, serviceContext);
 
 			if (fileEntry.getFolderId() != newParentFolderId) {
 				fileEntry = DLAppServiceUtil.moveFileEntry(
@@ -634,6 +635,9 @@ public class DLWebDAVStorageImpl extends BaseWebDAVStorageImpl {
 		catch (Exception e) {
 			throw new WebDAVException(e);
 		}
+		finally {
+			FileUtil.delete(file);
+		}
 	}
 
 	@Override
@@ -652,7 +656,8 @@ public class DLWebDAVStorageImpl extends BaseWebDAVStorageImpl {
 			String description = StringPool.BLANK;
 			String changeLog = StringPool.BLANK;
 
-			ServiceContext serviceContext = new ServiceContext();
+			ServiceContext serviceContext = ServiceContextFactory.getInstance(
+				request);
 
 			serviceContext.setAddGroupPermissions(
 				isAddGroupPermissions(groupId));
@@ -669,14 +674,16 @@ public class DLWebDAVStorageImpl extends BaseWebDAVStorageImpl {
 			FileUtil.write(file, request.getInputStream());
 
 			if (contentType.equals(ContentTypes.APPLICATION_OCTET_STREAM)) {
-				contentType = MimeTypesUtil.getContentType(file);
+				contentType = MimeTypesUtil.getContentType(file, title);
 			}
 
 			try {
 				FileEntry fileEntry = DLAppServiceUtil.getFileEntry(
 					groupId, parentFolderId, title);
 
-				if (isLocked(fileEntry, webDavRequest.getLockUuid())) {
+				if (!hasLock(fileEntry, webDavRequest.getLockUuid()) &&
+					(fileEntry.getLock() != null)) {
+
 					return WebDAVUtil.SC_LOCKED;
 				}
 
@@ -685,7 +692,8 @@ public class DLWebDAVStorageImpl extends BaseWebDAVStorageImpl {
 				description = fileEntry.getDescription();
 
 				String[] assetTagNames = AssetTagLocalServiceUtil.getTagNames(
-					FileEntry.class.getName(), fileEntry.getFileEntryId());
+					DLFileEntryConstants.getClassName(),
+					fileEntry.getFileEntryId());
 
 				serviceContext.setAssetTagNames(assetTagNames);
 
@@ -694,6 +702,11 @@ public class DLWebDAVStorageImpl extends BaseWebDAVStorageImpl {
 					changeLog, false, file, serviceContext);
 			}
 			catch (NoSuchFileEntryException nsfee) {
+				if (file.length() == 0) {
+					serviceContext.setWorkflowAction(
+						WorkflowConstants.ACTION_SAVE_DRAFT);
+				}
+
 				DLAppServiceUtil.addFileEntry(
 					groupId, parentFolderId, title, contentType, title,
 					description, changeLog, file, serviceContext);
@@ -723,9 +736,7 @@ public class DLWebDAVStorageImpl extends BaseWebDAVStorageImpl {
 			throw new WebDAVException(e);
 		}
 		finally {
-			if (file != null) {
-				file.delete();
-			}
+			FileUtil.delete(file);
 		}
 	}
 
@@ -736,14 +747,18 @@ public class DLWebDAVStorageImpl extends BaseWebDAVStorageImpl {
 
 		Resource resource = getResource(webDavRequest);
 
+		long companyId = webDavRequest.getCompanyId();
+
 		Lock lock = null;
 
 		try {
 			if (resource instanceof DLFileEntryResourceImpl) {
-				lock = DLAppServiceUtil.refreshFileEntryLock(uuid, timeout);
+				lock = DLAppServiceUtil.refreshFileEntryLock(
+					uuid, companyId, timeout);
 			}
 			else {
-				lock = DLAppServiceUtil.refreshFolderLock(uuid, timeout);
+				lock = DLAppServiceUtil.refreshFolderLock(
+					uuid, companyId, timeout);
 			}
 		}
 		catch (Exception e) {
@@ -763,7 +778,7 @@ public class DLWebDAVStorageImpl extends BaseWebDAVStorageImpl {
 			if (resource instanceof DLFileEntryResourceImpl) {
 				FileEntry fileEntry = (FileEntry)resource.getModel();
 
-				DLAppServiceUtil.checkInFileEntry(
+				DLAppServiceUtil.unlockFileEntry(
 					fileEntry.getFileEntryId(), token);
 
 				if (webDavRequest.isAppleDoubleRequest()) {
@@ -814,7 +829,9 @@ public class DLWebDAVStorageImpl extends BaseWebDAVStorageImpl {
 				FileEntry fileEntry = DLAppServiceUtil.getFileEntry(
 					groupId, parentFolderId, name);
 
-				if (isLocked(fileEntry, lockUuid)) {
+				if (!hasLock(fileEntry, lockUuid) &&
+					(fileEntry.getLock() != null)) {
+
 					throw new LockException();
 				}
 
@@ -896,7 +913,7 @@ public class DLWebDAVStorageImpl extends BaseWebDAVStorageImpl {
 		long groupId = webDavRequest.getGroupId();
 
 		List<Folder> folders = DLAppServiceUtil.getFolders(
-			groupId, parentFolderId);
+			groupId, parentFolderId, false);
 
 		for (Folder folder : folders) {
 			Resource resource = toResource(webDavRequest, folder, true);
@@ -913,7 +930,7 @@ public class DLWebDAVStorageImpl extends BaseWebDAVStorageImpl {
 		return getFolderId(companyId, pathArray, true);
 	}
 
-	protected boolean isLocked(FileEntry fileEntry, String lockUuid)
+	protected boolean hasLock(FileEntry fileEntry, String lockUuid)
 		throws Exception {
 
 		if (Validator.isNull(lockUuid)) {
@@ -927,11 +944,9 @@ public class DLWebDAVStorageImpl extends BaseWebDAVStorageImpl {
 			// Client claims to know of a lock. Verify the lock UUID.
 
 			try {
-				boolean verified = DLAppServiceUtil.verifyFileEntryCheckOut(
+				return DLAppServiceUtil.verifyFileEntryLock(
 					fileEntry.getRepositoryId(), fileEntry.getFileEntryId(),
 					lockUuid);
-
-				return !verified;
 			}
 			catch (NoSuchLockException nsle) {
 				return false;
@@ -940,8 +955,7 @@ public class DLWebDAVStorageImpl extends BaseWebDAVStorageImpl {
 	}
 
 	protected Resource toResource(
-		WebDAVRequest webDavRequest, FileEntry fileEntry,
-		boolean appendPath) {
+		WebDAVRequest webDavRequest, FileEntry fileEntry, boolean appendPath) {
 
 		String parentPath = getRootPath() + webDavRequest.getPath();
 		String name = StringPool.BLANK;

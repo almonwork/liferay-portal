@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -23,6 +23,7 @@ import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.model.Account;
 import com.liferay.portal.model.Address;
 import com.liferay.portal.model.Contact;
+import com.liferay.portal.model.Country;
 import com.liferay.portal.model.ListTypeConstants;
 import com.liferay.portal.model.Organization;
 import com.liferay.portal.model.User;
@@ -30,7 +31,6 @@ import com.liferay.portal.service.base.AddressLocalServiceBaseImpl;
 import com.liferay.portal.util.PortalUtil;
 
 import java.util.Date;
-import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -81,20 +81,6 @@ public class AddressLocalServiceImpl extends AddressLocalServiceBaseImpl {
 		return address;
 	}
 
-	@Override
-	public void deleteAddress(Address address) throws SystemException {
-		addressPersistence.remove(address);
-	}
-
-	@Override
-	public void deleteAddress(long addressId)
-		throws PortalException, SystemException {
-
-		Address address = addressPersistence.findByPrimaryKey(addressId);
-
-		deleteAddress(address);
-	}
-
 	public void deleteAddresses(long companyId, String className, long classPK)
 		throws SystemException {
 
@@ -106,13 +92,6 @@ public class AddressLocalServiceImpl extends AddressLocalServiceBaseImpl {
 		for (Address address : addresses) {
 			deleteAddress(address);
 		}
-	}
-
-	@Override
-	public Address getAddress(long addressId)
-		throws PortalException, SystemException {
-
-		return addressPersistence.findByPrimaryKey(addressId);
 	}
 
 	public List<Address> getAddresses() throws SystemException {
@@ -166,15 +145,11 @@ public class AddressLocalServiceImpl extends AddressLocalServiceBaseImpl {
 		// id, class name, and class pk that also has mailing set to true
 
 		if (mailing) {
-			Iterator<Address> itr = addressPersistence.findByC_C_C_M(
-				companyId, classNameId, classPK, mailing).iterator();
+			List<Address> addresses = addressPersistence.findByC_C_C_M(
+				companyId, classNameId, classPK, mailing);
 
-			while (itr.hasNext()) {
-				Address address = itr.next();
-
-				if ((addressId <= 0) ||
-					(address.getAddressId() != addressId)) {
-
+			for (Address address : addresses) {
+				if ((addressId <= 0) || (address.getAddressId() != addressId)) {
 					address.setMailing(false);
 
 					addressPersistence.update(address, false);
@@ -186,15 +161,11 @@ public class AddressLocalServiceImpl extends AddressLocalServiceBaseImpl {
 		// id, class name, and class pk that also has primary set to true
 
 		if (primary) {
-			Iterator<Address> itr = addressPersistence.findByC_C_C_P(
-				companyId, classNameId, classPK, primary).iterator();
+			List<Address> addresses = addressPersistence.findByC_C_C_P(
+				companyId, classNameId, classPK, primary);
 
-			while (itr.hasNext()) {
-				Address address = itr.next();
-
-				if ((addressId <= 0) ||
-					(address.getAddressId() != addressId)) {
-
+			for (Address address : addresses) {
+				if ((addressId <= 0) || (address.getAddressId() != addressId)) {
 					address.setPrimary(false);
 
 					addressPersistence.update(address, false);
@@ -216,7 +187,11 @@ public class AddressLocalServiceImpl extends AddressLocalServiceBaseImpl {
 			throw new AddressCityException();
 		}
 		else if (Validator.isNull(zip)) {
-			throw new AddressZipException();
+			Country country = countryService.fetchCountry(countryId);
+
+			if ((country != null) && country.isZipRequired()) {
+				throw new AddressZipException();
+			}
 		}
 
 		if (addressId > 0) {

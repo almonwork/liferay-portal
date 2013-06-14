@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -23,7 +23,8 @@ package com.liferay.portal.service;
  * @see       TicketLocalService
  * @generated
  */
-public class TicketLocalServiceWrapper implements TicketLocalService {
+public class TicketLocalServiceWrapper implements TicketLocalService,
+	ServiceWrapper<TicketLocalService> {
 	public TicketLocalServiceWrapper(TicketLocalService ticketLocalService) {
 		_ticketLocalService = ticketLocalService;
 	}
@@ -55,24 +56,31 @@ public class TicketLocalServiceWrapper implements TicketLocalService {
 	* Deletes the ticket with the primary key from the database. Also notifies the appropriate model listeners.
 	*
 	* @param ticketId the primary key of the ticket
+	* @return the ticket that was removed
 	* @throws PortalException if a ticket with the primary key could not be found
 	* @throws SystemException if a system exception occurred
 	*/
-	public void deleteTicket(long ticketId)
+	public com.liferay.portal.model.Ticket deleteTicket(long ticketId)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException {
-		_ticketLocalService.deleteTicket(ticketId);
+		return _ticketLocalService.deleteTicket(ticketId);
 	}
 
 	/**
 	* Deletes the ticket from the database. Also notifies the appropriate model listeners.
 	*
 	* @param ticket the ticket
+	* @return the ticket that was removed
 	* @throws SystemException if a system exception occurred
 	*/
-	public void deleteTicket(com.liferay.portal.model.Ticket ticket)
+	public com.liferay.portal.model.Ticket deleteTicket(
+		com.liferay.portal.model.Ticket ticket)
 		throws com.liferay.portal.kernel.exception.SystemException {
-		_ticketLocalService.deleteTicket(ticket);
+		return _ticketLocalService.deleteTicket(ticket);
+	}
+
+	public com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery() {
+		return _ticketLocalService.dynamicQuery();
 	}
 
 	/**
@@ -144,6 +152,11 @@ public class TicketLocalServiceWrapper implements TicketLocalService {
 		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery)
 		throws com.liferay.portal.kernel.exception.SystemException {
 		return _ticketLocalService.dynamicQueryCount(dynamicQuery);
+	}
+
+	public com.liferay.portal.model.Ticket fetchTicket(long ticketId)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return _ticketLocalService.fetchTicket(ticketId);
 	}
 
 	/**
@@ -261,12 +274,26 @@ public class TicketLocalServiceWrapper implements TicketLocalService {
 		return _ticketLocalService.getTicket(key);
 	}
 
+	/**
+	 * @deprecated Renamed to {@link #getWrappedService}
+	 */
 	public TicketLocalService getWrappedTicketLocalService() {
 		return _ticketLocalService;
 	}
 
+	/**
+	 * @deprecated Renamed to {@link #setWrappedService}
+	 */
 	public void setWrappedTicketLocalService(
 		TicketLocalService ticketLocalService) {
+		_ticketLocalService = ticketLocalService;
+	}
+
+	public TicketLocalService getWrappedService() {
+		return _ticketLocalService;
+	}
+
+	public void setWrappedService(TicketLocalService ticketLocalService) {
 		_ticketLocalService = ticketLocalService;
 	}
 

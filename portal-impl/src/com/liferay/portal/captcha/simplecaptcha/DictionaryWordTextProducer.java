@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,7 +14,7 @@
 
 package com.liferay.portal.captcha.simplecaptcha;
 
-import com.liferay.portlet.words.util.WordsUtil;
+import com.liferay.portal.words.WordsUtil;
 
 import nl.captcha.text.producer.TextProducer;
 

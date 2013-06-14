@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -27,19 +27,26 @@ import javax.portlet.PortletURL;
  */
 public interface Indexer {
 
-	public static final int DEFAULT_INTERVAL = 1000;
+	public static final int DEFAULT_INTERVAL = 10000;
+
+	public void delete(long companyId, String uid) throws SearchException;
 
 	public void delete(Object obj) throws SearchException;
 
 	public String[] getClassNames();
 
-	public Document getDocument(Object obj)	throws SearchException;
+	public Document getDocument(Object obj) throws SearchException;
 
 	public BooleanQuery getFacetQuery(
 			String className, SearchContext searchContext)
 		throws Exception;
 
+	public BooleanQuery getFullQuery(SearchContext searchContext)
+		throws SearchException;
+
 	public IndexerPostProcessor[] getIndexerPostProcessors();
+
+	public String getPortletId();
 
 	public String getSearchEngineId();
 
@@ -51,11 +58,13 @@ public interface Indexer {
 		throws SearchException;
 
 	public boolean hasPermission(
-			PermissionChecker permissionChecker, long entryClassPK,
-			String actionId)
+			PermissionChecker permissionChecker, String entryClassName,
+			long entryClassPK, String actionId)
 		throws Exception;
 
 	public boolean isFilterSearch();
+
+	public boolean isPermissionAware();
 
 	public boolean isStagingAware();
 

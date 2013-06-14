@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -17,7 +17,6 @@ package com.liferay.portal.spring.hibernate;
 import com.liferay.portal.dao.orm.hibernate.DB2Dialect;
 import com.liferay.portal.dao.orm.hibernate.SQLServer2005Dialect;
 import com.liferay.portal.dao.orm.hibernate.SQLServer2008Dialect;
-import com.liferay.portal.kernel.dao.db.DBFactoryUtil;
 import com.liferay.portal.kernel.dao.jdbc.DataAccess;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
@@ -44,14 +43,6 @@ import org.hibernate.dialect.resolver.DialectFactory;
  * @author Brian Wing Shun Chan
  */
 public class DialectDetector {
-
-	public static String determineDialect(DataSource dataSource) {
-		Dialect dialect = getDialect(dataSource);
-
-		DBFactoryUtil.setDB(dialect);
-
-		return dialect.getClass().getName();
-	}
 
 	public static Dialect getDialect(DataSource dataSource) {
 		String dialectKey = null;
@@ -90,7 +81,7 @@ public class DialectDetector {
 					sb.append("production. Hypersonic is an embedded ");
 					sb.append("database useful for development and demo'ing ");
 					sb.append("purposes. The database settings can be ");
-					sb.append("changed in portal.properties.");
+					sb.append("changed in portal-ext.properties.");
 
 					_log.warn(sb.toString());
 				}

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -21,7 +21,11 @@ import com.liferay.portal.model.RoleConstants;
 import com.liferay.portal.model.User;
 import com.liferay.portal.service.RoleLocalServiceUtil;
 import com.liferay.portal.service.UserLocalServiceUtil;
+import com.liferay.portal.util.PropsValues;
 import com.liferay.portlet.admin.util.OmniadminUtil;
+
+import java.util.Collections;
+import java.util.List;
 
 import javax.portlet.PortletRequest;
 
@@ -30,14 +34,34 @@ import javax.portlet.PortletRequest;
  */
 public abstract class BasePermissionChecker implements PermissionChecker {
 
+	@Override
 	public abstract PermissionChecker clone();
 
 	public long getCompanyId() {
 		return user.getCompanyId();
 	}
 
+	public List<Long> getGuestResourceBlockIds(
+		long companyId, long groupId, String name, String actionId) {
+
+		return Collections.emptyList();
+	}
+
+	public List<Long> getOwnerResourceBlockIds(
+		long companyId, long groupId, String name, String actionId) {
+
+		return Collections.emptyList();
+	}
+
 	public long getOwnerRoleId() {
 		return ownerRole.getRoleId();
+	}
+
+	public List<Long> getResourceBlockIds(
+		long companyId, long groupId, long userId, String name,
+		String actionId) {
+
+		return Collections.emptyList();
 	}
 
 	public long[] getRoleIds(long userId, long groupId) {
@@ -62,7 +86,7 @@ public abstract class BasePermissionChecker implements PermissionChecker {
 		return hasPermission(groupId, name, String.valueOf(primKey), actionId);
 	}
 
-	public void init(User user, boolean checkGuest) {
+	public void init(User user) {
 		this.user = user;
 
 		if (user.isDefaultUser()) {
@@ -80,8 +104,6 @@ public abstract class BasePermissionChecker implements PermissionChecker {
 
 			this.signedIn = true;
 		}
-
-		this.checkGuest = checkGuest;
 
 		try {
 			this.ownerRole = RoleLocalServiceUtil.getRole(
@@ -125,19 +147,15 @@ public abstract class BasePermissionChecker implements PermissionChecker {
 	public void resetValues() {
 	}
 
-	public void setCheckGuest(boolean checkGuest) {
-		this.checkGuest = checkGuest;
-	}
-
 	public void setValues(PortletRequest portletRequest) {
 	}
 
-	protected User user;
+	protected boolean checkGuest = PropsValues.PERMISSIONS_CHECK_GUEST_ENABLED;
 	protected long defaultUserId;
-	protected boolean signedIn;
-	protected boolean checkGuest;
 	protected Boolean omniadmin;
 	protected Role ownerRole;
+	protected boolean signedIn;
+	protected User user;
 
 	private static Log _log = LogFactoryUtil.getLog(
 		BasePermissionChecker.class);

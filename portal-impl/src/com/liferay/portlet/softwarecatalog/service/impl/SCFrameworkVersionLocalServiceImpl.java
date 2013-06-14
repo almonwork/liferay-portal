@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -49,8 +49,7 @@ public class SCFrameworkVersionLocalServiceImpl
 		long frameworkVersionId = counterLocalService.increment();
 
 		SCFrameworkVersion frameworkVersion =
-			scFrameworkVersionPersistence.create(
-				frameworkVersionId);
+			scFrameworkVersionPersistence.create(frameworkVersionId);
 
 		frameworkVersion.setGroupId(groupId);
 		frameworkVersion.setCompanyId(user.getCompanyId());
@@ -67,12 +66,12 @@ public class SCFrameworkVersionLocalServiceImpl
 
 		// Resources
 
-		if (serviceContext.getAddGroupPermissions() ||
-			serviceContext.getAddGuestPermissions()) {
+		if (serviceContext.isAddGroupPermissions() ||
+			serviceContext.isAddGuestPermissions()) {
 
 			addFrameworkVersionResources(
-				frameworkVersion, serviceContext.getAddGroupPermissions(),
-				serviceContext.getAddGuestPermissions());
+				frameworkVersion, serviceContext.isAddGroupPermissions(),
+				serviceContext.isAddGuestPermissions());
 		}
 		else {
 			addFrameworkVersionResources(
@@ -108,8 +107,8 @@ public class SCFrameworkVersionLocalServiceImpl
 	}
 
 	public void addFrameworkVersionResources(
-			SCFrameworkVersion frameworkVersion,
-			boolean addGroupPermissions, boolean addGuestPermissions)
+			SCFrameworkVersion frameworkVersion, boolean addGroupPermissions,
+			boolean addGuestPermissions)
 		throws PortalException, SystemException {
 
 		resourceLocalService.addResources(
@@ -184,9 +183,7 @@ public class SCFrameworkVersionLocalServiceImpl
 		return scFrameworkVersionPersistence.findByGroupId(groupId, start, end);
 	}
 
-	public int getFrameworkVersionsCount(long groupId)
-		throws SystemException {
-
+	public int getFrameworkVersionsCount(long groupId) throws SystemException {
 		return scFrameworkVersionPersistence.countByGroupId(groupId);
 	}
 

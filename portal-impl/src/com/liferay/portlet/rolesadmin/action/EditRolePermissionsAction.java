@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -20,6 +20,7 @@ import com.liferay.portal.kernel.servlet.SessionErrors;
 import com.liferay.portal.kernel.servlet.SessionMessages;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.Constants;
+import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.StringUtil;
@@ -31,13 +32,13 @@ import com.liferay.portal.model.RoleConstants;
 import com.liferay.portal.security.auth.PrincipalException;
 import com.liferay.portal.security.permission.ResourceActionsUtil;
 import com.liferay.portal.security.permission.comparator.ActionComparator;
-import com.liferay.portal.service.PermissionServiceUtil;
+import com.liferay.portal.service.ResourceBlockLocalServiceUtil;
+import com.liferay.portal.service.ResourceBlockServiceUtil;
 import com.liferay.portal.service.ResourcePermissionServiceUtil;
 import com.liferay.portal.service.RoleLocalServiceUtil;
 import com.liferay.portal.struts.PortletAction;
 import com.liferay.portal.theme.ThemeDisplay;
 import com.liferay.portal.util.PortalUtil;
-import com.liferay.portal.util.PropsValues;
 import com.liferay.portal.util.WebKeys;
 
 import java.util.HashMap;
@@ -57,6 +58,7 @@ import org.apache.struts.action.ActionMapping;
 /**
  * @author Brian Wing Shun Chan
  * @author Jorge Ferrer
+ * @author Connor McKay
  */
 public class EditRolePermissionsAction extends PortletAction {
 
@@ -81,7 +83,7 @@ public class EditRolePermissionsAction extends PortletAction {
 				e instanceof PrincipalException ||
 				e instanceof RolePermissionsException) {
 
-				SessionErrors.add(actionRequest, e.getClass().getName());
+				SessionErrors.add(actionRequest, e.getClass());
 
 				setForward(actionRequest, "portlet.roles_admin.error");
 			}
@@ -104,7 +106,7 @@ public class EditRolePermissionsAction extends PortletAction {
 			if (e instanceof NoSuchRoleException ||
 				e instanceof PrincipalException) {
 
-				SessionErrors.add(renderRequest, e.getClass().getName());
+				SessionErrors.add(renderRequest, e.getClass());
 
 				return mapping.findForward("portlet.roles_admin.error");
 			}
@@ -125,7 +127,6 @@ public class EditRolePermissionsAction extends PortletAction {
 			WebKeys.THEME_DISPLAY);
 
 		long roleId = ParamUtil.getLong(actionRequest, "roleId");
-		long permissionId = ParamUtil.getLong(actionRequest, "permissionId");
 		String name = ParamUtil.getString(actionRequest, "name");
 		int scope = ParamUtil.getInteger(actionRequest, "scope");
 		String primKey = ParamUtil.getString(actionRequest, "primKey");
@@ -145,14 +146,22 @@ public class EditRolePermissionsAction extends PortletAction {
 			throw new RolePermissionsException(roleName);
 		}
 
-		if (PropsValues.PERMISSIONS_USER_CHECK_ALGORITHM == 6) {
+		if (ResourceBlockLocalServiceUtil.isSupported(name)) {
+			if (scope == ResourceConstants.SCOPE_GROUP) {
+				ResourceBlockServiceUtil.removeGroupScopePermission(
+					themeDisplay.getScopeGroupId(), themeDisplay.getCompanyId(),
+					GetterUtil.getLong(primKey), name, roleId, actionId);
+			}
+			else {
+				ResourceBlockServiceUtil.removeCompanyScopePermission(
+					themeDisplay.getScopeGroupId(), themeDisplay.getCompanyId(),
+					name, roleId, actionId);
+			}
+		}
+		else {
 			ResourcePermissionServiceUtil.removeResourcePermission(
 				themeDisplay.getScopeGroupId(), themeDisplay.getCompanyId(),
 				name, scope, primKey, roleId, actionId);
-		}
-		else {
-			PermissionServiceUtil.unsetRolePermission(
-				roleId, themeDisplay.getScopeGroupId(), permissionId);
 		}
 
 		// Send redirect
@@ -167,57 +176,7 @@ public class EditRolePermissionsAction extends PortletAction {
 		}
 	}
 
-	protected void updateAction_1to5(
-			Role role, long groupId, String selResource, String actionId,
-			boolean selected, int scope, String[] groupIds)
-		throws Exception {
-
-		long roleId = role.getRoleId();
-
-		if (selected) {
-			if (scope == ResourceConstants.SCOPE_COMPANY) {
-				PermissionServiceUtil.setRolePermission(
-					roleId, groupId, selResource, scope,
-					String.valueOf(role.getCompanyId()), actionId);
-			}
-			else if (scope == ResourceConstants.SCOPE_GROUP_TEMPLATE) {
-				PermissionServiceUtil.setRolePermission(
-					roleId, groupId, selResource,
-					ResourceConstants.SCOPE_GROUP_TEMPLATE,
-					String.valueOf(GroupConstants.DEFAULT_PARENT_GROUP_ID),
-					actionId);
-			}
-			else {
-				PermissionServiceUtil.unsetRolePermissions(
-					roleId, groupId, selResource, ResourceConstants.SCOPE_GROUP,
-					actionId);
-
-				for (String curGroupId : groupIds) {
-					PermissionServiceUtil.setRolePermission(
-						roleId, groupId, selResource,
-						ResourceConstants.SCOPE_GROUP, curGroupId, actionId);
-				}
-			}
-		}
-		else {
-
-			// Remove company, group template, and group permissions
-
-			PermissionServiceUtil.unsetRolePermissions(
-				roleId, groupId, selResource, ResourceConstants.SCOPE_COMPANY,
-				actionId);
-
-			PermissionServiceUtil.unsetRolePermissions(
-				roleId, groupId, selResource,
-				ResourceConstants.SCOPE_GROUP_TEMPLATE, actionId);
-
-			PermissionServiceUtil.unsetRolePermissions(
-				roleId, groupId, selResource, ResourceConstants.SCOPE_GROUP,
-				actionId);
-		}
-	}
-
-	protected void updateAction_6(
+	protected void updateAction(
 			Role role, long groupId, String selResource, String actionId,
 			boolean selected, int scope, String[] groupIds)
 		throws Exception {
@@ -352,13 +311,13 @@ public class EditRolePermissionsAction extends PortletAction {
 					}
 				}
 
-				if (PropsValues.PERMISSIONS_USER_CHECK_ALGORITHM == 6) {
-					updateAction_6(
+				if (ResourceBlockLocalServiceUtil.isSupported(selResource)) {
+					updateActions_Blocks(
 						role, themeDisplay.getScopeGroupId(), selResource,
 						actionId, selected, scope, groupIds);
 				}
 				else {
-					updateAction_1to5(
+					updateAction(
 						role, themeDisplay.getScopeGroupId(), selResource,
 						actionId, selected, scope, groupIds);
 				}
@@ -376,6 +335,42 @@ public class EditRolePermissionsAction extends PortletAction {
 			redirect = redirect + "&" + Constants.CMD + "=" + Constants.VIEW;
 
 			actionResponse.sendRedirect(redirect);
+		}
+	}
+
+	protected void updateActions_Blocks(
+			Role role, long scopeGroupId, String selResource, String actionId,
+			boolean selected, int scope, String[] groupIds)
+		throws Exception {
+
+		long companyId = role.getCompanyId();
+		long roleId = role.getRoleId();
+
+		if (selected) {
+			if (scope == ResourceConstants.SCOPE_GROUP) {
+				ResourceBlockServiceUtil.removeAllGroupScopePermissions(
+					scopeGroupId, companyId, selResource, roleId, actionId);
+				ResourceBlockServiceUtil.removeCompanyScopePermission(
+					scopeGroupId, companyId, selResource, roleId, actionId);
+
+				for (String groupId : groupIds) {
+					ResourceBlockServiceUtil.addGroupScopePermission(
+						scopeGroupId, companyId, GetterUtil.getLong(groupId),
+						selResource, roleId, actionId);
+				}
+			}
+			else {
+				ResourceBlockServiceUtil.removeAllGroupScopePermissions(
+					scopeGroupId, companyId, selResource, roleId, actionId);
+				ResourceBlockServiceUtil.addCompanyScopePermission(
+					scopeGroupId, companyId, selResource, roleId, actionId);
+			}
+		}
+		else {
+			ResourceBlockServiceUtil.removeAllGroupScopePermissions(
+				scopeGroupId, companyId, selResource, roleId, actionId);
+			ResourceBlockServiceUtil.removeCompanyScopePermission(
+				scopeGroupId, companyId, selResource, roleId, actionId);
 		}
 	}
 

@@ -6,6 +6,8 @@
 	var isArray = Lang.isArray;
 	var arrayIndexOf = AArray.indexOf;
 
+	var EVENT_CLICK = 'click';
+
 	var htmlEscapedValues = [];
 	var htmlUnescapedValues = [];
 
@@ -37,6 +39,10 @@
 	var REGEX_HTML_ESCAPE = new RegExp('[' + htmlUnescapedValues.join('') + ']', 'g');
 
 	var REGEX_HTML_UNESCAPE = new RegExp(htmlEscapedValues.join('|'), 'gi');
+
+	var SRC_HIDE_LINK = {
+		src: 'hideLink'
+	};
 
 	var Window = {
 		ALIGN_CENTER: {
@@ -222,6 +228,10 @@
 			}
 		},
 
+		clamp: function(value, min, max) {
+			return Math.min(Math.max(value, min), max);
+		},
+
 		disableEsc: function() {
 			if ((document.all) && (event.keyCode == 27)) {
 				event.returnValue = false;
@@ -319,6 +329,10 @@
 			return portletId;
 		},
 
+		getPortletNamespace: function(portletId) {
+			return '_' + portletId + '_';
+		},
+
 		getTop: function() {
 			var topWindow = Util._topWindow;
 
@@ -342,11 +356,13 @@
 					if (!parentThemeDisplay) {
 						break;
 					}
-					else if (!parentThemeDisplay.isStatePopUp()) {
+					else if (!parentThemeDisplay.isStatePopUp() || (parentWindow == parentWindow.parent)) {
 						topWindow = parentWindow;
 
 						break;
 					}
+
+					parentWindow = parentWindow.parent;
 				}
 
 				if (!topWindow) {
@@ -416,15 +432,14 @@
 			return Liferay.EDITORS && Liferay.EDITORS[editorImpl];
 		},
 
-		openWindow: function(config) {
+		openWindow: function(config, callback) {
 			config.openingWindow = window;
 
 			var top = Util.getTop();
 
 			var topUtil = top.Liferay.Util;
-			var topAUI = top.AUI;
 
-			topUtil._openWindowProvider(config);
+			topUtil._openWindowProvider(config, callback);
 		},
 
 		processTab: function(id) {
@@ -522,17 +537,15 @@
 					document.selection.createRange().text='\t';
 				}
 
-		        el.scrollTop = oldscroll;
+				el.scrollTop = oldscroll;
 
 				return false;
-		    }
+			}
 		},
 
 		toCharCode: A.cached(
 			function(name) {
 				var buffer = [];
-
-				name = unescape(escape(name).replace(/%u/g, '\\u'));
 
 				for (var i = 0; i < name.length; i++) {
 					buffer[i] = name.charCodeAt(i);
@@ -541,6 +554,10 @@
 				return buffer.join('');
 			}
 		),
+
+		toNumber: function(value) {
+			return parseInt(value, 10) || 0;
+		},
 
 		uncamelize: function(value, separator) {
 			separator = separator || ' ';
@@ -581,6 +598,8 @@
 			}
 
 			form.submit();
+
+			form.attr('target', '');
 		},
 
 		_escapeHTML: function(match) {
@@ -654,27 +673,51 @@
 		Util,
 		'afterIframeLoaded',
 		function(event) {
-			var iframePlugin = event.currentTarget;
+			var iframeDocument = A.one(event.doc);
 
-			var iframeBody = iframePlugin.node.get('contentWindow.document.body');
+			var iframeBody = iframeDocument.one('body');
+
+			var dialog = event.dialog;
 
 			iframeBody.addClass('aui-dialog-iframe-popup');
 
-			var closeButton = iframeBody.one('.aui-button-input-cancel');
+			iframeBody.delegate(
+				EVENT_CLICK,
+				function() {
+					iframeDocument.purge(true);
 
-			if (closeButton) {
-				var dialog = iframePlugin.get('host');
+					dialog.close();
+				},
+				'.aui-button-input-cancel'
+			);
 
-				closeButton.on('click', dialog.close, dialog);
-			}
+			iframeBody.delegate(
+				'submit',
+				function(event) {
+					iframeDocument.purge(true);
+				},
+				'form'
+			);
+
+			iframeBody.delegate(
+				EVENT_CLICK,
+				function(){
+					dialog.set('visible', false, SRC_HIDE_LINK);
+
+					iframeDocument.purge(true);
+				},
+				'.lfr-hide-dialog'
+			);
 
 			var rolesSearchContainer = iframeBody.one('#rolesSearchContainerSearchContainer');
 
 			if (rolesSearchContainer) {
 				rolesSearchContainer.delegate(
-					'click',
+					EVENT_CLICK,
 					function(event){
 						event.preventDefault();
+
+						iframeDocument.purge(true);
 
 						submitForm(document.hrefFm, event.currentTarget.attr('href'));
 					},
@@ -701,7 +744,7 @@
 	Liferay.provide(
 		Util,
 		'checkAll',
-		function(form, name, allBox) {
+		function(form, name, allBox, selectClassName) {
 			var selector;
 
 			if (isArray(name)) {
@@ -714,6 +757,10 @@
 			form = A.one(form);
 
 			form.all(selector).set('checked', A.one(allBox).get('checked'));
+
+			if (selectClassName) {
+				form.all(selectClassName).toggleClass('selected', A.one(allBox).get('checked'));
+			}
 		},
 		['aui-base']
 	);
@@ -726,7 +773,7 @@
 			var totalOn = 0;
 			var inputs = A.one(form).all('input[type=checkbox]');
 
-			allBox = A.one(allBox);
+			allBox = A.one(allBox) || A.one(form).one('input[name=' + allBox + ']');
 
 			if (!isArray(name)) {
 				name = [name];
@@ -893,7 +940,7 @@
 				}
 
 				checkBox.on(
-					'click',
+					EVENT_CLICK,
 					function() {
 						toggleBox.set('disabled', !toggleBox.get('disabled'));
 					}
@@ -927,7 +974,7 @@
 			var interacting = false;
 
 			var clickHandle = A.getDoc().on(
-				'click',
+				EVENT_CLICK,
 				function(event) {
 					interacting = true;
 
@@ -957,7 +1004,13 @@
 			if (link) {
 				var url = link.attr('href');
 
-				submitForm(document.hrefFm, url);
+				var newWindow = (link.attr('target') == '_blank');
+
+				if (newWindow) {
+					A.one(document.hrefFm).attr('target', '_blank');
+				}
+
+				submitForm(document.hrefFm, url, !newWindow);
 
 				Util._submitLocked = null;
 			}
@@ -979,30 +1032,18 @@
 	Liferay.provide(
 		Util,
 		'inlineEditor',
-		function(options) {
-			if (options.uri && options.button) {
-				var button = options.button;
-				var height = options.height || 640;
-				var textarea = options.textarea;
-				var uri = options.uri;
-				var width = options.width || 680;
+		function(options, callback) {
+			var editorButton = A.one(options.button);
 
-				options.dialog = {
-					stack: false
-				};
+			if (options.uri && editorButton) {
+				delete options.button;
 
-				var editorButton = A.one(button);
-
-				if (editorButton) {
-					delete options.button;
-
-					editorButton.on(
-						'click',
-						function(event) {
-							Util.openWindow(options);
-						}
-					);
-				}
+				editorButton.on(
+					EVENT_CLICK,
+					function(event) {
+						Util.openWindow(options, callback);
+					}
+				);
 			}
 		},
 		['aui-dialog', 'aui-io']
@@ -1043,7 +1084,7 @@
 	Liferay.provide(
 		Util,
 		'openDDMPortlet',
-		function(config) {
+		function(config, callback) {
 			var instance = this;
 
 			var defaultValues = {
@@ -1057,27 +1098,42 @@
 
 			ddmURL.setEscapeXML(false);
 
+			ddmURL.setDoAsGroupId(config.doAsGroupId || themeDisplay.getScopeGroupId());
+
 			ddmURL.setParameter('chooseCallback', config.chooseCallback);
+			ddmURL.setParameter('classNameId', config.classNameId);
+			ddmURL.setParameter('classPK', config.classPK);
+			ddmURL.setParameter('ddmResource', config.ddmResource);
+			ddmURL.setParameter('ddmResourceActionId', config.ddmResourceActionId);
 			ddmURL.setParameter('saveCallback', config.saveCallback);
 			ddmURL.setParameter('scopeAvailableFields', config.availableFields);
 			ddmURL.setParameter('scopeStorageType', config.storageType);
 			ddmURL.setParameter('scopeStructureName', config.structureName);
 			ddmURL.setParameter('scopeStructureType', config.structureType);
+			ddmURL.setParameter('scopeTemplateMode', config.templateMode);
+			ddmURL.setParameter('scopeTemplateType', config.templateType);
 
-			if (config.showManageTemplates) {
+			if ('showGlobalScope' in config) {
+				ddmURL.setParameter('showGlobalScope', config.showGlobalScope);
+			}
+
+			if ('showManageTemplates' in config) {
 				ddmURL.setParameter('showManageTemplates', config.showManageTemplates);
 			}
 
-			if (config.showToolbar) {
+			if ('showToolbar' in config) {
 				ddmURL.setParameter('showToolbar', config.showToolbar);
 			}
-
-			ddmURL.setParameter('structureId', config.structureId);
-			ddmURL.setParameter('struts_action', '/dynamic_data_mapping/view');
 
 			if (config.struts_action) {
 				ddmURL.setParameter('struts_action', config.struts_action);
 			}
+			else {
+				ddmURL.setParameter('struts_action', '/dynamic_data_mapping/view');
+			}
+
+			ddmURL.setParameter('templateHeaderTitle', config.templateHeaderTitle);
+			ddmURL.setParameter('templateId', config.templateId);
 
 			ddmURL.setPortletId(166);
 			ddmURL.setWindowState('pop_up');
@@ -1096,7 +1152,7 @@
 				dialogConfig.align = Util.Window.ALIGN_CENTER;
 			}
 
-			Util.openWindow(config);
+			Util.openWindow(config, callback);
 		},
 		['liferay-portlet-url']
 	);
@@ -1106,34 +1162,54 @@
 		'portletTitleEdit',
 		function(options) {
 			var obj = options.obj;
-			var title = obj.one('.portlet-title-text');
 
-			if (title && !title.hasClass('not-editable')) {
-				title.setData('portletTitleEditOptions', options);
+			if (obj && !obj.hasClass('portlet-borderless')) {
+				var title = obj.one('.portlet-title-text');
 
-				title.on(
-					'click',
-					function(event) {
-						var editable = Util._getEditableInstance(title);
+				if (title && !title.hasClass('not-editable')) {
+					title.setData('portletTitleEditOptions', options);
 
-						var rendered = editable.get('rendered');
+					title.on(
+						EVENT_CLICK,
+						function(event) {
+							var editable = Util._getEditableInstance(title);
 
-						if (rendered) {
-							editable.fire('stopEditing');
+							var rendered = editable.get('rendered');
+
+							if (rendered) {
+								editable.fire('stopEditing');
+							}
+
+							editable.set('node', event.currentTarget);
+
+							if (rendered) {
+								editable.syncUI();
+							}
+
+							editable._startEditing(event);
 						}
-
-						editable.set('node', event.currentTarget);
-
-						if (rendered) {
-							editable.syncUI();
-						}
-
-						editable._startEditing(event);
-					}
-				);
+					);
+				}
 			}
 		},
 		['aui-editable']
+	);
+
+	Liferay.provide(
+		Util,
+		'removeFolderSelection',
+		function(folderIdString, folderNameString, namespace) {
+			A.byIdNS(namespace, folderIdString).val(0);
+
+			var nameEl = A.byIdNS(namespace, folderNameString);
+
+			nameEl.attr('href', '');
+
+			nameEl.empty();
+
+			Liferay.Util.toggleDisabled(A.byIdNS(namespace, 'removeFolderButton'), true);
+		},
+		['aui-base']
 	);
 
 	Liferay.provide(
@@ -1142,7 +1218,7 @@
 		function(box, value) {
 			box = A.one(box);
 
-			var selectedIndex =  box.get('selectedIndex');
+			var selectedIndex = box.get('selectedIndex');
 
 			if (!value) {
 				box.all('option').item(selectedIndex).remove(true);
@@ -1319,6 +1395,7 @@
 				{
 					data: {
 						doAsUserId: params.doAsUserId,
+						p_auth: Liferay.authToken,
 						p_l_id: params.plid,
 						portletId: params.portletId,
 						title: params.title
@@ -1327,6 +1404,31 @@
 			);
 		},
 		['aui-io']
+	);
+
+	Liferay.provide(
+		Util,
+		'selectFolder',
+		function(folderData, folderHref, namespace) {
+			A.byIdNS(namespace, folderData['idString']).val(folderData['idValue']);
+
+			var nameEl = A.byIdNS(namespace, folderData['nameString']);
+
+			Liferay.Util.addParams(namespace + 'folderId=' + folderData['idValue'], folderHref);
+
+			nameEl.attr('href', folderHref);
+
+			nameEl.setContent(folderData['nameValue'] + '&nbsp;');
+
+			var button = A.byIdNS(namespace, 'removeFolderButton');
+
+			if (button) {
+				button.set('disabled', false);
+
+				button.ancestor('.aui-button').removeClass('aui-button-disabled');
+			}
+		},
+		['aui-base']
 	);
 
 	Liferay.provide(
@@ -1424,7 +1526,7 @@
 				}
 
 				checkBox.on(
-					'click',
+					EVENT_CLICK,
 					function() {
 						toggleBox.toggle();
 					}
@@ -1437,11 +1539,14 @@
 	Liferay.provide(
 		Util,
 		'toggleControls',
-		function() {
-			var trigger = A.one('.toggle-controls');
+		function(node) {
+			var docBody = A.getBody();
+
+			node = node || docBody;
+
+			var trigger = node.one('.toggle-controls');
 
 			if (trigger) {
-				var docBody = A.getBody();
 				var hiddenClass = 'controls-hidden';
 				var visibleClass = 'controls-visible';
 				var currentClass = visibleClass;
@@ -1453,25 +1558,37 @@
 				docBody.addClass(currentClass);
 
 				trigger.on(
-					'click',
+					EVENT_CLICK,
 					function(event) {
 						docBody.toggleClass(visibleClass).toggleClass(hiddenClass);
 
 						Liferay._editControlsState = (docBody.hasClass(visibleClass) ? 'visible' : 'hidden');
 
-						A.io.request(
-							themeDisplay.getPathMain() + '/portal/session_click',
-							{
-								data: {
-									'liferay_toggle_controls': Liferay._editControlsState
-								}
-							}
-						);
+						Liferay.Store('liferay_toggle_controls', Liferay._editControlsState);
 					}
 				);
 			}
 		},
-		['aui-io']
+		['liferay-store']
+	);
+
+	Liferay.provide(
+		Util,
+		'toggleDisabled',
+		function(button, state) {
+			if (!A.instanceOf(button, A.NodeList)) {
+				button = A.all(button);
+			}
+
+			button.each(
+				function(item, index, collection) {
+					item.attr('disabled', state);
+
+					item.ancestor('.aui-button').toggleClass('aui-button-disabled', state);
+				}
+			);
+		},
+		['aui-base']
 	);
 
 	Liferay.provide(
@@ -1481,26 +1598,27 @@
 			var radioButton = A.one('#' + radioId);
 			var showBox = A.one('#' + showBoxId);
 
-			if (radioButton && showBox) {
+			if (radioButton) {
 				var checked = radioButton.get('checked');
 
-				showBox.toggle(checked);
+				if (showBox) {
+					showBox.toggle(checked);
+				}
 
 				radioButton.on(
 					'change',
 					function() {
-						showBox.show();
-
-						var hideBox;
-
-						if (isArray(hideBoxIds)) {
-							hideBox = A.all('#' + hideBoxIds.join(',#'));
-						}
-						else {
-							hideBox = A.one('#' + hideBoxIds);
+						if (showBox) {
+							showBox.show();
 						}
 
-						hideBox.hide();
+						if (Lang.isValue(hideBoxIds)) {
+							if (Lang.isArray(hideBoxIds)) {
+								hideBoxIds = hideBoxIds.join(',#');
+							}
+
+							A.all('#' + hideBoxIds).hide();
+						}
 					}
 				);
 			}
@@ -1516,14 +1634,18 @@
 			var toggleBox = A.one('#' + toggleBoxId);
 
 			if (selectBox && toggleBox) {
-				var toggle = function() {
-					var action = 'show';
+				var dynamicValue = Lang.isFunction(value);
 
-					if (selectBox.val() != value) {
-						action = 'hide';
+				var toggle = function() {
+					var currentValue = selectBox.val();
+
+					var visible = (value == currentValue);
+
+					if (dynamicValue) {
+						visible = value(currentValue, value);
 					}
 
-					toggleBox[action]();
+					toggleBox.toggle(visible);
 				};
 
 				toggle();
@@ -1538,7 +1660,19 @@
 		Util,
 		'updateCheckboxValue',
 		function(checkbox) {
-			A.one(checkbox).previous().val(checkbox.checked);
+			checkbox = A.one(checkbox);
+
+			if (checkbox) {
+				var checked = checkbox.attr('checked');
+
+				var value = 'false';
+
+				if (checked) {
+					value = checkbox.val();
+				}
+
+				checkbox.previous().val(value);
+			}
 		},
 		['aui-base']
 	);
@@ -1571,8 +1705,8 @@
 	Liferay.provide(
 		Util,
 		'_openWindowProvider',
-		function(config) {
-			Util._openWindow(config);
+		function(config, callback) {
+			Util._openWindow(config, callback);
 		},
 		['liferay-util-window']
 	);

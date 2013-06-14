@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,7 +14,6 @@
 
 package com.liferay.portlet.expando.service.persistence;
 
-import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.service.persistence.BasePersistence;
 
 import com.liferay.portlet.expando.model.ExpandoValue;
@@ -1164,9 +1163,11 @@ public interface ExpandoValuePersistence extends BasePersistence<ExpandoValue> {
 	*
 	* @param columnId the column ID
 	* @param rowId the row ID
+	* @return the expando value that was removed
 	* @throws SystemException if a system exception occurred
 	*/
-	public void removeByC_R(long columnId, long rowId)
+	public com.liferay.portlet.expando.model.ExpandoValue removeByC_R(
+		long columnId, long rowId)
 		throws com.liferay.portal.kernel.exception.SystemException,
 			com.liferay.portlet.expando.NoSuchValueException;
 
@@ -1186,9 +1187,11 @@ public interface ExpandoValuePersistence extends BasePersistence<ExpandoValue> {
 	* @param tableId the table ID
 	* @param columnId the column ID
 	* @param classPK the class p k
+	* @return the expando value that was removed
 	* @throws SystemException if a system exception occurred
 	*/
-	public void removeByT_C_C(long tableId, long columnId, long classPK)
+	public com.liferay.portlet.expando.model.ExpandoValue removeByT_C_C(
+		long tableId, long columnId, long classPK)
 		throws com.liferay.portal.kernel.exception.SystemException,
 			com.liferay.portlet.expando.NoSuchValueException;
 
@@ -1328,7 +1331,4 @@ public interface ExpandoValuePersistence extends BasePersistence<ExpandoValue> {
 	*/
 	public int countAll()
 		throws com.liferay.portal.kernel.exception.SystemException;
-
-	public ExpandoValue remove(ExpandoValue expandoValue)
-		throws SystemException;
 }

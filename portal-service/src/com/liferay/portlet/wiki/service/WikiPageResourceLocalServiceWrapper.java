@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,6 +14,8 @@
 
 package com.liferay.portlet.wiki.service;
 
+import com.liferay.portal.service.ServiceWrapper;
+
 /**
  * <p>
  * This class is a wrapper for {@link WikiPageResourceLocalService}.
@@ -24,7 +26,8 @@ package com.liferay.portlet.wiki.service;
  * @generated
  */
 public class WikiPageResourceLocalServiceWrapper
-	implements WikiPageResourceLocalService {
+	implements WikiPageResourceLocalService,
+		ServiceWrapper<WikiPageResourceLocalService> {
 	public WikiPageResourceLocalServiceWrapper(
 		WikiPageResourceLocalService wikiPageResourceLocalService) {
 		_wikiPageResourceLocalService = wikiPageResourceLocalService;
@@ -58,25 +61,32 @@ public class WikiPageResourceLocalServiceWrapper
 	* Deletes the wiki page resource with the primary key from the database. Also notifies the appropriate model listeners.
 	*
 	* @param resourcePrimKey the primary key of the wiki page resource
+	* @return the wiki page resource that was removed
 	* @throws PortalException if a wiki page resource with the primary key could not be found
 	* @throws SystemException if a system exception occurred
 	*/
-	public void deleteWikiPageResource(long resourcePrimKey)
+	public com.liferay.portlet.wiki.model.WikiPageResource deleteWikiPageResource(
+		long resourcePrimKey)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException {
-		_wikiPageResourceLocalService.deleteWikiPageResource(resourcePrimKey);
+		return _wikiPageResourceLocalService.deleteWikiPageResource(resourcePrimKey);
 	}
 
 	/**
 	* Deletes the wiki page resource from the database. Also notifies the appropriate model listeners.
 	*
 	* @param wikiPageResource the wiki page resource
+	* @return the wiki page resource that was removed
 	* @throws SystemException if a system exception occurred
 	*/
-	public void deleteWikiPageResource(
+	public com.liferay.portlet.wiki.model.WikiPageResource deleteWikiPageResource(
 		com.liferay.portlet.wiki.model.WikiPageResource wikiPageResource)
 		throws com.liferay.portal.kernel.exception.SystemException {
-		_wikiPageResourceLocalService.deleteWikiPageResource(wikiPageResource);
+		return _wikiPageResourceLocalService.deleteWikiPageResource(wikiPageResource);
+	}
+
+	public com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery() {
+		return _wikiPageResourceLocalService.dynamicQuery();
 	}
 
 	/**
@@ -149,6 +159,12 @@ public class WikiPageResourceLocalServiceWrapper
 		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery)
 		throws com.liferay.portal.kernel.exception.SystemException {
 		return _wikiPageResourceLocalService.dynamicQueryCount(dynamicQuery);
+	}
+
+	public com.liferay.portlet.wiki.model.WikiPageResource fetchWikiPageResource(
+		long resourcePrimKey)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return _wikiPageResourceLocalService.fetchWikiPageResource(resourcePrimKey);
 	}
 
 	/**
@@ -281,11 +297,26 @@ public class WikiPageResourceLocalServiceWrapper
 			title);
 	}
 
+	/**
+	 * @deprecated Renamed to {@link #getWrappedService}
+	 */
 	public WikiPageResourceLocalService getWrappedWikiPageResourceLocalService() {
 		return _wikiPageResourceLocalService;
 	}
 
+	/**
+	 * @deprecated Renamed to {@link #setWrappedService}
+	 */
 	public void setWrappedWikiPageResourceLocalService(
+		WikiPageResourceLocalService wikiPageResourceLocalService) {
+		_wikiPageResourceLocalService = wikiPageResourceLocalService;
+	}
+
+	public WikiPageResourceLocalService getWrappedService() {
+		return _wikiPageResourceLocalService;
+	}
+
+	public void setWrappedService(
 		WikiPageResourceLocalService wikiPageResourceLocalService) {
 		_wikiPageResourceLocalService = wikiPageResourceLocalService;
 	}

@@ -22,35 +22,29 @@ ${theme.include(body_top_include)}
 	<a href="#main-content" id="skip-to-content"><@liferay.language key="skip-to-content" /></a>
 
 	<header id="banner" role="banner">
-		<hgroup id="heading">
-			<h1 class="company-title">
-				<a class="logo" href="${company_url}" title="<@liferay.language key="go-to" /> ${company_name}">
-					<span>${company_name}</span>
+		<div id="heading">
+			<h1 class="site-title">
+				<a class="${logo_css_class}" href="${site_default_url}" title="<@liferay.language key="go-to" /> ${site_name}">
+					<img alt="${logo_description}" height="${site_logo_height}" src="${site_logo}" width="${site_logo_width}" />
 				</a>
+
+				<#if show_site_name>
+					<span class="site-name" title="<@liferay.language key="go-to" /> ${site_name}">
+						${site_name}
+					</span>
+				</#if>
 			</h1>
 
-			<h2 class="site-title">
-				<a href="${site_default_url}" title="<@liferay.language key="go-to" /> ${site_name}">
-					<span>${site_name}</span>
-				</a>
-			</h2>
-
-			<h3 class="page-title">
+			<h2 class="page-title">
 				<span>${the_title}</span>
-			</h3>
-		</hgroup>
+			</h2>
+		</div>
 
 		<#if !is_signed_in>
 			<a href="${sign_in_url}" id="sign-in" rel="nofollow">${sign_in_text}</a>
 		</#if>
 
-		<#if update_available_url??>
-			<div class="popup-alert-notice">
-				<a class="update-available" href="${update_available_url}"><@liferay.language key="updates-are-available-for-liferay" /></a>
-			</div>
-		</#if>
-
-		<#if has_navigation>
+		<#if has_navigation || is_signed_in>
 			<#include "${full_templates_path}/navigation.ftl" />
 		</#if>
 	</header>

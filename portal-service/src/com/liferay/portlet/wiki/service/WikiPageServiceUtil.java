@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -15,7 +15,6 @@
 package com.liferay.portlet.wiki.service;
 
 import com.liferay.portal.kernel.bean.PortalBeanLocatorUtil;
-import com.liferay.portal.kernel.util.MethodCache;
 import com.liferay.portal.kernel.util.ReferenceRegistry;
 
 /**
@@ -37,6 +36,25 @@ public class WikiPageServiceUtil {
 	 *
 	 * Never modify this class directly. Add custom service methods to {@link com.liferay.portlet.wiki.service.impl.WikiPageServiceImpl} and rerun ServiceBuilder to regenerate this class.
 	 */
+
+	/**
+	* Returns the Spring bean ID for this bean.
+	*
+	* @return the Spring bean ID for this bean
+	*/
+	public static java.lang.String getBeanIdentifier() {
+		return getService().getBeanIdentifier();
+	}
+
+	/**
+	* Sets the Spring bean ID for this bean.
+	*
+	* @param beanIdentifier the Spring bean ID for this bean
+	*/
+	public static void setBeanIdentifier(java.lang.String beanIdentifier) {
+		getService().setBeanIdentifier(beanIdentifier);
+	}
+
 	public static com.liferay.portlet.wiki.model.WikiPage addPage(long nodeId,
 		java.lang.String title, java.lang.String content,
 		java.lang.String summary, boolean minorEdit,
@@ -60,28 +78,29 @@ public class WikiPageServiceUtil {
 			parentTitle, redirectTitle, serviceContext);
 	}
 
-	public static void addPageAttachments(long nodeId, java.lang.String title,
-		java.util.List<com.liferay.portal.kernel.util.ObjectValuePair<java.lang.String, byte[]>> files)
+	public static void addPageAttachment(long nodeId, java.lang.String title,
+		java.lang.String fileName, java.io.File file)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException {
-		getService().addPageAttachments(nodeId, title, files);
+		getService().addPageAttachment(nodeId, title, fileName, file);
 	}
 
-	public static void addPageAttachment(long nodeId, java.lang.String title,
-		java.lang.String fileName, byte[] bytes)
+	public static void addPageAttachments(long nodeId, java.lang.String title,
+		java.util.List<com.liferay.portal.kernel.util.ObjectValuePair<java.lang.String, java.io.InputStream>> inputStream)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException {
-		getService().addPageAttachment(nodeId, title, fileName, bytes);
+		getService().addPageAttachments(nodeId, title, inputStream);
 	}
 
 	public static java.lang.String addTempPageAttachment(long nodeId,
 		java.lang.String fileName, java.lang.String tempFolderName,
-		java.io.File file)
+		java.io.InputStream inputStream)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException,
 			java.io.IOException {
 		return getService()
-				   .addTempPageAttachment(nodeId, fileName, tempFolderName, file);
+				   .addTempPageAttachment(nodeId, fileName, tempFolderName,
+			inputStream);
 	}
 
 	public static void changeParent(long nodeId, java.lang.String title,
@@ -229,20 +248,15 @@ public class WikiPageServiceUtil {
 
 			ReferenceRegistry.registerReference(WikiPageServiceUtil.class,
 				"_service");
-			MethodCache.remove(WikiPageService.class);
 		}
 
 		return _service;
 	}
 
+	/**
+	 * @deprecated
+	 */
 	public void setService(WikiPageService service) {
-		MethodCache.remove(WikiPageService.class);
-
-		_service = service;
-
-		ReferenceRegistry.registerReference(WikiPageServiceUtil.class,
-			"_service");
-		MethodCache.remove(WikiPageService.class);
 	}
 
 	private static WikiPageService _service;

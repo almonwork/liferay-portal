@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,7 +14,7 @@
 
 package com.liferay.portalweb.portal.controlpanel.pagetemplates;
 
-import com.liferay.portalweb.portal.BaseTests;
+import com.liferay.portalweb.portal.BaseTestSuite;
 
 import junit.framework.Test;
 import junit.framework.TestSuite;
@@ -22,11 +22,9 @@ import junit.framework.TestSuite;
 /**
  * @author Brian Wing Shun Chan
  */
-public class PageTemplatesTests extends BaseTests {
-
+public class PageTemplatesTests extends BaseTestSuite {
 	public static Test suite() {
 		TestSuite testSuite = new TestSuite();
-
 		testSuite.addTestSuite(AddPageTemplateTest.class);
 		testSuite.addTestSuite(DeactivatePageTemplateTest.class);
 		testSuite.addTestSuite(ActivatePageTemplateTest.class);
@@ -36,5 +34,4 @@ public class PageTemplatesTests extends BaseTests {
 
 		return testSuite;
 	}
-
 }

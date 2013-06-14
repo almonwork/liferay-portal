@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -33,7 +33,6 @@ List<Group> groups = (List<Group>)request.getAttribute("user.groups");
 <h3><liferay-ui:message key="sites" /></h3>
 
 <liferay-ui:search-container
-	id='<%= renderResponse.getNamespace() + "groupsSearchContainer" %>'
 	headerNames="name,roles,null"
 >
 	<liferay-ui:search-container-results
@@ -46,10 +45,11 @@ List<Group> groups = (List<Group>)request.getAttribute("user.groups");
 		escapedModel="<%= true %>"
 		keyProperty="groupId"
 		modelVar="group"
+		rowIdProperty="friendlyURL"
 	>
 		<liferay-ui:search-container-column-text
 			name="name"
-			value="<%= HtmlUtil.escape(group.getDescriptiveName()) %>"
+			value="<%= HtmlUtil.escape(group.getDescriptiveName(locale)) %>"
 		/>
 
 		<liferay-ui:search-container-column-text
@@ -60,18 +60,15 @@ List<Group> groups = (List<Group>)request.getAttribute("user.groups");
 			<%
 			List<UserGroupRole> userGroupRoles = UserGroupRoleLocalServiceUtil.getUserGroupRoles(selUser.getUserId(), group.getGroupId());
 
-			Iterator itr = userGroupRoles.iterator();
-
-			while (itr.hasNext()) {
-				UserGroupRole userGroupRole = (UserGroupRole)itr.next();
-
+			for (UserGroupRole userGroupRole : userGroupRoles) {
 				Role role = RoleLocalServiceUtil.getRole(userGroupRole.getRoleId());
 
 				buffer.append(HtmlUtil.escape(role.getTitle(locale)));
+				buffer.append(StringPool.COMMA_AND_SPACE);
+			}
 
-				if (itr.hasNext()) {
-					buffer.append(StringPool.COMMA_AND_SPACE);
-				}
+			if (!userGroupRoles.isEmpty()) {
+				buffer.setIndex(buffer.index() - 1);
 			}
 			%>
 

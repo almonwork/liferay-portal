@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,8 +14,9 @@
 
 package com.liferay.portal.tools;
 
-import com.liferay.portal.image.ImageProcessorImpl;
+import com.liferay.portal.image.ImageToolImpl;
 import com.liferay.portal.kernel.image.ImageBag;
+import com.liferay.portal.kernel.image.ImageTool;
 import com.liferay.portal.kernel.util.GetterUtil;
 
 import java.awt.image.RenderedImage;
@@ -63,19 +64,18 @@ public class ThumbnailBuilder {
 				}
 			}
 
-			ImageBag imageBag = _imageProcessorUtil.read(originalFile);
+			ImageBag imageBag = _imageToolUtil.read(originalFile);
 
-			RenderedImage thumbnail = _imageProcessorUtil.scale(
+			RenderedImage renderedImage = _imageToolUtil.scale(
 				imageBag.getRenderedImage(), height, width);
 
-			ImageIO.write(thumbnail, imageBag.getType(), thumbnailFile);
+			ImageIO.write(renderedImage, imageBag.getType(), thumbnailFile);
 		}
 		catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
 
-	private static ImageProcessorImpl _imageProcessorUtil =
-		ImageProcessorImpl.getInstance();
+	private static ImageTool _imageToolUtil = ImageToolImpl.getInstance();
 
 }

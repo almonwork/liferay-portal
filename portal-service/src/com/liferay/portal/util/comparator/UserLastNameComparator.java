@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -22,13 +22,13 @@ import com.liferay.portal.model.User;
  */
 public class UserLastNameComparator extends OrderByComparator {
 
-	public static String ORDER_BY_ASC =
-		"User_.lastName ASC, User_.firstName ASC, User_.middleName ASC";
+	public static final String ORDER_BY_ASC =
+		"lastName ASC, firstName ASC, middleName ASC";
 
-	public static String ORDER_BY_DESC =
-		"User_.lastName DESC, User_.firstName DESC, User_.middleName DESC";
+	public static final String ORDER_BY_DESC =
+		"lastName DESC, firstName DESC, middleName DESC";
 
-	public static String[] ORDER_BY_FIELDS = {
+	public static final String[] ORDER_BY_FIELDS = {
 		"lastName", "firstName", "middleName"
 	};
 

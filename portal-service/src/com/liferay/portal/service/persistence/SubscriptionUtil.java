@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -91,14 +91,6 @@ public class SubscriptionUtil {
 		return getPersistence()
 				   .findWithDynamicQuery(dynamicQuery, start, end,
 			orderByComparator);
-	}
-
-	/**
-	 * @see com.liferay.portal.service.persistence.BasePersistence#remove(com.liferay.portal.model.BaseModel)
-	 */
-	public static Subscription remove(Subscription subscription)
-		throws SystemException {
-		return getPersistence().remove(subscription);
 	}
 
 	/**
@@ -731,13 +723,15 @@ public class SubscriptionUtil {
 	* @param userId the user ID
 	* @param classNameId the class name ID
 	* @param classPK the class p k
+	* @return the subscription that was removed
 	* @throws SystemException if a system exception occurred
 	*/
-	public static void removeByC_U_C_C(long companyId, long userId,
-		long classNameId, long classPK)
+	public static com.liferay.portal.model.Subscription removeByC_U_C_C(
+		long companyId, long userId, long classNameId, long classPK)
 		throws com.liferay.portal.NoSuchSubscriptionException,
 			com.liferay.portal.kernel.exception.SystemException {
-		getPersistence().removeByC_U_C_C(companyId, userId, classNameId, classPK);
+		return getPersistence()
+				   .removeByC_U_C_C(companyId, userId, classNameId, classPK);
 	}
 
 	/**
@@ -829,11 +823,10 @@ public class SubscriptionUtil {
 		return _persistence;
 	}
 
+	/**
+	 * @deprecated
+	 */
 	public void setPersistence(SubscriptionPersistence persistence) {
-		_persistence = persistence;
-
-		ReferenceRegistry.registerReference(SubscriptionUtil.class,
-			"_persistence");
 	}
 
 	private static SubscriptionPersistence _persistence;

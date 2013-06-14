@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -91,14 +91,6 @@ public class PasswordPolicyRelUtil {
 		return getPersistence()
 				   .findWithDynamicQuery(dynamicQuery, start, end,
 			orderByComparator);
-	}
-
-	/**
-	 * @see com.liferay.portal.service.persistence.BasePersistence#remove(com.liferay.portal.model.BaseModel)
-	 */
-	public static PasswordPolicyRel remove(PasswordPolicyRel passwordPolicyRel)
-		throws SystemException {
-		return getPersistence().remove(passwordPolicyRel);
 	}
 
 	/**
@@ -490,12 +482,14 @@ public class PasswordPolicyRelUtil {
 	*
 	* @param classNameId the class name ID
 	* @param classPK the class p k
+	* @return the password policy rel that was removed
 	* @throws SystemException if a system exception occurred
 	*/
-	public static void removeByC_C(long classNameId, long classPK)
+	public static com.liferay.portal.model.PasswordPolicyRel removeByC_C(
+		long classNameId, long classPK)
 		throws com.liferay.portal.NoSuchPasswordPolicyRelException,
 			com.liferay.portal.kernel.exception.SystemException {
-		getPersistence().removeByC_C(classNameId, classPK);
+		return getPersistence().removeByC_C(classNameId, classPK);
 	}
 
 	/**
@@ -504,13 +498,15 @@ public class PasswordPolicyRelUtil {
 	* @param passwordPolicyId the password policy ID
 	* @param classNameId the class name ID
 	* @param classPK the class p k
+	* @return the password policy rel that was removed
 	* @throws SystemException if a system exception occurred
 	*/
-	public static void removeByP_C_C(long passwordPolicyId, long classNameId,
-		long classPK)
+	public static com.liferay.portal.model.PasswordPolicyRel removeByP_C_C(
+		long passwordPolicyId, long classNameId, long classPK)
 		throws com.liferay.portal.NoSuchPasswordPolicyRelException,
 			com.liferay.portal.kernel.exception.SystemException {
-		getPersistence().removeByP_C_C(passwordPolicyId, classNameId, classPK);
+		return getPersistence()
+				   .removeByP_C_C(passwordPolicyId, classNameId, classPK);
 	}
 
 	/**
@@ -586,11 +582,10 @@ public class PasswordPolicyRelUtil {
 		return _persistence;
 	}
 
+	/**
+	 * @deprecated
+	 */
 	public void setPersistence(PasswordPolicyRelPersistence persistence) {
-		_persistence = persistence;
-
-		ReferenceRegistry.registerReference(PasswordPolicyRelUtil.class,
-			"_persistence");
 	}
 
 	private static PasswordPolicyRelPersistence _persistence;

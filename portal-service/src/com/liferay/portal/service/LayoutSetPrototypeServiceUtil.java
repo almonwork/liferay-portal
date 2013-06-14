@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -15,7 +15,6 @@
 package com.liferay.portal.service;
 
 import com.liferay.portal.kernel.bean.PortalBeanLocatorUtil;
-import com.liferay.portal.kernel.util.MethodCache;
 import com.liferay.portal.kernel.util.ReferenceRegistry;
 
 /**
@@ -37,16 +36,35 @@ public class LayoutSetPrototypeServiceUtil {
 	 *
 	 * Never modify this class directly. Add custom service methods to {@link com.liferay.portal.service.impl.LayoutSetPrototypeServiceImpl} and rerun ServiceBuilder to regenerate this class.
 	 */
+
+	/**
+	* Returns the Spring bean ID for this bean.
+	*
+	* @return the Spring bean ID for this bean
+	*/
+	public static java.lang.String getBeanIdentifier() {
+		return getService().getBeanIdentifier();
+	}
+
+	/**
+	* Sets the Spring bean ID for this bean.
+	*
+	* @param beanIdentifier the Spring bean ID for this bean
+	*/
+	public static void setBeanIdentifier(java.lang.String beanIdentifier) {
+		getService().setBeanIdentifier(beanIdentifier);
+	}
+
 	public static com.liferay.portal.model.LayoutSetPrototype addLayoutSetPrototype(
 		java.util.Map<java.util.Locale, java.lang.String> nameMap,
 		java.lang.String description, boolean active,
-		boolean allowModifications, boolean allowLayoutAddition,
+		boolean layoutsUpdateable,
 		com.liferay.portal.service.ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException {
 		return getService()
 				   .addLayoutSetPrototype(nameMap, description, active,
-			allowModifications, allowLayoutAddition, serviceContext);
+			layoutsUpdateable, serviceContext);
 	}
 
 	public static void deleteLayoutSetPrototype(long layoutSetPrototypeId)
@@ -74,14 +92,13 @@ public class LayoutSetPrototypeServiceUtil {
 		long layoutSetPrototypeId,
 		java.util.Map<java.util.Locale, java.lang.String> nameMap,
 		java.lang.String description, boolean active,
-		boolean allowModifications, boolean allowLayoutAddition,
+		boolean layoutsUpdateable,
 		com.liferay.portal.service.ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException {
 		return getService()
 				   .updateLayoutSetPrototype(layoutSetPrototypeId, nameMap,
-			description, active, allowModifications, allowLayoutAddition,
-			serviceContext);
+			description, active, layoutsUpdateable, serviceContext);
 	}
 
 	public static com.liferay.portal.model.LayoutSetPrototype updateLayoutSetPrototype(
@@ -98,20 +115,15 @@ public class LayoutSetPrototypeServiceUtil {
 
 			ReferenceRegistry.registerReference(LayoutSetPrototypeServiceUtil.class,
 				"_service");
-			MethodCache.remove(LayoutSetPrototypeService.class);
 		}
 
 		return _service;
 	}
 
+	/**
+	 * @deprecated
+	 */
 	public void setService(LayoutSetPrototypeService service) {
-		MethodCache.remove(LayoutSetPrototypeService.class);
-
-		_service = service;
-
-		ReferenceRegistry.registerReference(LayoutSetPrototypeServiceUtil.class,
-			"_service");
-		MethodCache.remove(LayoutSetPrototypeService.class);
 	}
 
 	private static LayoutSetPrototypeService _service;

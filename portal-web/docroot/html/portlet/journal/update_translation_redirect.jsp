@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -35,7 +35,7 @@ if (cmd.equals(Constants.TRANSLATE)) {
 <aui:script use="aui-base">
 	var openingWindow = Liferay.Util.getOpener();
 
-	openingWindow.<portlet:namespace />postProcessTranslation('<%= HtmlUtil.escape(cmd) %>', '<%= article.getVersion() %>', '<%= HtmlUtil.escape(toLanguageId) %>', '<%= toLanguageDisplayName %>');
+	openingWindow.<portlet:namespace />postProcessTranslation('<%= System.currentTimeMillis() %>', '<%= HtmlUtil.escape(cmd) %>', '<%= article.getVersion() %>', '<%= HtmlUtil.escape(toLanguageId) %>', '<%= toLanguageDisplayName %>');
 
 	Liferay.fire(
 		'closeWindow',

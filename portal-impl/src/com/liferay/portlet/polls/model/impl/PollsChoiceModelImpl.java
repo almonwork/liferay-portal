@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -15,11 +15,11 @@
 package com.liferay.portlet.polls.model.impl;
 
 import com.liferay.portal.kernel.bean.AutoEscapeBeanHandler;
-import com.liferay.portal.kernel.language.LanguageUtil;
+import com.liferay.portal.kernel.json.JSON;
 import com.liferay.portal.kernel.util.GetterUtil;
-import com.liferay.portal.kernel.util.HtmlUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.LocalizationUtil;
+import com.liferay.portal.kernel.util.ProxyUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.Validator;
@@ -31,13 +31,15 @@ import com.liferay.portlet.expando.model.ExpandoBridge;
 import com.liferay.portlet.expando.util.ExpandoBridgeFactoryUtil;
 import com.liferay.portlet.polls.model.PollsChoice;
 import com.liferay.portlet.polls.model.PollsChoiceModel;
+import com.liferay.portlet.polls.model.PollsChoiceSoap;
 
 import java.io.Serializable;
 
-import java.lang.reflect.Proxy;
-
 import java.sql.Types;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
@@ -54,6 +56,7 @@ import java.util.Map;
  * @see com.liferay.portlet.polls.model.PollsChoiceModel
  * @generated
  */
+@JSON(strict = true)
 public class PollsChoiceModelImpl extends BaseModelImpl<PollsChoice>
 	implements PollsChoiceModel {
 	/*
@@ -82,13 +85,45 @@ public class PollsChoiceModelImpl extends BaseModelImpl<PollsChoice>
 	public static final boolean FINDER_CACHE_ENABLED = GetterUtil.getBoolean(com.liferay.portal.util.PropsUtil.get(
 				"value.object.finder.cache.enabled.com.liferay.portlet.polls.model.PollsChoice"),
 			true);
+	public static final boolean COLUMN_BITMASK_ENABLED = GetterUtil.getBoolean(com.liferay.portal.util.PropsUtil.get(
+				"value.object.column.bitmask.enabled.com.liferay.portlet.polls.model.PollsChoice"),
+			true);
+	public static long NAME_COLUMN_BITMASK = 1L;
+	public static long QUESTIONID_COLUMN_BITMASK = 2L;
+	public static long UUID_COLUMN_BITMASK = 4L;
 
-	public Class<?> getModelClass() {
-		return PollsChoice.class;
+	/**
+	 * Converts the soap model instance into a normal model instance.
+	 *
+	 * @param soapModel the soap model instance to convert
+	 * @return the normal model instance
+	 */
+	public static PollsChoice toModel(PollsChoiceSoap soapModel) {
+		PollsChoice model = new PollsChoiceImpl();
+
+		model.setUuid(soapModel.getUuid());
+		model.setChoiceId(soapModel.getChoiceId());
+		model.setQuestionId(soapModel.getQuestionId());
+		model.setName(soapModel.getName());
+		model.setDescription(soapModel.getDescription());
+
+		return model;
 	}
 
-	public String getModelClassName() {
-		return PollsChoice.class.getName();
+	/**
+	 * Converts the soap model instances into normal model instances.
+	 *
+	 * @param soapModels the soap model instances to convert
+	 * @return the normal model instances
+	 */
+	public static List<PollsChoice> toModels(PollsChoiceSoap[] soapModels) {
+		List<PollsChoice> models = new ArrayList<PollsChoice>(soapModels.length);
+
+		for (PollsChoiceSoap soapModel : soapModels) {
+			models.add(toModel(soapModel));
+		}
+
+		return models;
 	}
 
 	public static final long LOCK_EXPIRATION_TIME = GetterUtil.getLong(com.liferay.portal.util.PropsUtil.get(
@@ -113,6 +148,61 @@ public class PollsChoiceModelImpl extends BaseModelImpl<PollsChoice>
 		setPrimaryKey(((Long)primaryKeyObj).longValue());
 	}
 
+	public Class<?> getModelClass() {
+		return PollsChoice.class;
+	}
+
+	public String getModelClassName() {
+		return PollsChoice.class.getName();
+	}
+
+	@Override
+	public Map<String, Object> getModelAttributes() {
+		Map<String, Object> attributes = new HashMap<String, Object>();
+
+		attributes.put("uuid", getUuid());
+		attributes.put("choiceId", getChoiceId());
+		attributes.put("questionId", getQuestionId());
+		attributes.put("name", getName());
+		attributes.put("description", getDescription());
+
+		return attributes;
+	}
+
+	@Override
+	public void setModelAttributes(Map<String, Object> attributes) {
+		String uuid = (String)attributes.get("uuid");
+
+		if (uuid != null) {
+			setUuid(uuid);
+		}
+
+		Long choiceId = (Long)attributes.get("choiceId");
+
+		if (choiceId != null) {
+			setChoiceId(choiceId);
+		}
+
+		Long questionId = (Long)attributes.get("questionId");
+
+		if (questionId != null) {
+			setQuestionId(questionId);
+		}
+
+		String name = (String)attributes.get("name");
+
+		if (name != null) {
+			setName(name);
+		}
+
+		String description = (String)attributes.get("description");
+
+		if (description != null) {
+			setDescription(description);
+		}
+	}
+
+	@JSON
 	public String getUuid() {
 		if (_uuid == null) {
 			return StringPool.BLANK;
@@ -123,9 +213,18 @@ public class PollsChoiceModelImpl extends BaseModelImpl<PollsChoice>
 	}
 
 	public void setUuid(String uuid) {
+		if (_originalUuid == null) {
+			_originalUuid = _uuid;
+		}
+
 		_uuid = uuid;
 	}
 
+	public String getOriginalUuid() {
+		return GetterUtil.getString(_originalUuid);
+	}
+
+	@JSON
 	public long getChoiceId() {
 		return _choiceId;
 	}
@@ -134,11 +233,14 @@ public class PollsChoiceModelImpl extends BaseModelImpl<PollsChoice>
 		_choiceId = choiceId;
 	}
 
+	@JSON
 	public long getQuestionId() {
 		return _questionId;
 	}
 
 	public void setQuestionId(long questionId) {
+		_columnBitmask = -1L;
+
 		if (!_setOriginalQuestionId) {
 			_setOriginalQuestionId = true;
 
@@ -152,6 +254,7 @@ public class PollsChoiceModelImpl extends BaseModelImpl<PollsChoice>
 		return _originalQuestionId;
 	}
 
+	@JSON
 	public String getName() {
 		if (_name == null) {
 			return StringPool.BLANK;
@@ -162,6 +265,8 @@ public class PollsChoiceModelImpl extends BaseModelImpl<PollsChoice>
 	}
 
 	public void setName(String name) {
+		_columnBitmask = -1L;
+
 		if (_originalName == null) {
 			_originalName = _name;
 		}
@@ -173,6 +278,7 @@ public class PollsChoiceModelImpl extends BaseModelImpl<PollsChoice>
 		return GetterUtil.getString(_originalName);
 	}
 
+	@JSON
 	public String getDescription() {
 		if (_description == null) {
 			return StringPool.BLANK;
@@ -195,27 +301,23 @@ public class PollsChoiceModelImpl extends BaseModelImpl<PollsChoice>
 	}
 
 	public String getDescription(String languageId) {
-		String value = LocalizationUtil.getLocalization(getDescription(),
-				languageId);
-
-		if (isEscapedModel()) {
-			return HtmlUtil.escape(value);
-		}
-		else {
-			return value;
-		}
+		return LocalizationUtil.getLocalization(getDescription(), languageId);
 	}
 
 	public String getDescription(String languageId, boolean useDefault) {
-		String value = LocalizationUtil.getLocalization(getDescription(),
-				languageId, useDefault);
+		return LocalizationUtil.getLocalization(getDescription(), languageId,
+			useDefault);
+	}
 
-		if (isEscapedModel()) {
-			return HtmlUtil.escape(value);
-		}
-		else {
-			return value;
-		}
+	public String getDescriptionCurrentLanguageId() {
+		return _descriptionCurrentLanguageId;
+	}
+
+	@JSON
+	public String getDescriptionCurrentValue() {
+		Locale locale = getLocale(_descriptionCurrentLanguageId);
+
+		return getDescription(locale);
 	}
 
 	public Map<Locale, String> getDescriptionMap() {
@@ -246,6 +348,10 @@ public class PollsChoiceModelImpl extends BaseModelImpl<PollsChoice>
 		}
 	}
 
+	public void setDescriptionCurrentLanguageId(String languageId) {
+		_descriptionCurrentLanguageId = languageId;
+	}
+
 	public void setDescriptionMap(Map<Locale, String> descriptionMap) {
 		setDescriptionMap(descriptionMap, LocaleUtil.getDefault());
 	}
@@ -256,44 +362,37 @@ public class PollsChoiceModelImpl extends BaseModelImpl<PollsChoice>
 			return;
 		}
 
-		Locale[] locales = LanguageUtil.getAvailableLocales();
+		setDescription(LocalizationUtil.updateLocalization(descriptionMap,
+				getDescription(), "Description",
+				LocaleUtil.toLanguageId(defaultLocale)));
+	}
 
-		for (Locale locale : locales) {
-			String description = descriptionMap.get(locale);
-
-			setDescription(description, locale, defaultLocale);
-		}
+	public long getColumnBitmask() {
+		return _columnBitmask;
 	}
 
 	@Override
 	public PollsChoice toEscapedModel() {
-		if (isEscapedModel()) {
-			return (PollsChoice)this;
+		if (_escapedModelProxy == null) {
+			_escapedModelProxy = (PollsChoice)ProxyUtil.newProxyInstance(_classLoader,
+					_escapedModelProxyInterfaces,
+					new AutoEscapeBeanHandler(this));
 		}
-		else {
-			if (_escapedModelProxy == null) {
-				_escapedModelProxy = (PollsChoice)Proxy.newProxyInstance(_classLoader,
-						_escapedModelProxyInterfaces,
-						new AutoEscapeBeanHandler(this));
-			}
 
-			return _escapedModelProxy;
-		}
+		return _escapedModelProxy;
 	}
 
 	@Override
 	public ExpandoBridge getExpandoBridge() {
-		if (_expandoBridge == null) {
-			_expandoBridge = ExpandoBridgeFactoryUtil.getExpandoBridge(0,
-					PollsChoice.class.getName(), getPrimaryKey());
-		}
-
-		return _expandoBridge;
+		return ExpandoBridgeFactoryUtil.getExpandoBridge(0,
+			PollsChoice.class.getName(), getPrimaryKey());
 	}
 
 	@Override
 	public void setExpandoBridgeAttributes(ServiceContext serviceContext) {
-		getExpandoBridge().setAttributes(serviceContext);
+		ExpandoBridge expandoBridge = getExpandoBridge();
+
+		expandoBridge.setAttributes(serviceContext);
 	}
 
 	@Override
@@ -371,11 +470,15 @@ public class PollsChoiceModelImpl extends BaseModelImpl<PollsChoice>
 	public void resetOriginalValues() {
 		PollsChoiceModelImpl pollsChoiceModelImpl = this;
 
+		pollsChoiceModelImpl._originalUuid = pollsChoiceModelImpl._uuid;
+
 		pollsChoiceModelImpl._originalQuestionId = pollsChoiceModelImpl._questionId;
 
 		pollsChoiceModelImpl._setOriginalQuestionId = false;
 
 		pollsChoiceModelImpl._originalName = pollsChoiceModelImpl._name;
+
+		pollsChoiceModelImpl._columnBitmask = 0;
 	}
 
 	@Override
@@ -470,6 +573,7 @@ public class PollsChoiceModelImpl extends BaseModelImpl<PollsChoice>
 			PollsChoice.class
 		};
 	private String _uuid;
+	private String _originalUuid;
 	private long _choiceId;
 	private long _questionId;
 	private long _originalQuestionId;
@@ -477,6 +581,7 @@ public class PollsChoiceModelImpl extends BaseModelImpl<PollsChoice>
 	private String _name;
 	private String _originalName;
 	private String _description;
-	private transient ExpandoBridge _expandoBridge;
+	private String _descriptionCurrentLanguageId;
+	private long _columnBitmask;
 	private PollsChoice _escapedModelProxy;
 }

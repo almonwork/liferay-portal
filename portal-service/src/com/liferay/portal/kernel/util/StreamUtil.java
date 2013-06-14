@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -33,8 +33,10 @@ import java.nio.channels.FileChannel;
 public class StreamUtil {
 
 	public static final int BUFFER_SIZE = GetterUtil.getInteger(
-		System.getProperty(StreamUtil.class.getName() + ".buffer.size"),
-		8192);
+		System.getProperty(StreamUtil.class.getName() + ".buffer.size"), 8192);
+
+	public static final boolean FORCE_TIO = GetterUtil.getBoolean(
+		System.getProperty(StreamUtil.class.getName() + ".force.tio"));
 
 	public static void cleanUp(Channel channel) {
 		try {
@@ -124,6 +126,14 @@ public class StreamUtil {
 			boolean cleanUp)
 		throws IOException {
 
+		transfer(inputStream, outputStream, bufferSize, cleanUp, 0);
+	}
+
+	public static void transfer(
+			InputStream inputStream, OutputStream outputStream, int bufferSize,
+			boolean cleanUp, long length)
+		throws IOException {
+
 		if (inputStream == null) {
 			throw new IllegalArgumentException("Input stream cannot be null");
 		}
@@ -136,43 +146,88 @@ public class StreamUtil {
 			bufferSize = BUFFER_SIZE;
 		}
 
-		if ((inputStream instanceof FileInputStream) &&
-			(outputStream instanceof FileOutputStream)) {
+		try {
+			if (!FORCE_TIO && (inputStream instanceof FileInputStream) &&
+				(outputStream instanceof FileOutputStream)) {
 
-			FileInputStream fileInputStream = (FileInputStream)inputStream;
+				FileInputStream fileInputStream = (FileInputStream)inputStream;
+				FileOutputStream fileOutputStream =
+					(FileOutputStream)outputStream;
 
-			FileChannel sourceChannel = fileInputStream.getChannel();
-
-			FileOutputStream fileOutputStream = (FileOutputStream)outputStream;
-
-			FileChannel targetChannel = fileOutputStream.getChannel();
-
-			long position = 0;
-
-			while (position < sourceChannel.size()) {
-				position += sourceChannel.transferTo(
-					position, sourceChannel.size() - position, targetChannel);
+				transferFileChannel(
+					fileInputStream.getChannel(), fileOutputStream.getChannel(),
+					length);
 			}
-
+			else {
+				transferByteArray(
+					inputStream, outputStream, bufferSize, length);
+			}
+		}
+		finally {
 			if (cleanUp) {
-				cleanUp(fileInputStream, fileOutputStream);
+				cleanUp(inputStream, outputStream);
+			}
+		}
+	}
+
+	public static void transfer(
+			InputStream inputStream, OutputStream outputStream, long length)
+		throws IOException {
+
+		transfer(inputStream, outputStream, BUFFER_SIZE, true, length);
+	}
+
+	protected static void transferByteArray(
+			InputStream inputStream, OutputStream outputStream, int bufferSize,
+			long length)
+		throws IOException {
+
+		byte[] bytes = new byte[bufferSize];
+
+		long remainingLength = length;
+
+		if (remainingLength > 0) {
+			while (remainingLength > 0) {
+				int readBytes = inputStream.read(
+					bytes, 0, (int)Math.min(remainingLength, bufferSize));
+
+				if (readBytes == -1) {
+					break;
+				}
+
+				outputStream.write(bytes, 0, readBytes);
+
+				remainingLength -= readBytes;
 			}
 		}
 		else {
-			try {
-				byte[] bytes = new byte[bufferSize];
+			int value = -1;
 
-				int value = -1;
+			while ((value = inputStream.read(bytes)) != -1) {
+				outputStream.write(bytes, 0, value);
+			}
+		}
+	}
 
-				while ((value = inputStream.read(bytes)) != -1) {
-					outputStream.write(bytes, 0 , value);
-				}
-			}
-			finally {
-				if (cleanUp) {
-					cleanUp(inputStream, outputStream);
-				}
-			}
+	protected static void transferFileChannel(
+			FileChannel inputFileChannel, FileChannel outputFileChannel,
+			long length)
+		throws IOException {
+
+		long size = 0;
+
+		if (length > 0) {
+			size = length;
+		}
+		else {
+			size = inputFileChannel.size();
+		}
+
+		long position = 0;
+
+		while (position < size) {
+			position += inputFileChannel.transferTo(
+				position, size - position, outputFileChannel);
 		}
 	}
 

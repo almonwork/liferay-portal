@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -54,6 +54,19 @@ public interface BasePersistence<T extends BaseModel<T>> {
 	 * </p>
 	 */
 	public void clearCache();
+
+	/**
+	 * Clears the cache for a List instances of this model.
+	 *
+	 * <p>
+	 * The {@link com.liferay.portal.kernel.dao.orm.EntityCache} and {@link
+	 * com.liferay.portal.kernel.dao.orm.FinderCache} are both cleared by this
+	 * method.
+	 * </p>
+	 *
+	 * @param modelList the List instances of this model to clear the cache for
+	 */
+	public void clearCache(List<T> modelList);
 
 	/**
 	 * Clears the cache for one instance of this model.

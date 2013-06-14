@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -68,6 +68,14 @@ public class OrganizationFinderUtil {
 				   .countByC_PO_N_T_S_C_Z_R_C(companyId, parentOrganizationId,
 			parentOrganizationIdComparator, names, type, streets, cities, zips,
 			regionId, countryId, params, andOperator);
+	}
+
+	public static java.util.List<com.liferay.portal.model.Organization> findByCompanyId(
+		long companyId,
+		java.util.LinkedHashMap<java.lang.String, java.lang.Object> params,
+		int start, int end, com.liferay.portal.kernel.util.OrderByComparator obc)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getFinder().findByCompanyId(companyId, params, start, end, obc);
 	}
 
 	public static java.util.List<com.liferay.portal.model.Organization> findByKeywords(

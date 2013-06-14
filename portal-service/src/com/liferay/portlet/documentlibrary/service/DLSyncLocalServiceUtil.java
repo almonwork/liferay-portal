@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -15,7 +15,6 @@
 package com.liferay.portlet.documentlibrary.service;
 
 import com.liferay.portal.kernel.bean.PortalBeanLocatorUtil;
-import com.liferay.portal.kernel.util.MethodCache;
 import com.liferay.portal.kernel.util.ReferenceRegistry;
 
 /**
@@ -66,25 +65,32 @@ public class DLSyncLocalServiceUtil {
 	* Deletes the d l sync with the primary key from the database. Also notifies the appropriate model listeners.
 	*
 	* @param syncId the primary key of the d l sync
+	* @return the d l sync that was removed
 	* @throws PortalException if a d l sync with the primary key could not be found
 	* @throws SystemException if a system exception occurred
 	*/
-	public static void deleteDLSync(long syncId)
+	public static com.liferay.portlet.documentlibrary.model.DLSync deleteDLSync(
+		long syncId)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException {
-		getService().deleteDLSync(syncId);
+		return getService().deleteDLSync(syncId);
 	}
 
 	/**
 	* Deletes the d l sync from the database. Also notifies the appropriate model listeners.
 	*
 	* @param dlSync the d l sync
+	* @return the d l sync that was removed
 	* @throws SystemException if a system exception occurred
 	*/
-	public static void deleteDLSync(
+	public static com.liferay.portlet.documentlibrary.model.DLSync deleteDLSync(
 		com.liferay.portlet.documentlibrary.model.DLSync dlSync)
 		throws com.liferay.portal.kernel.exception.SystemException {
-		getService().deleteDLSync(dlSync);
+		return getService().deleteDLSync(dlSync);
+	}
+
+	public static com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery() {
+		return getService().dynamicQuery();
 	}
 
 	/**
@@ -156,6 +162,11 @@ public class DLSyncLocalServiceUtil {
 		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery)
 		throws com.liferay.portal.kernel.exception.SystemException {
 		return getService().dynamicQueryCount(dynamicQuery);
+	}
+
+	public static com.liferay.portlet.documentlibrary.model.DLSync fetchDLSync(
+		long syncId) throws com.liferay.portal.kernel.exception.SystemException {
+		return getService().fetchDLSync(syncId);
 	}
 
 	/**
@@ -254,18 +265,55 @@ public class DLSyncLocalServiceUtil {
 		getService().setBeanIdentifier(beanIdentifier);
 	}
 
+	/**
+	* @deprecated {@link #addSync(long, String, long, long, long, String,
+	String, String, String)}
+	*/
 	public static com.liferay.portlet.documentlibrary.model.DLSync addSync(
-		java.lang.String fileId, long companyId, long repositoryId,
-		java.lang.String type)
-		throws com.liferay.portal.kernel.exception.SystemException {
-		return getService().addSync(fileId, companyId, repositoryId, type);
+		long fileId, java.lang.String fileUuid, long companyId,
+		long repositoryId, long parentFolderId, java.lang.String name,
+		java.lang.String type, java.lang.String version)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException {
+		return getService()
+				   .addSync(fileId, fileUuid, companyId, repositoryId,
+			parentFolderId, name, type, version);
+	}
+
+	public static com.liferay.portlet.documentlibrary.model.DLSync addSync(
+		long fileId, java.lang.String fileUuid, long companyId,
+		long repositoryId, long parentFolderId, java.lang.String name,
+		java.lang.String description, java.lang.String type,
+		java.lang.String version)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException {
+		return getService()
+				   .addSync(fileId, fileUuid, companyId, repositoryId,
+			parentFolderId, name, description, type, version);
+	}
+
+	/**
+	* @deprecated {@link #updateSync(long, long, String, String, String,
+	String)}
+	*/
+	public static com.liferay.portlet.documentlibrary.model.DLSync updateSync(
+		long fileId, long parentFolderId, java.lang.String name,
+		java.lang.String event, java.lang.String version)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException {
+		return getService()
+				   .updateSync(fileId, parentFolderId, name, event, version);
 	}
 
 	public static com.liferay.portlet.documentlibrary.model.DLSync updateSync(
-		java.lang.String fileId, java.lang.String event)
+		long fileId, long parentFolderId, java.lang.String name,
+		java.lang.String description, java.lang.String event,
+		java.lang.String version)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException {
-		return getService().updateSync(fileId, event);
+		return getService()
+				   .updateSync(fileId, parentFolderId, name, description,
+			event, version);
 	}
 
 	public static DLSyncLocalService getService() {
@@ -274,20 +322,15 @@ public class DLSyncLocalServiceUtil {
 
 			ReferenceRegistry.registerReference(DLSyncLocalServiceUtil.class,
 				"_service");
-			MethodCache.remove(DLSyncLocalService.class);
 		}
 
 		return _service;
 	}
 
+	/**
+	 * @deprecated
+	 */
 	public void setService(DLSyncLocalService service) {
-		MethodCache.remove(DLSyncLocalService.class);
-
-		_service = service;
-
-		ReferenceRegistry.registerReference(DLSyncLocalServiceUtil.class,
-			"_service");
-		MethodCache.remove(DLSyncLocalService.class);
 	}
 
 	private static DLSyncLocalService _service;

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -29,6 +29,10 @@ import java.util.List;
  * @author Raymond Augé
  */
 public class ContentHits {
+
+	public boolean isShowListed() {
+		return _showListed;
+	}
 
 	public void recordHits(
 			Hits hits, long groupId, boolean privateLayout, int start, int end)
@@ -79,10 +83,6 @@ public class ContentHits {
 		hits.setSearchTime(
 			(float)(System.currentTimeMillis() - hits.getStart()) /
 				Time.SECOND);
-	}
-
-	public boolean isShowListed() {
-		return _showListed;
 	}
 
 	public void setShowListed(boolean showListed) {

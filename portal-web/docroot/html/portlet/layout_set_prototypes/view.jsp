@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -24,6 +24,8 @@ PortletURL portletURL = renderResponse.createRenderURL();
 portletURL.setParameter("struts_action", "/layout_set_prototypes/view");
 %>
 
+<liferay-ui:error exception="<%= RequiredLayoutSetPrototypeException.class %>" message="you-cannot-delete-site-templates-that-are-used-by-a-site" />
+
 <liferay-util:include page="/html/portlet/layout_set_prototypes/toolbar.jsp">
 	<liferay-util:param name="toolbarItem" value="view-all" />
 </liferay-util:include>
@@ -34,8 +36,8 @@ portletURL.setParameter("struts_action", "/layout_set_prototypes/view");
 	<aui:input name="redirect" type="hidden" value="<%= portletURL.toString() %>" />
 
 	<liferay-ui:search-container
-		searchContainer='<%= new SearchContainer(renderRequest, null, null, SearchContainer.DEFAULT_CUR_PARAM, SearchContainer.DEFAULT_DELTA, portletURL, null, LanguageUtil.get(pageContext, "no-site-templates-were-found")) %>'
 		headerNames="name"
+		searchContainer='<%= new SearchContainer(renderRequest, null, null, SearchContainer.DEFAULT_CUR_PARAM, SearchContainer.DEFAULT_DELTA, portletURL, null, LanguageUtil.get(pageContext, "no-site-templates-were-found")) %>'
 	>
 		<aui:input name="deleteLayoutSetPrototypesIds" type="hidden" />
 
@@ -80,3 +82,31 @@ portletURL.setParameter("struts_action", "/layout_set_prototypes/view");
 		<liferay-ui:search-iterator />
 	</liferay-ui:search-container>
 </aui:form>
+
+<aui:script use="aui-base,aui-dialog">
+	A.getBody().delegate(
+		'click',
+		function(event){
+			event.preventDefault();
+
+			var link = event.currentTarget;
+			var title = link.get('text');
+
+			Liferay.Util.openWindow(
+				{
+					dialog:
+						{
+							centered: true,
+							constrain: true,
+							modal: true,
+							width: 600
+						},
+					id: '<portlet:namespace />' + title,
+					title: title,
+					uri: link.attr('href')
+				}
+			);
+		},
+		'.layoutset-prototype-action a'
+	);
+</aui:script>

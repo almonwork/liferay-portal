@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -37,13 +37,14 @@ import java.util.List;
 public class RatingsEntryFinderImpl
 	extends BasePersistenceImpl<RatingsEntry> implements RatingsEntryFinder {
 
-	public static String FIND_BY_U_C_C =
+	public static final String FIND_BY_U_C_C =
 		RatingsEntryFinder.class.getName() + ".findByU_C_C";
 
 	public static final FinderPath FINDER_PATH_FIND_BY_U_C_C = new FinderPath(
 		RatingsEntryModelImpl.ENTITY_CACHE_ENABLED,
 		RatingsEntryModelImpl.FINDER_CACHE_ENABLED, RatingsEntryImpl.class,
-		RatingsEntryPersistenceImpl.FINDER_CLASS_NAME_LIST, "findByU_C_C",
+		RatingsEntryPersistenceImpl.FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION,
+		"findByU_C_C",
 		new String[] {
 			Long.class.getName(), Long.class.getName(), List.class.getName()
 		});
@@ -60,41 +61,56 @@ public class RatingsEntryFinderImpl
 		List<RatingsEntry> list = (List<RatingsEntry>)FinderCacheUtil.getResult(
 			FINDER_PATH_FIND_BY_U_C_C, finderArgs, this);
 
-		if (list == null) {
-			Session session = null;
+		if ((list != null) && !list.isEmpty()) {
+			for (RatingsEntry ratingsEntry : list) {
+				if ((userId != ratingsEntry.getUserId()) ||
+					(classNameId != ratingsEntry.getClassNameId()) ||
+					!classPKs.contains(ratingsEntry.getClassPK())) {
 
-			try {
-				session = openSession();
+					list = null;
 
-				String sql = CustomSQLUtil.get(FIND_BY_U_C_C);
-
-				sql = StringUtil.replace(
-					sql, "[$CLASS_PKS$]", StringUtil.merge(classPKs));
-
-				SQLQuery q = session.createSQLQuery(sql);
-
-				q.addEntity("RatingsEntry", RatingsEntryImpl.class);
-
-				QueryPos qPos = QueryPos.getInstance(q);
-
-				qPos.add(userId);
-				qPos.add(classNameId);
-
-				list = q.list();
-			}
-			catch (Exception e) {
-				throw new SystemException(e);
-			}
-			finally {
-				if (list == null) {
-					list = new ArrayList<RatingsEntry>();
+					break;
 				}
-
-				FinderCacheUtil.putResult(
-					FINDER_PATH_FIND_BY_U_C_C, finderArgs, list);
-
-				closeSession(session);
 			}
+		}
+
+		if (list != null) {
+			return list;
+		}
+
+		Session session = null;
+
+		try {
+			session = openSession();
+
+			String sql = CustomSQLUtil.get(FIND_BY_U_C_C);
+
+			sql = StringUtil.replace(
+				sql, "[$CLASS_PKS$]", StringUtil.merge(classPKs));
+
+			SQLQuery q = session.createSQLQuery(sql);
+
+			q.addEntity("RatingsEntry", RatingsEntryImpl.class);
+
+			QueryPos qPos = QueryPos.getInstance(q);
+
+			qPos.add(userId);
+			qPos.add(classNameId);
+
+			list = q.list(true);
+		}
+		catch (Exception e) {
+			throw new SystemException(e);
+		}
+		finally {
+			if (list == null) {
+				list = new ArrayList<RatingsEntry>();
+			}
+
+			FinderCacheUtil.putResult(
+				FINDER_PATH_FIND_BY_U_C_C, finderArgs, list);
+
+			closeSession(session);
 		}
 
 		return list;

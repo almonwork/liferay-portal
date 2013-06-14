@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -16,11 +16,13 @@ package com.liferay.portal.service.permission;
 
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
+import com.liferay.portal.kernel.security.pacl.permission.PortalRuntimePermission;
 import com.liferay.portal.model.Team;
 import com.liferay.portal.security.permission.PermissionChecker;
 
 /**
  * @author Brian Wing Shun Chan
+ * @author Raymond Augé
  */
 public class TeamPermissionUtil {
 
@@ -54,15 +56,17 @@ public class TeamPermissionUtil {
 	}
 
 	public static TeamPermission getTeamPermission() {
-		return _userGroupPermission;
+		PortalRuntimePermission.checkGetBeanProperty(TeamPermissionUtil.class);
+
+		return _teamPermission;
 	}
 
-	public void setTeamPermission(
-		TeamPermission userGroupPermission) {
+	public void setTeamPermission(TeamPermission teamPermission) {
+		PortalRuntimePermission.checkSetBeanProperty(getClass());
 
-		_userGroupPermission = userGroupPermission;
+		_teamPermission = teamPermission;
 	}
 
-	private static TeamPermission _userGroupPermission;
+	private static TeamPermission _teamPermission;
 
 }

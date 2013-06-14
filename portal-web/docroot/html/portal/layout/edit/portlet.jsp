@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -16,9 +16,10 @@
 
 <%@ include file="/html/portal/layout/edit/init.jsp" %>
 
-<div id="<portlet:namespace />copyPortletsFromPage" class="aui-helper-hidden">
+<div class="aui-helper-hidden" id="<portlet:namespace />copyPortletsFromPage">
+
 	<p>
-		<liferay-ui:message key="the-portlets-in-page-x-will-be-replaced-with-the-portlets-in-the-page-you-select-below" arguments="<%= HtmlUtil.escape(selLayout.getName(locale)) %>" />
+		<liferay-ui:message arguments="<%= HtmlUtil.escape(selLayout.getName(locale)) %>" key="the-portlets-in-page-x-will-be-replaced-with-the-portlets-in-the-page-you-select-below" />
 	</p>
 
 	<aui:select label="copy-from-page" name="copyLayoutId" showEmptyOption="<%= true %>">
@@ -74,66 +75,65 @@
 	</aui:button-row>
 </div>
 
-<aui:script use="aui-button-item,aui-dialog">
-	var content = A.one('#<portlet:namespace />copyPortletsFromPage');
+<c:if test="<%= LayoutPermissionUtil.contains(permissionChecker, selLayout, ActionKeys.UPDATE) %>">
+	<aui:script use="aui-button-item,aui-dialog">
+		var content = A.one('#<portlet:namespace />copyPortletsFromPage');
 
-	var popUp = null;
-
-	var button = new A.ButtonItem(
-		{
-			handler: function(event) {
-				if (!popUp) {
-					 popUp = new A.Dialog(
+		var button = new A.ButtonItem(
+			{
+				handler: function(event) {
+					var popUp = new A.Dialog(
 						{
+							align: Liferay.Util.Window.ALIGN_CENTER,
 							bodyContent: content.show(),
-							centered: true,
-							title: '<liferay-ui:message key="copy-portlets-from-page" />',
+							destroyOnClose: true,
 							modal: true,
+							title: '<%= UnicodeLanguageUtil.get(pageContext, "copy-portlets-from-page") %>',
 							width: 500
 						}
 					).render();
-				}
 
-				popUp.show();
+					popUp.show();
 
-				var submitButton = popUp.get('contentBox').one('#<portlet:namespace />copySubmitButton');
+					var submitButton = popUp.get('contentBox').one('#<portlet:namespace />copySubmitButton');
 
-				if (submitButton) {
-					submitButton.on(
-						'click',
-						function(event) {
-							popUp.close();
+					if (submitButton) {
+						submitButton.on(
+							'click',
+							function(event) {
+								popUp.close();
 
-							var form = A.one('#<portlet:namespace />fm');
+								var form = A.one('#<portlet:namespace />fm');
 
-							if (form) {
-								form.append(content);
+								if (form) {
+									form.append(content);
+								}
+
+								<portlet:namespace />saveLayout();
 							}
+						);
+					}
+				},
+				icon: 'copy',
+				label: '<%= UnicodeLanguageUtil.get(pageContext, "copy-portlets-from-page") %>'
+			}
+		);
 
-							<portlet:namespace />saveLayout();
-						}
-					);
-				}
-			},
-			icon: 'copy',
-			label: '<liferay-ui:message key="copy-portlets-from-page" />'
+		var buttonRow = A.one('#<portlet:namespace />layoutToolbar');
+
+		if (buttonRow) {
+			var layoutToolbar = buttonRow.getData('layoutToolbar');
+
+			if (layoutToolbar) {
+				layoutToolbar.add(button);
+			}
 		}
-	);
 
-	var buttonRow = A.one('#<portlet:namespace />layoutToolbar');
-
-	if (buttonRow) {
-		var layoutToolbar = buttonRow.getData('layoutToolbar');
-
-		if (layoutToolbar) {
-			layoutToolbar.add(button);
-		}
-	}
-
-	Liferay.on(
-		'<portlet:namespace />toggleLayoutTypeFields',
-		function(event) {
-			button.toggle(event.type == 'portlet');
-		}
-	);
-</aui:script>
+		Liferay.on(
+			'<portlet:namespace />toggleLayoutTypeFields',
+			function(event) {
+				button.toggle(event.type == 'portlet');
+			}
+		);
+	</aui:script>
+</c:if>

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -22,6 +22,7 @@ import com.liferay.portal.CompanyMxException;
 import com.liferay.portal.CompanyVirtualHostException;
 import com.liferay.portal.CompanyWebIdException;
 import com.liferay.portal.EmailAddressException;
+import com.liferay.portal.LocaleException;
 import com.liferay.portal.NoSuchCountryException;
 import com.liferay.portal.NoSuchListTypeException;
 import com.liferay.portal.NoSuchRegionException;
@@ -89,7 +90,7 @@ public class EditCompanyAction extends PortletAction {
 		}
 		catch (Exception e) {
 			if (e instanceof PrincipalException) {
-				SessionErrors.add(actionRequest, e.getClass().getName());
+				SessionErrors.add(actionRequest, e.getClass());
 
 				setForward(actionRequest, "portlet.portal_settings.error");
 			}
@@ -101,6 +102,7 @@ public class EditCompanyAction extends PortletAction {
 					 e instanceof CompanyVirtualHostException ||
 					 e instanceof CompanyWebIdException ||
 					 e instanceof EmailAddressException ||
+					 e instanceof LocaleException ||
 					 e instanceof NoSuchCountryException ||
 					 e instanceof NoSuchListTypeException ||
 					 e instanceof NoSuchRegionException ||
@@ -115,7 +117,7 @@ public class EditCompanyAction extends PortletAction {
 						e.getClass().getName() + nslte.getType());
 				}
 				else {
-					SessionErrors.add(actionRequest, e.getClass().getName(), e);
+					SessionErrors.add(actionRequest, e.getClass(), e);
 				}
 
 				setForward(
@@ -169,6 +171,8 @@ public class EditCompanyAction extends PortletAction {
 			legalType, sicCode, tickerSymbol, industry, type, size, languageId,
 			timeZoneId, addresses, emailAddresses, phones, websites,
 			properties);
+
+		PortalUtil.resetCDNHosts();
 	}
 
 	protected void updateDisplay(ActionRequest actionRequest) throws Exception {
@@ -240,8 +244,7 @@ public class EditCompanyAction extends PortletAction {
 		else if (Validator.isNull(casServerURL) &&
 				 Validator.isNull(casServiceURL)) {
 
-			SessionErrors.add(
-				actionRequest, "casServerURLAndServiceURLNotSet");
+			SessionErrors.add(actionRequest, "casServerURLAndServiceURLNotSet");
 		}
 		else {
 			if (Validator.isNotNull(casServerURL) &&

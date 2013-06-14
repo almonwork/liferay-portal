@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -72,52 +72,7 @@ request.setAttribute("view.jsp-portletURL", portletURL);
 
 <c:choose>
 	<c:when test='<%= topLink.equals("message-boards-home") %>'>
-		<c:if test="<%= category == null %>">
-			<div class="category-subscriptions">
-				<div class="category-subscription-types">
-					<liferay-ui:icon
-						image="rss"
-						label="<%= true %>"
-						method="get"
-						target="_blank"
-						url="<%= rssURL.toString() %>"
-					/>
-
-					<c:if test="<%= MBPermission.contains(permissionChecker, scopeGroupId, ActionKeys.SUBSCRIBE) %>">
-						<c:choose>
-							<c:when test="<%= SubscriptionLocalServiceUtil.isSubscribed(user.getCompanyId(), user.getUserId(), MBCategory.class.getName(), scopeGroupId) %>">
-								<portlet:actionURL var="unsubscribeURL">
-									<portlet:param name="struts_action" value="/message_boards/edit_category" />
-									<portlet:param name="<%= Constants.CMD %>" value="<%= Constants.UNSUBSCRIBE %>" />
-									<portlet:param name="redirect" value="<%= currentURL %>" />
-									<portlet:param name="mbCategoryId" value="<%= String.valueOf(MBCategoryConstants.DEFAULT_PARENT_CATEGORY_ID) %>" />
-								</portlet:actionURL>
-
-								<liferay-ui:icon
-									image="unsubscribe"
-									label="<%= true %>"
-									url="<%= unsubscribeURL %>"
-								/>
-							</c:when>
-							<c:otherwise>
-								<portlet:actionURL var="subscribeURL">
-									<portlet:param name="struts_action" value="/message_boards/edit_category" />
-									<portlet:param name="<%= Constants.CMD %>" value="<%= Constants.SUBSCRIBE %>" />
-									<portlet:param name="redirect" value="<%= currentURL %>" />
-									<portlet:param name="mbCategoryId" value="<%= String.valueOf(MBCategoryConstants.DEFAULT_PARENT_CATEGORY_ID) %>" />
-								</portlet:actionURL>
-
-								<liferay-ui:icon
-									image="subscribe"
-									label="<%= true %>"
-									url="<%= subscribeURL %>"
-								/>
-							</c:otherwise>
-						</c:choose>
-					</c:if>
-				</div>
-			</div>
-		</c:if>
+		<%@ include file="/html/portlet/message_boards/category_subscriptions.jspf" %>
 
 		<%
 		boolean showAddCategoryButton = MBCategoryPermission.contains(permissionChecker, scopeGroupId, categoryId, ActionKeys.ADD_CATEGORY);
@@ -306,8 +261,14 @@ request.setAttribute("view.jsp-portletURL", portletURL);
 					total = MBThreadServiceUtil.getGroupThreadsCount(scopeGroupId, groupThreadsUserId, WorkflowConstants.STATUS_APPROVED, true);
 				}
 				else if (topLink.equals("recent-posts")) {
-					results = MBThreadServiceUtil.getGroupThreads(scopeGroupId, groupThreadsUserId, WorkflowConstants.STATUS_APPROVED, false, false, searchContainer.getStart(), searchContainer.getEnd());
-					total = MBThreadServiceUtil.getGroupThreadsCount(scopeGroupId, groupThreadsUserId, WorkflowConstants.STATUS_APPROVED, false, false);
+					Calendar calendar = Calendar.getInstance();
+
+					int offset = GetterUtil.getInteger(recentPostsDateOffset);
+
+					calendar.add(Calendar.DATE, -offset);
+
+					results = MBThreadServiceUtil.getGroupThreads(scopeGroupId, groupThreadsUserId, calendar.getTime(), WorkflowConstants.STATUS_APPROVED, searchContainer.getStart(), searchContainer.getEnd());
+					total = MBThreadServiceUtil.getGroupThreadsCount(scopeGroupId, groupThreadsUserId, calendar.getTime(), WorkflowConstants.STATUS_APPROVED);
 				}
 
 				pageContext.setAttribute("results", results);
@@ -338,9 +299,7 @@ request.setAttribute("view.jsp-portletURL", portletURL);
 
 				message = message.toEscapedModel();
 
-				boolean readThread = MBMessageFlagLocalServiceUtil.hasReadFlag(themeDisplay.getUserId(), thread);
-
-				row.setBold(!readThread);
+				row.setBold(!MBThreadFlagLocalServiceUtil.hasThreadFlag(themeDisplay.getUserId(), thread));
 				row.setObject(new Object[] {message, threadSubscriptionClassPKs});
 				row.setRestricted(!MBMessagePermission.contains(permissionChecker, message, ActionKeys.VIEW));
 				%>
@@ -365,7 +324,7 @@ request.setAttribute("view.jsp-portletURL", portletURL);
 				rssURL.setParameter("userId", String.valueOf(groupThreadsUserId));
 			}
 
-			rssURL.setParameter("mbCategoryId", "");
+			rssURL.setParameter("mbCategoryId", StringPool.BLANK);
 			%>
 
 			<br />

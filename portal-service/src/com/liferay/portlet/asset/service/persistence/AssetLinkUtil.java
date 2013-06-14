@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -92,14 +92,6 @@ public class AssetLinkUtil {
 		return getPersistence()
 				   .findWithDynamicQuery(dynamicQuery, start, end,
 			orderByComparator);
-	}
-
-	/**
-	 * @see com.liferay.portal.service.persistence.BasePersistence#remove(com.liferay.portal.model.BaseModel)
-	 */
-	public static AssetLink remove(AssetLink assetLink)
-		throws SystemException {
-		return getPersistence().remove(assetLink);
 	}
 
 	/**
@@ -977,12 +969,14 @@ public class AssetLinkUtil {
 	* @param entryId1 the entry id1
 	* @param entryId2 the entry id2
 	* @param type the type
+	* @return the asset link that was removed
 	* @throws SystemException if a system exception occurred
 	*/
-	public static void removeByE_E_T(long entryId1, long entryId2, int type)
+	public static com.liferay.portlet.asset.model.AssetLink removeByE_E_T(
+		long entryId1, long entryId2, int type)
 		throws com.liferay.portal.kernel.exception.SystemException,
 			com.liferay.portlet.asset.NoSuchLinkException {
-		getPersistence().removeByE_E_T(entryId1, entryId2, type);
+		return getPersistence().removeByE_E_T(entryId1, entryId2, type);
 	}
 
 	/**
@@ -1094,10 +1088,10 @@ public class AssetLinkUtil {
 		return _persistence;
 	}
 
+	/**
+	 * @deprecated
+	 */
 	public void setPersistence(AssetLinkPersistence persistence) {
-		_persistence = persistence;
-
-		ReferenceRegistry.registerReference(AssetLinkUtil.class, "_persistence");
 	}
 
 	private static AssetLinkPersistence _persistence;

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,6 +14,8 @@
 
 package com.liferay.portlet.blogs.service;
 
+import com.liferay.portal.service.ServiceWrapper;
+
 /**
  * <p>
  * This class is a wrapper for {@link BlogsStatsUserLocalService}.
@@ -24,7 +26,8 @@ package com.liferay.portlet.blogs.service;
  * @generated
  */
 public class BlogsStatsUserLocalServiceWrapper
-	implements BlogsStatsUserLocalService {
+	implements BlogsStatsUserLocalService,
+		ServiceWrapper<BlogsStatsUserLocalService> {
 	public BlogsStatsUserLocalServiceWrapper(
 		BlogsStatsUserLocalService blogsStatsUserLocalService) {
 		_blogsStatsUserLocalService = blogsStatsUserLocalService;
@@ -58,25 +61,32 @@ public class BlogsStatsUserLocalServiceWrapper
 	* Deletes the blogs stats user with the primary key from the database. Also notifies the appropriate model listeners.
 	*
 	* @param statsUserId the primary key of the blogs stats user
+	* @return the blogs stats user that was removed
 	* @throws PortalException if a blogs stats user with the primary key could not be found
 	* @throws SystemException if a system exception occurred
 	*/
-	public void deleteBlogsStatsUser(long statsUserId)
+	public com.liferay.portlet.blogs.model.BlogsStatsUser deleteBlogsStatsUser(
+		long statsUserId)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException {
-		_blogsStatsUserLocalService.deleteBlogsStatsUser(statsUserId);
+		return _blogsStatsUserLocalService.deleteBlogsStatsUser(statsUserId);
 	}
 
 	/**
 	* Deletes the blogs stats user from the database. Also notifies the appropriate model listeners.
 	*
 	* @param blogsStatsUser the blogs stats user
+	* @return the blogs stats user that was removed
 	* @throws SystemException if a system exception occurred
 	*/
-	public void deleteBlogsStatsUser(
+	public com.liferay.portlet.blogs.model.BlogsStatsUser deleteBlogsStatsUser(
 		com.liferay.portlet.blogs.model.BlogsStatsUser blogsStatsUser)
 		throws com.liferay.portal.kernel.exception.SystemException {
-		_blogsStatsUserLocalService.deleteBlogsStatsUser(blogsStatsUser);
+		return _blogsStatsUserLocalService.deleteBlogsStatsUser(blogsStatsUser);
+	}
+
+	public com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery() {
+		return _blogsStatsUserLocalService.dynamicQuery();
 	}
 
 	/**
@@ -148,6 +158,12 @@ public class BlogsStatsUserLocalServiceWrapper
 		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery)
 		throws com.liferay.portal.kernel.exception.SystemException {
 		return _blogsStatsUserLocalService.dynamicQueryCount(dynamicQuery);
+	}
+
+	public com.liferay.portlet.blogs.model.BlogsStatsUser fetchBlogsStatsUser(
+		long statsUserId)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return _blogsStatsUserLocalService.fetchBlogsStatsUser(statsUserId);
 	}
 
 	/**
@@ -357,11 +373,26 @@ public class BlogsStatsUserLocalServiceWrapper
 		_blogsStatsUserLocalService.updateStatsUser(groupId, userId, displayDate);
 	}
 
+	/**
+	 * @deprecated Renamed to {@link #getWrappedService}
+	 */
 	public BlogsStatsUserLocalService getWrappedBlogsStatsUserLocalService() {
 		return _blogsStatsUserLocalService;
 	}
 
+	/**
+	 * @deprecated Renamed to {@link #setWrappedService}
+	 */
 	public void setWrappedBlogsStatsUserLocalService(
+		BlogsStatsUserLocalService blogsStatsUserLocalService) {
+		_blogsStatsUserLocalService = blogsStatsUserLocalService;
+	}
+
+	public BlogsStatsUserLocalService getWrappedService() {
+		return _blogsStatsUserLocalService;
+	}
+
+	public void setWrappedService(
 		BlogsStatsUserLocalService blogsStatsUserLocalService) {
 		_blogsStatsUserLocalService = blogsStatsUserLocalService;
 	}

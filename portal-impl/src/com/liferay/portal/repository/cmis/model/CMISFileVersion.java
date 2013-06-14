@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -21,12 +21,18 @@ import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.repository.model.FileVersion;
 import com.liferay.portal.kernel.util.FileUtil;
+import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.MimeTypesUtil;
 import com.liferay.portal.kernel.util.StringPool;
+import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.model.User;
 import com.liferay.portal.repository.cmis.CMISRepository;
+import com.liferay.portal.security.auth.PrincipalThreadLocal;
 import com.liferay.portal.service.CMISRepositoryLocalServiceUtil;
 import com.liferay.portal.service.UserLocalServiceUtil;
+import com.liferay.portlet.documentlibrary.NoSuchFileEntryException;
 import com.liferay.portlet.documentlibrary.model.DLFileVersion;
+import com.liferay.portlet.documentlibrary.service.DLAppHelperLocalServiceUtil;
 import com.liferay.portlet.documentlibrary.util.DLUtil;
 import com.liferay.portlet.expando.model.ExpandoBridge;
 
@@ -36,10 +42,12 @@ import java.io.Serializable;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.chemistry.opencmis.client.api.Document;
 import org.apache.chemistry.opencmis.commons.data.ContentStream;
+import org.apache.chemistry.opencmis.commons.exceptions.CmisObjectNotFoundException;
 
 /**
  * @author Alexander Chow
@@ -47,9 +55,11 @@ import org.apache.chemistry.opencmis.commons.data.ContentStream;
 public class CMISFileVersion extends CMISModel implements FileVersion {
 
 	public CMISFileVersion(
-		CMISRepository cmisRepository, long fileVersionId, Document document) {
+		CMISRepository cmisRepository, String uuid, long fileVersionId,
+		Document document) {
 
 		_cmisRepository = cmisRepository;
+		_uuid = uuid;
 		_fileVersionId = fileVersionId;
 		_document = document;
 	}
@@ -69,6 +79,15 @@ public class CMISFileVersion extends CMISModel implements FileVersion {
 
 	public InputStream getContentStream(boolean incrementCounter) {
 		ContentStream contentStream = _document.getContentStream();
+
+		try {
+			DLAppHelperLocalServiceUtil.getFileAsStream(
+				PrincipalThreadLocal.getUserId(), getFileEntry(),
+				incrementCounter);
+		}
+		catch (Exception e) {
+			_log.error(e);
+		}
 
 		return contentStream.getStream();
 	}
@@ -93,13 +112,31 @@ public class CMISFileVersion extends CMISModel implements FileVersion {
 	}
 
 	public FileEntry getFileEntry() throws PortalException, SystemException {
+		Document document = null;
+
+		try {
+			List<Document> allVersions = _document.getAllVersions();
+
+			if (allVersions.isEmpty()) {
+				document = _document;
+			}
+			else {
+				document = allVersions.get(0);
+			}
+		}
+		catch (CmisObjectNotFoundException confe) {
+			throw new NoSuchFileEntryException(confe);
+		}
+
 		return CMISRepositoryLocalServiceUtil.toFileEntry(
-			getRepositoryId(), _document.getAllVersions().get(0));
+			getRepositoryId(), document);
 	}
 
 	public long getFileEntryId() {
 		try {
 			return getFileEntry().getFileEntryId();
+		}
+		catch (NoSuchFileEntryException nsfee) {
 		}
 		catch (Exception e) {
 			_log.error(e, e);
@@ -121,7 +158,13 @@ public class CMISFileVersion extends CMISModel implements FileVersion {
 	}
 
 	public String getMimeType() {
-		return _document.getContentStreamMimeType();
+		String mimeType = _document.getContentStreamMimeType();
+
+		if (Validator.isNotNull(mimeType)) {
+			return mimeType;
+		}
+
+		return MimeTypesUtil.getContentType(getTitle());
 	}
 
 	public Object getModel() {
@@ -199,8 +242,7 @@ public class CMISFileVersion extends CMISModel implements FileVersion {
 
 	public String getUserUuid() {
 		try {
-			User user = UserLocalServiceUtil.getDefaultUser(
-				getCompanyId());
+			User user = UserLocalServiceUtil.getDefaultUser(getCompanyId());
 
 			return user.getUserUuid();
 		}
@@ -209,8 +251,12 @@ public class CMISFileVersion extends CMISModel implements FileVersion {
 		}
 	}
 
+	public String getUuid() {
+		return _uuid;
+	}
+
 	public String getVersion() {
-		return _document.getVersionLabel();
+		return GetterUtil.getString(_document.getVersionLabel());
 	}
 
 	public boolean isApproved() {
@@ -230,6 +276,10 @@ public class CMISFileVersion extends CMISModel implements FileVersion {
 	}
 
 	public boolean isExpired() {
+		return false;
+	}
+
+	public boolean isInTrash() {
 		return false;
 	}
 
@@ -286,5 +336,6 @@ public class CMISFileVersion extends CMISModel implements FileVersion {
 	private CMISRepository _cmisRepository;
 	private Document _document;
 	private long _fileVersionId;
+	private String _uuid;
 
 }

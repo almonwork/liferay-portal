@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -17,12 +17,13 @@ package com.liferay.portal.spring.context;
 import com.liferay.portal.bean.BeanLocatorImpl;
 import com.liferay.portal.kernel.bean.BeanLocator;
 import com.liferay.portal.kernel.bean.PortletBeanLocatorUtil;
-import com.liferay.portal.kernel.concurrent.LockRegistry;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.portlet.PortletClassLoaderUtil;
 import com.liferay.portal.kernel.util.MethodCache;
-import com.liferay.portal.kernel.util.StringPool;
+import com.liferay.portal.security.lang.PortalSecurityManagerThreadLocal;
+import com.liferay.portal.security.pacl.PACLPolicy;
+import com.liferay.portal.security.pacl.PACLPolicyManager;
 
 import java.lang.reflect.Method;
 
@@ -41,15 +42,6 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
  * @see    PortletContextLoader
  */
 public class PortletContextLoaderListener extends ContextLoaderListener {
-
-	public static String getLockKey(ServletContext servletContext) {
-		return getLockKey(servletContext.getContextPath());
-	}
-
-	public static String getLockKey(String contextPath) {
-		return PortletContextLoaderListener.class.getName().concat(
-			StringPool.PERIOD).concat(contextPath);
-	}
 
 	@Override
 	public void contextDestroyed(ServletContextEvent servletContextEvent) {
@@ -84,29 +76,41 @@ public class PortletContextLoaderListener extends ContextLoaderListener {
 	public void contextInitialized(ServletContextEvent servletContextEvent) {
 		MethodCache.reset();
 
+		ServletContext servletContext = servletContextEvent.getServletContext();
+
+		Object previousApplicationContext = servletContext.getAttribute(
+			WebApplicationContext.ROOT_WEB_APPLICATION_CONTEXT_ATTRIBUTE);
+
+		servletContext.removeAttribute(
+			WebApplicationContext.ROOT_WEB_APPLICATION_CONTEXT_ATTRIBUTE);
+
+		ClassLoader classLoader = PortletClassLoaderUtil.getClassLoader();
+
+		PACLPolicy previousPACLPolicy =
+			PortalSecurityManagerThreadLocal.getPACLPolicy();
+
 		try {
+			PACLPolicy paclPolicy = PACLPolicyManager.getPACLPolicy(
+				classLoader);
+
+			PortalSecurityManagerThreadLocal.setPACLPolicy(paclPolicy);
+
 			super.contextInitialized(servletContextEvent);
 		}
 		finally {
-			ServletContext servletContext =
-				servletContextEvent.getServletContext();
-
-			String lockKey = getLockKey(servletContext);
-
-			LockRegistry.freeLock(lockKey, lockKey, true);
+			PortalSecurityManagerThreadLocal.setPACLPolicy(previousPACLPolicy);
 		}
 
 		PortletBeanFactoryCleaner.readBeans();
 
-		ClassLoader classLoader = PortletClassLoaderUtil.getClassLoader();
-
-		ServletContext servletContext = servletContextEvent.getServletContext();
-
 		ApplicationContext applicationContext =
 			WebApplicationContextUtils.getWebApplicationContext(servletContext);
 
-		BeanLocator beanLocator = new BeanLocatorImpl(
+		BeanLocatorImpl beanLocatorImpl = new BeanLocatorImpl(
 			classLoader, applicationContext);
+
+		beanLocatorImpl.setPACLServletContextName(
+			servletContext.getServletContextName());
 
 		try {
 			Class<?> beanLocatorUtilClass = Class.forName(
@@ -117,17 +121,24 @@ public class PortletContextLoaderListener extends ContextLoaderListener {
 				"setBeanLocator", new Class[] {BeanLocator.class});
 
 			setBeanLocatorMethod.invoke(
-				beanLocatorUtilClass, new Object[] {beanLocator});
+				beanLocatorUtilClass, new Object[] {beanLocatorImpl});
 
 			PortletBeanLocatorUtil.setBeanLocator(
-				servletContext.getServletContextName(), beanLocator);
+				servletContext.getServletContextName(), beanLocatorImpl);
 		}
 		catch (Exception e) {
 			_log.error(e, e);
 		}
 
-		servletContext.removeAttribute(
-			WebApplicationContext.ROOT_WEB_APPLICATION_CONTEXT_ATTRIBUTE);
+		if (previousApplicationContext == null) {
+			servletContext.removeAttribute(
+				WebApplicationContext.ROOT_WEB_APPLICATION_CONTEXT_ATTRIBUTE);
+		}
+		else {
+			servletContext.setAttribute(
+				WebApplicationContext.ROOT_WEB_APPLICATION_CONTEXT_ATTRIBUTE,
+				previousApplicationContext);
+		}
 	}
 
 	@Override

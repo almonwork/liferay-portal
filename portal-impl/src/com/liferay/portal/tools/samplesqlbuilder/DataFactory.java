@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -16,15 +16,14 @@ package com.liferay.portal.tools.samplesqlbuilder;
 
 import com.liferay.counter.model.Counter;
 import com.liferay.counter.model.impl.CounterModelImpl;
+import com.liferay.portal.kernel.util.CharPool;
+import com.liferay.portal.kernel.util.FastDateFormatFactoryUtil;
 import com.liferay.portal.kernel.util.IntegerWrapper;
-import com.liferay.portal.kernel.util.KeyValuePair;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.StringUtil;
+import com.liferay.portal.kernel.util.Time;
 import com.liferay.portal.kernel.util.UnicodeProperties;
 import com.liferay.portal.kernel.util.Validator;
-import com.liferay.portal.kernel.xml.Document;
-import com.liferay.portal.kernel.xml.Element;
-import com.liferay.portal.kernel.xml.SAXReaderUtil;
 import com.liferay.portal.model.ClassName;
 import com.liferay.portal.model.Company;
 import com.liferay.portal.model.Contact;
@@ -33,10 +32,9 @@ import com.liferay.portal.model.GroupConstants;
 import com.liferay.portal.model.Layout;
 import com.liferay.portal.model.LayoutTypePortletConstants;
 import com.liferay.portal.model.ModelHintsUtil;
-import com.liferay.portal.model.Permission;
-import com.liferay.portal.model.Resource;
-import com.liferay.portal.model.ResourceCode;
+import com.liferay.portal.model.PortletPreferences;
 import com.liferay.portal.model.ResourceConstants;
+import com.liferay.portal.model.ResourcePermission;
 import com.liferay.portal.model.Role;
 import com.liferay.portal.model.RoleConstants;
 import com.liferay.portal.model.User;
@@ -45,18 +43,48 @@ import com.liferay.portal.model.impl.CompanyImpl;
 import com.liferay.portal.model.impl.ContactImpl;
 import com.liferay.portal.model.impl.GroupImpl;
 import com.liferay.portal.model.impl.LayoutImpl;
-import com.liferay.portal.model.impl.PermissionImpl;
-import com.liferay.portal.model.impl.ResourceCodeImpl;
-import com.liferay.portal.model.impl.ResourceImpl;
+import com.liferay.portal.model.impl.PortletPreferencesImpl;
+import com.liferay.portal.model.impl.ResourcePermissionImpl;
 import com.liferay.portal.model.impl.RoleImpl;
 import com.liferay.portal.model.impl.UserImpl;
-import com.liferay.portal.security.permission.ResourceActionsUtil;
+import com.liferay.portal.util.PortletKeys;
 import com.liferay.portlet.asset.model.AssetEntry;
 import com.liferay.portlet.asset.model.impl.AssetEntryImpl;
 import com.liferay.portlet.blogs.model.BlogsEntry;
 import com.liferay.portlet.blogs.model.BlogsStatsUser;
 import com.liferay.portlet.blogs.model.impl.BlogsEntryImpl;
 import com.liferay.portlet.blogs.model.impl.BlogsStatsUserImpl;
+import com.liferay.portlet.documentlibrary.model.DLFileEntry;
+import com.liferay.portlet.documentlibrary.model.DLFileEntryMetadata;
+import com.liferay.portlet.documentlibrary.model.DLFileRank;
+import com.liferay.portlet.documentlibrary.model.DLFileVersion;
+import com.liferay.portlet.documentlibrary.model.DLFolder;
+import com.liferay.portlet.documentlibrary.model.DLSync;
+import com.liferay.portlet.documentlibrary.model.DLSyncConstants;
+import com.liferay.portlet.documentlibrary.model.impl.DLFileEntryImpl;
+import com.liferay.portlet.documentlibrary.model.impl.DLFileEntryMetadataImpl;
+import com.liferay.portlet.documentlibrary.model.impl.DLFileRankImpl;
+import com.liferay.portlet.documentlibrary.model.impl.DLFileVersionImpl;
+import com.liferay.portlet.documentlibrary.model.impl.DLFolderImpl;
+import com.liferay.portlet.documentlibrary.model.impl.DLSyncImpl;
+import com.liferay.portlet.dynamicdatalists.model.DDLRecord;
+import com.liferay.portlet.dynamicdatalists.model.DDLRecordSet;
+import com.liferay.portlet.dynamicdatalists.model.DDLRecordVersion;
+import com.liferay.portlet.dynamicdatalists.model.impl.DDLRecordImpl;
+import com.liferay.portlet.dynamicdatalists.model.impl.DDLRecordSetImpl;
+import com.liferay.portlet.dynamicdatalists.model.impl.DDLRecordVersionImpl;
+import com.liferay.portlet.dynamicdatamapping.model.DDMContent;
+import com.liferay.portlet.dynamicdatamapping.model.DDMStorageLink;
+import com.liferay.portlet.dynamicdatamapping.model.DDMStructure;
+import com.liferay.portlet.dynamicdatamapping.model.DDMStructureLink;
+import com.liferay.portlet.dynamicdatamapping.model.impl.DDMContentImpl;
+import com.liferay.portlet.dynamicdatamapping.model.impl.DDMStorageLinkImpl;
+import com.liferay.portlet.dynamicdatamapping.model.impl.DDMStructureImpl;
+import com.liferay.portlet.dynamicdatamapping.model.impl.DDMStructureLinkImpl;
+import com.liferay.portlet.journal.model.JournalArticle;
+import com.liferay.portlet.journal.model.JournalArticleResource;
+import com.liferay.portlet.journal.model.impl.JournalArticleImpl;
+import com.liferay.portlet.journal.model.impl.JournalArticleResourceImpl;
 import com.liferay.portlet.messageboards.model.MBCategory;
 import com.liferay.portlet.messageboards.model.MBCategoryConstants;
 import com.liferay.portlet.messageboards.model.MBDiscussion;
@@ -68,6 +96,8 @@ import com.liferay.portlet.messageboards.model.impl.MBDiscussionImpl;
 import com.liferay.portlet.messageboards.model.impl.MBMessageImpl;
 import com.liferay.portlet.messageboards.model.impl.MBStatsUserImpl;
 import com.liferay.portlet.messageboards.model.impl.MBThreadImpl;
+import com.liferay.portlet.social.model.SocialActivity;
+import com.liferay.portlet.social.model.impl.SocialActivityImpl;
 import com.liferay.portlet.wiki.model.WikiNode;
 import com.liferay.portlet.wiki.model.WikiPage;
 import com.liferay.portlet.wiki.model.impl.WikiNodeImpl;
@@ -76,10 +106,11 @@ import com.liferay.util.SimpleCounter;
 
 import java.io.File;
 
+import java.text.Format;
+
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.Date;
 import java.util.List;
-import java.util.Map;
 
 /**
  * @author Brian Wing Shun Chan
@@ -87,9 +118,11 @@ import java.util.Map;
 public class DataFactory {
 
 	public DataFactory(
-		String baseDir, int maxGroupsCount, int maxUserToGroupCount,
-		SimpleCounter counter, SimpleCounter permissionCounter,
-		SimpleCounter resourceCounter, SimpleCounter resourceCodeCounter) {
+		String baseDir, int maxGroupsCount, int maxJournalArticleSize,
+		int maxUserToGroupCount, SimpleCounter counter,
+		SimpleCounter dlDateCounter, SimpleCounter permissionCounter,
+		SimpleCounter resourceCounter, SimpleCounter resourcePermissionCounter,
+		SimpleCounter socialActivityCounter) {
 
 		try {
 			_baseDir = baseDir;
@@ -97,15 +130,15 @@ public class DataFactory {
 			_maxUserToGroupCount = maxUserToGroupCount;
 
 			_counter = counter;
-			_permissionCounter = permissionCounter;
-			_resourceCounter = resourceCounter;
-			_resourceCodeCounter = resourceCodeCounter;
+			_dlDateCounter = dlDateCounter;
+			_resourcePermissionCounter = resourcePermissionCounter;
+			_socialActivityCounter = socialActivityCounter;
 
 			initClassNames();
 			initCompany();
 			initDefaultUser();
 			initGroups();
-			initResourceCodes();
+			initJournalArticle(maxJournalArticleSize);
 			initRoles();
 			initUserNames();
 		}
@@ -115,9 +148,8 @@ public class DataFactory {
 	}
 
 	public AssetEntry addAssetEntry(
-			long groupId, long userId, long classNameId, long classPK,
-			boolean visible, String mimeType, String title)
-		throws Exception {
+		long groupId, long userId, long classNameId, long classPK,
+		boolean visible, String mimeType, String title) {
 
 		AssetEntry assetEntry = new AssetEntryImpl();
 
@@ -133,9 +165,8 @@ public class DataFactory {
 	}
 
 	public BlogsEntry addBlogsEntry(
-			long groupId, long userId, String title, String urlTitle,
-			String content)
-		throws Exception {
+		long groupId, long userId, String title, String urlTitle,
+		String content) {
 
 		BlogsEntry blogsEntry = new BlogsEntryImpl();
 
@@ -149,9 +180,7 @@ public class DataFactory {
 		return blogsEntry;
 	}
 
-	public BlogsStatsUser addBlogsStatsUser(long groupId, long userId)
-		throws Exception {
-
+	public BlogsStatsUser addBlogsStatsUser(long groupId, long userId) {
 		BlogsStatsUser blogsStatsUser = new BlogsStatsUserImpl();
 
 		blogsStatsUser.setGroupId(groupId);
@@ -160,9 +189,7 @@ public class DataFactory {
 		return blogsStatsUser;
 	}
 
-	public Contact addContact(String firstName, String lastName)
-		throws Exception {
-
+	public Contact addContact(String firstName, String lastName) {
 		Contact contact = new ContactImpl();
 
 		contact.setContactId(_counter.get());
@@ -173,10 +200,217 @@ public class DataFactory {
 		return contact;
 	}
 
+	public DDLRecord addDDLRecord(
+		long groupId, long companyId, long userId, long ddlRecordSetId) {
+
+		DDLRecord ddlRecord = new DDLRecordImpl();
+
+		ddlRecord.setRecordId(_counter.get());
+		ddlRecord.setGroupId(groupId);
+		ddlRecord.setCompanyId(companyId);
+		ddlRecord.setUserId(userId);
+		ddlRecord.setCreateDate(newCreateDate());
+		ddlRecord.setRecordSetId(ddlRecordSetId);
+
+		return ddlRecord;
+	}
+
+	public DDLRecordSet addDDLRecordSet(
+		long groupId, long companyId, long userId, long ddmStructureId) {
+
+		DDLRecordSet ddlRecordSet = new DDLRecordSetImpl();
+
+		ddlRecordSet.setRecordSetId(_counter.get());
+		ddlRecordSet.setGroupId(groupId);
+		ddlRecordSet.setCompanyId(companyId);
+		ddlRecordSet.setUserId(userId);
+		ddlRecordSet.setDDMStructureId(ddmStructureId);
+
+		return ddlRecordSet;
+	}
+
+	public DDLRecordVersion addDDLRecordVersion(DDLRecord ddlRecord) {
+		DDLRecordVersion ddlRecordVersion = new DDLRecordVersionImpl();
+
+		ddlRecordVersion.setRecordVersionId(_counter.get());
+		ddlRecordVersion.setGroupId(ddlRecord.getGroupId());
+		ddlRecordVersion.setCompanyId(ddlRecord.getCompanyId());
+		ddlRecordVersion.setUserId(ddlRecord.getUserId());
+		ddlRecordVersion.setRecordSetId(ddlRecord.getRecordSetId());
+		ddlRecordVersion.setRecordId(ddlRecord.getRecordId());
+
+		return ddlRecordVersion;
+	}
+
+	public DDMContent addDDMContent(long groupId, long companyId, long userId) {
+		DDMContent ddmContent = new DDMContentImpl();
+
+		ddmContent.setContentId(_counter.get());
+		ddmContent.setGroupId(groupId);
+		ddmContent.setCompanyId(companyId);
+		ddmContent.setUserId(userId);
+
+		return ddmContent;
+	}
+
+	public DDMStorageLink addDDMStorageLink(
+		long classNameId, long classPK, long structureId) {
+
+		DDMStorageLink ddmStorageLink = new DDMStorageLinkImpl();
+
+		ddmStorageLink.setStorageLinkId(_counter.get());
+		ddmStorageLink.setClassNameId(classNameId);
+		ddmStorageLink.setClassPK(classPK);
+		ddmStorageLink.setStructureId(structureId);
+
+		return ddmStorageLink;
+	}
+
+	public DDMStructure addDDMStructure(
+		long groupId, long companyId, long userId, long classNameId) {
+
+		DDMStructure ddmStructure = new DDMStructureImpl();
+
+		ddmStructure.setStructureId(_counter.get());
+		ddmStructure.setGroupId(groupId);
+		ddmStructure.setCompanyId(companyId);
+		ddmStructure.setUserId(userId);
+		ddmStructure.setCreateDate(newCreateDate());
+		ddmStructure.setClassNameId(classNameId);
+
+		return ddmStructure;
+	}
+
+	public DDMStructureLink addDDMStructureLink(
+		long classPK, long structureId) {
+
+		DDMStructureLink ddmStructureLink = new DDMStructureLinkImpl();
+
+		ddmStructureLink.setStructureLinkId(_counter.get());
+		ddmStructureLink.setClassNameId(_dlFileEntryClassName.getClassNameId());
+		ddmStructureLink.setClassPK(classPK);
+		ddmStructureLink.setStructureId(structureId);
+
+		return ddmStructureLink;
+	}
+
+	public DLFileEntry addDlFileEntry(
+		long groupId, long companyId, long userId, long folderId,
+		String extension, String mimeType, String name, String title,
+		String description) {
+
+		DLFileEntry dlFileEntry = new DLFileEntryImpl();
+
+		dlFileEntry.setFileEntryId(_counter.get());
+		dlFileEntry.setGroupId(groupId);
+		dlFileEntry.setCompanyId(companyId);
+		dlFileEntry.setUserId(userId);
+		dlFileEntry.setCreateDate(newCreateDate());
+		dlFileEntry.setRepositoryId(groupId);
+		dlFileEntry.setFolderId(folderId);
+		dlFileEntry.setName(name);
+		dlFileEntry.setExtension(extension);
+		dlFileEntry.setMimeType(mimeType);
+		dlFileEntry.setTitle(title);
+		dlFileEntry.setDescription(description);
+		dlFileEntry.setSmallImageId(_counter.get());
+		dlFileEntry.setLargeImageId(_counter.get());
+
+		return dlFileEntry;
+	}
+
+	public DLFileEntryMetadata addDLFileEntryMetadata(
+		long ddmStorageId, long ddmStructureId, long fileEntryId,
+		long fileVersionId) {
+
+		DLFileEntryMetadata dlFileEntryMetadata = new DLFileEntryMetadataImpl();
+
+		dlFileEntryMetadata.setFileEntryMetadataId(_counter.get());
+		dlFileEntryMetadata.setDDMStorageId(ddmStorageId);
+		dlFileEntryMetadata.setDDMStructureId(ddmStructureId);
+		dlFileEntryMetadata.setFileEntryId(fileEntryId);
+		dlFileEntryMetadata.setFileVersionId(fileVersionId);
+
+		return dlFileEntryMetadata;
+	}
+
+	public DLFileRank addDLFileRank(
+		long groupId, long companyId, long userId, long fileEntryId) {
+
+		DLFileRank dlFileRank = new DLFileRankImpl();
+
+		dlFileRank.setFileRankId(_counter.get());
+		dlFileRank.setGroupId(groupId);
+		dlFileRank.setCompanyId(companyId);
+		dlFileRank.setUserId(userId);
+		dlFileRank.setFileEntryId(fileEntryId);
+
+		return dlFileRank;
+	}
+
+	public DLFileVersion addDLFileVersion(DLFileEntry dlFileEntry) {
+		DLFileVersion dlFileVersion = new DLFileVersionImpl();
+
+		dlFileVersion.setFileVersionId(_counter.get());
+		dlFileVersion.setGroupId(dlFileEntry.getGroupId());
+		dlFileVersion.setCompanyId(dlFileEntry.getCompanyId());
+		dlFileVersion.setUserId(dlFileEntry.getUserId());
+		dlFileVersion.setRepositoryId(dlFileEntry.getRepositoryId());
+		dlFileVersion.setFileEntryId(dlFileEntry.getFileEntryId());
+		dlFileVersion.setExtension(dlFileEntry.getExtension());
+		dlFileVersion.setMimeType(dlFileEntry.getMimeType());
+		dlFileVersion.setTitle(dlFileEntry.getTitle());
+		dlFileVersion.setDescription(dlFileEntry.getDescription());
+		dlFileVersion.setSize(dlFileEntry.getSize());
+
+		return dlFileVersion;
+	}
+
+	public DLFolder addDLFolder(
+		long groupId, long companyId, long userId, long parentFolderId,
+		String name, String description) {
+
+		DLFolder dlFolder = new DLFolderImpl();
+
+		dlFolder.setFolderId(_counter.get());
+		dlFolder.setGroupId(groupId);
+		dlFolder.setCompanyId(companyId);
+		dlFolder.setUserId(userId);
+		dlFolder.setCreateDate(newCreateDate());
+		dlFolder.setRepositoryId(groupId);
+		dlFolder.setParentFolderId(parentFolderId);
+		dlFolder.setName(name);
+		dlFolder.setDescription(description);
+
+		return dlFolder;
+	}
+
+	public DLSync addDLSync(
+		long companyId, long fileId, long repositoryId, long parentFolderId,
+		boolean typeFolder) {
+
+		DLSync dlSync = new DLSyncImpl();
+
+		dlSync.setSyncId(_counter.get());
+		dlSync.setCompanyId(companyId);
+		dlSync.setFileId(fileId);
+		dlSync.setRepositoryId(repositoryId);
+		dlSync.setParentFolderId(parentFolderId);
+		dlSync.setEvent(DLSyncConstants.EVENT_ADD);
+
+		if (typeFolder) {
+			dlSync.setType(DLSyncConstants.TYPE_FOLDER);
+		}
+		else {
+			dlSync.setType(DLSyncConstants.TYPE_FILE);
+		}
+
+		return dlSync;
+	}
+
 	public Group addGroup(
-			long groupId, long classNameId, long classPK, String name,
-			String friendlyURL, boolean site)
-		throws Exception {
+		long groupId, long classNameId, long classPK, String name,
+		String friendlyURL, boolean site) {
 
 		Group group = new GroupImpl();
 
@@ -190,10 +424,35 @@ public class DataFactory {
 		return group;
 	}
 
+	public JournalArticle addJournalArticle(
+		long resourcePrimKey, long groupId, long companyId, String articleId) {
+
+		JournalArticle journalArticle = new JournalArticleImpl();
+
+		journalArticle.setId(_counter.get());
+		journalArticle.setResourcePrimKey(resourcePrimKey);
+		journalArticle.setGroupId(groupId);
+		journalArticle.setCompanyId(companyId);
+		journalArticle.setArticleId(articleId);
+		journalArticle.setContent(_journalArticleContent);
+
+		return journalArticle;
+	}
+
+	public JournalArticleResource addJournalArticleResource(long groupId) {
+		JournalArticleResource journalArticleResource =
+			new JournalArticleResourceImpl();
+
+		journalArticleResource.setResourcePrimKey(_counter.get());
+		journalArticleResource.setGroupId(groupId);
+		journalArticleResource.setArticleId(String.valueOf(_counter.get()));
+
+		return journalArticleResource;
+	}
+
 	public Layout addLayout(
-			int layoutId, String name, String friendlyURL, String column1,
-			String column2)
-		throws Exception {
+		int layoutId, String name, String friendlyURL, String column1,
+		String column2) {
 
 		Layout layout = new LayoutImpl();
 
@@ -219,9 +478,8 @@ public class DataFactory {
 	}
 
 	public MBCategory addMBCategory(
-			long categoryId, long groupId, long companyId, long userId,
-			String name, String description, int threadCount, int messageCount)
-		throws Exception {
+		long categoryId, long groupId, long companyId, long userId, String name,
+		String description, int threadCount, int messageCount) {
 
 		MBCategory mbCategory = new MBCategoryImpl();
 
@@ -239,8 +497,7 @@ public class DataFactory {
 	}
 
 	public MBDiscussion addMBDiscussion(
-			long classNameId, long classPK, long threadId)
-		throws Exception {
+		long classNameId, long classPK, long threadId) {
 
 		MBDiscussion mbDiscussion = new MBDiscussionImpl();
 
@@ -253,10 +510,9 @@ public class DataFactory {
 	}
 
 	public MBMessage addMBMessage(
-			long messageId, long groupId, long userId, long classNameId,
-			long classPK, long categoryId, long threadId, long rootMessageId,
-			long parentMessageId, String subject, String body)
-		throws Exception {
+		long messageId, long groupId, long userId, long classNameId,
+		long classPK, long categoryId, long threadId, long rootMessageId,
+		long parentMessageId, String subject, String body) {
 
 		MBMessage mbMessage = new MBMessageImpl();
 
@@ -275,9 +531,7 @@ public class DataFactory {
 		return mbMessage;
 	}
 
-	public MBStatsUser addMBStatsUser(long groupId, long userId)
-		throws Exception {
-
+	public MBStatsUser addMBStatsUser(long groupId, long userId) {
 		MBStatsUser mbStatsUser = new MBStatsUserImpl();
 
 		mbStatsUser.setGroupId(groupId);
@@ -287,9 +541,8 @@ public class DataFactory {
 	}
 
 	public MBThread addMBThread(
-			long threadId, long groupId, long companyId, long categoryId,
-			long rootMessageId, int messageCount, long lastPostByUserId)
-		throws Exception {
+		long threadId, long groupId, long companyId, long categoryId,
+		long rootMessageId, int messageCount, long lastPostByUserId) {
 
 		MBThread mbThread = new MBThreadImpl();
 
@@ -305,97 +558,75 @@ public class DataFactory {
 		return mbThread;
 	}
 
-	public List<Permission> addPermissions(Resource resource) throws Exception {
-		List<Permission> permissions = new ArrayList<Permission>();
+	public PortletPreferences addPortletPreferences(
+		long ownerId, long plid, String portletId, String preferences) {
 
-		String name = _individualResourceNames.get(resource.getCodeId());
+		PortletPreferences portletPreferences = new PortletPreferencesImpl();
 
-		List<String> actions = ResourceActionsUtil.getModelResourceActions(
-			name);
+		portletPreferences.setPortletPreferencesId(_counter.get());
+		portletPreferences.setOwnerId(ownerId);
+		portletPreferences.setOwnerType(PortletKeys.PREFS_OWNER_TYPE_LAYOUT);
+		portletPreferences.setPlid(plid);
+		portletPreferences.setPortletId(portletId);
+		portletPreferences.setPreferences(preferences);
 
-		for (String action : actions) {
-			Permission permission = new PermissionImpl();
-
-			permission.setPermissionId(_permissionCounter.get());
-			permission.setCompanyId(_company.getCompanyId());
-			permission.setActionId(action);
-			permission.setResourceId(resource.getResourceId());
-
-			permissions.add(permission);
-		}
-
-		return permissions;
+		return portletPreferences;
 	}
 
-	public Resource addResource(String name, String primKey) throws Exception {
-		Long codeId = _individualResourceCodeIds.get(name);
+	public List<ResourcePermission> addResourcePermission(
+		long companyId, String name, String primKey) {
 
-		Resource resource = new ResourceImpl();
+		List<ResourcePermission> resourcePermissions =
+			new ArrayList<ResourcePermission>(2);
 
-		resource.setResourceId(_resourceCounter.get());
-		resource.setCodeId(codeId);
-		resource.setPrimKey(primKey);
+		ResourcePermission resourcePermission = new ResourcePermissionImpl();
 
-		return resource;
+		resourcePermission.setResourcePermissionId(
+			_resourcePermissionCounter.get());
+		resourcePermission.setCompanyId(companyId);
+		resourcePermission.setName(name);
+		resourcePermission.setScope(ResourceConstants.SCOPE_INDIVIDUAL);
+		resourcePermission.setPrimKey(primKey);
+		resourcePermission.setRoleId(_ownerRole.getRoleId());
+		resourcePermission.setOwnerId(_defaultUser.getUserId());
+		resourcePermission.setActionIds(1);
+
+		resourcePermissions.add(resourcePermission);
+
+		resourcePermission = new ResourcePermissionImpl();
+
+		resourcePermission.setResourcePermissionId(
+			_resourcePermissionCounter.get());
+		resourcePermission.setCompanyId(companyId);
+		resourcePermission.setName(name);
+		resourcePermission.setScope(ResourceConstants.SCOPE_INDIVIDUAL);
+		resourcePermission.setPrimKey(primKey);
+		resourcePermission.setRoleId(_guestRole.getRoleId());
+		resourcePermission.setOwnerId(0);
+		resourcePermission.setActionIds(1);
+
+		resourcePermissions.add(resourcePermission);
+
+		return resourcePermissions;
 	}
 
-	public List<KeyValuePair> addRolesPermissions(
-			Resource resource, List<Permission> permissions, Role memberRole)
-		throws Exception {
+	public SocialActivity addSocialActivity(
+		long groupId, long companyId, long userId, long classNameId,
+		long classPK) {
 
-		List<KeyValuePair> rolesPermissions = new ArrayList<KeyValuePair>();
+		SocialActivity socialActivity = new SocialActivityImpl();
 
-		for (Permission permission : permissions) {
-			KeyValuePair kvp = new KeyValuePair();
+		socialActivity.setActivityId(_socialActivityCounter.get());
+		socialActivity.setGroupId(groupId);
+		socialActivity.setCompanyId(companyId);
+		socialActivity.setUserId(userId);
+		socialActivity.setClassNameId(classNameId);
+		socialActivity.setClassPK(classPK);
 
-			kvp.setKey(String.valueOf(_ownerRole.getRoleId()));
-			kvp.setValue(String.valueOf(permission.getPermissionId()));
-
-			rolesPermissions.add(kvp);
-		}
-
-		String name = _individualResourceNames.get(resource.getCodeId());
-
-		if (memberRole != null) {
-			List<String> groupDefaultActions =
-				ResourceActionsUtil.getModelResourceGroupDefaultActions(name);
-
-			for (Permission permission : permissions) {
-				if (!groupDefaultActions.contains(permission.getActionId())) {
-					continue;
-				}
-
-				KeyValuePair kvp = new KeyValuePair();
-
-				kvp.setKey(String.valueOf(memberRole.getRoleId()));
-				kvp.setValue(String.valueOf(permission.getPermissionId()));
-
-				rolesPermissions.add(kvp);
-			}
-		}
-
-		List<String> guestDefaultactions =
-			ResourceActionsUtil.getModelResourceGuestDefaultActions(name);
-
-		for (Permission permission : permissions) {
-			if (!guestDefaultactions.contains(permission.getActionId())) {
-				continue;
-			}
-
-			KeyValuePair kvp = new KeyValuePair();
-
-			kvp.setKey(String.valueOf(_guestRole.getRoleId()));
-			kvp.setValue(String.valueOf(permission.getPermissionId()));
-
-			rolesPermissions.add(kvp);
-		}
-
-		return rolesPermissions;
+		return socialActivity;
 	}
 
-	public User addUser(boolean defaultUser, String screenName)
-		throws Exception {
-
+	public User addUser(boolean defaultUser, String screenName) {
 		User user = new UserImpl();
 
 		user.setUserId(_counter.get());
@@ -431,8 +662,7 @@ public class DataFactory {
 	}
 
 	public WikiNode addWikiNode(
-			long groupId, long userId, String name, String description)
-		throws Exception {
+		long groupId, long userId, String name, String description) {
 
 		WikiNode wikiNode = new WikiNodeImpl();
 
@@ -446,9 +676,8 @@ public class DataFactory {
 	}
 
 	public WikiPage addWikiPage(
-			long groupId, long userId, long nodeId, String title,
-			double version, String content, boolean head)
-		throws Exception {
+		long groupId, long userId, long nodeId, String title, double version,
+		String content, boolean head) {
 
 		WikiPage wikiPage = new WikiPageImpl();
 
@@ -485,8 +714,28 @@ public class DataFactory {
 		return _counters;
 	}
 
+	public String getDateLong(Date date) {
+		return String.valueOf(date.getTime());
+	}
+
+	public String getDateString(Date date) {
+		return _simpleDateFormat.format(date);
+	}
+
+	public ClassName getDDLRecordSetClassName() {
+		return _ddlRecordSetClassName;
+	}
+
+	public ClassName getDDMContentClassName() {
+		return _ddmContentClassName;
+	}
+
 	public User getDefaultUser() {
 		return _defaultUser;
+	}
+
+	public ClassName getDLFileEntryClassName() {
+		return _dlFileEntryClassName;
 	}
 
 	public ClassName getGroupClassName() {
@@ -503,6 +752,10 @@ public class DataFactory {
 
 	public Role getGuestRole() {
 		return _guestRole;
+	}
+
+	public ClassName getJournalArticleClassName() {
+		return _journalArticleClassName;
 	}
 
 	public ClassName getMBMessageClassName() {
@@ -523,10 +776,6 @@ public class DataFactory {
 
 	public Role getPowerUserRole() {
 		return _powerUserRole;
-	}
-
-	public List<ResourceCode> getResourceCodes() {
-		return _resourceCodes;
 	}
 
 	public ClassName getRoleClassName() {
@@ -565,7 +814,7 @@ public class DataFactory {
 		return _wikiPageClassName;
 	}
 
-	public void initClassNames() throws Exception {
+	public void initClassNames() {
 		if (_classNames != null) {
 			return;
 		}
@@ -585,8 +834,20 @@ public class DataFactory {
 			if (model.equals(BlogsEntry.class.getName())) {
 				_blogsEntryClassName = className;
 			}
+			else if (model.equals(DDLRecordSet.class.getName())) {
+				_ddlRecordSetClassName = className;
+			}
+			else if (model.equals(DDMContent.class.getName())) {
+				_ddmContentClassName = className;
+			}
+			else if (model.equals(DLFileEntry.class.getName())) {
+				_dlFileEntryClassName = className;
+			}
 			else if (model.equals(Group.class.getName())) {
 				_groupClassName = className;
+			}
+			else if (model.equals(JournalArticle.class.getName())) {
+				_journalArticleClassName = className;
 			}
 			else if (model.equals(MBMessage.class.getName())) {
 				_mbMessageClassName = className;
@@ -603,14 +864,14 @@ public class DataFactory {
 		}
 	}
 
-	public void initCompany() throws Exception {
+	public void initCompany() {
 		_company = new CompanyImpl();
 
 		_company.setCompanyId(_counter.get());
 		_company.setAccountId(_counter.get());
 	}
 
-	public void initCounters() throws Exception {
+	public void initCounters() {
 		if (_counters != null) {
 			return;
 		}
@@ -626,41 +887,32 @@ public class DataFactory {
 
 		_counters.add(counter);
 
-		// Permission
+		// ResourcePermission
 
 		counter = new CounterModelImpl();
 
-		counter.setName(Permission.class.getName());
-		counter.setCurrentId(_permissionCounter.get());
+		counter.setName(ResourcePermission.class.getName());
+		counter.setCurrentId(_resourcePermissionCounter.get());
 
 		_counters.add(counter);
 
-		// Resource
+		// SocialActivity
 
 		counter = new CounterModelImpl();
 
-		counter.setName(Resource.class.getName());
-		counter.setCurrentId(_resourceCounter.get());
-
-		_counters.add(counter);
-
-		// ResourceCode
-
-		counter = new CounterModelImpl();
-
-		counter.setName(ResourceCode.class.getName());
-		counter.setCurrentId(_resourceCodeCounter.get());
+		counter.setName(SocialActivity.class.getName());
+		counter.setCurrentId(_socialActivityCounter.get());
 
 		_counters.add(counter);
 	}
 
-	public void initDefaultUser() throws Exception {
+	public void initDefaultUser() {
 		_defaultUser = new UserImpl();
 
 		_defaultUser.setUserId(_counter.get());
 	}
 
-	public void initGroups() throws Exception {
+	public void initGroups() {
 		if (_groups != null) {
 			return;
 		}
@@ -683,81 +935,21 @@ public class DataFactory {
 		_guestGroup = group;
 	}
 
-	public void initResourceCodes() throws Exception {
-		if (_resourceCodes != null) {
-			return;
+	public void initJournalArticle(int maxJournalArticleSize) throws Exception {
+		if (maxJournalArticleSize <= 0) {
+			maxJournalArticleSize = 1;
 		}
 
-		_resourceCodes = new ArrayList<ResourceCode>();
+		char[] chars = new char[maxJournalArticleSize];
 
-		_individualResourceCodeIds = new HashMap<String, Long>();
-		_individualResourceNames = new HashMap<Long, String>();
-
-		List<String> models = ModelHintsUtil.getModels();
-
-		for (String model : models) {
-			initResourceCodes(model);
+		for (int i = 0; i < maxJournalArticleSize; i++) {
+			chars[i] = (char)(CharPool.LOWER_CASE_A + (i % 26));
 		}
 
-		Document document = SAXReaderUtil.read(
-			new File(
-				_baseDir, "../portal-web/docroot/WEB-INF/portlet-custom.xml"),
-			false);
-
-		Element rootElement = document.getRootElement();
-
-		List<Element> portletElements = rootElement.elements("portlet");
-
-		for (Element portletElement : portletElements) {
-			String portletName = portletElement.elementText("portlet-name");
-
-			initResourceCodes(portletName);
-		}
+		_journalArticleContent = new String(chars);
 	}
 
-	public void initResourceCodes(String name) throws Exception {
-
-		// Company
-
-		ResourceCode resourceCode = newResourceCode();
-
-		resourceCode.setName(name);
-		resourceCode.setScope(ResourceConstants.SCOPE_COMPANY);
-
-		_resourceCodes.add(resourceCode);
-
-		// Group
-
-		resourceCode = newResourceCode();
-
-		resourceCode.setName(name);
-		resourceCode.setScope(ResourceConstants.SCOPE_GROUP);
-
-		_resourceCodes.add(resourceCode);
-
-		// Group template
-
-		resourceCode = newResourceCode();
-
-		resourceCode.setName(name);
-		resourceCode.setScope(ResourceConstants.SCOPE_GROUP_TEMPLATE);
-
-		_resourceCodes.add(resourceCode);
-
-		// Individual
-
-		resourceCode = newResourceCode();
-
-		resourceCode.setName(name);
-		resourceCode.setScope(ResourceConstants.SCOPE_INDIVIDUAL);
-
-		_resourceCodes.add(resourceCode);
-
-		_individualResourceCodeIds.put(name, resourceCode.getCodeId());
-		_individualResourceNames.put(resourceCode.getCodeId(), name);
-	}
-
-	public void initRoles() throws Exception {
+	public void initRoles() {
 		if (_roles != null) {
 			return;
 		}
@@ -910,12 +1102,8 @@ public class DataFactory {
 		return new IntegerWrapper();
 	}
 
-	protected ResourceCode newResourceCode() {
-		ResourceCode resourceCode = new ResourceCodeImpl();
-
-		resourceCode.setCodeId(_resourceCodeCounter.get());
-
-		return resourceCode;
+	protected Date newCreateDate() {
+		return new Date(_baseCreateTime + (_dlDateCounter.get() * Time.SECOND));
 	}
 
 	protected Role newRole() {
@@ -929,19 +1117,24 @@ public class DataFactory {
 	}
 
 	private Role _administratorRole;
+	private long _baseCreateTime = System.currentTimeMillis() + Time.YEAR;
 	private String _baseDir;
 	private ClassName _blogsEntryClassName;
 	private List<ClassName> _classNames;
 	private Company _company;
 	private SimpleCounter _counter;
 	private List<CounterModelImpl> _counters;
+	private ClassName _ddlRecordSetClassName;
+	private ClassName _ddmContentClassName;
 	private User _defaultUser;
+	private SimpleCounter _dlDateCounter;
+	private ClassName _dlFileEntryClassName;
 	private ClassName _groupClassName;
 	private List<Group> _groups;
 	private Group _guestGroup;
 	private Role _guestRole;
-	private Map<String, Long> _individualResourceCodeIds;
-	private Map<Long, String> _individualResourceNames;
+	private ClassName _journalArticleClassName;
+	private String _journalArticleContent;
 	private int _maxGroupsCount;
 	private int _maxUserToGroupCount;
 	private ClassName _mbMessageClassName;
@@ -949,16 +1142,16 @@ public class DataFactory {
 	private Role _organizationOwnerRole;
 	private Role _organizationUserRole;
 	private Role _ownerRole;
-	private SimpleCounter _permissionCounter;
 	private Role _powerUserRole;
-	private SimpleCounter _resourceCodeCounter;
-	private List<ResourceCode> _resourceCodes;
-	private SimpleCounter _resourceCounter;
+	private SimpleCounter _resourcePermissionCounter;
 	private ClassName _roleClassName;
 	private List<Role> _roles;
+	private Format _simpleDateFormat =
+		FastDateFormatFactoryUtil.getSimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 	private Role _siteAdministratorRole;
 	private Role _siteMemberRole;
 	private Role _siteOwnerRole;
+	private SimpleCounter _socialActivityCounter;
 	private ClassName _userClassName;
 	private Object[] _userNames;
 	private Role _userRole;

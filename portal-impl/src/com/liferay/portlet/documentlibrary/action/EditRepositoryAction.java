@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -32,6 +32,7 @@ import com.liferay.portal.util.PortalUtil;
 import com.liferay.portal.util.WebKeys;
 import com.liferay.portlet.documentlibrary.DuplicateFolderNameException;
 import com.liferay.portlet.documentlibrary.DuplicateRepositoryNameException;
+import com.liferay.portlet.documentlibrary.FolderNameException;
 import com.liferay.portlet.documentlibrary.RepositoryNameException;
 import com.liferay.portlet.documentlibrary.model.DLFolder;
 
@@ -72,16 +73,17 @@ public class EditRepositoryAction extends PortletAction {
 			if (e instanceof NoSuchRepositoryException ||
 				e instanceof PrincipalException) {
 
-				SessionErrors.add(actionRequest, e.getClass().getName());
+				SessionErrors.add(actionRequest, e.getClass());
 
 				setForward(actionRequest, "portlet.document_library.error");
 			}
 			else if (e instanceof DuplicateFolderNameException ||
 					 e instanceof DuplicateRepositoryNameException ||
+					 e instanceof FolderNameException ||
 					 e instanceof InvalidRepositoryException ||
 					 e instanceof RepositoryNameException) {
 
-				SessionErrors.add(actionRequest, e.getClass().getName());
+				SessionErrors.add(actionRequest, e.getClass());
 			}
 			else {
 				throw e;
@@ -102,7 +104,7 @@ public class EditRepositoryAction extends PortletAction {
 			if (e instanceof NoSuchRepositoryException ||
 				e instanceof PrincipalException) {
 
-				SessionErrors.add(renderRequest, e.getClass().getName());
+				SessionErrors.add(renderRequest, e.getClass());
 
 				return mapping.findForward("portlet.document_library.error");
 			}
@@ -121,7 +123,7 @@ public class EditRepositoryAction extends PortletAction {
 
 		long repositoryId = ParamUtil.getLong(actionRequest, "repositoryId");
 
-		RepositoryServiceUtil.unmountRepository(repositoryId);
+		RepositoryServiceUtil.deleteRepository(repositoryId);
 	}
 
 	protected void updateRepository(ActionRequest actionRequest)
@@ -152,7 +154,7 @@ public class EditRepositoryAction extends PortletAction {
 
 			// Add repository
 
-			RepositoryServiceUtil.mountRepository(
+			RepositoryServiceUtil.addRepository(
 				themeDisplay.getScopeGroupId(), classNameId, folderId, name,
 				description, portletDisplay.getId(), typeSettingsProperties,
 				serviceContext);

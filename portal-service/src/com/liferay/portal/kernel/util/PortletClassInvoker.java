@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -16,7 +16,7 @@ package com.liferay.portal.kernel.util;
 
 import com.liferay.portal.kernel.portlet.PortletBag;
 import com.liferay.portal.kernel.portlet.PortletBagPool;
-import com.liferay.portal.kernel.servlet.PortletServlet;
+import com.liferay.portal.kernel.servlet.PluginContextListener;
 
 import javax.servlet.ServletContext;
 
@@ -41,7 +41,7 @@ public class PortletClassInvoker {
 			ServletContext servletContext = portletBag.getServletContext();
 
 			portletClassLoader = (ClassLoader)servletContext.getAttribute(
-				PortletServlet.PORTLET_CLASS_LOADER);
+				PluginContextListener.PLUGIN_CLASS_LOADER);
 		}
 
 		Thread currentThread = Thread.currentThread();

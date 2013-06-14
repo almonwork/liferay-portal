@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -140,7 +140,7 @@ public class PortletContextImpl implements PortletContext {
 	}
 
 	public URL getResource(String path) throws MalformedURLException {
-		if ((path == null) || (!path.startsWith(StringPool.SLASH))) {
+		if ((path == null) || !path.startsWith(StringPool.SLASH)) {
 			throw new MalformedURLException();
 		}
 
@@ -197,9 +197,9 @@ public class PortletContextImpl implements PortletContext {
 		_servletContext.setAttribute(name, obj);
 	}
 
-	private static int _MAJOR_VERSION = 2;
+	private static final int _MAJOR_VERSION = 2;
 
-	private static int _MINOR_VERSION = 0;
+	private static final int _MINOR_VERSION = 0;
 
 	private static Log _log = LogFactoryUtil.getLog(PortletContextImpl.class);
 

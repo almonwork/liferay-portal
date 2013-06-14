@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -15,7 +15,6 @@
 package com.liferay.portlet.dynamicdatamapping.service;
 
 import com.liferay.portal.kernel.bean.PortalBeanLocatorUtil;
-import com.liferay.portal.kernel.util.MethodCache;
 import com.liferay.portal.kernel.util.ReferenceRegistry;
 
 /**
@@ -66,25 +65,32 @@ public class DDMContentLocalServiceUtil {
 	* Deletes the d d m content with the primary key from the database. Also notifies the appropriate model listeners.
 	*
 	* @param contentId the primary key of the d d m content
+	* @return the d d m content that was removed
 	* @throws PortalException if a d d m content with the primary key could not be found
 	* @throws SystemException if a system exception occurred
 	*/
-	public static void deleteDDMContent(long contentId)
+	public static com.liferay.portlet.dynamicdatamapping.model.DDMContent deleteDDMContent(
+		long contentId)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException {
-		getService().deleteDDMContent(contentId);
+		return getService().deleteDDMContent(contentId);
 	}
 
 	/**
 	* Deletes the d d m content from the database. Also notifies the appropriate model listeners.
 	*
 	* @param ddmContent the d d m content
+	* @return the d d m content that was removed
 	* @throws SystemException if a system exception occurred
 	*/
-	public static void deleteDDMContent(
+	public static com.liferay.portlet.dynamicdatamapping.model.DDMContent deleteDDMContent(
 		com.liferay.portlet.dynamicdatamapping.model.DDMContent ddmContent)
 		throws com.liferay.portal.kernel.exception.SystemException {
-		getService().deleteDDMContent(ddmContent);
+		return getService().deleteDDMContent(ddmContent);
+	}
+
+	public static com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery() {
+		return getService().dynamicQuery();
 	}
 
 	/**
@@ -156,6 +162,12 @@ public class DDMContentLocalServiceUtil {
 		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery)
 		throws com.liferay.portal.kernel.exception.SystemException {
 		return getService().dynamicQueryCount(dynamicQuery);
+	}
+
+	public static com.liferay.portlet.dynamicdatamapping.model.DDMContent fetchDDMContent(
+		long contentId)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getService().fetchDDMContent(contentId);
 	}
 
 	/**
@@ -339,20 +351,15 @@ public class DDMContentLocalServiceUtil {
 
 			ReferenceRegistry.registerReference(DDMContentLocalServiceUtil.class,
 				"_service");
-			MethodCache.remove(DDMContentLocalService.class);
 		}
 
 		return _service;
 	}
 
+	/**
+	 * @deprecated
+	 */
 	public void setService(DDMContentLocalService service) {
-		MethodCache.remove(DDMContentLocalService.class);
-
-		_service = service;
-
-		ReferenceRegistry.registerReference(DDMContentLocalServiceUtil.class,
-			"_service");
-		MethodCache.remove(DDMContentLocalService.class);
 	}
 
 	private static DDMContentLocalService _service;

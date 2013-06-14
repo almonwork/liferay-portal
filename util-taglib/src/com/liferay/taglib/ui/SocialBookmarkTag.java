@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -76,6 +76,18 @@ public class SocialBookmarkTag extends IncludeTag {
 		}
 	}
 
+	protected String getPostUrl() {
+		Map<String, String> vars = new HashMap<String, String>();
+
+		vars.put("liferay:social-bookmark:title", HttpUtil.encodeURL(_title));
+		vars.put("liferay:social-bookmark:url", _url);
+
+		String postUrl = PropsUtil.get(
+			PropsKeys.SOCIAL_BOOKMARK_POST_URL, new Filter(_type, vars));
+
+		return postUrl;
+	}
+
 	@Override
 	protected void setAttributes(HttpServletRequest request) {
 		String jspPath = _jspPaths.get(_type);
@@ -98,18 +110,6 @@ public class SocialBookmarkTag extends IncludeTag {
 		request.setAttribute("liferay-ui:social-bookmark:title", _title);
 		request.setAttribute("liferay-ui:social-bookmark:type", _type);
 		request.setAttribute("liferay-ui:social-bookmark:url", _url);
-	}
-
-	private String getPostUrl() {
-		Map<String, String> vars = new HashMap<String, String>();
-
-		vars.put("liferay:social-bookmark:title", HttpUtil.encodeURL(_title));
-		vars.put("liferay:social-bookmark:url", _url);
-
-		String postUrl = PropsUtil.get(
-			PropsKeys.SOCIAL_BOOKMARK_POST_URL, new Filter(_type, vars));
-
-		return postUrl;
 	}
 
 	private static final String _PAGE =

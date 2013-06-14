@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -40,7 +40,7 @@ if (Validator.isNotNull(ddmStructureId)) {
 	try {
 		DDMStructure ddmStructure = DDMStructureLocalServiceUtil.getStructure(ddmStructureId);
 
-		ddmStructureName = ddmStructure.getName(locale);
+		ddmStructureName = HtmlUtil.escape(ddmStructure.getName(locale));
 	}
 	catch (NoSuchStructureException nsse) {
 	}
@@ -65,8 +65,9 @@ if (Validator.isNotNull(ddmStructureId)) {
 	<aui:input name="groupId" type="hidden" value="<%= groupId %>" />
 	<aui:input name="recordSetId" type="hidden" value="<%= recordSetId %>" />
 	<aui:input name="ddmStructureId" type="hidden" value="<%= ddmStructureId %>" />
+	<aui:input name="scope" type="hidden" value="<%= DDLRecordSetConstants.SCOPE_DYNAMIC_DATA_LISTS %>" />
 
-	<liferay-ui:error exception="<%= RecordSetDDMStructureIdException.class %>" message="please-enter-valid-definition" />
+	<liferay-ui:error exception="<%= RecordSetDDMStructureIdException.class %>" message="please-enter-a-valid-definition" />
 	<liferay-ui:error exception="<%= RecordSetNameException.class %>" message="please-enter-a-valid-name" />
 
 	<liferay-ui:asset-categories-error />
@@ -125,7 +126,7 @@ if (Validator.isNotNull(ddmStructureId)) {
 				for (WorkflowDefinition workflowDefinition : workflowDefinitions) {
 					boolean selected = false;
 
-					if ((workflowDefinitionLink != null) && (workflowDefinitionLink.getWorkflowDefinitionName().equals(workflowDefinition.getName())) && (workflowDefinitionLink.getWorkflowDefinitionVersion() == workflowDefinition.getVersion())) {
+					if ((workflowDefinitionLink != null) && workflowDefinitionLink.getWorkflowDefinitionName().equals(workflowDefinition.getName()) && (workflowDefinitionLink.getWorkflowDefinitionVersion() == workflowDefinition.getVersion())) {
 						selected = true;
 					}
 				%>
@@ -152,16 +153,18 @@ if (Validator.isNotNull(ddmStructureId)) {
 		Liferay.Util.openDDMPortlet(
 			{
 				chooseCallback: '<portlet:namespace />selectDDMStructure',
-				saveCallback: '<portlet:namespace />selectDDMStructure',
+				classNameId: '<%= PortalUtil.getClassNameId(DDMStructure.class) %>',
+				classPK: ddmStructureId,
+				ddmResource: '<%= ddmResource %>',
 				dialog: {
-					width:820
+					width: 820
 				},
+				saveCallback: '<portlet:namespace />selectDDMStructure',
 				storageType: '<%= PropsValues.DYNAMIC_DATA_LISTS_STORAGE_TYPE %>',
-				structureId: ddmStructureId,
 				structureName: 'data-definition',
 				structureType: 'com.liferay.portlet.dynamicdatalists.model.DDLRecordSet',
 				struts_action: strutsAction,
-				title: '<liferay-ui:message key="data-definitions" />'
+				title: '<%= UnicodeLanguageUtil.get(pageContext, "data-definitions") %>'
 			}
 		);
 	}

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -16,6 +16,7 @@ package com.liferay.portal.service.permission;
 
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
+import com.liferay.portal.kernel.security.pacl.permission.PortalRuntimePermission;
 import com.liferay.portal.model.Organization;
 import com.liferay.portal.security.permission.PermissionChecker;
 
@@ -52,6 +53,15 @@ public class OrganizationPermissionUtil {
 	}
 
 	public static boolean contains(
+			PermissionChecker permissionChecker, long[] organizationIds,
+			String actionId)
+		throws PortalException, SystemException {
+
+		return getOrganizationPermission().contains(
+			permissionChecker, organizationIds, actionId);
+	}
+
+	public static boolean contains(
 			PermissionChecker permissionChecker, Organization organization,
 			String actionId)
 		throws PortalException, SystemException {
@@ -61,11 +71,16 @@ public class OrganizationPermissionUtil {
 	}
 
 	public static OrganizationPermission getOrganizationPermission() {
+		PortalRuntimePermission.checkGetBeanProperty(
+			OrganizationPermissionUtil.class);
+
 		return _organizationPermission;
 	}
 
 	public void setOrganizationPermission(
 		OrganizationPermission organizationPermission) {
+
+		PortalRuntimePermission.checkSetBeanProperty(getClass());
 
 		_organizationPermission = organizationPermission;
 	}

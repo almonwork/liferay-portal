@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -15,7 +15,6 @@
 package com.liferay.portal.service;
 
 import com.liferay.portal.kernel.bean.PortalBeanLocatorUtil;
-import com.liferay.portal.kernel.util.MethodCache;
 import com.liferay.portal.kernel.util.ReferenceRegistry;
 
 /**
@@ -66,25 +65,32 @@ public class ServiceComponentLocalServiceUtil {
 	* Deletes the service component with the primary key from the database. Also notifies the appropriate model listeners.
 	*
 	* @param serviceComponentId the primary key of the service component
+	* @return the service component that was removed
 	* @throws PortalException if a service component with the primary key could not be found
 	* @throws SystemException if a system exception occurred
 	*/
-	public static void deleteServiceComponent(long serviceComponentId)
+	public static com.liferay.portal.model.ServiceComponent deleteServiceComponent(
+		long serviceComponentId)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException {
-		getService().deleteServiceComponent(serviceComponentId);
+		return getService().deleteServiceComponent(serviceComponentId);
 	}
 
 	/**
 	* Deletes the service component from the database. Also notifies the appropriate model listeners.
 	*
 	* @param serviceComponent the service component
+	* @return the service component that was removed
 	* @throws SystemException if a system exception occurred
 	*/
-	public static void deleteServiceComponent(
+	public static com.liferay.portal.model.ServiceComponent deleteServiceComponent(
 		com.liferay.portal.model.ServiceComponent serviceComponent)
 		throws com.liferay.portal.kernel.exception.SystemException {
-		getService().deleteServiceComponent(serviceComponent);
+		return getService().deleteServiceComponent(serviceComponent);
+	}
+
+	public static com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery() {
+		return getService().dynamicQuery();
 	}
 
 	/**
@@ -156,6 +162,12 @@ public class ServiceComponentLocalServiceUtil {
 		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery)
 		throws com.liferay.portal.kernel.exception.SystemException {
 		return getService().dynamicQueryCount(dynamicQuery);
+	}
+
+	public static com.liferay.portal.model.ServiceComponent fetchServiceComponent(
+		long serviceComponentId)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getService().fetchServiceComponent(serviceComponentId);
 	}
 
 	/**
@@ -296,20 +308,15 @@ public class ServiceComponentLocalServiceUtil {
 
 			ReferenceRegistry.registerReference(ServiceComponentLocalServiceUtil.class,
 				"_service");
-			MethodCache.remove(ServiceComponentLocalService.class);
 		}
 
 		return _service;
 	}
 
+	/**
+	 * @deprecated
+	 */
 	public void setService(ServiceComponentLocalService service) {
-		MethodCache.remove(ServiceComponentLocalService.class);
-
-		_service = service;
-
-		ReferenceRegistry.registerReference(ServiceComponentLocalServiceUtil.class,
-			"_service");
-		MethodCache.remove(ServiceComponentLocalService.class);
 	}
 
 	private static ServiceComponentLocalService _service;

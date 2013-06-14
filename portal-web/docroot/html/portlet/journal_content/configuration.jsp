@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -29,6 +29,8 @@ try {
 	if (Validator.isNotNull(articleId)) {
 		article = JournalArticleLocalServiceUtil.getLatestArticle(groupId, articleId);
 
+		article = article.toEscapedModel();
+
 		groupId = article.getGroupId();
 		type = article.getType();
 	}
@@ -40,12 +42,12 @@ groupId = ParamUtil.getLong(request, "groupId", themeDisplay.getScopeGroupId());
 type = ParamUtil.getString(request, "type", type);
 %>
 
-<liferay-portlet:actionURL portletConfiguration="true" var="configurationURL" />
-<liferay-portlet:renderURL portletConfiguration="true" varImpl="portletURL" />
+<liferay-portlet:actionURL portletConfiguration="true" var="configurationActionURL" />
+<liferay-portlet:renderURL portletConfiguration="true" varImpl="configurationRenderURL" />
 
-<aui:form action="<%= configurationURL %>" method="post" name="fm1">
+<aui:form action="<%= configurationActionURL %>" method="post" name="fm1">
 	<aui:input name="<%= Constants.CMD %>" type="hidden" />
-	<aui:input name="redirect" type="hidden" value='<%= portletURL.toString() + StringPool.AMPERSAND + renderResponse.getNamespace() + "cur=" + cur %>' />
+	<aui:input name="redirect" type="hidden" value='<%= configurationRenderURL + StringPool.AMPERSAND + renderResponse.getNamespace() + "cur=" + cur %>' />
 
 	<liferay-ui:error exception="<%= NoSuchArticleException.class %>" message="the-web-content-could-not-be-found" />
 
@@ -55,7 +57,7 @@ type = ParamUtil.getString(request, "type", type);
 		</span>
 
 		<span class="displaying-article-id-holder <%= article == null ? "aui-helper-hidden" : StringPool.BLANK %>">
-			<liferay-ui:message key="displaying-content" />: <span class="displaying-article-id"><%= article != null ? HtmlUtil.escape(article.getTitle(locale)) : StringPool.BLANK %></span>
+			<liferay-ui:message key="displaying-content" />: <span class="displaying-article-id"><%= article != null ? article.getTitle(locale) : StringPool.BLANK %></span>
 		</span>
 	</div>
 
@@ -64,8 +66,26 @@ type = ParamUtil.getString(request, "type", type);
 		<%
 		String structureId = article.getStructureId();
 
+		JournalStructure structure = null;
+
+		long structureGroupId = groupId;
+
 		if (Validator.isNotNull(structureId)) {
-			List templates = JournalTemplateLocalServiceUtil.getStructureTemplates(groupId, structureId);
+			try {
+				structure = JournalStructureLocalServiceUtil.getStructure(groupId, structureId, true);
+
+				structureGroupId = structure.getGroupId();
+			}
+			catch (NoSuchStructureException nsse) {
+			}
+
+			List<JournalTemplate> templates = new ArrayList<JournalTemplate>();
+
+			templates.addAll(JournalTemplateLocalServiceUtil.getStructureTemplates(structureGroupId, structureId));
+
+			if (groupId != structureGroupId) {
+				templates.addAll(JournalTemplateLocalServiceUtil.getStructureTemplates(groupId, structureId));
+			}
 
 			if (!templates.isEmpty()) {
 				if (Validator.isNull(templateId)) {
@@ -106,12 +126,12 @@ type = ParamUtil.getString(request, "type", type);
 							<aui:a href="<%= editTemplateURL %>" id="tableIteratorObjName"><%= tableIteratorObj.getName() %></aui:a>
 						</liferay-util:buffer>
 
-						<aui:input checked="<%= templateChecked %>" inlineLabel="right" name="overideTemplateId" label="<%= linkContent %>" onChange='<%= "if (this.checked) {document." + renderResponse.getNamespace() + "fm." + renderResponse.getNamespace() + "templateId.value = this.value;}" %>' type="radio" value="<%= tableIteratorObj.getTemplateId() %>" />
+						<aui:input checked="<%= templateChecked %>" label="<%= linkContent %>" name="overideTemplateId" onChange='<%= "if (this.checked) {document." + renderResponse.getNamespace() + "fm." + renderResponse.getNamespace() + "templateId.value = this.value;}" %>' type="radio" value="<%= tableIteratorObj.getTemplateId() %>" />
 
 						<c:if test="<%= tableIteratorObj.isSmallImage() %>">
 							<br />
 
-							<img border="0" hspace="0" src="<%= Validator.isNotNull(tableIteratorObj.getSmallImageURL()) ? tableIteratorObj.getSmallImageURL() : themeDisplay.getPathImage() + "/journal/template?img_id=" + tableIteratorObj.getSmallImageId() + "&t=" + ImageServletTokenUtil.getToken(tableIteratorObj.getSmallImageId()) %>" vspace="0" />
+							<img border="0" hspace="0" src="<%= Validator.isNotNull(tableIteratorObj.getSmallImageURL()) ? tableIteratorObj.getSmallImageURL() : themeDisplay.getPathImage() + "/journal/template?img_id=" + tableIteratorObj.getSmallImageId() + "&t=" + WebServerServletTokenUtil.getToken(tableIteratorObj.getSmallImageId()) %>" vspace="0" />
 						</c:if>
 					</liferay-ui:table-iterator>
 
@@ -131,7 +151,7 @@ type = ParamUtil.getString(request, "type", type);
 	dynamicRenderRequest.setParameter("type", type);
 	dynamicRenderRequest.setParameter("groupId", String.valueOf(groupId));
 
-	ArticleSearch searchContainer = new ArticleSearch(dynamicRenderRequest, portletURL);
+	ArticleSearch searchContainer = new ArticleSearch(dynamicRenderRequest, configurationRenderURL);
 	%>
 
 	<liferay-ui:search-form
@@ -152,6 +172,7 @@ type = ParamUtil.getString(request, "type", type);
 	searchTerms.setVersion(-1);
 
 	List<JournalArticle> results = null;
+	int total = 0;
 	%>
 
 	<%@ include file="/html/portlet/journal/article_search_results.jspf" %>
@@ -207,9 +228,9 @@ type = ParamUtil.getString(request, "type", type);
 	<liferay-ui:search-iterator searchContainer="<%= searchContainer %>" />
 </aui:form>
 
-<aui:form action="<%= configurationURL %>" method="post" name="fm">
+<aui:form action="<%= configurationActionURL %>" method="post" name="fm">
 	<aui:input name="<%= Constants.CMD %>" type="hidden" value="<%= Constants.UPDATE %>" />
-	<aui:input name="redirect" type="hidden" value='<%= portletURL.toString() + StringPool.AMPERSAND + renderResponse.getNamespace() + "cur" + cur %>' />
+	<aui:input name="redirect" type="hidden" value='<%= configurationRenderURL + StringPool.AMPERSAND + renderResponse.getNamespace() + "cur" + cur %>' />
 	<aui:input name="preferences--groupId--" type="hidden" value="<%= groupId %>" />
 	<aui:input name="preferences--articleId--" type="hidden" value="<%= articleId %>" />
 	<aui:input name="preferences--templateId--" type="hidden" value="<%= templateId %>" />
@@ -276,7 +297,7 @@ type = ParamUtil.getString(request, "type", type);
 
 			var displayArticleId = A.one('.displaying-article-id');
 
-			displayArticleId.set('innerHTML', articletTitle + ' (<%= LanguageUtil.get(pageContext, "modified") %>)');
+			displayArticleId.set('innerHTML', articletTitle + ' (<%= UnicodeLanguageUtil.get(pageContext, "modified") %>)');
 			displayArticleId.addClass('modified');
 		},
 		['aui-base']

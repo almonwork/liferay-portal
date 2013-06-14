@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -47,6 +47,7 @@ public class UnsyncCharArrayReader extends Reader {
 		if (buffer == null) {
 			throw new IOException("Stream closed");
 		}
+
 		markIndex = index;
 	}
 
@@ -75,9 +76,7 @@ public class UnsyncCharArrayReader extends Reader {
 	}
 
 	@Override
-	public int read(char[] chars, int offset, int length)
-		throws IOException {
-
+	public int read(char[] chars, int offset, int length) throws IOException {
 		if (buffer == null) {
 			throw new IOException("Stream closed");
 		}
@@ -163,7 +162,7 @@ public class UnsyncCharArrayReader extends Reader {
 			return 0;
 		}
 
-		if (index + skip > capacity) {
+		if ((index + skip) > capacity) {
 			skip = capacity - index;
 		}
 

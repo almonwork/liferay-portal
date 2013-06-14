@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -15,7 +15,6 @@
 package com.liferay.portlet.messageboards.service;
 
 import com.liferay.portal.kernel.bean.PortalBeanLocatorUtil;
-import com.liferay.portal.kernel.util.MethodCache;
 import com.liferay.portal.kernel.util.ReferenceRegistry;
 
 /**
@@ -66,25 +65,32 @@ public class MBBanLocalServiceUtil {
 	* Deletes the message boards ban with the primary key from the database. Also notifies the appropriate model listeners.
 	*
 	* @param banId the primary key of the message boards ban
+	* @return the message boards ban that was removed
 	* @throws PortalException if a message boards ban with the primary key could not be found
 	* @throws SystemException if a system exception occurred
 	*/
-	public static void deleteMBBan(long banId)
+	public static com.liferay.portlet.messageboards.model.MBBan deleteMBBan(
+		long banId)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException {
-		getService().deleteMBBan(banId);
+		return getService().deleteMBBan(banId);
 	}
 
 	/**
 	* Deletes the message boards ban from the database. Also notifies the appropriate model listeners.
 	*
 	* @param mbBan the message boards ban
+	* @return the message boards ban that was removed
 	* @throws SystemException if a system exception occurred
 	*/
-	public static void deleteMBBan(
+	public static com.liferay.portlet.messageboards.model.MBBan deleteMBBan(
 		com.liferay.portlet.messageboards.model.MBBan mbBan)
 		throws com.liferay.portal.kernel.exception.SystemException {
-		getService().deleteMBBan(mbBan);
+		return getService().deleteMBBan(mbBan);
+	}
+
+	public static com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery() {
+		return getService().dynamicQuery();
 	}
 
 	/**
@@ -156,6 +162,11 @@ public class MBBanLocalServiceUtil {
 		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery)
 		throws com.liferay.portal.kernel.exception.SystemException {
 		return getService().dynamicQueryCount(dynamicQuery);
+	}
+
+	public static com.liferay.portlet.messageboards.model.MBBan fetchMBBan(
+		long banId) throws com.liferay.portal.kernel.exception.SystemException {
+		return getService().fetchMBBan(banId);
 	}
 
 	/**
@@ -323,20 +334,15 @@ public class MBBanLocalServiceUtil {
 
 			ReferenceRegistry.registerReference(MBBanLocalServiceUtil.class,
 				"_service");
-			MethodCache.remove(MBBanLocalService.class);
 		}
 
 		return _service;
 	}
 
+	/**
+	 * @deprecated
+	 */
 	public void setService(MBBanLocalService service) {
-		MethodCache.remove(MBBanLocalService.class);
-
-		_service = service;
-
-		ReferenceRegistry.registerReference(MBBanLocalServiceUtil.class,
-			"_service");
-		MethodCache.remove(MBBanLocalService.class);
 	}
 
 	private static MBBanLocalService _service;

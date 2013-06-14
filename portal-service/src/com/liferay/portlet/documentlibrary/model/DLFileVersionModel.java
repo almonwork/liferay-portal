@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -18,6 +18,7 @@ import com.liferay.portal.kernel.bean.AutoEscape;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.model.BaseModel;
 import com.liferay.portal.model.CacheModel;
+import com.liferay.portal.model.GroupedModel;
 import com.liferay.portal.model.WorkflowedModel;
 import com.liferay.portal.service.ServiceContext;
 
@@ -41,7 +42,7 @@ import java.util.Date;
  * @generated
  */
 public interface DLFileVersionModel extends BaseModel<DLFileVersion>,
-	WorkflowedModel {
+	GroupedModel, WorkflowedModel {
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
@@ -61,6 +62,21 @@ public interface DLFileVersionModel extends BaseModel<DLFileVersion>,
 	 * @param primaryKey the primary key of this document library file version
 	 */
 	public void setPrimaryKey(long primaryKey);
+
+	/**
+	 * Returns the uuid of this document library file version.
+	 *
+	 * @return the uuid of this document library file version
+	 */
+	@AutoEscape
+	public String getUuid();
+
+	/**
+	 * Sets the uuid of this document library file version.
+	 *
+	 * @param uuid the uuid of this document library file version
+	 */
+	public void setUuid(String uuid);
 
 	/**
 	 * Returns the file version ID of this document library file version.
@@ -163,6 +179,20 @@ public interface DLFileVersionModel extends BaseModel<DLFileVersion>,
 	public void setCreateDate(Date createDate);
 
 	/**
+	 * Returns the modified date of this document library file version.
+	 *
+	 * @return the modified date of this document library file version
+	 */
+	public Date getModifiedDate();
+
+	/**
+	 * Sets the modified date of this document library file version.
+	 *
+	 * @param modifiedDate the modified date of this document library file version
+	 */
+	public void setModifiedDate(Date modifiedDate);
+
+	/**
 	 * Returns the repository ID of this document library file version.
 	 *
 	 * @return the repository ID of this document library file version
@@ -175,6 +205,20 @@ public interface DLFileVersionModel extends BaseModel<DLFileVersion>,
 	 * @param repositoryId the repository ID of this document library file version
 	 */
 	public void setRepositoryId(long repositoryId);
+
+	/**
+	 * Returns the folder ID of this document library file version.
+	 *
+	 * @return the folder ID of this document library file version
+	 */
+	public long getFolderId();
+
+	/**
+	 * Sets the folder ID of this document library file version.
+	 *
+	 * @param folderId the folder ID of this document library file version
+	 */
+	public void setFolderId(long folderId);
 
 	/**
 	 * Returns the file entry ID of this document library file version.
@@ -422,6 +466,13 @@ public interface DLFileVersionModel extends BaseModel<DLFileVersion>,
 	public boolean isExpired();
 
 	/**
+	 * Returns <code>true</code> if this document library file version is in the Recycle Bin.
+	 *
+	 * @return <code>true</code> if this document library file version is in the Recycle Bin; <code>false</code> otherwise
+	 */
+	public boolean isInTrash();
+
+	/**
 	 * Returns <code>true</code> if this document library file version is pending.
 	 *
 	 * @return <code>true</code> if this document library file version is pending; <code>false</code> otherwise
@@ -437,8 +488,6 @@ public interface DLFileVersionModel extends BaseModel<DLFileVersion>,
 	public void setCachedModel(boolean cachedModel);
 
 	public boolean isEscapedModel();
-
-	public void setEscapedModel(boolean escapedModel);
 
 	public Serializable getPrimaryKeyObj();
 

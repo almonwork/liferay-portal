@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -15,7 +15,6 @@
 package com.liferay.portlet.softwarecatalog.service;
 
 import com.liferay.portal.kernel.bean.PortalBeanLocatorUtil;
-import com.liferay.portal.kernel.util.MethodCache;
 import com.liferay.portal.kernel.util.ReferenceRegistry;
 
 /**
@@ -66,25 +65,32 @@ public class SCProductEntryLocalServiceUtil {
 	* Deletes the s c product entry with the primary key from the database. Also notifies the appropriate model listeners.
 	*
 	* @param productEntryId the primary key of the s c product entry
+	* @return the s c product entry that was removed
 	* @throws PortalException if a s c product entry with the primary key could not be found
 	* @throws SystemException if a system exception occurred
 	*/
-	public static void deleteSCProductEntry(long productEntryId)
+	public static com.liferay.portlet.softwarecatalog.model.SCProductEntry deleteSCProductEntry(
+		long productEntryId)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException {
-		getService().deleteSCProductEntry(productEntryId);
+		return getService().deleteSCProductEntry(productEntryId);
 	}
 
 	/**
 	* Deletes the s c product entry from the database. Also notifies the appropriate model listeners.
 	*
 	* @param scProductEntry the s c product entry
+	* @return the s c product entry that was removed
 	* @throws SystemException if a system exception occurred
 	*/
-	public static void deleteSCProductEntry(
+	public static com.liferay.portlet.softwarecatalog.model.SCProductEntry deleteSCProductEntry(
 		com.liferay.portlet.softwarecatalog.model.SCProductEntry scProductEntry)
 		throws com.liferay.portal.kernel.exception.SystemException {
-		getService().deleteSCProductEntry(scProductEntry);
+		return getService().deleteSCProductEntry(scProductEntry);
+	}
+
+	public static com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery() {
+		return getService().dynamicQuery();
 	}
 
 	/**
@@ -156,6 +162,12 @@ public class SCProductEntryLocalServiceUtil {
 		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery)
 		throws com.liferay.portal.kernel.exception.SystemException {
 		return getService().dynamicQueryCount(dynamicQuery);
+	}
+
+	public static com.liferay.portlet.softwarecatalog.model.SCProductEntry fetchSCProductEntry(
+		long productEntryId)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getService().fetchSCProductEntry(productEntryId);
 	}
 
 	/**
@@ -315,17 +327,18 @@ public class SCProductEntryLocalServiceUtil {
 		getService().deleteProductEntries(groupId);
 	}
 
-	public static void deleteProductEntry(long productEntryId)
+	public static com.liferay.portlet.softwarecatalog.model.SCProductEntry deleteProductEntry(
+		long productEntryId)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException {
-		getService().deleteProductEntry(productEntryId);
+		return getService().deleteProductEntry(productEntryId);
 	}
 
-	public static void deleteProductEntry(
+	public static com.liferay.portlet.softwarecatalog.model.SCProductEntry deleteProductEntry(
 		com.liferay.portlet.softwarecatalog.model.SCProductEntry productEntry)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException {
-		getService().deleteProductEntry(productEntry);
+		return getService().deleteProductEntry(productEntry);
 	}
 
 	public static java.util.List<com.liferay.portlet.softwarecatalog.model.SCProductEntry> getCompanyProductEntries(
@@ -422,20 +435,15 @@ public class SCProductEntryLocalServiceUtil {
 
 			ReferenceRegistry.registerReference(SCProductEntryLocalServiceUtil.class,
 				"_service");
-			MethodCache.remove(SCProductEntryLocalService.class);
 		}
 
 		return _service;
 	}
 
+	/**
+	 * @deprecated
+	 */
 	public void setService(SCProductEntryLocalService service) {
-		MethodCache.remove(SCProductEntryLocalService.class);
-
-		_service = service;
-
-		ReferenceRegistry.registerReference(SCProductEntryLocalServiceUtil.class,
-			"_service");
-		MethodCache.remove(SCProductEntryLocalService.class);
 	}
 
 	private static SCProductEntryLocalService _service;

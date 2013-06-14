@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -21,21 +21,23 @@ String toolbarItem = ParamUtil.getString(request, "toolbarItem", "view-all");
 %>
 
 <div class="lfr-portlet-toolbar">
-	<portlet:renderURL var="viewRolesURL">
+	<portlet:renderURL var="viewLayoutSetPrototypesURL">
 		<portlet:param name="struts_action" value="/layout_set_prototypes/view" />
 	</portlet:renderURL>
 
 	<span class="lfr-toolbar-button view-button <%= toolbarItem.equals("view-all") ? "current" : StringPool.BLANK %>">
-		<a href="<%= viewRolesURL %>"><liferay-ui:message key="view-all" /></a>
+		<a href="<%= viewLayoutSetPrototypesURL %>"><liferay-ui:message key="view-all" /></a>
 	</span>
 
 	<c:if test="<%= PortalPermissionUtil.contains(permissionChecker, ActionKeys.ADD_LAYOUT_SET_PROTOTYPE) %>">
 		<portlet:renderURL var="addLayoutSetPrototypeURL">
 			<portlet:param name="struts_action" value="/layout_set_prototypes/edit_layout_set_prototype" />
-			<portlet:param name="redirect" value="<%= currentURL %>" />
-			<portlet:param name="backURL" value="<%= currentURL %>" />
+			<portlet:param name="redirect" value="<%= viewLayoutSetPrototypesURL %>" />
+			<portlet:param name="backURL" value="<%= viewLayoutSetPrototypesURL %>" />
 		</portlet:renderURL>
 
-		<span class="lfr-toolbar-button add-button <%= toolbarItem.equals("add") ? "current" : StringPool.BLANK %>"><a href="<%= addLayoutSetPrototypeURL %>"><liferay-ui:message key="add" /></a></span>
+		<span class="lfr-toolbar-button add-button <%= toolbarItem.equals("add") ? "current" : StringPool.BLANK %>">
+			<a href="<%= addLayoutSetPrototypeURL %>"><liferay-ui:message key="add" /></a>
+		</span>
 	</c:if>
 </div>

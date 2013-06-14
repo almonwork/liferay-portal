@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -32,14 +32,43 @@ public interface ChannelHub {
 			long userId, Collection<String> notificationEventUuids)
 		throws ChannelException;
 
+	public void confirmDelivery(
+			long userId, Collection<String> notificationEventUuids,
+			boolean archive)
+		throws ChannelException;
+
 	public void confirmDelivery(long userId, String notificationEventUuid)
+		throws ChannelException;
+
+	public void confirmDelivery(
+			long userId, String notificationEventUuid, boolean archive)
 		throws ChannelException;
 
 	public Channel createChannel(long userId) throws ChannelException;
 
+	public void deleteUserNotificiationEvent(
+			long userId, String notificationEventUuid)
+		throws ChannelException;
+
+	public void deleteUserNotificiationEvents(
+			long userId, Collection<String> notificationEventUuids)
+		throws ChannelException;
+
 	public void destroy() throws ChannelException;
 
 	public Channel destroyChannel(long userId) throws ChannelException;
+
+	public Channel fetchChannel(long userId) throws ChannelException;
+
+	public Channel fetchChannel(long userId, boolean createIfAbsent)
+		throws ChannelException;
+
+	public List<NotificationEvent> fetchNotificationEvents(long userId)
+		throws ChannelException;
+
+	public List<NotificationEvent> fetchNotificationEvents(
+			long userId, boolean flush)
+		throws ChannelException;
 
 	public void flush() throws ChannelException;
 

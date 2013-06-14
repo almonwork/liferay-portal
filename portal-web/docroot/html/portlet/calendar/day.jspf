@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -114,11 +114,7 @@ List<CalEvent> results = CalEventServiceUtil.getEvents(scopeGroupId, selCal, eve
 List<CalEvent> allDayResults = new ArrayList<CalEvent>();
 List<CalEvent> partDayResults = new ArrayList<CalEvent>();
 
-Iterator<CalEvent> itr = results.iterator();
-
-while (itr.hasNext()) {
-	CalEvent event = itr.next();
-
+for (CalEvent event : results) {
 	if (event.isAllDay()) {
 		allDayResults.add(event);
 	}
@@ -306,7 +302,7 @@ if (!partDayResults.isEmpty()) {
 
 					<c:if test="<%= eventBoxLength >= 100 %>">
 						<div class="event-description">
-							<%= StringUtil.shorten(event.getDescription(), 100) %>
+							<%= StringUtil.shorten(HtmlUtil.extractText(event.getDescription()), 100) %>
 						</div>
 					</c:if>
 				</div>

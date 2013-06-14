@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -18,14 +18,14 @@
 
 <portlet:defineObjects />
 
-<tiles:useAttribute id="tilesPortletContent" name="portlet_content" classname="java.lang.String" ignore="true" />
-<tiles:useAttribute id="tilesPortletDecorate" name="portlet_decorate" classname="java.lang.String" ignore="true" />
-<tiles:useAttribute id="tilesPortletPadding" name="portlet_padding" classname="java.lang.String" ignore="true" />
+<tiles:useAttribute classname="java.lang.String" id="tilesPortletContent" ignore="true" name="portlet_content" />
+<tiles:useAttribute classname="java.lang.String" id="tilesPortletDecorate" ignore="true" name="portlet_decorate" />
+<tiles:useAttribute classname="java.lang.String" id="tilesPortletPadding" ignore="true" name="portlet_padding" />
 
 <%
 Portlet portlet = (Portlet)request.getAttribute(WebKeys.RENDER_PORTLET);
 
-PortletPreferences portletSetup = PortletPreferencesFactoryUtil.getStrictLayoutPortletSetup(layout, portletDisplay.getId());
+PortletPreferences portletSetup = portletDisplay.getPortletSetup();
 
 RenderResponseImpl renderResponseImpl = (RenderResponseImpl)PortletResponseImpl.getPortletResponseImpl(renderResponse);
 
@@ -39,7 +39,7 @@ if (tilesPortletDecorateBoolean) {
 	portletDecorateDefault = GetterUtil.getBoolean(themeDisplay.getThemeSetting("portlet-setup-show-borders-default"), PropsValues.THEME_PORTLET_DECORATE_DEFAULT);
 }
 
-boolean portletDecorate = GetterUtil.getBoolean(portletSetup.getValue("portlet-setup-show-borders", String.valueOf(portletDecorateDefault)));
+boolean portletDecorate = GetterUtil.getBoolean(portletSetup.getValue("portletSetupShowBorders", String.valueOf(portletDecorateDefault)));
 
 Boolean portletDecorateObj = (Boolean)renderRequest.getAttribute(WebKeys.PORTLET_DECORATE);
 
@@ -60,7 +60,7 @@ if (portletDisplay.isAccess() && portletDisplay.isActive() && (portletTitle == n
 ResourceBundle resourceBundle = portletConfig.getResourceBundle(locale);
 
 if (portletTitle == null) {
-	portletTitle = resourceBundle.getString(JavaConstants.JAVAX_PORTLET_TITLE);
+	portletTitle = ResourceBundleUtil.getString(resourceBundle, JavaConstants.JAVAX_PORTLET_TITLE);
 }
 
 portletDisplay.setTitle(portletTitle);
@@ -143,7 +143,18 @@ boolean wsrp = ParamUtil.getBoolean(request, "wsrp");
 			<c:otherwise>
 
 				<%
-				boolean showPortletActions = tilesPortletDecorateBoolean && (portletDisplay.isShowPortletCssIcon() || portletDisplay.isShowConfigurationIcon() || portletDisplay.isShowEditIcon() || portletDisplay.isShowCloseIcon());
+				boolean showPortletActions =
+					(group.isLayoutPrototype() || tilesPortletDecorateBoolean) &&
+					(portletDisplay.isShowCloseIcon() ||
+					 portletDisplay.isShowConfigurationIcon() ||
+					 portletDisplay.isShowEditDefaultsIcon() ||
+					 portletDisplay.isShowEditGuestIcon() ||
+					 portletDisplay.isShowEditIcon() ||
+					 portletDisplay.isShowExportImportIcon() ||
+					 portletDisplay.isShowHelpIcon() ||
+					 portletDisplay.isShowPortletCssIcon() ||
+					 portletDisplay.isShowPrintIcon() ||
+					 portletDisplay.isShowRefreshIcon());
 				%>
 
 				<div class="portlet-borderless-container" <%= containerStyles %>>
@@ -163,7 +174,7 @@ boolean wsrp = ParamUtil.getBoolean(request, "wsrp");
 										<span class="portlet-action portlet-close">
 											<span class="portlet-action-separator">-</span>
 
-											<a href="<%= portletDisplay.getURLClose() %>" title="<liferay-ui:message key="close" />"><liferay-ui:message key="close" /></a>
+											<liferay-portlet:icon-close />
 										</span>
 									</c:if>
 

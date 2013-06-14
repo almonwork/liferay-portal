@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,6 +14,11 @@
 
 package com.liferay.portlet.expando.model;
 
+import com.liferay.portal.model.ModelWrapper;
+
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * <p>
  * This class is a wrapper for {@link ExpandoRow}.
@@ -23,7 +28,7 @@ package com.liferay.portlet.expando.model;
  * @see       ExpandoRow
  * @generated
  */
-public class ExpandoRowWrapper implements ExpandoRow {
+public class ExpandoRowWrapper implements ExpandoRow, ModelWrapper<ExpandoRow> {
 	public ExpandoRowWrapper(ExpandoRow expandoRow) {
 		_expandoRow = expandoRow;
 	}
@@ -34,6 +39,43 @@ public class ExpandoRowWrapper implements ExpandoRow {
 
 	public String getModelClassName() {
 		return ExpandoRow.class.getName();
+	}
+
+	public Map<String, Object> getModelAttributes() {
+		Map<String, Object> attributes = new HashMap<String, Object>();
+
+		attributes.put("rowId", getRowId());
+		attributes.put("companyId", getCompanyId());
+		attributes.put("tableId", getTableId());
+		attributes.put("classPK", getClassPK());
+
+		return attributes;
+	}
+
+	public void setModelAttributes(Map<String, Object> attributes) {
+		Long rowId = (Long)attributes.get("rowId");
+
+		if (rowId != null) {
+			setRowId(rowId);
+		}
+
+		Long companyId = (Long)attributes.get("companyId");
+
+		if (companyId != null) {
+			setCompanyId(companyId);
+		}
+
+		Long tableId = (Long)attributes.get("tableId");
+
+		if (tableId != null) {
+			setTableId(tableId);
+		}
+
+		Long classPK = (Long)attributes.get("classPK");
+
+		if (classPK != null) {
+			setClassPK(classPK);
+		}
 	}
 
 	/**
@@ -146,10 +188,6 @@ public class ExpandoRowWrapper implements ExpandoRow {
 		return _expandoRow.isEscapedModel();
 	}
 
-	public void setEscapedModel(boolean escapedModel) {
-		_expandoRow.setEscapedModel(escapedModel);
-	}
-
 	public java.io.Serializable getPrimaryKeyObj() {
 		return _expandoRow.getPrimaryKeyObj();
 	}
@@ -204,7 +242,14 @@ public class ExpandoRowWrapper implements ExpandoRow {
 		_expandoRow.persist();
 	}
 
+	/**
+	 * @deprecated Renamed to {@link #getWrappedModel}
+	 */
 	public ExpandoRow getWrappedExpandoRow() {
+		return _expandoRow;
+	}
+
+	public ExpandoRow getWrappedModel() {
 		return _expandoRow;
 	}
 

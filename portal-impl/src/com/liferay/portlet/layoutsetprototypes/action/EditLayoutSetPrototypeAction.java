@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -15,18 +15,21 @@
 package com.liferay.portlet.layoutsetprototypes.action;
 
 import com.liferay.portal.NoSuchLayoutSetPrototypeException;
+import com.liferay.portal.RequiredLayoutSetPrototypeException;
 import com.liferay.portal.kernel.servlet.SessionErrors;
 import com.liferay.portal.kernel.util.Constants;
 import com.liferay.portal.kernel.util.LocalizationUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.UnicodeProperties;
+import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.model.LayoutSetPrototype;
 import com.liferay.portal.security.auth.PrincipalException;
 import com.liferay.portal.service.LayoutSetPrototypeServiceUtil;
 import com.liferay.portal.service.ServiceContext;
 import com.liferay.portal.service.ServiceContextFactory;
 import com.liferay.portal.struts.PortletAction;
+import com.liferay.portal.util.PortalUtil;
 
 import java.util.Locale;
 import java.util.Map;
@@ -68,10 +71,20 @@ public class EditLayoutSetPrototypeAction extends PortletAction {
 		}
 		catch (Exception e) {
 			if (e instanceof PrincipalException) {
-				SessionErrors.add(actionRequest, e.getClass().getName());
+				SessionErrors.add(actionRequest, e.getClass());
 
 				setForward(
 					actionRequest, "portlet.layout_set_prototypes.error");
+			}
+			else if (e instanceof RequiredLayoutSetPrototypeException) {
+				SessionErrors.add(actionRequest, e.getClass());
+
+				String redirect = PortalUtil.escapeRedirect(
+					ParamUtil.getString(actionRequest, "redirect"));
+
+				if (Validator.isNotNull(redirect)) {
+					actionResponse.sendRedirect(redirect);
+				}
 			}
 			else {
 				throw e;
@@ -92,7 +105,7 @@ public class EditLayoutSetPrototypeAction extends PortletAction {
 			if (e instanceof NoSuchLayoutSetPrototypeException ||
 				e instanceof PrincipalException) {
 
-				SessionErrors.add(renderRequest, e.getClass().getName());
+				SessionErrors.add(renderRequest, e.getClass());
 
 				return mapping.findForward(
 					"portlet.layout_set_prototypes.error");
@@ -129,10 +142,8 @@ public class EditLayoutSetPrototypeAction extends PortletAction {
 			actionRequest, "name");
 		String description = ParamUtil.getString(actionRequest, "description");
 		boolean active = ParamUtil.getBoolean(actionRequest, "active");
-		boolean allowModifications = ParamUtil.getBoolean(
-			actionRequest, "allowModifications");
-		boolean allowLayoutAddition = ParamUtil.getBoolean(
-			actionRequest, "allowLayoutAdditions");
+		boolean layoutsUpdateable = ParamUtil.getBoolean(
+			actionRequest, "layoutsUpdateable");
 
 		ServiceContext serviceContext = ServiceContextFactory.getInstance(
 			actionRequest);
@@ -145,8 +156,8 @@ public class EditLayoutSetPrototypeAction extends PortletAction {
 
 			layoutSetPrototype =
 				LayoutSetPrototypeServiceUtil.addLayoutSetPrototype(
-					nameMap, description, active, allowModifications,
-					allowLayoutAddition, serviceContext);
+					nameMap, description, active, layoutsUpdateable,
+					serviceContext);
 		}
 		else {
 
@@ -155,7 +166,7 @@ public class EditLayoutSetPrototypeAction extends PortletAction {
 			layoutSetPrototype =
 				LayoutSetPrototypeServiceUtil.updateLayoutSetPrototype(
 					layoutSetPrototypeId, nameMap, description, active,
-					allowModifications,	allowLayoutAddition, serviceContext);
+					layoutsUpdateable, serviceContext);
 		}
 
 		// Custom JSPs

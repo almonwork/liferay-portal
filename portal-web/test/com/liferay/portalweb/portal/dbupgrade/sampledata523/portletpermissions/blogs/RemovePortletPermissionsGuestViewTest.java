@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -29,9 +29,10 @@ public class RemovePortletPermissionsGuestViewTest extends BaseTestCase {
 			switch (label) {
 			case 1:
 				selenium.open("/web/guest/home");
+				loadRequiredJavaScriptModules();
 
 				for (int second = 0;; second++) {
-					if (second >= 60) {
+					if (second >= 90) {
 						fail("timeout");
 					}
 
@@ -47,19 +48,18 @@ public class RemovePortletPermissionsGuestViewTest extends BaseTestCase {
 					Thread.sleep(1000);
 				}
 
-				selenium.saveScreenShotAndSource();
 				selenium.clickAt("link=Blogs Portlet Permissions Page",
-					RuntimeVariables.replace(""));
+					RuntimeVariables.replace("Blogs Portlet Permissions Page"));
 				selenium.waitForPageToLoad("30000");
-				selenium.saveScreenShotAndSource();
+				loadRequiredJavaScriptModules();
 				selenium.clickAt("link=Configuration",
-					RuntimeVariables.replace(""));
+					RuntimeVariables.replace("Configuration"));
 				selenium.waitForPageToLoad("30000");
-				selenium.saveScreenShotAndSource();
+				loadRequiredJavaScriptModules();
 				selenium.clickAt("link=Permissions",
-					RuntimeVariables.replace(""));
+					RuntimeVariables.replace("Permissions"));
 				selenium.waitForPageToLoad("30000");
-				selenium.saveScreenShotAndSource();
+				loadRequiredJavaScriptModules();
 
 				boolean guestViewChecked = selenium.isChecked("13_ACTION_VIEW");
 
@@ -69,17 +69,18 @@ public class RemovePortletPermissionsGuestViewTest extends BaseTestCase {
 					continue;
 				}
 
-				selenium.clickAt("13_ACTION_VIEW", RuntimeVariables.replace(""));
+				selenium.clickAt("//input[@name='13_ACTION_VIEW']",
+					RuntimeVariables.replace("Guest View Checkbox"));
 
 			case 2:
 				selenium.clickAt("//input[@value='Submit']",
-					RuntimeVariables.replace(""));
+					RuntimeVariables.replace("Submit"));
 				selenium.waitForPageToLoad("30000");
-				selenium.saveScreenShotAndSource();
+				loadRequiredJavaScriptModules();
 				assertTrue(selenium.isTextPresent(
 						"Your request processed successfully."));
-				assertFalse(selenium.isChecked("13_ACTION_VIEW"));
-				selenium.saveScreenShotAndSource();
+				assertFalse(selenium.isChecked(
+						"//input[@name='13_ACTION_VIEW']"));
 
 			case 100:
 				label = -1;

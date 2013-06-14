@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -91,15 +91,6 @@ public class WorkflowDefinitionLinkUtil {
 		return getPersistence()
 				   .findWithDynamicQuery(dynamicQuery, start, end,
 			orderByComparator);
-	}
-
-	/**
-	 * @see com.liferay.portal.service.persistence.BasePersistence#remove(com.liferay.portal.model.BaseModel)
-	 */
-	public static WorkflowDefinitionLink remove(
-		WorkflowDefinitionLink workflowDefinitionLink)
-		throws SystemException {
-		return getPersistence().remove(workflowDefinitionLink);
 	}
 
 	/**
@@ -618,14 +609,17 @@ public class WorkflowDefinitionLinkUtil {
 	* @param classNameId the class name ID
 	* @param classPK the class p k
 	* @param typePK the type p k
+	* @return the workflow definition link that was removed
 	* @throws SystemException if a system exception occurred
 	*/
-	public static void removeByG_C_C_C_T(long groupId, long companyId,
-		long classNameId, long classPK, long typePK)
+	public static com.liferay.portal.model.WorkflowDefinitionLink removeByG_C_C_C_T(
+		long groupId, long companyId, long classNameId, long classPK,
+		long typePK)
 		throws com.liferay.portal.NoSuchWorkflowDefinitionLinkException,
 			com.liferay.portal.kernel.exception.SystemException {
-		getPersistence()
-			.removeByG_C_C_C_T(groupId, companyId, classNameId, classPK, typePK);
+		return getPersistence()
+				   .removeByG_C_C_C_T(groupId, companyId, classNameId, classPK,
+			typePK);
 	}
 
 	/**
@@ -708,11 +702,10 @@ public class WorkflowDefinitionLinkUtil {
 		return _persistence;
 	}
 
+	/**
+	 * @deprecated
+	 */
 	public void setPersistence(WorkflowDefinitionLinkPersistence persistence) {
-		_persistence = persistence;
-
-		ReferenceRegistry.registerReference(WorkflowDefinitionLinkUtil.class,
-			"_persistence");
 	}
 
 	private static WorkflowDefinitionLinkPersistence _persistence;

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -107,9 +107,7 @@ public class AssetTagServiceImpl extends AssetTagServiceBaseImpl {
 			groupId, start, end, obc);
 	}
 
-	public int getGroupTagsCount(long groupId)
-		throws  SystemException {
-
+	public int getGroupTagsCount(long groupId) throws SystemException {
 		return assetTagPersistence.filterCountByGroupId(groupId);
 	}
 
@@ -187,12 +185,20 @@ public class AssetTagServiceImpl extends AssetTagServiceBaseImpl {
 		return filterTags(assetTagLocalService.getTags(className, classPK));
 	}
 
-	public int getTagsCount(
-			long groupId, String name, String[] tagProperties)
+	public int getTagsCount(long groupId, long classNameId, String name)
 		throws SystemException {
 
-		return assetTagFinder.filterCountByG_N_P(
-			groupId, name, tagProperties);
+		return assetTagFinder.filterCountByG_C_N(groupId, classNameId, name);
+	}
+
+	public int getTagsCount(long groupId, String name) throws SystemException {
+		return assetTagFinder.filterCountByG_N(groupId, name);
+	}
+
+	public int getTagsCount(long groupId, String name, String[] tagProperties)
+		throws SystemException {
+
+		return assetTagFinder.filterCountByG_N_P(groupId, name, tagProperties);
 	}
 
 	public void mergeTags(
@@ -222,8 +228,7 @@ public class AssetTagServiceImpl extends AssetTagServiceBaseImpl {
 			int end)
 		throws SystemException {
 
-		List<AssetTag> tags = getTags(
-			groupId, name, tagProperties, start, end);
+		List<AssetTag> tags = getTags(groupId, name, tagProperties, start, end);
 
 		return Autocomplete.listToJson(tags, "name", "name");
 	}

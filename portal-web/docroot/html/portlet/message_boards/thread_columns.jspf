@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -55,10 +55,10 @@
 >
 
 	<%
-	if (MBMessageFlagLocalServiceUtil.hasAnswerFlag(message.getMessageId())) {
+	if (MBThreadLocalServiceUtil.hasAnswerMessage(thread.getThreadId())) {
 		buffer.append(LanguageUtil.get(pageContext, "resolved"));
 	}
-	else if (MBMessageFlagLocalServiceUtil.hasQuestionFlag(message.getMessageId())) {
+	else if (thread.isQuestion()) {
 		buffer.append(LanguageUtil.get(pageContext, "waiting-for-an-answer"));
 	}
 	%>
@@ -83,35 +83,6 @@
 	value="<%= String.valueOf(thread.getViewCount()) %>"
 />
 
-<liferay-ui:search-container-column-text
-	buffer="buffer"
-	href="<%= rowURL %>"
-	name="last-post"
->
+<%@ include file="/html/portlet/message_boards/thread_columns_last_post.jspf" %>
 
-	<%
-	if (thread.getLastPostDate() == null) {
-		buffer.append(LanguageUtil.get(pageContext, "none"));
-	}
-	else {
-		buffer.append(LanguageUtil.get(pageContext, "date"));
-		buffer.append(": ");
-		buffer.append(dateFormatDateTime.format(thread.getLastPostDate()));
-
-		String lastPostByUserName = HtmlUtil.escape(PortalUtil.getUserName(thread.getLastPostByUserId(), StringPool.BLANK));
-
-		if (Validator.isNotNull(lastPostByUserName)) {
-			buffer.append("<br />");
-			buffer.append(LanguageUtil.get(pageContext, "by"));
-			buffer.append(": ");
-			buffer.append(lastPostByUserName);
-		}
-	}
-	%>
-
-</liferay-ui:search-container-column-text>
-
-<liferay-ui:search-container-column-jsp
-	align="right"
-	path="/html/portlet/message_boards/message_action.jsp"
-/>
+<%@ include file="/html/portlet/message_boards/thread_columns_action.jspf" %>

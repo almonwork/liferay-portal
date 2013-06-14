@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -19,6 +19,7 @@ import com.liferay.portal.kernel.cluster.ClusterNodeResponses;
 import com.liferay.portal.kernel.cluster.FutureClusterResponses;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.security.pacl.permission.PortalRuntimePermission;
 import com.liferay.portal.kernel.util.MethodHandler;
 import com.liferay.portal.model.ClusterGroup;
 import com.liferay.portal.service.ClusterGroupLocalServiceUtil;
@@ -27,6 +28,7 @@ import java.lang.reflect.Method;
 
 /**
  * @author Shuyang Zhou
+ * @author Raymond Augé
  */
 public class PortalManagerUtil {
 
@@ -36,6 +38,12 @@ public class PortalManagerUtil {
 		return new MethodHandler(_manageMethod, manageAction);
 	}
 
+	public static PortalManager getPortalManager() {
+		PortalRuntimePermission.checkGetBeanProperty(PortalManagerUtil.class);
+
+		return _portalManager;
+	}
+
 	public static FutureClusterResponses manage(
 			ClusterGroup clusterGroup, ManageAction<?> manageAction)
 		throws ManageActionException {
@@ -43,13 +51,13 @@ public class PortalManagerUtil {
 		ManageAction<FutureClusterResponses> manageActionWrapper =
 			new ClusterManageActionWrapper(clusterGroup, manageAction);
 
-		return _portalManager.manage(manageActionWrapper);
+		return getPortalManager().manage(manageActionWrapper);
 	}
 
 	public static <T> T manage(ManageAction<T> manageAction)
 		throws ManageActionException {
 
-		return _portalManager.manage(manageAction);
+		return getPortalManager().manage(manageAction);
 	}
 
 	public static void manageAsync(
@@ -62,7 +70,7 @@ public class PortalManagerUtil {
 		clusterGroup.setClusterNodeIds(clusterNode.getClusterNodeId());
 
 		manage(clusterGroup, manageAction);
- 	}
+	}
 
 	public static <T> T manageSync(
 			ClusterNode clusterNode, ManageAction<T> manageAction)
@@ -84,6 +92,8 @@ public class PortalManagerUtil {
 	}
 
 	public void setPortalManager(PortalManager portalManager) {
+		PortalRuntimePermission.checkSetBeanProperty(getClass());
+
 		_portalManager = portalManager;
 	}
 

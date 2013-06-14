@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -35,7 +35,8 @@ import com.liferay.portal.kernel.transaction.Transactional;
  */
 @Transactional(isolation = Isolation.PORTAL, rollbackFor =  {
 	PortalException.class, SystemException.class})
-public interface LockLocalService extends PersistedModelLocalService {
+public interface LockLocalService extends BaseLocalService,
+	PersistedModelLocalService {
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
@@ -65,10 +66,11 @@ public interface LockLocalService extends PersistedModelLocalService {
 	* Deletes the lock with the primary key from the database. Also notifies the appropriate model listeners.
 	*
 	* @param lockId the primary key of the lock
+	* @return the lock that was removed
 	* @throws PortalException if a lock with the primary key could not be found
 	* @throws SystemException if a system exception occurred
 	*/
-	public void deleteLock(long lockId)
+	public com.liferay.portal.model.Lock deleteLock(long lockId)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException;
 
@@ -76,10 +78,14 @@ public interface LockLocalService extends PersistedModelLocalService {
 	* Deletes the lock from the database. Also notifies the appropriate model listeners.
 	*
 	* @param lock the lock
+	* @return the lock that was removed
 	* @throws SystemException if a system exception occurred
 	*/
-	public void deleteLock(com.liferay.portal.model.Lock lock)
+	public com.liferay.portal.model.Lock deleteLock(
+		com.liferay.portal.model.Lock lock)
 		throws com.liferay.portal.kernel.exception.SystemException;
+
+	public com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery();
 
 	/**
 	* Performs a dynamic query on the database and returns the matching rows.
@@ -141,6 +147,10 @@ public interface LockLocalService extends PersistedModelLocalService {
 	*/
 	public long dynamicQueryCount(
 		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery)
+		throws com.liferay.portal.kernel.exception.SystemException;
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public com.liferay.portal.model.Lock fetchLock(long lockId)
 		throws com.liferay.portal.kernel.exception.SystemException;
 
 	/**
@@ -241,30 +251,27 @@ public interface LockLocalService extends PersistedModelLocalService {
 			com.liferay.portal.kernel.exception.SystemException;
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public com.liferay.portal.model.Lock getLockByUuid(java.lang.String uuid)
+	public com.liferay.portal.model.Lock getLockByUuidAndCompanyId(
+		java.lang.String uuid, long companyId)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException;
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public boolean hasLock(long userId, java.lang.String className, long key)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException;
+		throws com.liferay.portal.kernel.exception.SystemException;
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public boolean hasLock(long userId, java.lang.String className,
 		java.lang.String key)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException;
+		throws com.liferay.portal.kernel.exception.SystemException;
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public boolean isLocked(java.lang.String className, long key)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException;
+		throws com.liferay.portal.kernel.exception.SystemException;
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public boolean isLocked(java.lang.String className, java.lang.String key)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException;
+		throws com.liferay.portal.kernel.exception.SystemException;
 
 	public com.liferay.portal.model.Lock lock(long userId,
 		java.lang.String className, long key, java.lang.String owner,
@@ -288,7 +295,7 @@ public interface LockLocalService extends PersistedModelLocalService {
 		throws com.liferay.portal.kernel.exception.SystemException;
 
 	public com.liferay.portal.model.Lock refresh(java.lang.String uuid,
-		long expirationTime)
+		long companyId, long expirationTime)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException;
 

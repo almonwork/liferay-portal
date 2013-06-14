@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -32,11 +32,6 @@ import javax.portlet.RenderResponse;
 public class HelloWorldPortlet extends GenericPortlet {
 
 	@Override
-	public void processAction(
-		ActionRequest actionRequest, ActionResponse actionResponse) {
-	}
-
-	@Override
 	public void doView(
 			RenderRequest renderRequest, RenderResponse renderResponse)
 		throws IOException {
@@ -48,6 +43,11 @@ public class HelloWorldPortlet extends GenericPortlet {
 		writer.print("Welcome to " + ReleaseInfo.getReleaseInfo() + ".");
 
 		writer.close();
+	}
+
+	@Override
+	public void processAction(
+		ActionRequest actionRequest, ActionResponse actionResponse) {
 	}
 
 }

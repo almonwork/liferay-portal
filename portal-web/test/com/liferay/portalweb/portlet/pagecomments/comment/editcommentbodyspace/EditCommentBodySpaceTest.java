@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -23,14 +23,15 @@ import com.liferay.portalweb.portal.util.RuntimeVariables;
 public class EditCommentBodySpaceTest extends BaseTestCase {
 	public void testEditCommentBodySpace() throws Exception {
 		selenium.open("/web/guest/home/");
+		loadRequiredJavaScriptModules();
 
 		for (int second = 0;; second++) {
-			if (second >= 60) {
+			if (second >= 90) {
 				fail("timeout");
 			}
 
 			try {
-				if (selenium.isElementPresent("link=Page Comments Test Page")) {
+				if (selenium.isVisible("link=Page Comments Test Page")) {
 					break;
 				}
 			}
@@ -40,22 +41,24 @@ public class EditCommentBodySpaceTest extends BaseTestCase {
 			Thread.sleep(1000);
 		}
 
-		selenium.saveScreenShotAndSource();
 		selenium.clickAt("link=Page Comments Test Page",
-			RuntimeVariables.replace(""));
+			RuntimeVariables.replace("Page Comments Test Page"));
 		selenium.waitForPageToLoad("30000");
-		selenium.saveScreenShotAndSource();
-		assertEquals(RuntimeVariables.replace("This is a test page comment."),
-			selenium.getText("//div/div[3]/div/div[1]"));
-		selenium.clickAt("link=Edit", RuntimeVariables.replace(""));
+		loadRequiredJavaScriptModules();
+		assertEquals(RuntimeVariables.replace("PC Comment"),
+			selenium.getText("//div[@class='lfr-discussion-message']"));
+		assertEquals(RuntimeVariables.replace("Edit"),
+			selenium.getText("//li[3]/span/a/span"));
+		selenium.clickAt("//li[3]/span/a/span", RuntimeVariables.replace("Edit"));
 
 		for (int second = 0;; second++) {
-			if (second >= 60) {
+			if (second >= 90) {
 				fail("timeout");
 			}
 
 			try {
-				if (selenium.isElementPresent("_107_editReplyBody1")) {
+				if (selenium.isVisible(
+							"//textarea[@name='_107_editReplyBody1']")) {
 					break;
 				}
 			}
@@ -65,28 +68,46 @@ public class EditCommentBodySpaceTest extends BaseTestCase {
 			Thread.sleep(1000);
 		}
 
-		selenium.saveScreenShotAndSource();
-		selenium.type("_107_editReplyBody1", RuntimeVariables.replace(" "));
-		selenium.saveScreenShotAndSource();
-		selenium.keyPress("_107_editReplyBody1",
-			RuntimeVariables.replace("\\48"));
-		selenium.keyPress("_107_editReplyBody1", RuntimeVariables.replace("\\8"));
+		selenium.type("//textarea[@name='_107_editReplyBody1']",
+			RuntimeVariables.replace(" "));
 		selenium.clickAt("//input[@value='Publish']",
-			RuntimeVariables.replace(""));
-		Thread.sleep(5000);
+			RuntimeVariables.replace("Publish"));
+
+		for (int second = 0;; second++) {
+			if (second >= 90) {
+				fail("timeout");
+			}
+
+			try {
+				if (RuntimeVariables.replace("Please enter a valid message.")
+										.equals(selenium.getText(
+								"//div[@class='lfr-message-response portlet-msg-error']"))) {
+					break;
+				}
+			}
+			catch (Exception e) {
+			}
+
+			Thread.sleep(1000);
+		}
+
+		assertEquals(RuntimeVariables.replace("Please enter a valid message."),
+			selenium.getText(
+				"//div[@class='lfr-message-response portlet-msg-error']"));
 		assertFalse(selenium.isTextPresent(
-				"Your request completed successfully."));
-		assertTrue(selenium.isVisible("_107_editReplyBody1"));
+				"Your request processed successfully."));
+		assertTrue(selenium.isVisible("//textarea[@name='_107_editReplyBody1']"));
 		assertTrue(selenium.isVisible("//input[@value='Publish']"));
 		selenium.open("/web/guest/home/");
+		loadRequiredJavaScriptModules();
 
 		for (int second = 0;; second++) {
-			if (second >= 60) {
+			if (second >= 90) {
 				fail("timeout");
 			}
 
 			try {
-				if (selenium.isElementPresent("link=Page Comments Test Page")) {
+				if (selenium.isVisible("link=Page Comments Test Page")) {
 					break;
 				}
 			}
@@ -96,12 +117,11 @@ public class EditCommentBodySpaceTest extends BaseTestCase {
 			Thread.sleep(1000);
 		}
 
-		selenium.saveScreenShotAndSource();
 		selenium.clickAt("link=Page Comments Test Page",
-			RuntimeVariables.replace(""));
+			RuntimeVariables.replace("Page Comments Test Page"));
 		selenium.waitForPageToLoad("30000");
-		selenium.saveScreenShotAndSource();
-		assertEquals(RuntimeVariables.replace("This is a test page comment."),
-			selenium.getText("//div/div[3]/div/div[1]"));
+		loadRequiredJavaScriptModules();
+		assertEquals(RuntimeVariables.replace("PC Comment"),
+			selenium.getText("//div[@class='lfr-discussion-message']"));
 	}
 }

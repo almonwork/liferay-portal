@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -76,6 +76,8 @@ public interface ShardModel extends AttachedModel, BaseModel<Shard> {
 	 */
 	public String getClassName();
 
+	public void setClassName(String className);
+
 	/**
 	 * Returns the class name ID of this shard.
 	 *
@@ -128,8 +130,6 @@ public interface ShardModel extends AttachedModel, BaseModel<Shard> {
 	public void setCachedModel(boolean cachedModel);
 
 	public boolean isEscapedModel();
-
-	public void setEscapedModel(boolean escapedModel);
 
 	public Serializable getPrimaryKeyObj();
 

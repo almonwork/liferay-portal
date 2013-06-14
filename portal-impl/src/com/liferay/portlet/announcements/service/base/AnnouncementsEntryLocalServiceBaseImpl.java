@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -23,15 +23,14 @@ import com.liferay.portal.kernel.bean.IdentifiableBean;
 import com.liferay.portal.kernel.dao.jdbc.SqlUpdate;
 import com.liferay.portal.kernel.dao.jdbc.SqlUpdateFactoryUtil;
 import com.liferay.portal.kernel.dao.orm.DynamicQuery;
+import com.liferay.portal.kernel.dao.orm.DynamicQueryFactoryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
-import com.liferay.portal.kernel.search.Indexer;
-import com.liferay.portal.kernel.search.IndexerRegistryUtil;
-import com.liferay.portal.kernel.search.SearchException;
+import com.liferay.portal.kernel.search.Indexable;
+import com.liferay.portal.kernel.search.IndexableType;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.model.PersistedModel;
+import com.liferay.portal.service.BaseLocalServiceImpl;
 import com.liferay.portal.service.CompanyLocalService;
 import com.liferay.portal.service.CompanyService;
 import com.liferay.portal.service.GroupLocalService;
@@ -40,7 +39,6 @@ import com.liferay.portal.service.OrganizationLocalService;
 import com.liferay.portal.service.OrganizationService;
 import com.liferay.portal.service.PersistedModelLocalServiceRegistry;
 import com.liferay.portal.service.ResourceLocalService;
-import com.liferay.portal.service.ResourceService;
 import com.liferay.portal.service.RoleLocalService;
 import com.liferay.portal.service.RoleService;
 import com.liferay.portal.service.UserGroupLocalService;
@@ -52,8 +50,6 @@ import com.liferay.portal.service.persistence.GroupFinder;
 import com.liferay.portal.service.persistence.GroupPersistence;
 import com.liferay.portal.service.persistence.OrganizationFinder;
 import com.liferay.portal.service.persistence.OrganizationPersistence;
-import com.liferay.portal.service.persistence.ResourceFinder;
-import com.liferay.portal.service.persistence.ResourcePersistence;
 import com.liferay.portal.service.persistence.RoleFinder;
 import com.liferay.portal.service.persistence.RolePersistence;
 import com.liferay.portal.service.persistence.UserFinder;
@@ -92,7 +88,8 @@ import javax.sql.DataSource;
  * @generated
  */
 public abstract class AnnouncementsEntryLocalServiceBaseImpl
-	implements AnnouncementsEntryLocalService, IdentifiableBean {
+	extends BaseLocalServiceImpl implements AnnouncementsEntryLocalService,
+		IdentifiableBean {
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
@@ -106,27 +103,12 @@ public abstract class AnnouncementsEntryLocalServiceBaseImpl
 	 * @return the announcements entry that was added
 	 * @throws SystemException if a system exception occurred
 	 */
+	@Indexable(type = IndexableType.REINDEX)
 	public AnnouncementsEntry addAnnouncementsEntry(
 		AnnouncementsEntry announcementsEntry) throws SystemException {
 		announcementsEntry.setNew(true);
 
-		announcementsEntry = announcementsEntryPersistence.update(announcementsEntry,
-				false);
-
-		Indexer indexer = IndexerRegistryUtil.getIndexer(getModelClassName());
-
-		if (indexer != null) {
-			try {
-				indexer.reindex(announcementsEntry);
-			}
-			catch (SearchException se) {
-				if (_log.isWarnEnabled()) {
-					_log.warn(se, se);
-				}
-			}
-		}
-
-		return announcementsEntry;
+		return announcementsEntryPersistence.update(announcementsEntry, false);
 	}
 
 	/**
@@ -143,49 +125,34 @@ public abstract class AnnouncementsEntryLocalServiceBaseImpl
 	 * Deletes the announcements entry with the primary key from the database. Also notifies the appropriate model listeners.
 	 *
 	 * @param entryId the primary key of the announcements entry
+	 * @return the announcements entry that was removed
 	 * @throws PortalException if a announcements entry with the primary key could not be found
 	 * @throws SystemException if a system exception occurred
 	 */
-	public void deleteAnnouncementsEntry(long entryId)
+	@Indexable(type = IndexableType.DELETE)
+	public AnnouncementsEntry deleteAnnouncementsEntry(long entryId)
 		throws PortalException, SystemException {
-		AnnouncementsEntry announcementsEntry = announcementsEntryPersistence.remove(entryId);
-
-		Indexer indexer = IndexerRegistryUtil.getIndexer(getModelClassName());
-
-		if (indexer != null) {
-			try {
-				indexer.delete(announcementsEntry);
-			}
-			catch (SearchException se) {
-				if (_log.isWarnEnabled()) {
-					_log.warn(se, se);
-				}
-			}
-		}
+		return announcementsEntryPersistence.remove(entryId);
 	}
 
 	/**
 	 * Deletes the announcements entry from the database. Also notifies the appropriate model listeners.
 	 *
 	 * @param announcementsEntry the announcements entry
+	 * @return the announcements entry that was removed
 	 * @throws SystemException if a system exception occurred
 	 */
-	public void deleteAnnouncementsEntry(AnnouncementsEntry announcementsEntry)
-		throws SystemException {
-		announcementsEntryPersistence.remove(announcementsEntry);
+	@Indexable(type = IndexableType.DELETE)
+	public AnnouncementsEntry deleteAnnouncementsEntry(
+		AnnouncementsEntry announcementsEntry) throws SystemException {
+		return announcementsEntryPersistence.remove(announcementsEntry);
+	}
 
-		Indexer indexer = IndexerRegistryUtil.getIndexer(getModelClassName());
+	public DynamicQuery dynamicQuery() {
+		Class<?> clazz = getClass();
 
-		if (indexer != null) {
-			try {
-				indexer.delete(announcementsEntry);
-			}
-			catch (SearchException se) {
-				if (_log.isWarnEnabled()) {
-					_log.warn(se, se);
-				}
-			}
-		}
+		return DynamicQueryFactoryUtil.forClass(AnnouncementsEntry.class,
+			clazz.getClassLoader());
 	}
 
 	/**
@@ -254,6 +221,11 @@ public abstract class AnnouncementsEntryLocalServiceBaseImpl
 		return announcementsEntryPersistence.countWithDynamicQuery(dynamicQuery);
 	}
 
+	public AnnouncementsEntry fetchAnnouncementsEntry(long entryId)
+		throws SystemException {
+		return announcementsEntryPersistence.fetchByPrimaryKey(entryId);
+	}
+
 	/**
 	 * Returns the announcements entry with the primary key.
 	 *
@@ -306,6 +278,7 @@ public abstract class AnnouncementsEntryLocalServiceBaseImpl
 	 * @return the announcements entry that was updated
 	 * @throws SystemException if a system exception occurred
 	 */
+	@Indexable(type = IndexableType.REINDEX)
 	public AnnouncementsEntry updateAnnouncementsEntry(
 		AnnouncementsEntry announcementsEntry) throws SystemException {
 		return updateAnnouncementsEntry(announcementsEntry, true);
@@ -319,28 +292,13 @@ public abstract class AnnouncementsEntryLocalServiceBaseImpl
 	 * @return the announcements entry that was updated
 	 * @throws SystemException if a system exception occurred
 	 */
+	@Indexable(type = IndexableType.REINDEX)
 	public AnnouncementsEntry updateAnnouncementsEntry(
 		AnnouncementsEntry announcementsEntry, boolean merge)
 		throws SystemException {
 		announcementsEntry.setNew(false);
 
-		announcementsEntry = announcementsEntryPersistence.update(announcementsEntry,
-				merge);
-
-		Indexer indexer = IndexerRegistryUtil.getIndexer(getModelClassName());
-
-		if (indexer != null) {
-			try {
-				indexer.reindex(announcementsEntry);
-			}
-			catch (SearchException se) {
-				if (_log.isWarnEnabled()) {
-					_log.warn(se, se);
-				}
-			}
-		}
-
-		return announcementsEntry;
+		return announcementsEntryPersistence.update(announcementsEntry, merge);
 	}
 
 	/**
@@ -789,60 +747,6 @@ public abstract class AnnouncementsEntryLocalServiceBaseImpl
 	}
 
 	/**
-	 * Returns the resource remote service.
-	 *
-	 * @return the resource remote service
-	 */
-	public ResourceService getResourceService() {
-		return resourceService;
-	}
-
-	/**
-	 * Sets the resource remote service.
-	 *
-	 * @param resourceService the resource remote service
-	 */
-	public void setResourceService(ResourceService resourceService) {
-		this.resourceService = resourceService;
-	}
-
-	/**
-	 * Returns the resource persistence.
-	 *
-	 * @return the resource persistence
-	 */
-	public ResourcePersistence getResourcePersistence() {
-		return resourcePersistence;
-	}
-
-	/**
-	 * Sets the resource persistence.
-	 *
-	 * @param resourcePersistence the resource persistence
-	 */
-	public void setResourcePersistence(ResourcePersistence resourcePersistence) {
-		this.resourcePersistence = resourcePersistence;
-	}
-
-	/**
-	 * Returns the resource finder.
-	 *
-	 * @return the resource finder
-	 */
-	public ResourceFinder getResourceFinder() {
-		return resourceFinder;
-	}
-
-	/**
-	 * Sets the resource finder.
-	 *
-	 * @param resourceFinder the resource finder
-	 */
-	public void setResourceFinder(ResourceFinder resourceFinder) {
-		this.resourceFinder = resourceFinder;
-	}
-
-	/**
 	 * Returns the role local service.
 	 *
 	 * @return the role local service
@@ -1163,12 +1067,6 @@ public abstract class AnnouncementsEntryLocalServiceBaseImpl
 	protected OrganizationFinder organizationFinder;
 	@BeanReference(type = ResourceLocalService.class)
 	protected ResourceLocalService resourceLocalService;
-	@BeanReference(type = ResourceService.class)
-	protected ResourceService resourceService;
-	@BeanReference(type = ResourcePersistence.class)
-	protected ResourcePersistence resourcePersistence;
-	@BeanReference(type = ResourceFinder.class)
-	protected ResourceFinder resourceFinder;
 	@BeanReference(type = RoleLocalService.class)
 	protected RoleLocalService roleLocalService;
 	@BeanReference(type = RoleService.class)
@@ -1195,6 +1093,5 @@ public abstract class AnnouncementsEntryLocalServiceBaseImpl
 	protected UserGroupFinder userGroupFinder;
 	@BeanReference(type = PersistedModelLocalServiceRegistry.class)
 	protected PersistedModelLocalServiceRegistry persistedModelLocalServiceRegistry;
-	private static Log _log = LogFactoryUtil.getLog(AnnouncementsEntryLocalServiceBaseImpl.class);
 	private String _beanIdentifier;
 }

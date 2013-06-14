@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -48,14 +48,34 @@ public class WikiDisplayPortletDataHandlerImpl extends BasePortletDataHandler {
 	@Override
 	public PortletDataHandlerControl[] getExportControls() {
 		return new PortletDataHandlerControl[] {
-			_nodesAndPages, _attachments, _categories, _comments, _tags
+			_nodesAndPages
+		};
+	}
+
+	@Override
+	public PortletDataHandlerControl[] getExportMetadataControls() {
+		return new PortletDataHandlerControl[] {
+			new PortletDataHandlerBoolean(
+				_NAMESPACE, "wiki-pages", true,
+				WikiPortletDataHandlerImpl.getMetadataControls()
+			)
 		};
 	}
 
 	@Override
 	public PortletDataHandlerControl[] getImportControls() {
 		return new PortletDataHandlerControl[] {
-			_nodesAndPages, _attachments, _categories, _comments, _tags
+			_nodesAndPages
+		};
+	}
+
+	@Override
+	public PortletDataHandlerControl[] getImportMetadataControls() {
+		return new PortletDataHandlerControl[] {
+			new PortletDataHandlerBoolean(
+				_NAMESPACE, "wiki-pages", true,
+				WikiPortletDataHandlerImpl.getMetadataControls()
+			)
 		};
 	}
 
@@ -201,11 +221,11 @@ public class WikiDisplayPortletDataHandlerImpl extends BasePortletDataHandler {
 				portletDataContext, pageElement, page);
 		}
 
-		Map<Long, Long> nodePKs =
+		Map<Long, Long> nodeIds =
 			(Map<Long, Long>)portletDataContext.getNewPrimaryKeysMap(
 				WikiNode.class);
 
-		for (long nodeId : nodePKs.values()) {
+		for (long nodeId : nodeIds.values()) {
 			WikiCacheUtil.clearCache(nodeId);
 		}
 
@@ -213,7 +233,7 @@ public class WikiDisplayPortletDataHandlerImpl extends BasePortletDataHandler {
 			portletPreferences.getValue("nodeId", StringPool.BLANK));
 
 		if (nodeId > 0) {
-			nodeId = MapUtil.getLong(nodePKs, nodeId, nodeId);
+			nodeId = MapUtil.getLong(nodeIds, nodeId, nodeId);
 
 			portletPreferences.setValue("nodeId", String.valueOf(nodeId));
 		}
@@ -226,20 +246,8 @@ public class WikiDisplayPortletDataHandlerImpl extends BasePortletDataHandler {
 	private static Log _log = LogFactoryUtil.getLog(
 		WikiDisplayPortletDataHandlerImpl.class);
 
-	private static PortletDataHandlerBoolean _attachments =
-		new PortletDataHandlerBoolean(_NAMESPACE, "attachments");
-
-	private static PortletDataHandlerBoolean _categories =
-		new PortletDataHandlerBoolean(_NAMESPACE, "categories");
-
-	private static PortletDataHandlerBoolean _comments =
-		new PortletDataHandlerBoolean(_NAMESPACE, "comments");
-
 	private static PortletDataHandlerBoolean _nodesAndPages =
 		new PortletDataHandlerBoolean(
 			_NAMESPACE, "wikis-and-pages", true, true);
-
-	private static PortletDataHandlerBoolean _tags =
-		new PortletDataHandlerBoolean(_NAMESPACE, "tags");
 
 }

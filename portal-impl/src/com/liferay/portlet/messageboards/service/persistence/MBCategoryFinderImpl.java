@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -48,10 +48,10 @@ import java.util.List;
 public class MBCategoryFinderImpl
 	extends BasePersistenceImpl<MBCategory> implements MBCategoryFinder {
 
-	public static String COUNT_BY_S_G_U_P =
+	public static final String COUNT_BY_S_G_U_P =
 		MBCategoryFinder.class.getName() + ".countByS_G_U_P";
 
-	public static String FIND_BY_S_G_U_P =
+	public static final String FIND_BY_S_G_U_P =
 		MBCategoryFinder.class.getName() + ".findByS_G_U_P";
 
 	public int countByS_G_U_P(
@@ -132,7 +132,7 @@ public class MBCategoryFinderImpl
 
 			int count = 0;
 
-			Iterator<Long> itr = q.list().iterator();
+			Iterator<Long> itr = q.iterate();
 
 			if (itr.hasNext()) {
 				Long l = itr.next();

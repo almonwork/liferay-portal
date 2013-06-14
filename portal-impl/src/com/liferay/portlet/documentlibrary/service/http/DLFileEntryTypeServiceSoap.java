@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -49,8 +49,8 @@ import java.rmi.RemoteException;
  *
  * <p>
  * You can see a list of services at
- * http://localhost:8080/tunnel-web/secure/axis. Set the property
- * <b>tunnel.servlet.hosts.allowed</b> in portal.properties to configure
+ * http://localhost:8080/api/secure/axis. Set the property
+ * <b>axis.servlet.hosts.allowed</b> in portal.properties to configure
  * security.
  * </p>
  *
@@ -112,10 +112,10 @@ public class DLFileEntryTypeServiceSoap {
 	}
 
 	public static com.liferay.portlet.documentlibrary.model.DLFileEntryTypeSoap[] getFileEntryTypes(
-		long groupId, int start, int end) throws RemoteException {
+		long[] groupIds) throws RemoteException {
 		try {
 			java.util.List<com.liferay.portlet.documentlibrary.model.DLFileEntryType> returnValue =
-				DLFileEntryTypeServiceUtil.getFileEntryTypes(groupId, start, end);
+				DLFileEntryTypeServiceUtil.getFileEntryTypes(groupIds);
 
 			return com.liferay.portlet.documentlibrary.model.DLFileEntryTypeSoap.toSoapModels(returnValue);
 		}
@@ -126,10 +126,46 @@ public class DLFileEntryTypeServiceSoap {
 		}
 	}
 
-	public static int getFileEntryTypesCount(long groupId)
+	public static int getFileEntryTypesCount(long[] groupIds)
 		throws RemoteException {
 		try {
-			int returnValue = DLFileEntryTypeServiceUtil.getFileEntryTypesCount(groupId);
+			int returnValue = DLFileEntryTypeServiceUtil.getFileEntryTypesCount(groupIds);
+
+			return returnValue;
+		}
+		catch (Exception e) {
+			_log.error(e, e);
+
+			throw new RemoteException(e.getMessage());
+		}
+	}
+
+	public static com.liferay.portlet.documentlibrary.model.DLFileEntryTypeSoap[] search(
+		long companyId, long[] groupIds, java.lang.String keywords,
+		boolean includeBasicFileEntryType, int start, int end,
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
+		throws RemoteException {
+		try {
+			java.util.List<com.liferay.portlet.documentlibrary.model.DLFileEntryType> returnValue =
+				DLFileEntryTypeServiceUtil.search(companyId, groupIds,
+					keywords, includeBasicFileEntryType, start, end,
+					orderByComparator);
+
+			return com.liferay.portlet.documentlibrary.model.DLFileEntryTypeSoap.toSoapModels(returnValue);
+		}
+		catch (Exception e) {
+			_log.error(e, e);
+
+			throw new RemoteException(e.getMessage());
+		}
+	}
+
+	public static int searchCount(long companyId, long[] groupIds,
+		java.lang.String keywords, boolean includeBasicFileEntryType)
+		throws RemoteException {
+		try {
+			int returnValue = DLFileEntryTypeServiceUtil.searchCount(companyId,
+					groupIds, keywords, includeBasicFileEntryType);
 
 			return returnValue;
 		}

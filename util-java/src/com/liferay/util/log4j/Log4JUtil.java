@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,6 +14,9 @@
 
 package com.liferay.util.log4j;
 
+import com.liferay.portal.kernel.io.unsync.UnsyncByteArrayOutputStream;
+import com.liferay.portal.kernel.log.LogFactory;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.util.PropsKeys;
 import com.liferay.portal.kernel.util.PropsUtil;
 import com.liferay.portal.kernel.util.ServerDetector;
@@ -21,6 +24,7 @@ import com.liferay.portal.kernel.util.StreamUtil;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.Reader;
 import java.io.StringReader;
@@ -33,13 +37,12 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.log4j.Level;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.apache.log4j.xml.DOMConfigurator;
-
-import org.aspectj.util.FileUtil;
 
 import org.dom4j.Document;
 import org.dom4j.Element;
@@ -49,6 +52,12 @@ import org.dom4j.io.SAXReader;
  * @author Brian Wing Shun Chan
  */
 public class Log4JUtil {
+
+	public static void configureLog4J(ClassLoader classLoader) {
+		configureLog4J(classLoader.getResource("META-INF/portal-log4j.xml"));
+		configureLog4J(
+			classLoader.getResource("META-INF/portal-log4j-ext.xml"));
+	}
 
 	public static void configureLog4J(URL url) {
 		if (url == null) {
@@ -61,16 +70,14 @@ public class Log4JUtil {
 			return;
 		}
 
-		// See LPS-6029 and LPS-8865
+		// See LPS-6029, LPS-8865, and LPS-24280
 
-		if (!ServerDetector.isJBoss()) {
-			DOMConfigurator domConfigurator = new DOMConfigurator();
+		DOMConfigurator domConfigurator = new DOMConfigurator();
 
-			Reader urlReader = new StringReader(urlContent);
+		Reader urlReader = new StringReader(urlContent);
 
-			domConfigurator.doConfigure(
-				urlReader, LogManager.getLoggerRepository());
-		}
+		domConfigurator.doConfigure(
+			urlReader, LogManager.getLoggerRepository());
 
 		Set<String> currentLoggerNames = new HashSet<String>();
 
@@ -85,9 +92,9 @@ public class Log4JUtil {
 		try {
 			SAXReader saxReader = new SAXReader();
 
-			Reader urlReader = new StringReader(urlContent);
+			Reader reader = new StringReader(urlContent);
 
-			Document document = saxReader.read(urlReader, url.toExternalForm());
+			Document document = saxReader.read(reader, url.toExternalForm());
 
 			Element rootElement = document.getRootElement();
 
@@ -100,7 +107,7 @@ public class Log4JUtil {
 
 				String priority = priorityElement.attributeValue("value");
 
-				setLevel(name, priority);
+				setLevel(name, priority, false);
 			}
 		}
 		catch (Exception e) {
@@ -108,7 +115,53 @@ public class Log4JUtil {
 		}
 	}
 
-	public static void setLevel(String name, String priority) {
+	public static Map<String, String> getCustomLogSettings() {
+		return new HashMap<String, String>(_customLogSettings);
+	}
+
+	public static String getOriginalLevel(String className) {
+		Level level = Level.ALL;
+
+		Enumeration<Logger> enu = LogManager.getCurrentLoggers();
+
+		while (enu.hasMoreElements()) {
+			Logger logger = enu.nextElement();
+
+			if (className.equals(logger.getName())) {
+				level = logger.getLevel();
+
+				break;
+			}
+		}
+
+		return level.toString();
+	}
+
+	public static void initLog4J(
+		String serverId, String liferayHome, ClassLoader classLoader,
+		LogFactory logFactory, Map<String, String> customLogSettings) {
+
+		ServerDetector.init(serverId);
+
+		_liferayHome = liferayHome;
+
+		configureLog4J(classLoader);
+
+		try {
+			LogFactoryUtil.setLogFactory(logFactory);
+		}
+		catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		for (String name : customLogSettings.keySet()) {
+			String priority = customLogSettings.get(name);
+
+			setLevel(name, priority, false);
+		}
+	}
+
+	public static void setLevel(String name, String priority, boolean custom) {
 		Logger logger = Logger.getLogger(name);
 
 		logger.setLevel(Level.toLevel(priority));
@@ -117,6 +170,25 @@ public class Log4JUtil {
 			name);
 
 		jdkLogger.setLevel(_getJdkLevel(priority));
+
+		if (custom) {
+			_customLogSettings.put(name, priority);
+		}
+	}
+
+	/**
+	 * @see {@link com.liferay.portal.util.FileImpl#getBytes(InputStream, int,
+	 *      boolean)}
+	 */
+	private static byte[] _getBytes(InputStream inputStream)
+		throws IOException {
+
+		UnsyncByteArrayOutputStream unsyncByteArrayOutputStream =
+			new UnsyncByteArrayOutputStream();
+
+		StreamUtil.transfer(inputStream, unsyncByteArrayOutputStream, -1, true);
+
+		return unsyncByteArrayOutputStream.toByteArray();
 	}
 
 	private static java.util.logging.Level _getJdkLevel(String priority) {
@@ -134,10 +206,18 @@ public class Log4JUtil {
 		}
 	}
 
+	private static String _getLiferayHome() {
+		if (_liferayHome == null) {
+			_liferayHome = PropsUtil.get(PropsKeys.LIFERAY_HOME);
+		}
+
+		return _liferayHome;
+	}
+
 	private static String _getURLContent(URL url) {
 		Map<String, String> variables = new HashMap<String, String>();
 
-		variables.put("liferay.home", PropsUtil.get(PropsKeys.LIFERAY_HOME));
+		variables.put("liferay.home", _getLiferayHome());
 
 		String urlContent = null;
 
@@ -146,7 +226,7 @@ public class Log4JUtil {
 		try {
 			inputStream = url.openStream();
 
-			byte[] bytes = FileUtil.readAsByteArray(inputStream);
+			byte[] bytes = _getBytes(inputStream);
 
 			urlContent = new String(bytes, StringPool.UTF8);
 		}
@@ -185,5 +265,9 @@ public class Log4JUtil {
 
 		return urlContent;
 	}
+
+	private static Map<String, String> _customLogSettings =
+		new ConcurrentHashMap<String, String>();
+	private static String _liferayHome;
 
 }

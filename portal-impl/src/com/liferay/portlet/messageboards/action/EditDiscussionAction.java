@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -63,7 +63,8 @@ public class EditDiscussionAction extends PortletAction {
 		String cmd = ParamUtil.getString(actionRequest, Constants.CMD);
 
 		try {
-			String redirect = ParamUtil.getString(actionRequest, "redirect");
+			String redirect = PortalUtil.escapeRedirect(
+				ParamUtil.getString(actionRequest, "redirect"));
 
 			if (cmd.equals(Constants.ADD) || cmd.equals(Constants.UPDATE)) {
 				MBMessage message = updateMessage(actionRequest);
@@ -123,7 +124,7 @@ public class EditDiscussionAction extends PortletAction {
 			if (e instanceof NoSuchMessageException ||
 				e instanceof PrincipalException) {
 
-				SessionErrors.add(renderRequest, e.getClass().getName());
+				SessionErrors.add(renderRequest, e.getClass());
 
 				return mapping.findForward("portlet.message_boards.error");
 			}
@@ -158,6 +159,27 @@ public class EditDiscussionAction extends PortletAction {
 	@Override
 	protected boolean isCheckMethodOnProcessAction() {
 		return _CHECK_METHOD_ON_PROCESS_ACTION;
+	}
+
+	protected void subscribeToComments(
+			ActionRequest actionRequest, boolean subscribe)
+		throws Exception {
+
+		ThemeDisplay themeDisplay = (ThemeDisplay)actionRequest.getAttribute(
+			WebKeys.THEME_DISPLAY);
+
+		String className = ParamUtil.getString(actionRequest, "className");
+		long classPK = ParamUtil.getLong(actionRequest, "classPK");
+
+		if (subscribe) {
+			SubscriptionLocalServiceUtil.addSubscription(
+				themeDisplay.getUserId(), themeDisplay.getScopeGroupId(),
+				className, classPK);
+		}
+		else {
+			SubscriptionLocalServiceUtil.deleteSubscription(
+				themeDisplay.getUserId(), className, classPK);
+		}
 	}
 
 	protected MBMessage updateMessage(ActionRequest actionRequest)
@@ -210,7 +232,7 @@ public class EditDiscussionAction extends PortletAction {
 				}
 
 				if (user.getStatus() != WorkflowConstants.STATUS_INCOMPLETE) {
-					return  null;
+					return null;
 				}
 			}
 
@@ -248,27 +270,6 @@ public class EditDiscussionAction extends PortletAction {
 		}
 
 		return message;
-	}
-
-	protected void subscribeToComments(
-			ActionRequest actionRequest, boolean subscribe)
-		throws Exception {
-
-		ThemeDisplay themeDisplay = (ThemeDisplay)actionRequest.getAttribute(
-			WebKeys.THEME_DISPLAY);
-
-		String className = ParamUtil.getString(actionRequest, "className");
-		long classPK = ParamUtil.getLong(actionRequest, "classPK");
-
-		if (subscribe) {
-			SubscriptionLocalServiceUtil.addSubscription(
-				themeDisplay.getUserId(), themeDisplay.getScopeGroupId(),
-				className, classPK);
-		}
-		else {
-			SubscriptionLocalServiceUtil.deleteSubscription(
-				themeDisplay.getUserId(), className, classPK);
-		}
 	}
 
 	private static final boolean _CHECK_METHOD_ON_PROCESS_ACTION = false;

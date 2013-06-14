@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,6 +14,8 @@
 
 package com.liferay.portlet.announcements.service;
 
+import com.liferay.portal.service.ServiceWrapper;
+
 /**
  * <p>
  * This class is a wrapper for {@link AnnouncementsFlagLocalService}.
@@ -24,7 +26,8 @@ package com.liferay.portlet.announcements.service;
  * @generated
  */
 public class AnnouncementsFlagLocalServiceWrapper
-	implements AnnouncementsFlagLocalService {
+	implements AnnouncementsFlagLocalService,
+		ServiceWrapper<AnnouncementsFlagLocalService> {
 	public AnnouncementsFlagLocalServiceWrapper(
 		AnnouncementsFlagLocalService announcementsFlagLocalService) {
 		_announcementsFlagLocalService = announcementsFlagLocalService;
@@ -58,25 +61,32 @@ public class AnnouncementsFlagLocalServiceWrapper
 	* Deletes the announcements flag with the primary key from the database. Also notifies the appropriate model listeners.
 	*
 	* @param flagId the primary key of the announcements flag
+	* @return the announcements flag that was removed
 	* @throws PortalException if a announcements flag with the primary key could not be found
 	* @throws SystemException if a system exception occurred
 	*/
-	public void deleteAnnouncementsFlag(long flagId)
+	public com.liferay.portlet.announcements.model.AnnouncementsFlag deleteAnnouncementsFlag(
+		long flagId)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException {
-		_announcementsFlagLocalService.deleteAnnouncementsFlag(flagId);
+		return _announcementsFlagLocalService.deleteAnnouncementsFlag(flagId);
 	}
 
 	/**
 	* Deletes the announcements flag from the database. Also notifies the appropriate model listeners.
 	*
 	* @param announcementsFlag the announcements flag
+	* @return the announcements flag that was removed
 	* @throws SystemException if a system exception occurred
 	*/
-	public void deleteAnnouncementsFlag(
+	public com.liferay.portlet.announcements.model.AnnouncementsFlag deleteAnnouncementsFlag(
 		com.liferay.portlet.announcements.model.AnnouncementsFlag announcementsFlag)
 		throws com.liferay.portal.kernel.exception.SystemException {
-		_announcementsFlagLocalService.deleteAnnouncementsFlag(announcementsFlag);
+		return _announcementsFlagLocalService.deleteAnnouncementsFlag(announcementsFlag);
+	}
+
+	public com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery() {
+		return _announcementsFlagLocalService.dynamicQuery();
 	}
 
 	/**
@@ -149,6 +159,11 @@ public class AnnouncementsFlagLocalServiceWrapper
 		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery)
 		throws com.liferay.portal.kernel.exception.SystemException {
 		return _announcementsFlagLocalService.dynamicQueryCount(dynamicQuery);
+	}
+
+	public com.liferay.portlet.announcements.model.AnnouncementsFlag fetchAnnouncementsFlag(
+		long flagId) throws com.liferay.portal.kernel.exception.SystemException {
+		return _announcementsFlagLocalService.fetchAnnouncementsFlag(flagId);
 	}
 
 	/**
@@ -279,11 +294,26 @@ public class AnnouncementsFlagLocalServiceWrapper
 		return _announcementsFlagLocalService.getFlag(userId, entryId, value);
 	}
 
+	/**
+	 * @deprecated Renamed to {@link #getWrappedService}
+	 */
 	public AnnouncementsFlagLocalService getWrappedAnnouncementsFlagLocalService() {
 		return _announcementsFlagLocalService;
 	}
 
+	/**
+	 * @deprecated Renamed to {@link #setWrappedService}
+	 */
 	public void setWrappedAnnouncementsFlagLocalService(
+		AnnouncementsFlagLocalService announcementsFlagLocalService) {
+		_announcementsFlagLocalService = announcementsFlagLocalService;
+	}
+
+	public AnnouncementsFlagLocalService getWrappedService() {
+		return _announcementsFlagLocalService;
+	}
+
+	public void setWrappedService(
 		AnnouncementsFlagLocalService announcementsFlagLocalService) {
 		_announcementsFlagLocalService = announcementsFlagLocalService;
 	}

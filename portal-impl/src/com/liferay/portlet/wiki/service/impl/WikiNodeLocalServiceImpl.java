@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -38,12 +38,11 @@ import com.liferay.portlet.wiki.model.WikiNode;
 import com.liferay.portlet.wiki.model.WikiPage;
 import com.liferay.portlet.wiki.service.base.WikiNodeLocalServiceBaseImpl;
 
-import java.io.File;
+import java.io.InputStream;
 
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -110,12 +109,12 @@ public class WikiNodeLocalServiceImpl extends WikiNodeLocalServiceBaseImpl {
 
 		// Resources
 
-		if (serviceContext.getAddGroupPermissions() ||
-			serviceContext.getAddGuestPermissions()) {
+		if (serviceContext.isAddGroupPermissions() ||
+			serviceContext.isAddGuestPermissions()) {
 
 			addNodeResources(
-				node, serviceContext.getAddGroupPermissions(),
-				serviceContext.getAddGuestPermissions());
+				node, serviceContext.isAddGroupPermissions(),
+				serviceContext.isAddGuestPermissions());
 		}
 		else {
 			addNodeResources(
@@ -137,17 +136,6 @@ public class WikiNodeLocalServiceImpl extends WikiNodeLocalServiceBaseImpl {
 	}
 
 	public void addNodeResources(
-			WikiNode node, boolean addGroupPermissions,
-			boolean addGuestPermissions)
-		throws PortalException, SystemException {
-
-		resourceLocalService.addResources(
-			node.getCompanyId(), node.getGroupId(),	node.getUserId(),
-			WikiNode.class.getName(), node.getNodeId(), false,
-			addGroupPermissions, addGuestPermissions);
-	}
-
-	public void addNodeResources(
 			long nodeId, String[] groupPermissions, String[] guestPermissions)
 		throws PortalException, SystemException {
 
@@ -157,11 +145,22 @@ public class WikiNodeLocalServiceImpl extends WikiNodeLocalServiceBaseImpl {
 	}
 
 	public void addNodeResources(
+			WikiNode node, boolean addGroupPermissions,
+			boolean addGuestPermissions)
+		throws PortalException, SystemException {
+
+		resourceLocalService.addResources(
+			node.getCompanyId(), node.getGroupId(), node.getUserId(),
+			WikiNode.class.getName(), node.getNodeId(), false,
+			addGroupPermissions, addGuestPermissions);
+	}
+
+	public void addNodeResources(
 			WikiNode node, String[] groupPermissions, String[] guestPermissions)
 		throws PortalException, SystemException {
 
 		resourceLocalService.addModelResources(
-			node.getCompanyId(), node.getGroupId(),	node.getUserId(),
+			node.getCompanyId(), node.getGroupId(), node.getUserId(),
 			WikiNode.class.getName(), node.getNodeId(), groupPermissions,
 			guestPermissions);
 	}
@@ -179,7 +178,8 @@ public class WikiNodeLocalServiceImpl extends WikiNodeLocalServiceBaseImpl {
 
 		// Indexer
 
-		Indexer indexer = IndexerRegistryUtil.getIndexer(WikiPage.class);
+		Indexer indexer = IndexerRegistryUtil.nullSafeGetIndexer(
+			WikiPage.class);
 
 		indexer.delete(node);
 
@@ -206,12 +206,9 @@ public class WikiNodeLocalServiceImpl extends WikiNodeLocalServiceBaseImpl {
 	public void deleteNodes(long groupId)
 		throws PortalException, SystemException {
 
-		Iterator<WikiNode> itr = wikiNodePersistence.findByGroupId(
-			groupId).iterator();
+		List<WikiNode> nodes = wikiNodePersistence.findByGroupId(groupId);
 
-		while (itr.hasNext()) {
-			WikiNode node = itr.next();
-
+		for (WikiNode node : nodes) {
 			deleteNode(node);
 		}
 	}
@@ -268,15 +265,15 @@ public class WikiNodeLocalServiceImpl extends WikiNodeLocalServiceBaseImpl {
 	}
 
 	public void importPages(
-			long userId, long nodeId, String importer, File[] files,
-			Map<String, String[]> options)
+			long userId, long nodeId, String importer,
+			InputStream[] inputStreams, Map<String, String[]> options)
 		throws PortalException, SystemException {
 
 		WikiNode node = getNode(nodeId);
 
 		WikiImporter wikiImporter = getWikiImporter(importer);
 
-		wikiImporter.importPages(userId, node, files, options);
+		wikiImporter.importPages(userId, node, inputStreams, options);
 	}
 
 	public void subscribeNode(long userId, long nodeId)
@@ -361,12 +358,6 @@ public class WikiNodeLocalServiceImpl extends WikiNodeLocalServiceBaseImpl {
 		return wikiImporter;
 	}
 
-	protected void validate(long groupId, String name)
-		throws PortalException, SystemException {
-
-		validate(0, groupId, name);
-	}
-
 	protected void validate(long nodeId, long groupId, String name)
 		throws PortalException, SystemException {
 
@@ -374,7 +365,7 @@ public class WikiNodeLocalServiceImpl extends WikiNodeLocalServiceBaseImpl {
 			throw new NodeNameException(name + " is reserved");
 		}
 
-		if (!Validator.isAlphanumericName(name)) {
+		if (Validator.isNull(name)) {
 			throw new NodeNameException();
 		}
 
@@ -383,6 +374,12 @@ public class WikiNodeLocalServiceImpl extends WikiNodeLocalServiceBaseImpl {
 		if ((node != null) && (node.getNodeId() != nodeId)) {
 			throw new DuplicateNodeNameException();
 		}
+	}
+
+	protected void validate(long groupId, String name)
+		throws PortalException, SystemException {
+
+		validate(0, groupId, name);
 	}
 
 	private static Log _log = LogFactoryUtil.getLog(

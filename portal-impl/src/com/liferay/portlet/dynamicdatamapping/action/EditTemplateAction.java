@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -19,6 +19,7 @@ import com.liferay.portal.kernel.upload.UploadPortletRequest;
 import com.liferay.portal.kernel.util.Constants;
 import com.liferay.portal.kernel.util.LocalizationUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
+import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.security.auth.PrincipalException;
 import com.liferay.portal.service.ServiceContext;
@@ -27,16 +28,13 @@ import com.liferay.portal.struts.PortletAction;
 import com.liferay.portal.theme.ThemeDisplay;
 import com.liferay.portal.util.PortalUtil;
 import com.liferay.portal.util.WebKeys;
-import com.liferay.portlet.ActionRequestImpl;
 import com.liferay.portlet.PortletPreferencesFactoryUtil;
 import com.liferay.portlet.PortletURLImpl;
 import com.liferay.portlet.dynamicdatamapping.NoSuchTemplateException;
 import com.liferay.portlet.dynamicdatamapping.TemplateNameException;
 import com.liferay.portlet.dynamicdatamapping.TemplateScriptException;
-import com.liferay.portlet.dynamicdatamapping.model.DDMStructure;
 import com.liferay.portlet.dynamicdatamapping.model.DDMTemplate;
 import com.liferay.portlet.dynamicdatamapping.model.DDMTemplateConstants;
-import com.liferay.portlet.dynamicdatamapping.service.DDMStructureLocalServiceUtil;
 import com.liferay.portlet.dynamicdatamapping.service.DDMTemplateServiceUtil;
 import com.liferay.util.JS;
 
@@ -75,7 +73,7 @@ public class EditTemplateAction extends PortletAction {
 				template = updateTemplate(actionRequest);
 			}
 			else if (cmd.equals(Constants.DELETE)) {
-				deleteTemplate(actionRequest);
+				deleteTemplates(actionRequest);
 			}
 
 			if (Validator.isNotNull(cmd)) {
@@ -99,14 +97,14 @@ public class EditTemplateAction extends PortletAction {
 			if (e instanceof NoSuchTemplateException ||
 				e instanceof PrincipalException) {
 
-				SessionErrors.add(actionRequest, e.getClass().getName());
+				SessionErrors.add(actionRequest, e.getClass());
 
 				setForward(actionRequest, "portlet.dynamic_data_mapping.error");
 			}
 			else if (e instanceof TemplateNameException ||
 					 e instanceof TemplateScriptException) {
 
-				SessionErrors.add(actionRequest, e.getClass().getName(), e);
+				SessionErrors.add(actionRequest, e.getClass(), e);
 			}
 			else {
 				throw e;
@@ -128,7 +126,7 @@ public class EditTemplateAction extends PortletAction {
 			if (e instanceof NoSuchTemplateException ||
 				e instanceof PrincipalException) {
 
-				SessionErrors.add(renderRequest, e.getClass().getName());
+				SessionErrors.add(renderRequest, e.getClass());
 
 				return mapping.findForward(
 					"portlet.dynamic_data_mapping.error");
@@ -140,17 +138,26 @@ public class EditTemplateAction extends PortletAction {
 
 		return mapping.findForward(
 			getForward(
-				renderRequest,
-				"portlet.dynamic_data_mapping.edit_template"));
+				renderRequest, "portlet.dynamic_data_mapping.edit_template"));
 	}
 
-	protected void deleteTemplate(ActionRequest actionRequest)
+	protected void deleteTemplates(ActionRequest actionRequest)
 		throws Exception {
+
+		long[] deleteTemplateIds = null;
 
 		long templateId = ParamUtil.getLong(actionRequest, "templateId");
 
 		if (templateId > 0) {
-			DDMTemplateServiceUtil.deleteTemplate(templateId);
+			deleteTemplateIds = new long[] {templateId};
+		}
+		else {
+			deleteTemplateIds = StringUtil.split(
+				ParamUtil.getString(actionRequest, "deleteTemplateIds"), 0L);
+		}
+
+		for (long deleteTemplateId : deleteTemplateIds) {
+			DDMTemplateServiceUtil.deleteTemplate(deleteTemplateId);
 		}
 	}
 
@@ -162,14 +169,15 @@ public class EditTemplateAction extends PortletAction {
 		ThemeDisplay themeDisplay = (ThemeDisplay)actionRequest.getAttribute(
 			WebKeys.THEME_DISPLAY);
 
-		long structureId = ParamUtil.getLong(actionRequest, "structureId");
+		long classNameId = ParamUtil.getLong(actionRequest, "classNameId");
+		long classPK = ParamUtil.getLong(actionRequest, "classPK");
 		String availableFields = ParamUtil.getString(
 			actionRequest, "availableFields");
 		String saveCallback = ParamUtil.getString(
 			actionRequest, "saveCallback");
 
 		PortletURLImpl portletURL = new PortletURLImpl(
-			(ActionRequestImpl)actionRequest, portletConfig.getPortletName(),
+			actionRequest, portletConfig.getPortletName(),
 			themeDisplay.getPlid(), PortletRequest.RENDER_PHASE);
 
 		portletURL.setWindowState(actionRequest.getWindowState());
@@ -183,7 +191,8 @@ public class EditTemplateAction extends PortletAction {
 		portletURL.setParameter(
 			"groupId", String.valueOf(template.getGroupId()), false);
 		portletURL.setParameter(
-			"structureId", String.valueOf(structureId), false);
+			"classNameId", String.valueOf(classNameId), false);
+		portletURL.setParameter("classPK", String.valueOf(classPK), false);
 		portletURL.setParameter("type", template.getType(), false);
 		portletURL.setParameter("availableFields", availableFields, false);
 		portletURL.setParameter("saveCallback", saveCallback, false);
@@ -194,24 +203,28 @@ public class EditTemplateAction extends PortletAction {
 	protected DDMTemplate updateTemplate(ActionRequest actionRequest)
 		throws Exception {
 
-		UploadPortletRequest uploadRequest = PortalUtil.getUploadPortletRequest(
-			actionRequest);
+		UploadPortletRequest uploadPortletRequest =
+			PortalUtil.getUploadPortletRequest(actionRequest);
 
-		long templateId = ParamUtil.getLong(uploadRequest, "templateId");
+		long templateId = ParamUtil.getLong(uploadPortletRequest, "templateId");
 
-		long groupId = ParamUtil.getLong(uploadRequest, "groupId");
-		long structureId = ParamUtil.getLong(uploadRequest, "structureId");
+		long groupId = ParamUtil.getLong(uploadPortletRequest, "groupId");
+		long classNameId = ParamUtil.getLong(
+			uploadPortletRequest, "classNameId");
+		long classPK = ParamUtil.getLong(uploadPortletRequest, "classPK");
 		Map<Locale, String> nameMap = LocalizationUtil.getLocalizationMap(
 			actionRequest, "name");
 		Map<Locale, String> descriptionMap =
 			LocalizationUtil.getLocalizationMap(actionRequest, "description");
-		String type = ParamUtil.getString(uploadRequest, "type");
+		String type = ParamUtil.getString(uploadPortletRequest, "type");
+		String mode = ParamUtil.getString(uploadPortletRequest, "mode");
 		String language = ParamUtil.getString(
-			uploadRequest, "language", DDMTemplateConstants.LANG_TYPE_VM);
+			uploadPortletRequest, "language",
+			DDMTemplateConstants.LANG_TYPE_VM);
 
-		String script = ParamUtil.getString(uploadRequest, "script");
+		String script = ParamUtil.getString(uploadPortletRequest, "script");
 		String scriptContent = JS.decodeURIComponent(
-			ParamUtil.getString(uploadRequest, "scriptContent"));
+			ParamUtil.getString(uploadPortletRequest, "scriptContent"));
 
 		if (Validator.isNull(script)) {
 			script = scriptContent;
@@ -223,17 +236,14 @@ public class EditTemplateAction extends PortletAction {
 		DDMTemplate template = null;
 
 		if (templateId <= 0) {
-			DDMStructure structure = DDMStructureLocalServiceUtil.getStructure(
-				structureId);
-
 			template = DDMTemplateServiceUtil.addTemplate(
-				groupId, structure.getStructureId(), nameMap, descriptionMap,
-				type, language, script, serviceContext);
+				groupId, classNameId, classPK, null, nameMap, descriptionMap,
+				type, mode, language, script, serviceContext);
 		}
 		else {
 			template = DDMTemplateServiceUtil.updateTemplate(
-				templateId, nameMap, descriptionMap, type, language, script,
-				serviceContext);
+				templateId, nameMap, descriptionMap, type, mode, language,
+				script, serviceContext);
 		}
 
 		String portletResource = ParamUtil.getString(

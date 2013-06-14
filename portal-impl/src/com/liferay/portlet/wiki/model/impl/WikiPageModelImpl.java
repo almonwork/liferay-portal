@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -18,6 +18,7 @@ import com.liferay.portal.kernel.bean.AutoEscapeBeanHandler;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.json.JSON;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.ProxyUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
@@ -34,13 +35,13 @@ import com.liferay.portlet.wiki.model.WikiPageSoap;
 
 import java.io.Serializable;
 
-import java.lang.reflect.Proxy;
-
 import java.sql.Types;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * The base model implementation for the WikiPage service. Represents a row in the &quot;WikiPage&quot; database table, with each column mapped to a property of this class.
@@ -102,6 +103,22 @@ public class WikiPageModelImpl extends BaseModelImpl<WikiPage>
 	public static final boolean FINDER_CACHE_ENABLED = GetterUtil.getBoolean(com.liferay.portal.util.PropsUtil.get(
 				"value.object.finder.cache.enabled.com.liferay.portlet.wiki.model.WikiPage"),
 			true);
+	public static final boolean COLUMN_BITMASK_ENABLED = GetterUtil.getBoolean(com.liferay.portal.util.PropsUtil.get(
+				"value.object.column.bitmask.enabled.com.liferay.portlet.wiki.model.WikiPage"),
+			true);
+	public static long COMPANYID_COLUMN_BITMASK = 1L;
+	public static long FORMAT_COLUMN_BITMASK = 2L;
+	public static long GROUPID_COLUMN_BITMASK = 4L;
+	public static long HEAD_COLUMN_BITMASK = 8L;
+	public static long NODEID_COLUMN_BITMASK = 16L;
+	public static long PARENTTITLE_COLUMN_BITMASK = 32L;
+	public static long REDIRECTTITLE_COLUMN_BITMASK = 64L;
+	public static long RESOURCEPRIMKEY_COLUMN_BITMASK = 128L;
+	public static long STATUS_COLUMN_BITMASK = 256L;
+	public static long TITLE_COLUMN_BITMASK = 512L;
+	public static long USERID_COLUMN_BITMASK = 1024L;
+	public static long UUID_COLUMN_BITMASK = 2048L;
+	public static long VERSION_COLUMN_BITMASK = 4096L;
 
 	/**
 	 * Converts the soap model instance into a normal model instance.
@@ -155,14 +172,6 @@ public class WikiPageModelImpl extends BaseModelImpl<WikiPage>
 		return models;
 	}
 
-	public Class<?> getModelClass() {
-		return WikiPage.class;
-	}
-
-	public String getModelClassName() {
-		return WikiPage.class.getName();
-	}
-
 	public static final long LOCK_EXPIRATION_TIME = GetterUtil.getLong(com.liferay.portal.util.PropsUtil.get(
 				"lock.expiration.time.com.liferay.portlet.wiki.model.WikiPage"));
 
@@ -183,6 +192,186 @@ public class WikiPageModelImpl extends BaseModelImpl<WikiPage>
 
 	public void setPrimaryKeyObj(Serializable primaryKeyObj) {
 		setPrimaryKey(((Long)primaryKeyObj).longValue());
+	}
+
+	public Class<?> getModelClass() {
+		return WikiPage.class;
+	}
+
+	public String getModelClassName() {
+		return WikiPage.class.getName();
+	}
+
+	@Override
+	public Map<String, Object> getModelAttributes() {
+		Map<String, Object> attributes = new HashMap<String, Object>();
+
+		attributes.put("uuid", getUuid());
+		attributes.put("pageId", getPageId());
+		attributes.put("resourcePrimKey", getResourcePrimKey());
+		attributes.put("groupId", getGroupId());
+		attributes.put("companyId", getCompanyId());
+		attributes.put("userId", getUserId());
+		attributes.put("userName", getUserName());
+		attributes.put("createDate", getCreateDate());
+		attributes.put("modifiedDate", getModifiedDate());
+		attributes.put("nodeId", getNodeId());
+		attributes.put("title", getTitle());
+		attributes.put("version", getVersion());
+		attributes.put("minorEdit", getMinorEdit());
+		attributes.put("content", getContent());
+		attributes.put("summary", getSummary());
+		attributes.put("format", getFormat());
+		attributes.put("head", getHead());
+		attributes.put("parentTitle", getParentTitle());
+		attributes.put("redirectTitle", getRedirectTitle());
+		attributes.put("status", getStatus());
+		attributes.put("statusByUserId", getStatusByUserId());
+		attributes.put("statusByUserName", getStatusByUserName());
+		attributes.put("statusDate", getStatusDate());
+
+		return attributes;
+	}
+
+	@Override
+	public void setModelAttributes(Map<String, Object> attributes) {
+		String uuid = (String)attributes.get("uuid");
+
+		if (uuid != null) {
+			setUuid(uuid);
+		}
+
+		Long pageId = (Long)attributes.get("pageId");
+
+		if (pageId != null) {
+			setPageId(pageId);
+		}
+
+		Long resourcePrimKey = (Long)attributes.get("resourcePrimKey");
+
+		if (resourcePrimKey != null) {
+			setResourcePrimKey(resourcePrimKey);
+		}
+
+		Long groupId = (Long)attributes.get("groupId");
+
+		if (groupId != null) {
+			setGroupId(groupId);
+		}
+
+		Long companyId = (Long)attributes.get("companyId");
+
+		if (companyId != null) {
+			setCompanyId(companyId);
+		}
+
+		Long userId = (Long)attributes.get("userId");
+
+		if (userId != null) {
+			setUserId(userId);
+		}
+
+		String userName = (String)attributes.get("userName");
+
+		if (userName != null) {
+			setUserName(userName);
+		}
+
+		Date createDate = (Date)attributes.get("createDate");
+
+		if (createDate != null) {
+			setCreateDate(createDate);
+		}
+
+		Date modifiedDate = (Date)attributes.get("modifiedDate");
+
+		if (modifiedDate != null) {
+			setModifiedDate(modifiedDate);
+		}
+
+		Long nodeId = (Long)attributes.get("nodeId");
+
+		if (nodeId != null) {
+			setNodeId(nodeId);
+		}
+
+		String title = (String)attributes.get("title");
+
+		if (title != null) {
+			setTitle(title);
+		}
+
+		Double version = (Double)attributes.get("version");
+
+		if (version != null) {
+			setVersion(version);
+		}
+
+		Boolean minorEdit = (Boolean)attributes.get("minorEdit");
+
+		if (minorEdit != null) {
+			setMinorEdit(minorEdit);
+		}
+
+		String content = (String)attributes.get("content");
+
+		if (content != null) {
+			setContent(content);
+		}
+
+		String summary = (String)attributes.get("summary");
+
+		if (summary != null) {
+			setSummary(summary);
+		}
+
+		String format = (String)attributes.get("format");
+
+		if (format != null) {
+			setFormat(format);
+		}
+
+		Boolean head = (Boolean)attributes.get("head");
+
+		if (head != null) {
+			setHead(head);
+		}
+
+		String parentTitle = (String)attributes.get("parentTitle");
+
+		if (parentTitle != null) {
+			setParentTitle(parentTitle);
+		}
+
+		String redirectTitle = (String)attributes.get("redirectTitle");
+
+		if (redirectTitle != null) {
+			setRedirectTitle(redirectTitle);
+		}
+
+		Integer status = (Integer)attributes.get("status");
+
+		if (status != null) {
+			setStatus(status);
+		}
+
+		Long statusByUserId = (Long)attributes.get("statusByUserId");
+
+		if (statusByUserId != null) {
+			setStatusByUserId(statusByUserId);
+		}
+
+		String statusByUserName = (String)attributes.get("statusByUserName");
+
+		if (statusByUserName != null) {
+			setStatusByUserName(statusByUserName);
+		}
+
+		Date statusDate = (Date)attributes.get("statusDate");
+
+		if (statusDate != null) {
+			setStatusDate(statusDate);
+		}
 	}
 
 	@JSON
@@ -222,6 +411,8 @@ public class WikiPageModelImpl extends BaseModelImpl<WikiPage>
 	}
 
 	public void setResourcePrimKey(long resourcePrimKey) {
+		_columnBitmask |= RESOURCEPRIMKEY_COLUMN_BITMASK;
+
 		if (!_setOriginalResourcePrimKey) {
 			_setOriginalResourcePrimKey = true;
 
@@ -245,6 +436,8 @@ public class WikiPageModelImpl extends BaseModelImpl<WikiPage>
 	}
 
 	public void setGroupId(long groupId) {
+		_columnBitmask |= GROUPID_COLUMN_BITMASK;
+
 		if (!_setOriginalGroupId) {
 			_setOriginalGroupId = true;
 
@@ -264,7 +457,19 @@ public class WikiPageModelImpl extends BaseModelImpl<WikiPage>
 	}
 
 	public void setCompanyId(long companyId) {
+		_columnBitmask |= COMPANYID_COLUMN_BITMASK;
+
+		if (!_setOriginalCompanyId) {
+			_setOriginalCompanyId = true;
+
+			_originalCompanyId = _companyId;
+		}
+
 		_companyId = companyId;
+	}
+
+	public long getOriginalCompanyId() {
+		return _originalCompanyId;
 	}
 
 	@JSON
@@ -273,6 +478,14 @@ public class WikiPageModelImpl extends BaseModelImpl<WikiPage>
 	}
 
 	public void setUserId(long userId) {
+		_columnBitmask |= USERID_COLUMN_BITMASK;
+
+		if (!_setOriginalUserId) {
+			_setOriginalUserId = true;
+
+			_originalUserId = _userId;
+		}
+
 		_userId = userId;
 	}
 
@@ -282,6 +495,10 @@ public class WikiPageModelImpl extends BaseModelImpl<WikiPage>
 
 	public void setUserUuid(String userUuid) {
 		_userUuid = userUuid;
+	}
+
+	public long getOriginalUserId() {
+		return _originalUserId;
 	}
 
 	@JSON
@@ -322,6 +539,8 @@ public class WikiPageModelImpl extends BaseModelImpl<WikiPage>
 	}
 
 	public void setNodeId(long nodeId) {
+		_columnBitmask = -1L;
+
 		if (!_setOriginalNodeId) {
 			_setOriginalNodeId = true;
 
@@ -346,6 +565,8 @@ public class WikiPageModelImpl extends BaseModelImpl<WikiPage>
 	}
 
 	public void setTitle(String title) {
+		_columnBitmask = -1L;
+
 		if (_originalTitle == null) {
 			_originalTitle = _title;
 		}
@@ -363,6 +584,8 @@ public class WikiPageModelImpl extends BaseModelImpl<WikiPage>
 	}
 
 	public void setVersion(double version) {
+		_columnBitmask = -1L;
+
 		if (!_setOriginalVersion) {
 			_setOriginalVersion = true;
 
@@ -428,7 +651,17 @@ public class WikiPageModelImpl extends BaseModelImpl<WikiPage>
 	}
 
 	public void setFormat(String format) {
+		_columnBitmask |= FORMAT_COLUMN_BITMASK;
+
+		if (_originalFormat == null) {
+			_originalFormat = _format;
+		}
+
 		_format = format;
+	}
+
+	public String getOriginalFormat() {
+		return GetterUtil.getString(_originalFormat);
 	}
 
 	@JSON
@@ -441,7 +674,19 @@ public class WikiPageModelImpl extends BaseModelImpl<WikiPage>
 	}
 
 	public void setHead(boolean head) {
+		_columnBitmask |= HEAD_COLUMN_BITMASK;
+
+		if (!_setOriginalHead) {
+			_setOriginalHead = true;
+
+			_originalHead = _head;
+		}
+
 		_head = head;
+	}
+
+	public boolean getOriginalHead() {
+		return _originalHead;
 	}
 
 	@JSON
@@ -455,7 +700,17 @@ public class WikiPageModelImpl extends BaseModelImpl<WikiPage>
 	}
 
 	public void setParentTitle(String parentTitle) {
+		_columnBitmask |= PARENTTITLE_COLUMN_BITMASK;
+
+		if (_originalParentTitle == null) {
+			_originalParentTitle = _parentTitle;
+		}
+
 		_parentTitle = parentTitle;
+	}
+
+	public String getOriginalParentTitle() {
+		return GetterUtil.getString(_originalParentTitle);
 	}
 
 	@JSON
@@ -469,7 +724,17 @@ public class WikiPageModelImpl extends BaseModelImpl<WikiPage>
 	}
 
 	public void setRedirectTitle(String redirectTitle) {
+		_columnBitmask |= REDIRECTTITLE_COLUMN_BITMASK;
+
+		if (_originalRedirectTitle == null) {
+			_originalRedirectTitle = _redirectTitle;
+		}
+
 		_redirectTitle = redirectTitle;
+	}
+
+	public String getOriginalRedirectTitle() {
+		return GetterUtil.getString(_originalRedirectTitle);
 	}
 
 	@JSON
@@ -478,7 +743,19 @@ public class WikiPageModelImpl extends BaseModelImpl<WikiPage>
 	}
 
 	public void setStatus(int status) {
+		_columnBitmask |= STATUS_COLUMN_BITMASK;
+
+		if (!_setOriginalStatus) {
+			_setOriginalStatus = true;
+
+			_originalStatus = _status;
+		}
+
 		_status = status;
+	}
+
+	public int getOriginalStatus() {
+		return _originalStatus;
 	}
 
 	@JSON
@@ -556,6 +833,15 @@ public class WikiPageModelImpl extends BaseModelImpl<WikiPage>
 		}
 	}
 
+	public boolean isInTrash() {
+		if (getStatus() == WorkflowConstants.STATUS_IN_TRASH) {
+			return true;
+		}
+		else {
+			return false;
+		}
+	}
+
 	public boolean isPending() {
 		if (getStatus() == WorkflowConstants.STATUS_PENDING) {
 			return true;
@@ -565,35 +851,32 @@ public class WikiPageModelImpl extends BaseModelImpl<WikiPage>
 		}
 	}
 
+	public long getColumnBitmask() {
+		return _columnBitmask;
+	}
+
 	@Override
 	public WikiPage toEscapedModel() {
-		if (isEscapedModel()) {
-			return (WikiPage)this;
+		if (_escapedModelProxy == null) {
+			_escapedModelProxy = (WikiPage)ProxyUtil.newProxyInstance(_classLoader,
+					_escapedModelProxyInterfaces,
+					new AutoEscapeBeanHandler(this));
 		}
-		else {
-			if (_escapedModelProxy == null) {
-				_escapedModelProxy = (WikiPage)Proxy.newProxyInstance(_classLoader,
-						_escapedModelProxyInterfaces,
-						new AutoEscapeBeanHandler(this));
-			}
 
-			return _escapedModelProxy;
-		}
+		return _escapedModelProxy;
 	}
 
 	@Override
 	public ExpandoBridge getExpandoBridge() {
-		if (_expandoBridge == null) {
-			_expandoBridge = ExpandoBridgeFactoryUtil.getExpandoBridge(getCompanyId(),
-					WikiPage.class.getName(), getPrimaryKey());
-		}
-
-		return _expandoBridge;
+		return ExpandoBridgeFactoryUtil.getExpandoBridge(getCompanyId(),
+			WikiPage.class.getName(), getPrimaryKey());
 	}
 
 	@Override
 	public void setExpandoBridgeAttributes(ServiceContext serviceContext) {
-		getExpandoBridge().setAttributes(serviceContext);
+		ExpandoBridge expandoBridge = getExpandoBridge();
+
+		expandoBridge.setAttributes(serviceContext);
 	}
 
 	@Override
@@ -716,6 +999,14 @@ public class WikiPageModelImpl extends BaseModelImpl<WikiPage>
 
 		wikiPageModelImpl._setOriginalGroupId = false;
 
+		wikiPageModelImpl._originalCompanyId = wikiPageModelImpl._companyId;
+
+		wikiPageModelImpl._setOriginalCompanyId = false;
+
+		wikiPageModelImpl._originalUserId = wikiPageModelImpl._userId;
+
+		wikiPageModelImpl._setOriginalUserId = false;
+
 		wikiPageModelImpl._originalNodeId = wikiPageModelImpl._nodeId;
 
 		wikiPageModelImpl._setOriginalNodeId = false;
@@ -725,6 +1016,22 @@ public class WikiPageModelImpl extends BaseModelImpl<WikiPage>
 		wikiPageModelImpl._originalVersion = wikiPageModelImpl._version;
 
 		wikiPageModelImpl._setOriginalVersion = false;
+
+		wikiPageModelImpl._originalFormat = wikiPageModelImpl._format;
+
+		wikiPageModelImpl._originalHead = wikiPageModelImpl._head;
+
+		wikiPageModelImpl._setOriginalHead = false;
+
+		wikiPageModelImpl._originalParentTitle = wikiPageModelImpl._parentTitle;
+
+		wikiPageModelImpl._originalRedirectTitle = wikiPageModelImpl._redirectTitle;
+
+		wikiPageModelImpl._originalStatus = wikiPageModelImpl._status;
+
+		wikiPageModelImpl._setOriginalStatus = false;
+
+		wikiPageModelImpl._columnBitmask = 0;
 	}
 
 	@Override
@@ -1029,8 +1336,12 @@ public class WikiPageModelImpl extends BaseModelImpl<WikiPage>
 	private long _originalGroupId;
 	private boolean _setOriginalGroupId;
 	private long _companyId;
+	private long _originalCompanyId;
+	private boolean _setOriginalCompanyId;
 	private long _userId;
 	private String _userUuid;
+	private long _originalUserId;
+	private boolean _setOriginalUserId;
 	private String _userName;
 	private Date _createDate;
 	private Date _modifiedDate;
@@ -1046,14 +1357,21 @@ public class WikiPageModelImpl extends BaseModelImpl<WikiPage>
 	private String _content;
 	private String _summary;
 	private String _format;
+	private String _originalFormat;
 	private boolean _head;
+	private boolean _originalHead;
+	private boolean _setOriginalHead;
 	private String _parentTitle;
+	private String _originalParentTitle;
 	private String _redirectTitle;
+	private String _originalRedirectTitle;
 	private int _status;
+	private int _originalStatus;
+	private boolean _setOriginalStatus;
 	private long _statusByUserId;
 	private String _statusByUserUuid;
 	private String _statusByUserName;
 	private Date _statusDate;
-	private transient ExpandoBridge _expandoBridge;
+	private long _columnBitmask;
 	private WikiPage _escapedModelProxy;
 }

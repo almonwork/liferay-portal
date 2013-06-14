@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -35,6 +35,9 @@ import com.liferay.portal.kernel.xml.Element;
 import com.liferay.portal.kernel.xml.SAXReaderUtil;
 import com.liferay.portal.model.ModelHintsUtil;
 import com.liferay.portal.model.ServiceComponent;
+import com.liferay.portal.security.lang.PortalSecurityManagerThreadLocal;
+import com.liferay.portal.security.pacl.PACLPolicy;
+import com.liferay.portal.security.pacl.PACLPolicyManager;
 import com.liferay.portal.service.base.ServiceComponentLocalServiceBaseImpl;
 import com.liferay.portal.tools.servicebuilder.Entity;
 
@@ -176,55 +179,33 @@ public class ServiceComponentLocalServiceImpl
 			String tablesSQL, String sequencesSQL, String indexesSQL)
 		throws Exception {
 
-		DB db = DBFactoryUtil.getDB();
+		PACLPolicy previousPACLPolicy =
+			PortalSecurityManagerThreadLocal.getPACLPolicy();
 
-		if (previousServiceComponent == null) {
-			if (_log.isInfoEnabled()) {
-				_log.info("Running " + buildNamespace + " SQL scripts");
-			}
+		boolean checkGetClassLoader =
+			PortalSecurityManagerThreadLocal.isCheckGetClassLoader();
+		boolean checkReadFile =
+			PortalSecurityManagerThreadLocal.isCheckReadFile();
 
-			db.runSQLTemplateString(tablesSQL, true, false);
-			db.runSQLTemplateString(sequencesSQL, true, false);
-			db.runSQLTemplateString(indexesSQL, true, false);
+		try {
+			PACLPolicy paclPolicy = PACLPolicyManager.getPACLPolicy(
+				classLoader);
+
+			PortalSecurityManagerThreadLocal.setPACLPolicy(paclPolicy);
+
+			PortalSecurityManagerThreadLocal.setCheckGetClassLoader(false);
+			PortalSecurityManagerThreadLocal.setCheckReadFile(false);
+
+			doUpgradeDB(
+				classLoader, buildNamespace, buildNumber, buildAutoUpgrade,
+				previousServiceComponent, tablesSQL, sequencesSQL, indexesSQL);
 		}
-		else if (buildAutoUpgrade) {
-			if (_log.isInfoEnabled()) {
-				_log.info(
-					"Upgrading " + buildNamespace +
-						" database to build number " + buildNumber);
-			}
+		finally {
+			PortalSecurityManagerThreadLocal.setPACLPolicy(previousPACLPolicy);
 
-			if (!tablesSQL.equals(
-					previousServiceComponent.getTablesSQL())) {
-
-				if (_log.isInfoEnabled()) {
-					_log.info("Upgrading database with tables.sql");
-				}
-
-				db.runSQLTemplateString(tablesSQL, true, false);
-
-				upgradeModels(classLoader);
-			}
-
-			if (!sequencesSQL.equals(
-					previousServiceComponent.getSequencesSQL())) {
-
-				if (_log.isInfoEnabled()) {
-					_log.info("Upgrading database with sequences.sql");
-				}
-
-				db.runSQLTemplateString(sequencesSQL, true, false);
-			}
-
-			if (!indexesSQL.equals(
-					previousServiceComponent.getIndexesSQL())) {
-
-				if (_log.isInfoEnabled()) {
-					_log.info("Upgrading database with indexes.sql");
-				}
-
-				db.runSQLTemplateString(indexesSQL, true, false);
-			}
+			PortalSecurityManagerThreadLocal.setCheckGetClassLoader(
+				checkGetClassLoader);
+			PortalSecurityManagerThreadLocal.setCheckReadFile(checkReadFile);
 		}
 	}
 
@@ -277,6 +258,60 @@ public class ServiceComponentLocalServiceImpl
 		FinderCacheUtil.clearCache();
 	}
 
+	protected void doUpgradeDB(
+			ClassLoader classLoader, String buildNamespace, long buildNumber,
+			boolean buildAutoUpgrade, ServiceComponent previousServiceComponent,
+			String tablesSQL, String sequencesSQL, String indexesSQL)
+		throws Exception {
+
+		DB db = DBFactoryUtil.getDB();
+
+		if (previousServiceComponent == null) {
+			if (_log.isInfoEnabled()) {
+				_log.info("Running " + buildNamespace + " SQL scripts");
+			}
+
+			db.runSQLTemplateString(tablesSQL, true, false);
+			db.runSQLTemplateString(sequencesSQL, true, false);
+			db.runSQLTemplateString(indexesSQL, true, false);
+		}
+		else if (buildAutoUpgrade) {
+			if (_log.isInfoEnabled()) {
+				_log.info(
+					"Upgrading " + buildNamespace +
+						" database to build number " + buildNumber);
+			}
+
+			if (!tablesSQL.equals(previousServiceComponent.getTablesSQL())) {
+				if (_log.isInfoEnabled()) {
+					_log.info("Upgrading database with tables.sql");
+				}
+
+				db.runSQLTemplateString(tablesSQL, true, false);
+
+				upgradeModels(classLoader);
+			}
+
+			if (!sequencesSQL.equals(
+					previousServiceComponent.getSequencesSQL())) {
+
+				if (_log.isInfoEnabled()) {
+					_log.info("Upgrading database with sequences.sql");
+				}
+
+				db.runSQLTemplateString(sequencesSQL, true, false);
+			}
+
+			if (!indexesSQL.equals(previousServiceComponent.getIndexesSQL())) {
+				if (_log.isInfoEnabled()) {
+					_log.info("Upgrading database with indexes.sql");
+				}
+
+				db.runSQLTemplateString(indexesSQL, true, false);
+			}
+		}
+	}
+
 	protected List<String> getModels(ClassLoader classLoader)
 		throws DocumentException, IOException {
 
@@ -322,6 +357,28 @@ public class ServiceComponentLocalServiceImpl
 		return models;
 	}
 
+	protected void removeOldServiceComponents(String buildNamespace)
+		throws SystemException {
+
+		int serviceComponentsCount =
+			serviceComponentPersistence.countByBuildNamespace(buildNamespace);
+
+		if (serviceComponentsCount < _MAX_SERVICE_COMPONENTS) {
+			return;
+		}
+
+		List<ServiceComponent> serviceComponents =
+			serviceComponentPersistence.findByBuildNamespace(
+				buildNamespace, _MAX_SERVICE_COMPONENTS,
+				serviceComponentsCount);
+
+		for (int i = 0; i < serviceComponents.size(); i++) {
+			ServiceComponent serviceComponent = serviceComponents.get(i);
+
+			serviceComponentPersistence.remove(serviceComponent);
+		}
+	}
+
 	protected void upgradeModels(ClassLoader classLoader) throws Exception {
 		List<String> models = getModels(classLoader);
 
@@ -354,28 +411,6 @@ public class ServiceComponentLocalServiceImpl
 			upgradeTable.setCreateSQL(tableSQLCreate);
 
 			upgradeTable.updateTable();
-		}
-	}
-
-	protected void removeOldServiceComponents(String buildNamespace)
-		throws SystemException {
-
-		int serviceComponentsCount =
-			serviceComponentPersistence.countByBuildNamespace(buildNamespace);
-
-		if (serviceComponentsCount < _MAX_SERVICE_COMPONENTS) {
-			return;
-		}
-
-		List<ServiceComponent> serviceComponents =
-			serviceComponentPersistence.findByBuildNamespace(
-				buildNamespace, _MAX_SERVICE_COMPONENTS,
-				serviceComponentsCount);
-
-		for (int i = 0; i < serviceComponents.size(); i++) {
-			ServiceComponent serviceComponent = serviceComponents.get(i);
-
-			serviceComponentPersistence.remove(serviceComponent);
 		}
 	}
 

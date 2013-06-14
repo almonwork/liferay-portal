@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,6 +14,9 @@
 
 package com.liferay.portal.kernel.util;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import javax.portlet.PortletRequest;
 import javax.portlet.PortletSession;
 
@@ -22,6 +25,7 @@ import javax.servlet.http.HttpSession;
 
 /**
  * @author Jorge Ferrer
+ * @author Sergio González
  */
 public class ProgressTracker {
 
@@ -29,64 +33,90 @@ public class ProgressTracker {
 		ProgressTracker.class.getName() + "_PERCENT";
 
 	public ProgressTracker(HttpServletRequest request, String progressId) {
-		_request = request;
-		_progressId = progressId;
+		this(request.getSession(), progressId);
 	}
 
 	public ProgressTracker(PortletRequest portletRequest, String progressId) {
-		_portletRequest = portletRequest;
+		this(portletRequest.getPortletSession(), progressId);
+	}
+
+	public ProgressTracker(HttpSession session, String progressId) {
+		_session = session;
 		_progressId = progressId;
+
+		addProgress(ProgressStatusConstants.PREPARED, 0, StringPool.BLANK);
 	}
 
-	public int getProgress() {
-		if (_request != null) {
-			HttpSession session = _request.getSession();
+	public ProgressTracker(PortletSession portletSession, String progressId) {
+		_portletSession = portletSession;
+		_progressId = progressId;
 
-			return (Integer)session.getAttribute(PERCENT + _progressId);
-		}
-		else {
-			PortletSession portletSession = _portletRequest.getPortletSession();
-
-			return (Integer)portletSession.getAttribute(PERCENT + _progressId);
-		}
+		addProgress(ProgressStatusConstants.PREPARED, 0, StringPool.BLANK);
 	}
 
-	public void start() {
-		updateProgress(1);
-	}
+	public void addProgress(int status, int percent, String message) {
+		Tuple tuple = new Tuple(percent, message);
 
-	public void updateProgress(int percentage) {
-		if (_request != null) {
-			HttpSession session = _request.getSession();
-
-			session.setAttribute(
-				PERCENT + _progressId, new Integer(percentage));
-		}
-		else {
-			PortletSession portletSession = _portletRequest.getPortletSession();
-
-			portletSession.setAttribute(
-				PERCENT + _progressId, new Integer(percentage),
-				PortletSession.APPLICATION_SCOPE);
-		}
+		_progress.put(status, tuple);
 	}
 
 	public void finish() {
-		if (_request != null) {
-			HttpSession session = _request.getSession();
-
-			session.removeAttribute(PERCENT + _progressId);
+		if (_session != null) {
+			_session.removeAttribute(PERCENT + _progressId);
 		}
 		else {
-			PortletSession portletSession = _portletRequest.getPortletSession();
-
-			portletSession.removeAttribute(
+			_portletSession.removeAttribute(
 				PERCENT + _progressId, PortletSession.APPLICATION_SCOPE);
 		}
 	}
 
-	private HttpServletRequest _request;
-	private PortletRequest _portletRequest;
+	public String getMessage() {
+		Tuple tuple = _progress.get(_status);
+
+		String message = GetterUtil.getString(tuple.getObject(1));
+
+		return message;
+	}
+
+	public int getPercent() {
+		return _percent;
+	}
+
+	public int getStatus() {
+		return _status;
+	}
+
+	public void initialize() {
+		if (_session != null) {
+			_session.setAttribute(PERCENT + _progressId, this);
+		}
+		else {
+			_portletSession.setAttribute(
+				PERCENT + _progressId, this, PortletSession.APPLICATION_SCOPE);
+		}
+	}
+
+	public void setPercent(int percent) {
+		_percent = percent;
+	}
+
+	public void setStatus(int status) {
+		_status = status;
+
+		Tuple tuple = _progress.get(_status);
+
+		_percent = GetterUtil.getInteger(tuple.getObject(0));
+	}
+
+	public void start() {
+		setPercent(1);
+	}
+
+	private int _percent;
+	private PortletSession _portletSession;
+	private Map<Integer, Tuple> _progress = new HashMap<Integer, Tuple>();
 	private String _progressId;
+	private HttpSession _session;
+	private int _status = ProgressStatusConstants.PREPARED;
 
 }

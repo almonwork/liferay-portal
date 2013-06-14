@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -19,15 +19,16 @@ import com.liferay.portal.kernel.captcha.CaptchaException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.util.InstanceFactory;
-import com.liferay.portal.kernel.util.PortalClassLoaderUtil;
 import com.liferay.portal.kernel.util.PropsKeys;
+import com.liferay.portal.security.pacl.PACLClassLoaderUtil;
 import com.liferay.portal.util.PrefsPropsUtil;
 import com.liferay.portal.util.PropsValues;
 
 import java.io.IOException;
 
 import javax.portlet.PortletRequest;
-import javax.portlet.PortletResponse;
+import javax.portlet.ResourceRequest;
+import javax.portlet.ResourceResponse;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -81,12 +82,12 @@ public class CaptchaImpl implements Captcha {
 	}
 
 	public void serveImage(
-			PortletRequest portletRequest, PortletResponse portletResponse)
+			ResourceRequest resourceRequest, ResourceResponse resourceResponse)
 		throws IOException {
 
 		_initialize();
 
-		_captcha.serveImage(portletRequest, portletResponse);
+		_captcha.serveImage(resourceRequest, resourceResponse);
 	}
 
 	public void setCaptcha(Captcha captcha) {
@@ -94,8 +95,7 @@ public class CaptchaImpl implements Captcha {
 
 		if (captcha == null) {
 			if (_log.isInfoEnabled()) {
-				_log.info(
-					"Restoring " + _originalCaptcha.getClass().getName());
+				_log.info("Restoring " + _originalCaptcha.getClass().getName());
 			}
 
 			_captcha = _originalCaptcha;
@@ -129,7 +129,8 @@ public class CaptchaImpl implements Captcha {
 				}
 
 				_captcha = (Captcha)InstanceFactory.newInstance(
-					PortalClassLoaderUtil.getClassLoader(), captchaClassName);
+					PACLClassLoaderUtil.getPortalClassLoader(),
+					captchaClassName);
 
 				_originalCaptcha = _captcha;
 			}

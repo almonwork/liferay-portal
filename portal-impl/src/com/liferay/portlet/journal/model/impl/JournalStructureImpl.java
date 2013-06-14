@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -21,7 +21,7 @@ import com.liferay.portal.kernel.xml.SAXReaderUtil;
 import com.liferay.portlet.journal.model.JournalStructure;
 import com.liferay.portlet.journal.service.JournalStructureLocalServiceUtil;
 
-import java.util.Iterator;
+import java.util.List;
 
 /**
  * @author Brian Wing Shun Chan
@@ -43,7 +43,7 @@ public class JournalStructureImpl extends JournalStructureBaseImpl {
 		try {
 			JournalStructure parentStructure =
 				JournalStructureLocalServiceUtil.getStructure(
-					getGroupId(), parentStructureId);
+					getGroupId(), parentStructureId, true);
 
 			Document doc = SAXReaderUtil.read(getXsd());
 
@@ -69,14 +69,13 @@ public class JournalStructureImpl extends JournalStructureBaseImpl {
 	protected void addParentStructureId(
 		Element parentEl, String parentStructureId) {
 
-		Iterator<Element> itr = parentEl.elements(_DYNAMIC_ELEMENT).iterator();
+		List<Element> dynamicElements = parentEl.elements(_DYNAMIC_ELEMENT);
 
-		while (itr.hasNext()) {
-			Element dynamicEl = itr.next();
+		for (Element dynamicElement : dynamicElements) {
+			dynamicElement.addAttribute(
+				_PARENT_STRUCTURE_ID, parentStructureId);
 
-			dynamicEl.addAttribute(_PARENT_STRUCTURE_ID, parentStructureId);
-
-			addParentStructureId(dynamicEl, parentStructureId);
+			addParentStructureId(dynamicElement, parentStructureId);
 		}
 	}
 

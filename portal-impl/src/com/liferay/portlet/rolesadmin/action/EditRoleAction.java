@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -67,7 +67,7 @@ public class EditRoleAction extends PortletAction {
 		}
 		catch (Exception e) {
 			if (e instanceof PrincipalException) {
-				SessionErrors.add(actionRequest, e.getClass().getName());
+				SessionErrors.add(actionRequest, e.getClass());
 
 				setForward(actionRequest, "portlet.roles_admin.error");
 			}
@@ -76,7 +76,7 @@ public class EditRoleAction extends PortletAction {
 					 e instanceof RequiredRoleException ||
 					 e instanceof RoleNameException) {
 
-				SessionErrors.add(actionRequest, e.getClass().getName());
+				SessionErrors.add(actionRequest, e.getClass());
 
 				if (cmd.equals(Constants.DELETE)) {
 					String redirect = PortalUtil.escapeRedirect(
@@ -106,7 +106,7 @@ public class EditRoleAction extends PortletAction {
 			if (e instanceof NoSuchRoleException ||
 				e instanceof PrincipalException) {
 
-				SessionErrors.add(renderRequest, e.getClass().getName());
+				SessionErrors.add(renderRequest, e.getClass());
 
 				return mapping.findForward("portlet.roles_admin.error");
 			}
@@ -131,7 +131,8 @@ public class EditRoleAction extends PortletAction {
 		String name = ParamUtil.getString(actionRequest, "name");
 		Map<Locale, String> titleMap = LocalizationUtil.getLocalizationMap(
 			actionRequest, "title");
-		String description = ParamUtil.getString(actionRequest, "description");
+		Map<Locale, String> descriptionMap =
+			LocalizationUtil.getLocalizationMap(actionRequest, "description");
 		int type = ParamUtil.getInteger(
 			actionRequest, "type", RoleConstants.TYPE_REGULAR);
 		String subtype = ParamUtil.getString(actionRequest, "subtype");
@@ -140,14 +141,14 @@ public class EditRoleAction extends PortletAction {
 
 			// Add role
 
-			RoleServiceUtil.addRole(name, titleMap, description, type);
+			RoleServiceUtil.addRole(name, titleMap, descriptionMap, type);
 		}
 		else {
 
 			// Update role
 
 			RoleServiceUtil.updateRole(
-				roleId, name, titleMap, description, subtype);
+				roleId, name, titleMap, descriptionMap, subtype);
 		}
 	}
 

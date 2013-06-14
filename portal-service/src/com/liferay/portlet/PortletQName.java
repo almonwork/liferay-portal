@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -36,10 +36,10 @@ public interface PortletQName {
 
 	public String getPublicRenderParameterName(QName qName);
 
-	public QName getQName(String publicRenderParameterName);
-
 	public QName getQName(
 		Element qNameEl, Element nameEl, String defaultNamespace);
+
+	public QName getQName(String publicRenderParameterName);
 
 	public String getRemovePublicRenderParameterName(QName qName);
 

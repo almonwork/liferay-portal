@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -23,14 +23,15 @@ import com.liferay.portalweb.portal.util.RuntimeVariables;
 public class SearchCategoryItemTest extends BaseTestCase {
 	public void testSearchCategoryItem() throws Exception {
 		selenium.open("/web/guest/home/");
+		loadRequiredJavaScriptModules();
 
 		for (int second = 0;; second++) {
-			if (second >= 60) {
+			if (second >= 90) {
 				fail("timeout");
 			}
 
 			try {
-				if (selenium.isElementPresent("link=Shopping Test Page")) {
+				if (selenium.isVisible("link=Shopping Test Page")) {
 					break;
 				}
 			}
@@ -40,30 +41,33 @@ public class SearchCategoryItemTest extends BaseTestCase {
 			Thread.sleep(1000);
 		}
 
-		selenium.saveScreenShotAndSource();
-		selenium.clickAt("link=Shopping Test Page", RuntimeVariables.replace(""));
+		selenium.clickAt("link=Shopping Test Page",
+			RuntimeVariables.replace("Shopping Test Page"));
 		selenium.waitForPageToLoad("30000");
-		selenium.saveScreenShotAndSource();
-		selenium.clickAt("link=Categories", RuntimeVariables.replace(""));
+		loadRequiredJavaScriptModules();
+		selenium.clickAt("link=Categories",
+			RuntimeVariables.replace("Categories"));
 		selenium.waitForPageToLoad("30000");
-		selenium.saveScreenShotAndSource();
-		selenium.type("_34_keywords1", RuntimeVariables.replace("Item Test"));
-		selenium.saveScreenShotAndSource();
+		loadRequiredJavaScriptModules();
+		selenium.type("//input[@id='_34_keywords1']",
+			RuntimeVariables.replace("Shopping Category Item Name"));
 		selenium.click(RuntimeVariables.replace(
 				"//input[@value='Search Categories']"));
 		selenium.waitForPageToLoad("30000");
-		selenium.saveScreenShotAndSource();
-		assertTrue(selenium.isTextPresent(
-				"Item Test\nThis is an item test.\nLimited: Time Only"));
+		loadRequiredJavaScriptModules();
+		assertEquals(RuntimeVariables.replace(
+				"Shopping Category Item Name\nShopping Category Item Description\nShopping: Category Item Properties"),
+			selenium.getText("//td[2]/a"));
 		selenium.open("/web/guest/home/");
+		loadRequiredJavaScriptModules();
 
 		for (int second = 0;; second++) {
-			if (second >= 60) {
+			if (second >= 90) {
 				fail("timeout");
 			}
 
 			try {
-				if (selenium.isElementPresent("link=Shopping Test Page")) {
+				if (selenium.isVisible("link=Shopping Test Page")) {
 					break;
 				}
 			}
@@ -73,20 +77,24 @@ public class SearchCategoryItemTest extends BaseTestCase {
 			Thread.sleep(1000);
 		}
 
-		selenium.saveScreenShotAndSource();
-		selenium.clickAt("link=Shopping Test Page", RuntimeVariables.replace(""));
+		selenium.clickAt("link=Shopping Test Page",
+			RuntimeVariables.replace("Shopping Test Page"));
 		selenium.waitForPageToLoad("30000");
-		selenium.saveScreenShotAndSource();
-		selenium.clickAt("link=Categories", RuntimeVariables.replace(""));
+		loadRequiredJavaScriptModules();
+		selenium.clickAt("link=Categories",
+			RuntimeVariables.replace("Categories"));
 		selenium.waitForPageToLoad("30000");
-		selenium.saveScreenShotAndSource();
-		selenium.type("_34_keywords1", RuntimeVariables.replace("Item1 Test1"));
-		selenium.saveScreenShotAndSource();
-		selenium.click(RuntimeVariables.replace(
-				"//input[@value='Search Categories']"));
+		loadRequiredJavaScriptModules();
+		selenium.type("//input[@id='_34_keywords1']",
+			RuntimeVariables.replace("Shopping1 Category1 Item1 Name1"));
+		selenium.clickAt("//input[@value='Search Categories']",
+			RuntimeVariables.replace("Search Categories"));
 		selenium.waitForPageToLoad("30000");
-		selenium.saveScreenShotAndSource();
+		loadRequiredJavaScriptModules();
+		assertEquals(RuntimeVariables.replace(
+				"No entries were found that matched the keywords: Shopping1 Category1 Item1 Name1."),
+			selenium.getText("//div[@class='portlet-msg-info']"));
 		assertFalse(selenium.isTextPresent(
-				"Item Test\nThis is an item test.\nLimited: Time Only"));
+				"Shopping Category Item Name\nShopping Category Item Description\nShopping: Category Item Properties"));
 	}
 }

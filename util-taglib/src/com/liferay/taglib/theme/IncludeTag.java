@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -19,8 +19,7 @@ import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.model.Theme;
 import com.liferay.taglib.util.ThemeUtil;
 
-import javax.servlet.ServletContext;
-import javax.servlet.http.HttpServletRequest;
+import javax.servlet.jsp.JspException;
 
 /**
  * @author Brian Wing Shun Chan
@@ -28,22 +27,19 @@ import javax.servlet.http.HttpServletRequest;
 public class IncludeTag extends com.liferay.taglib.util.IncludeTag {
 
 	@Override
-	protected String getCustomPage(
-		ServletContext servletContext, HttpServletRequest request) {
+	public int doEndTag() throws JspException {
+		try {
+			Theme theme = (Theme)request.getAttribute(WebKeys.THEME);
 
-		return null;
-	}
+			ThemeUtil.include(
+				servletContext, request, new PipingServletResponse(pageContext),
+				pageContext, getPage(), theme);
 
-	@Override
-	protected void include(String page) throws Exception {
-		ServletContext servletContext = getServletContext();
-		HttpServletRequest request = getServletRequest();
-
-		Theme theme = (Theme)request.getAttribute(WebKeys.THEME);
-
-		ThemeUtil.include(
-			servletContext, request, new PipingServletResponse(pageContext),
-			pageContext, page, theme);
+			return EVAL_PAGE;
+		}
+		catch (Exception e) {
+			throw new JspException(e);
+		}
 	}
 
 }

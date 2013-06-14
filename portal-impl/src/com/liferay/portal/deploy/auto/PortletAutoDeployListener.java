@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -16,6 +16,7 @@ package com.liferay.portal.deploy.auto;
 
 import com.liferay.portal.kernel.deploy.auto.AutoDeployException;
 import com.liferay.portal.kernel.deploy.auto.BaseAutoDeployListener;
+import com.liferay.portal.kernel.deploy.auto.context.AutoDeploymentContext;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.util.Portal;
@@ -26,14 +27,19 @@ import java.io.File;
  * @author Ivica Cardic
  * @author Brian Wing Shun Chan
  * @author Jorge Ferrer
+ * @author Miguel Pastor
  */
 public class PortletAutoDeployListener extends BaseAutoDeployListener {
 
 	public PortletAutoDeployListener() {
-		_deployer = new PortletAutoDeployer();
+		_autoDeployer = new PortletAutoDeployer();
 	}
 
-	public void deploy(File file) throws AutoDeployException {
+	public void deploy(AutoDeploymentContext autoDeploymentContext)
+		throws AutoDeployException {
+
+		File file = autoDeploymentContext.getFile();
+
 		if (_log.isDebugEnabled()) {
 			_log.debug("Invoking deploy for " + file.getPath());
 		}
@@ -43,7 +49,7 @@ public class PortletAutoDeployListener extends BaseAutoDeployListener {
 		if (isMatchingFile(
 				file, "WEB-INF/" + Portal.PORTLET_XML_FILE_NAME_STANDARD)) {
 
-			deployer = _deployer;
+			deployer = _autoDeployer;
 		}
 		else if (isMatchingFile(file, "index_mvc.jsp")) {
 			deployer = getMvcDeployer();
@@ -75,7 +81,7 @@ public class PortletAutoDeployListener extends BaseAutoDeployListener {
 			_log.debug("Using deployer " + deployer.getClass().getName());
 		}
 
-		deployer.autoDeploy(file.getName());
+		deployer.autoDeploy(autoDeploymentContext);
 
 		if (_log.isInfoEnabled()) {
 			_log.info(
@@ -85,35 +91,35 @@ public class PortletAutoDeployListener extends BaseAutoDeployListener {
 	}
 
 	protected AutoDeployer getMvcDeployer() {
-		if (_mvcDeployer == null) {
-			_mvcDeployer = new MVCPortletAutoDeployer();
+		if (_mvcPortletAutoDeployer == null) {
+			_mvcPortletAutoDeployer = new MVCPortletAutoDeployer();
 		}
 
-		return _mvcDeployer;
+		return _mvcPortletAutoDeployer;
 	}
 
 	protected AutoDeployer getPhpDeployer() throws AutoDeployException {
-		if (_phpDeployer == null) {
-			_phpDeployer = new PHPPortletAutoDeployer();
+		if (_phpPortletAutoDeployer == null) {
+			_phpPortletAutoDeployer = new PHPPortletAutoDeployer();
 		}
 
-		return _phpDeployer;
+		return _phpPortletAutoDeployer;
 	}
 
 	protected AutoDeployer getWaiDeployer() throws AutoDeployException {
-		if (_waiDeployer == null) {
-			_waiDeployer = new WAIAutoDeployer();
+		if (_waiAutoDeployer == null) {
+			_waiAutoDeployer = new WAIAutoDeployer();
 		}
 
-		return _waiDeployer;
+		return _waiAutoDeployer;
 	}
 
 	private static Log _log = LogFactoryUtil.getLog(
 		PortletAutoDeployListener.class);
 
-	private AutoDeployer _deployer;
-	private MVCPortletAutoDeployer _mvcDeployer;
-	private PHPPortletAutoDeployer _phpDeployer;
-	private WAIAutoDeployer _waiDeployer;
+	private AutoDeployer _autoDeployer;
+	private MVCPortletAutoDeployer _mvcPortletAutoDeployer;
+	private PHPPortletAutoDeployer _phpPortletAutoDeployer;
+	private WAIAutoDeployer _waiAutoDeployer;
 
 }

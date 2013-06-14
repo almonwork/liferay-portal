@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -40,14 +40,14 @@ public class PortalPreferencesImpl
 	implements Cloneable, PortalPreferences, Serializable {
 
 	public PortalPreferencesImpl() {
-		this(0, 0, 0, Collections.<String, Preference>emptyMap(), false);
+		this(0, 0, 0, null, Collections.<String, Preference>emptyMap(), false);
 	}
 
 	public PortalPreferencesImpl(
-		long companyId, long ownerId, int ownerType,
+		long companyId, long ownerId, int ownerType, String xml,
 		Map<String, Preference> preferences, boolean signedIn) {
 
-		super(companyId, ownerId, ownerType, preferences);
+		super(companyId, ownerId, ownerType, xml, preferences);
 
 		_signedIn = signedIn;
 	}
@@ -55,12 +55,16 @@ public class PortalPreferencesImpl
 	@Override
 	public Object clone() {
 		return new PortalPreferencesImpl(
-			getCompanyId(), getOwnerId(), getOwnerType(),
+			getCompanyId(), getOwnerId(), getOwnerType(), getOriginalXML(),
 			getOriginalPreferences(), isSignedIn());
 	}
 
 	@Override
 	public boolean equals(Object obj) {
+		if (obj == null) {
+			return false;
+		}
+
 		PortalPreferencesImpl portalPreferences = (PortalPreferencesImpl)obj;
 
 		if (this == portalPreferences) {
@@ -70,29 +74,13 @@ public class PortalPreferencesImpl
 		if ((getCompanyId() == portalPreferences.getCompanyId()) &&
 			(getOwnerId() == portalPreferences.getOwnerId()) &&
 			(getOwnerType() == portalPreferences.getOwnerType()) &&
-			(getMap().equals(portalPreferences.getMap()))) {
+			getPreferences().equals(portalPreferences.getPreferences())) {
 
 			return true;
 		}
 		else {
 			return false;
 		}
-	}
-
-	@Override
-	public int hashCode() {
-		HashCode hashCode = HashCodeFactoryUtil.getHashCode();
-
-		hashCode.append(getCompanyId());
-		hashCode.append(getOwnerId());
-		hashCode.append(getOwnerType());
-		hashCode.append(getPreferences());
-
-		return hashCode.toHashCode();
-	}
-
-	public boolean isSignedIn() {
-		return _signedIn;
 	}
 
 	@Override
@@ -116,6 +104,22 @@ public class PortalPreferencesImpl
 		key = _encodeKey(namespace, key);
 
 		return super.getValues(key, defaultValue);
+	}
+
+	@Override
+	public int hashCode() {
+		HashCode hashCode = HashCodeFactoryUtil.getHashCode();
+
+		hashCode.append(getCompanyId());
+		hashCode.append(getOwnerId());
+		hashCode.append(getOwnerType());
+		hashCode.append(getPreferences());
+
+		return hashCode.toHashCode();
+	}
+
+	public boolean isSignedIn() {
+		return _signedIn;
 	}
 
 	@Override
@@ -153,7 +157,7 @@ public class PortalPreferencesImpl
 	}
 
 	public void setValue(String namespace, String key, String value) {
-		if (Validator.isNull(key) || (key.equals(_RANDOM_KEY))) {
+		if (Validator.isNull(key) || key.equals(_RANDOM_KEY)) {
 			return;
 		}
 
@@ -177,7 +181,7 @@ public class PortalPreferencesImpl
 	}
 
 	public void setValues(String namespace, String key, String[] values) {
-		if (Validator.isNull(key) || (key.equals(_RANDOM_KEY))) {
+		if (Validator.isNull(key) || key.equals(_RANDOM_KEY)) {
 			return;
 		}
 
@@ -216,7 +220,7 @@ public class PortalPreferencesImpl
 			return key;
 		}
 		else {
-			return namespace + StringPool.POUND + key;
+			return namespace.concat(StringPool.POUND).concat(key);
 		}
 	}
 

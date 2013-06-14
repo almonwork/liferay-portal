@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -23,9 +23,10 @@ import com.liferay.portalweb.portal.util.RuntimeVariables;
 public class ExportLARCPPage2BlogsPageScopeTest extends BaseTestCase {
 	public void testExportLARCPPage2BlogsPageScope() throws Exception {
 		selenium.open("/web/blogs-page-scope-community/");
+		loadRequiredJavaScriptModules();
 
 		for (int second = 0;; second++) {
-			if (second >= 60) {
+			if (second >= 90) {
 				fail("timeout");
 			}
 
@@ -40,25 +41,18 @@ public class ExportLARCPPage2BlogsPageScopeTest extends BaseTestCase {
 			Thread.sleep(1000);
 		}
 
-		selenium.saveScreenShotAndSource();
 		selenium.clickAt("link=Control Panel",
 			RuntimeVariables.replace("Control Panel"));
 		selenium.waitForPageToLoad("30000");
-		selenium.saveScreenShotAndSource();
-		selenium.clickAt("link=Blogs", RuntimeVariables.replace("Blogs"));
-		selenium.waitForPageToLoad("30000");
-		selenium.saveScreenShotAndSource();
-		assertEquals(RuntimeVariables.replace("Default"),
-			selenium.getText("//div[2]/span/a"));
-		selenium.clickAt("//div[2]/span/a", RuntimeVariables.replace("Default"));
+		loadRequiredJavaScriptModules();
 
 		for (int second = 0;; second++) {
-			if (second >= 60) {
+			if (second >= 90) {
 				fail("timeout");
 			}
 
 			try {
-				if (selenium.isVisible("//li[2]/a")) {
+				if (selenium.isVisible("link=Blogs")) {
 					break;
 				}
 			}
@@ -68,21 +62,16 @@ public class ExportLARCPPage2BlogsPageScopeTest extends BaseTestCase {
 			Thread.sleep(1000);
 		}
 
-		selenium.saveScreenShotAndSource();
-		assertEquals(RuntimeVariables.replace("Blogs Test Page2"),
-			selenium.getText("//li[2]/a"));
-		selenium.clickAt("//li[2]/a",
-			RuntimeVariables.replace("Blogs Test Page2"));
+		selenium.clickAt("link=Blogs", RuntimeVariables.replace("Blogs"));
 		selenium.waitForPageToLoad("30000");
-		selenium.saveScreenShotAndSource();
-		assertEquals(RuntimeVariables.replace("Blogs Test Page2"),
-			selenium.getText("//div[2]/span/a"));
-		assertEquals(RuntimeVariables.replace("Options"),
-			selenium.getText("//strong/a"));
-		selenium.clickAt("//strong/a", RuntimeVariables.replace("Options"));
+		loadRequiredJavaScriptModules();
+		assertEquals(RuntimeVariables.replace("Scope: Default"),
+			selenium.getText("//div/span/ul/li/strong/a/span"));
+		selenium.clickAt("//div/span/ul/li/strong/a/span",
+			RuntimeVariables.replace("Scope: Default"));
 
 		for (int second = 0;; second++) {
-			if (second >= 60) {
+			if (second >= 90) {
 				fail("timeout");
 			}
 
@@ -98,39 +87,83 @@ public class ExportLARCPPage2BlogsPageScopeTest extends BaseTestCase {
 			Thread.sleep(1000);
 		}
 
-		selenium.saveScreenShotAndSource();
-		assertEquals(RuntimeVariables.replace("Export / Import"),
+		assertEquals(RuntimeVariables.replace("Blogs Test Page2"),
 			selenium.getText(
 				"//div[@class='lfr-component lfr-menu-list']/ul/li[2]/a"));
-		selenium.click(RuntimeVariables.replace(
-				"//div[@class='lfr-component lfr-menu-list']/ul/li[2]/a"));
+		selenium.clickAt("//div[@class='lfr-component lfr-menu-list']/ul/li[2]/a",
+			RuntimeVariables.replace("Blogs Test Page2"));
 		selenium.waitForPageToLoad("30000");
-		selenium.saveScreenShotAndSource();
+		loadRequiredJavaScriptModules();
+		Thread.sleep(5000);
+
+		for (int second = 0;; second++) {
+			if (second >= 90) {
+				fail("timeout");
+			}
+
+			try {
+				if (RuntimeVariables.replace("Scope: Blogs Test Page2")
+										.equals(selenium.getText(
+								"//div/span/ul/li/strong/a/span"))) {
+					break;
+				}
+			}
+			catch (Exception e) {
+			}
+
+			Thread.sleep(1000);
+		}
+
+		assertEquals(RuntimeVariables.replace("Scope: Blogs Test Page2"),
+			selenium.getText("//div/span/ul/li/strong/a/span"));
+		assertEquals(RuntimeVariables.replace("Options"),
+			selenium.getText("//menu/span/ul/li/strong/a"));
+		selenium.clickAt("//menu/span/ul/li/strong/a",
+			RuntimeVariables.replace("Options"));
+
+		for (int second = 0;; second++) {
+			if (second >= 90) {
+				fail("timeout");
+			}
+
+			try {
+				if (selenium.isVisible(
+							"//div[@class='lfr-component lfr-menu-list']/ul/li[1]/a")) {
+					break;
+				}
+			}
+			catch (Exception e) {
+			}
+
+			Thread.sleep(1000);
+		}
+
+		assertEquals(RuntimeVariables.replace("Export / Import"),
+			selenium.getText(
+				"//div[@class='lfr-component lfr-menu-list']/ul/li[1]/a"));
+		selenium.click(RuntimeVariables.replace(
+				"//div[@class='lfr-component lfr-menu-list']/ul/li[1]/a"));
+		selenium.waitForPageToLoad("30000");
+		loadRequiredJavaScriptModules();
 		selenium.type("//input[@id='_86_exportFileName']",
 			RuntimeVariables.replace("Blogs_Page_Scope.Page2.CP.lar"));
-		selenium.saveScreenShotAndSource();
 		assertFalse(selenium.isChecked(
-				"//input[@id='_86_PORTLET_DATA_33Checkbox']"));
-		selenium.saveScreenShotAndSource();
-		selenium.clickAt("//input[@id='_86_PORTLET_DATA_33Checkbox']",
+				"//input[@id='_86_PORTLET_DATA_161Checkbox']"));
+		selenium.clickAt("//input[@id='_86_PORTLET_DATA_161Checkbox']",
 			RuntimeVariables.replace("Data"));
 		assertTrue(selenium.isChecked(
-				"//input[@id='_86_PORTLET_DATA_33Checkbox']"));
-		selenium.saveScreenShotAndSource();
+				"//input[@id='_86_PORTLET_DATA_161Checkbox']"));
 		assertFalse(selenium.isChecked("//input[@id='_86_PERMISSIONSCheckbox']"));
-		selenium.saveScreenShotAndSource();
 		selenium.clickAt("//input[@id='_86_PERMISSIONSCheckbox']",
 			RuntimeVariables.replace("Permissions"));
 		assertTrue(selenium.isChecked("//input[@id='_86_PERMISSIONSCheckbox']"));
-		selenium.saveScreenShotAndSource();
 		assertFalse(selenium.isChecked("//input[@id='_86_CATEGORIESCheckbox']"));
-		selenium.saveScreenShotAndSource();
 		selenium.clickAt("//input[@id='_86_CATEGORIESCheckbox']",
 			RuntimeVariables.replace("Categories"));
 		assertTrue(selenium.isChecked("//input[@id='_86_CATEGORIESCheckbox']"));
-		selenium.saveScreenShotAndSource();
+		Thread.sleep(5000);
 		selenium.clickAt("//input[@value='Export']",
 			RuntimeVariables.replace("Export"));
-		selenium.downloadFile("Blogs_Page_Scope.Page2.CP.lar");
+		selenium.downloadTempFile("Blogs_Page_Scope.Page2.CP.lar");
 	}
 }

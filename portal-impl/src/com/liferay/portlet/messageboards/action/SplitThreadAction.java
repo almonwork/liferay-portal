@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -41,7 +41,9 @@ import com.liferay.portlet.messageboards.service.MBMessageLocalServiceUtil;
 import com.liferay.portlet.messageboards.service.MBMessageServiceUtil;
 import com.liferay.portlet.messageboards.service.MBThreadServiceUtil;
 
-import java.util.ArrayList;
+import java.io.InputStream;
+
+import java.util.Collections;
 
 import javax.portlet.ActionRequest;
 import javax.portlet.ActionResponse;
@@ -73,7 +75,7 @@ public class SplitThreadAction extends PortletAction {
 			if (e instanceof PrincipalException ||
 				e instanceof RequiredMessageException) {
 
-				SessionErrors.add(actionRequest, e.getClass().getName());
+				SessionErrors.add(actionRequest, e.getClass());
 
 				setForward(actionRequest, "portlet.message_boards.error");
 			}
@@ -82,7 +84,7 @@ public class SplitThreadAction extends PortletAction {
 					 e instanceof NoSuchThreadException ||
 					 e instanceof SplitThreadException) {
 
-				SessionErrors.add(actionRequest, e.getClass().getName());
+				SessionErrors.add(actionRequest, e.getClass());
 			}
 			else {
 				throw e;
@@ -103,7 +105,7 @@ public class SplitThreadAction extends PortletAction {
 			if (e instanceof NoSuchMessageException ||
 				e instanceof PrincipalException) {
 
-				SessionErrors.add(renderRequest, e.getClass().getName());
+				SessionErrors.add(renderRequest, e.getClass());
 
 				return mapping.findForward("portlet.message_boards.error");
 			}
@@ -158,14 +160,7 @@ public class SplitThreadAction extends PortletAction {
 				layoutFullURL + "/-/message_boards/view_message/" +
 					message.getMessageId();
 
-			body = StringUtil.replace(
-				body,
-				new String[] {
-					"${newThreadURL}",
-				},
-				new String[] {
-					newThreadURL
-				});
+			body = StringUtil.replace(body, "${newThreadURL}", newThreadURL);
 
 			serviceContext.setAddGroupPermissions(true);
 			serviceContext.setAddGuestPermissions(true);
@@ -173,8 +168,8 @@ public class SplitThreadAction extends PortletAction {
 			MBMessageServiceUtil.addMessage(
 				message.getGroupId(), message.getCategoryId(), oldThreadId,
 				oldParentMessageId, subject, body, format,
-				new ArrayList<ObjectValuePair<String, byte[]>>(), false,
-				MBThreadConstants.PRIORITY_NOT_GIVEN,
+				Collections.<ObjectValuePair<String, InputStream>>emptyList(),
+				false, MBThreadConstants.PRIORITY_NOT_GIVEN,
 				message.getAllowPingbacks(), serviceContext);
 		}
 

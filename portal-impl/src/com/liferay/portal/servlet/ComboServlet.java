@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,6 +14,8 @@
 
 package com.liferay.portal.servlet;
 
+import com.liferay.portal.kernel.cache.PortalCache;
+import com.liferay.portal.kernel.cache.SingleVMPoolUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.servlet.HttpHeaders;
@@ -23,22 +25,27 @@ import com.liferay.portal.kernel.util.CharPool;
 import com.liferay.portal.kernel.util.ContentTypes;
 import com.liferay.portal.kernel.util.FileUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
+import com.liferay.portal.kernel.util.PropsKeys;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
+import com.liferay.portal.kernel.util.Time;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.servlet.filters.dynamiccss.DynamicCSSUtil;
 import com.liferay.portal.util.MinifierUtil;
 import com.liferay.portal.util.PortalUtil;
+import com.liferay.portal.util.PrefsPropsUtil;
 import com.liferay.portal.util.PropsValues;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.Serializable;
 
 import java.util.Arrays;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
+import java.util.HashSet;
+import java.util.Set;
 
 import javax.servlet.ServletContext;
+import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -46,13 +53,30 @@ import javax.servlet.http.HttpServletResponse;
 /**
  * @author Eduardo Lundgren
  * @author Edward Han
+ * @author Zsigmond Rab
  */
 public class ComboServlet extends HttpServlet {
 
 	@Override
 	public void service(
 			HttpServletRequest request, HttpServletResponse response)
-		throws IOException {
+		throws IOException, ServletException {
+
+		try {
+			doService(request, response);
+		}
+		catch (Exception e) {
+			_log.error(e, e);
+
+			PortalUtil.sendError(
+				HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e, request,
+				response);
+		}
+	}
+
+	protected void doService(
+			HttpServletRequest request, HttpServletResponse response)
+		throws Exception {
 
 		String contextPath = PortalUtil.getPathContext();
 
@@ -64,6 +88,14 @@ public class ComboServlet extends HttpServlet {
 			return;
 		}
 
+		Set<String> modulePathsSet = new HashSet<String>(modulePaths.length);
+
+		for (String path : modulePaths) {
+			modulePathsSet.add(path);
+		}
+
+		modulePaths = modulePathsSet.toArray(new String[modulePathsSet.size()]);
+
 		Arrays.sort(modulePaths);
 
 		String modulePathsString = null;
@@ -73,7 +105,8 @@ public class ComboServlet extends HttpServlet {
 		if (!PropsValues.COMBO_CHECK_TIMESTAMP) {
 			modulePathsString = Arrays.toString(modulePaths);
 
-			bytesArray = _byteArrays.get(modulePathsString);
+			bytesArray = (byte[][])_bytesArrayPortalCache.get(
+				modulePathsString);
 		}
 
 		String firstModulePath = modulePaths[0];
@@ -93,25 +126,50 @@ public class ComboServlet extends HttpServlet {
 				}
 			}
 
+			if (!minifierType.equals("css") && !minifierType.equals("js")) {
+				minifierType = "js";
+			}
+
 			int length = modulePaths.length;
 
 			bytesArray = new byte[length][];
 
 			for (String modulePath : modulePaths) {
+				if (!validateModuleExtension(modulePath)) {
+					response.setHeader(
+						HttpHeaders.CACHE_CONTROL,
+						HttpHeaders.CACHE_CONTROL_NO_CACHE_VALUE);
+					response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+
+					return;
+				}
+
 				byte[] bytes = new byte[0];
 
 				if (Validator.isNotNull(modulePath)) {
 					modulePath = StringUtil.replaceFirst(
 						p.concat(modulePath), contextPath, StringPool.BLANK);
 
-					bytes = getFileContent(response, modulePath, minifierType);
+					if (getFile(modulePath) == null) {
+						response.setHeader(
+							HttpHeaders.CACHE_CONTROL,
+							HttpHeaders.CACHE_CONTROL_NO_CACHE_VALUE);
+						response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+
+						return;
+					}
+
+					bytes = getFileContent(
+						request, response, modulePath, minifierType);
 				}
 
 				bytesArray[--length] = bytes;
 			}
 
-			if (modulePathsString != null) {
-				_byteArrays.put(modulePathsString, bytesArray);
+			if ((modulePathsString != null) &&
+				!PropsValues.COMBO_CHECK_TIMESTAMP) {
+
+				_bytesArrayPortalCache.put(modulePathsString, bytesArray);
 			}
 		}
 
@@ -171,17 +229,17 @@ public class ComboServlet extends HttpServlet {
 	}
 
 	protected byte[] getFileContent(
-			HttpServletResponse response, String path, String minifierType)
+			HttpServletRequest request, HttpServletResponse response,
+			String path, String minifierType)
 		throws IOException {
 
 		String fileContentKey = path.concat(StringPool.QUESTION).concat(
 			minifierType);
 
-		FileContentBag fileContentBag = _fileContentBags.get(fileContentKey);
+		FileContentBag fileContentBag =
+			(FileContentBag)_fileContentBagPortalCache.get(fileContentKey);
 
-		if ((fileContentBag != null) &&
-			!PropsValues.COMBO_CHECK_TIMESTAMP) {
-
+		if ((fileContentBag != null) && !PropsValues.COMBO_CHECK_TIMESTAMP) {
 			return fileContentBag._fileContent;
 		}
 
@@ -198,7 +256,7 @@ public class ComboServlet extends HttpServlet {
 				return fileContentBag._fileContent;
 			}
 			else {
-				_fileContentBags.remove(fileContentKey, fileContentBag);
+				_fileContentBagPortalCache.remove(fileContentKey);
 			}
 		}
 
@@ -216,7 +274,7 @@ public class ComboServlet extends HttpServlet {
 
 					try {
 						stringFileContent = DynamicCSSUtil.parseSass(
-							cssRealPath, stringFileContent);
+							request, cssRealPath, stringFileContent);
 					}
 					catch (Exception e) {
 						_log.error(
@@ -245,14 +303,36 @@ public class ComboServlet extends HttpServlet {
 				file.lastModified());
 		}
 
-		FileContentBag oldFileContentBag = _fileContentBags.putIfAbsent(
-			fileContentKey, fileContentBag);
+		if (PropsValues.COMBO_CHECK_TIMESTAMP) {
+			int timeToLive =
+				(int)(PropsValues.COMBO_CHECK_TIMESTAMP_INTERVAL / Time.SECOND);
 
-		if (oldFileContentBag != null) {
-			fileContentBag = oldFileContentBag;
+			_fileContentBagPortalCache.put(
+				fileContentKey, fileContentBag, timeToLive);
 		}
 
 		return fileContentBag._fileContent;
+	}
+
+	protected boolean validateModuleExtension(String moduleName)
+		throws Exception {
+
+		boolean validModuleExtension = false;
+
+		String[] fileExtensions = PrefsPropsUtil.getStringArray(
+			PropsKeys.COMBO_ALLOWED_FILE_EXTENSIONS, StringPool.COMMA);
+
+		for (int i = 0; i < fileExtensions.length; i++) {
+			if (StringPool.STAR.equals(fileExtensions[i]) ||
+				StringUtil.endsWith(moduleName, fileExtensions[i])) {
+
+				validModuleExtension = true;
+
+				break;
+			}
+		}
+
+		return validModuleExtension;
 	}
 
 	private static final String _CSS_EXTENSION = "css";
@@ -268,7 +348,12 @@ public class ComboServlet extends HttpServlet {
 
 	private static Log _log = LogFactoryUtil.getLog(ComboServlet.class);
 
-	private static class FileContentBag {
+	private PortalCache _bytesArrayPortalCache = SingleVMPoolUtil.getCache(
+		ComboServlet.class.getName());
+	private PortalCache _fileContentBagPortalCache = SingleVMPoolUtil.getCache(
+		FileContentBag.class.getName());
+
+	private static class FileContentBag implements Serializable {
 
 		public FileContentBag(byte[] fileContent, long lastModifiedTime) {
 			_fileContent = fileContent;
@@ -279,10 +364,5 @@ public class ComboServlet extends HttpServlet {
 		private long _lastModified;
 
 	}
-
-	private ConcurrentMap<String, byte[][]> _byteArrays =
-		new ConcurrentHashMap<String, byte[][]>();
-	private ConcurrentMap<String, FileContentBag> _fileContentBags =
-		new ConcurrentHashMap<String, FileContentBag>();
 
 }

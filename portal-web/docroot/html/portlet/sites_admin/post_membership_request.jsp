@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -40,7 +40,7 @@ MembershipRequest membershipRequest = (MembershipRequest)request.getAttribute(We
 	<liferay-ui:header
 		backURL="<%= redirect %>"
 		localizeTitle="<%= false %>"
-		title='<%= LanguageUtil.format(pageContext, "request-membership-for-x", group.getDescriptiveName()) %>'
+		title='<%= LanguageUtil.format(pageContext, "request-membership-for-x", group.getDescriptiveName(locale)) %>'
 	/>
 
 	<liferay-ui:error exception="<%= MembershipRequestCommentsException.class %>" message="please-enter-valid-comments" />

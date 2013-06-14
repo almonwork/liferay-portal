@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -25,7 +25,9 @@ import com.liferay.portal.kernel.util.UnicodeProperties;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.model.Portlet;
+import com.liferay.portal.security.permission.ActionKeys;
 import com.liferay.portal.service.PortletLocalServiceUtil;
+import com.liferay.portal.service.permission.PortletPermissionUtil;
 import com.liferay.portal.theme.ThemeDisplay;
 import com.liferay.portlet.PortletConfigFactoryUtil;
 import com.liferay.portlet.PortletPreferencesFactoryUtil;
@@ -52,7 +54,7 @@ import javax.servlet.ServletContext;
 public class DefaultConfigurationAction
 	implements ConfigurationAction, ResourceServingConfigurationAction {
 
-	public final static String PREFERENCES_PREFIX = "preferences--";
+	public static final String PREFERENCES_PREFIX = "preferences--";
 
 	public String getLocalizedParameter(
 		PortletRequest portletRequest, String name) {
@@ -81,11 +83,18 @@ public class DefaultConfigurationAction
 			return;
 		}
 
+		ThemeDisplay themeDisplay = (ThemeDisplay)actionRequest.getAttribute(
+			WebKeys.THEME_DISPLAY);
+
 		UnicodeProperties properties = PropertiesParamUtil.getProperties(
 			actionRequest, PREFERENCES_PREFIX);
 
 		String portletResource = ParamUtil.getString(
 			actionRequest, "portletResource");
+
+		PortletPermissionUtil.check(
+			themeDisplay.getPermissionChecker(), themeDisplay.getLayout(),
+			portletResource, ActionKeys.CONFIGURATION);
 
 		PortletPreferences portletPreferences =
 			PortletPreferencesFactoryUtil.getPortletSetup(
@@ -117,7 +126,15 @@ public class DefaultConfigurationAction
 			portletPreferences.store();
 
 			SessionMessages.add(
-				actionRequest, portletConfig.getPortletName() + ".doConfigure");
+				actionRequest,
+				portletConfig.getPortletName() +
+					SessionMessages.KEY_SUFFIX_REFRESH_PORTLET,
+				portletResource);
+
+			SessionMessages.add(
+				actionRequest,
+				portletConfig.getPortletName() +
+					SessionMessages.KEY_SUFFIX_UPDATED_CONFIGURATION);
 		}
 	}
 
@@ -127,6 +144,13 @@ public class DefaultConfigurationAction
 		throws Exception {
 
 		PortletConfig selPortletConfig = getSelPortletConfig(renderRequest);
+
+		String configTemplate = selPortletConfig.getInitParameter(
+			"config-template");
+
+		if (Validator.isNotNull(configTemplate)) {
+			return configTemplate;
+		}
 
 		String configJSP = selPortletConfig.getInitParameter("config-jsp");
 

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -26,6 +26,7 @@ import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.model.User;
+import com.liferay.portal.security.auth.AuthSettingsUtil;
 import com.liferay.portal.security.auth.PrincipalThreadLocal;
 import com.liferay.portal.security.permission.PermissionChecker;
 import com.liferay.portal.security.permission.PermissionCheckerFactoryUtil;
@@ -63,9 +64,11 @@ public class SecureFilter extends BasePortalFilter {
 			filterConfig.getInitParameter("basic_auth"));
 		_digestAuthEnabled = GetterUtil.getBoolean(
 			filterConfig.getInitParameter("digest_auth"));
+		_usePermissionChecker = GetterUtil.getBoolean(
+			filterConfig.getInitParameter("use_permission_checker"));
 
-		String propertyPrefix =
-			filterConfig.getInitParameter("portal_property_prefix");
+		String propertyPrefix = filterConfig.getInitParameter(
+			"portal_property_prefix");
 
 		String[] hostsAllowedArray = null;
 
@@ -87,24 +90,95 @@ public class SecureFilter extends BasePortalFilter {
 		}
 	}
 
-	protected boolean isAccessAllowed(HttpServletRequest request) {
-		String remoteAddr = request.getRemoteAddr();
-		String serverIp = PortalUtil.getComputerAddress();
+	protected HttpServletRequest basicAuth(
+			HttpServletRequest request, HttpServletResponse response)
+		throws Exception {
 
-		if ((_hostsAllowed.size() > 0) &&
-			(!_hostsAllowed.contains(remoteAddr))) {
+		HttpSession session = request.getSession();
 
-			if ((serverIp.equals(remoteAddr)) &&
-				(_hostsAllowed.contains(_SERVER_IP))) {
+		session.setAttribute(WebKeys.BASIC_AUTH_ENABLED, Boolean.TRUE);
 
-				return true;
-			}
+		long userId = GetterUtil.getLong(
+			(String)session.getAttribute(_AUTHENTICATED_USER));
 
-			return false;
+		if (userId > 0) {
+			request = new ProtectedServletRequest(
+				request, String.valueOf(userId), HttpServletRequest.BASIC_AUTH);
 		}
 		else {
-			return true;
+			try {
+				userId = PortalUtil.getBasicAuthUserId(request);
+			}
+			catch (Exception e) {
+				_log.error(e, e);
+			}
+
+			if (userId > 0) {
+				request = setCredentials(
+					request, session, userId, HttpServletRequest.BASIC_AUTH);
+			}
+			else {
+				response.setHeader(HttpHeaders.WWW_AUTHENTICATE, _BASIC_REALM);
+				response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+
+				return null;
+			}
 		}
+
+		return request;
+	}
+
+	protected HttpServletRequest digestAuth(
+			HttpServletRequest request, HttpServletResponse response)
+		throws Exception {
+
+		HttpSession session = request.getSession();
+
+		long userId = GetterUtil.getLong(
+			(String)session.getAttribute(_AUTHENTICATED_USER));
+
+		if (userId > 0) {
+			request = new ProtectedServletRequest(
+				request, String.valueOf(userId),
+				HttpServletRequest.DIGEST_AUTH);
+		}
+		else {
+			try {
+				userId = PortalUtil.getDigestAuthUserId(request);
+			}
+			catch (Exception e) {
+				_log.error(e, e);
+			}
+
+			if (userId > 0) {
+				request = setCredentials(
+					request, session, userId, HttpServletRequest.DIGEST_AUTH);
+			}
+			else {
+
+				// Must generate a new nonce for each 401 (RFC2617, 3.2.1)
+
+				long companyId = PortalInstances.getCompanyId(request);
+
+				String remoteAddress = request.getRemoteAddr();
+
+				String nonce = NonceUtil.generate(companyId, remoteAddress);
+
+				StringBundler sb = new StringBundler(4);
+
+				sb.append(_DIGEST_REALM);
+				sb.append(", nonce=\"");
+				sb.append(nonce);
+				sb.append("\"");
+
+				response.setHeader(HttpHeaders.WWW_AUTHENTICATE, sb.toString());
+				response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+
+				return null;
+			}
+		}
+
+		return request;
 	}
 
 	@Override
@@ -115,7 +189,7 @@ public class SecureFilter extends BasePortalFilter {
 
 		String remoteAddr = request.getRemoteAddr();
 
-		if (isAccessAllowed(request)) {
+		if (AuthSettingsUtil.isAccessAllowed(request, _hostsAllowed)) {
 			if (_log.isDebugEnabled()) {
 				_log.debug("Access allowed for " + remoteAddr);
 			}
@@ -182,8 +256,8 @@ public class SecureFilter extends BasePortalFilter {
 				User user = PortalUtil.getUser(request);
 
 				if ((user != null) && !user.isDefaultUser()) {
-					setCredentials(
-						request, request.getSession(), user.getUserId());
+					request = setCredentials(
+						request, request.getSession(), user.getUserId(), null);
 				}
 				else {
 					if (_digestAuthEnabled) {
@@ -201,104 +275,16 @@ public class SecureFilter extends BasePortalFilter {
 		}
 	}
 
-	protected HttpServletRequest basicAuth(
-			HttpServletRequest request, HttpServletResponse response)
-		throws Exception {
-
-		HttpSession session = request.getSession();
-
-		session.setAttribute(WebKeys.BASIC_AUTH_ENABLED, Boolean.TRUE);
-
-		long userId = GetterUtil.getLong(
-			(String)session.getAttribute(_AUTHENTICATED_USER));
-
-		if (userId > 0) {
-			request = new ProtectedServletRequest(
-				request, String.valueOf(userId));
-		}
-		else {
-			try {
-				userId = PortalUtil.getBasicAuthUserId(request);
-			}
-			catch (Exception e) {
-				_log.error(e, e);
-			}
-
-			if (userId > 0) {
-				request = setCredentials(request, session, userId);
-			}
-			else {
-				response.setHeader(HttpHeaders.WWW_AUTHENTICATE, _BASIC_REALM);
-				response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-
-				return null;
-			}
-		}
-
-		return request;
-	}
-
-	protected HttpServletRequest digestAuth(
-			HttpServletRequest request, HttpServletResponse response)
-		throws Exception {
-
-		HttpSession session = request.getSession();
-
-		long userId = GetterUtil.getLong(
-			(String)session.getAttribute(_AUTHENTICATED_USER));
-
-		if (userId > 0) {
-			request = new ProtectedServletRequest(
-				request, String.valueOf(userId));
-		}
-		else {
-			try {
-				userId = PortalUtil.getDigestAuthUserId(request);
-			}
-			catch (Exception e) {
-				_log.error(e, e);
-			}
-
-			if (userId > 0) {
-				request = setCredentials(request, session, userId);
-			}
-			else {
-
-				// Must generate a new nonce for each 401 (RFC2617, 3.2.1)
-
-				long companyId = PortalInstances.getCompanyId(request);
-
-				String remoteAddress = request.getRemoteAddr();
-
-				String nonce = NonceUtil.generate(companyId, remoteAddress);
-
-				StringBundler sb = new StringBundler(4);
-
-				sb.append(_DIGEST_REALM);
-				sb.append(", nonce=\"");
-				sb.append(nonce);
-				sb.append("\"");
-
-				response.setHeader(
-					HttpHeaders.WWW_AUTHENTICATE, sb.toString());
-				response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-
-				return null;
-			}
-		}
-
-		return request;
-	}
-
 	protected HttpServletRequest setCredentials(
-			HttpServletRequest request, HttpSession session, long userId)
+			HttpServletRequest request, HttpSession session, long userId,
+			String authType)
 		throws Exception {
 
 		User user = UserLocalServiceUtil.getUser(userId);
 
 		String userIdString = String.valueOf(userId);
 
-		request = new ProtectedServletRequest(request, userIdString);
+		request = new ProtectedServletRequest(request, userIdString, authType);
 
 		session.setAttribute(WebKeys.USER, user);
 		session.setAttribute(_AUTHENTICATED_USER, userIdString);
@@ -309,7 +295,7 @@ public class SecureFilter extends BasePortalFilter {
 				PortalUtil.getUserPassword(request));
 
 			PermissionChecker permissionChecker =
-				PermissionCheckerFactoryUtil.create(user, false);
+				PermissionCheckerFactoryUtil.create(user);
 
 			PermissionThreadLocal.setPermissionChecker(permissionChecker);
 		}
@@ -321,7 +307,7 @@ public class SecureFilter extends BasePortalFilter {
 		_usePermissionChecker = usePermissionChecker;
 	}
 
-	public static final String _AUTHENTICATED_USER =
+	private static final String _AUTHENTICATED_USER =
 		SecureFilter.class + "_AUTHENTICATED_USER";
 
 	private static final String _BASIC_REALM =
@@ -329,8 +315,6 @@ public class SecureFilter extends BasePortalFilter {
 
 	private static final String _DIGEST_REALM =
 		"Digest realm=\"" + Portal.PORTAL_REALM + "\"";
-
-	private static final String _SERVER_IP = "SERVER_IP";
 
 	private static Log _log = LogFactoryUtil.getLog(SecureFilter.class);
 

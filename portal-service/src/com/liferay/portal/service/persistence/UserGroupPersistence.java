@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,7 +14,6 @@
 
 package com.liferay.portal.service.persistence;
 
-import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.model.UserGroup;
 
 /**
@@ -550,9 +549,11 @@ public interface UserGroupPersistence extends BasePersistence<UserGroup> {
 	*
 	* @param companyId the company ID
 	* @param name the name
+	* @return the user group that was removed
 	* @throws SystemException if a system exception occurred
 	*/
-	public void removeByC_N(long companyId, java.lang.String name)
+	public com.liferay.portal.model.UserGroup removeByC_N(long companyId,
+		java.lang.String name)
 		throws com.liferay.portal.NoSuchUserGroupException,
 			com.liferay.portal.kernel.exception.SystemException;
 
@@ -1192,6 +1193,4 @@ public interface UserGroupPersistence extends BasePersistence<UserGroup> {
 	public void setUsers(long pk,
 		java.util.List<com.liferay.portal.model.User> users)
 		throws com.liferay.portal.kernel.exception.SystemException;
-
-	public UserGroup remove(UserGroup userGroup) throws SystemException;
 }

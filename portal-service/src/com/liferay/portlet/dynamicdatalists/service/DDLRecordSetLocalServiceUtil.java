@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -15,7 +15,6 @@
 package com.liferay.portlet.dynamicdatalists.service;
 
 import com.liferay.portal.kernel.bean.PortalBeanLocatorUtil;
-import com.liferay.portal.kernel.util.MethodCache;
 import com.liferay.portal.kernel.util.ReferenceRegistry;
 
 /**
@@ -66,25 +65,32 @@ public class DDLRecordSetLocalServiceUtil {
 	* Deletes the d d l record set with the primary key from the database. Also notifies the appropriate model listeners.
 	*
 	* @param recordSetId the primary key of the d d l record set
+	* @return the d d l record set that was removed
 	* @throws PortalException if a d d l record set with the primary key could not be found
 	* @throws SystemException if a system exception occurred
 	*/
-	public static void deleteDDLRecordSet(long recordSetId)
+	public static com.liferay.portlet.dynamicdatalists.model.DDLRecordSet deleteDDLRecordSet(
+		long recordSetId)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException {
-		getService().deleteDDLRecordSet(recordSetId);
+		return getService().deleteDDLRecordSet(recordSetId);
 	}
 
 	/**
 	* Deletes the d d l record set from the database. Also notifies the appropriate model listeners.
 	*
 	* @param ddlRecordSet the d d l record set
+	* @return the d d l record set that was removed
 	* @throws SystemException if a system exception occurred
 	*/
-	public static void deleteDDLRecordSet(
+	public static com.liferay.portlet.dynamicdatalists.model.DDLRecordSet deleteDDLRecordSet(
 		com.liferay.portlet.dynamicdatalists.model.DDLRecordSet ddlRecordSet)
 		throws com.liferay.portal.kernel.exception.SystemException {
-		getService().deleteDDLRecordSet(ddlRecordSet);
+		return getService().deleteDDLRecordSet(ddlRecordSet);
+	}
+
+	public static com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery() {
+		return getService().dynamicQuery();
 	}
 
 	/**
@@ -156,6 +162,12 @@ public class DDLRecordSetLocalServiceUtil {
 		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery)
 		throws com.liferay.portal.kernel.exception.SystemException {
 		return getService().dynamicQueryCount(dynamicQuery);
+	}
+
+	public static com.liferay.portlet.dynamicdatalists.model.DDLRecordSet fetchDDLRecordSet(
+		long recordSetId)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getService().fetchDDLRecordSet(recordSetId);
 	}
 
 	/**
@@ -276,13 +288,13 @@ public class DDLRecordSetLocalServiceUtil {
 		java.lang.String recordSetKey,
 		java.util.Map<java.util.Locale, java.lang.String> nameMap,
 		java.util.Map<java.util.Locale, java.lang.String> descriptionMap,
-		int minDisplayRows,
+		int minDisplayRows, int scope,
 		com.liferay.portal.service.ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException {
 		return getService()
 				   .addRecordSet(userId, groupId, ddmStructureId, recordSetKey,
-			nameMap, descriptionMap, minDisplayRows, serviceContext);
+			nameMap, descriptionMap, minDisplayRows, scope, serviceContext);
 	}
 
 	public static void addRecordSetResources(
@@ -362,36 +374,38 @@ public class DDLRecordSetLocalServiceUtil {
 	}
 
 	public static java.util.List<com.liferay.portlet.dynamicdatalists.model.DDLRecordSet> search(
-		long companyId, long groupId, java.lang.String keywords, int start,
-		int end,
+		long companyId, long groupId, java.lang.String keywords, int scope,
+		int start, int end,
 		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
 		throws com.liferay.portal.kernel.exception.SystemException {
 		return getService()
-				   .search(companyId, groupId, keywords, start, end,
+				   .search(companyId, groupId, keywords, scope, start, end,
 			orderByComparator);
 	}
 
 	public static java.util.List<com.liferay.portlet.dynamicdatalists.model.DDLRecordSet> search(
 		long companyId, long groupId, java.lang.String name,
-		java.lang.String description, boolean andOperator, int start, int end,
+		java.lang.String description, int scope, boolean andOperator,
+		int start, int end,
 		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
 		throws com.liferay.portal.kernel.exception.SystemException {
 		return getService()
-				   .search(companyId, groupId, name, description, andOperator,
-			start, end, orderByComparator);
+				   .search(companyId, groupId, name, description, scope,
+			andOperator, start, end, orderByComparator);
 	}
 
 	public static int searchCount(long companyId, long groupId,
-		java.lang.String keywords)
+		java.lang.String keywords, int scope)
 		throws com.liferay.portal.kernel.exception.SystemException {
-		return getService().searchCount(companyId, groupId, keywords);
+		return getService().searchCount(companyId, groupId, keywords, scope);
 	}
 
 	public static int searchCount(long companyId, long groupId,
-		java.lang.String name, java.lang.String description, boolean andOperator)
+		java.lang.String name, java.lang.String description, int scope,
+		boolean andOperator)
 		throws com.liferay.portal.kernel.exception.SystemException {
 		return getService()
-				   .searchCount(companyId, groupId, name, description,
+				   .searchCount(companyId, groupId, name, description, scope,
 			andOperator);
 	}
 
@@ -437,20 +451,15 @@ public class DDLRecordSetLocalServiceUtil {
 
 			ReferenceRegistry.registerReference(DDLRecordSetLocalServiceUtil.class,
 				"_service");
-			MethodCache.remove(DDLRecordSetLocalService.class);
 		}
 
 		return _service;
 	}
 
+	/**
+	 * @deprecated
+	 */
 	public void setService(DDLRecordSetLocalService service) {
-		MethodCache.remove(DDLRecordSetLocalService.class);
-
-		_service = service;
-
-		ReferenceRegistry.registerReference(DDLRecordSetLocalServiceUtil.class,
-			"_service");
-		MethodCache.remove(DDLRecordSetLocalService.class);
 	}
 
 	private static DDLRecordSetLocalService _service;

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -15,10 +15,18 @@
 package com.liferay.portal.kernel.concurrent;
 
 /**
+ * Implements the same behavior as {@link
+ * java.util.concurrent.ThreadPoolExecutor.DiscardPolicy}.
+ *
  * @author Shuyang Zhou
+ * @see    java.util.concurrent.ThreadPoolExecutor.DiscardPolicy
  */
 public class DiscardPolicy implements RejectedExecutionHandler {
 
+	/**
+	 * @see java.util.concurrent.ThreadPoolExecutor.DiscardPolicy#rejectedExecution(
+	 *      Runnable, java.util.concurrent.ThreadPoolExecutor)
+	 */
 	public void rejectedExecution(
 		Runnable runnable, ThreadPoolExecutor threadPoolExecutor) {
 	}

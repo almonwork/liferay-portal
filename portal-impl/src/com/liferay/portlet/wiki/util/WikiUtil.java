@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -32,7 +32,9 @@ import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.security.permission.ActionKeys;
 import com.liferay.portal.security.permission.PermissionChecker;
 import com.liferay.portal.theme.ThemeDisplay;
+import com.liferay.portal.util.PortalUtil;
 import com.liferay.portal.util.PropsUtil;
+import com.liferay.portal.util.PropsValues;
 import com.liferay.portal.util.WebKeys;
 import com.liferay.portlet.wiki.PageContentException;
 import com.liferay.portlet.wiki.WikiFormatException;
@@ -77,7 +79,7 @@ public class WikiUtil {
 			page, viewPageURL, editPageURL, attachmentURLPrefix);
 	}
 
-	public static String diffHtml (
+	public static String diffHtml(
 			WikiPage sourcePage, WikiPage targetPage, PortletURL viewPageURL,
 			PortletURL editPageURL, String attachmentURLPrefix)
 		throws Exception {
@@ -87,7 +89,7 @@ public class WikiUtil {
 
 		if (sourcePage != null) {
 			sourceContent = WikiUtil.convert(
-				sourcePage, viewPageURL, editPageURL,attachmentURLPrefix);
+				sourcePage, viewPageURL, editPageURL, attachmentURLPrefix);
 		}
 
 		if (targetPage != null) {
@@ -104,17 +106,20 @@ public class WikiUtil {
 		return _instance._getEditPage(format);
 	}
 
-	public static String getEmailFromAddress(PortletPreferences preferences) {
-		String emailFromAddress = PropsUtil.get(
-			PropsKeys.WIKI_EMAIL_FROM_ADDRESS);
+	public static String getEmailFromAddress(
+			PortletPreferences preferences, long companyId)
+		throws SystemException {
 
-		return preferences.getValue("emailFromAddress", emailFromAddress);
+		return PortalUtil.getEmailFromAddress(
+			preferences, companyId, PropsValues.WIKI_EMAIL_FROM_ADDRESS);
 	}
 
-	public static String getEmailFromName(PortletPreferences preferences) {
-		String emailFromName = PropsUtil.get(PropsKeys.WIKI_EMAIL_FROM_NAME);
+	public static String getEmailFromName(
+			PortletPreferences preferences, long companyId)
+		throws SystemException {
 
-		return preferences.getValue("emailFromName", emailFromName);
+		return PortalUtil.getEmailFromName(
+			preferences, companyId, PropsValues.WIKI_EMAIL_FROM_NAME);
 	}
 
 	public static String getEmailPageAddedBody(PortletPreferences preferences) {
@@ -247,8 +252,8 @@ public class WikiUtil {
 		List<WikiNode> nodes = WikiNodeLocalServiceUtil.getNodes(groupId);
 
 		PortletPreferences preferences = portletRequest.getPreferences();
-		String[] visibleNodeNames =
-			StringUtil.split(preferences.getValue("visibleNodes", null));
+		String[] visibleNodeNames = StringUtil.split(
+			preferences.getValue("visibleNodes", null));
 		nodes = orderNodes(nodes, visibleNodeNames);
 
 		String[] hiddenNodes = StringUtil.split(
@@ -257,11 +262,13 @@ public class WikiUtil {
 
 		for (WikiNode node : nodes) {
 			if ((Arrays.binarySearch(hiddenNodes, node.getName()) < 0) &&
-				(WikiNodePermission.contains(permissionChecker, node,
-					ActionKeys.VIEW))) {
+				(WikiNodePermission.contains(
+					permissionChecker, node, ActionKeys.VIEW))) {
+
 				return node;
 			}
 		}
+
 		return null;
 	}
 
@@ -373,8 +380,7 @@ public class WikiUtil {
 		return content;
 	}
 
-	public static boolean validate(
-			long nodeId, String content, String format)
+	public static boolean validate(long nodeId, String content, String format)
 		throws WikiFormatException {
 
 		return _instance._validate(nodeId, content, format);

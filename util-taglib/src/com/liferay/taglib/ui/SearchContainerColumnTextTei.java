@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,6 +14,7 @@
 
 package com.liferay.taglib.ui;
 
+import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.Validator;
 
 import javax.servlet.jsp.tagext.TagData;
@@ -32,7 +33,7 @@ public class SearchContainerColumnTextTei extends TagExtraInfo {
 		if (Validator.isNotNull(buffer)) {
 			return new VariableInfo[] {
 				new VariableInfo(
-					buffer, StringBuilder.class.getName(), true,
+					buffer, StringBundler.class.getName(), true,
 					VariableInfo.NESTED)
 			};
 		}

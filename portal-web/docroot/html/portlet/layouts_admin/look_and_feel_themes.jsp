@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -27,8 +27,6 @@ ColorScheme selColorScheme = (ColorScheme)request.getAttribute("edit_pages.jsp-s
 String device = (String)request.getAttribute("edit_pages.jsp-device");
 boolean editable = (Boolean)request.getAttribute("edit_pages.jsp-editable");
 
-PluginPackage selPluginPackage = selTheme.getPluginPackage();
-
 Map<String, ThemeSetting> configurableSettings = selTheme.getConfigurableSettings();
 %>
 
@@ -50,6 +48,11 @@ Map<String, ThemeSetting> configurableSettings = selTheme.getConfigurableSetting
 				</c:choose>
 
 				<dl class="theme-fields">
+
+					<%
+					PluginPackage selPluginPackage = selTheme.getPluginPackage();
+					%>
+
 					<c:if test="<%= (selPluginPackage != null) && Validator.isNotNull(selPluginPackage.getShortDescription()) %>">
 						<dt>
 							<liferay-ui:message key="description" />
@@ -101,9 +104,9 @@ Map<String, ThemeSetting> configurableSettings = selTheme.getConfigurableSetting
 
 		<c:if test="<%= editable %>">
 			<c:if test="<%= !colorSchemes.isEmpty() || !configurableSettings.isEmpty() %>">
-				<liferay-ui:panel-container extended="<%= true %>" persistState="<%= true %>">
+				<liferay-ui:panel-container extended="<%= true %>" id='<%= device + "layoutsAdminLookAndFeelPanelContainer" %>' persistState="<%= true %>">
 					<c:if test="<%= !colorSchemes.isEmpty() %>">
-						<liferay-ui:panel collapsible="<%= true %>" extended="<%= false %>" persistState="<%= true %>" title='<%= LanguageUtil.format(pageContext, "color-schemes-x", colorSchemes.size()) %>'>
+						<liferay-ui:panel collapsible="<%= true %>" extended="<%= false %>" id='<%= device + "layoutsAdminLookAndFeelColorsPanel" %>' persistState="<%= true %>" title='<%= LanguageUtil.format(pageContext, "color-schemes-x", colorSchemes.size()) %>'>
 							<aui:fieldset cssCclass="color-schemes">
 								<div class="lfr-component lfr-theme-list">
 
@@ -121,7 +124,7 @@ Map<String, ThemeSetting> configurableSettings = selTheme.getConfigurableSetting
 								<div class="<%= cssClass %> theme-entry">
 									<img alt="" class="modify-link theme-thumbnail" onclick="document.getElementById('<portlet:namespace /><%= device %>ColorSchemeId<%= i %>').checked = true;" src="<%= selTheme.getStaticResourcePath() %><%= curColorScheme.getColorSchemeThumbnailPath() %>/thumbnail.png" title="<%= curColorScheme.getName() %>" />
 
-										<aui:input cssClass="theme-title" checked="<%= selColorScheme.getColorSchemeId().equals(curColorScheme.getColorSchemeId()) %>" id='<%= device + "ColorSchemeId" + i %>' label="<%= curColorScheme.getName() %>" name='<%= device + "ColorSchemeId" %>' type="radio" value="<%= curColorScheme.getColorSchemeId() %>" />
+										<aui:input checked="<%= selColorScheme.getColorSchemeId().equals(curColorScheme.getColorSchemeId()) %>" cssClass="theme-title" id='<%= device + "ColorSchemeId" + i %>' label="<%= curColorScheme.getName() %>" name='<%= device + "ColorSchemeId" %>' type="radio" value="<%= curColorScheme.getColorSchemeId() %>" />
 									</div>
 
 									<%
@@ -134,7 +137,7 @@ Map<String, ThemeSetting> configurableSettings = selTheme.getConfigurableSetting
 					</c:if>
 
 					<c:if test="<%= !configurableSettings.isEmpty() %>">
-						<liferay-ui:panel collapsible="<%= true %>" extended="<%= false %>" persistState="<%= true %>" title="settings">
+						<liferay-ui:panel collapsible="<%= true %>" extended="<%= false %>" id='<%= device + "layoutsAdminLookAndFeelSettingsPanel" %>' persistState="<%= true %>" title="settings">
 							<aui:fieldset>
 
 								<%
@@ -175,6 +178,12 @@ Map<String, ThemeSetting> configurableSettings = selTheme.getConfigurableSetting
 										</c:when>
 									</c:choose>
 
+									<c:if test="<%= Validator.isNotNull(themeSetting.getScript()) %>">
+										<aui:script position="inline">
+											<%= StringUtil.replace(themeSetting.getScript(), "[@NAMESPACE@]", renderResponse.getNamespace()) %>
+										</aui:script>
+									</c:if>
+
 								<%
 								}
 								%>
@@ -194,21 +203,14 @@ Map<String, ThemeSetting> configurableSettings = selTheme.getConfigurableSetting
 					<%= LanguageUtil.format(pageContext, "available-themes-x", (themes.size() - 1)) %>
 				</span>
 
-				<c:if test="<%= permissionChecker.isOmniadmin() && PrefsPropsUtil.getBoolean(PropsKeys.AUTO_DEPLOY_ENABLED, PropsValues.AUTO_DEPLOY_ENABLED) %>">
+				<c:if test="<%= permissionChecker.isOmniadmin() && PortletLocalServiceUtil.hasPortlet(themeDisplay.getCompanyId(), PortletKeys.MARKETPLACE_STORE) && PrefsPropsUtil.getBoolean(PropsKeys.AUTO_DEPLOY_ENABLED, PropsValues.AUTO_DEPLOY_ENABLED) %>">
 
 					<%
-					PortletURL installPluginsURL = PortletURLFactoryUtil.create(request, PortletKeys.PLUGIN_INSTALLER, themeDisplay.getPlid(), PortletRequest.RENDER_PHASE);
-
-					installPluginsURL.setWindowState(LiferayWindowState.MAXIMIZED);
-					installPluginsURL.setPortletMode(PortletMode.VIEW);
-
-					installPluginsURL.setParameter("struts_action", "/plugin_installer/view");
-					installPluginsURL.setParameter("backURL", currentURL);
-					installPluginsURL.setParameter("tabs2", "theme-plugins");
+					PortletURL marketplaceURL = PortletURLFactoryUtil.create(request, PortletKeys.MARKETPLACE_STORE, themeDisplay.getPlid(), PortletRequest.RENDER_PHASE);
 					%>
 
 					<span class="install-themes">
-						<a href="<%= installPluginsURL %>" id="<portlet:namespace />installMore"><liferay-ui:message key="install-more" /></a>
+						<a href="<%= marketplaceURL %>" id="<portlet:namespace />installMore"><liferay-ui:message key="install-more" /></a>
 					</span>
 				</c:if>
 			</h3>

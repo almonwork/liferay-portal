@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -20,6 +20,7 @@ import com.liferay.portal.kernel.portlet.DefaultFriendlyURLMapper;
 import com.liferay.portal.kernel.portlet.LiferayPortletURL;
 import com.liferay.portal.kernel.servlet.HttpMethods;
 import com.liferay.portal.kernel.util.CharPool;
+import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.util.PortalUtil;
 
@@ -94,12 +95,10 @@ public class AlloyFriendlyURLMapper extends DefaultFriendlyURLMapper {
 		HttpServletRequest request = (HttpServletRequest)requestContext.get(
 			"request");
 
-		String method = request.getMethod();
-
-		friendlyURLPath = method +
+		friendlyURLPath = request.getMethod() +
 			friendlyURLPath.substring(getMapping().length() + 1);
 
-		if (friendlyURLPath.endsWith(StringPool.SLASH))	{
+		if (friendlyURLPath.endsWith(StringPool.SLASH)) {
 			friendlyURLPath = friendlyURLPath.substring(
 				0, friendlyURLPath.length() - 1);
 		}
@@ -124,18 +123,19 @@ public class AlloyFriendlyURLMapper extends DefaultFriendlyURLMapper {
 		String namespace = PortalUtil.getPortletNamespace(portletId);
 
 		addParameter(namespace, parameterMap, "p_p_id", portletId);
-		addParameter(parameterMap, "p_p_lifecycle", getLifecycle(method));
+		addParameter(parameterMap, "p_p_lifecycle", getLifecycle(request));
 
 		populateParams(parameterMap, namespace, routeParameters);
 	}
 
-	protected String getLifecycle(String method) {
+	protected String getLifecycle(HttpServletRequest request) {
+		String method = request.getMethod();
+
 		if (method.equalsIgnoreCase(HttpMethods.POST)) {
 			return "1";
 		}
-		else {
-			return "0";
-		}
+
+		return ParamUtil.getString(request, "p_p_lifecycle", "0");
 	}
 
 	private static Log _log = LogFactoryUtil.getLog(

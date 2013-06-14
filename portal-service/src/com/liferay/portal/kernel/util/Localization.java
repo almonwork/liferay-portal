@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -131,6 +131,17 @@ public interface Localization {
 	 * @return the locales and localized strings
 	 */
 	public Map<Locale, String> getLocalizationMap(String xml);
+
+	/**
+	 * Returns a map of locales and localized strings for the given languageIds
+	 * and values.
+	 *
+	 * @param  languageIds the languageIds of the localized Strings
+	 * @param  values the localized strings for the different languageId
+	 * @return the map of locales and values for the given parameters
+	 */
+	public Map<Locale, String> getLocalizationMap(
+		String[] languageIds, String[] values);
 
 	/**
 	 * Returns the localizations XML for the parameter in the portlet request,
@@ -278,7 +289,7 @@ public interface Localization {
 	 *         this prefix, followed by an underscore, and the language ID.
 	 * @throws Exception if an exception occurred
 	 */
-	public void setLocalizedPreferencesValues (
+	public void setLocalizedPreferencesValues(
 			PortletRequest portletRequest, PortletPreferences preferences,
 			String parameter)
 		throws Exception;
@@ -310,6 +321,22 @@ public interface Localization {
 			PortletPreferences preferences, String key, String languageId,
 			String[] values)
 		throws Exception;
+
+	/**
+	 * Updates the localized string for all the available languages in the
+	 * localizations XML for the map of locales and localized strings and
+	 * changes the default language. Stores the localized strings as characters
+	 * in the XML.
+	 *
+	 * @param  localizationMap the locales and localized strings
+	 * @param  xml the localizations XML
+	 * @param  key the name of the localized string, such as &quot;Title&quot;
+	 * @param  defaultLanguageId the ID of the default language
+	 * @return the updated localizations XML
+	 */
+	public String updateLocalization(
+		Map<Locale, String> localizationMap, String xml, String key,
+		String defaultLanguageId);
 
 	/**
 	 * Updates the localized string for the system default language in the

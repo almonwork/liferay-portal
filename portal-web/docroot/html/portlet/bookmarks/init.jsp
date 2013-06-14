@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -16,33 +16,28 @@
 
 <%@ include file="/html/portlet/init.jsp" %>
 
-<%@ page import="com.liferay.portal.kernel.search.Document" %>
-<%@ page import="com.liferay.portal.kernel.search.Field" %>
-<%@ page import="com.liferay.portal.kernel.search.Hits" %>
-<%@ page import="com.liferay.portal.kernel.search.Indexer" %>
-<%@ page import="com.liferay.portal.kernel.search.IndexerRegistryUtil" %>
-<%@ page import="com.liferay.portal.kernel.search.SearchContext" %>
-<%@ page import="com.liferay.portal.kernel.search.SearchContextFactory" %>
-<%@ page import="com.liferay.portlet.asset.model.AssetCategory" %>
-<%@ page import="com.liferay.portlet.asset.model.AssetEntry" %>
-<%@ page import="com.liferay.portlet.asset.model.AssetVocabulary" %>
-<%@ page import="com.liferay.portlet.asset.service.AssetCategoryLocalServiceUtil" %>
-<%@ page import="com.liferay.portlet.asset.service.AssetEntryLocalServiceUtil" %>
-<%@ page import="com.liferay.portlet.asset.service.AssetEntryServiceUtil" %>
-<%@ page import="com.liferay.portlet.asset.service.AssetVocabularyLocalServiceUtil" %>
-<%@ page import="com.liferay.portlet.asset.service.persistence.AssetEntryQuery" %>
-<%@ page import="com.liferay.portlet.bookmarks.EntryURLException" %>
-<%@ page import="com.liferay.portlet.bookmarks.FolderNameException" %>
-<%@ page import="com.liferay.portlet.bookmarks.NoSuchEntryException" %>
-<%@ page import="com.liferay.portlet.bookmarks.NoSuchFolderException" %>
-<%@ page import="com.liferay.portlet.bookmarks.model.BookmarksEntry" %>
-<%@ page import="com.liferay.portlet.bookmarks.model.BookmarksFolder" %>
-<%@ page import="com.liferay.portlet.bookmarks.model.BookmarksFolderConstants" %>
-<%@ page import="com.liferay.portlet.bookmarks.service.BookmarksEntryServiceUtil" %>
-<%@ page import="com.liferay.portlet.bookmarks.service.BookmarksFolderServiceUtil" %>
-<%@ page import="com.liferay.portlet.bookmarks.service.permission.BookmarksEntryPermission" %>
-<%@ page import="com.liferay.portlet.bookmarks.service.permission.BookmarksFolderPermission" %>
-<%@ page import="com.liferay.portlet.bookmarks.util.BookmarksUtil" %>
+<%@ page import="com.liferay.portal.kernel.search.Document" %><%@
+page import="com.liferay.portal.kernel.search.Hits" %><%@
+page import="com.liferay.portal.kernel.search.Indexer" %><%@
+page import="com.liferay.portal.kernel.search.IndexerRegistryUtil" %><%@
+page import="com.liferay.portal.kernel.search.SearchContext" %><%@
+page import="com.liferay.portal.kernel.search.SearchContextFactory" %><%@
+page import="com.liferay.portlet.asset.model.AssetEntry" %><%@
+page import="com.liferay.portlet.asset.service.AssetEntryLocalServiceUtil" %><%@
+page import="com.liferay.portlet.asset.service.AssetEntryServiceUtil" %><%@
+page import="com.liferay.portlet.asset.service.persistence.AssetEntryQuery" %><%@
+page import="com.liferay.portlet.bookmarks.EntryURLException" %><%@
+page import="com.liferay.portlet.bookmarks.FolderNameException" %><%@
+page import="com.liferay.portlet.bookmarks.NoSuchEntryException" %><%@
+page import="com.liferay.portlet.bookmarks.NoSuchFolderException" %><%@
+page import="com.liferay.portlet.bookmarks.model.BookmarksEntry" %><%@
+page import="com.liferay.portlet.bookmarks.model.BookmarksFolder" %><%@
+page import="com.liferay.portlet.bookmarks.model.BookmarksFolderConstants" %><%@
+page import="com.liferay.portlet.bookmarks.service.BookmarksEntryServiceUtil" %><%@
+page import="com.liferay.portlet.bookmarks.service.BookmarksFolderServiceUtil" %><%@
+page import="com.liferay.portlet.bookmarks.service.permission.BookmarksEntryPermission" %><%@
+page import="com.liferay.portlet.bookmarks.service.permission.BookmarksFolderPermission" %><%@
+page import="com.liferay.portlet.bookmarks.util.BookmarksUtil" %>
 
 <%
 PortalPreferences portalPreferences = PortletPreferencesFactoryUtil.getPortalPreferences(request);
@@ -58,14 +53,12 @@ else if (layout.isTypeControlPanel()) {
 	preferences = PortletPreferencesLocalServiceUtil.getPreferences(themeDisplay.getCompanyId(), scopeGroupId, PortletKeys.PREFS_OWNER_TYPE_GROUP, 0, PortletKeys.BOOKMARKS, null);
 }
 
-BookmarksFolder rootFolder = null;
-
 long rootFolderId = PrefsParamUtil.getLong(preferences, request, "rootFolderId", BookmarksFolderConstants.DEFAULT_PARENT_FOLDER_ID);
 String rootFolderName = StringPool.BLANK;
 
 if (rootFolderId != BookmarksFolderConstants.DEFAULT_PARENT_FOLDER_ID) {
 	try {
-		rootFolder = BookmarksFolderServiceUtil.getFolder(rootFolderId);
+		BookmarksFolder rootFolder = BookmarksFolderServiceUtil.getFolder(rootFolderId);
 
 		rootFolderName = rootFolder.getName();
 	}

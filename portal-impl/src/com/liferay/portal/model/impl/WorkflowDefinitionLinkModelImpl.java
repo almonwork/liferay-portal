@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -17,8 +17,10 @@ package com.liferay.portal.model.impl;
 import com.liferay.portal.kernel.bean.AutoEscapeBeanHandler;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.ProxyUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
+import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.model.CacheModel;
 import com.liferay.portal.model.WorkflowDefinitionLink;
 import com.liferay.portal.model.WorkflowDefinitionLinkModel;
@@ -30,11 +32,11 @@ import com.liferay.portlet.expando.util.ExpandoBridgeFactoryUtil;
 
 import java.io.Serializable;
 
-import java.lang.reflect.Proxy;
-
 import java.sql.Types;
 
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * The base model implementation for the WorkflowDefinitionLink service. Represents a row in the &quot;WorkflowDefinitionLink&quot; database table, with each column mapped to a property of this class.
@@ -84,15 +86,16 @@ public class WorkflowDefinitionLinkModelImpl extends BaseModelImpl<WorkflowDefin
 	public static final boolean FINDER_CACHE_ENABLED = GetterUtil.getBoolean(com.liferay.portal.util.PropsUtil.get(
 				"value.object.finder.cache.enabled.com.liferay.portal.model.WorkflowDefinitionLink"),
 			true);
-
-	public Class<?> getModelClass() {
-		return WorkflowDefinitionLink.class;
-	}
-
-	public String getModelClassName() {
-		return WorkflowDefinitionLink.class.getName();
-	}
-
+	public static final boolean COLUMN_BITMASK_ENABLED = GetterUtil.getBoolean(com.liferay.portal.util.PropsUtil.get(
+				"value.object.column.bitmask.enabled.com.liferay.portal.model.WorkflowDefinitionLink"),
+			true);
+	public static long CLASSNAMEID_COLUMN_BITMASK = 1L;
+	public static long CLASSPK_COLUMN_BITMASK = 2L;
+	public static long COMPANYID_COLUMN_BITMASK = 4L;
+	public static long GROUPID_COLUMN_BITMASK = 8L;
+	public static long TYPEPK_COLUMN_BITMASK = 16L;
+	public static long WORKFLOWDEFINITIONNAME_COLUMN_BITMASK = 32L;
+	public static long WORKFLOWDEFINITIONVERSION_COLUMN_BITMASK = 64L;
 	public static final long LOCK_EXPIRATION_TIME = GetterUtil.getLong(com.liferay.portal.util.PropsUtil.get(
 				"lock.expiration.time.com.liferay.portal.model.WorkflowDefinitionLink"));
 
@@ -115,6 +118,113 @@ public class WorkflowDefinitionLinkModelImpl extends BaseModelImpl<WorkflowDefin
 		setPrimaryKey(((Long)primaryKeyObj).longValue());
 	}
 
+	public Class<?> getModelClass() {
+		return WorkflowDefinitionLink.class;
+	}
+
+	public String getModelClassName() {
+		return WorkflowDefinitionLink.class.getName();
+	}
+
+	@Override
+	public Map<String, Object> getModelAttributes() {
+		Map<String, Object> attributes = new HashMap<String, Object>();
+
+		attributes.put("workflowDefinitionLinkId", getWorkflowDefinitionLinkId());
+		attributes.put("groupId", getGroupId());
+		attributes.put("companyId", getCompanyId());
+		attributes.put("userId", getUserId());
+		attributes.put("userName", getUserName());
+		attributes.put("createDate", getCreateDate());
+		attributes.put("modifiedDate", getModifiedDate());
+		attributes.put("classNameId", getClassNameId());
+		attributes.put("classPK", getClassPK());
+		attributes.put("typePK", getTypePK());
+		attributes.put("workflowDefinitionName", getWorkflowDefinitionName());
+		attributes.put("workflowDefinitionVersion",
+			getWorkflowDefinitionVersion());
+
+		return attributes;
+	}
+
+	@Override
+	public void setModelAttributes(Map<String, Object> attributes) {
+		Long workflowDefinitionLinkId = (Long)attributes.get(
+				"workflowDefinitionLinkId");
+
+		if (workflowDefinitionLinkId != null) {
+			setWorkflowDefinitionLinkId(workflowDefinitionLinkId);
+		}
+
+		Long groupId = (Long)attributes.get("groupId");
+
+		if (groupId != null) {
+			setGroupId(groupId);
+		}
+
+		Long companyId = (Long)attributes.get("companyId");
+
+		if (companyId != null) {
+			setCompanyId(companyId);
+		}
+
+		Long userId = (Long)attributes.get("userId");
+
+		if (userId != null) {
+			setUserId(userId);
+		}
+
+		String userName = (String)attributes.get("userName");
+
+		if (userName != null) {
+			setUserName(userName);
+		}
+
+		Date createDate = (Date)attributes.get("createDate");
+
+		if (createDate != null) {
+			setCreateDate(createDate);
+		}
+
+		Date modifiedDate = (Date)attributes.get("modifiedDate");
+
+		if (modifiedDate != null) {
+			setModifiedDate(modifiedDate);
+		}
+
+		Long classNameId = (Long)attributes.get("classNameId");
+
+		if (classNameId != null) {
+			setClassNameId(classNameId);
+		}
+
+		Long classPK = (Long)attributes.get("classPK");
+
+		if (classPK != null) {
+			setClassPK(classPK);
+		}
+
+		Long typePK = (Long)attributes.get("typePK");
+
+		if (typePK != null) {
+			setTypePK(typePK);
+		}
+
+		String workflowDefinitionName = (String)attributes.get(
+				"workflowDefinitionName");
+
+		if (workflowDefinitionName != null) {
+			setWorkflowDefinitionName(workflowDefinitionName);
+		}
+
+		Integer workflowDefinitionVersion = (Integer)attributes.get(
+				"workflowDefinitionVersion");
+
+		if (workflowDefinitionVersion != null) {
+			setWorkflowDefinitionVersion(workflowDefinitionVersion);
+		}
+	}
+
 	public long getWorkflowDefinitionLinkId() {
 		return _workflowDefinitionLinkId;
 	}
@@ -128,6 +238,8 @@ public class WorkflowDefinitionLinkModelImpl extends BaseModelImpl<WorkflowDefin
 	}
 
 	public void setGroupId(long groupId) {
+		_columnBitmask |= GROUPID_COLUMN_BITMASK;
+
 		if (!_setOriginalGroupId) {
 			_setOriginalGroupId = true;
 
@@ -146,6 +258,8 @@ public class WorkflowDefinitionLinkModelImpl extends BaseModelImpl<WorkflowDefin
 	}
 
 	public void setCompanyId(long companyId) {
+		_columnBitmask |= COMPANYID_COLUMN_BITMASK;
+
 		if (!_setOriginalCompanyId) {
 			_setOriginalCompanyId = true;
 
@@ -212,11 +326,23 @@ public class WorkflowDefinitionLinkModelImpl extends BaseModelImpl<WorkflowDefin
 		return PortalUtil.getClassName(getClassNameId());
 	}
 
+	public void setClassName(String className) {
+		long classNameId = 0;
+
+		if (Validator.isNotNull(className)) {
+			classNameId = PortalUtil.getClassNameId(className);
+		}
+
+		setClassNameId(classNameId);
+	}
+
 	public long getClassNameId() {
 		return _classNameId;
 	}
 
 	public void setClassNameId(long classNameId) {
+		_columnBitmask |= CLASSNAMEID_COLUMN_BITMASK;
+
 		if (!_setOriginalClassNameId) {
 			_setOriginalClassNameId = true;
 
@@ -235,6 +361,8 @@ public class WorkflowDefinitionLinkModelImpl extends BaseModelImpl<WorkflowDefin
 	}
 
 	public void setClassPK(long classPK) {
+		_columnBitmask |= CLASSPK_COLUMN_BITMASK;
+
 		if (!_setOriginalClassPK) {
 			_setOriginalClassPK = true;
 
@@ -253,6 +381,8 @@ public class WorkflowDefinitionLinkModelImpl extends BaseModelImpl<WorkflowDefin
 	}
 
 	public void setTypePK(long typePK) {
+		_columnBitmask |= TYPEPK_COLUMN_BITMASK;
+
 		if (!_setOriginalTypePK) {
 			_setOriginalTypePK = true;
 
@@ -276,7 +406,17 @@ public class WorkflowDefinitionLinkModelImpl extends BaseModelImpl<WorkflowDefin
 	}
 
 	public void setWorkflowDefinitionName(String workflowDefinitionName) {
+		_columnBitmask = -1L;
+
+		if (_originalWorkflowDefinitionName == null) {
+			_originalWorkflowDefinitionName = _workflowDefinitionName;
+		}
+
 		_workflowDefinitionName = workflowDefinitionName;
+	}
+
+	public String getOriginalWorkflowDefinitionName() {
+		return GetterUtil.getString(_originalWorkflowDefinitionName);
 	}
 
 	public int getWorkflowDefinitionVersion() {
@@ -284,38 +424,47 @@ public class WorkflowDefinitionLinkModelImpl extends BaseModelImpl<WorkflowDefin
 	}
 
 	public void setWorkflowDefinitionVersion(int workflowDefinitionVersion) {
+		_columnBitmask |= WORKFLOWDEFINITIONVERSION_COLUMN_BITMASK;
+
+		if (!_setOriginalWorkflowDefinitionVersion) {
+			_setOriginalWorkflowDefinitionVersion = true;
+
+			_originalWorkflowDefinitionVersion = _workflowDefinitionVersion;
+		}
+
 		_workflowDefinitionVersion = workflowDefinitionVersion;
+	}
+
+	public int getOriginalWorkflowDefinitionVersion() {
+		return _originalWorkflowDefinitionVersion;
+	}
+
+	public long getColumnBitmask() {
+		return _columnBitmask;
 	}
 
 	@Override
 	public WorkflowDefinitionLink toEscapedModel() {
-		if (isEscapedModel()) {
-			return (WorkflowDefinitionLink)this;
+		if (_escapedModelProxy == null) {
+			_escapedModelProxy = (WorkflowDefinitionLink)ProxyUtil.newProxyInstance(_classLoader,
+					_escapedModelProxyInterfaces,
+					new AutoEscapeBeanHandler(this));
 		}
-		else {
-			if (_escapedModelProxy == null) {
-				_escapedModelProxy = (WorkflowDefinitionLink)Proxy.newProxyInstance(_classLoader,
-						_escapedModelProxyInterfaces,
-						new AutoEscapeBeanHandler(this));
-			}
 
-			return _escapedModelProxy;
-		}
+		return _escapedModelProxy;
 	}
 
 	@Override
 	public ExpandoBridge getExpandoBridge() {
-		if (_expandoBridge == null) {
-			_expandoBridge = ExpandoBridgeFactoryUtil.getExpandoBridge(getCompanyId(),
-					WorkflowDefinitionLink.class.getName(), getPrimaryKey());
-		}
-
-		return _expandoBridge;
+		return ExpandoBridgeFactoryUtil.getExpandoBridge(getCompanyId(),
+			WorkflowDefinitionLink.class.getName(), getPrimaryKey());
 	}
 
 	@Override
 	public void setExpandoBridgeAttributes(ServiceContext serviceContext) {
-		getExpandoBridge().setAttributes(serviceContext);
+		ExpandoBridge expandoBridge = getExpandoBridge();
+
+		expandoBridge.setAttributes(serviceContext);
 	}
 
 	@Override
@@ -406,6 +555,14 @@ public class WorkflowDefinitionLinkModelImpl extends BaseModelImpl<WorkflowDefin
 		workflowDefinitionLinkModelImpl._originalTypePK = workflowDefinitionLinkModelImpl._typePK;
 
 		workflowDefinitionLinkModelImpl._setOriginalTypePK = false;
+
+		workflowDefinitionLinkModelImpl._originalWorkflowDefinitionName = workflowDefinitionLinkModelImpl._workflowDefinitionName;
+
+		workflowDefinitionLinkModelImpl._originalWorkflowDefinitionVersion = workflowDefinitionLinkModelImpl._workflowDefinitionVersion;
+
+		workflowDefinitionLinkModelImpl._setOriginalWorkflowDefinitionVersion = false;
+
+		workflowDefinitionLinkModelImpl._columnBitmask = 0;
 	}
 
 	@Override
@@ -586,7 +743,10 @@ public class WorkflowDefinitionLinkModelImpl extends BaseModelImpl<WorkflowDefin
 	private long _originalTypePK;
 	private boolean _setOriginalTypePK;
 	private String _workflowDefinitionName;
+	private String _originalWorkflowDefinitionName;
 	private int _workflowDefinitionVersion;
-	private transient ExpandoBridge _expandoBridge;
+	private int _originalWorkflowDefinitionVersion;
+	private boolean _setOriginalWorkflowDefinitionVersion;
+	private long _columnBitmask;
 	private WorkflowDefinitionLink _escapedModelProxy;
 }

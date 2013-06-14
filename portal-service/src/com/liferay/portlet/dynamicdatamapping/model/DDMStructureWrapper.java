@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,6 +14,12 @@
 
 package com.liferay.portlet.dynamicdatamapping.model;
 
+import com.liferay.portal.model.ModelWrapper;
+
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * <p>
  * This class is a wrapper for {@link DDMStructure}.
@@ -23,7 +29,8 @@ package com.liferay.portlet.dynamicdatamapping.model;
  * @see       DDMStructure
  * @generated
  */
-public class DDMStructureWrapper implements DDMStructure {
+public class DDMStructureWrapper implements DDMStructure,
+	ModelWrapper<DDMStructure> {
 	public DDMStructureWrapper(DDMStructure ddmStructure) {
 		_ddmStructure = ddmStructure;
 	}
@@ -34,6 +41,120 @@ public class DDMStructureWrapper implements DDMStructure {
 
 	public String getModelClassName() {
 		return DDMStructure.class.getName();
+	}
+
+	public Map<String, Object> getModelAttributes() {
+		Map<String, Object> attributes = new HashMap<String, Object>();
+
+		attributes.put("uuid", getUuid());
+		attributes.put("structureId", getStructureId());
+		attributes.put("groupId", getGroupId());
+		attributes.put("companyId", getCompanyId());
+		attributes.put("userId", getUserId());
+		attributes.put("userName", getUserName());
+		attributes.put("createDate", getCreateDate());
+		attributes.put("modifiedDate", getModifiedDate());
+		attributes.put("classNameId", getClassNameId());
+		attributes.put("structureKey", getStructureKey());
+		attributes.put("name", getName());
+		attributes.put("description", getDescription());
+		attributes.put("xsd", getXsd());
+		attributes.put("storageType", getStorageType());
+		attributes.put("type", getType());
+
+		return attributes;
+	}
+
+	public void setModelAttributes(Map<String, Object> attributes) {
+		String uuid = (String)attributes.get("uuid");
+
+		if (uuid != null) {
+			setUuid(uuid);
+		}
+
+		Long structureId = (Long)attributes.get("structureId");
+
+		if (structureId != null) {
+			setStructureId(structureId);
+		}
+
+		Long groupId = (Long)attributes.get("groupId");
+
+		if (groupId != null) {
+			setGroupId(groupId);
+		}
+
+		Long companyId = (Long)attributes.get("companyId");
+
+		if (companyId != null) {
+			setCompanyId(companyId);
+		}
+
+		Long userId = (Long)attributes.get("userId");
+
+		if (userId != null) {
+			setUserId(userId);
+		}
+
+		String userName = (String)attributes.get("userName");
+
+		if (userName != null) {
+			setUserName(userName);
+		}
+
+		Date createDate = (Date)attributes.get("createDate");
+
+		if (createDate != null) {
+			setCreateDate(createDate);
+		}
+
+		Date modifiedDate = (Date)attributes.get("modifiedDate");
+
+		if (modifiedDate != null) {
+			setModifiedDate(modifiedDate);
+		}
+
+		Long classNameId = (Long)attributes.get("classNameId");
+
+		if (classNameId != null) {
+			setClassNameId(classNameId);
+		}
+
+		String structureKey = (String)attributes.get("structureKey");
+
+		if (structureKey != null) {
+			setStructureKey(structureKey);
+		}
+
+		String name = (String)attributes.get("name");
+
+		if (name != null) {
+			setName(name);
+		}
+
+		String description = (String)attributes.get("description");
+
+		if (description != null) {
+			setDescription(description);
+		}
+
+		String xsd = (String)attributes.get("xsd");
+
+		if (xsd != null) {
+			setXsd(xsd);
+		}
+
+		String storageType = (String)attributes.get("storageType");
+
+		if (storageType != null) {
+			setStorageType(storageType);
+		}
+
+		Integer type = (Integer)attributes.get("type");
+
+		if (type != null) {
+			setType(type);
+		}
 	}
 
 	/**
@@ -227,6 +348,10 @@ public class DDMStructureWrapper implements DDMStructure {
 		return _ddmStructure.getClassName();
 	}
 
+	public void setClassName(java.lang.String className) {
+		_ddmStructure.setClassName(className);
+	}
+
 	/**
 	* Returns the class name ID of this d d m structure.
 	*
@@ -315,6 +440,14 @@ public class DDMStructureWrapper implements DDMStructure {
 		return _ddmStructure.getName(languageId, useDefault);
 	}
 
+	public java.lang.String getNameCurrentLanguageId() {
+		return _ddmStructure.getNameCurrentLanguageId();
+	}
+
+	public java.lang.String getNameCurrentValue() {
+		return _ddmStructure.getNameCurrentValue();
+	}
+
 	/**
 	* Returns a map of the locales and localized names of this d d m structure.
 	*
@@ -353,6 +486,10 @@ public class DDMStructureWrapper implements DDMStructure {
 	public void setName(java.lang.String name, java.util.Locale locale,
 		java.util.Locale defaultLocale) {
 		_ddmStructure.setName(name, locale, defaultLocale);
+	}
+
+	public void setNameCurrentLanguageId(java.lang.String languageId) {
+		_ddmStructure.setNameCurrentLanguageId(languageId);
 	}
 
 	/**
@@ -430,6 +567,14 @@ public class DDMStructureWrapper implements DDMStructure {
 		return _ddmStructure.getDescription(languageId, useDefault);
 	}
 
+	public java.lang.String getDescriptionCurrentLanguageId() {
+		return _ddmStructure.getDescriptionCurrentLanguageId();
+	}
+
+	public java.lang.String getDescriptionCurrentValue() {
+		return _ddmStructure.getDescriptionCurrentValue();
+	}
+
 	/**
 	* Returns a map of the locales and localized descriptions of this d d m structure.
 	*
@@ -469,6 +614,10 @@ public class DDMStructureWrapper implements DDMStructure {
 	public void setDescription(java.lang.String description,
 		java.util.Locale locale, java.util.Locale defaultLocale) {
 		_ddmStructure.setDescription(description, locale, defaultLocale);
+	}
+
+	public void setDescriptionCurrentLanguageId(java.lang.String languageId) {
+		_ddmStructure.setDescriptionCurrentLanguageId(languageId);
 	}
 
 	/**
@@ -529,6 +678,24 @@ public class DDMStructureWrapper implements DDMStructure {
 		_ddmStructure.setStorageType(storageType);
 	}
 
+	/**
+	* Returns the type of this d d m structure.
+	*
+	* @return the type of this d d m structure
+	*/
+	public int getType() {
+		return _ddmStructure.getType();
+	}
+
+	/**
+	* Sets the type of this d d m structure.
+	*
+	* @param type the type of this d d m structure
+	*/
+	public void setType(int type) {
+		_ddmStructure.setType(type);
+	}
+
 	public boolean isNew() {
 		return _ddmStructure.isNew();
 	}
@@ -547,10 +714,6 @@ public class DDMStructureWrapper implements DDMStructure {
 
 	public boolean isEscapedModel() {
 		return _ddmStructure.isEscapedModel();
-	}
-
-	public void setEscapedModel(boolean escapedModel) {
-		_ddmStructure.setEscapedModel(escapedModel);
 	}
 
 	public java.io.Serializable getPrimaryKeyObj() {
@@ -607,16 +770,33 @@ public class DDMStructureWrapper implements DDMStructure {
 		_ddmStructure.persist();
 	}
 
-	public java.lang.String getFieldDataType(java.lang.String fieldName) {
+	public java.util.List<java.lang.String> getAvailableLocales() {
+		return _ddmStructure.getAvailableLocales();
+	}
+
+	public java.lang.String getDefaultLocale() {
+		return _ddmStructure.getDefaultLocale();
+	}
+
+	public com.liferay.portal.kernel.xml.Document getDocument() {
+		return _ddmStructure.getDocument();
+	}
+
+	public java.lang.String getFieldDataType(java.lang.String fieldName)
+		throws com.liferay.portlet.dynamicdatamapping.StructureFieldException {
 		return _ddmStructure.getFieldDataType(fieldName);
 	}
 
-	public boolean getFieldDisplayChildLabelAsValue(java.lang.String fieldName) {
-		return _ddmStructure.getFieldDisplayChildLabelAsValue(fieldName);
+	public java.lang.String getFieldLabel(java.lang.String fieldName,
+		java.util.Locale locale)
+		throws com.liferay.portlet.dynamicdatamapping.StructureFieldException {
+		return _ddmStructure.getFieldLabel(fieldName, locale);
 	}
 
-	public java.lang.String getFieldLabel(java.lang.String fieldName) {
-		return _ddmStructure.getFieldLabel(fieldName);
+	public java.lang.String getFieldLabel(java.lang.String fieldName,
+		java.lang.String locale)
+		throws com.liferay.portlet.dynamicdatamapping.StructureFieldException {
+		return _ddmStructure.getFieldLabel(fieldName, locale);
 	}
 
 	public java.util.Set<java.lang.String> getFieldNames() {
@@ -624,11 +804,19 @@ public class DDMStructureWrapper implements DDMStructure {
 	}
 
 	public java.lang.String getFieldProperty(java.lang.String fieldName,
-		java.lang.String property) {
+		java.lang.String property)
+		throws com.liferay.portlet.dynamicdatamapping.StructureFieldException {
 		return _ddmStructure.getFieldProperty(fieldName, property);
 	}
 
-	public boolean getFieldRequired(java.lang.String fieldName) {
+	public java.lang.String getFieldProperty(java.lang.String fieldName,
+		java.lang.String property, java.lang.String locale)
+		throws com.liferay.portlet.dynamicdatamapping.StructureFieldException {
+		return _ddmStructure.getFieldProperty(fieldName, property, locale);
+	}
+
+	public boolean getFieldRequired(java.lang.String fieldName)
+		throws com.liferay.portlet.dynamicdatamapping.StructureFieldException {
 		return _ddmStructure.getFieldRequired(fieldName);
 	}
 
@@ -638,19 +826,53 @@ public class DDMStructureWrapper implements DDMStructure {
 		return _ddmStructure.getFields(fieldName, attributeName, attributeValue);
 	}
 
+	public java.util.Map<java.lang.String, java.lang.String> getFields(
+		java.lang.String fieldName, java.lang.String attributeName,
+		java.lang.String attributeValue, java.lang.String locale) {
+		return _ddmStructure.getFields(fieldName, attributeName,
+			attributeValue, locale);
+	}
+
 	public java.util.Map<java.lang.String, java.util.Map<java.lang.String, java.lang.String>> getFieldsMap() {
 		return _ddmStructure.getFieldsMap();
 	}
 
-	public java.lang.String getFieldType(java.lang.String fieldName) {
+	public java.util.Map<java.lang.String, java.util.Map<java.lang.String, java.lang.String>> getFieldsMap(
+		java.lang.String locale) {
+		return _ddmStructure.getFieldsMap(locale);
+	}
+
+	public java.lang.String getFieldType(java.lang.String fieldName)
+		throws com.liferay.portlet.dynamicdatamapping.StructureFieldException {
 		return _ddmStructure.getFieldType(fieldName);
+	}
+
+	public java.util.List<com.liferay.portlet.dynamicdatamapping.model.DDMTemplate> getTemplates()
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return _ddmStructure.getTemplates();
 	}
 
 	public boolean hasField(java.lang.String fieldName) {
 		return _ddmStructure.hasField(fieldName);
 	}
 
+	public void setDocument(com.liferay.portal.kernel.xml.Document document) {
+		_ddmStructure.setDocument(document);
+	}
+
+	public void setLocalizedFieldsMap(
+		java.util.Map<java.lang.String, java.util.Map<java.lang.String, java.util.Map<java.lang.String, java.lang.String>>> localizedFieldsMap) {
+		_ddmStructure.setLocalizedFieldsMap(localizedFieldsMap);
+	}
+
+	/**
+	 * @deprecated Renamed to {@link #getWrappedModel}
+	 */
 	public DDMStructure getWrappedDDMStructure() {
+		return _ddmStructure;
+	}
+
+	public DDMStructure getWrappedModel() {
 		return _ddmStructure;
 	}
 

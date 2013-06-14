@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -17,6 +17,8 @@ package com.liferay.portal.service.impl;
 import com.liferay.portal.NoSuchWorkflowDefinitionLinkException;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
+import com.liferay.portal.kernel.spring.aop.Skip;
+import com.liferay.portal.kernel.staging.StagingUtil;
 import com.liferay.portal.kernel.util.CharPool;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.ObjectValuePair;
@@ -24,7 +26,6 @@ import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.portal.kernel.workflow.WorkflowEngineManagerUtil;
-import com.liferay.portal.model.Group;
 import com.liferay.portal.model.User;
 import com.liferay.portal.model.WorkflowDefinitionLink;
 import com.liferay.portal.service.base.WorkflowDefinitionLinkLocalServiceBaseImpl;
@@ -104,8 +105,8 @@ public class WorkflowDefinitionLinkLocalServiceImpl
 		long classNameId = PortalUtil.getClassNameId(className);
 
 		return workflowDefinitionLinkPersistence.findByG_C_C_C_T(
-			WorkflowConstants.DEFAULT_GROUP_ID, companyId, classNameId,
-			classPK, typePK);
+			WorkflowConstants.DEFAULT_GROUP_ID, companyId, classNameId, classPK,
+			typePK);
 	}
 
 	public WorkflowDefinitionLink getWorkflowDefinitionLink(
@@ -131,11 +132,7 @@ public class WorkflowDefinitionLinkLocalServiceImpl
 		WorkflowDefinitionLink workflowDefinitionLink = null;
 
 		if (groupId > 0) {
-			Group group = groupLocalService.getGroup(groupId);
-
-			if (group.isLayout()) {
-				groupId = group.getParentGroupId();
-			}
+			groupId = StagingUtil.getLiveGroupId(groupId);
 		}
 
 		workflowDefinitionLink =
@@ -161,7 +158,7 @@ public class WorkflowDefinitionLinkLocalServiceImpl
 	public int getWorkflowDefinitionLinksCount(
 			long companyId, String workflowDefinitionName,
 			int workflowDefinitionVersion)
-		throws SystemException{
+		throws SystemException {
 
 		if (!WorkflowEngineManagerUtil.isDeployed()) {
 			return 0;
@@ -171,6 +168,7 @@ public class WorkflowDefinitionLinkLocalServiceImpl
 			companyId, workflowDefinitionName, workflowDefinitionVersion);
 	}
 
+	@Skip
 	public boolean hasWorkflowDefinitionLink(
 			long companyId, long groupId, String className)
 		throws PortalException, SystemException {
@@ -178,6 +176,7 @@ public class WorkflowDefinitionLinkLocalServiceImpl
 		return hasWorkflowDefinitionLink(companyId, groupId, className, 0);
 	}
 
+	@Skip
 	public boolean hasWorkflowDefinitionLink(
 			long companyId, long groupId, String className, long classPK)
 		throws PortalException, SystemException {
@@ -186,6 +185,7 @@ public class WorkflowDefinitionLinkLocalServiceImpl
 			companyId, groupId, className, classPK, 0);
 	}
 
+	@Skip
 	public boolean hasWorkflowDefinitionLink(
 			long companyId, long groupId, String className, long classPK,
 			long typePK)
@@ -196,7 +196,7 @@ public class WorkflowDefinitionLinkLocalServiceImpl
 		}
 
 		try {
-			getWorkflowDefinitionLink(
+			workflowDefinitionLinkLocalService.getWorkflowDefinitionLink(
 				companyId, groupId, className, classPK, typePK);
 
 			return true;

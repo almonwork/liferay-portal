@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -166,5 +166,13 @@ public interface Element extends Branch {
 	public void setData(Object data);
 
 	public void setQName(QName qName);
+
+	public void sortAttributes(boolean recursive);
+
+	public void sortElementsByAttribute(
+		String elementName, String attributeName);
+
+	public void sortElementsByChildElement(
+		String elementName, String childElementName);
 
 }

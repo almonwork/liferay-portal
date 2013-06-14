@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -23,9 +23,10 @@ import com.liferay.portalweb.portal.util.RuntimeVariables;
 public class ViewPageLayoutTest extends BaseTestCase {
 	public void testViewPageLayout() throws Exception {
 		selenium.open("/web/guest/home/");
+		loadRequiredJavaScriptModules();
 
 		for (int second = 0;; second++) {
-			if (second >= 60) {
+			if (second >= 90) {
 				fail("timeout");
 			}
 
@@ -40,41 +41,39 @@ public class ViewPageLayoutTest extends BaseTestCase {
 			Thread.sleep(1000);
 		}
 
-		selenium.saveScreenShotAndSource();
 		selenium.clickAt("link=Control Panel", RuntimeVariables.replace(""));
 		selenium.waitForPageToLoad("30000");
-		selenium.saveScreenShotAndSource();
+		loadRequiredJavaScriptModules();
 		selenium.clickAt("link=Communities", RuntimeVariables.replace(""));
 		selenium.waitForPageToLoad("30000");
-		selenium.saveScreenShotAndSource();
+		loadRequiredJavaScriptModules();
 		selenium.type("_134_name",
 			RuntimeVariables.replace("Group Page Layout Community"));
-		selenium.saveScreenShotAndSource();
 		selenium.click(RuntimeVariables.replace("//input[@value='Search']"));
 		selenium.waitForPageToLoad("30000");
-		selenium.saveScreenShotAndSource();
+		loadRequiredJavaScriptModules();
 		selenium.clickAt("//td[2]/a", RuntimeVariables.replace("Open"));
 		selenium.waitForPageToLoad("30000");
-		selenium.saveScreenShotAndSource();
+		loadRequiredJavaScriptModules();
 		selenium.clickAt("link=Page Layout Page", RuntimeVariables.replace(""));
 		selenium.waitForPageToLoad("30000");
-		selenium.saveScreenShotAndSource();
+		loadRequiredJavaScriptModules();
 		selenium.clickAt("main-content", RuntimeVariables.replace(""));
 		selenium.clickAt("dockbar", RuntimeVariables.replace(""));
 		selenium.clickAt("navigation", RuntimeVariables.replace(""));
 		assertTrue(selenium.isElementPresent(
-				"//div[@id='column-1' and @class='yui3-aui-w50 portlet-column portlet-column-first yui3-aui-dd-drop']"));
+				"//div[@id='column-1' and @class='aui-w50 portlet-column portlet-column-first aui-dd-drop']"));
 		assertTrue(selenium.isElementPresent(
-				"//div[@id='column-2' and @class='yui3-aui-w50 portlet-column portlet-column-last yui3-aui-dd-drop']"));
+				"//div[@id='column-2' and @class='aui-w50 portlet-column portlet-column-last aui-dd-drop']"));
 		assertEquals(RuntimeVariables.replace("Breadcrumb"),
 			selenium.getText(
-				"//div[@id='column-1' and @class='yui3-aui-w50 portlet-column portlet-column-first yui3-aui-dd-drop']/div[1]/div[1]/section/header/h1/span[2]"));
+				"//div[@id='column-1' and @class='aui-w50 portlet-column portlet-column-first aui-dd-drop']/div[1]/div[1]/section/header/h1/span[2]"));
 		assertEquals(RuntimeVariables.replace("Navigation"),
 			selenium.getText(
-				"//div[@id='column-2' and @class='yui3-aui-w50 portlet-column portlet-column-last yui3-aui-dd-drop']/div[1]/div[1]/section/header/h1/span[2]"));
+				"//div[@id='column-2' and @class='aui-w50 portlet-column portlet-column-last aui-dd-drop']/div[1]/div[1]/section/header/h1/span[2]"));
 		assertFalse(selenium.isElementPresent(
-				"//div[@id='column-1' and @class='yui3-aui-w30 portlet-column portlet-column-first yui3-aui-dd-drop']"));
+				"//div[@id='column-1' and @class='aui-w30 portlet-column portlet-column-first aui-dd-drop']/div[1]/div[1]/section/header/h1/span[2]"));
 		assertFalse(selenium.isElementPresent(
-				"//div[@id='column-2' and @class='yui3-aui-w70 portlet-column portlet-column-last yui3-aui-dd-drop']"));
+				"//div[@id='column-2' and @class='aui-w70 portlet-column portlet-column-last aui-dd-drop']/div[1]/div[1]/section/header/h1/span[2]"));
 	}
 }

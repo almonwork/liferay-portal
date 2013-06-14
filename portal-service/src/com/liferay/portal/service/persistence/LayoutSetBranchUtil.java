@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -91,14 +91,6 @@ public class LayoutSetBranchUtil {
 		return getPersistence()
 				   .findWithDynamicQuery(dynamicQuery, start, end,
 			orderByComparator);
-	}
-
-	/**
-	 * @see com.liferay.portal.service.persistence.BasePersistence#remove(com.liferay.portal.model.BaseModel)
-	 */
-	public static LayoutSetBranch remove(LayoutSetBranch layoutSetBranch)
-		throws SystemException {
-		return getPersistence().remove(layoutSetBranch);
 	}
 
 	/**
@@ -728,13 +720,14 @@ public class LayoutSetBranchUtil {
 	* @param groupId the group ID
 	* @param privateLayout the private layout
 	* @param name the name
+	* @return the layout set branch that was removed
 	* @throws SystemException if a system exception occurred
 	*/
-	public static void removeByG_P_N(long groupId, boolean privateLayout,
-		java.lang.String name)
+	public static com.liferay.portal.model.LayoutSetBranch removeByG_P_N(
+		long groupId, boolean privateLayout, java.lang.String name)
 		throws com.liferay.portal.NoSuchLayoutSetBranchException,
 			com.liferay.portal.kernel.exception.SystemException {
-		getPersistence().removeByG_P_N(groupId, privateLayout, name);
+		return getPersistence().removeByG_P_N(groupId, privateLayout, name);
 	}
 
 	/**
@@ -834,11 +827,10 @@ public class LayoutSetBranchUtil {
 		return _persistence;
 	}
 
+	/**
+	 * @deprecated
+	 */
 	public void setPersistence(LayoutSetBranchPersistence persistence) {
-		_persistence = persistence;
-
-		ReferenceRegistry.registerReference(LayoutSetBranchUtil.class,
-			"_persistence");
 	}
 
 	private static LayoutSetBranchPersistence _persistence;

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -24,6 +24,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * @author Brian Wing Shun Chan
+ * @author Connor McKay
  */
 public class PersistedModelLocalServiceRegistryImpl
 	implements PersistedModelLocalServiceRegistry {
@@ -38,16 +39,34 @@ public class PersistedModelLocalServiceRegistryImpl
 		return ListUtil.fromMapValues(_persistedModelLocalServices);
 	}
 
+	public boolean isPermissionedModelLocalService(String className) {
+		PersistedModelLocalService persistedModelLocalService =
+			getPersistedModelLocalService(className);
+
+		if (persistedModelLocalService == null) {
+			return false;
+		}
+
+		if (persistedModelLocalService instanceof
+				PermissionedModelLocalService) {
+
+			return true;
+		}
+
+		return false;
+	}
+
 	public void register(
 		String className,
 		PersistedModelLocalService persistedModelLocalService) {
 
-		if (_persistedModelLocalServices.containsKey(className)) {
+		PersistedModelLocalService oldPersistedModelLocalService =
+			_persistedModelLocalServices.put(
+				className, persistedModelLocalService);
+
+		if (oldPersistedModelLocalService != null) {
 			_log.warn("Duplicate class name " + className);
 		}
-
-		_persistedModelLocalServices.put(
-			className, persistedModelLocalService);
 	}
 
 	public void unregister(String className) {

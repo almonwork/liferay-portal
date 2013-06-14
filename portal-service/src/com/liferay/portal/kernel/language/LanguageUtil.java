@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -13,6 +13,8 @@
  */
 
 package com.liferay.portal.kernel.language;
+
+import com.liferay.portal.kernel.security.pacl.permission.PortalRuntimePermission;
 
 import java.util.Locale;
 
@@ -182,6 +184,8 @@ public class LanguageUtil {
 	}
 
 	public static Language getLanguage() {
+		PortalRuntimePermission.checkGetBeanProperty(LanguageUtil.class);
+
 		return _language;
 	}
 
@@ -199,6 +203,21 @@ public class LanguageUtil {
 
 	public static Locale getLocale(String languageCode) {
 		return getLanguage().getLocale(languageCode);
+	}
+
+	public static String getTimeDescription(Locale locale, long milliseconds) {
+		return getLanguage().getTimeDescription(locale, milliseconds);
+	}
+
+	public static String getTimeDescription(
+		Locale locale, long milliseconds, boolean approximate) {
+
+		return getLanguage().getTimeDescription(
+			locale, milliseconds, approximate);
+	}
+
+	public static String getTimeDescription(Locale locale, Long milliseconds) {
+		return getLanguage().getTimeDescription(locale, milliseconds);
 	}
 
 	public static String getTimeDescription(
@@ -248,6 +267,8 @@ public class LanguageUtil {
 	}
 
 	public void setLanguage(Language language) {
+		PortalRuntimePermission.checkSetBeanProperty(getClass());
+
 		_language = language;
 	}
 

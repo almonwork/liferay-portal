@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -33,7 +33,11 @@ Group stagingGroup = null;
 
 int pagesCount = 0;
 
-if (selGroup.isStagingGroup()) {
+if (selGroup.isCompany()) {
+	stagingGroup = selGroup;
+	liveGroup = selGroup;
+}
+else if (selGroup.isStagingGroup()) {
 	liveGroup = selGroup.getLiveGroup();
 	stagingGroup = selGroup;
 }
@@ -50,7 +54,11 @@ else if (selGroup.isStaged()) {
 
 long selGroupId = selGroup.getGroupId();
 
-long liveGroupId = liveGroup.getGroupId();
+long liveGroupId = 0;
+
+if (liveGroup != null) {
+	liveGroupId = liveGroup.getGroupId();
+}
 
 long stagingGroupId = 0;
 
@@ -68,7 +76,7 @@ if (liveGroup.isStaged()) {
 		localPublishing = false;
 	}
 }
-else if (cmd.equals("publish_to_remote")) {
+else if (cmd.equals("publish_to_remote") || selGroup.isCompany()) {
 	localPublishing = false;
 }
 
@@ -90,7 +98,7 @@ String publishActionKey = "copy";
 if (liveGroup.isStaged()) {
 	publishActionKey = "publish";
 }
-else if (cmd.equals("publish_to_remote")) {
+else if (cmd.equals("publish_to_remote") || selGroup.isCompany()) {
 	publishActionKey = "publish";
 }
 
@@ -108,24 +116,21 @@ try {
 catch (NoSuchLayoutException nsle) {
 }
 
-long[] selectedPlids = new long[0];
+long[] selectedLayoutIds = new long[0];
 
 boolean privateLayout = ParamUtil.getBoolean(request, "privateLayout", tabs1.equals("private-pages"));
 
 if (selPlid > 0) {
-	selectedPlids = new long[] {selPlid};
-}
-else {
 	treeKey = treeKey + privateLayout;
 
-	selectedPlids = GetterUtil.getLongValues(StringUtil.split(SessionTreeJSClicks.getOpenNodes(request, treeKey + "SelectedNode"), ','));
+	selectedLayoutIds = GetterUtil.getLongValues(StringUtil.split(SessionTreeJSClicks.getOpenNodes(request, treeKey + "SelectedNode"), ','));
 }
 
 List results = new ArrayList();
 
-for (int i = 0; i < selectedPlids.length; i++) {
+for (int i = 0; i < selectedLayoutIds.length; i++) {
 	try {
-		results.add(LayoutLocalServiceUtil.getLayout(selectedPlids[i]));
+		results.add(LayoutLocalServiceUtil.getLayout(selGroupId, privateLayout, selectedLayoutIds[i]));
 	}
 	catch (NoSuchLayoutException nsle) {
 	}
@@ -151,7 +156,7 @@ else if (liveGroup.isUser()) {
 	user2 = UserLocalServiceUtil.getUserById(liveGroup.getClassPK());
 }
 
-String rootNodeName = liveGroup.getDescriptiveName();
+String rootNodeName = liveGroup.getDescriptiveName(locale);
 
 if (liveGroup.isOrganization()) {
 	rootNodeName = organization.getName();
@@ -173,8 +178,9 @@ if (selGroup.isStaged() && selGroup.isStagedRemotely()) {
 }
 
 portletURL.setParameter("struts_action", "/layouts_admin/edit_layouts");
+portletURL.setParameter("pagesRedirect", currentURL);
 portletURL.setParameter("groupId", String.valueOf(liveGroupId));
-portletURL.setParameter("private", String.valueOf(privateLayout));
+portletURL.setParameter("privateLayout", String.valueOf(privateLayout));
 
 PortletURL selectURL = renderResponse.createRenderURL();
 
@@ -183,7 +189,9 @@ selectURL.setParameter("struts_action", "/layouts_admin/publish_layouts");
 selectURL.setParameter(Constants.CMD, cmd);
 selectURL.setParameter("pagesRedirect", pagesRedirect);
 selectURL.setParameter("groupId", String.valueOf(stagingGroupId));
+selectURL.setParameter("selPlid", String.valueOf(selPlid));
 selectURL.setParameter("privateLayout", String.valueOf(privateLayout));
+selectURL.setParameter("layoutSetBranchId", String.valueOf(layoutSetBranchId));
 selectURL.setParameter("selectPages", String.valueOf(!selectPages));
 selectURL.setParameter("schedule", String.valueOf(schedule));
 
@@ -199,6 +207,24 @@ request.setAttribute("edit_pages.jsp-portletURL", portletURL);
 
 response.setHeader("Ajax-ID", request.getHeader("Ajax-ID"));
 %>
+
+<c:if test='<%= SessionMessages.contains(renderRequest, "request_processed") %>'>
+	<div class="portlet-msg-success">
+
+		<%
+		String successMessage = (String)SessionMessages.get(renderRequest, "request_processed");
+		%>
+
+		<c:choose>
+			<c:when test='<%= Validator.isNotNull(successMessage) && !successMessage.equals("request_processed") %>'>
+				<%= HtmlUtil.escape(successMessage) %>
+			</c:when>
+			<c:otherwise>
+				<liferay-ui:message key="your-request-completed-successfully" />
+			</c:otherwise>
+		</c:choose>
+	</div>
+</c:if>
 
 <style type="text/css">
 	#<portlet:namespace />pane th.col-3 {
@@ -222,13 +248,24 @@ response.setHeader("Ajax-ID", request.getHeader("Ajax-ID"));
 		display: inline;
 	}
 
-	#<portlet:namespace />pane {
-		border: 1px solid #CCC;
-		padding: 5px;
+	#<portlet:namespace />exportPagesFm .layout-variation-name {
+		color: #999;
+	}
+
+	#<portlet:namespace />exportPagesFm .page-not-exportable {
+		color: #933;
+	}
+
+	#<portlet:namespace />exportPagesFm .portlet-data-section legend {
+		font-size: 110%;
+	}
+
+	#<portlet:namespace />exportPagesFm .portlet-data-section .portlet-type-data-section .aui-legend {
+		border-width: 0;
 	}
 </style>
 
-<aui:form action='<%= portletURL.toString() + "&etag=0" %>' method="post" name="exportPagesFm" onSubmit='<%= "event.preventDefault(); " + renderResponse.getNamespace() + "refreshDialog();" %>' >
+<aui:form action='<%= portletURL.toString() + "&etag=0&strip=0" %>' method="post" name="exportPagesFm" onSubmit='<%= "event.preventDefault(); " + renderResponse.getNamespace() + "refreshDialog();" %>' >
 	<aui:input name="<%= Constants.CMD %>" type="hidden" value="<%= cmd %>" />
 	<aui:input name="tabs1" type="hidden" value="<%= tabs1 %>" />
 	<aui:input name="redirect" type="hidden" value="<%= currentURL %>" />
@@ -236,6 +273,38 @@ response.setHeader("Ajax-ID", request.getHeader("Ajax-ID"));
 	<aui:input name="layoutSetBranchName" type="hidden" value="<%= layoutSetBranchName %>" />
 	<aui:input name="lastImportUserName" type="hidden" value="<%= user.getFullName() %>" />
 	<aui:input name="lastImportUserUuid" type="hidden" value="<%= String.valueOf(user.getUserUuid()) %>" />
+
+	<liferay-ui:error exception="<%= DuplicateLockException.class %>" message="another-publishing-process-is-in-progress,-please-try-again-later" />
+
+	<liferay-ui:error exception="<%= LayoutPrototypeException.class %>">
+
+		<%
+		LayoutPrototypeException lpe = (LayoutPrototypeException)errorException;
+		%>
+
+		<liferay-ui:message key="the-pages-could-not-be-published-because-one-or-more-required-page-templates-could-not-be-found-on-the-remote-system.-please-import-the-following-templates-manually" />
+
+		<ul>
+
+			<%
+			List<Tuple> missingLayoutPrototypes = lpe.getMissingLayoutPrototypes();
+
+			for (Tuple missingLayoutPrototype : missingLayoutPrototypes) {
+				String layoutPrototypeClassName = (String)missingLayoutPrototype.getObject(0);
+				String layoutPrototypeUuid = (String)missingLayoutPrototype.getObject(1);
+				String layoutPrototypeName = (String)missingLayoutPrototype.getObject(2);
+			%>
+
+			<li>
+				<%= ResourceActionsUtil.getModelResource(locale, layoutPrototypeClassName) %>: <strong><%= layoutPrototypeName %></strong> (<%= layoutPrototypeUuid %>)
+			</li>
+
+			<%
+			}
+			%>
+
+		</ul>
+	</liferay-ui:error>
 
 	<liferay-ui:error exception="<%= RemoteExportException.class %>">
 
@@ -254,6 +323,10 @@ response.setHeader("Ajax-ID", request.getHeader("Ajax-ID"));
 		<c:if test="<%= ree.getType() == RemoteExportException.NO_LAYOUTS %>">
 			<liferay-ui:message key="there-are-no-layouts-in-the-exported-data" />
 		</c:if>
+
+		<c:if test="<%= ree.getType() == RemoteExportException.NO_PERMISSIONS %>">
+			<liferay-ui:message arguments="<%= ree.getGroupId() %>" key="you-do-not-have-permissions-to-edit-the-site-with-id-x-on-the-remote-server" />
+		</c:if>
 	</liferay-ui:error>
 
 	<liferay-ui:error exception="<%= RemoteOptionsException.class %>">
@@ -268,6 +341,10 @@ response.setHeader("Ajax-ID", request.getHeader("Ajax-ID"));
 
 		<c:if test="<%= roe.getType() == RemoteOptionsException.REMOTE_GROUP_ID %>">
 			<liferay-ui:message arguments="<%= roe.getRemoteGroupId() %>" key="the-remote-site-id-x-is-not-valid" />
+		</c:if>
+
+		<c:if test="<%= roe.getType() == RemoteOptionsException.REMOTE_PATH_CONTEXT %>">
+			<liferay-ui:message arguments="<%= roe.getRemotePathContext() %>" key="the-remote-path-context-x-is-not-valid" />
 		</c:if>
 
 		<c:if test="<%= roe.getType() == RemoteOptionsException.REMOTE_PORT %>">
@@ -294,6 +371,8 @@ response.setHeader("Ajax-ID", request.getHeader("Ajax-ID"));
 				<liferay-util:include page="/html/portlet/layouts_admin/tree_js.jsp">
 					<liferay-util:param name="selectableTree" value="1" />
 					<liferay-util:param name="treeId" value="<%= treeKey %>" />
+					<liferay-util:param name="incomplete" value="<%= String.valueOf(false) %>" />
+					<liferay-util:param name="tabs1" value='<%= (privateLayout) ? "private-pages" : "public-pages" %>' />
 				</liferay-util:include>
 			</div>
 
@@ -347,7 +426,7 @@ response.setHeader("Ajax-ID", request.getHeader("Ajax-ID"));
 							List<LayoutSetBranch> layoutSetBranches = LayoutSetBranchLocalServiceUtil.getLayoutSetBranches(stagingGroup.getGroupId(), privateLayout);
 							%>
 
-							<aui:select inlineLabel="left" label='<%= privateLayout ? "private-pages-variation" : "public-pages-variation" %>' name="layoutSetBranchId">
+							<aui:select label="site-pages-variation" name="layoutSetBranchId">
 
 								<%
 								for (LayoutSetBranch layoutSetBranch : layoutSetBranches) {
@@ -369,23 +448,31 @@ response.setHeader("Ajax-ID", request.getHeader("Ajax-ID"));
 					</c:otherwise>
 				</c:choose>
 
-				<liferay-ui:panel-container cssClass="export-pages-panel-container" extended="<%= true %>" persistState="<%= true %>">
-					<liferay-ui:panel collapsible="<%= true %>" extended="<%= true %>" persistState="<%= true %>" title="pages">
-						<%@ include file="/html/portlet/layouts_admin/publish_layouts_select_pages.jspf" %>
+				<liferay-ui:panel-container cssClass="export-pages-panel-container" extended="<%= true %>" id="layoutsAdminExportPagesPanelContainer" persistState="<%= true %>">
+					<c:if test="<%= !selGroup.isCompany() %>">
+						<liferay-ui:panel collapsible="<%= true %>" extended="<%= true %>" id="layoutsAdminExportPagesPagesPanel" persistState="<%= true %>" title="pages">
+							<%@ include file="/html/portlet/layouts_admin/publish_layouts_select_pages.jspf" %>
+						</liferay-ui:panel>
+					</c:if>
+
+					<liferay-ui:panel collapsible="<%= true %>" defaultState="closed" extended="<%= true %>" id="layoutsAdminExportPagesPortletsPanel" persistState="<%= true %>" title="applications">
+						<%@ include file="/html/portlet/layouts_admin/publish_layouts_portlets.jspf" %>
 					</liferay-ui:panel>
 
-					<liferay-ui:panel collapsible="<%= true %>" defaultState="closed" extended="<%= true %>" persistState="<%= true %>" title="options">
-						<%@ include file="/html/portlet/layouts_admin/publish_layouts_options.jspf" %>
-					</liferay-ui:panel>
+					<c:if test="<%= !selGroup.isCompany() %>">
+						<liferay-ui:panel collapsible="<%= true %>" defaultState="closed" extended="<%= true %>" id="layoutsAdminExportPagesOptionsPanel" persistState="<%= true %>" title="other">
+							<%@ include file="/html/portlet/layouts_admin/publish_layouts_other.jspf" %>
+						</liferay-ui:panel>
+					</c:if>
 
 					<c:if test="<%= !localPublishing %>">
-						<liferay-ui:panel collapsible="<%= true %>" defaultState="closed" extended="<%= true %>" persistState="<%= true %>" title="remote-live-connection-settings">
+						<liferay-ui:panel collapsible="<%= true %>" defaultState="closed" extended="<%= true %>" id="layoutsAdminExportPagesConnectionPanel" persistState="<%= true %>" title="remote-live-connection-settings">
 							<%@ include file="/html/portlet/layouts_admin/publish_layouts_remote_options.jspf" %>
 						</liferay-ui:panel>
 					</c:if>
 
 					<c:if test="<%= schedule %>">
-						<liferay-ui:panel collapsible="<%= true %>" extended="<%= true %>" persistState="<%= true %>" title="schedule">
+						<liferay-ui:panel collapsible="<%= true %>" extended="<%= true %>" id="layoutsAdminExportPagesSchedulePanel" persistState="<%= true %>" title="schedule">
 							<%@ include file="/html/portlet/layouts_admin/publish_layouts_scheduler.jspf" %>
 						</liferay-ui:panel>
 					</c:if>
@@ -419,21 +506,12 @@ response.setHeader("Ajax-ID", request.getHeader("Ajax-ID"));
 				var dialog = A.DialogManager.findByChild('#<portlet:namespace />exportPagesFm');
 
 				if (dialog) {
-					dialog.io.set('uri', '<%= portletURL.toString() + "&etag=0" %>');
+					dialog.io.set('uri', '<%= portletURL.toString() + "&etag=0&strip=0" %>');
 
 					dialog.io.set(
 						'form',
 						{
 							id: '<portlet:namespace />exportPagesFm'
-						}
-					);
-
-					dialog.io.detach('success');
-
-					dialog.io.after(
-						'success',
-						function(event){
-							window.location.reload(true);
 						}
 					);
 

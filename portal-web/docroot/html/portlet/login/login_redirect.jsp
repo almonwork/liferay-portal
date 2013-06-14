@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -19,10 +19,10 @@
 <%
 String emailAddress = ParamUtil.getString(request, "emailAddress");
 
-boolean anonymousAccount = ParamUtil.getBoolean(request, "anonymousAccount");
+boolean anonymousAccount = ParamUtil.getBoolean(request, "anonymousUser");
 %>
 
-<c:if test="<%= anonymousAccount %>">
+<c:if test="<%= anonymousAccount && company.isStrangers() %>">
 	<div class="aui-helper-hidden lfr-message-response" id="<portlet:namespace />login-status-messages"></div>
 
 	<div class="anonymous-account">
@@ -115,7 +115,7 @@ boolean anonymousAccount = ParamUtil.getBoolean(request, "anonymousAccount");
 			Liferay.fire(
 				'closeWindow',
 				{
-					id: namespace
+					id: namespace + "signInDialog"
 				}
 			);
 		},
@@ -141,6 +141,10 @@ boolean anonymousAccount = ParamUtil.getBoolean(request, "anonymousAccount");
 		},
 		['aui-base']
 	);
+
+	<c:if test="<%= !company.isStrangers() %>">
+		<portlet:namespace />closeDialog();
+	</c:if>
 </aui:script>
 
 <aui:script use="aui-base">
@@ -157,7 +161,7 @@ boolean anonymousAccount = ParamUtil.getBoolean(request, "anonymousAccount");
 				window.opener.parent.Liferay.fire(
 					'closeWindow',
 					{
-						id: namespace
+						id: namespace + "signInDialog"
 					}
 				);
 
@@ -165,6 +169,8 @@ boolean anonymousAccount = ParamUtil.getBoolean(request, "anonymousAccount");
 			}
 		}
 		else {
+			window.opener.parent.location.href = "<%= HtmlUtil.escapeJS(PortalUtil.getPortalURL(renderRequest) + themeDisplay.getURLSignIn()) %>";
+
 			window.close();
 		}
 	}
@@ -180,7 +186,7 @@ boolean anonymousAccount = ParamUtil.getBoolean(request, "anonymousAccount");
 			Liferay.fire(
 				'closeWindow',
 				{
-					id: namespace
+					id: namespace + "signInDialog"
 				}
 			);
 		}

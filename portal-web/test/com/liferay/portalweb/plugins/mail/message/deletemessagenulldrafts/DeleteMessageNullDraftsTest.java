@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -23,9 +23,10 @@ import com.liferay.portalweb.portal.util.RuntimeVariables;
 public class DeleteMessageNullDraftsTest extends BaseTestCase {
 	public void testDeleteMessageNullDrafts() throws Exception {
 		selenium.open("/web/guest/home");
+		loadRequiredJavaScriptModules();
 
 		for (int second = 0;; second++) {
-			if (second >= 60) {
+			if (second >= 90) {
 				fail("timeout");
 			}
 
@@ -40,23 +41,22 @@ public class DeleteMessageNullDraftsTest extends BaseTestCase {
 			Thread.sleep(1000);
 		}
 
-		selenium.saveScreenShotAndSource();
 		selenium.click(RuntimeVariables.replace("link=Mail Test Page"));
 		selenium.waitForPageToLoad("30000");
-		selenium.saveScreenShotAndSource();
+		loadRequiredJavaScriptModules();
 		assertEquals(RuntimeVariables.replace(
-				"liferay.qa.mail.portlet.60x@gmail.com"),
-			selenium.getText("//div[1]/div/ul/li/span/span/a"));
-		selenium.clickAt("//div[1]/div/ul/li/span/span/a",
-			RuntimeVariables.replace("liferay.qa.mail.portlet.60x@gmail.com"));
+				"liferay.qa.testing.trunk@gmail.com"),
+			selenium.getText("//div/div/div[1]/div/ul/li/span/span/a"));
+		selenium.clickAt("//div/div/div[1]/div/ul/li/span/span/a",
+			RuntimeVariables.replace("liferay.qa.testing.trunk@gmail.com"));
 
 		for (int second = 0;; second++) {
-			if (second >= 60) {
+			if (second >= 90) {
 				fail("timeout");
 			}
 
 			try {
-				if (selenium.isPartialText("//div[2]/div/a", "Drafts")) {
+				if (selenium.isVisible("//a[contains(.,'Drafts')]")) {
 					break;
 				}
 			}
@@ -66,13 +66,13 @@ public class DeleteMessageNullDraftsTest extends BaseTestCase {
 			Thread.sleep(1000);
 		}
 
-		selenium.saveScreenShotAndSource();
-		assertTrue(selenium.isPartialText("//div[2]/div/a", "Drafts"));
-		selenium.clickAt("//div[2]/div/a", RuntimeVariables.replace("Drafts"));
+		assertTrue(selenium.isPartialText("//a[contains(.,'Drafts')]", "Drafts"));
+		selenium.clickAt("//a[contains(.,'Drafts')]",
+			RuntimeVariables.replace("Drafts"));
 		Thread.sleep(5000);
 
 		for (int second = 0;; second++) {
-			if (second >= 60) {
+			if (second >= 90) {
 				fail("timeout");
 			}
 
@@ -87,12 +87,11 @@ public class DeleteMessageNullDraftsTest extends BaseTestCase {
 			Thread.sleep(1000);
 		}
 
-		selenium.saveScreenShotAndSource();
 		selenium.clickAt("//input[@value='Delete']",
 			RuntimeVariables.replace("Delete"));
 
 		for (int second = 0;; second++) {
-			if (second >= 60) {
+			if (second >= 90) {
 				fail("timeout");
 			}
 
@@ -109,7 +108,6 @@ public class DeleteMessageNullDraftsTest extends BaseTestCase {
 			Thread.sleep(1000);
 		}
 
-		selenium.saveScreenShotAndSource();
 		assertEquals(RuntimeVariables.replace("No messages selected."),
 			selenium.getText("//span[@class='message portlet-msg-error']"));
 	}

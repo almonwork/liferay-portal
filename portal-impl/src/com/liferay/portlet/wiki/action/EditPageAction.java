@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -113,7 +113,7 @@ public class EditPageAction extends PortletAction {
 				e instanceof NoSuchPageException ||
 				e instanceof PrincipalException) {
 
-				SessionErrors.add(actionRequest, e.getClass().getName());
+				SessionErrors.add(actionRequest, e.getClass());
 
 				setForward(actionRequest, "portlet.wiki.error");
 			}
@@ -122,12 +122,12 @@ public class EditPageAction extends PortletAction {
 					 e instanceof PageVersionException ||
 					 e instanceof PageTitleException) {
 
-				SessionErrors.add(actionRequest, e.getClass().getName());
+				SessionErrors.add(actionRequest, e.getClass());
 			}
 			else if (e instanceof AssetCategoryException ||
 					 e instanceof AssetTagException) {
 
-				SessionErrors.add(actionRequest, e.getClass().getName(), e);
+				SessionErrors.add(actionRequest, e.getClass(), e);
 			}
 			else {
 				throw e;
@@ -155,7 +155,7 @@ public class EditPageAction extends PortletAction {
 				e instanceof PageTitleException ||
 				e instanceof PrincipalException) {
 
-				SessionErrors.add(renderRequest, e.getClass().getName());
+				SessionErrors.add(renderRequest, e.getClass());
 
 				return mapping.findForward("portlet.wiki.error");
 			}
@@ -215,11 +215,10 @@ public class EditPageAction extends PortletAction {
 			}
 			catch (NoSuchPageException nspe1) {
 				try {
-					page = WikiPageServiceUtil.getPage(
-						nodeId, title, false);
+					page = WikiPageServiceUtil.getPage(nodeId, title, false);
 				}
 				catch (NoSuchPageException nspe2) {
-					if ((title.equals(WikiPageConstants.FRONT_PAGE)) &&
+					if (title.equals(WikiPageConstants.FRONT_PAGE) &&
 						(version == 0)) {
 
 						ServiceContext serviceContext = new ServiceContext();
@@ -271,6 +270,11 @@ public class EditPageAction extends PortletAction {
 		portletURL.setParameter("title", page.getTitle(), false);
 
 		return portletURL.toString();
+	}
+
+	@Override
+	protected boolean isCheckMethodOnProcessAction() {
+		return _CHECK_METHOD_ON_PROCESS_ACTION;
 	}
 
 	protected void revertPage(ActionRequest actionRequest) throws Exception {
@@ -333,11 +337,6 @@ public class EditPageAction extends PortletAction {
 		}
 
 		return page;
-	}
-
-	@Override
-	protected boolean isCheckMethodOnProcessAction() {
-		return _CHECK_METHOD_ON_PROCESS_ACTION;
 	}
 
 	private static final boolean _CHECK_METHOD_ON_PROCESS_ACTION = false;

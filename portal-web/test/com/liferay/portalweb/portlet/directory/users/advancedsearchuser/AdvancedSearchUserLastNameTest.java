@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -28,15 +28,15 @@ public class AdvancedSearchUserLastNameTest extends BaseTestCase {
 			switch (label) {
 			case 1:
 				selenium.open("/web/guest/home/");
+				loadRequiredJavaScriptModules();
 
 				for (int second = 0;; second++) {
-					if (second >= 60) {
+					if (second >= 90) {
 						fail("timeout");
 					}
 
 					try {
-						if (selenium.isElementPresent(
-									"link=Directory Test Page")) {
+						if (selenium.isVisible("link=Directory Test Page")) {
 							break;
 						}
 					}
@@ -46,14 +46,13 @@ public class AdvancedSearchUserLastNameTest extends BaseTestCase {
 					Thread.sleep(1000);
 				}
 
-				selenium.saveScreenShotAndSource();
 				selenium.clickAt("link=Directory Test Page",
-					RuntimeVariables.replace(""));
+					RuntimeVariables.replace("Directory Test Page"));
 				selenium.waitForPageToLoad("30000");
-				selenium.saveScreenShotAndSource();
-				selenium.clickAt("link=Users", RuntimeVariables.replace(""));
+				loadRequiredJavaScriptModules();
+				selenium.clickAt("link=Users", RuntimeVariables.replace("Users"));
 				selenium.waitForPageToLoad("30000");
-				selenium.saveScreenShotAndSource();
+				loadRequiredJavaScriptModules();
 
 				boolean advancedVisible = selenium.isVisible(
 						"link=Advanced \u00bb");
@@ -65,17 +64,18 @@ public class AdvancedSearchUserLastNameTest extends BaseTestCase {
 				}
 
 				selenium.clickAt("link=Advanced \u00bb",
-					RuntimeVariables.replace(""));
+					RuntimeVariables.replace("Advanced \u00bb"));
 
 			case 2:
 
 				for (int second = 0;; second++) {
-					if (second >= 60) {
+					if (second >= 90) {
 						fail("timeout");
 					}
 
 					try {
-						if (selenium.isVisible("_11_andOperator")) {
+						if (selenium.isVisible(
+									"//select[@id='_11_andOperator']")) {
 							break;
 						}
 					}
@@ -85,33 +85,30 @@ public class AdvancedSearchUserLastNameTest extends BaseTestCase {
 					Thread.sleep(1000);
 				}
 
-				selenium.saveScreenShotAndSource();
-				selenium.select("_11_andOperator",
-					RuntimeVariables.replace("label=Any"));
-				selenium.type("_11_lastName",
-					RuntimeVariables.replace("TestLast"));
-				selenium.saveScreenShotAndSource();
+				selenium.select("//select[@id='_11_andOperator']",
+					RuntimeVariables.replace("Any"));
+				selenium.type("//input[@id='_11_lastName']",
+					RuntimeVariables.replace("userln"));
 				selenium.click(RuntimeVariables.replace(
-						"//div[2]/span[2]/span/input"));
+						"//input[@value='Search']"));
 				selenium.waitForPageToLoad("30000");
-				selenium.saveScreenShotAndSource();
-				selenium.type("_11_lastName", RuntimeVariables.replace(""));
-				selenium.saveScreenShotAndSource();
-				assertTrue(selenium.isElementPresent("link=TestFirst1"));
-				selenium.type("_11_lastName",
-					RuntimeVariables.replace("TestLastA"));
-				selenium.saveScreenShotAndSource();
-				selenium.click(RuntimeVariables.replace(
-						"//div[2]/span[2]/span/input"));
-				selenium.waitForPageToLoad("30000");
-				selenium.saveScreenShotAndSource();
-				selenium.select("_11_andOperator",
-					RuntimeVariables.replace("label=All"));
-				selenium.type("_11_lastName", RuntimeVariables.replace(""));
-				selenium.saveScreenShotAndSource();
-				selenium.clickAt("link=\u00ab Basic",
+				loadRequiredJavaScriptModules();
+				selenium.type("//input[@id='_11_lastName']",
 					RuntimeVariables.replace(""));
-				assertFalse(selenium.isTextPresent("TestFirst1"));
+				assertTrue(selenium.isElementPresent("link=userfn"));
+				selenium.type("//input[@id='_11_lastName']",
+					RuntimeVariables.replace("userln1"));
+				selenium.click(RuntimeVariables.replace(
+						"//input[@value='Search']"));
+				selenium.waitForPageToLoad("30000");
+				loadRequiredJavaScriptModules();
+				selenium.select("//select[@id='_11_andOperator']",
+					RuntimeVariables.replace("All"));
+				selenium.type("//input[@id='_11_lastName']",
+					RuntimeVariables.replace(""));
+				selenium.clickAt("link=\u00ab Basic",
+					RuntimeVariables.replace("\u00ab Basic"));
+				assertFalse(selenium.isTextPresent("userfn"));
 
 			case 100:
 				label = -1;

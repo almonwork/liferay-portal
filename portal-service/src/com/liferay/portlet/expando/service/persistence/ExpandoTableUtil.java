@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -92,14 +92,6 @@ public class ExpandoTableUtil {
 		return getPersistence()
 				   .findWithDynamicQuery(dynamicQuery, start, end,
 			orderByComparator);
-	}
-
-	/**
-	 * @see com.liferay.portal.service.persistence.BasePersistence#remove(com.liferay.portal.model.BaseModel)
-	 */
-	public static ExpandoTable remove(ExpandoTable expandoTable)
-		throws SystemException {
-		return getPersistence().remove(expandoTable);
 	}
 
 	/**
@@ -445,13 +437,14 @@ public class ExpandoTableUtil {
 	* @param companyId the company ID
 	* @param classNameId the class name ID
 	* @param name the name
+	* @return the expando table that was removed
 	* @throws SystemException if a system exception occurred
 	*/
-	public static void removeByC_C_N(long companyId, long classNameId,
-		java.lang.String name)
+	public static com.liferay.portlet.expando.model.ExpandoTable removeByC_C_N(
+		long companyId, long classNameId, java.lang.String name)
 		throws com.liferay.portal.kernel.exception.SystemException,
 			com.liferay.portlet.expando.NoSuchTableException {
-		getPersistence().removeByC_C_N(companyId, classNameId, name);
+		return getPersistence().removeByC_C_N(companyId, classNameId, name);
 	}
 
 	/**
@@ -514,11 +507,10 @@ public class ExpandoTableUtil {
 		return _persistence;
 	}
 
+	/**
+	 * @deprecated
+	 */
 	public void setPersistence(ExpandoTablePersistence persistence) {
-		_persistence = persistence;
-
-		ReferenceRegistry.registerReference(ExpandoTableUtil.class,
-			"_persistence");
 	}
 
 	private static ExpandoTablePersistence _persistence;

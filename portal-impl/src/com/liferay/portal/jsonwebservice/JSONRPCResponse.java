@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -30,11 +30,11 @@ import java.util.Map;
 public class JSONRPCResponse implements JSONSerializable {
 
 	public JSONRPCResponse(
-		JSONRPCRequest jsonRpcRequest, Object result, Exception exception) {
+		JSONRPCRequest jsonRPCRequest, Object result, Exception exception) {
 
-		_id = jsonRpcRequest.getId();
+		_id = jsonRPCRequest.getId();
 
-		_jsonrpc = GetterUtil.getString(jsonRpcRequest.getJsonrpc());
+		_jsonrpc = GetterUtil.getString(jsonRPCRequest.getJsonrpc());
 
 		if (!_jsonrpc.equals("2.0")) {
 			_error = new Error(-32700, "Invalid JSON RPC version " + _jsonrpc);
@@ -55,7 +55,7 @@ public class JSONRPCResponse implements JSONSerializable {
 				message = cause.toString();
 			}
 			else {
-				message = exception.getMessage();
+				message = exception.toString();
 			}
 
 			if (message == null) {

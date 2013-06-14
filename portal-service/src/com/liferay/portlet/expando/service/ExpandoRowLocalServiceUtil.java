@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -15,7 +15,6 @@
 package com.liferay.portlet.expando.service;
 
 import com.liferay.portal.kernel.bean.PortalBeanLocatorUtil;
-import com.liferay.portal.kernel.util.MethodCache;
 import com.liferay.portal.kernel.util.ReferenceRegistry;
 
 /**
@@ -66,25 +65,32 @@ public class ExpandoRowLocalServiceUtil {
 	* Deletes the expando row with the primary key from the database. Also notifies the appropriate model listeners.
 	*
 	* @param rowId the primary key of the expando row
+	* @return the expando row that was removed
 	* @throws PortalException if a expando row with the primary key could not be found
 	* @throws SystemException if a system exception occurred
 	*/
-	public static void deleteExpandoRow(long rowId)
+	public static com.liferay.portlet.expando.model.ExpandoRow deleteExpandoRow(
+		long rowId)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException {
-		getService().deleteExpandoRow(rowId);
+		return getService().deleteExpandoRow(rowId);
 	}
 
 	/**
 	* Deletes the expando row from the database. Also notifies the appropriate model listeners.
 	*
 	* @param expandoRow the expando row
+	* @return the expando row that was removed
 	* @throws SystemException if a system exception occurred
 	*/
-	public static void deleteExpandoRow(
+	public static com.liferay.portlet.expando.model.ExpandoRow deleteExpandoRow(
 		com.liferay.portlet.expando.model.ExpandoRow expandoRow)
 		throws com.liferay.portal.kernel.exception.SystemException {
-		getService().deleteExpandoRow(expandoRow);
+		return getService().deleteExpandoRow(expandoRow);
+	}
+
+	public static com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery() {
+		return getService().dynamicQuery();
 	}
 
 	/**
@@ -156,6 +162,11 @@ public class ExpandoRowLocalServiceUtil {
 		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery)
 		throws com.liferay.portal.kernel.exception.SystemException {
 		return getService().dynamicQueryCount(dynamicQuery);
+	}
+
+	public static com.liferay.portlet.expando.model.ExpandoRow fetchExpandoRow(
+		long rowId) throws com.liferay.portal.kernel.exception.SystemException {
+		return getService().fetchExpandoRow(rowId);
 	}
 
 	/**
@@ -407,20 +418,15 @@ public class ExpandoRowLocalServiceUtil {
 
 			ReferenceRegistry.registerReference(ExpandoRowLocalServiceUtil.class,
 				"_service");
-			MethodCache.remove(ExpandoRowLocalService.class);
 		}
 
 		return _service;
 	}
 
+	/**
+	 * @deprecated
+	 */
 	public void setService(ExpandoRowLocalService service) {
-		MethodCache.remove(ExpandoRowLocalService.class);
-
-		_service = service;
-
-		ReferenceRegistry.registerReference(ExpandoRowLocalServiceUtil.class,
-			"_service");
-		MethodCache.remove(ExpandoRowLocalService.class);
 	}
 
 	private static ExpandoRowLocalService _service;

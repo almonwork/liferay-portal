@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -64,6 +64,10 @@ else {
 
 <h3><liferay-ui:message key="websites" /></h3>
 
+<div class="portlet-msg-info">
+	<liferay-ui:message key="url-and-type-are-required-fields.-websites-must-start-with-http-or-https" />
+</div>
+
 <liferay-ui:error key="<%= NoSuchListTypeException.class.getName() + className + ListTypeConstants.WEBSITE %>" message="please-select-a-type" />
 <liferay-ui:error exception="<%= WebsiteURLException.class %>" message="please-enter-a-valid-url" />
 
@@ -80,14 +84,13 @@ else {
 
 		<div class="lfr-form-row lfr-form-row-inline">
 			<div class="row-fields">
+				<aui:input name='<%= "websiteId" + websitesIndex %>' type="hidden" value="<%= website.getWebsiteId() %>" />
 
-				<aui:input name='<%= "websiteId" + websitesIndex %>' type="hidden" />
+				<aui:input fieldParam='<%= "websiteUrl" + websitesIndex %>' id='<%= "websiteUrl" + websitesIndex %>' name="url" />
 
-				<aui:input fieldParam='<%= "websiteUrl" + websitesIndex %>' name="url" />
+				<aui:select label="type" listType="<%= className + ListTypeConstants.WEBSITE %>" name='<%= "websiteTypeId" + websitesIndex %>' />
 
-				<aui:select label="type" name='<%= "websiteTypeId" + websitesIndex %>' listType="<%= className + ListTypeConstants.WEBSITE %>" />
-
-				<aui:input checked="<%= website.isPrimary() %>" cssClass="primary-ctrl" id='<%= "websitePrimary" + websitesIndex %>' inlineLabel="left" label="primary" name="websitePrimary" type="radio" value="<%= websitesIndex %>" />
+				<aui:input checked="<%= website.isPrimary() %>" cssClass="primary-ctrl" id='<%= "websitePrimary" + websitesIndex %>' label="primary" name="websitePrimary" type="radio" value="<%= websitesIndex %>" />
 			</div>
 		</div>
 

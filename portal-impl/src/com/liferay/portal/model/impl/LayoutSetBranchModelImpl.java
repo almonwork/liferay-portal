@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -18,6 +18,7 @@ import com.liferay.portal.kernel.bean.AutoEscapeBeanHandler;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.json.JSON;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.ProxyUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.model.CacheModel;
@@ -32,13 +33,13 @@ import com.liferay.portlet.expando.util.ExpandoBridgeFactoryUtil;
 
 import java.io.Serializable;
 
-import java.lang.reflect.Proxy;
-
 import java.sql.Types;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * The base model implementation for the LayoutSetBranch service. Represents a row in the &quot;LayoutSetBranch&quot; database table, with each column mapped to a property of this class.
@@ -73,9 +74,19 @@ public class LayoutSetBranchModelImpl extends BaseModelImpl<LayoutSetBranch>
 			{ "privateLayout", Types.BOOLEAN },
 			{ "name", Types.VARCHAR },
 			{ "description", Types.VARCHAR },
-			{ "master", Types.BOOLEAN }
+			{ "master", Types.BOOLEAN },
+			{ "logo", Types.BOOLEAN },
+			{ "logoId", Types.BIGINT },
+			{ "themeId", Types.VARCHAR },
+			{ "colorSchemeId", Types.VARCHAR },
+			{ "wapThemeId", Types.VARCHAR },
+			{ "wapColorSchemeId", Types.VARCHAR },
+			{ "css", Types.VARCHAR },
+			{ "settings_", Types.VARCHAR },
+			{ "layoutSetPrototypeUuid", Types.VARCHAR },
+			{ "layoutSetPrototypeLinkEnabled", Types.BOOLEAN }
 		};
-	public static final String TABLE_SQL_CREATE = "create table LayoutSetBranch (layoutSetBranchId LONG not null primary key,groupId LONG,companyId LONG,userId LONG,userName VARCHAR(75) null,createDate DATE null,modifiedDate DATE null,privateLayout BOOLEAN,name VARCHAR(75) null,description STRING null,master BOOLEAN)";
+	public static final String TABLE_SQL_CREATE = "create table LayoutSetBranch (layoutSetBranchId LONG not null primary key,groupId LONG,companyId LONG,userId LONG,userName VARCHAR(75) null,createDate DATE null,modifiedDate DATE null,privateLayout BOOLEAN,name VARCHAR(75) null,description STRING null,master BOOLEAN,logo BOOLEAN,logoId LONG,themeId VARCHAR(75) null,colorSchemeId VARCHAR(75) null,wapThemeId VARCHAR(75) null,wapColorSchemeId VARCHAR(75) null,css STRING null,settings_ STRING null,layoutSetPrototypeUuid VARCHAR(75) null,layoutSetPrototypeLinkEnabled BOOLEAN)";
 	public static final String TABLE_SQL_DROP = "drop table LayoutSetBranch";
 	public static final String ORDER_BY_JPQL = " ORDER BY layoutSetBranch.name ASC";
 	public static final String ORDER_BY_SQL = " ORDER BY LayoutSetBranch.name ASC";
@@ -88,6 +99,12 @@ public class LayoutSetBranchModelImpl extends BaseModelImpl<LayoutSetBranch>
 	public static final boolean FINDER_CACHE_ENABLED = GetterUtil.getBoolean(com.liferay.portal.util.PropsUtil.get(
 				"value.object.finder.cache.enabled.com.liferay.portal.model.LayoutSetBranch"),
 			true);
+	public static final boolean COLUMN_BITMASK_ENABLED = GetterUtil.getBoolean(com.liferay.portal.util.PropsUtil.get(
+				"value.object.column.bitmask.enabled.com.liferay.portal.model.LayoutSetBranch"),
+			true);
+	public static long GROUPID_COLUMN_BITMASK = 1L;
+	public static long NAME_COLUMN_BITMASK = 2L;
+	public static long PRIVATELAYOUT_COLUMN_BITMASK = 4L;
 
 	/**
 	 * Converts the soap model instance into a normal model instance.
@@ -109,6 +126,16 @@ public class LayoutSetBranchModelImpl extends BaseModelImpl<LayoutSetBranch>
 		model.setName(soapModel.getName());
 		model.setDescription(soapModel.getDescription());
 		model.setMaster(soapModel.getMaster());
+		model.setLogo(soapModel.getLogo());
+		model.setLogoId(soapModel.getLogoId());
+		model.setThemeId(soapModel.getThemeId());
+		model.setColorSchemeId(soapModel.getColorSchemeId());
+		model.setWapThemeId(soapModel.getWapThemeId());
+		model.setWapColorSchemeId(soapModel.getWapColorSchemeId());
+		model.setCss(soapModel.getCss());
+		model.setSettings(soapModel.getSettings());
+		model.setLayoutSetPrototypeUuid(soapModel.getLayoutSetPrototypeUuid());
+		model.setLayoutSetPrototypeLinkEnabled(soapModel.getLayoutSetPrototypeLinkEnabled());
 
 		return model;
 	}
@@ -128,14 +155,6 @@ public class LayoutSetBranchModelImpl extends BaseModelImpl<LayoutSetBranch>
 		}
 
 		return models;
-	}
-
-	public Class<?> getModelClass() {
-		return LayoutSetBranch.class;
-	}
-
-	public String getModelClassName() {
-		return LayoutSetBranch.class.getName();
 	}
 
 	public static final long LOCK_EXPIRATION_TIME = GetterUtil.getLong(com.liferay.portal.util.PropsUtil.get(
@@ -160,6 +179,175 @@ public class LayoutSetBranchModelImpl extends BaseModelImpl<LayoutSetBranch>
 		setPrimaryKey(((Long)primaryKeyObj).longValue());
 	}
 
+	public Class<?> getModelClass() {
+		return LayoutSetBranch.class;
+	}
+
+	public String getModelClassName() {
+		return LayoutSetBranch.class.getName();
+	}
+
+	@Override
+	public Map<String, Object> getModelAttributes() {
+		Map<String, Object> attributes = new HashMap<String, Object>();
+
+		attributes.put("layoutSetBranchId", getLayoutSetBranchId());
+		attributes.put("groupId", getGroupId());
+		attributes.put("companyId", getCompanyId());
+		attributes.put("userId", getUserId());
+		attributes.put("userName", getUserName());
+		attributes.put("createDate", getCreateDate());
+		attributes.put("modifiedDate", getModifiedDate());
+		attributes.put("privateLayout", getPrivateLayout());
+		attributes.put("name", getName());
+		attributes.put("description", getDescription());
+		attributes.put("master", getMaster());
+		attributes.put("logo", getLogo());
+		attributes.put("logoId", getLogoId());
+		attributes.put("themeId", getThemeId());
+		attributes.put("colorSchemeId", getColorSchemeId());
+		attributes.put("wapThemeId", getWapThemeId());
+		attributes.put("wapColorSchemeId", getWapColorSchemeId());
+		attributes.put("css", getCss());
+		attributes.put("settings", getSettings());
+		attributes.put("layoutSetPrototypeUuid", getLayoutSetPrototypeUuid());
+		attributes.put("layoutSetPrototypeLinkEnabled",
+			getLayoutSetPrototypeLinkEnabled());
+
+		return attributes;
+	}
+
+	@Override
+	public void setModelAttributes(Map<String, Object> attributes) {
+		Long layoutSetBranchId = (Long)attributes.get("layoutSetBranchId");
+
+		if (layoutSetBranchId != null) {
+			setLayoutSetBranchId(layoutSetBranchId);
+		}
+
+		Long groupId = (Long)attributes.get("groupId");
+
+		if (groupId != null) {
+			setGroupId(groupId);
+		}
+
+		Long companyId = (Long)attributes.get("companyId");
+
+		if (companyId != null) {
+			setCompanyId(companyId);
+		}
+
+		Long userId = (Long)attributes.get("userId");
+
+		if (userId != null) {
+			setUserId(userId);
+		}
+
+		String userName = (String)attributes.get("userName");
+
+		if (userName != null) {
+			setUserName(userName);
+		}
+
+		Date createDate = (Date)attributes.get("createDate");
+
+		if (createDate != null) {
+			setCreateDate(createDate);
+		}
+
+		Date modifiedDate = (Date)attributes.get("modifiedDate");
+
+		if (modifiedDate != null) {
+			setModifiedDate(modifiedDate);
+		}
+
+		Boolean privateLayout = (Boolean)attributes.get("privateLayout");
+
+		if (privateLayout != null) {
+			setPrivateLayout(privateLayout);
+		}
+
+		String name = (String)attributes.get("name");
+
+		if (name != null) {
+			setName(name);
+		}
+
+		String description = (String)attributes.get("description");
+
+		if (description != null) {
+			setDescription(description);
+		}
+
+		Boolean master = (Boolean)attributes.get("master");
+
+		if (master != null) {
+			setMaster(master);
+		}
+
+		Boolean logo = (Boolean)attributes.get("logo");
+
+		if (logo != null) {
+			setLogo(logo);
+		}
+
+		Long logoId = (Long)attributes.get("logoId");
+
+		if (logoId != null) {
+			setLogoId(logoId);
+		}
+
+		String themeId = (String)attributes.get("themeId");
+
+		if (themeId != null) {
+			setThemeId(themeId);
+		}
+
+		String colorSchemeId = (String)attributes.get("colorSchemeId");
+
+		if (colorSchemeId != null) {
+			setColorSchemeId(colorSchemeId);
+		}
+
+		String wapThemeId = (String)attributes.get("wapThemeId");
+
+		if (wapThemeId != null) {
+			setWapThemeId(wapThemeId);
+		}
+
+		String wapColorSchemeId = (String)attributes.get("wapColorSchemeId");
+
+		if (wapColorSchemeId != null) {
+			setWapColorSchemeId(wapColorSchemeId);
+		}
+
+		String css = (String)attributes.get("css");
+
+		if (css != null) {
+			setCss(css);
+		}
+
+		String settings = (String)attributes.get("settings");
+
+		if (settings != null) {
+			setSettings(settings);
+		}
+
+		String layoutSetPrototypeUuid = (String)attributes.get(
+				"layoutSetPrototypeUuid");
+
+		if (layoutSetPrototypeUuid != null) {
+			setLayoutSetPrototypeUuid(layoutSetPrototypeUuid);
+		}
+
+		Boolean layoutSetPrototypeLinkEnabled = (Boolean)attributes.get(
+				"layoutSetPrototypeLinkEnabled");
+
+		if (layoutSetPrototypeLinkEnabled != null) {
+			setLayoutSetPrototypeLinkEnabled(layoutSetPrototypeLinkEnabled);
+		}
+	}
+
 	@JSON
 	public long getLayoutSetBranchId() {
 		return _layoutSetBranchId;
@@ -175,6 +363,8 @@ public class LayoutSetBranchModelImpl extends BaseModelImpl<LayoutSetBranch>
 	}
 
 	public void setGroupId(long groupId) {
+		_columnBitmask |= GROUPID_COLUMN_BITMASK;
+
 		if (!_setOriginalGroupId) {
 			_setOriginalGroupId = true;
 
@@ -256,6 +446,8 @@ public class LayoutSetBranchModelImpl extends BaseModelImpl<LayoutSetBranch>
 	}
 
 	public void setPrivateLayout(boolean privateLayout) {
+		_columnBitmask |= PRIVATELAYOUT_COLUMN_BITMASK;
+
 		if (!_setOriginalPrivateLayout) {
 			_setOriginalPrivateLayout = true;
 
@@ -280,6 +472,8 @@ public class LayoutSetBranchModelImpl extends BaseModelImpl<LayoutSetBranch>
 	}
 
 	public void setName(String name) {
+		_columnBitmask = -1L;
+
 		if (_originalName == null) {
 			_originalName = _name;
 		}
@@ -318,35 +512,166 @@ public class LayoutSetBranchModelImpl extends BaseModelImpl<LayoutSetBranch>
 		_master = master;
 	}
 
-	@Override
-	public LayoutSetBranch toEscapedModel() {
-		if (isEscapedModel()) {
-			return (LayoutSetBranch)this;
+	@JSON
+	public boolean getLogo() {
+		return _logo;
+	}
+
+	public boolean isLogo() {
+		return _logo;
+	}
+
+	public void setLogo(boolean logo) {
+		_logo = logo;
+	}
+
+	@JSON
+	public long getLogoId() {
+		return _logoId;
+	}
+
+	public void setLogoId(long logoId) {
+		_logoId = logoId;
+	}
+
+	@JSON
+	public String getThemeId() {
+		if (_themeId == null) {
+			return StringPool.BLANK;
 		}
 		else {
-			if (_escapedModelProxy == null) {
-				_escapedModelProxy = (LayoutSetBranch)Proxy.newProxyInstance(_classLoader,
-						_escapedModelProxyInterfaces,
-						new AutoEscapeBeanHandler(this));
-			}
-
-			return _escapedModelProxy;
+			return _themeId;
 		}
+	}
+
+	public void setThemeId(String themeId) {
+		_themeId = themeId;
+	}
+
+	@JSON
+	public String getColorSchemeId() {
+		if (_colorSchemeId == null) {
+			return StringPool.BLANK;
+		}
+		else {
+			return _colorSchemeId;
+		}
+	}
+
+	public void setColorSchemeId(String colorSchemeId) {
+		_colorSchemeId = colorSchemeId;
+	}
+
+	@JSON
+	public String getWapThemeId() {
+		if (_wapThemeId == null) {
+			return StringPool.BLANK;
+		}
+		else {
+			return _wapThemeId;
+		}
+	}
+
+	public void setWapThemeId(String wapThemeId) {
+		_wapThemeId = wapThemeId;
+	}
+
+	@JSON
+	public String getWapColorSchemeId() {
+		if (_wapColorSchemeId == null) {
+			return StringPool.BLANK;
+		}
+		else {
+			return _wapColorSchemeId;
+		}
+	}
+
+	public void setWapColorSchemeId(String wapColorSchemeId) {
+		_wapColorSchemeId = wapColorSchemeId;
+	}
+
+	@JSON
+	public String getCss() {
+		if (_css == null) {
+			return StringPool.BLANK;
+		}
+		else {
+			return _css;
+		}
+	}
+
+	public void setCss(String css) {
+		_css = css;
+	}
+
+	@JSON
+	public String getSettings() {
+		if (_settings == null) {
+			return StringPool.BLANK;
+		}
+		else {
+			return _settings;
+		}
+	}
+
+	public void setSettings(String settings) {
+		_settings = settings;
+	}
+
+	@JSON
+	public String getLayoutSetPrototypeUuid() {
+		if (_layoutSetPrototypeUuid == null) {
+			return StringPool.BLANK;
+		}
+		else {
+			return _layoutSetPrototypeUuid;
+		}
+	}
+
+	public void setLayoutSetPrototypeUuid(String layoutSetPrototypeUuid) {
+		_layoutSetPrototypeUuid = layoutSetPrototypeUuid;
+	}
+
+	@JSON
+	public boolean getLayoutSetPrototypeLinkEnabled() {
+		return _layoutSetPrototypeLinkEnabled;
+	}
+
+	public boolean isLayoutSetPrototypeLinkEnabled() {
+		return _layoutSetPrototypeLinkEnabled;
+	}
+
+	public void setLayoutSetPrototypeLinkEnabled(
+		boolean layoutSetPrototypeLinkEnabled) {
+		_layoutSetPrototypeLinkEnabled = layoutSetPrototypeLinkEnabled;
+	}
+
+	public long getColumnBitmask() {
+		return _columnBitmask;
+	}
+
+	@Override
+	public LayoutSetBranch toEscapedModel() {
+		if (_escapedModelProxy == null) {
+			_escapedModelProxy = (LayoutSetBranch)ProxyUtil.newProxyInstance(_classLoader,
+					_escapedModelProxyInterfaces,
+					new AutoEscapeBeanHandler(this));
+		}
+
+		return _escapedModelProxy;
 	}
 
 	@Override
 	public ExpandoBridge getExpandoBridge() {
-		if (_expandoBridge == null) {
-			_expandoBridge = ExpandoBridgeFactoryUtil.getExpandoBridge(getCompanyId(),
-					LayoutSetBranch.class.getName(), getPrimaryKey());
-		}
-
-		return _expandoBridge;
+		return ExpandoBridgeFactoryUtil.getExpandoBridge(getCompanyId(),
+			LayoutSetBranch.class.getName(), getPrimaryKey());
 	}
 
 	@Override
 	public void setExpandoBridgeAttributes(ServiceContext serviceContext) {
-		getExpandoBridge().setAttributes(serviceContext);
+		ExpandoBridge expandoBridge = getExpandoBridge();
+
+		expandoBridge.setAttributes(serviceContext);
 	}
 
 	@Override
@@ -364,6 +689,16 @@ public class LayoutSetBranchModelImpl extends BaseModelImpl<LayoutSetBranch>
 		layoutSetBranchImpl.setName(getName());
 		layoutSetBranchImpl.setDescription(getDescription());
 		layoutSetBranchImpl.setMaster(getMaster());
+		layoutSetBranchImpl.setLogo(getLogo());
+		layoutSetBranchImpl.setLogoId(getLogoId());
+		layoutSetBranchImpl.setThemeId(getThemeId());
+		layoutSetBranchImpl.setColorSchemeId(getColorSchemeId());
+		layoutSetBranchImpl.setWapThemeId(getWapThemeId());
+		layoutSetBranchImpl.setWapColorSchemeId(getWapColorSchemeId());
+		layoutSetBranchImpl.setCss(getCss());
+		layoutSetBranchImpl.setSettings(getSettings());
+		layoutSetBranchImpl.setLayoutSetPrototypeUuid(getLayoutSetPrototypeUuid());
+		layoutSetBranchImpl.setLayoutSetPrototypeLinkEnabled(getLayoutSetPrototypeLinkEnabled());
 
 		layoutSetBranchImpl.resetOriginalValues();
 
@@ -425,6 +760,8 @@ public class LayoutSetBranchModelImpl extends BaseModelImpl<LayoutSetBranch>
 		layoutSetBranchModelImpl._setOriginalPrivateLayout = false;
 
 		layoutSetBranchModelImpl._originalName = layoutSetBranchModelImpl._name;
+
+		layoutSetBranchModelImpl._columnBitmask = 0;
 	}
 
 	@Override
@@ -485,12 +822,75 @@ public class LayoutSetBranchModelImpl extends BaseModelImpl<LayoutSetBranch>
 
 		layoutSetBranchCacheModel.master = getMaster();
 
+		layoutSetBranchCacheModel.logo = getLogo();
+
+		layoutSetBranchCacheModel.logoId = getLogoId();
+
+		layoutSetBranchCacheModel.themeId = getThemeId();
+
+		String themeId = layoutSetBranchCacheModel.themeId;
+
+		if ((themeId != null) && (themeId.length() == 0)) {
+			layoutSetBranchCacheModel.themeId = null;
+		}
+
+		layoutSetBranchCacheModel.colorSchemeId = getColorSchemeId();
+
+		String colorSchemeId = layoutSetBranchCacheModel.colorSchemeId;
+
+		if ((colorSchemeId != null) && (colorSchemeId.length() == 0)) {
+			layoutSetBranchCacheModel.colorSchemeId = null;
+		}
+
+		layoutSetBranchCacheModel.wapThemeId = getWapThemeId();
+
+		String wapThemeId = layoutSetBranchCacheModel.wapThemeId;
+
+		if ((wapThemeId != null) && (wapThemeId.length() == 0)) {
+			layoutSetBranchCacheModel.wapThemeId = null;
+		}
+
+		layoutSetBranchCacheModel.wapColorSchemeId = getWapColorSchemeId();
+
+		String wapColorSchemeId = layoutSetBranchCacheModel.wapColorSchemeId;
+
+		if ((wapColorSchemeId != null) && (wapColorSchemeId.length() == 0)) {
+			layoutSetBranchCacheModel.wapColorSchemeId = null;
+		}
+
+		layoutSetBranchCacheModel.css = getCss();
+
+		String css = layoutSetBranchCacheModel.css;
+
+		if ((css != null) && (css.length() == 0)) {
+			layoutSetBranchCacheModel.css = null;
+		}
+
+		layoutSetBranchCacheModel.settings = getSettings();
+
+		String settings = layoutSetBranchCacheModel.settings;
+
+		if ((settings != null) && (settings.length() == 0)) {
+			layoutSetBranchCacheModel.settings = null;
+		}
+
+		layoutSetBranchCacheModel.layoutSetPrototypeUuid = getLayoutSetPrototypeUuid();
+
+		String layoutSetPrototypeUuid = layoutSetBranchCacheModel.layoutSetPrototypeUuid;
+
+		if ((layoutSetPrototypeUuid != null) &&
+				(layoutSetPrototypeUuid.length() == 0)) {
+			layoutSetBranchCacheModel.layoutSetPrototypeUuid = null;
+		}
+
+		layoutSetBranchCacheModel.layoutSetPrototypeLinkEnabled = getLayoutSetPrototypeLinkEnabled();
+
 		return layoutSetBranchCacheModel;
 	}
 
 	@Override
 	public String toString() {
-		StringBundler sb = new StringBundler(23);
+		StringBundler sb = new StringBundler(43);
 
 		sb.append("{layoutSetBranchId=");
 		sb.append(getLayoutSetBranchId());
@@ -514,13 +914,33 @@ public class LayoutSetBranchModelImpl extends BaseModelImpl<LayoutSetBranch>
 		sb.append(getDescription());
 		sb.append(", master=");
 		sb.append(getMaster());
+		sb.append(", logo=");
+		sb.append(getLogo());
+		sb.append(", logoId=");
+		sb.append(getLogoId());
+		sb.append(", themeId=");
+		sb.append(getThemeId());
+		sb.append(", colorSchemeId=");
+		sb.append(getColorSchemeId());
+		sb.append(", wapThemeId=");
+		sb.append(getWapThemeId());
+		sb.append(", wapColorSchemeId=");
+		sb.append(getWapColorSchemeId());
+		sb.append(", css=");
+		sb.append(getCss());
+		sb.append(", settings=");
+		sb.append(getSettings());
+		sb.append(", layoutSetPrototypeUuid=");
+		sb.append(getLayoutSetPrototypeUuid());
+		sb.append(", layoutSetPrototypeLinkEnabled=");
+		sb.append(getLayoutSetPrototypeLinkEnabled());
 		sb.append("}");
 
 		return sb.toString();
 	}
 
 	public String toXmlString() {
-		StringBundler sb = new StringBundler(37);
+		StringBundler sb = new StringBundler(67);
 
 		sb.append("<model><model-name>");
 		sb.append("com.liferay.portal.model.LayoutSetBranch");
@@ -570,6 +990,46 @@ public class LayoutSetBranchModelImpl extends BaseModelImpl<LayoutSetBranch>
 			"<column><column-name>master</column-name><column-value><![CDATA[");
 		sb.append(getMaster());
 		sb.append("]]></column-value></column>");
+		sb.append(
+			"<column><column-name>logo</column-name><column-value><![CDATA[");
+		sb.append(getLogo());
+		sb.append("]]></column-value></column>");
+		sb.append(
+			"<column><column-name>logoId</column-name><column-value><![CDATA[");
+		sb.append(getLogoId());
+		sb.append("]]></column-value></column>");
+		sb.append(
+			"<column><column-name>themeId</column-name><column-value><![CDATA[");
+		sb.append(getThemeId());
+		sb.append("]]></column-value></column>");
+		sb.append(
+			"<column><column-name>colorSchemeId</column-name><column-value><![CDATA[");
+		sb.append(getColorSchemeId());
+		sb.append("]]></column-value></column>");
+		sb.append(
+			"<column><column-name>wapThemeId</column-name><column-value><![CDATA[");
+		sb.append(getWapThemeId());
+		sb.append("]]></column-value></column>");
+		sb.append(
+			"<column><column-name>wapColorSchemeId</column-name><column-value><![CDATA[");
+		sb.append(getWapColorSchemeId());
+		sb.append("]]></column-value></column>");
+		sb.append(
+			"<column><column-name>css</column-name><column-value><![CDATA[");
+		sb.append(getCss());
+		sb.append("]]></column-value></column>");
+		sb.append(
+			"<column><column-name>settings</column-name><column-value><![CDATA[");
+		sb.append(getSettings());
+		sb.append("]]></column-value></column>");
+		sb.append(
+			"<column><column-name>layoutSetPrototypeUuid</column-name><column-value><![CDATA[");
+		sb.append(getLayoutSetPrototypeUuid());
+		sb.append("]]></column-value></column>");
+		sb.append(
+			"<column><column-name>layoutSetPrototypeLinkEnabled</column-name><column-value><![CDATA[");
+		sb.append(getLayoutSetPrototypeLinkEnabled());
+		sb.append("]]></column-value></column>");
 
 		sb.append("</model>");
 
@@ -597,6 +1057,16 @@ public class LayoutSetBranchModelImpl extends BaseModelImpl<LayoutSetBranch>
 	private String _originalName;
 	private String _description;
 	private boolean _master;
-	private transient ExpandoBridge _expandoBridge;
+	private boolean _logo;
+	private long _logoId;
+	private String _themeId;
+	private String _colorSchemeId;
+	private String _wapThemeId;
+	private String _wapColorSchemeId;
+	private String _css;
+	private String _settings;
+	private String _layoutSetPrototypeUuid;
+	private boolean _layoutSetPrototypeLinkEnabled;
+	private long _columnBitmask;
 	private LayoutSetBranch _escapedModelProxy;
 }

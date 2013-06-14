@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -52,26 +52,6 @@ import org.apache.struts.action.ActionMapping;
 public class RSSAction extends PortletAction {
 
 	@Override
-	public ActionForward strutsExecute(
-			ActionMapping mapping, ActionForm form, HttpServletRequest request,
-			HttpServletResponse response)
-		throws Exception {
-
-		try {
-			ServletResponseUtil.sendFile(
-				request, response, null, getRSS(request),
-				ContentTypes.TEXT_XML_UTF8);
-
-			return null;
-		}
-		catch (Exception e) {
-			PortalUtil.sendError(e, request, response);
-
-			return null;
-		}
-	}
-
-	@Override
 	public void processAction(
 			ActionMapping mapping, ActionForm form, PortletConfig portletConfig,
 			ActionRequest actionRequest, ActionResponse actionResponse)
@@ -94,6 +74,26 @@ public class RSSAction extends PortletAction {
 		}
 	}
 
+	@Override
+	public ActionForward strutsExecute(
+			ActionMapping mapping, ActionForm form, HttpServletRequest request,
+			HttpServletResponse response)
+		throws Exception {
+
+		try {
+			ServletResponseUtil.sendFile(
+				request, response, null, getRSS(request),
+				ContentTypes.TEXT_XML_UTF8);
+
+			return null;
+		}
+		catch (Exception e) {
+			PortalUtil.sendError(e, request, response);
+
+			return null;
+		}
+	}
+
 	protected byte[] getRSS(HttpServletRequest request) throws Exception {
 		ThemeDisplay themeDisplay = (ThemeDisplay)request.getAttribute(
 			WebKeys.THEME_DISPLAY);
@@ -106,9 +106,9 @@ public class RSSAction extends PortletAction {
 		int max = ParamUtil.getInteger(
 			request, "max", SearchContainer.DEFAULT_DELTA);
 		String type = ParamUtil.getString(
-			request, "type", RSSUtil.DEFAULT_TYPE);
+			request, "type", RSSUtil.TYPE_DEFAULT);
 		double version = ParamUtil.getDouble(
-			request, "version", RSSUtil.DEFAULT_VERSION);
+			request, "version", RSSUtil.VERSION_DEFAULT);
 		String displayStyle = ParamUtil.getString(
 			request, "displayStyle", RSSUtil.DISPLAY_STYLE_FULL_CONTENT);
 
@@ -129,7 +129,7 @@ public class RSSAction extends PortletAction {
 
 		String rss = StringPool.BLANK;
 
-		if ((nodeId > 0) && (Validator.isNotNull(title))) {
+		if ((nodeId > 0) && Validator.isNotNull(title)) {
 			rss = WikiPageServiceUtil.getPagesRSS(
 				companyId, nodeId, title, max, type, version, displayStyle,
 				feedURL.toString(), entryURL.toString(), locale);

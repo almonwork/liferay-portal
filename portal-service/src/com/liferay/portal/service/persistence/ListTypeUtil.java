@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -91,13 +91,6 @@ public class ListTypeUtil {
 		return getPersistence()
 				   .findWithDynamicQuery(dynamicQuery, start, end,
 			orderByComparator);
-	}
-
-	/**
-	 * @see com.liferay.portal.service.persistence.BasePersistence#remove(com.liferay.portal.model.BaseModel)
-	 */
-	public static ListType remove(ListType listType) throws SystemException {
-		return getPersistence().remove(listType);
 	}
 
 	/**
@@ -415,10 +408,10 @@ public class ListTypeUtil {
 		return _persistence;
 	}
 
+	/**
+	 * @deprecated
+	 */
 	public void setPersistence(ListTypePersistence persistence) {
-		_persistence = persistence;
-
-		ReferenceRegistry.registerReference(ListTypeUtil.class, "_persistence");
 	}
 
 	private static ListTypePersistence _persistence;

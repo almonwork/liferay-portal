@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -15,6 +15,7 @@
 package com.liferay.portal.dao.orm.hibernate;
 
 import com.liferay.portal.kernel.dao.orm.CacheMode;
+import com.liferay.portal.kernel.dao.orm.LockMode;
 import com.liferay.portal.kernel.dao.orm.ORMException;
 import com.liferay.portal.kernel.dao.orm.Query;
 import com.liferay.portal.kernel.dao.orm.ScrollableResults;
@@ -28,6 +29,8 @@ import java.sql.Timestamp;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
+
+import org.hibernate.LockOptions;
 
 /**
  * @author Brian Wing Shun Chan
@@ -68,20 +71,38 @@ public class QueryImpl implements Query {
 		}
 	}
 
+	public Object iterateNext() throws ORMException {
+		Iterator<?> iterator = iterate(false);
+
+		if (iterator.hasNext()) {
+			return iterator.next();
+		}
+
+		return null;
+	}
+
 	public List<?> list() throws ORMException {
-		return list(true);
+		return list(false, false);
 	}
 
 	public List<?> list(boolean unmodifiable) throws ORMException {
+		return list(true, unmodifiable);
+	}
+
+	public List<?> list(boolean copy, boolean unmodifiable)
+		throws ORMException {
+
 		try {
 			List<?> list = _query.list();
 
 			if (unmodifiable) {
-				return new UnmodifiableList<Object>(list);
+				list = new UnmodifiableList<Object>(list);
 			}
-			else {
-				return ListUtil.copy(list);
+			else if (copy) {
+				list = ListUtil.copy(list);
 			}
+
+			return list;
 		}
 		catch (Exception e) {
 			throw ExceptionTranslator.translate(e);
@@ -181,6 +202,19 @@ public class QueryImpl implements Query {
 		}
 
 		_query.setInteger(name, value);
+
+		return this;
+	}
+
+	public Query setLockMode(String alias, LockMode lockMode) {
+		org.hibernate.LockMode hibernateLockMode = LockModeTranslator.translate(
+			lockMode);
+
+		LockOptions lockOptions = new LockOptions(hibernateLockMode);
+
+		lockOptions.setAliasSpecificLockMode(alias, hibernateLockMode);
+
+		_query.setLockOptions(lockOptions);
 
 		return this;
 	}

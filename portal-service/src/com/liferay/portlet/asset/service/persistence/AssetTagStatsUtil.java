@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -92,14 +92,6 @@ public class AssetTagStatsUtil {
 		return getPersistence()
 				   .findWithDynamicQuery(dynamicQuery, start, end,
 			orderByComparator);
-	}
-
-	/**
-	 * @see com.liferay.portal.service.persistence.BasePersistence#remove(com.liferay.portal.model.BaseModel)
-	 */
-	public static AssetTagStats remove(AssetTagStats assetTagStats)
-		throws SystemException {
-		return getPersistence().remove(assetTagStats);
 	}
 
 	/**
@@ -559,12 +551,14 @@ public class AssetTagStatsUtil {
 	*
 	* @param tagId the tag ID
 	* @param classNameId the class name ID
+	* @return the asset tag stats that was removed
 	* @throws SystemException if a system exception occurred
 	*/
-	public static void removeByT_C(long tagId, long classNameId)
+	public static com.liferay.portlet.asset.model.AssetTagStats removeByT_C(
+		long tagId, long classNameId)
 		throws com.liferay.portal.kernel.exception.SystemException,
 			com.liferay.portlet.asset.NoSuchTagStatsException {
-		getPersistence().removeByT_C(tagId, classNameId);
+		return getPersistence().removeByT_C(tagId, classNameId);
 	}
 
 	/**
@@ -636,11 +630,10 @@ public class AssetTagStatsUtil {
 		return _persistence;
 	}
 
+	/**
+	 * @deprecated
+	 */
 	public void setPersistence(AssetTagStatsPersistence persistence) {
-		_persistence = persistence;
-
-		ReferenceRegistry.registerReference(AssetTagStatsUtil.class,
-			"_persistence");
 	}
 
 	private static AssetTagStatsPersistence _persistence;

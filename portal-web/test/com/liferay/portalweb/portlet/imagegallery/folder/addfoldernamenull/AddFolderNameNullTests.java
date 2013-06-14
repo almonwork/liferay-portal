@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,7 +14,10 @@
 
 package com.liferay.portalweb.portlet.imagegallery.folder.addfoldernamenull;
 
-import com.liferay.portalweb.portal.BaseTests;
+import com.liferay.portalweb.portal.BaseTestSuite;
+import com.liferay.portalweb.portal.util.TearDownPageTest;
+import com.liferay.portalweb.portlet.imagegallery.portlet.addportletmg.AddPageMGTest;
+import com.liferay.portalweb.portlet.imagegallery.portlet.addportletmg.AddPortletMGTest;
 
 import junit.framework.Test;
 import junit.framework.TestSuite;
@@ -22,18 +25,16 @@ import junit.framework.TestSuite;
 /**
  * @author Brian Wing Shun Chan
  */
-public class AddFolderNameNullTests extends BaseTests {
-
+public class AddFolderNameNullTests extends BaseTestSuite {
 	public static Test suite() {
 		TestSuite testSuite = new TestSuite();
-
-		testSuite.addTestSuite(AddPageIGTest.class);
-		testSuite.addTestSuite(AddPortletIGTest.class);
+		testSuite.addTestSuite(AddPageMGTest.class);
+		testSuite.addTestSuite(AddPortletMGTest.class);
+		testSuite.addTestSuite(ConfigurePortletDisplaySettingsTest.class);
 		testSuite.addTestSuite(AddFolderNameNullTest.class);
 		testSuite.addTestSuite(TearDownIGFolderTest.class);
 		testSuite.addTestSuite(TearDownPageTest.class);
 
 		return testSuite;
 	}
-
 }

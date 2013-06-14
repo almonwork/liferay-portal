@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -20,6 +20,8 @@ import com.liferay.portal.kernel.pop.MessageListener;
 import com.liferay.portal.kernel.pop.MessageListenerException;
 import com.liferay.portal.kernel.util.CharPool;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.ObjectValuePair;
+import com.liferay.portal.kernel.util.StreamUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.model.Company;
 import com.liferay.portal.model.User;
@@ -42,6 +44,10 @@ import com.liferay.portlet.messageboards.service.MBMessageLocalServiceUtil;
 import com.liferay.portlet.messageboards.service.MBMessageServiceUtil;
 import com.liferay.portlet.messageboards.util.MBMailMessage;
 import com.liferay.portlet.messageboards.util.MBUtil;
+
+import java.io.InputStream;
+
+import java.util.List;
 
 import javax.mail.Message;
 
@@ -79,6 +85,12 @@ public class MessageListenerImpl implements MessageListener {
 				_log.debug("Check to see if user " + from + " exists");
 			}
 
+			if (from.equalsIgnoreCase(
+					PropsValues.MAIL_SESSION_MAIL_POP3_USER)) {
+
+				return false;
+			}
+
 			UserLocalServiceUtil.getUserByEmailAddress(
 				company.getCompanyId(), from);
 
@@ -95,6 +107,8 @@ public class MessageListenerImpl implements MessageListener {
 
 	public void deliver(String from, String recipient, Message message)
 		throws MessageListenerException {
+
+		List<ObjectValuePair<String, InputStream>> inputStreamOVPs = null;
 
 		try {
 			StopWatch stopWatch = null;
@@ -164,9 +178,11 @@ public class MessageListenerImpl implements MessageListener {
 
 			String subject = MBUtil.getSubjectWithoutMessageId(message);
 
-			MBMailMessage collector = new MBMailMessage();
+			MBMailMessage mbMailMessage = new MBMailMessage();
 
-			MBUtil.collectPartContent(message, collector);
+			MBUtil.collectPartContent(message, mbMailMessage);
+
+			inputStreamOVPs = mbMailMessage.getInputStreamOVPs();
 
 			PermissionCheckerUtil.setThreadValues(user);
 
@@ -181,16 +197,16 @@ public class MessageListenerImpl implements MessageListener {
 
 			if (parentMessage == null) {
 				MBMessageServiceUtil.addMessage(
-					groupId, categoryId, subject, collector.getBody(),
-					MBMessageConstants.DEFAULT_FORMAT, collector.getFiles(),
-					false, 0.0, true, serviceContext);
+					groupId, categoryId, subject, mbMailMessage.getBody(),
+					MBMessageConstants.DEFAULT_FORMAT, inputStreamOVPs, false,
+					0.0, true, serviceContext);
 			}
 			else {
 				MBMessageServiceUtil.addMessage(
 					groupId, categoryId, parentMessage.getThreadId(),
-					parentMessage.getMessageId(), subject, collector.getBody(),
-					MBMessageConstants.DEFAULT_FORMAT, collector.getFiles(),
-					false, 0.0, true, serviceContext);
+					parentMessage.getMessageId(), subject,
+					mbMailMessage.getBody(), MBMessageConstants.DEFAULT_FORMAT,
+					inputStreamOVPs, false, 0.0, true, serviceContext);
 			}
 
 			if (_log.isDebugEnabled()) {
@@ -211,6 +227,16 @@ public class MessageListenerImpl implements MessageListener {
 			throw new MessageListenerException(e);
 		}
 		finally {
+			if (inputStreamOVPs != null) {
+				for (ObjectValuePair<String, InputStream> inputStreamOVP :
+						inputStreamOVPs) {
+
+					InputStream inputStream = inputStreamOVP.getValue();
+
+					StreamUtil.cleanUp(inputStream);
+				}
+			}
+
 			PermissionCheckerUtil.setThreadValues(null);
 		}
 	}
@@ -239,7 +265,13 @@ public class MessageListenerImpl implements MessageListener {
 			pos++;
 		}
 
-		String mx = messageId.substring(pos, messageId.length() - 1);
+		int endPos = messageId.indexOf(CharPool.GREATER_THAN, pos);
+
+		if (endPos == -1) {
+			endPos = messageId.length();
+		}
+
+		String mx = messageId.substring(pos, endPos);
 
 		return CompanyLocalServiceUtil.getCompanyByMx(mx);
 	}

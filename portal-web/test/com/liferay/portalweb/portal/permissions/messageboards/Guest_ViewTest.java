@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -23,14 +23,15 @@ import com.liferay.portalweb.portal.util.RuntimeVariables;
 public class Guest_ViewTest extends BaseTestCase {
 	public void testGuest_View() throws Exception {
 		selenium.open("/web/guest/home/");
+		loadRequiredJavaScriptModules();
 
 		for (int second = 0;; second++) {
-			if (second >= 60) {
+			if (second >= 90) {
 				fail("timeout");
 			}
 
 			try {
-				if (selenium.isElementPresent("_58_login")) {
+				if (selenium.isVisible("//input[@id='_58_login']")) {
 					break;
 				}
 			}
@@ -40,14 +41,14 @@ public class Guest_ViewTest extends BaseTestCase {
 			Thread.sleep(1000);
 		}
 
-		selenium.saveScreenShotAndSource();
-		assertTrue(selenium.isElementPresent("_58_login"));
-		assertTrue(selenium.isElementPresent("//input[@value='Sign In']"));
-		assertTrue(selenium.isElementPresent("link=Sign In"));
-		selenium.open("/web/guest/home/");
+		assertTrue(selenium.isVisible("//input[@id='_58_login']"));
+		assertTrue(selenium.isVisible("//input[@value='Sign In']"));
+		assertTrue(selenium.isVisible("//a[@id='sign-in']"));
+		selenium.open("/web/site-name/");
+		loadRequiredJavaScriptModules();
 
 		for (int second = 0;; second++) {
-			if (second >= 60) {
+			if (second >= 90) {
 				fail("timeout");
 			}
 
@@ -62,19 +63,23 @@ public class Guest_ViewTest extends BaseTestCase {
 			Thread.sleep(1000);
 		}
 
-		selenium.saveScreenShotAndSource();
 		selenium.clickAt("link=Message Boards Permissions Page",
-			RuntimeVariables.replace(""));
+			RuntimeVariables.replace("Message Boards Permissions Page"));
 		selenium.waitForPageToLoad("30000");
-		selenium.saveScreenShotAndSource();
-		assertTrue(selenium.isElementPresent("link=Permissions Test 1"));
-		selenium.clickAt("link=Permissions Test 1", RuntimeVariables.replace(""));
+		loadRequiredJavaScriptModules();
+		assertEquals(RuntimeVariables.replace("Category Name"),
+			selenium.getText("//a/strong"));
+		selenium.clickAt("//a/strong", RuntimeVariables.replace("Category Name"));
 		selenium.waitForPageToLoad("30000");
-		selenium.saveScreenShotAndSource();
-		selenium.clickAt("link=Test Thread 1", RuntimeVariables.replace(""));
+		loadRequiredJavaScriptModules();
+		assertEquals(RuntimeVariables.replace("Thread Subject"),
+			selenium.getText("//tr[3]/td/a"));
+		selenium.clickAt("//tr[3]/td/a",
+			RuntimeVariables.replace("Thread Subject"));
 		selenium.waitForPageToLoad("30000");
-		selenium.saveScreenShotAndSource();
-		assertTrue(selenium.isTextPresent("Test Thread Message 1"));
-		assertTrue(selenium.isTextPresent("Test Thread Message Reply 1"));
+		loadRequiredJavaScriptModules();
+		assertEquals(RuntimeVariables.replace("Thread Body"),
+			selenium.getText("//div[@class='thread-body']"));
+		assertTrue(selenium.isTextPresent("Thread Body Reply"));
 	}
 }

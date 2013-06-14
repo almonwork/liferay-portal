@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -56,13 +56,11 @@ import com.liferay.portlet.blogs.service.persistence.BlogsStatsUserPersistence;
 import com.liferay.portlet.documentlibrary.service.persistence.DLFileRankPersistence;
 import com.liferay.portlet.expando.service.persistence.ExpandoValuePersistence;
 import com.liferay.portlet.messageboards.service.persistence.MBBanPersistence;
-import com.liferay.portlet.messageboards.service.persistence.MBMessageFlagPersistence;
 import com.liferay.portlet.messageboards.service.persistence.MBMessagePersistence;
 import com.liferay.portlet.messageboards.service.persistence.MBStatsUserPersistence;
+import com.liferay.portlet.messageboards.service.persistence.MBThreadFlagPersistence;
 import com.liferay.portlet.shopping.service.persistence.ShoppingCartPersistence;
 import com.liferay.portlet.social.service.persistence.SocialActivityPersistence;
-import com.liferay.portlet.social.service.persistence.SocialEquityLogPersistence;
-import com.liferay.portlet.social.service.persistence.SocialEquityUserPersistence;
 import com.liferay.portlet.social.service.persistence.SocialRequestPersistence;
 
 import java.io.Serializable;
@@ -92,130 +90,194 @@ public class UserPersistenceImpl extends BasePersistenceImpl<User>
 	 * Never modify or reference this class directly. Always use {@link UserUtil} to access the user persistence. Modify <code>service.xml</code> and rerun ServiceBuilder to regenerate this class.
 	 */
 	public static final String FINDER_CLASS_NAME_ENTITY = UserImpl.class.getName();
-	public static final String FINDER_CLASS_NAME_LIST = FINDER_CLASS_NAME_ENTITY +
-		".List";
-	public static final FinderPath FINDER_PATH_FIND_BY_UUID = new FinderPath(UserModelImpl.ENTITY_CACHE_ENABLED,
+	public static final String FINDER_CLASS_NAME_LIST_WITH_PAGINATION = FINDER_CLASS_NAME_ENTITY +
+		".List1";
+	public static final String FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION = FINDER_CLASS_NAME_ENTITY +
+		".List2";
+	public static final FinderPath FINDER_PATH_WITH_PAGINATION_FIND_BY_UUID = new FinderPath(UserModelImpl.ENTITY_CACHE_ENABLED,
 			UserModelImpl.FINDER_CACHE_ENABLED, UserImpl.class,
-			FINDER_CLASS_NAME_LIST, "findByUuid",
+			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByUuid",
 			new String[] {
 				String.class.getName(),
 				
 			"java.lang.Integer", "java.lang.Integer",
 				"com.liferay.portal.kernel.util.OrderByComparator"
 			});
+	public static final FinderPath FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_UUID = new FinderPath(UserModelImpl.ENTITY_CACHE_ENABLED,
+			UserModelImpl.FINDER_CACHE_ENABLED, UserImpl.class,
+			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByUuid",
+			new String[] { String.class.getName() },
+			UserModelImpl.UUID_COLUMN_BITMASK);
 	public static final FinderPath FINDER_PATH_COUNT_BY_UUID = new FinderPath(UserModelImpl.ENTITY_CACHE_ENABLED,
 			UserModelImpl.FINDER_CACHE_ENABLED, Long.class,
-			FINDER_CLASS_NAME_LIST, "countByUuid",
+			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByUuid",
 			new String[] { String.class.getName() });
-	public static final FinderPath FINDER_PATH_FIND_BY_COMPANYID = new FinderPath(UserModelImpl.ENTITY_CACHE_ENABLED,
+	public static final FinderPath FINDER_PATH_WITH_PAGINATION_FIND_BY_UUID_C = new FinderPath(UserModelImpl.ENTITY_CACHE_ENABLED,
 			UserModelImpl.FINDER_CACHE_ENABLED, UserImpl.class,
-			FINDER_CLASS_NAME_LIST, "findByCompanyId",
+			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByUuid_C",
+			new String[] {
+				String.class.getName(), Long.class.getName(),
+				
+			"java.lang.Integer", "java.lang.Integer",
+				"com.liferay.portal.kernel.util.OrderByComparator"
+			});
+	public static final FinderPath FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_UUID_C =
+		new FinderPath(UserModelImpl.ENTITY_CACHE_ENABLED,
+			UserModelImpl.FINDER_CACHE_ENABLED, UserImpl.class,
+			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByUuid_C",
+			new String[] { String.class.getName(), Long.class.getName() },
+			UserModelImpl.UUID_COLUMN_BITMASK |
+			UserModelImpl.COMPANYID_COLUMN_BITMASK);
+	public static final FinderPath FINDER_PATH_COUNT_BY_UUID_C = new FinderPath(UserModelImpl.ENTITY_CACHE_ENABLED,
+			UserModelImpl.FINDER_CACHE_ENABLED, Long.class,
+			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByUuid_C",
+			new String[] { String.class.getName(), Long.class.getName() });
+	public static final FinderPath FINDER_PATH_WITH_PAGINATION_FIND_BY_COMPANYID =
+		new FinderPath(UserModelImpl.ENTITY_CACHE_ENABLED,
+			UserModelImpl.FINDER_CACHE_ENABLED, UserImpl.class,
+			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByCompanyId",
 			new String[] {
 				Long.class.getName(),
 				
 			"java.lang.Integer", "java.lang.Integer",
 				"com.liferay.portal.kernel.util.OrderByComparator"
 			});
+	public static final FinderPath FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_COMPANYID =
+		new FinderPath(UserModelImpl.ENTITY_CACHE_ENABLED,
+			UserModelImpl.FINDER_CACHE_ENABLED, UserImpl.class,
+			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByCompanyId",
+			new String[] { Long.class.getName() },
+			UserModelImpl.COMPANYID_COLUMN_BITMASK);
 	public static final FinderPath FINDER_PATH_COUNT_BY_COMPANYID = new FinderPath(UserModelImpl.ENTITY_CACHE_ENABLED,
 			UserModelImpl.FINDER_CACHE_ENABLED, Long.class,
-			FINDER_CLASS_NAME_LIST, "countByCompanyId",
+			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByCompanyId",
 			new String[] { Long.class.getName() });
 	public static final FinderPath FINDER_PATH_FETCH_BY_CONTACTID = new FinderPath(UserModelImpl.ENTITY_CACHE_ENABLED,
 			UserModelImpl.FINDER_CACHE_ENABLED, UserImpl.class,
 			FINDER_CLASS_NAME_ENTITY, "fetchByContactId",
-			new String[] { Long.class.getName() });
+			new String[] { Long.class.getName() },
+			UserModelImpl.CONTACTID_COLUMN_BITMASK);
 	public static final FinderPath FINDER_PATH_COUNT_BY_CONTACTID = new FinderPath(UserModelImpl.ENTITY_CACHE_ENABLED,
 			UserModelImpl.FINDER_CACHE_ENABLED, Long.class,
-			FINDER_CLASS_NAME_LIST, "countByContactId",
+			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByContactId",
 			new String[] { Long.class.getName() });
-	public static final FinderPath FINDER_PATH_FIND_BY_EMAILADDRESS = new FinderPath(UserModelImpl.ENTITY_CACHE_ENABLED,
+	public static final FinderPath FINDER_PATH_WITH_PAGINATION_FIND_BY_EMAILADDRESS =
+		new FinderPath(UserModelImpl.ENTITY_CACHE_ENABLED,
 			UserModelImpl.FINDER_CACHE_ENABLED, UserImpl.class,
-			FINDER_CLASS_NAME_LIST, "findByEmailAddress",
+			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByEmailAddress",
 			new String[] {
 				String.class.getName(),
 				
 			"java.lang.Integer", "java.lang.Integer",
 				"com.liferay.portal.kernel.util.OrderByComparator"
 			});
+	public static final FinderPath FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_EMAILADDRESS =
+		new FinderPath(UserModelImpl.ENTITY_CACHE_ENABLED,
+			UserModelImpl.FINDER_CACHE_ENABLED, UserImpl.class,
+			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByEmailAddress",
+			new String[] { String.class.getName() },
+			UserModelImpl.EMAILADDRESS_COLUMN_BITMASK);
 	public static final FinderPath FINDER_PATH_COUNT_BY_EMAILADDRESS = new FinderPath(UserModelImpl.ENTITY_CACHE_ENABLED,
 			UserModelImpl.FINDER_CACHE_ENABLED, Long.class,
-			FINDER_CLASS_NAME_LIST, "countByEmailAddress",
+			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByEmailAddress",
 			new String[] { String.class.getName() });
 	public static final FinderPath FINDER_PATH_FETCH_BY_PORTRAITID = new FinderPath(UserModelImpl.ENTITY_CACHE_ENABLED,
 			UserModelImpl.FINDER_CACHE_ENABLED, UserImpl.class,
 			FINDER_CLASS_NAME_ENTITY, "fetchByPortraitId",
-			new String[] { Long.class.getName() });
+			new String[] { Long.class.getName() },
+			UserModelImpl.PORTRAITID_COLUMN_BITMASK);
 	public static final FinderPath FINDER_PATH_COUNT_BY_PORTRAITID = new FinderPath(UserModelImpl.ENTITY_CACHE_ENABLED,
 			UserModelImpl.FINDER_CACHE_ENABLED, Long.class,
-			FINDER_CLASS_NAME_LIST, "countByPortraitId",
+			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByPortraitId",
 			new String[] { Long.class.getName() });
 	public static final FinderPath FINDER_PATH_FETCH_BY_C_U = new FinderPath(UserModelImpl.ENTITY_CACHE_ENABLED,
 			UserModelImpl.FINDER_CACHE_ENABLED, UserImpl.class,
 			FINDER_CLASS_NAME_ENTITY, "fetchByC_U",
-			new String[] { Long.class.getName(), Long.class.getName() });
+			new String[] { Long.class.getName(), Long.class.getName() },
+			UserModelImpl.COMPANYID_COLUMN_BITMASK |
+			UserModelImpl.USERID_COLUMN_BITMASK);
 	public static final FinderPath FINDER_PATH_COUNT_BY_C_U = new FinderPath(UserModelImpl.ENTITY_CACHE_ENABLED,
 			UserModelImpl.FINDER_CACHE_ENABLED, Long.class,
-			FINDER_CLASS_NAME_LIST, "countByC_U",
+			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByC_U",
 			new String[] { Long.class.getName(), Long.class.getName() });
 	public static final FinderPath FINDER_PATH_FETCH_BY_C_DU = new FinderPath(UserModelImpl.ENTITY_CACHE_ENABLED,
 			UserModelImpl.FINDER_CACHE_ENABLED, UserImpl.class,
 			FINDER_CLASS_NAME_ENTITY, "fetchByC_DU",
-			new String[] { Long.class.getName(), Boolean.class.getName() });
+			new String[] { Long.class.getName(), Boolean.class.getName() },
+			UserModelImpl.COMPANYID_COLUMN_BITMASK |
+			UserModelImpl.DEFAULTUSER_COLUMN_BITMASK);
 	public static final FinderPath FINDER_PATH_COUNT_BY_C_DU = new FinderPath(UserModelImpl.ENTITY_CACHE_ENABLED,
 			UserModelImpl.FINDER_CACHE_ENABLED, Long.class,
-			FINDER_CLASS_NAME_LIST, "countByC_DU",
+			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByC_DU",
 			new String[] { Long.class.getName(), Boolean.class.getName() });
 	public static final FinderPath FINDER_PATH_FETCH_BY_C_SN = new FinderPath(UserModelImpl.ENTITY_CACHE_ENABLED,
 			UserModelImpl.FINDER_CACHE_ENABLED, UserImpl.class,
 			FINDER_CLASS_NAME_ENTITY, "fetchByC_SN",
-			new String[] { Long.class.getName(), String.class.getName() });
+			new String[] { Long.class.getName(), String.class.getName() },
+			UserModelImpl.COMPANYID_COLUMN_BITMASK |
+			UserModelImpl.SCREENNAME_COLUMN_BITMASK);
 	public static final FinderPath FINDER_PATH_COUNT_BY_C_SN = new FinderPath(UserModelImpl.ENTITY_CACHE_ENABLED,
 			UserModelImpl.FINDER_CACHE_ENABLED, Long.class,
-			FINDER_CLASS_NAME_LIST, "countByC_SN",
+			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByC_SN",
 			new String[] { Long.class.getName(), String.class.getName() });
 	public static final FinderPath FINDER_PATH_FETCH_BY_C_EA = new FinderPath(UserModelImpl.ENTITY_CACHE_ENABLED,
 			UserModelImpl.FINDER_CACHE_ENABLED, UserImpl.class,
 			FINDER_CLASS_NAME_ENTITY, "fetchByC_EA",
-			new String[] { Long.class.getName(), String.class.getName() });
+			new String[] { Long.class.getName(), String.class.getName() },
+			UserModelImpl.COMPANYID_COLUMN_BITMASK |
+			UserModelImpl.EMAILADDRESS_COLUMN_BITMASK);
 	public static final FinderPath FINDER_PATH_COUNT_BY_C_EA = new FinderPath(UserModelImpl.ENTITY_CACHE_ENABLED,
 			UserModelImpl.FINDER_CACHE_ENABLED, Long.class,
-			FINDER_CLASS_NAME_LIST, "countByC_EA",
+			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByC_EA",
 			new String[] { Long.class.getName(), String.class.getName() });
 	public static final FinderPath FINDER_PATH_FETCH_BY_C_FID = new FinderPath(UserModelImpl.ENTITY_CACHE_ENABLED,
 			UserModelImpl.FINDER_CACHE_ENABLED, UserImpl.class,
 			FINDER_CLASS_NAME_ENTITY, "fetchByC_FID",
-			new String[] { Long.class.getName(), Long.class.getName() });
+			new String[] { Long.class.getName(), Long.class.getName() },
+			UserModelImpl.COMPANYID_COLUMN_BITMASK |
+			UserModelImpl.FACEBOOKID_COLUMN_BITMASK);
 	public static final FinderPath FINDER_PATH_COUNT_BY_C_FID = new FinderPath(UserModelImpl.ENTITY_CACHE_ENABLED,
 			UserModelImpl.FINDER_CACHE_ENABLED, Long.class,
-			FINDER_CLASS_NAME_LIST, "countByC_FID",
+			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByC_FID",
 			new String[] { Long.class.getName(), Long.class.getName() });
 	public static final FinderPath FINDER_PATH_FETCH_BY_C_O = new FinderPath(UserModelImpl.ENTITY_CACHE_ENABLED,
 			UserModelImpl.FINDER_CACHE_ENABLED, UserImpl.class,
 			FINDER_CLASS_NAME_ENTITY, "fetchByC_O",
-			new String[] { Long.class.getName(), String.class.getName() });
+			new String[] { Long.class.getName(), String.class.getName() },
+			UserModelImpl.COMPANYID_COLUMN_BITMASK |
+			UserModelImpl.OPENID_COLUMN_BITMASK);
 	public static final FinderPath FINDER_PATH_COUNT_BY_C_O = new FinderPath(UserModelImpl.ENTITY_CACHE_ENABLED,
 			UserModelImpl.FINDER_CACHE_ENABLED, Long.class,
-			FINDER_CLASS_NAME_LIST, "countByC_O",
+			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByC_O",
 			new String[] { Long.class.getName(), String.class.getName() });
-	public static final FinderPath FINDER_PATH_FIND_BY_C_S = new FinderPath(UserModelImpl.ENTITY_CACHE_ENABLED,
+	public static final FinderPath FINDER_PATH_WITH_PAGINATION_FIND_BY_C_S = new FinderPath(UserModelImpl.ENTITY_CACHE_ENABLED,
 			UserModelImpl.FINDER_CACHE_ENABLED, UserImpl.class,
-			FINDER_CLASS_NAME_LIST, "findByC_S",
+			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByC_S",
 			new String[] {
 				Long.class.getName(), Integer.class.getName(),
 				
 			"java.lang.Integer", "java.lang.Integer",
 				"com.liferay.portal.kernel.util.OrderByComparator"
 			});
+	public static final FinderPath FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_C_S = new FinderPath(UserModelImpl.ENTITY_CACHE_ENABLED,
+			UserModelImpl.FINDER_CACHE_ENABLED, UserImpl.class,
+			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByC_S",
+			new String[] { Long.class.getName(), Integer.class.getName() },
+			UserModelImpl.COMPANYID_COLUMN_BITMASK |
+			UserModelImpl.STATUS_COLUMN_BITMASK);
 	public static final FinderPath FINDER_PATH_COUNT_BY_C_S = new FinderPath(UserModelImpl.ENTITY_CACHE_ENABLED,
 			UserModelImpl.FINDER_CACHE_ENABLED, Long.class,
-			FINDER_CLASS_NAME_LIST, "countByC_S",
+			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByC_S",
 			new String[] { Long.class.getName(), Integer.class.getName() });
-	public static final FinderPath FINDER_PATH_FIND_ALL = new FinderPath(UserModelImpl.ENTITY_CACHE_ENABLED,
+	public static final FinderPath FINDER_PATH_WITH_PAGINATION_FIND_ALL = new FinderPath(UserModelImpl.ENTITY_CACHE_ENABLED,
 			UserModelImpl.FINDER_CACHE_ENABLED, UserImpl.class,
-			FINDER_CLASS_NAME_LIST, "findAll", new String[0]);
+			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findAll", new String[0]);
+	public static final FinderPath FINDER_PATH_WITHOUT_PAGINATION_FIND_ALL = new FinderPath(UserModelImpl.ENTITY_CACHE_ENABLED,
+			UserModelImpl.FINDER_CACHE_ENABLED, UserImpl.class,
+			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findAll", new String[0]);
 	public static final FinderPath FINDER_PATH_COUNT_ALL = new FinderPath(UserModelImpl.ENTITY_CACHE_ENABLED,
 			UserModelImpl.FINDER_CACHE_ENABLED, Long.class,
-			FINDER_CLASS_NAME_LIST, "countAll", new String[0]);
+			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countAll", new String[0]);
 
 	/**
 	 * Caches the user in the entity cache if it is enabled.
@@ -276,8 +338,11 @@ public class UserPersistenceImpl extends BasePersistenceImpl<User>
 	public void cacheResult(List<User> users) {
 		for (User user : users) {
 			if (EntityCacheUtil.getResult(UserModelImpl.ENTITY_CACHE_ENABLED,
-						UserImpl.class, user.getPrimaryKey(), this) == null) {
+						UserImpl.class, user.getPrimaryKey()) == null) {
 				cacheResult(user);
+			}
+			else {
+				user.resetOriginalValues();
 			}
 		}
 	}
@@ -296,8 +361,10 @@ public class UserPersistenceImpl extends BasePersistenceImpl<User>
 		}
 
 		EntityCacheUtil.clearCache(UserImpl.class.getName());
+
 		FinderCacheUtil.clearCache(FINDER_CLASS_NAME_ENTITY);
-		FinderCacheUtil.clearCache(FINDER_CLASS_NAME_LIST);
+		FinderCacheUtil.clearCache(FINDER_CLASS_NAME_LIST_WITH_PAGINATION);
+		FinderCacheUtil.clearCache(FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
 	}
 
 	/**
@@ -312,6 +379,26 @@ public class UserPersistenceImpl extends BasePersistenceImpl<User>
 		EntityCacheUtil.removeResult(UserModelImpl.ENTITY_CACHE_ENABLED,
 			UserImpl.class, user.getPrimaryKey());
 
+		FinderCacheUtil.clearCache(FINDER_CLASS_NAME_LIST_WITH_PAGINATION);
+		FinderCacheUtil.clearCache(FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
+
+		clearUniqueFindersCache(user);
+	}
+
+	@Override
+	public void clearCache(List<User> users) {
+		FinderCacheUtil.clearCache(FINDER_CLASS_NAME_LIST_WITH_PAGINATION);
+		FinderCacheUtil.clearCache(FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
+
+		for (User user : users) {
+			EntityCacheUtil.removeResult(UserModelImpl.ENTITY_CACHE_ENABLED,
+				UserImpl.class, user.getPrimaryKey());
+
+			clearUniqueFindersCache(user);
+		}
+	}
+
+	protected void clearUniqueFindersCache(User user) {
 		FinderCacheUtil.removeResult(FINDER_PATH_FETCH_BY_CONTACTID,
 			new Object[] { Long.valueOf(user.getContactId()) });
 
@@ -372,43 +459,43 @@ public class UserPersistenceImpl extends BasePersistenceImpl<User>
 	/**
 	 * Removes the user with the primary key from the database. Also notifies the appropriate model listeners.
 	 *
-	 * @param primaryKey the primary key of the user
-	 * @return the user that was removed
-	 * @throws com.liferay.portal.NoSuchModelException if a user with the primary key could not be found
-	 * @throws SystemException if a system exception occurred
-	 */
-	@Override
-	public User remove(Serializable primaryKey)
-		throws NoSuchModelException, SystemException {
-		return remove(((Long)primaryKey).longValue());
-	}
-
-	/**
-	 * Removes the user with the primary key from the database. Also notifies the appropriate model listeners.
-	 *
 	 * @param userId the primary key of the user
 	 * @return the user that was removed
 	 * @throws com.liferay.portal.NoSuchUserException if a user with the primary key could not be found
 	 * @throws SystemException if a system exception occurred
 	 */
 	public User remove(long userId) throws NoSuchUserException, SystemException {
+		return remove(Long.valueOf(userId));
+	}
+
+	/**
+	 * Removes the user with the primary key from the database. Also notifies the appropriate model listeners.
+	 *
+	 * @param primaryKey the primary key of the user
+	 * @return the user that was removed
+	 * @throws com.liferay.portal.NoSuchUserException if a user with the primary key could not be found
+	 * @throws SystemException if a system exception occurred
+	 */
+	@Override
+	public User remove(Serializable primaryKey)
+		throws NoSuchUserException, SystemException {
 		Session session = null;
 
 		try {
 			session = openSession();
 
-			User user = (User)session.get(UserImpl.class, Long.valueOf(userId));
+			User user = (User)session.get(UserImpl.class, primaryKey);
 
 			if (user == null) {
 				if (_log.isWarnEnabled()) {
-					_log.warn(_NO_SUCH_ENTITY_WITH_PRIMARY_KEY + userId);
+					_log.warn(_NO_SUCH_ENTITY_WITH_PRIMARY_KEY + primaryKey);
 				}
 
 				throw new NoSuchUserException(_NO_SUCH_ENTITY_WITH_PRIMARY_KEY +
-					userId);
+					primaryKey);
 			}
 
-			return userPersistence.remove(user);
+			return remove(user);
 		}
 		catch (NoSuchUserException nsee) {
 			throw nsee;
@@ -419,18 +506,6 @@ public class UserPersistenceImpl extends BasePersistenceImpl<User>
 		finally {
 			closeSession(session);
 		}
-	}
-
-	/**
-	 * Removes the user from the database. Also notifies the appropriate model listeners.
-	 *
-	 * @param user the user
-	 * @return the user that was removed
-	 * @throws SystemException if a system exception occurred
-	 */
-	@Override
-	public User remove(User user) throws SystemException {
-		return super.remove(user);
 	}
 
 	@Override
@@ -455,16 +530,6 @@ public class UserPersistenceImpl extends BasePersistenceImpl<User>
 		}
 		finally {
 			FinderCacheUtil.clearCache(UserModelImpl.MAPPING_TABLE_USERS_ORGS_NAME);
-		}
-
-		try {
-			clearPermissions.clear(user.getPrimaryKey());
-		}
-		catch (Exception e) {
-			throw processException(e);
-		}
-		finally {
-			FinderCacheUtil.clearCache(UserModelImpl.MAPPING_TABLE_USERS_PERMISSIONS_NAME);
 		}
 
 		try {
@@ -511,57 +576,7 @@ public class UserPersistenceImpl extends BasePersistenceImpl<User>
 			closeSession(session);
 		}
 
-		FinderCacheUtil.clearCache(FINDER_CLASS_NAME_LIST);
-
-		UserModelImpl userModelImpl = (UserModelImpl)user;
-
-		FinderCacheUtil.removeResult(FINDER_PATH_FETCH_BY_CONTACTID,
-			new Object[] { Long.valueOf(userModelImpl.getContactId()) });
-
-		FinderCacheUtil.removeResult(FINDER_PATH_FETCH_BY_PORTRAITID,
-			new Object[] { Long.valueOf(userModelImpl.getPortraitId()) });
-
-		FinderCacheUtil.removeResult(FINDER_PATH_FETCH_BY_C_U,
-			new Object[] {
-				Long.valueOf(userModelImpl.getCompanyId()),
-				Long.valueOf(userModelImpl.getUserId())
-			});
-
-		FinderCacheUtil.removeResult(FINDER_PATH_FETCH_BY_C_DU,
-			new Object[] {
-				Long.valueOf(userModelImpl.getCompanyId()),
-				Boolean.valueOf(userModelImpl.getDefaultUser())
-			});
-
-		FinderCacheUtil.removeResult(FINDER_PATH_FETCH_BY_C_SN,
-			new Object[] {
-				Long.valueOf(userModelImpl.getCompanyId()),
-				
-			userModelImpl.getScreenName()
-			});
-
-		FinderCacheUtil.removeResult(FINDER_PATH_FETCH_BY_C_EA,
-			new Object[] {
-				Long.valueOf(userModelImpl.getCompanyId()),
-				
-			userModelImpl.getEmailAddress()
-			});
-
-		FinderCacheUtil.removeResult(FINDER_PATH_FETCH_BY_C_FID,
-			new Object[] {
-				Long.valueOf(userModelImpl.getCompanyId()),
-				Long.valueOf(userModelImpl.getFacebookId())
-			});
-
-		FinderCacheUtil.removeResult(FINDER_PATH_FETCH_BY_C_O,
-			new Object[] {
-				Long.valueOf(userModelImpl.getCompanyId()),
-				
-			userModelImpl.getOpenId()
-			});
-
-		EntityCacheUtil.removeResult(UserModelImpl.ENTITY_CACHE_ENABLED,
-			UserImpl.class, user.getPrimaryKey());
+		clearCache(user);
 
 		return user;
 	}
@@ -597,164 +612,301 @@ public class UserPersistenceImpl extends BasePersistenceImpl<User>
 			closeSession(session);
 		}
 
-		FinderCacheUtil.clearCache(FINDER_CLASS_NAME_LIST);
+		FinderCacheUtil.clearCache(FINDER_CLASS_NAME_LIST_WITH_PAGINATION);
+
+		if (isNew || !UserModelImpl.COLUMN_BITMASK_ENABLED) {
+			FinderCacheUtil.clearCache(FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
+		}
+
+		else {
+			if ((userModelImpl.getColumnBitmask() &
+					FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_UUID.getColumnBitmask()) != 0) {
+				Object[] args = new Object[] { userModelImpl.getOriginalUuid() };
+
+				FinderCacheUtil.removeResult(FINDER_PATH_COUNT_BY_UUID, args);
+				FinderCacheUtil.removeResult(FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_UUID,
+					args);
+
+				args = new Object[] { userModelImpl.getUuid() };
+
+				FinderCacheUtil.removeResult(FINDER_PATH_COUNT_BY_UUID, args);
+				FinderCacheUtil.removeResult(FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_UUID,
+					args);
+			}
+
+			if ((userModelImpl.getColumnBitmask() &
+					FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_UUID_C.getColumnBitmask()) != 0) {
+				Object[] args = new Object[] {
+						userModelImpl.getOriginalUuid(),
+						Long.valueOf(userModelImpl.getOriginalCompanyId())
+					};
+
+				FinderCacheUtil.removeResult(FINDER_PATH_COUNT_BY_UUID_C, args);
+				FinderCacheUtil.removeResult(FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_UUID_C,
+					args);
+
+				args = new Object[] {
+						userModelImpl.getUuid(),
+						Long.valueOf(userModelImpl.getCompanyId())
+					};
+
+				FinderCacheUtil.removeResult(FINDER_PATH_COUNT_BY_UUID_C, args);
+				FinderCacheUtil.removeResult(FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_UUID_C,
+					args);
+			}
+
+			if ((userModelImpl.getColumnBitmask() &
+					FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_COMPANYID.getColumnBitmask()) != 0) {
+				Object[] args = new Object[] {
+						Long.valueOf(userModelImpl.getOriginalCompanyId())
+					};
+
+				FinderCacheUtil.removeResult(FINDER_PATH_COUNT_BY_COMPANYID,
+					args);
+				FinderCacheUtil.removeResult(FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_COMPANYID,
+					args);
+
+				args = new Object[] { Long.valueOf(userModelImpl.getCompanyId()) };
+
+				FinderCacheUtil.removeResult(FINDER_PATH_COUNT_BY_COMPANYID,
+					args);
+				FinderCacheUtil.removeResult(FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_COMPANYID,
+					args);
+			}
+
+			if ((userModelImpl.getColumnBitmask() &
+					FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_EMAILADDRESS.getColumnBitmask()) != 0) {
+				Object[] args = new Object[] {
+						userModelImpl.getOriginalEmailAddress()
+					};
+
+				FinderCacheUtil.removeResult(FINDER_PATH_COUNT_BY_EMAILADDRESS,
+					args);
+				FinderCacheUtil.removeResult(FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_EMAILADDRESS,
+					args);
+
+				args = new Object[] { userModelImpl.getEmailAddress() };
+
+				FinderCacheUtil.removeResult(FINDER_PATH_COUNT_BY_EMAILADDRESS,
+					args);
+				FinderCacheUtil.removeResult(FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_EMAILADDRESS,
+					args);
+			}
+
+			if ((userModelImpl.getColumnBitmask() &
+					FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_C_S.getColumnBitmask()) != 0) {
+				Object[] args = new Object[] {
+						Long.valueOf(userModelImpl.getOriginalCompanyId()),
+						Integer.valueOf(userModelImpl.getOriginalStatus())
+					};
+
+				FinderCacheUtil.removeResult(FINDER_PATH_COUNT_BY_C_S, args);
+				FinderCacheUtil.removeResult(FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_C_S,
+					args);
+
+				args = new Object[] {
+						Long.valueOf(userModelImpl.getCompanyId()),
+						Integer.valueOf(userModelImpl.getStatus())
+					};
+
+				FinderCacheUtil.removeResult(FINDER_PATH_COUNT_BY_C_S, args);
+				FinderCacheUtil.removeResult(FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_C_S,
+					args);
+			}
+		}
 
 		EntityCacheUtil.putResult(UserModelImpl.ENTITY_CACHE_ENABLED,
 			UserImpl.class, user.getPrimaryKey(), user);
 
-		if (!isNew &&
-				(user.getContactId() != userModelImpl.getOriginalContactId())) {
-			FinderCacheUtil.removeResult(FINDER_PATH_FETCH_BY_CONTACTID,
-				new Object[] { Long.valueOf(
-						userModelImpl.getOriginalContactId()) });
-		}
-
-		if (isNew ||
-				(user.getContactId() != userModelImpl.getOriginalContactId())) {
+		if (isNew) {
 			FinderCacheUtil.putResult(FINDER_PATH_FETCH_BY_CONTACTID,
 				new Object[] { Long.valueOf(user.getContactId()) }, user);
-		}
 
-		if (!isNew &&
-				(user.getPortraitId() != userModelImpl.getOriginalPortraitId())) {
-			FinderCacheUtil.removeResult(FINDER_PATH_FETCH_BY_PORTRAITID,
-				new Object[] { Long.valueOf(
-						userModelImpl.getOriginalPortraitId()) });
-		}
-
-		if (isNew ||
-				(user.getPortraitId() != userModelImpl.getOriginalPortraitId())) {
 			FinderCacheUtil.putResult(FINDER_PATH_FETCH_BY_PORTRAITID,
 				new Object[] { Long.valueOf(user.getPortraitId()) }, user);
-		}
 
-		if (!isNew &&
-				((user.getCompanyId() != userModelImpl.getOriginalCompanyId()) ||
-				(user.getUserId() != userModelImpl.getOriginalUserId()))) {
-			FinderCacheUtil.removeResult(FINDER_PATH_FETCH_BY_C_U,
-				new Object[] {
-					Long.valueOf(userModelImpl.getOriginalCompanyId()),
-					Long.valueOf(userModelImpl.getOriginalUserId())
-				});
-		}
-
-		if (isNew ||
-				((user.getCompanyId() != userModelImpl.getOriginalCompanyId()) ||
-				(user.getUserId() != userModelImpl.getOriginalUserId()))) {
 			FinderCacheUtil.putResult(FINDER_PATH_FETCH_BY_C_U,
 				new Object[] {
 					Long.valueOf(user.getCompanyId()),
 					Long.valueOf(user.getUserId())
 				}, user);
-		}
 
-		if (!isNew &&
-				((user.getCompanyId() != userModelImpl.getOriginalCompanyId()) ||
-				(user.getDefaultUser() != userModelImpl.getOriginalDefaultUser()))) {
-			FinderCacheUtil.removeResult(FINDER_PATH_FETCH_BY_C_DU,
-				new Object[] {
-					Long.valueOf(userModelImpl.getOriginalCompanyId()),
-					Boolean.valueOf(userModelImpl.getOriginalDefaultUser())
-				});
-		}
-
-		if (isNew ||
-				((user.getCompanyId() != userModelImpl.getOriginalCompanyId()) ||
-				(user.getDefaultUser() != userModelImpl.getOriginalDefaultUser()))) {
 			FinderCacheUtil.putResult(FINDER_PATH_FETCH_BY_C_DU,
 				new Object[] {
 					Long.valueOf(user.getCompanyId()),
 					Boolean.valueOf(user.getDefaultUser())
 				}, user);
-		}
 
-		if (!isNew &&
-				((user.getCompanyId() != userModelImpl.getOriginalCompanyId()) ||
-				!Validator.equals(user.getScreenName(),
-					userModelImpl.getOriginalScreenName()))) {
-			FinderCacheUtil.removeResult(FINDER_PATH_FETCH_BY_C_SN,
-				new Object[] {
-					Long.valueOf(userModelImpl.getOriginalCompanyId()),
-					
-				userModelImpl.getOriginalScreenName()
-				});
-		}
-
-		if (isNew ||
-				((user.getCompanyId() != userModelImpl.getOriginalCompanyId()) ||
-				!Validator.equals(user.getScreenName(),
-					userModelImpl.getOriginalScreenName()))) {
 			FinderCacheUtil.putResult(FINDER_PATH_FETCH_BY_C_SN,
 				new Object[] {
 					Long.valueOf(user.getCompanyId()),
 					
 				user.getScreenName()
 				}, user);
-		}
 
-		if (!isNew &&
-				((user.getCompanyId() != userModelImpl.getOriginalCompanyId()) ||
-				!Validator.equals(user.getEmailAddress(),
-					userModelImpl.getOriginalEmailAddress()))) {
-			FinderCacheUtil.removeResult(FINDER_PATH_FETCH_BY_C_EA,
-				new Object[] {
-					Long.valueOf(userModelImpl.getOriginalCompanyId()),
-					
-				userModelImpl.getOriginalEmailAddress()
-				});
-		}
-
-		if (isNew ||
-				((user.getCompanyId() != userModelImpl.getOriginalCompanyId()) ||
-				!Validator.equals(user.getEmailAddress(),
-					userModelImpl.getOriginalEmailAddress()))) {
 			FinderCacheUtil.putResult(FINDER_PATH_FETCH_BY_C_EA,
 				new Object[] {
 					Long.valueOf(user.getCompanyId()),
 					
 				user.getEmailAddress()
 				}, user);
-		}
 
-		if (!isNew &&
-				((user.getCompanyId() != userModelImpl.getOriginalCompanyId()) ||
-				(user.getFacebookId() != userModelImpl.getOriginalFacebookId()))) {
-			FinderCacheUtil.removeResult(FINDER_PATH_FETCH_BY_C_FID,
-				new Object[] {
-					Long.valueOf(userModelImpl.getOriginalCompanyId()),
-					Long.valueOf(userModelImpl.getOriginalFacebookId())
-				});
-		}
-
-		if (isNew ||
-				((user.getCompanyId() != userModelImpl.getOriginalCompanyId()) ||
-				(user.getFacebookId() != userModelImpl.getOriginalFacebookId()))) {
 			FinderCacheUtil.putResult(FINDER_PATH_FETCH_BY_C_FID,
 				new Object[] {
 					Long.valueOf(user.getCompanyId()),
 					Long.valueOf(user.getFacebookId())
 				}, user);
-		}
 
-		if (!isNew &&
-				((user.getCompanyId() != userModelImpl.getOriginalCompanyId()) ||
-				!Validator.equals(user.getOpenId(),
-					userModelImpl.getOriginalOpenId()))) {
-			FinderCacheUtil.removeResult(FINDER_PATH_FETCH_BY_C_O,
-				new Object[] {
-					Long.valueOf(userModelImpl.getOriginalCompanyId()),
-					
-				userModelImpl.getOriginalOpenId()
-				});
-		}
-
-		if (isNew ||
-				((user.getCompanyId() != userModelImpl.getOriginalCompanyId()) ||
-				!Validator.equals(user.getOpenId(),
-					userModelImpl.getOriginalOpenId()))) {
 			FinderCacheUtil.putResult(FINDER_PATH_FETCH_BY_C_O,
 				new Object[] { Long.valueOf(user.getCompanyId()), user.getOpenId() },
 				user);
+		}
+		else {
+			if ((userModelImpl.getColumnBitmask() &
+					FINDER_PATH_FETCH_BY_CONTACTID.getColumnBitmask()) != 0) {
+				Object[] args = new Object[] {
+						Long.valueOf(userModelImpl.getOriginalContactId())
+					};
+
+				FinderCacheUtil.removeResult(FINDER_PATH_COUNT_BY_CONTACTID,
+					args);
+
+				FinderCacheUtil.removeResult(FINDER_PATH_FETCH_BY_CONTACTID,
+					args);
+
+				FinderCacheUtil.putResult(FINDER_PATH_FETCH_BY_CONTACTID,
+					new Object[] { Long.valueOf(user.getContactId()) }, user);
+			}
+
+			if ((userModelImpl.getColumnBitmask() &
+					FINDER_PATH_FETCH_BY_PORTRAITID.getColumnBitmask()) != 0) {
+				Object[] args = new Object[] {
+						Long.valueOf(userModelImpl.getOriginalPortraitId())
+					};
+
+				FinderCacheUtil.removeResult(FINDER_PATH_COUNT_BY_PORTRAITID,
+					args);
+
+				FinderCacheUtil.removeResult(FINDER_PATH_FETCH_BY_PORTRAITID,
+					args);
+
+				FinderCacheUtil.putResult(FINDER_PATH_FETCH_BY_PORTRAITID,
+					new Object[] { Long.valueOf(user.getPortraitId()) }, user);
+			}
+
+			if ((userModelImpl.getColumnBitmask() &
+					FINDER_PATH_FETCH_BY_C_U.getColumnBitmask()) != 0) {
+				Object[] args = new Object[] {
+						Long.valueOf(userModelImpl.getOriginalCompanyId()),
+						Long.valueOf(userModelImpl.getOriginalUserId())
+					};
+
+				FinderCacheUtil.removeResult(FINDER_PATH_COUNT_BY_C_U, args);
+
+				FinderCacheUtil.removeResult(FINDER_PATH_FETCH_BY_C_U, args);
+
+				FinderCacheUtil.putResult(FINDER_PATH_FETCH_BY_C_U,
+					new Object[] {
+						Long.valueOf(user.getCompanyId()),
+						Long.valueOf(user.getUserId())
+					}, user);
+			}
+
+			if ((userModelImpl.getColumnBitmask() &
+					FINDER_PATH_FETCH_BY_C_DU.getColumnBitmask()) != 0) {
+				Object[] args = new Object[] {
+						Long.valueOf(userModelImpl.getOriginalCompanyId()),
+						Boolean.valueOf(userModelImpl.getOriginalDefaultUser())
+					};
+
+				FinderCacheUtil.removeResult(FINDER_PATH_COUNT_BY_C_DU, args);
+
+				FinderCacheUtil.removeResult(FINDER_PATH_FETCH_BY_C_DU, args);
+
+				FinderCacheUtil.putResult(FINDER_PATH_FETCH_BY_C_DU,
+					new Object[] {
+						Long.valueOf(user.getCompanyId()),
+						Boolean.valueOf(user.getDefaultUser())
+					}, user);
+			}
+
+			if ((userModelImpl.getColumnBitmask() &
+					FINDER_PATH_FETCH_BY_C_SN.getColumnBitmask()) != 0) {
+				Object[] args = new Object[] {
+						Long.valueOf(userModelImpl.getOriginalCompanyId()),
+						
+						userModelImpl.getOriginalScreenName()
+					};
+
+				FinderCacheUtil.removeResult(FINDER_PATH_COUNT_BY_C_SN, args);
+
+				FinderCacheUtil.removeResult(FINDER_PATH_FETCH_BY_C_SN, args);
+
+				FinderCacheUtil.putResult(FINDER_PATH_FETCH_BY_C_SN,
+					new Object[] {
+						Long.valueOf(user.getCompanyId()),
+						
+					user.getScreenName()
+					}, user);
+			}
+
+			if ((userModelImpl.getColumnBitmask() &
+					FINDER_PATH_FETCH_BY_C_EA.getColumnBitmask()) != 0) {
+				Object[] args = new Object[] {
+						Long.valueOf(userModelImpl.getOriginalCompanyId()),
+						
+						userModelImpl.getOriginalEmailAddress()
+					};
+
+				FinderCacheUtil.removeResult(FINDER_PATH_COUNT_BY_C_EA, args);
+
+				FinderCacheUtil.removeResult(FINDER_PATH_FETCH_BY_C_EA, args);
+
+				FinderCacheUtil.putResult(FINDER_PATH_FETCH_BY_C_EA,
+					new Object[] {
+						Long.valueOf(user.getCompanyId()),
+						
+					user.getEmailAddress()
+					}, user);
+			}
+
+			if ((userModelImpl.getColumnBitmask() &
+					FINDER_PATH_FETCH_BY_C_FID.getColumnBitmask()) != 0) {
+				Object[] args = new Object[] {
+						Long.valueOf(userModelImpl.getOriginalCompanyId()),
+						Long.valueOf(userModelImpl.getOriginalFacebookId())
+					};
+
+				FinderCacheUtil.removeResult(FINDER_PATH_COUNT_BY_C_FID, args);
+
+				FinderCacheUtil.removeResult(FINDER_PATH_FETCH_BY_C_FID, args);
+
+				FinderCacheUtil.putResult(FINDER_PATH_FETCH_BY_C_FID,
+					new Object[] {
+						Long.valueOf(user.getCompanyId()),
+						Long.valueOf(user.getFacebookId())
+					}, user);
+			}
+
+			if ((userModelImpl.getColumnBitmask() &
+					FINDER_PATH_FETCH_BY_C_O.getColumnBitmask()) != 0) {
+				Object[] args = new Object[] {
+						Long.valueOf(userModelImpl.getOriginalCompanyId()),
+						
+						userModelImpl.getOriginalOpenId()
+					};
+
+				FinderCacheUtil.removeResult(FINDER_PATH_COUNT_BY_C_O, args);
+
+				FinderCacheUtil.removeResult(FINDER_PATH_FETCH_BY_C_O, args);
+
+				FinderCacheUtil.putResult(FINDER_PATH_FETCH_BY_C_O,
+					new Object[] {
+						Long.valueOf(user.getCompanyId()),
+						
+					user.getOpenId()
+					}, user);
+			}
 		}
 
 		return user;
@@ -873,7 +1025,7 @@ public class UserPersistenceImpl extends BasePersistenceImpl<User>
 	 */
 	public User fetchByPrimaryKey(long userId) throws SystemException {
 		User user = (User)EntityCacheUtil.getResult(UserModelImpl.ENTITY_CACHE_ENABLED,
-				UserImpl.class, userId, this);
+				UserImpl.class, userId);
 
 		if (user == _nullUser) {
 			return null;
@@ -955,15 +1107,31 @@ public class UserPersistenceImpl extends BasePersistenceImpl<User>
 	 */
 	public List<User> findByUuid(String uuid, int start, int end,
 		OrderByComparator orderByComparator) throws SystemException {
-		Object[] finderArgs = new Object[] {
-				uuid,
-				
-				String.valueOf(start), String.valueOf(end),
-				String.valueOf(orderByComparator)
-			};
+		FinderPath finderPath = null;
+		Object[] finderArgs = null;
 
-		List<User> list = (List<User>)FinderCacheUtil.getResult(FINDER_PATH_FIND_BY_UUID,
+		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) &&
+				(orderByComparator == null)) {
+			finderPath = FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_UUID;
+			finderArgs = new Object[] { uuid };
+		}
+		else {
+			finderPath = FINDER_PATH_WITH_PAGINATION_FIND_BY_UUID;
+			finderArgs = new Object[] { uuid, start, end, orderByComparator };
+		}
+
+		List<User> list = (List<User>)FinderCacheUtil.getResult(finderPath,
 				finderArgs, this);
+
+		if ((list != null) && !list.isEmpty()) {
+			for (User user : list) {
+				if (!Validator.equals(uuid, user.getUuid())) {
+					list = null;
+
+					break;
+				}
+			}
+		}
 
 		if (list == null) {
 			StringBundler query = null;
@@ -1017,14 +1185,12 @@ public class UserPersistenceImpl extends BasePersistenceImpl<User>
 			}
 			finally {
 				if (list == null) {
-					FinderCacheUtil.removeResult(FINDER_PATH_FIND_BY_UUID,
-						finderArgs);
+					FinderCacheUtil.removeResult(finderPath, finderArgs);
 				}
 				else {
 					cacheResult(list);
 
-					FinderCacheUtil.putResult(FINDER_PATH_FIND_BY_UUID,
-						finderArgs, list);
+					FinderCacheUtil.putResult(finderPath, finderArgs, list);
 				}
 
 				closeSession(session);
@@ -1176,17 +1342,17 @@ public class UserPersistenceImpl extends BasePersistenceImpl<User>
 		}
 
 		if (orderByComparator != null) {
-			String[] orderByFields = orderByComparator.getOrderByFields();
+			String[] orderByConditionFields = orderByComparator.getOrderByConditionFields();
 
-			if (orderByFields.length > 0) {
+			if (orderByConditionFields.length > 0) {
 				query.append(WHERE_AND);
 			}
 
-			for (int i = 0; i < orderByFields.length; i++) {
+			for (int i = 0; i < orderByConditionFields.length; i++) {
 				query.append(_ORDER_BY_ENTITY_ALIAS);
-				query.append(orderByFields[i]);
+				query.append(orderByConditionFields[i]);
 
-				if ((i + 1) < orderByFields.length) {
+				if ((i + 1) < orderByConditionFields.length) {
 					if (orderByComparator.isAscending() ^ previous) {
 						query.append(WHERE_GREATER_THAN_HAS_NEXT);
 					}
@@ -1205,6 +1371,8 @@ public class UserPersistenceImpl extends BasePersistenceImpl<User>
 			}
 
 			query.append(ORDER_BY_CLAUSE);
+
+			String[] orderByFields = orderByComparator.getOrderByFields();
 
 			for (int i = 0; i < orderByFields.length; i++) {
 				query.append(_ORDER_BY_ENTITY_ALIAS);
@@ -1243,7 +1411,403 @@ public class UserPersistenceImpl extends BasePersistenceImpl<User>
 		}
 
 		if (orderByComparator != null) {
-			Object[] values = orderByComparator.getOrderByValues(user);
+			Object[] values = orderByComparator.getOrderByConditionValues(user);
+
+			for (Object value : values) {
+				qPos.add(value);
+			}
+		}
+
+		List<User> list = q.list();
+
+		if (list.size() == 2) {
+			return list.get(1);
+		}
+		else {
+			return null;
+		}
+	}
+
+	/**
+	 * Returns all the users where uuid = &#63; and companyId = &#63;.
+	 *
+	 * @param uuid the uuid
+	 * @param companyId the company ID
+	 * @return the matching users
+	 * @throws SystemException if a system exception occurred
+	 */
+	public List<User> findByUuid_C(String uuid, long companyId)
+		throws SystemException {
+		return findByUuid_C(uuid, companyId, QueryUtil.ALL_POS,
+			QueryUtil.ALL_POS, null);
+	}
+
+	/**
+	 * Returns a range of all the users where uuid = &#63; and companyId = &#63;.
+	 *
+	 * <p>
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set.
+	 * </p>
+	 *
+	 * @param uuid the uuid
+	 * @param companyId the company ID
+	 * @param start the lower bound of the range of users
+	 * @param end the upper bound of the range of users (not inclusive)
+	 * @return the range of matching users
+	 * @throws SystemException if a system exception occurred
+	 */
+	public List<User> findByUuid_C(String uuid, long companyId, int start,
+		int end) throws SystemException {
+		return findByUuid_C(uuid, companyId, start, end, null);
+	}
+
+	/**
+	 * Returns an ordered range of all the users where uuid = &#63; and companyId = &#63;.
+	 *
+	 * <p>
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set.
+	 * </p>
+	 *
+	 * @param uuid the uuid
+	 * @param companyId the company ID
+	 * @param start the lower bound of the range of users
+	 * @param end the upper bound of the range of users (not inclusive)
+	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
+	 * @return the ordered range of matching users
+	 * @throws SystemException if a system exception occurred
+	 */
+	public List<User> findByUuid_C(String uuid, long companyId, int start,
+		int end, OrderByComparator orderByComparator) throws SystemException {
+		FinderPath finderPath = null;
+		Object[] finderArgs = null;
+
+		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) &&
+				(orderByComparator == null)) {
+			finderPath = FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_UUID_C;
+			finderArgs = new Object[] { uuid, companyId };
+		}
+		else {
+			finderPath = FINDER_PATH_WITH_PAGINATION_FIND_BY_UUID_C;
+			finderArgs = new Object[] {
+					uuid, companyId,
+					
+					start, end, orderByComparator
+				};
+		}
+
+		List<User> list = (List<User>)FinderCacheUtil.getResult(finderPath,
+				finderArgs, this);
+
+		if ((list != null) && !list.isEmpty()) {
+			for (User user : list) {
+				if (!Validator.equals(uuid, user.getUuid()) ||
+						(companyId != user.getCompanyId())) {
+					list = null;
+
+					break;
+				}
+			}
+		}
+
+		if (list == null) {
+			StringBundler query = null;
+
+			if (orderByComparator != null) {
+				query = new StringBundler(4 +
+						(orderByComparator.getOrderByFields().length * 3));
+			}
+			else {
+				query = new StringBundler(3);
+			}
+
+			query.append(_SQL_SELECT_USER_WHERE);
+
+			if (uuid == null) {
+				query.append(_FINDER_COLUMN_UUID_C_UUID_1);
+			}
+			else {
+				if (uuid.equals(StringPool.BLANK)) {
+					query.append(_FINDER_COLUMN_UUID_C_UUID_3);
+				}
+				else {
+					query.append(_FINDER_COLUMN_UUID_C_UUID_2);
+				}
+			}
+
+			query.append(_FINDER_COLUMN_UUID_C_COMPANYID_2);
+
+			if (orderByComparator != null) {
+				appendOrderByComparator(query, _ORDER_BY_ENTITY_ALIAS,
+					orderByComparator);
+			}
+
+			String sql = query.toString();
+
+			Session session = null;
+
+			try {
+				session = openSession();
+
+				Query q = session.createQuery(sql);
+
+				QueryPos qPos = QueryPos.getInstance(q);
+
+				if (uuid != null) {
+					qPos.add(uuid);
+				}
+
+				qPos.add(companyId);
+
+				list = (List<User>)QueryUtil.list(q, getDialect(), start, end);
+			}
+			catch (Exception e) {
+				throw processException(e);
+			}
+			finally {
+				if (list == null) {
+					FinderCacheUtil.removeResult(finderPath, finderArgs);
+				}
+				else {
+					cacheResult(list);
+
+					FinderCacheUtil.putResult(finderPath, finderArgs, list);
+				}
+
+				closeSession(session);
+			}
+		}
+
+		return list;
+	}
+
+	/**
+	 * Returns the first user in the ordered set where uuid = &#63; and companyId = &#63;.
+	 *
+	 * <p>
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set.
+	 * </p>
+	 *
+	 * @param uuid the uuid
+	 * @param companyId the company ID
+	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	 * @return the first matching user
+	 * @throws com.liferay.portal.NoSuchUserException if a matching user could not be found
+	 * @throws SystemException if a system exception occurred
+	 */
+	public User findByUuid_C_First(String uuid, long companyId,
+		OrderByComparator orderByComparator)
+		throws NoSuchUserException, SystemException {
+		List<User> list = findByUuid_C(uuid, companyId, 0, 1, orderByComparator);
+
+		if (list.isEmpty()) {
+			StringBundler msg = new StringBundler(6);
+
+			msg.append(_NO_SUCH_ENTITY_WITH_KEY);
+
+			msg.append("uuid=");
+			msg.append(uuid);
+
+			msg.append(", companyId=");
+			msg.append(companyId);
+
+			msg.append(StringPool.CLOSE_CURLY_BRACE);
+
+			throw new NoSuchUserException(msg.toString());
+		}
+		else {
+			return list.get(0);
+		}
+	}
+
+	/**
+	 * Returns the last user in the ordered set where uuid = &#63; and companyId = &#63;.
+	 *
+	 * <p>
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set.
+	 * </p>
+	 *
+	 * @param uuid the uuid
+	 * @param companyId the company ID
+	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	 * @return the last matching user
+	 * @throws com.liferay.portal.NoSuchUserException if a matching user could not be found
+	 * @throws SystemException if a system exception occurred
+	 */
+	public User findByUuid_C_Last(String uuid, long companyId,
+		OrderByComparator orderByComparator)
+		throws NoSuchUserException, SystemException {
+		int count = countByUuid_C(uuid, companyId);
+
+		List<User> list = findByUuid_C(uuid, companyId, count - 1, count,
+				orderByComparator);
+
+		if (list.isEmpty()) {
+			StringBundler msg = new StringBundler(6);
+
+			msg.append(_NO_SUCH_ENTITY_WITH_KEY);
+
+			msg.append("uuid=");
+			msg.append(uuid);
+
+			msg.append(", companyId=");
+			msg.append(companyId);
+
+			msg.append(StringPool.CLOSE_CURLY_BRACE);
+
+			throw new NoSuchUserException(msg.toString());
+		}
+		else {
+			return list.get(0);
+		}
+	}
+
+	/**
+	 * Returns the users before and after the current user in the ordered set where uuid = &#63; and companyId = &#63;.
+	 *
+	 * <p>
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set.
+	 * </p>
+	 *
+	 * @param userId the primary key of the current user
+	 * @param uuid the uuid
+	 * @param companyId the company ID
+	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	 * @return the previous, current, and next user
+	 * @throws com.liferay.portal.NoSuchUserException if a user with the primary key could not be found
+	 * @throws SystemException if a system exception occurred
+	 */
+	public User[] findByUuid_C_PrevAndNext(long userId, String uuid,
+		long companyId, OrderByComparator orderByComparator)
+		throws NoSuchUserException, SystemException {
+		User user = findByPrimaryKey(userId);
+
+		Session session = null;
+
+		try {
+			session = openSession();
+
+			User[] array = new UserImpl[3];
+
+			array[0] = getByUuid_C_PrevAndNext(session, user, uuid, companyId,
+					orderByComparator, true);
+
+			array[1] = user;
+
+			array[2] = getByUuid_C_PrevAndNext(session, user, uuid, companyId,
+					orderByComparator, false);
+
+			return array;
+		}
+		catch (Exception e) {
+			throw processException(e);
+		}
+		finally {
+			closeSession(session);
+		}
+	}
+
+	protected User getByUuid_C_PrevAndNext(Session session, User user,
+		String uuid, long companyId, OrderByComparator orderByComparator,
+		boolean previous) {
+		StringBundler query = null;
+
+		if (orderByComparator != null) {
+			query = new StringBundler(6 +
+					(orderByComparator.getOrderByFields().length * 6));
+		}
+		else {
+			query = new StringBundler(3);
+		}
+
+		query.append(_SQL_SELECT_USER_WHERE);
+
+		if (uuid == null) {
+			query.append(_FINDER_COLUMN_UUID_C_UUID_1);
+		}
+		else {
+			if (uuid.equals(StringPool.BLANK)) {
+				query.append(_FINDER_COLUMN_UUID_C_UUID_3);
+			}
+			else {
+				query.append(_FINDER_COLUMN_UUID_C_UUID_2);
+			}
+		}
+
+		query.append(_FINDER_COLUMN_UUID_C_COMPANYID_2);
+
+		if (orderByComparator != null) {
+			String[] orderByConditionFields = orderByComparator.getOrderByConditionFields();
+
+			if (orderByConditionFields.length > 0) {
+				query.append(WHERE_AND);
+			}
+
+			for (int i = 0; i < orderByConditionFields.length; i++) {
+				query.append(_ORDER_BY_ENTITY_ALIAS);
+				query.append(orderByConditionFields[i]);
+
+				if ((i + 1) < orderByConditionFields.length) {
+					if (orderByComparator.isAscending() ^ previous) {
+						query.append(WHERE_GREATER_THAN_HAS_NEXT);
+					}
+					else {
+						query.append(WHERE_LESSER_THAN_HAS_NEXT);
+					}
+				}
+				else {
+					if (orderByComparator.isAscending() ^ previous) {
+						query.append(WHERE_GREATER_THAN);
+					}
+					else {
+						query.append(WHERE_LESSER_THAN);
+					}
+				}
+			}
+
+			query.append(ORDER_BY_CLAUSE);
+
+			String[] orderByFields = orderByComparator.getOrderByFields();
+
+			for (int i = 0; i < orderByFields.length; i++) {
+				query.append(_ORDER_BY_ENTITY_ALIAS);
+				query.append(orderByFields[i]);
+
+				if ((i + 1) < orderByFields.length) {
+					if (orderByComparator.isAscending() ^ previous) {
+						query.append(ORDER_BY_ASC_HAS_NEXT);
+					}
+					else {
+						query.append(ORDER_BY_DESC_HAS_NEXT);
+					}
+				}
+				else {
+					if (orderByComparator.isAscending() ^ previous) {
+						query.append(ORDER_BY_ASC);
+					}
+					else {
+						query.append(ORDER_BY_DESC);
+					}
+				}
+			}
+		}
+
+		String sql = query.toString();
+
+		Query q = session.createQuery(sql);
+
+		q.setFirstResult(0);
+		q.setMaxResults(2);
+
+		QueryPos qPos = QueryPos.getInstance(q);
+
+		if (uuid != null) {
+			qPos.add(uuid);
+		}
+
+		qPos.add(companyId);
+
+		if (orderByComparator != null) {
+			Object[] values = orderByComparator.getOrderByConditionValues(user);
 
 			for (Object value : values) {
 				qPos.add(value);
@@ -1306,15 +1870,31 @@ public class UserPersistenceImpl extends BasePersistenceImpl<User>
 	 */
 	public List<User> findByCompanyId(long companyId, int start, int end,
 		OrderByComparator orderByComparator) throws SystemException {
-		Object[] finderArgs = new Object[] {
-				companyId,
-				
-				String.valueOf(start), String.valueOf(end),
-				String.valueOf(orderByComparator)
-			};
+		FinderPath finderPath = null;
+		Object[] finderArgs = null;
 
-		List<User> list = (List<User>)FinderCacheUtil.getResult(FINDER_PATH_FIND_BY_COMPANYID,
+		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) &&
+				(orderByComparator == null)) {
+			finderPath = FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_COMPANYID;
+			finderArgs = new Object[] { companyId };
+		}
+		else {
+			finderPath = FINDER_PATH_WITH_PAGINATION_FIND_BY_COMPANYID;
+			finderArgs = new Object[] { companyId, start, end, orderByComparator };
+		}
+
+		List<User> list = (List<User>)FinderCacheUtil.getResult(finderPath,
 				finderArgs, this);
+
+		if ((list != null) && !list.isEmpty()) {
+			for (User user : list) {
+				if ((companyId != user.getCompanyId())) {
+					list = null;
+
+					break;
+				}
+			}
+		}
 
 		if (list == null) {
 			StringBundler query = null;
@@ -1356,14 +1936,12 @@ public class UserPersistenceImpl extends BasePersistenceImpl<User>
 			}
 			finally {
 				if (list == null) {
-					FinderCacheUtil.removeResult(FINDER_PATH_FIND_BY_COMPANYID,
-						finderArgs);
+					FinderCacheUtil.removeResult(finderPath, finderArgs);
 				}
 				else {
 					cacheResult(list);
 
-					FinderCacheUtil.putResult(FINDER_PATH_FIND_BY_COMPANYID,
-						finderArgs, list);
+					FinderCacheUtil.putResult(finderPath, finderArgs, list);
 				}
 
 				closeSession(session);
@@ -1507,17 +2085,17 @@ public class UserPersistenceImpl extends BasePersistenceImpl<User>
 		query.append(_FINDER_COLUMN_COMPANYID_COMPANYID_2);
 
 		if (orderByComparator != null) {
-			String[] orderByFields = orderByComparator.getOrderByFields();
+			String[] orderByConditionFields = orderByComparator.getOrderByConditionFields();
 
-			if (orderByFields.length > 0) {
+			if (orderByConditionFields.length > 0) {
 				query.append(WHERE_AND);
 			}
 
-			for (int i = 0; i < orderByFields.length; i++) {
+			for (int i = 0; i < orderByConditionFields.length; i++) {
 				query.append(_ORDER_BY_ENTITY_ALIAS);
-				query.append(orderByFields[i]);
+				query.append(orderByConditionFields[i]);
 
-				if ((i + 1) < orderByFields.length) {
+				if ((i + 1) < orderByConditionFields.length) {
 					if (orderByComparator.isAscending() ^ previous) {
 						query.append(WHERE_GREATER_THAN_HAS_NEXT);
 					}
@@ -1536,6 +2114,8 @@ public class UserPersistenceImpl extends BasePersistenceImpl<User>
 			}
 
 			query.append(ORDER_BY_CLAUSE);
+
+			String[] orderByFields = orderByComparator.getOrderByFields();
 
 			for (int i = 0; i < orderByFields.length; i++) {
 				query.append(_ORDER_BY_ENTITY_ALIAS);
@@ -1572,7 +2152,7 @@ public class UserPersistenceImpl extends BasePersistenceImpl<User>
 		qPos.add(companyId);
 
 		if (orderByComparator != null) {
-			Object[] values = orderByComparator.getOrderByValues(user);
+			Object[] values = orderByComparator.getOrderByConditionValues(user);
 
 			for (Object value : values) {
 				qPos.add(value);
@@ -1649,6 +2229,14 @@ public class UserPersistenceImpl extends BasePersistenceImpl<User>
 		if (retrieveFromCache) {
 			result = FinderCacheUtil.getResult(FINDER_PATH_FETCH_BY_CONTACTID,
 					finderArgs, this);
+		}
+
+		if (result instanceof User) {
+			User user = (User)result;
+
+			if ((contactId != user.getContactId())) {
+				result = null;
+			}
 		}
 
 		if (result == null) {
@@ -1763,15 +2351,35 @@ public class UserPersistenceImpl extends BasePersistenceImpl<User>
 	 */
 	public List<User> findByEmailAddress(String emailAddress, int start,
 		int end, OrderByComparator orderByComparator) throws SystemException {
-		Object[] finderArgs = new Object[] {
-				emailAddress,
-				
-				String.valueOf(start), String.valueOf(end),
-				String.valueOf(orderByComparator)
-			};
+		FinderPath finderPath = null;
+		Object[] finderArgs = null;
 
-		List<User> list = (List<User>)FinderCacheUtil.getResult(FINDER_PATH_FIND_BY_EMAILADDRESS,
+		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) &&
+				(orderByComparator == null)) {
+			finderPath = FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_EMAILADDRESS;
+			finderArgs = new Object[] { emailAddress };
+		}
+		else {
+			finderPath = FINDER_PATH_WITH_PAGINATION_FIND_BY_EMAILADDRESS;
+			finderArgs = new Object[] {
+					emailAddress,
+					
+					start, end, orderByComparator
+				};
+		}
+
+		List<User> list = (List<User>)FinderCacheUtil.getResult(finderPath,
 				finderArgs, this);
+
+		if ((list != null) && !list.isEmpty()) {
+			for (User user : list) {
+				if (!Validator.equals(emailAddress, user.getEmailAddress())) {
+					list = null;
+
+					break;
+				}
+			}
+		}
 
 		if (list == null) {
 			StringBundler query = null;
@@ -1825,14 +2433,12 @@ public class UserPersistenceImpl extends BasePersistenceImpl<User>
 			}
 			finally {
 				if (list == null) {
-					FinderCacheUtil.removeResult(FINDER_PATH_FIND_BY_EMAILADDRESS,
-						finderArgs);
+					FinderCacheUtil.removeResult(finderPath, finderArgs);
 				}
 				else {
 					cacheResult(list);
 
-					FinderCacheUtil.putResult(FINDER_PATH_FIND_BY_EMAILADDRESS,
-						finderArgs, list);
+					FinderCacheUtil.putResult(finderPath, finderArgs, list);
 				}
 
 				closeSession(session);
@@ -1988,17 +2594,17 @@ public class UserPersistenceImpl extends BasePersistenceImpl<User>
 		}
 
 		if (orderByComparator != null) {
-			String[] orderByFields = orderByComparator.getOrderByFields();
+			String[] orderByConditionFields = orderByComparator.getOrderByConditionFields();
 
-			if (orderByFields.length > 0) {
+			if (orderByConditionFields.length > 0) {
 				query.append(WHERE_AND);
 			}
 
-			for (int i = 0; i < orderByFields.length; i++) {
+			for (int i = 0; i < orderByConditionFields.length; i++) {
 				query.append(_ORDER_BY_ENTITY_ALIAS);
-				query.append(orderByFields[i]);
+				query.append(orderByConditionFields[i]);
 
-				if ((i + 1) < orderByFields.length) {
+				if ((i + 1) < orderByConditionFields.length) {
 					if (orderByComparator.isAscending() ^ previous) {
 						query.append(WHERE_GREATER_THAN_HAS_NEXT);
 					}
@@ -2017,6 +2623,8 @@ public class UserPersistenceImpl extends BasePersistenceImpl<User>
 			}
 
 			query.append(ORDER_BY_CLAUSE);
+
+			String[] orderByFields = orderByComparator.getOrderByFields();
 
 			for (int i = 0; i < orderByFields.length; i++) {
 				query.append(_ORDER_BY_ENTITY_ALIAS);
@@ -2055,7 +2663,7 @@ public class UserPersistenceImpl extends BasePersistenceImpl<User>
 		}
 
 		if (orderByComparator != null) {
-			Object[] values = orderByComparator.getOrderByValues(user);
+			Object[] values = orderByComparator.getOrderByConditionValues(user);
 
 			for (Object value : values) {
 				qPos.add(value);
@@ -2132,6 +2740,14 @@ public class UserPersistenceImpl extends BasePersistenceImpl<User>
 		if (retrieveFromCache) {
 			result = FinderCacheUtil.getResult(FINDER_PATH_FETCH_BY_PORTRAITID,
 					finderArgs, this);
+		}
+
+		if (result instanceof User) {
+			User user = (User)result;
+
+			if ((portraitId != user.getPortraitId())) {
+				result = null;
+			}
 		}
 
 		if (result == null) {
@@ -2266,6 +2882,15 @@ public class UserPersistenceImpl extends BasePersistenceImpl<User>
 		if (retrieveFromCache) {
 			result = FinderCacheUtil.getResult(FINDER_PATH_FETCH_BY_C_U,
 					finderArgs, this);
+		}
+
+		if (result instanceof User) {
+			User user = (User)result;
+
+			if ((companyId != user.getCompanyId()) ||
+					(userId != user.getUserId())) {
+				result = null;
+			}
 		}
 
 		if (result == null) {
@@ -2407,6 +3032,15 @@ public class UserPersistenceImpl extends BasePersistenceImpl<User>
 					finderArgs, this);
 		}
 
+		if (result instanceof User) {
+			User user = (User)result;
+
+			if ((companyId != user.getCompanyId()) ||
+					(defaultUser != user.getDefaultUser())) {
+				result = null;
+			}
+		}
+
 		if (result == null) {
 			StringBundler query = new StringBundler(3);
 
@@ -2544,6 +3178,15 @@ public class UserPersistenceImpl extends BasePersistenceImpl<User>
 		if (retrieveFromCache) {
 			result = FinderCacheUtil.getResult(FINDER_PATH_FETCH_BY_C_SN,
 					finderArgs, this);
+		}
+
+		if (result instanceof User) {
+			User user = (User)result;
+
+			if ((companyId != user.getCompanyId()) ||
+					!Validator.equals(screenName, user.getScreenName())) {
+				result = null;
+			}
 		}
 
 		if (result == null) {
@@ -2698,6 +3341,15 @@ public class UserPersistenceImpl extends BasePersistenceImpl<User>
 					finderArgs, this);
 		}
 
+		if (result instanceof User) {
+			User user = (User)result;
+
+			if ((companyId != user.getCompanyId()) ||
+					!Validator.equals(emailAddress, user.getEmailAddress())) {
+				result = null;
+			}
+		}
+
 		if (result == null) {
 			StringBundler query = new StringBundler(3);
 
@@ -2850,6 +3502,15 @@ public class UserPersistenceImpl extends BasePersistenceImpl<User>
 					finderArgs, this);
 		}
 
+		if (result instanceof User) {
+			User user = (User)result;
+
+			if ((companyId != user.getCompanyId()) ||
+					(facebookId != user.getFacebookId())) {
+				result = null;
+			}
+		}
+
 		if (result == null) {
 			StringBundler query = new StringBundler(3);
 
@@ -2989,6 +3650,15 @@ public class UserPersistenceImpl extends BasePersistenceImpl<User>
 					finderArgs, this);
 		}
 
+		if (result instanceof User) {
+			User user = (User)result;
+
+			if ((companyId != user.getCompanyId()) ||
+					!Validator.equals(openId, user.getOpenId())) {
+				result = null;
+			}
+		}
+
 		if (result == null) {
 			StringBundler query = new StringBundler(3);
 
@@ -3122,15 +3792,36 @@ public class UserPersistenceImpl extends BasePersistenceImpl<User>
 	 */
 	public List<User> findByC_S(long companyId, int status, int start, int end,
 		OrderByComparator orderByComparator) throws SystemException {
-		Object[] finderArgs = new Object[] {
-				companyId, status,
-				
-				String.valueOf(start), String.valueOf(end),
-				String.valueOf(orderByComparator)
-			};
+		FinderPath finderPath = null;
+		Object[] finderArgs = null;
 
-		List<User> list = (List<User>)FinderCacheUtil.getResult(FINDER_PATH_FIND_BY_C_S,
+		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) &&
+				(orderByComparator == null)) {
+			finderPath = FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_C_S;
+			finderArgs = new Object[] { companyId, status };
+		}
+		else {
+			finderPath = FINDER_PATH_WITH_PAGINATION_FIND_BY_C_S;
+			finderArgs = new Object[] {
+					companyId, status,
+					
+					start, end, orderByComparator
+				};
+		}
+
+		List<User> list = (List<User>)FinderCacheUtil.getResult(finderPath,
 				finderArgs, this);
+
+		if ((list != null) && !list.isEmpty()) {
+			for (User user : list) {
+				if ((companyId != user.getCompanyId()) ||
+						(status != user.getStatus())) {
+					list = null;
+
+					break;
+				}
+			}
+		}
 
 		if (list == null) {
 			StringBundler query = null;
@@ -3176,14 +3867,12 @@ public class UserPersistenceImpl extends BasePersistenceImpl<User>
 			}
 			finally {
 				if (list == null) {
-					FinderCacheUtil.removeResult(FINDER_PATH_FIND_BY_C_S,
-						finderArgs);
+					FinderCacheUtil.removeResult(finderPath, finderArgs);
 				}
 				else {
 					cacheResult(list);
 
-					FinderCacheUtil.putResult(FINDER_PATH_FIND_BY_C_S,
-						finderArgs, list);
+					FinderCacheUtil.putResult(finderPath, finderArgs, list);
 				}
 
 				closeSession(session);
@@ -3339,17 +4028,17 @@ public class UserPersistenceImpl extends BasePersistenceImpl<User>
 		query.append(_FINDER_COLUMN_C_S_STATUS_2);
 
 		if (orderByComparator != null) {
-			String[] orderByFields = orderByComparator.getOrderByFields();
+			String[] orderByConditionFields = orderByComparator.getOrderByConditionFields();
 
-			if (orderByFields.length > 0) {
+			if (orderByConditionFields.length > 0) {
 				query.append(WHERE_AND);
 			}
 
-			for (int i = 0; i < orderByFields.length; i++) {
+			for (int i = 0; i < orderByConditionFields.length; i++) {
 				query.append(_ORDER_BY_ENTITY_ALIAS);
-				query.append(orderByFields[i]);
+				query.append(orderByConditionFields[i]);
 
-				if ((i + 1) < orderByFields.length) {
+				if ((i + 1) < orderByConditionFields.length) {
 					if (orderByComparator.isAscending() ^ previous) {
 						query.append(WHERE_GREATER_THAN_HAS_NEXT);
 					}
@@ -3368,6 +4057,8 @@ public class UserPersistenceImpl extends BasePersistenceImpl<User>
 			}
 
 			query.append(ORDER_BY_CLAUSE);
+
+			String[] orderByFields = orderByComparator.getOrderByFields();
 
 			for (int i = 0; i < orderByFields.length; i++) {
 				query.append(_ORDER_BY_ENTITY_ALIAS);
@@ -3406,7 +4097,7 @@ public class UserPersistenceImpl extends BasePersistenceImpl<User>
 		qPos.add(status);
 
 		if (orderByComparator != null) {
-			Object[] values = orderByComparator.getOrderByValues(user);
+			Object[] values = orderByComparator.getOrderByConditionValues(user);
 
 			for (Object value : values) {
 				qPos.add(value);
@@ -3464,12 +4155,20 @@ public class UserPersistenceImpl extends BasePersistenceImpl<User>
 	 */
 	public List<User> findAll(int start, int end,
 		OrderByComparator orderByComparator) throws SystemException {
-		Object[] finderArgs = new Object[] {
-				String.valueOf(start), String.valueOf(end),
-				String.valueOf(orderByComparator)
-			};
+		FinderPath finderPath = null;
+		Object[] finderArgs = new Object[] { start, end, orderByComparator };
 
-		List<User> list = (List<User>)FinderCacheUtil.getResult(FINDER_PATH_FIND_ALL,
+		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) &&
+				(orderByComparator == null)) {
+			finderPath = FINDER_PATH_WITHOUT_PAGINATION_FIND_ALL;
+			finderArgs = FINDER_ARGS_EMPTY;
+		}
+		else {
+			finderPath = FINDER_PATH_WITH_PAGINATION_FIND_ALL;
+			finderArgs = new Object[] { start, end, orderByComparator };
+		}
+
+		List<User> list = (List<User>)FinderCacheUtil.getResult(finderPath,
 				finderArgs, this);
 
 		if (list == null) {
@@ -3514,14 +4213,12 @@ public class UserPersistenceImpl extends BasePersistenceImpl<User>
 			}
 			finally {
 				if (list == null) {
-					FinderCacheUtil.removeResult(FINDER_PATH_FIND_ALL,
-						finderArgs);
+					FinderCacheUtil.removeResult(finderPath, finderArgs);
 				}
 				else {
 					cacheResult(list);
 
-					FinderCacheUtil.putResult(FINDER_PATH_FIND_ALL, finderArgs,
-						list);
+					FinderCacheUtil.putResult(finderPath, finderArgs, list);
 				}
 
 				closeSession(session);
@@ -3539,7 +4236,21 @@ public class UserPersistenceImpl extends BasePersistenceImpl<User>
 	 */
 	public void removeByUuid(String uuid) throws SystemException {
 		for (User user : findByUuid(uuid)) {
-			userPersistence.remove(user);
+			remove(user);
+		}
+	}
+
+	/**
+	 * Removes all the users where uuid = &#63; and companyId = &#63; from the database.
+	 *
+	 * @param uuid the uuid
+	 * @param companyId the company ID
+	 * @throws SystemException if a system exception occurred
+	 */
+	public void removeByUuid_C(String uuid, long companyId)
+		throws SystemException {
+		for (User user : findByUuid_C(uuid, companyId)) {
+			remove(user);
 		}
 	}
 
@@ -3551,7 +4262,7 @@ public class UserPersistenceImpl extends BasePersistenceImpl<User>
 	 */
 	public void removeByCompanyId(long companyId) throws SystemException {
 		for (User user : findByCompanyId(companyId)) {
-			userPersistence.remove(user);
+			remove(user);
 		}
 	}
 
@@ -3559,13 +4270,14 @@ public class UserPersistenceImpl extends BasePersistenceImpl<User>
 	 * Removes the user where contactId = &#63; from the database.
 	 *
 	 * @param contactId the contact ID
+	 * @return the user that was removed
 	 * @throws SystemException if a system exception occurred
 	 */
-	public void removeByContactId(long contactId)
+	public User removeByContactId(long contactId)
 		throws NoSuchUserException, SystemException {
 		User user = findByContactId(contactId);
 
-		userPersistence.remove(user);
+		return remove(user);
 	}
 
 	/**
@@ -3577,7 +4289,7 @@ public class UserPersistenceImpl extends BasePersistenceImpl<User>
 	public void removeByEmailAddress(String emailAddress)
 		throws SystemException {
 		for (User user : findByEmailAddress(emailAddress)) {
-			userPersistence.remove(user);
+			remove(user);
 		}
 	}
 
@@ -3585,13 +4297,14 @@ public class UserPersistenceImpl extends BasePersistenceImpl<User>
 	 * Removes the user where portraitId = &#63; from the database.
 	 *
 	 * @param portraitId the portrait ID
+	 * @return the user that was removed
 	 * @throws SystemException if a system exception occurred
 	 */
-	public void removeByPortraitId(long portraitId)
+	public User removeByPortraitId(long portraitId)
 		throws NoSuchUserException, SystemException {
 		User user = findByPortraitId(portraitId);
 
-		userPersistence.remove(user);
+		return remove(user);
 	}
 
 	/**
@@ -3599,13 +4312,14 @@ public class UserPersistenceImpl extends BasePersistenceImpl<User>
 	 *
 	 * @param companyId the company ID
 	 * @param userId the user ID
+	 * @return the user that was removed
 	 * @throws SystemException if a system exception occurred
 	 */
-	public void removeByC_U(long companyId, long userId)
+	public User removeByC_U(long companyId, long userId)
 		throws NoSuchUserException, SystemException {
 		User user = findByC_U(companyId, userId);
 
-		userPersistence.remove(user);
+		return remove(user);
 	}
 
 	/**
@@ -3613,13 +4327,14 @@ public class UserPersistenceImpl extends BasePersistenceImpl<User>
 	 *
 	 * @param companyId the company ID
 	 * @param defaultUser the default user
+	 * @return the user that was removed
 	 * @throws SystemException if a system exception occurred
 	 */
-	public void removeByC_DU(long companyId, boolean defaultUser)
+	public User removeByC_DU(long companyId, boolean defaultUser)
 		throws NoSuchUserException, SystemException {
 		User user = findByC_DU(companyId, defaultUser);
 
-		userPersistence.remove(user);
+		return remove(user);
 	}
 
 	/**
@@ -3627,13 +4342,14 @@ public class UserPersistenceImpl extends BasePersistenceImpl<User>
 	 *
 	 * @param companyId the company ID
 	 * @param screenName the screen name
+	 * @return the user that was removed
 	 * @throws SystemException if a system exception occurred
 	 */
-	public void removeByC_SN(long companyId, String screenName)
+	public User removeByC_SN(long companyId, String screenName)
 		throws NoSuchUserException, SystemException {
 		User user = findByC_SN(companyId, screenName);
 
-		userPersistence.remove(user);
+		return remove(user);
 	}
 
 	/**
@@ -3641,13 +4357,14 @@ public class UserPersistenceImpl extends BasePersistenceImpl<User>
 	 *
 	 * @param companyId the company ID
 	 * @param emailAddress the email address
+	 * @return the user that was removed
 	 * @throws SystemException if a system exception occurred
 	 */
-	public void removeByC_EA(long companyId, String emailAddress)
+	public User removeByC_EA(long companyId, String emailAddress)
 		throws NoSuchUserException, SystemException {
 		User user = findByC_EA(companyId, emailAddress);
 
-		userPersistence.remove(user);
+		return remove(user);
 	}
 
 	/**
@@ -3655,13 +4372,14 @@ public class UserPersistenceImpl extends BasePersistenceImpl<User>
 	 *
 	 * @param companyId the company ID
 	 * @param facebookId the facebook ID
+	 * @return the user that was removed
 	 * @throws SystemException if a system exception occurred
 	 */
-	public void removeByC_FID(long companyId, long facebookId)
+	public User removeByC_FID(long companyId, long facebookId)
 		throws NoSuchUserException, SystemException {
 		User user = findByC_FID(companyId, facebookId);
 
-		userPersistence.remove(user);
+		return remove(user);
 	}
 
 	/**
@@ -3669,13 +4387,14 @@ public class UserPersistenceImpl extends BasePersistenceImpl<User>
 	 *
 	 * @param companyId the company ID
 	 * @param openId the open ID
+	 * @return the user that was removed
 	 * @throws SystemException if a system exception occurred
 	 */
-	public void removeByC_O(long companyId, String openId)
+	public User removeByC_O(long companyId, String openId)
 		throws NoSuchUserException, SystemException {
 		User user = findByC_O(companyId, openId);
 
-		userPersistence.remove(user);
+		return remove(user);
 	}
 
 	/**
@@ -3688,7 +4407,7 @@ public class UserPersistenceImpl extends BasePersistenceImpl<User>
 	public void removeByC_S(long companyId, int status)
 		throws SystemException {
 		for (User user : findByC_S(companyId, status)) {
-			userPersistence.remove(user);
+			remove(user);
 		}
 	}
 
@@ -3699,7 +4418,7 @@ public class UserPersistenceImpl extends BasePersistenceImpl<User>
 	 */
 	public void removeAll() throws SystemException {
 		for (User user : findAll()) {
-			userPersistence.remove(user);
+			remove(user);
 		}
 	}
 
@@ -3759,6 +4478,77 @@ public class UserPersistenceImpl extends BasePersistenceImpl<User>
 				}
 
 				FinderCacheUtil.putResult(FINDER_PATH_COUNT_BY_UUID,
+					finderArgs, count);
+
+				closeSession(session);
+			}
+		}
+
+		return count.intValue();
+	}
+
+	/**
+	 * Returns the number of users where uuid = &#63; and companyId = &#63;.
+	 *
+	 * @param uuid the uuid
+	 * @param companyId the company ID
+	 * @return the number of matching users
+	 * @throws SystemException if a system exception occurred
+	 */
+	public int countByUuid_C(String uuid, long companyId)
+		throws SystemException {
+		Object[] finderArgs = new Object[] { uuid, companyId };
+
+		Long count = (Long)FinderCacheUtil.getResult(FINDER_PATH_COUNT_BY_UUID_C,
+				finderArgs, this);
+
+		if (count == null) {
+			StringBundler query = new StringBundler(3);
+
+			query.append(_SQL_COUNT_USER_WHERE);
+
+			if (uuid == null) {
+				query.append(_FINDER_COLUMN_UUID_C_UUID_1);
+			}
+			else {
+				if (uuid.equals(StringPool.BLANK)) {
+					query.append(_FINDER_COLUMN_UUID_C_UUID_3);
+				}
+				else {
+					query.append(_FINDER_COLUMN_UUID_C_UUID_2);
+				}
+			}
+
+			query.append(_FINDER_COLUMN_UUID_C_COMPANYID_2);
+
+			String sql = query.toString();
+
+			Session session = null;
+
+			try {
+				session = openSession();
+
+				Query q = session.createQuery(sql);
+
+				QueryPos qPos = QueryPos.getInstance(q);
+
+				if (uuid != null) {
+					qPos.add(uuid);
+				}
+
+				qPos.add(companyId);
+
+				count = (Long)q.uniqueResult();
+			}
+			catch (Exception e) {
+				throw processException(e);
+			}
+			finally {
+				if (count == null) {
+					count = Long.valueOf(0);
+				}
+
+				FinderCacheUtil.putResult(FINDER_PATH_COUNT_BY_UUID_C,
 					finderArgs, count);
 
 				closeSession(session);
@@ -4448,10 +5238,8 @@ public class UserPersistenceImpl extends BasePersistenceImpl<User>
 	 * @throws SystemException if a system exception occurred
 	 */
 	public int countAll() throws SystemException {
-		Object[] finderArgs = new Object[0];
-
 		Long count = (Long)FinderCacheUtil.getResult(FINDER_PATH_COUNT_ALL,
-				finderArgs, this);
+				FINDER_ARGS_EMPTY, this);
 
 		if (count == null) {
 			Session session = null;
@@ -4471,8 +5259,8 @@ public class UserPersistenceImpl extends BasePersistenceImpl<User>
 					count = Long.valueOf(0);
 				}
 
-				FinderCacheUtil.putResult(FINDER_PATH_COUNT_ALL, finderArgs,
-					count);
+				FinderCacheUtil.putResult(FINDER_PATH_COUNT_ALL,
+					FINDER_ARGS_EMPTY, count);
 
 				closeSession(session);
 			}
@@ -4520,6 +5308,10 @@ public class UserPersistenceImpl extends BasePersistenceImpl<User>
 				"com.liferay.portal.kernel.util.OrderByComparator"
 			});
 
+	static {
+		FINDER_PATH_GET_GROUPS.setCacheKeyGeneratorCacheName(null);
+	}
+
 	/**
 	 * Returns an ordered range of all the groups associated with the user.
 	 *
@@ -4536,10 +5328,7 @@ public class UserPersistenceImpl extends BasePersistenceImpl<User>
 	 */
 	public List<com.liferay.portal.model.Group> getGroups(long pk, int start,
 		int end, OrderByComparator orderByComparator) throws SystemException {
-		Object[] finderArgs = new Object[] {
-				pk, String.valueOf(start), String.valueOf(end),
-				String.valueOf(orderByComparator)
-			};
+		Object[] finderArgs = new Object[] { pk, start, end, orderByComparator };
 
 		List<com.liferay.portal.model.Group> list = (List<com.liferay.portal.model.Group>)FinderCacheUtil.getResult(FINDER_PATH_GET_GROUPS,
 				finderArgs, this);
@@ -4598,6 +5387,10 @@ public class UserPersistenceImpl extends BasePersistenceImpl<User>
 			UserModelImpl.FINDER_CACHE_ENABLED_USERS_GROUPS, Long.class,
 			UserModelImpl.MAPPING_TABLE_USERS_GROUPS_NAME, "getGroupsSize",
 			new String[] { Long.class.getName() });
+
+	static {
+		FINDER_PATH_GET_GROUPS_SIZE.setCacheKeyGeneratorCacheName(null);
+	}
 
 	/**
 	 * Returns the number of groups associated with the user.
@@ -4984,6 +5777,10 @@ public class UserPersistenceImpl extends BasePersistenceImpl<User>
 				"com.liferay.portal.kernel.util.OrderByComparator"
 			});
 
+	static {
+		FINDER_PATH_GET_ORGANIZATIONS.setCacheKeyGeneratorCacheName(null);
+	}
+
 	/**
 	 * Returns an ordered range of all the organizations associated with the user.
 	 *
@@ -5001,10 +5798,7 @@ public class UserPersistenceImpl extends BasePersistenceImpl<User>
 	public List<com.liferay.portal.model.Organization> getOrganizations(
 		long pk, int start, int end, OrderByComparator orderByComparator)
 		throws SystemException {
-		Object[] finderArgs = new Object[] {
-				pk, String.valueOf(start), String.valueOf(end),
-				String.valueOf(orderByComparator)
-			};
+		Object[] finderArgs = new Object[] { pk, start, end, orderByComparator };
 
 		List<com.liferay.portal.model.Organization> list = (List<com.liferay.portal.model.Organization>)FinderCacheUtil.getResult(FINDER_PATH_GET_ORGANIZATIONS,
 				finderArgs, this);
@@ -5063,6 +5857,10 @@ public class UserPersistenceImpl extends BasePersistenceImpl<User>
 			UserModelImpl.FINDER_CACHE_ENABLED_USERS_ORGS, Long.class,
 			UserModelImpl.MAPPING_TABLE_USERS_ORGS_NAME,
 			"getOrganizationsSize", new String[] { Long.class.getName() });
+
+	static {
+		FINDER_PATH_GET_ORGANIZATIONS_SIZE.setCacheKeyGeneratorCacheName(null);
+	}
 
 	/**
 	 * Returns the number of organizations associated with the user.
@@ -5422,483 +6220,6 @@ public class UserPersistenceImpl extends BasePersistenceImpl<User>
 	}
 
 	/**
-	 * Returns all the permissions associated with the user.
-	 *
-	 * @param pk the primary key of the user
-	 * @return the permissions associated with the user
-	 * @throws SystemException if a system exception occurred
-	 */
-	public List<com.liferay.portal.model.Permission> getPermissions(long pk)
-		throws SystemException {
-		return getPermissions(pk, QueryUtil.ALL_POS, QueryUtil.ALL_POS);
-	}
-
-	/**
-	 * Returns a range of all the permissions associated with the user.
-	 *
-	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set.
-	 * </p>
-	 *
-	 * @param pk the primary key of the user
-	 * @param start the lower bound of the range of users
-	 * @param end the upper bound of the range of users (not inclusive)
-	 * @return the range of permissions associated with the user
-	 * @throws SystemException if a system exception occurred
-	 */
-	public List<com.liferay.portal.model.Permission> getPermissions(long pk,
-		int start, int end) throws SystemException {
-		return getPermissions(pk, start, end, null);
-	}
-
-	public static final FinderPath FINDER_PATH_GET_PERMISSIONS = new FinderPath(com.liferay.portal.model.impl.PermissionModelImpl.ENTITY_CACHE_ENABLED,
-			UserModelImpl.FINDER_CACHE_ENABLED_USERS_PERMISSIONS,
-			com.liferay.portal.model.impl.PermissionImpl.class,
-			UserModelImpl.MAPPING_TABLE_USERS_PERMISSIONS_NAME,
-			"getPermissions",
-			new String[] {
-				Long.class.getName(), "java.lang.Integer", "java.lang.Integer",
-				"com.liferay.portal.kernel.util.OrderByComparator"
-			});
-
-	/**
-	 * Returns an ordered range of all the permissions associated with the user.
-	 *
-	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set.
-	 * </p>
-	 *
-	 * @param pk the primary key of the user
-	 * @param start the lower bound of the range of users
-	 * @param end the upper bound of the range of users (not inclusive)
-	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
-	 * @return the ordered range of permissions associated with the user
-	 * @throws SystemException if a system exception occurred
-	 */
-	public List<com.liferay.portal.model.Permission> getPermissions(long pk,
-		int start, int end, OrderByComparator orderByComparator)
-		throws SystemException {
-		Object[] finderArgs = new Object[] {
-				pk, String.valueOf(start), String.valueOf(end),
-				String.valueOf(orderByComparator)
-			};
-
-		List<com.liferay.portal.model.Permission> list = (List<com.liferay.portal.model.Permission>)FinderCacheUtil.getResult(FINDER_PATH_GET_PERMISSIONS,
-				finderArgs, this);
-
-		if (list == null) {
-			Session session = null;
-
-			try {
-				session = openSession();
-
-				String sql = null;
-
-				if (orderByComparator != null) {
-					sql = _SQL_GETPERMISSIONS.concat(ORDER_BY_CLAUSE)
-											 .concat(orderByComparator.getOrderBy());
-				}
-				else {
-					sql = _SQL_GETPERMISSIONS;
-				}
-
-				SQLQuery q = session.createSQLQuery(sql);
-
-				q.addEntity("Permission_",
-					com.liferay.portal.model.impl.PermissionImpl.class);
-
-				QueryPos qPos = QueryPos.getInstance(q);
-
-				qPos.add(pk);
-
-				list = (List<com.liferay.portal.model.Permission>)QueryUtil.list(q,
-						getDialect(), start, end);
-			}
-			catch (Exception e) {
-				throw processException(e);
-			}
-			finally {
-				if (list == null) {
-					FinderCacheUtil.removeResult(FINDER_PATH_GET_PERMISSIONS,
-						finderArgs);
-				}
-				else {
-					permissionPersistence.cacheResult(list);
-
-					FinderCacheUtil.putResult(FINDER_PATH_GET_PERMISSIONS,
-						finderArgs, list);
-				}
-
-				closeSession(session);
-			}
-		}
-
-		return list;
-	}
-
-	public static final FinderPath FINDER_PATH_GET_PERMISSIONS_SIZE = new FinderPath(com.liferay.portal.model.impl.PermissionModelImpl.ENTITY_CACHE_ENABLED,
-			UserModelImpl.FINDER_CACHE_ENABLED_USERS_PERMISSIONS, Long.class,
-			UserModelImpl.MAPPING_TABLE_USERS_PERMISSIONS_NAME,
-			"getPermissionsSize", new String[] { Long.class.getName() });
-
-	/**
-	 * Returns the number of permissions associated with the user.
-	 *
-	 * @param pk the primary key of the user
-	 * @return the number of permissions associated with the user
-	 * @throws SystemException if a system exception occurred
-	 */
-	public int getPermissionsSize(long pk) throws SystemException {
-		Object[] finderArgs = new Object[] { pk };
-
-		Long count = (Long)FinderCacheUtil.getResult(FINDER_PATH_GET_PERMISSIONS_SIZE,
-				finderArgs, this);
-
-		if (count == null) {
-			Session session = null;
-
-			try {
-				session = openSession();
-
-				SQLQuery q = session.createSQLQuery(_SQL_GETPERMISSIONSSIZE);
-
-				q.addScalar(COUNT_COLUMN_NAME,
-					com.liferay.portal.kernel.dao.orm.Type.LONG);
-
-				QueryPos qPos = QueryPos.getInstance(q);
-
-				qPos.add(pk);
-
-				count = (Long)q.uniqueResult();
-			}
-			catch (Exception e) {
-				throw processException(e);
-			}
-			finally {
-				if (count == null) {
-					count = Long.valueOf(0);
-				}
-
-				FinderCacheUtil.putResult(FINDER_PATH_GET_PERMISSIONS_SIZE,
-					finderArgs, count);
-
-				closeSession(session);
-			}
-		}
-
-		return count.intValue();
-	}
-
-	public static final FinderPath FINDER_PATH_CONTAINS_PERMISSION = new FinderPath(com.liferay.portal.model.impl.PermissionModelImpl.ENTITY_CACHE_ENABLED,
-			UserModelImpl.FINDER_CACHE_ENABLED_USERS_PERMISSIONS,
-			Boolean.class, UserModelImpl.MAPPING_TABLE_USERS_PERMISSIONS_NAME,
-			"containsPermission",
-			new String[] { Long.class.getName(), Long.class.getName() });
-
-	/**
-	 * Returns <code>true</code> if the permission is associated with the user.
-	 *
-	 * @param pk the primary key of the user
-	 * @param permissionPK the primary key of the permission
-	 * @return <code>true</code> if the permission is associated with the user; <code>false</code> otherwise
-	 * @throws SystemException if a system exception occurred
-	 */
-	public boolean containsPermission(long pk, long permissionPK)
-		throws SystemException {
-		Object[] finderArgs = new Object[] { pk, permissionPK };
-
-		Boolean value = (Boolean)FinderCacheUtil.getResult(FINDER_PATH_CONTAINS_PERMISSION,
-				finderArgs, this);
-
-		if (value == null) {
-			try {
-				value = Boolean.valueOf(containsPermission.contains(pk,
-							permissionPK));
-			}
-			catch (Exception e) {
-				throw processException(e);
-			}
-			finally {
-				if (value == null) {
-					value = Boolean.FALSE;
-				}
-
-				FinderCacheUtil.putResult(FINDER_PATH_CONTAINS_PERMISSION,
-					finderArgs, value);
-			}
-		}
-
-		return value.booleanValue();
-	}
-
-	/**
-	 * Returns <code>true</code> if the user has any permissions associated with it.
-	 *
-	 * @param pk the primary key of the user to check for associations with permissions
-	 * @return <code>true</code> if the user has any permissions associated with it; <code>false</code> otherwise
-	 * @throws SystemException if a system exception occurred
-	 */
-	public boolean containsPermissions(long pk) throws SystemException {
-		if (getPermissionsSize(pk) > 0) {
-			return true;
-		}
-		else {
-			return false;
-		}
-	}
-
-	/**
-	 * Adds an association between the user and the permission. Also notifies the appropriate model listeners and clears the mapping table finder cache.
-	 *
-	 * @param pk the primary key of the user
-	 * @param permissionPK the primary key of the permission
-	 * @throws SystemException if a system exception occurred
-	 */
-	public void addPermission(long pk, long permissionPK)
-		throws SystemException {
-		try {
-			addPermission.add(pk, permissionPK);
-		}
-		catch (Exception e) {
-			throw processException(e);
-		}
-		finally {
-			FinderCacheUtil.clearCache(UserModelImpl.MAPPING_TABLE_USERS_PERMISSIONS_NAME);
-		}
-	}
-
-	/**
-	 * Adds an association between the user and the permission. Also notifies the appropriate model listeners and clears the mapping table finder cache.
-	 *
-	 * @param pk the primary key of the user
-	 * @param permission the permission
-	 * @throws SystemException if a system exception occurred
-	 */
-	public void addPermission(long pk,
-		com.liferay.portal.model.Permission permission)
-		throws SystemException {
-		try {
-			addPermission.add(pk, permission.getPrimaryKey());
-		}
-		catch (Exception e) {
-			throw processException(e);
-		}
-		finally {
-			FinderCacheUtil.clearCache(UserModelImpl.MAPPING_TABLE_USERS_PERMISSIONS_NAME);
-		}
-	}
-
-	/**
-	 * Adds an association between the user and the permissions. Also notifies the appropriate model listeners and clears the mapping table finder cache.
-	 *
-	 * @param pk the primary key of the user
-	 * @param permissionPKs the primary keys of the permissions
-	 * @throws SystemException if a system exception occurred
-	 */
-	public void addPermissions(long pk, long[] permissionPKs)
-		throws SystemException {
-		try {
-			for (long permissionPK : permissionPKs) {
-				addPermission.add(pk, permissionPK);
-			}
-		}
-		catch (Exception e) {
-			throw processException(e);
-		}
-		finally {
-			FinderCacheUtil.clearCache(UserModelImpl.MAPPING_TABLE_USERS_PERMISSIONS_NAME);
-		}
-	}
-
-	/**
-	 * Adds an association between the user and the permissions. Also notifies the appropriate model listeners and clears the mapping table finder cache.
-	 *
-	 * @param pk the primary key of the user
-	 * @param permissions the permissions
-	 * @throws SystemException if a system exception occurred
-	 */
-	public void addPermissions(long pk,
-		List<com.liferay.portal.model.Permission> permissions)
-		throws SystemException {
-		try {
-			for (com.liferay.portal.model.Permission permission : permissions) {
-				addPermission.add(pk, permission.getPrimaryKey());
-			}
-		}
-		catch (Exception e) {
-			throw processException(e);
-		}
-		finally {
-			FinderCacheUtil.clearCache(UserModelImpl.MAPPING_TABLE_USERS_PERMISSIONS_NAME);
-		}
-	}
-
-	/**
-	 * Clears all associations between the user and its permissions. Also notifies the appropriate model listeners and clears the mapping table finder cache.
-	 *
-	 * @param pk the primary key of the user to clear the associated permissions from
-	 * @throws SystemException if a system exception occurred
-	 */
-	public void clearPermissions(long pk) throws SystemException {
-		try {
-			clearPermissions.clear(pk);
-		}
-		catch (Exception e) {
-			throw processException(e);
-		}
-		finally {
-			FinderCacheUtil.clearCache(UserModelImpl.MAPPING_TABLE_USERS_PERMISSIONS_NAME);
-		}
-	}
-
-	/**
-	 * Removes the association between the user and the permission. Also notifies the appropriate model listeners and clears the mapping table finder cache.
-	 *
-	 * @param pk the primary key of the user
-	 * @param permissionPK the primary key of the permission
-	 * @throws SystemException if a system exception occurred
-	 */
-	public void removePermission(long pk, long permissionPK)
-		throws SystemException {
-		try {
-			removePermission.remove(pk, permissionPK);
-		}
-		catch (Exception e) {
-			throw processException(e);
-		}
-		finally {
-			FinderCacheUtil.clearCache(UserModelImpl.MAPPING_TABLE_USERS_PERMISSIONS_NAME);
-		}
-	}
-
-	/**
-	 * Removes the association between the user and the permission. Also notifies the appropriate model listeners and clears the mapping table finder cache.
-	 *
-	 * @param pk the primary key of the user
-	 * @param permission the permission
-	 * @throws SystemException if a system exception occurred
-	 */
-	public void removePermission(long pk,
-		com.liferay.portal.model.Permission permission)
-		throws SystemException {
-		try {
-			removePermission.remove(pk, permission.getPrimaryKey());
-		}
-		catch (Exception e) {
-			throw processException(e);
-		}
-		finally {
-			FinderCacheUtil.clearCache(UserModelImpl.MAPPING_TABLE_USERS_PERMISSIONS_NAME);
-		}
-	}
-
-	/**
-	 * Removes the association between the user and the permissions. Also notifies the appropriate model listeners and clears the mapping table finder cache.
-	 *
-	 * @param pk the primary key of the user
-	 * @param permissionPKs the primary keys of the permissions
-	 * @throws SystemException if a system exception occurred
-	 */
-	public void removePermissions(long pk, long[] permissionPKs)
-		throws SystemException {
-		try {
-			for (long permissionPK : permissionPKs) {
-				removePermission.remove(pk, permissionPK);
-			}
-		}
-		catch (Exception e) {
-			throw processException(e);
-		}
-		finally {
-			FinderCacheUtil.clearCache(UserModelImpl.MAPPING_TABLE_USERS_PERMISSIONS_NAME);
-		}
-	}
-
-	/**
-	 * Removes the association between the user and the permissions. Also notifies the appropriate model listeners and clears the mapping table finder cache.
-	 *
-	 * @param pk the primary key of the user
-	 * @param permissions the permissions
-	 * @throws SystemException if a system exception occurred
-	 */
-	public void removePermissions(long pk,
-		List<com.liferay.portal.model.Permission> permissions)
-		throws SystemException {
-		try {
-			for (com.liferay.portal.model.Permission permission : permissions) {
-				removePermission.remove(pk, permission.getPrimaryKey());
-			}
-		}
-		catch (Exception e) {
-			throw processException(e);
-		}
-		finally {
-			FinderCacheUtil.clearCache(UserModelImpl.MAPPING_TABLE_USERS_PERMISSIONS_NAME);
-		}
-	}
-
-	/**
-	 * Sets the permissions associated with the user, removing and adding associations as necessary. Also notifies the appropriate model listeners and clears the mapping table finder cache.
-	 *
-	 * @param pk the primary key of the user
-	 * @param permissionPKs the primary keys of the permissions to be associated with the user
-	 * @throws SystemException if a system exception occurred
-	 */
-	public void setPermissions(long pk, long[] permissionPKs)
-		throws SystemException {
-		try {
-			Set<Long> permissionPKSet = SetUtil.fromArray(permissionPKs);
-
-			List<com.liferay.portal.model.Permission> permissions = getPermissions(pk);
-
-			for (com.liferay.portal.model.Permission permission : permissions) {
-				if (!permissionPKSet.remove(permission.getPrimaryKey())) {
-					removePermission.remove(pk, permission.getPrimaryKey());
-				}
-			}
-
-			for (Long permissionPK : permissionPKSet) {
-				addPermission.add(pk, permissionPK);
-			}
-		}
-		catch (Exception e) {
-			throw processException(e);
-		}
-		finally {
-			FinderCacheUtil.clearCache(UserModelImpl.MAPPING_TABLE_USERS_PERMISSIONS_NAME);
-		}
-	}
-
-	/**
-	 * Sets the permissions associated with the user, removing and adding associations as necessary. Also notifies the appropriate model listeners and clears the mapping table finder cache.
-	 *
-	 * @param pk the primary key of the user
-	 * @param permissions the permissions to be associated with the user
-	 * @throws SystemException if a system exception occurred
-	 */
-	public void setPermissions(long pk,
-		List<com.liferay.portal.model.Permission> permissions)
-		throws SystemException {
-		try {
-			long[] permissionPKs = new long[permissions.size()];
-
-			for (int i = 0; i < permissions.size(); i++) {
-				com.liferay.portal.model.Permission permission = permissions.get(i);
-
-				permissionPKs[i] = permission.getPrimaryKey();
-			}
-
-			setPermissions(pk, permissionPKs);
-		}
-		catch (Exception e) {
-			throw processException(e);
-		}
-		finally {
-			FinderCacheUtil.clearCache(UserModelImpl.MAPPING_TABLE_USERS_PERMISSIONS_NAME);
-		}
-	}
-
-	/**
 	 * Returns all the roles associated with the user.
 	 *
 	 * @param pk the primary key of the user
@@ -5937,6 +6258,10 @@ public class UserPersistenceImpl extends BasePersistenceImpl<User>
 				"com.liferay.portal.kernel.util.OrderByComparator"
 			});
 
+	static {
+		FINDER_PATH_GET_ROLES.setCacheKeyGeneratorCacheName(null);
+	}
+
 	/**
 	 * Returns an ordered range of all the roles associated with the user.
 	 *
@@ -5953,10 +6278,7 @@ public class UserPersistenceImpl extends BasePersistenceImpl<User>
 	 */
 	public List<com.liferay.portal.model.Role> getRoles(long pk, int start,
 		int end, OrderByComparator orderByComparator) throws SystemException {
-		Object[] finderArgs = new Object[] {
-				pk, String.valueOf(start), String.valueOf(end),
-				String.valueOf(orderByComparator)
-			};
+		Object[] finderArgs = new Object[] { pk, start, end, orderByComparator };
 
 		List<com.liferay.portal.model.Role> list = (List<com.liferay.portal.model.Role>)FinderCacheUtil.getResult(FINDER_PATH_GET_ROLES,
 				finderArgs, this);
@@ -6015,6 +6337,10 @@ public class UserPersistenceImpl extends BasePersistenceImpl<User>
 			UserModelImpl.FINDER_CACHE_ENABLED_USERS_ROLES, Long.class,
 			UserModelImpl.MAPPING_TABLE_USERS_ROLES_NAME, "getRolesSize",
 			new String[] { Long.class.getName() });
+
+	static {
+		FINDER_PATH_GET_ROLES_SIZE.setCacheKeyGeneratorCacheName(null);
+	}
 
 	/**
 	 * Returns the number of roles associated with the user.
@@ -6399,6 +6725,10 @@ public class UserPersistenceImpl extends BasePersistenceImpl<User>
 				"com.liferay.portal.kernel.util.OrderByComparator"
 			});
 
+	static {
+		FINDER_PATH_GET_TEAMS.setCacheKeyGeneratorCacheName(null);
+	}
+
 	/**
 	 * Returns an ordered range of all the teams associated with the user.
 	 *
@@ -6415,10 +6745,7 @@ public class UserPersistenceImpl extends BasePersistenceImpl<User>
 	 */
 	public List<com.liferay.portal.model.Team> getTeams(long pk, int start,
 		int end, OrderByComparator orderByComparator) throws SystemException {
-		Object[] finderArgs = new Object[] {
-				pk, String.valueOf(start), String.valueOf(end),
-				String.valueOf(orderByComparator)
-			};
+		Object[] finderArgs = new Object[] { pk, start, end, orderByComparator };
 
 		List<com.liferay.portal.model.Team> list = (List<com.liferay.portal.model.Team>)FinderCacheUtil.getResult(FINDER_PATH_GET_TEAMS,
 				finderArgs, this);
@@ -6476,6 +6803,10 @@ public class UserPersistenceImpl extends BasePersistenceImpl<User>
 			UserModelImpl.FINDER_CACHE_ENABLED_USERS_TEAMS, Long.class,
 			UserModelImpl.MAPPING_TABLE_USERS_TEAMS_NAME, "getTeamsSize",
 			new String[] { Long.class.getName() });
+
+	static {
+		FINDER_PATH_GET_TEAMS_SIZE.setCacheKeyGeneratorCacheName(null);
+	}
 
 	/**
 	 * Returns the number of teams associated with the user.
@@ -6860,6 +7191,10 @@ public class UserPersistenceImpl extends BasePersistenceImpl<User>
 				"com.liferay.portal.kernel.util.OrderByComparator"
 			});
 
+	static {
+		FINDER_PATH_GET_USERGROUPS.setCacheKeyGeneratorCacheName(null);
+	}
+
 	/**
 	 * Returns an ordered range of all the user groups associated with the user.
 	 *
@@ -6877,10 +7212,7 @@ public class UserPersistenceImpl extends BasePersistenceImpl<User>
 	public List<com.liferay.portal.model.UserGroup> getUserGroups(long pk,
 		int start, int end, OrderByComparator orderByComparator)
 		throws SystemException {
-		Object[] finderArgs = new Object[] {
-				pk, String.valueOf(start), String.valueOf(end),
-				String.valueOf(orderByComparator)
-			};
+		Object[] finderArgs = new Object[] { pk, start, end, orderByComparator };
 
 		List<com.liferay.portal.model.UserGroup> list = (List<com.liferay.portal.model.UserGroup>)FinderCacheUtil.getResult(FINDER_PATH_GET_USERGROUPS,
 				finderArgs, this);
@@ -6939,6 +7271,10 @@ public class UserPersistenceImpl extends BasePersistenceImpl<User>
 			UserModelImpl.FINDER_CACHE_ENABLED_USERS_USERGROUPS, Long.class,
 			UserModelImpl.MAPPING_TABLE_USERS_USERGROUPS_NAME,
 			"getUserGroupsSize", new String[] { Long.class.getName() });
+
+	static {
+		FINDER_PATH_GET_USERGROUPS_SIZE.setCacheKeyGeneratorCacheName(null);
+	}
 
 	/**
 	 * Returns the number of user groups associated with the user.
@@ -7319,47 +7655,41 @@ public class UserPersistenceImpl extends BasePersistenceImpl<User>
 			}
 		}
 
-		containsGroup = new ContainsGroup(this);
+		containsGroup = new ContainsGroup();
 
-		addGroup = new AddGroup(this);
-		clearGroups = new ClearGroups(this);
-		removeGroup = new RemoveGroup(this);
+		addGroup = new AddGroup();
+		clearGroups = new ClearGroups();
+		removeGroup = new RemoveGroup();
 
-		containsOrganization = new ContainsOrganization(this);
+		containsOrganization = new ContainsOrganization();
 
-		addOrganization = new AddOrganization(this);
-		clearOrganizations = new ClearOrganizations(this);
-		removeOrganization = new RemoveOrganization(this);
+		addOrganization = new AddOrganization();
+		clearOrganizations = new ClearOrganizations();
+		removeOrganization = new RemoveOrganization();
 
-		containsPermission = new ContainsPermission(this);
+		containsRole = new ContainsRole();
 
-		addPermission = new AddPermission(this);
-		clearPermissions = new ClearPermissions(this);
-		removePermission = new RemovePermission(this);
+		addRole = new AddRole();
+		clearRoles = new ClearRoles();
+		removeRole = new RemoveRole();
 
-		containsRole = new ContainsRole(this);
+		containsTeam = new ContainsTeam();
 
-		addRole = new AddRole(this);
-		clearRoles = new ClearRoles(this);
-		removeRole = new RemoveRole(this);
+		addTeam = new AddTeam();
+		clearTeams = new ClearTeams();
+		removeTeam = new RemoveTeam();
 
-		containsTeam = new ContainsTeam(this);
+		containsUserGroup = new ContainsUserGroup();
 
-		addTeam = new AddTeam(this);
-		clearTeams = new ClearTeams(this);
-		removeTeam = new RemoveTeam(this);
-
-		containsUserGroup = new ContainsUserGroup(this);
-
-		addUserGroup = new AddUserGroup(this);
-		clearUserGroups = new ClearUserGroups(this);
-		removeUserGroup = new RemoveUserGroup(this);
+		addUserGroup = new AddUserGroup();
+		clearUserGroups = new ClearUserGroups();
+		removeUserGroup = new RemoveUserGroup();
 	}
 
 	public void destroy() {
 		EntityCacheUtil.removeCache(UserImpl.class.getName());
 		FinderCacheUtil.removeCache(FINDER_CLASS_NAME_ENTITY);
-		FinderCacheUtil.removeCache(FINDER_CLASS_NAME_LIST);
+		FinderCacheUtil.removeCache(FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
 	}
 
 	@BeanReference(type = AccountPersistence.class)
@@ -7406,8 +7736,6 @@ public class UserPersistenceImpl extends BasePersistenceImpl<User>
 	protected MembershipRequestPersistence membershipRequestPersistence;
 	@BeanReference(type = OrganizationPersistence.class)
 	protected OrganizationPersistence organizationPersistence;
-	@BeanReference(type = OrgGroupPermissionPersistence.class)
-	protected OrgGroupPermissionPersistence orgGroupPermissionPersistence;
 	@BeanReference(type = OrgGroupRolePersistence.class)
 	protected OrgGroupRolePersistence orgGroupRolePersistence;
 	@BeanReference(type = OrgLaborPersistence.class)
@@ -7418,8 +7746,6 @@ public class UserPersistenceImpl extends BasePersistenceImpl<User>
 	protected PasswordPolicyRelPersistence passwordPolicyRelPersistence;
 	@BeanReference(type = PasswordTrackerPersistence.class)
 	protected PasswordTrackerPersistence passwordTrackerPersistence;
-	@BeanReference(type = PermissionPersistence.class)
-	protected PermissionPersistence permissionPersistence;
 	@BeanReference(type = PhonePersistence.class)
 	protected PhonePersistence phonePersistence;
 	@BeanReference(type = PluginSettingPersistence.class)
@@ -7440,14 +7766,16 @@ public class UserPersistenceImpl extends BasePersistenceImpl<User>
 	protected RepositoryPersistence repositoryPersistence;
 	@BeanReference(type = RepositoryEntryPersistence.class)
 	protected RepositoryEntryPersistence repositoryEntryPersistence;
-	@BeanReference(type = ResourcePersistence.class)
-	protected ResourcePersistence resourcePersistence;
 	@BeanReference(type = ResourceActionPersistence.class)
 	protected ResourceActionPersistence resourceActionPersistence;
-	@BeanReference(type = ResourceCodePersistence.class)
-	protected ResourceCodePersistence resourceCodePersistence;
+	@BeanReference(type = ResourceBlockPersistence.class)
+	protected ResourceBlockPersistence resourceBlockPersistence;
+	@BeanReference(type = ResourceBlockPermissionPersistence.class)
+	protected ResourceBlockPermissionPersistence resourceBlockPermissionPersistence;
 	@BeanReference(type = ResourcePermissionPersistence.class)
 	protected ResourcePermissionPersistence resourcePermissionPersistence;
+	@BeanReference(type = ResourceTypePermissionPersistence.class)
+	protected ResourceTypePermissionPersistence resourceTypePermissionPersistence;
 	@BeanReference(type = RolePersistence.class)
 	protected RolePersistence rolePersistence;
 	@BeanReference(type = ServiceComponentPersistence.class)
@@ -7500,18 +7828,14 @@ public class UserPersistenceImpl extends BasePersistenceImpl<User>
 	protected MBBanPersistence mbBanPersistence;
 	@BeanReference(type = MBMessagePersistence.class)
 	protected MBMessagePersistence mbMessagePersistence;
-	@BeanReference(type = MBMessageFlagPersistence.class)
-	protected MBMessageFlagPersistence mbMessageFlagPersistence;
 	@BeanReference(type = MBStatsUserPersistence.class)
 	protected MBStatsUserPersistence mbStatsUserPersistence;
+	@BeanReference(type = MBThreadFlagPersistence.class)
+	protected MBThreadFlagPersistence mbThreadFlagPersistence;
 	@BeanReference(type = ShoppingCartPersistence.class)
 	protected ShoppingCartPersistence shoppingCartPersistence;
 	@BeanReference(type = SocialActivityPersistence.class)
 	protected SocialActivityPersistence socialActivityPersistence;
-	@BeanReference(type = SocialEquityLogPersistence.class)
-	protected SocialEquityLogPersistence socialEquityLogPersistence;
-	@BeanReference(type = SocialEquityUserPersistence.class)
-	protected SocialEquityUserPersistence socialEquityUserPersistence;
 	@BeanReference(type = SocialRequestPersistence.class)
 	protected SocialRequestPersistence socialRequestPersistence;
 	protected ContainsGroup containsGroup;
@@ -7522,10 +7846,6 @@ public class UserPersistenceImpl extends BasePersistenceImpl<User>
 	protected AddOrganization addOrganization;
 	protected ClearOrganizations clearOrganizations;
 	protected RemoveOrganization removeOrganization;
-	protected ContainsPermission containsPermission;
-	protected AddPermission addPermission;
-	protected ClearPermissions clearPermissions;
-	protected RemovePermission removePermission;
 	protected ContainsRole containsRole;
 	protected AddRole addRole;
 	protected ClearRoles clearRoles;
@@ -7540,9 +7860,7 @@ public class UserPersistenceImpl extends BasePersistenceImpl<User>
 	protected RemoveUserGroup removeUserGroup;
 
 	protected class ContainsGroup {
-		protected ContainsGroup(UserPersistenceImpl persistenceImpl) {
-			super();
-
+		protected ContainsGroup() {
 			_mappingSqlQuery = MappingSqlQueryFactoryUtil.getMappingSqlQuery(getDataSource(),
 					_SQL_CONTAINSGROUP,
 					new int[] { java.sql.Types.BIGINT, java.sql.Types.BIGINT },
@@ -7569,15 +7887,14 @@ public class UserPersistenceImpl extends BasePersistenceImpl<User>
 	}
 
 	protected class AddGroup {
-		protected AddGroup(UserPersistenceImpl persistenceImpl) {
+		protected AddGroup() {
 			_sqlUpdate = SqlUpdateFactoryUtil.getSqlUpdate(getDataSource(),
 					"INSERT INTO Users_Groups (userId, groupId) VALUES (?, ?)",
 					new int[] { java.sql.Types.BIGINT, java.sql.Types.BIGINT });
-			_persistenceImpl = persistenceImpl;
 		}
 
 		protected void add(long userId, long groupId) throws SystemException {
-			if (!_persistenceImpl.containsGroup.contains(userId, groupId)) {
+			if (!containsGroup.contains(userId, groupId)) {
 				ModelListener<com.liferay.portal.model.Group>[] groupListeners = groupPersistence.getListeners();
 
 				for (ModelListener<User> listener : listeners) {
@@ -7607,11 +7924,10 @@ public class UserPersistenceImpl extends BasePersistenceImpl<User>
 		}
 
 		private SqlUpdate _sqlUpdate;
-		private UserPersistenceImpl _persistenceImpl;
 	}
 
 	protected class ClearGroups {
-		protected ClearGroups(UserPersistenceImpl persistenceImpl) {
+		protected ClearGroups() {
 			_sqlUpdate = SqlUpdateFactoryUtil.getSqlUpdate(getDataSource(),
 					"DELETE FROM Users_Groups WHERE userId = ?",
 					new int[] { java.sql.Types.BIGINT });
@@ -7661,16 +7977,15 @@ public class UserPersistenceImpl extends BasePersistenceImpl<User>
 	}
 
 	protected class RemoveGroup {
-		protected RemoveGroup(UserPersistenceImpl persistenceImpl) {
+		protected RemoveGroup() {
 			_sqlUpdate = SqlUpdateFactoryUtil.getSqlUpdate(getDataSource(),
 					"DELETE FROM Users_Groups WHERE userId = ? AND groupId = ?",
 					new int[] { java.sql.Types.BIGINT, java.sql.Types.BIGINT });
-			_persistenceImpl = persistenceImpl;
 		}
 
 		protected void remove(long userId, long groupId)
 			throws SystemException {
-			if (_persistenceImpl.containsGroup.contains(userId, groupId)) {
+			if (containsGroup.contains(userId, groupId)) {
 				ModelListener<com.liferay.portal.model.Group>[] groupListeners = groupPersistence.getListeners();
 
 				for (ModelListener<User> listener : listeners) {
@@ -7700,13 +8015,10 @@ public class UserPersistenceImpl extends BasePersistenceImpl<User>
 		}
 
 		private SqlUpdate _sqlUpdate;
-		private UserPersistenceImpl _persistenceImpl;
 	}
 
 	protected class ContainsOrganization {
-		protected ContainsOrganization(UserPersistenceImpl persistenceImpl) {
-			super();
-
+		protected ContainsOrganization() {
 			_mappingSqlQuery = MappingSqlQueryFactoryUtil.getMappingSqlQuery(getDataSource(),
 					_SQL_CONTAINSORGANIZATION,
 					new int[] { java.sql.Types.BIGINT, java.sql.Types.BIGINT },
@@ -7733,17 +8045,15 @@ public class UserPersistenceImpl extends BasePersistenceImpl<User>
 	}
 
 	protected class AddOrganization {
-		protected AddOrganization(UserPersistenceImpl persistenceImpl) {
+		protected AddOrganization() {
 			_sqlUpdate = SqlUpdateFactoryUtil.getSqlUpdate(getDataSource(),
 					"INSERT INTO Users_Orgs (userId, organizationId) VALUES (?, ?)",
 					new int[] { java.sql.Types.BIGINT, java.sql.Types.BIGINT });
-			_persistenceImpl = persistenceImpl;
 		}
 
 		protected void add(long userId, long organizationId)
 			throws SystemException {
-			if (!_persistenceImpl.containsOrganization.contains(userId,
-						organizationId)) {
+			if (!containsOrganization.contains(userId, organizationId)) {
 				ModelListener<com.liferay.portal.model.Organization>[] organizationListeners =
 					organizationPersistence.getListeners();
 
@@ -7776,11 +8086,10 @@ public class UserPersistenceImpl extends BasePersistenceImpl<User>
 		}
 
 		private SqlUpdate _sqlUpdate;
-		private UserPersistenceImpl _persistenceImpl;
 	}
 
 	protected class ClearOrganizations {
-		protected ClearOrganizations(UserPersistenceImpl persistenceImpl) {
+		protected ClearOrganizations() {
 			_sqlUpdate = SqlUpdateFactoryUtil.getSqlUpdate(getDataSource(),
 					"DELETE FROM Users_Orgs WHERE userId = ?",
 					new int[] { java.sql.Types.BIGINT });
@@ -7831,17 +8140,15 @@ public class UserPersistenceImpl extends BasePersistenceImpl<User>
 	}
 
 	protected class RemoveOrganization {
-		protected RemoveOrganization(UserPersistenceImpl persistenceImpl) {
+		protected RemoveOrganization() {
 			_sqlUpdate = SqlUpdateFactoryUtil.getSqlUpdate(getDataSource(),
 					"DELETE FROM Users_Orgs WHERE userId = ? AND organizationId = ?",
 					new int[] { java.sql.Types.BIGINT, java.sql.Types.BIGINT });
-			_persistenceImpl = persistenceImpl;
 		}
 
 		protected void remove(long userId, long organizationId)
 			throws SystemException {
-			if (_persistenceImpl.containsOrganization.contains(userId,
-						organizationId)) {
+			if (containsOrganization.contains(userId, organizationId)) {
 				ModelListener<com.liferay.portal.model.Organization>[] organizationListeners =
 					organizationPersistence.getListeners();
 
@@ -7874,187 +8181,10 @@ public class UserPersistenceImpl extends BasePersistenceImpl<User>
 		}
 
 		private SqlUpdate _sqlUpdate;
-		private UserPersistenceImpl _persistenceImpl;
-	}
-
-	protected class ContainsPermission {
-		protected ContainsPermission(UserPersistenceImpl persistenceImpl) {
-			super();
-
-			_mappingSqlQuery = MappingSqlQueryFactoryUtil.getMappingSqlQuery(getDataSource(),
-					_SQL_CONTAINSPERMISSION,
-					new int[] { java.sql.Types.BIGINT, java.sql.Types.BIGINT },
-					RowMapper.COUNT);
-		}
-
-		protected boolean contains(long userId, long permissionId) {
-			List<Integer> results = _mappingSqlQuery.execute(new Object[] {
-						new Long(userId), new Long(permissionId)
-					});
-
-			if (results.size() > 0) {
-				Integer count = results.get(0);
-
-				if (count.intValue() > 0) {
-					return true;
-				}
-			}
-
-			return false;
-		}
-
-		private MappingSqlQuery<Integer> _mappingSqlQuery;
-	}
-
-	protected class AddPermission {
-		protected AddPermission(UserPersistenceImpl persistenceImpl) {
-			_sqlUpdate = SqlUpdateFactoryUtil.getSqlUpdate(getDataSource(),
-					"INSERT INTO Users_Permissions (userId, permissionId) VALUES (?, ?)",
-					new int[] { java.sql.Types.BIGINT, java.sql.Types.BIGINT });
-			_persistenceImpl = persistenceImpl;
-		}
-
-		protected void add(long userId, long permissionId)
-			throws SystemException {
-			if (!_persistenceImpl.containsPermission.contains(userId,
-						permissionId)) {
-				ModelListener<com.liferay.portal.model.Permission>[] permissionListeners =
-					permissionPersistence.getListeners();
-
-				for (ModelListener<User> listener : listeners) {
-					listener.onBeforeAddAssociation(userId,
-						com.liferay.portal.model.Permission.class.getName(),
-						permissionId);
-				}
-
-				for (ModelListener<com.liferay.portal.model.Permission> listener : permissionListeners) {
-					listener.onBeforeAddAssociation(permissionId,
-						User.class.getName(), userId);
-				}
-
-				_sqlUpdate.update(new Object[] {
-						new Long(userId), new Long(permissionId)
-					});
-
-				for (ModelListener<User> listener : listeners) {
-					listener.onAfterAddAssociation(userId,
-						com.liferay.portal.model.Permission.class.getName(),
-						permissionId);
-				}
-
-				for (ModelListener<com.liferay.portal.model.Permission> listener : permissionListeners) {
-					listener.onAfterAddAssociation(permissionId,
-						User.class.getName(), userId);
-				}
-			}
-		}
-
-		private SqlUpdate _sqlUpdate;
-		private UserPersistenceImpl _persistenceImpl;
-	}
-
-	protected class ClearPermissions {
-		protected ClearPermissions(UserPersistenceImpl persistenceImpl) {
-			_sqlUpdate = SqlUpdateFactoryUtil.getSqlUpdate(getDataSource(),
-					"DELETE FROM Users_Permissions WHERE userId = ?",
-					new int[] { java.sql.Types.BIGINT });
-		}
-
-		protected void clear(long userId) throws SystemException {
-			ModelListener<com.liferay.portal.model.Permission>[] permissionListeners =
-				permissionPersistence.getListeners();
-
-			List<com.liferay.portal.model.Permission> permissions = null;
-
-			if ((listeners.length > 0) || (permissionListeners.length > 0)) {
-				permissions = getPermissions(userId);
-
-				for (com.liferay.portal.model.Permission permission : permissions) {
-					for (ModelListener<User> listener : listeners) {
-						listener.onBeforeRemoveAssociation(userId,
-							com.liferay.portal.model.Permission.class.getName(),
-							permission.getPrimaryKey());
-					}
-
-					for (ModelListener<com.liferay.portal.model.Permission> listener : permissionListeners) {
-						listener.onBeforeRemoveAssociation(permission.getPrimaryKey(),
-							User.class.getName(), userId);
-					}
-				}
-			}
-
-			_sqlUpdate.update(new Object[] { new Long(userId) });
-
-			if ((listeners.length > 0) || (permissionListeners.length > 0)) {
-				for (com.liferay.portal.model.Permission permission : permissions) {
-					for (ModelListener<User> listener : listeners) {
-						listener.onAfterRemoveAssociation(userId,
-							com.liferay.portal.model.Permission.class.getName(),
-							permission.getPrimaryKey());
-					}
-
-					for (ModelListener<com.liferay.portal.model.Permission> listener : permissionListeners) {
-						listener.onAfterRemoveAssociation(permission.getPrimaryKey(),
-							User.class.getName(), userId);
-					}
-				}
-			}
-		}
-
-		private SqlUpdate _sqlUpdate;
-	}
-
-	protected class RemovePermission {
-		protected RemovePermission(UserPersistenceImpl persistenceImpl) {
-			_sqlUpdate = SqlUpdateFactoryUtil.getSqlUpdate(getDataSource(),
-					"DELETE FROM Users_Permissions WHERE userId = ? AND permissionId = ?",
-					new int[] { java.sql.Types.BIGINT, java.sql.Types.BIGINT });
-			_persistenceImpl = persistenceImpl;
-		}
-
-		protected void remove(long userId, long permissionId)
-			throws SystemException {
-			if (_persistenceImpl.containsPermission.contains(userId,
-						permissionId)) {
-				ModelListener<com.liferay.portal.model.Permission>[] permissionListeners =
-					permissionPersistence.getListeners();
-
-				for (ModelListener<User> listener : listeners) {
-					listener.onBeforeRemoveAssociation(userId,
-						com.liferay.portal.model.Permission.class.getName(),
-						permissionId);
-				}
-
-				for (ModelListener<com.liferay.portal.model.Permission> listener : permissionListeners) {
-					listener.onBeforeRemoveAssociation(permissionId,
-						User.class.getName(), userId);
-				}
-
-				_sqlUpdate.update(new Object[] {
-						new Long(userId), new Long(permissionId)
-					});
-
-				for (ModelListener<User> listener : listeners) {
-					listener.onAfterRemoveAssociation(userId,
-						com.liferay.portal.model.Permission.class.getName(),
-						permissionId);
-				}
-
-				for (ModelListener<com.liferay.portal.model.Permission> listener : permissionListeners) {
-					listener.onAfterRemoveAssociation(permissionId,
-						User.class.getName(), userId);
-				}
-			}
-		}
-
-		private SqlUpdate _sqlUpdate;
-		private UserPersistenceImpl _persistenceImpl;
 	}
 
 	protected class ContainsRole {
-		protected ContainsRole(UserPersistenceImpl persistenceImpl) {
-			super();
-
+		protected ContainsRole() {
 			_mappingSqlQuery = MappingSqlQueryFactoryUtil.getMappingSqlQuery(getDataSource(),
 					_SQL_CONTAINSROLE,
 					new int[] { java.sql.Types.BIGINT, java.sql.Types.BIGINT },
@@ -8081,15 +8211,14 @@ public class UserPersistenceImpl extends BasePersistenceImpl<User>
 	}
 
 	protected class AddRole {
-		protected AddRole(UserPersistenceImpl persistenceImpl) {
+		protected AddRole() {
 			_sqlUpdate = SqlUpdateFactoryUtil.getSqlUpdate(getDataSource(),
 					"INSERT INTO Users_Roles (userId, roleId) VALUES (?, ?)",
 					new int[] { java.sql.Types.BIGINT, java.sql.Types.BIGINT });
-			_persistenceImpl = persistenceImpl;
 		}
 
 		protected void add(long userId, long roleId) throws SystemException {
-			if (!_persistenceImpl.containsRole.contains(userId, roleId)) {
+			if (!containsRole.contains(userId, roleId)) {
 				ModelListener<com.liferay.portal.model.Role>[] roleListeners = rolePersistence.getListeners();
 
 				for (ModelListener<User> listener : listeners) {
@@ -8119,11 +8248,10 @@ public class UserPersistenceImpl extends BasePersistenceImpl<User>
 		}
 
 		private SqlUpdate _sqlUpdate;
-		private UserPersistenceImpl _persistenceImpl;
 	}
 
 	protected class ClearRoles {
-		protected ClearRoles(UserPersistenceImpl persistenceImpl) {
+		protected ClearRoles() {
 			_sqlUpdate = SqlUpdateFactoryUtil.getSqlUpdate(getDataSource(),
 					"DELETE FROM Users_Roles WHERE userId = ?",
 					new int[] { java.sql.Types.BIGINT });
@@ -8173,16 +8301,15 @@ public class UserPersistenceImpl extends BasePersistenceImpl<User>
 	}
 
 	protected class RemoveRole {
-		protected RemoveRole(UserPersistenceImpl persistenceImpl) {
+		protected RemoveRole() {
 			_sqlUpdate = SqlUpdateFactoryUtil.getSqlUpdate(getDataSource(),
 					"DELETE FROM Users_Roles WHERE userId = ? AND roleId = ?",
 					new int[] { java.sql.Types.BIGINT, java.sql.Types.BIGINT });
-			_persistenceImpl = persistenceImpl;
 		}
 
 		protected void remove(long userId, long roleId)
 			throws SystemException {
-			if (_persistenceImpl.containsRole.contains(userId, roleId)) {
+			if (containsRole.contains(userId, roleId)) {
 				ModelListener<com.liferay.portal.model.Role>[] roleListeners = rolePersistence.getListeners();
 
 				for (ModelListener<User> listener : listeners) {
@@ -8212,13 +8339,10 @@ public class UserPersistenceImpl extends BasePersistenceImpl<User>
 		}
 
 		private SqlUpdate _sqlUpdate;
-		private UserPersistenceImpl _persistenceImpl;
 	}
 
 	protected class ContainsTeam {
-		protected ContainsTeam(UserPersistenceImpl persistenceImpl) {
-			super();
-
+		protected ContainsTeam() {
 			_mappingSqlQuery = MappingSqlQueryFactoryUtil.getMappingSqlQuery(getDataSource(),
 					_SQL_CONTAINSTEAM,
 					new int[] { java.sql.Types.BIGINT, java.sql.Types.BIGINT },
@@ -8245,15 +8369,14 @@ public class UserPersistenceImpl extends BasePersistenceImpl<User>
 	}
 
 	protected class AddTeam {
-		protected AddTeam(UserPersistenceImpl persistenceImpl) {
+		protected AddTeam() {
 			_sqlUpdate = SqlUpdateFactoryUtil.getSqlUpdate(getDataSource(),
 					"INSERT INTO Users_Teams (userId, teamId) VALUES (?, ?)",
 					new int[] { java.sql.Types.BIGINT, java.sql.Types.BIGINT });
-			_persistenceImpl = persistenceImpl;
 		}
 
 		protected void add(long userId, long teamId) throws SystemException {
-			if (!_persistenceImpl.containsTeam.contains(userId, teamId)) {
+			if (!containsTeam.contains(userId, teamId)) {
 				ModelListener<com.liferay.portal.model.Team>[] teamListeners = teamPersistence.getListeners();
 
 				for (ModelListener<User> listener : listeners) {
@@ -8283,11 +8406,10 @@ public class UserPersistenceImpl extends BasePersistenceImpl<User>
 		}
 
 		private SqlUpdate _sqlUpdate;
-		private UserPersistenceImpl _persistenceImpl;
 	}
 
 	protected class ClearTeams {
-		protected ClearTeams(UserPersistenceImpl persistenceImpl) {
+		protected ClearTeams() {
 			_sqlUpdate = SqlUpdateFactoryUtil.getSqlUpdate(getDataSource(),
 					"DELETE FROM Users_Teams WHERE userId = ?",
 					new int[] { java.sql.Types.BIGINT });
@@ -8337,16 +8459,15 @@ public class UserPersistenceImpl extends BasePersistenceImpl<User>
 	}
 
 	protected class RemoveTeam {
-		protected RemoveTeam(UserPersistenceImpl persistenceImpl) {
+		protected RemoveTeam() {
 			_sqlUpdate = SqlUpdateFactoryUtil.getSqlUpdate(getDataSource(),
 					"DELETE FROM Users_Teams WHERE userId = ? AND teamId = ?",
 					new int[] { java.sql.Types.BIGINT, java.sql.Types.BIGINT });
-			_persistenceImpl = persistenceImpl;
 		}
 
 		protected void remove(long userId, long teamId)
 			throws SystemException {
-			if (_persistenceImpl.containsTeam.contains(userId, teamId)) {
+			if (containsTeam.contains(userId, teamId)) {
 				ModelListener<com.liferay.portal.model.Team>[] teamListeners = teamPersistence.getListeners();
 
 				for (ModelListener<User> listener : listeners) {
@@ -8376,13 +8497,10 @@ public class UserPersistenceImpl extends BasePersistenceImpl<User>
 		}
 
 		private SqlUpdate _sqlUpdate;
-		private UserPersistenceImpl _persistenceImpl;
 	}
 
 	protected class ContainsUserGroup {
-		protected ContainsUserGroup(UserPersistenceImpl persistenceImpl) {
-			super();
-
+		protected ContainsUserGroup() {
 			_mappingSqlQuery = MappingSqlQueryFactoryUtil.getMappingSqlQuery(getDataSource(),
 					_SQL_CONTAINSUSERGROUP,
 					new int[] { java.sql.Types.BIGINT, java.sql.Types.BIGINT },
@@ -8409,16 +8527,15 @@ public class UserPersistenceImpl extends BasePersistenceImpl<User>
 	}
 
 	protected class AddUserGroup {
-		protected AddUserGroup(UserPersistenceImpl persistenceImpl) {
+		protected AddUserGroup() {
 			_sqlUpdate = SqlUpdateFactoryUtil.getSqlUpdate(getDataSource(),
 					"INSERT INTO Users_UserGroups (userId, userGroupId) VALUES (?, ?)",
 					new int[] { java.sql.Types.BIGINT, java.sql.Types.BIGINT });
-			_persistenceImpl = persistenceImpl;
 		}
 
 		protected void add(long userId, long userGroupId)
 			throws SystemException {
-			if (!_persistenceImpl.containsUserGroup.contains(userId, userGroupId)) {
+			if (!containsUserGroup.contains(userId, userGroupId)) {
 				ModelListener<com.liferay.portal.model.UserGroup>[] userGroupListeners =
 					userGroupPersistence.getListeners();
 
@@ -8451,11 +8568,10 @@ public class UserPersistenceImpl extends BasePersistenceImpl<User>
 		}
 
 		private SqlUpdate _sqlUpdate;
-		private UserPersistenceImpl _persistenceImpl;
 	}
 
 	protected class ClearUserGroups {
-		protected ClearUserGroups(UserPersistenceImpl persistenceImpl) {
+		protected ClearUserGroups() {
 			_sqlUpdate = SqlUpdateFactoryUtil.getSqlUpdate(getDataSource(),
 					"DELETE FROM Users_UserGroups WHERE userId = ?",
 					new int[] { java.sql.Types.BIGINT });
@@ -8506,16 +8622,15 @@ public class UserPersistenceImpl extends BasePersistenceImpl<User>
 	}
 
 	protected class RemoveUserGroup {
-		protected RemoveUserGroup(UserPersistenceImpl persistenceImpl) {
+		protected RemoveUserGroup() {
 			_sqlUpdate = SqlUpdateFactoryUtil.getSqlUpdate(getDataSource(),
 					"DELETE FROM Users_UserGroups WHERE userId = ? AND userGroupId = ?",
 					new int[] { java.sql.Types.BIGINT, java.sql.Types.BIGINT });
-			_persistenceImpl = persistenceImpl;
 		}
 
 		protected void remove(long userId, long userGroupId)
 			throws SystemException {
-			if (_persistenceImpl.containsUserGroup.contains(userId, userGroupId)) {
+			if (containsUserGroup.contains(userId, userGroupId)) {
 				ModelListener<com.liferay.portal.model.UserGroup>[] userGroupListeners =
 					userGroupPersistence.getListeners();
 
@@ -8548,7 +8663,6 @@ public class UserPersistenceImpl extends BasePersistenceImpl<User>
 		}
 
 		private SqlUpdate _sqlUpdate;
-		private UserPersistenceImpl _persistenceImpl;
 	}
 
 	private static final String _SQL_SELECT_USER = "SELECT user FROM User user";
@@ -8561,9 +8675,6 @@ public class UserPersistenceImpl extends BasePersistenceImpl<User>
 	private static final String _SQL_GETORGANIZATIONS = "SELECT {Organization_.*} FROM Organization_ INNER JOIN Users_Orgs ON (Users_Orgs.organizationId = Organization_.organizationId) WHERE (Users_Orgs.userId = ?)";
 	private static final String _SQL_GETORGANIZATIONSSIZE = "SELECT COUNT(*) AS COUNT_VALUE FROM Users_Orgs WHERE userId = ?";
 	private static final String _SQL_CONTAINSORGANIZATION = "SELECT COUNT(*) AS COUNT_VALUE FROM Users_Orgs WHERE userId = ? AND organizationId = ?";
-	private static final String _SQL_GETPERMISSIONS = "SELECT {Permission_.*} FROM Permission_ INNER JOIN Users_Permissions ON (Users_Permissions.permissionId = Permission_.permissionId) WHERE (Users_Permissions.userId = ?)";
-	private static final String _SQL_GETPERMISSIONSSIZE = "SELECT COUNT(*) AS COUNT_VALUE FROM Users_Permissions WHERE userId = ?";
-	private static final String _SQL_CONTAINSPERMISSION = "SELECT COUNT(*) AS COUNT_VALUE FROM Users_Permissions WHERE userId = ? AND permissionId = ?";
 	private static final String _SQL_GETROLES = "SELECT {Role_.*} FROM Role_ INNER JOIN Users_Roles ON (Users_Roles.roleId = Role_.roleId) WHERE (Users_Roles.userId = ?)";
 	private static final String _SQL_GETROLESSIZE = "SELECT COUNT(*) AS COUNT_VALUE FROM Users_Roles WHERE userId = ?";
 	private static final String _SQL_CONTAINSROLE = "SELECT COUNT(*) AS COUNT_VALUE FROM Users_Roles WHERE userId = ? AND roleId = ?";
@@ -8576,6 +8687,10 @@ public class UserPersistenceImpl extends BasePersistenceImpl<User>
 	private static final String _FINDER_COLUMN_UUID_UUID_1 = "user.uuid IS NULL";
 	private static final String _FINDER_COLUMN_UUID_UUID_2 = "user.uuid = ?";
 	private static final String _FINDER_COLUMN_UUID_UUID_3 = "(user.uuid IS NULL OR user.uuid = ?)";
+	private static final String _FINDER_COLUMN_UUID_C_UUID_1 = "user.uuid IS NULL AND ";
+	private static final String _FINDER_COLUMN_UUID_C_UUID_2 = "user.uuid = ? AND ";
+	private static final String _FINDER_COLUMN_UUID_C_UUID_3 = "(user.uuid IS NULL OR user.uuid = ?) AND ";
+	private static final String _FINDER_COLUMN_UUID_C_COMPANYID_2 = "user.companyId = ?";
 	private static final String _FINDER_COLUMN_COMPANYID_COMPANYID_2 = "user.companyId = ?";
 	private static final String _FINDER_COLUMN_CONTACTID_CONTACTID_2 = "user.contactId = ?";
 	private static final String _FINDER_COLUMN_EMAILADDRESS_EMAILADDRESS_1 = "user.emailAddress IS NULL";
@@ -8608,10 +8723,12 @@ public class UserPersistenceImpl extends BasePersistenceImpl<User>
 	private static final boolean _HIBERNATE_CACHE_USE_SECOND_LEVEL_CACHE = com.liferay.portal.util.PropsValues.HIBERNATE_CACHE_USE_SECOND_LEVEL_CACHE;
 	private static Log _log = LogFactoryUtil.getLog(UserPersistenceImpl.class);
 	private static User _nullUser = new UserImpl() {
+			@Override
 			public Object clone() {
 				return this;
 			}
 
+			@Override
 			public CacheModel<User> toCacheModel() {
 				return _nullUserCacheModel;
 			}

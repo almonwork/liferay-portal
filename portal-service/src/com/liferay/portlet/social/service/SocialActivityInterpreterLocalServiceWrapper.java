@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,6 +14,8 @@
 
 package com.liferay.portlet.social.service;
 
+import com.liferay.portal.service.ServiceWrapper;
+
 /**
  * <p>
  * This class is a wrapper for {@link SocialActivityInterpreterLocalService}.
@@ -24,7 +26,8 @@ package com.liferay.portlet.social.service;
  * @generated
  */
 public class SocialActivityInterpreterLocalServiceWrapper
-	implements SocialActivityInterpreterLocalService {
+	implements SocialActivityInterpreterLocalService,
+		ServiceWrapper<SocialActivityInterpreterLocalService> {
 	public SocialActivityInterpreterLocalServiceWrapper(
 		SocialActivityInterpreterLocalService socialActivityInterpreterLocalService) {
 		_socialActivityInterpreterLocalService = socialActivityInterpreterLocalService;
@@ -48,16 +51,43 @@ public class SocialActivityInterpreterLocalServiceWrapper
 		_socialActivityInterpreterLocalService.setBeanIdentifier(beanIdentifier);
 	}
 
+	/**
+	* Adds the activity interpreter to the list of available interpreters.
+	*
+	* @param activityInterpreter the activity interpreter
+	*/
 	public void addActivityInterpreter(
 		com.liferay.portlet.social.model.SocialActivityInterpreter activityInterpreter) {
 		_socialActivityInterpreterLocalService.addActivityInterpreter(activityInterpreter);
 	}
 
+	/**
+	* Removes the activity interpreter from the list of available interpreters.
+	*
+	* @param activityInterpreter the activity interpreter
+	*/
 	public void deleteActivityInterpreter(
 		com.liferay.portlet.social.model.SocialActivityInterpreter activityInterpreter) {
 		_socialActivityInterpreterLocalService.deleteActivityInterpreter(activityInterpreter);
 	}
 
+	/**
+	* Creates a human readable activity feed entry for the activity using an
+	* available compatible activity interpreter.
+	*
+	* <p>
+	* This method finds the appropriate interpreter for the activity by going
+	* through the available interpreters and asking them if they can handle the
+	* asset type of the activity.
+	* </p>
+	*
+	* @param activity the activity to be translated to human readable form
+	* @param themeDisplay the theme display needed by interpreters to create
+	links and get localized text fragments
+	* @return the activity feed that is a human readable form of the activity
+	record or <code>null</code> if a compatible interpreter is not
+	found
+	*/
 	public com.liferay.portlet.social.model.SocialActivityFeedEntry interpret(
 		com.liferay.portlet.social.model.SocialActivity activity,
 		com.liferay.portal.theme.ThemeDisplay themeDisplay) {
@@ -65,11 +95,26 @@ public class SocialActivityInterpreterLocalServiceWrapper
 			themeDisplay);
 	}
 
+	/**
+	 * @deprecated Renamed to {@link #getWrappedService}
+	 */
 	public SocialActivityInterpreterLocalService getWrappedSocialActivityInterpreterLocalService() {
 		return _socialActivityInterpreterLocalService;
 	}
 
+	/**
+	 * @deprecated Renamed to {@link #setWrappedService}
+	 */
 	public void setWrappedSocialActivityInterpreterLocalService(
+		SocialActivityInterpreterLocalService socialActivityInterpreterLocalService) {
+		_socialActivityInterpreterLocalService = socialActivityInterpreterLocalService;
+	}
+
+	public SocialActivityInterpreterLocalService getWrappedService() {
+		return _socialActivityInterpreterLocalService;
+	}
+
+	public void setWrappedService(
 		SocialActivityInterpreterLocalService socialActivityInterpreterLocalService) {
 		_socialActivityInterpreterLocalService = socialActivityInterpreterLocalService;
 	}

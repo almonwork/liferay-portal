@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -22,11 +22,13 @@ ResultRow row = (ResultRow)request.getAttribute(WebKeys.SEARCH_CONTAINER_RESULT_
 LayoutRevision rootLayoutRevision = (LayoutRevision)row.getObject();
 
 LayoutBranch layoutBranch = rootLayoutRevision.getLayoutBranch();
+
+long currentLayoutBranchId = GetterUtil.getLong((String)request.getAttribute("view_layout_branches.jsp-currentLayoutBranchId"));
 %>
 
 <liferay-ui:icon-menu>
 	<c:if test="<%= LayoutBranchPermissionUtil.contains(permissionChecker, layoutBranch, ActionKeys.UPDATE) %>">
-		<portlet:renderURL var="editURL">
+		<portlet:renderURL var="editURL" windowState="<%= LiferayWindowState.EXCLUSIVE.toString() %>">
 			<portlet:param name="struts_action" value="/staging_bar/edit_layout_branch" />
 			<portlet:param name="<%= Constants.CMD %>" value="<%= Constants.UPDATE %>" />
 			<portlet:param name="redirect" value="<%= currentURL %>" />
@@ -35,7 +37,7 @@ LayoutBranch layoutBranch = rootLayoutRevision.getLayoutBranch();
 		</portlet:renderURL>
 
 		<%
-		String taglibURL = "javascript:Liferay.Staging.Branching.updateBranch({uri: '" + HtmlUtil.escapeJS(editURL) +  "', dialogTitle: '" + UnicodeLanguageUtil.get(pageContext, "update-page-variation") + "'});";
+		String taglibURL = "javascript:Liferay.StagingBar.updateBranch({uri: '" + HtmlUtil.escapeJS(editURL) + "', dialogTitle: '" + UnicodeLanguageUtil.get(pageContext, "update-page-variation") + "'});";
 		%>
 
 		<liferay-ui:icon
@@ -50,6 +52,7 @@ LayoutBranch layoutBranch = rootLayoutRevision.getLayoutBranch();
 				<portlet:param name="redirect" value="<%= currentURL %>" />
 				<portlet:param name="groupId" value="<%= String.valueOf(layoutBranch.getGroupId()) %>" />
 				<portlet:param name="layoutBranchId" value="<%= String.valueOf(layoutBranch.getLayoutBranchId()) %>" />
+				<portlet:param name="currentLayoutBranchId" value="<%= String.valueOf(currentLayoutBranchId) %>" />
 			</portlet:actionURL>
 
 			<liferay-ui:icon-delete

@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -30,7 +30,7 @@ if (quote && Validator.isNull(body) && (curParentMessage != null)) {
 	body = sb.toString();
 }
 else if (splitThread && Validator.isNull(body)) {
-	body = LanguageUtil.format(pageContext, "the-new-thread-can-be-found-at-x", "[url=" + BBCodeUtil.NEW_THREAD_URL + "]" + BBCodeUtil.NEW_THREAD_URL + "[/url]", false);
+	body = LanguageUtil.format(pageContext, "the-new-thread-can-be-found-at-x", "[url=" + BBCodeTranslatorUtil.NEW_THREAD_URL + "]" + BBCodeTranslatorUtil.NEW_THREAD_URL + "[/url]", false);
 }
 %>
 

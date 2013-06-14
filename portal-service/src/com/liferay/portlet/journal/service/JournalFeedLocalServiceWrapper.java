@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,6 +14,8 @@
 
 package com.liferay.portlet.journal.service;
 
+import com.liferay.portal.service.ServiceWrapper;
+
 /**
  * <p>
  * This class is a wrapper for {@link JournalFeedLocalService}.
@@ -23,7 +25,8 @@ package com.liferay.portlet.journal.service;
  * @see       JournalFeedLocalService
  * @generated
  */
-public class JournalFeedLocalServiceWrapper implements JournalFeedLocalService {
+public class JournalFeedLocalServiceWrapper implements JournalFeedLocalService,
+	ServiceWrapper<JournalFeedLocalService> {
 	public JournalFeedLocalServiceWrapper(
 		JournalFeedLocalService journalFeedLocalService) {
 		_journalFeedLocalService = journalFeedLocalService;
@@ -57,25 +60,32 @@ public class JournalFeedLocalServiceWrapper implements JournalFeedLocalService {
 	* Deletes the journal feed with the primary key from the database. Also notifies the appropriate model listeners.
 	*
 	* @param id the primary key of the journal feed
+	* @return the journal feed that was removed
 	* @throws PortalException if a journal feed with the primary key could not be found
 	* @throws SystemException if a system exception occurred
 	*/
-	public void deleteJournalFeed(long id)
+	public com.liferay.portlet.journal.model.JournalFeed deleteJournalFeed(
+		long id)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException {
-		_journalFeedLocalService.deleteJournalFeed(id);
+		return _journalFeedLocalService.deleteJournalFeed(id);
 	}
 
 	/**
 	* Deletes the journal feed from the database. Also notifies the appropriate model listeners.
 	*
 	* @param journalFeed the journal feed
+	* @return the journal feed that was removed
 	* @throws SystemException if a system exception occurred
 	*/
-	public void deleteJournalFeed(
+	public com.liferay.portlet.journal.model.JournalFeed deleteJournalFeed(
 		com.liferay.portlet.journal.model.JournalFeed journalFeed)
 		throws com.liferay.portal.kernel.exception.SystemException {
-		_journalFeedLocalService.deleteJournalFeed(journalFeed);
+		return _journalFeedLocalService.deleteJournalFeed(journalFeed);
+	}
+
+	public com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery() {
+		return _journalFeedLocalService.dynamicQuery();
 	}
 
 	/**
@@ -147,6 +157,11 @@ public class JournalFeedLocalServiceWrapper implements JournalFeedLocalService {
 		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery)
 		throws com.liferay.portal.kernel.exception.SystemException {
 		return _journalFeedLocalService.dynamicQueryCount(dynamicQuery);
+	}
+
+	public com.liferay.portlet.journal.model.JournalFeed fetchJournalFeed(
+		long id) throws com.liferay.portal.kernel.exception.SystemException {
+		return _journalFeedLocalService.fetchJournalFeed(id);
 	}
 
 	/**
@@ -280,20 +295,29 @@ public class JournalFeedLocalServiceWrapper implements JournalFeedLocalService {
 			feedVersion, serviceContext);
 	}
 
-	public void addFeedResources(long feedId, boolean addGroupPermissions,
-		boolean addGuestPermissions)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
-		_journalFeedLocalService.addFeedResources(feedId, addGroupPermissions,
-			addGuestPermissions);
-	}
-
 	public void addFeedResources(
 		com.liferay.portlet.journal.model.JournalFeed feed,
 		boolean addGroupPermissions, boolean addGuestPermissions)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException {
 		_journalFeedLocalService.addFeedResources(feed, addGroupPermissions,
+			addGuestPermissions);
+	}
+
+	public void addFeedResources(
+		com.liferay.portlet.journal.model.JournalFeed feed,
+		java.lang.String[] groupPermissions, java.lang.String[] guestPermissions)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException {
+		_journalFeedLocalService.addFeedResources(feed, groupPermissions,
+			guestPermissions);
+	}
+
+	public void addFeedResources(long feedId, boolean addGroupPermissions,
+		boolean addGuestPermissions)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException {
+		_journalFeedLocalService.addFeedResources(feedId, addGroupPermissions,
 			addGuestPermissions);
 	}
 
@@ -305,13 +329,10 @@ public class JournalFeedLocalServiceWrapper implements JournalFeedLocalService {
 			guestPermissions);
 	}
 
-	public void addFeedResources(
-		com.liferay.portlet.journal.model.JournalFeed feed,
-		java.lang.String[] groupPermissions, java.lang.String[] guestPermissions)
+	public void deleteFeed(com.liferay.portlet.journal.model.JournalFeed feed)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException {
-		_journalFeedLocalService.addFeedResources(feed, groupPermissions,
-			guestPermissions);
+		_journalFeedLocalService.deleteFeed(feed);
 	}
 
 	public void deleteFeed(long feedId)
@@ -324,12 +345,6 @@ public class JournalFeedLocalServiceWrapper implements JournalFeedLocalService {
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException {
 		_journalFeedLocalService.deleteFeed(groupId, feedId);
-	}
-
-	public void deleteFeed(com.liferay.portlet.journal.model.JournalFeed feed)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
-		_journalFeedLocalService.deleteFeed(feed);
 	}
 
 	public com.liferay.portlet.journal.model.JournalFeed getFeed(long feedId)
@@ -417,11 +432,26 @@ public class JournalFeedLocalServiceWrapper implements JournalFeedLocalService {
 			targetPortletId, contentField, feedType, feedVersion, serviceContext);
 	}
 
+	/**
+	 * @deprecated Renamed to {@link #getWrappedService}
+	 */
 	public JournalFeedLocalService getWrappedJournalFeedLocalService() {
 		return _journalFeedLocalService;
 	}
 
+	/**
+	 * @deprecated Renamed to {@link #setWrappedService}
+	 */
 	public void setWrappedJournalFeedLocalService(
+		JournalFeedLocalService journalFeedLocalService) {
+		_journalFeedLocalService = journalFeedLocalService;
+	}
+
+	public JournalFeedLocalService getWrappedService() {
+		return _journalFeedLocalService;
+	}
+
+	public void setWrappedService(
 		JournalFeedLocalService journalFeedLocalService) {
 		_journalFeedLocalService = journalFeedLocalService;
 	}

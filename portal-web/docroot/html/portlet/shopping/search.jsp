@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -119,7 +119,7 @@ String keywords = ParamUtil.getString(request, "keywords");
 				sb.append("/shopping/item?img_id=");
 				sb.append(item.getSmallImageId());
 				sb.append("&t=");
-				sb.append(ImageServletTokenUtil.getToken(item.getSmallImageId()));
+				sb.append(WebServerServletTokenUtil.getToken(item.getSmallImageId()));
 			}
 
 			sb.append("\">");

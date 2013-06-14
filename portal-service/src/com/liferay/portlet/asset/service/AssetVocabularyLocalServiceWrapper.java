@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,6 +14,8 @@
 
 package com.liferay.portlet.asset.service;
 
+import com.liferay.portal.service.ServiceWrapper;
+
 /**
  * <p>
  * This class is a wrapper for {@link AssetVocabularyLocalService}.
@@ -24,7 +26,8 @@ package com.liferay.portlet.asset.service;
  * @generated
  */
 public class AssetVocabularyLocalServiceWrapper
-	implements AssetVocabularyLocalService {
+	implements AssetVocabularyLocalService,
+		ServiceWrapper<AssetVocabularyLocalService> {
 	public AssetVocabularyLocalServiceWrapper(
 		AssetVocabularyLocalService assetVocabularyLocalService) {
 		_assetVocabularyLocalService = assetVocabularyLocalService;
@@ -58,25 +61,32 @@ public class AssetVocabularyLocalServiceWrapper
 	* Deletes the asset vocabulary with the primary key from the database. Also notifies the appropriate model listeners.
 	*
 	* @param vocabularyId the primary key of the asset vocabulary
+	* @return the asset vocabulary that was removed
 	* @throws PortalException if a asset vocabulary with the primary key could not be found
 	* @throws SystemException if a system exception occurred
 	*/
-	public void deleteAssetVocabulary(long vocabularyId)
+	public com.liferay.portlet.asset.model.AssetVocabulary deleteAssetVocabulary(
+		long vocabularyId)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException {
-		_assetVocabularyLocalService.deleteAssetVocabulary(vocabularyId);
+		return _assetVocabularyLocalService.deleteAssetVocabulary(vocabularyId);
 	}
 
 	/**
 	* Deletes the asset vocabulary from the database. Also notifies the appropriate model listeners.
 	*
 	* @param assetVocabulary the asset vocabulary
+	* @return the asset vocabulary that was removed
 	* @throws SystemException if a system exception occurred
 	*/
-	public void deleteAssetVocabulary(
+	public com.liferay.portlet.asset.model.AssetVocabulary deleteAssetVocabulary(
 		com.liferay.portlet.asset.model.AssetVocabulary assetVocabulary)
 		throws com.liferay.portal.kernel.exception.SystemException {
-		_assetVocabularyLocalService.deleteAssetVocabulary(assetVocabulary);
+		return _assetVocabularyLocalService.deleteAssetVocabulary(assetVocabulary);
+	}
+
+	public com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery() {
+		return _assetVocabularyLocalService.dynamicQuery();
 	}
 
 	/**
@@ -149,6 +159,12 @@ public class AssetVocabularyLocalServiceWrapper
 		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery)
 		throws com.liferay.portal.kernel.exception.SystemException {
 		return _assetVocabularyLocalService.dynamicQueryCount(dynamicQuery);
+	}
+
+	public com.liferay.portlet.asset.model.AssetVocabulary fetchAssetVocabulary(
+		long vocabularyId)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return _assetVocabularyLocalService.fetchAssetVocabulary(vocabularyId);
 	}
 
 	/**
@@ -311,6 +327,12 @@ public class AssetVocabularyLocalServiceWrapper
 			groupPermissions, guestPermissions);
 	}
 
+	public void deleteVocabularies(long groupId)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException {
+		_assetVocabularyLocalService.deleteVocabularies(groupId);
+	}
+
 	public void deleteVocabulary(
 		com.liferay.portlet.asset.model.AssetVocabulary vocabulary)
 		throws com.liferay.portal.kernel.exception.PortalException,
@@ -358,6 +380,14 @@ public class AssetVocabularyLocalServiceWrapper
 			com.liferay.portal.kernel.exception.SystemException {
 		return _assetVocabularyLocalService.getGroupVocabularies(groupId,
 			createDefaultVocabulary);
+	}
+
+	public java.util.List<com.liferay.portlet.asset.model.AssetVocabulary> getGroupVocabularies(
+		long groupId, java.lang.String name, int start, int end,
+		com.liferay.portal.kernel.util.OrderByComparator obc)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return _assetVocabularyLocalService.getGroupVocabularies(groupId, name,
+			start, end, obc);
 	}
 
 	public com.liferay.portlet.asset.model.AssetVocabulary getGroupVocabulary(
@@ -408,11 +438,26 @@ public class AssetVocabularyLocalServiceWrapper
 			title, titleMap, descriptionMap, settings, serviceContext);
 	}
 
+	/**
+	 * @deprecated Renamed to {@link #getWrappedService}
+	 */
 	public AssetVocabularyLocalService getWrappedAssetVocabularyLocalService() {
 		return _assetVocabularyLocalService;
 	}
 
+	/**
+	 * @deprecated Renamed to {@link #setWrappedService}
+	 */
 	public void setWrappedAssetVocabularyLocalService(
+		AssetVocabularyLocalService assetVocabularyLocalService) {
+		_assetVocabularyLocalService = assetVocabularyLocalService;
+	}
+
+	public AssetVocabularyLocalService getWrappedService() {
+		return _assetVocabularyLocalService;
+	}
+
+	public void setWrappedService(
 		AssetVocabularyLocalService assetVocabularyLocalService) {
 		_assetVocabularyLocalService = assetVocabularyLocalService;
 	}

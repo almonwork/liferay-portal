@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,6 +14,10 @@
 
 package com.liferay.portal.model;
 
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * <p>
  * This class is a wrapper for {@link WebDAVProps}.
@@ -23,7 +27,8 @@ package com.liferay.portal.model;
  * @see       WebDAVProps
  * @generated
  */
-public class WebDAVPropsWrapper implements WebDAVProps {
+public class WebDAVPropsWrapper implements WebDAVProps,
+	ModelWrapper<WebDAVProps> {
 	public WebDAVPropsWrapper(WebDAVProps webDAVProps) {
 		_webDAVProps = webDAVProps;
 	}
@@ -34,6 +39,64 @@ public class WebDAVPropsWrapper implements WebDAVProps {
 
 	public String getModelClassName() {
 		return WebDAVProps.class.getName();
+	}
+
+	public Map<String, Object> getModelAttributes() {
+		Map<String, Object> attributes = new HashMap<String, Object>();
+
+		attributes.put("webDavPropsId", getWebDavPropsId());
+		attributes.put("companyId", getCompanyId());
+		attributes.put("createDate", getCreateDate());
+		attributes.put("modifiedDate", getModifiedDate());
+		attributes.put("classNameId", getClassNameId());
+		attributes.put("classPK", getClassPK());
+		attributes.put("props", getProps());
+
+		return attributes;
+	}
+
+	public void setModelAttributes(Map<String, Object> attributes) {
+		Long webDavPropsId = (Long)attributes.get("webDavPropsId");
+
+		if (webDavPropsId != null) {
+			setWebDavPropsId(webDavPropsId);
+		}
+
+		Long companyId = (Long)attributes.get("companyId");
+
+		if (companyId != null) {
+			setCompanyId(companyId);
+		}
+
+		Date createDate = (Date)attributes.get("createDate");
+
+		if (createDate != null) {
+			setCreateDate(createDate);
+		}
+
+		Date modifiedDate = (Date)attributes.get("modifiedDate");
+
+		if (modifiedDate != null) {
+			setModifiedDate(modifiedDate);
+		}
+
+		Long classNameId = (Long)attributes.get("classNameId");
+
+		if (classNameId != null) {
+			setClassNameId(classNameId);
+		}
+
+		Long classPK = (Long)attributes.get("classPK");
+
+		if (classPK != null) {
+			setClassPK(classPK);
+		}
+
+		String props = (String)attributes.get("props");
+
+		if (props != null) {
+			setProps(props);
+		}
 	}
 
 	/**
@@ -135,6 +198,10 @@ public class WebDAVPropsWrapper implements WebDAVProps {
 		return _webDAVProps.getClassName();
 	}
 
+	public void setClassName(java.lang.String className) {
+		_webDAVProps.setClassName(className);
+	}
+
 	/**
 	* Returns the class name ID of this web d a v props.
 	*
@@ -209,10 +276,6 @@ public class WebDAVPropsWrapper implements WebDAVProps {
 		return _webDAVProps.isEscapedModel();
 	}
 
-	public void setEscapedModel(boolean escapedModel) {
-		_webDAVProps.setEscapedModel(escapedModel);
-	}
-
 	public java.io.Serializable getPrimaryKeyObj() {
 		return _webDAVProps.getPrimaryKeyObj();
 	}
@@ -266,6 +329,16 @@ public class WebDAVPropsWrapper implements WebDAVProps {
 		_webDAVProps.persist();
 	}
 
+	public void addProp(java.lang.String name, java.lang.String prefix,
+		java.lang.String uri) throws java.lang.Exception {
+		_webDAVProps.addProp(name, prefix, uri);
+	}
+
+	public void addProp(java.lang.String name, java.lang.String prefix,
+		java.lang.String uri, java.lang.String text) throws java.lang.Exception {
+		_webDAVProps.addProp(name, prefix, uri, text);
+	}
+
 	public java.util.Set<com.liferay.portal.kernel.xml.QName> getPropsSet()
 		throws java.lang.Exception {
 		return _webDAVProps.getPropsSet();
@@ -277,16 +350,6 @@ public class WebDAVPropsWrapper implements WebDAVProps {
 		return _webDAVProps.getText(name, prefix, uri);
 	}
 
-	public void addProp(java.lang.String name, java.lang.String prefix,
-		java.lang.String uri) throws java.lang.Exception {
-		_webDAVProps.addProp(name, prefix, uri);
-	}
-
-	public void addProp(java.lang.String name, java.lang.String prefix,
-		java.lang.String uri, java.lang.String text) throws java.lang.Exception {
-		_webDAVProps.addProp(name, prefix, uri, text);
-	}
-
 	public void removeProp(java.lang.String name, java.lang.String prefix,
 		java.lang.String uri) throws java.lang.Exception {
 		_webDAVProps.removeProp(name, prefix, uri);
@@ -296,7 +359,14 @@ public class WebDAVPropsWrapper implements WebDAVProps {
 		_webDAVProps.store();
 	}
 
+	/**
+	 * @deprecated Renamed to {@link #getWrappedModel}
+	 */
 	public WebDAVProps getWrappedWebDAVProps() {
+		return _webDAVProps;
+	}
+
+	public WebDAVProps getWrappedModel() {
 		return _webDAVProps;
 	}
 

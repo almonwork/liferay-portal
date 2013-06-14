@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -68,22 +68,28 @@ public class TicketPersistenceImpl extends BasePersistenceImpl<Ticket>
 	 * Never modify or reference this class directly. Always use {@link TicketUtil} to access the ticket persistence. Modify <code>service.xml</code> and rerun ServiceBuilder to regenerate this class.
 	 */
 	public static final String FINDER_CLASS_NAME_ENTITY = TicketImpl.class.getName();
-	public static final String FINDER_CLASS_NAME_LIST = FINDER_CLASS_NAME_ENTITY +
-		".List";
+	public static final String FINDER_CLASS_NAME_LIST_WITH_PAGINATION = FINDER_CLASS_NAME_ENTITY +
+		".List1";
+	public static final String FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION = FINDER_CLASS_NAME_ENTITY +
+		".List2";
 	public static final FinderPath FINDER_PATH_FETCH_BY_KEY = new FinderPath(TicketModelImpl.ENTITY_CACHE_ENABLED,
 			TicketModelImpl.FINDER_CACHE_ENABLED, TicketImpl.class,
 			FINDER_CLASS_NAME_ENTITY, "fetchByKey",
-			new String[] { String.class.getName() });
+			new String[] { String.class.getName() },
+			TicketModelImpl.KEY_COLUMN_BITMASK);
 	public static final FinderPath FINDER_PATH_COUNT_BY_KEY = new FinderPath(TicketModelImpl.ENTITY_CACHE_ENABLED,
 			TicketModelImpl.FINDER_CACHE_ENABLED, Long.class,
-			FINDER_CLASS_NAME_LIST, "countByKey",
+			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByKey",
 			new String[] { String.class.getName() });
-	public static final FinderPath FINDER_PATH_FIND_ALL = new FinderPath(TicketModelImpl.ENTITY_CACHE_ENABLED,
+	public static final FinderPath FINDER_PATH_WITH_PAGINATION_FIND_ALL = new FinderPath(TicketModelImpl.ENTITY_CACHE_ENABLED,
 			TicketModelImpl.FINDER_CACHE_ENABLED, TicketImpl.class,
-			FINDER_CLASS_NAME_LIST, "findAll", new String[0]);
+			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findAll", new String[0]);
+	public static final FinderPath FINDER_PATH_WITHOUT_PAGINATION_FIND_ALL = new FinderPath(TicketModelImpl.ENTITY_CACHE_ENABLED,
+			TicketModelImpl.FINDER_CACHE_ENABLED, TicketImpl.class,
+			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findAll", new String[0]);
 	public static final FinderPath FINDER_PATH_COUNT_ALL = new FinderPath(TicketModelImpl.ENTITY_CACHE_ENABLED,
 			TicketModelImpl.FINDER_CACHE_ENABLED, Long.class,
-			FINDER_CLASS_NAME_LIST, "countAll", new String[0]);
+			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countAll", new String[0]);
 
 	/**
 	 * Caches the ticket in the entity cache if it is enabled.
@@ -109,8 +115,11 @@ public class TicketPersistenceImpl extends BasePersistenceImpl<Ticket>
 		for (Ticket ticket : tickets) {
 			if (EntityCacheUtil.getResult(
 						TicketModelImpl.ENTITY_CACHE_ENABLED, TicketImpl.class,
-						ticket.getPrimaryKey(), this) == null) {
+						ticket.getPrimaryKey()) == null) {
 				cacheResult(ticket);
+			}
+			else {
+				ticket.resetOriginalValues();
 			}
 		}
 	}
@@ -129,8 +138,10 @@ public class TicketPersistenceImpl extends BasePersistenceImpl<Ticket>
 		}
 
 		EntityCacheUtil.clearCache(TicketImpl.class.getName());
+
 		FinderCacheUtil.clearCache(FINDER_CLASS_NAME_ENTITY);
-		FinderCacheUtil.clearCache(FINDER_CLASS_NAME_LIST);
+		FinderCacheUtil.clearCache(FINDER_CLASS_NAME_LIST_WITH_PAGINATION);
+		FinderCacheUtil.clearCache(FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
 	}
 
 	/**
@@ -145,6 +156,26 @@ public class TicketPersistenceImpl extends BasePersistenceImpl<Ticket>
 		EntityCacheUtil.removeResult(TicketModelImpl.ENTITY_CACHE_ENABLED,
 			TicketImpl.class, ticket.getPrimaryKey());
 
+		FinderCacheUtil.clearCache(FINDER_CLASS_NAME_LIST_WITH_PAGINATION);
+		FinderCacheUtil.clearCache(FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
+
+		clearUniqueFindersCache(ticket);
+	}
+
+	@Override
+	public void clearCache(List<Ticket> tickets) {
+		FinderCacheUtil.clearCache(FINDER_CLASS_NAME_LIST_WITH_PAGINATION);
+		FinderCacheUtil.clearCache(FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
+
+		for (Ticket ticket : tickets) {
+			EntityCacheUtil.removeResult(TicketModelImpl.ENTITY_CACHE_ENABLED,
+				TicketImpl.class, ticket.getPrimaryKey());
+
+			clearUniqueFindersCache(ticket);
+		}
+	}
+
+	protected void clearUniqueFindersCache(Ticket ticket) {
 		FinderCacheUtil.removeResult(FINDER_PATH_FETCH_BY_KEY,
 			new Object[] { ticket.getKey() });
 	}
@@ -167,20 +198,6 @@ public class TicketPersistenceImpl extends BasePersistenceImpl<Ticket>
 	/**
 	 * Removes the ticket with the primary key from the database. Also notifies the appropriate model listeners.
 	 *
-	 * @param primaryKey the primary key of the ticket
-	 * @return the ticket that was removed
-	 * @throws com.liferay.portal.NoSuchModelException if a ticket with the primary key could not be found
-	 * @throws SystemException if a system exception occurred
-	 */
-	@Override
-	public Ticket remove(Serializable primaryKey)
-		throws NoSuchModelException, SystemException {
-		return remove(((Long)primaryKey).longValue());
-	}
-
-	/**
-	 * Removes the ticket with the primary key from the database. Also notifies the appropriate model listeners.
-	 *
 	 * @param ticketId the primary key of the ticket
 	 * @return the ticket that was removed
 	 * @throws com.liferay.portal.NoSuchTicketException if a ticket with the primary key could not be found
@@ -188,24 +205,37 @@ public class TicketPersistenceImpl extends BasePersistenceImpl<Ticket>
 	 */
 	public Ticket remove(long ticketId)
 		throws NoSuchTicketException, SystemException {
+		return remove(Long.valueOf(ticketId));
+	}
+
+	/**
+	 * Removes the ticket with the primary key from the database. Also notifies the appropriate model listeners.
+	 *
+	 * @param primaryKey the primary key of the ticket
+	 * @return the ticket that was removed
+	 * @throws com.liferay.portal.NoSuchTicketException if a ticket with the primary key could not be found
+	 * @throws SystemException if a system exception occurred
+	 */
+	@Override
+	public Ticket remove(Serializable primaryKey)
+		throws NoSuchTicketException, SystemException {
 		Session session = null;
 
 		try {
 			session = openSession();
 
-			Ticket ticket = (Ticket)session.get(TicketImpl.class,
-					Long.valueOf(ticketId));
+			Ticket ticket = (Ticket)session.get(TicketImpl.class, primaryKey);
 
 			if (ticket == null) {
 				if (_log.isWarnEnabled()) {
-					_log.warn(_NO_SUCH_ENTITY_WITH_PRIMARY_KEY + ticketId);
+					_log.warn(_NO_SUCH_ENTITY_WITH_PRIMARY_KEY + primaryKey);
 				}
 
 				throw new NoSuchTicketException(_NO_SUCH_ENTITY_WITH_PRIMARY_KEY +
-					ticketId);
+					primaryKey);
 			}
 
-			return ticketPersistence.remove(ticket);
+			return remove(ticket);
 		}
 		catch (NoSuchTicketException nsee) {
 			throw nsee;
@@ -216,18 +246,6 @@ public class TicketPersistenceImpl extends BasePersistenceImpl<Ticket>
 		finally {
 			closeSession(session);
 		}
-	}
-
-	/**
-	 * Removes the ticket from the database. Also notifies the appropriate model listeners.
-	 *
-	 * @param ticket the ticket
-	 * @return the ticket that was removed
-	 * @throws SystemException if a system exception occurred
-	 */
-	@Override
-	public Ticket remove(Ticket ticket) throws SystemException {
-		return super.remove(ticket);
 	}
 
 	@Override
@@ -248,15 +266,7 @@ public class TicketPersistenceImpl extends BasePersistenceImpl<Ticket>
 			closeSession(session);
 		}
 
-		FinderCacheUtil.clearCache(FINDER_CLASS_NAME_LIST);
-
-		TicketModelImpl ticketModelImpl = (TicketModelImpl)ticket;
-
-		FinderCacheUtil.removeResult(FINDER_PATH_FETCH_BY_KEY,
-			new Object[] { ticketModelImpl.getKey() });
-
-		EntityCacheUtil.removeResult(TicketModelImpl.ENTITY_CACHE_ENABLED,
-			TicketImpl.class, ticket.getPrimaryKey());
+		clearCache(ticket);
 
 		return ticket;
 	}
@@ -286,23 +296,31 @@ public class TicketPersistenceImpl extends BasePersistenceImpl<Ticket>
 			closeSession(session);
 		}
 
-		FinderCacheUtil.clearCache(FINDER_CLASS_NAME_LIST);
+		FinderCacheUtil.clearCache(FINDER_CLASS_NAME_LIST_WITH_PAGINATION);
+
+		if (isNew || !TicketModelImpl.COLUMN_BITMASK_ENABLED) {
+			FinderCacheUtil.clearCache(FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
+		}
 
 		EntityCacheUtil.putResult(TicketModelImpl.ENTITY_CACHE_ENABLED,
 			TicketImpl.class, ticket.getPrimaryKey(), ticket);
 
-		if (!isNew &&
-				(!Validator.equals(ticket.getKey(),
-					ticketModelImpl.getOriginalKey()))) {
-			FinderCacheUtil.removeResult(FINDER_PATH_FETCH_BY_KEY,
-				new Object[] { ticketModelImpl.getOriginalKey() });
-		}
-
-		if (isNew ||
-				(!Validator.equals(ticket.getKey(),
-					ticketModelImpl.getOriginalKey()))) {
+		if (isNew) {
 			FinderCacheUtil.putResult(FINDER_PATH_FETCH_BY_KEY,
 				new Object[] { ticket.getKey() }, ticket);
+		}
+		else {
+			if ((ticketModelImpl.getColumnBitmask() &
+					FINDER_PATH_FETCH_BY_KEY.getColumnBitmask()) != 0) {
+				Object[] args = new Object[] { ticketModelImpl.getOriginalKey() };
+
+				FinderCacheUtil.removeResult(FINDER_PATH_COUNT_BY_KEY, args);
+
+				FinderCacheUtil.removeResult(FINDER_PATH_FETCH_BY_KEY, args);
+
+				FinderCacheUtil.putResult(FINDER_PATH_FETCH_BY_KEY,
+					new Object[] { ticket.getKey() }, ticket);
+			}
 		}
 
 		return ticket;
@@ -391,7 +409,7 @@ public class TicketPersistenceImpl extends BasePersistenceImpl<Ticket>
 	 */
 	public Ticket fetchByPrimaryKey(long ticketId) throws SystemException {
 		Ticket ticket = (Ticket)EntityCacheUtil.getResult(TicketModelImpl.ENTITY_CACHE_ENABLED,
-				TicketImpl.class, ticketId, this);
+				TicketImpl.class, ticketId);
 
 		if (ticket == _nullTicket) {
 			return null;
@@ -489,6 +507,14 @@ public class TicketPersistenceImpl extends BasePersistenceImpl<Ticket>
 		if (retrieveFromCache) {
 			result = FinderCacheUtil.getResult(FINDER_PATH_FETCH_BY_KEY,
 					finderArgs, this);
+		}
+
+		if (result instanceof Ticket) {
+			Ticket ticket = (Ticket)result;
+
+			if (!Validator.equals(key, ticket.getKey())) {
+				result = null;
+			}
 		}
 
 		if (result == null) {
@@ -612,12 +638,20 @@ public class TicketPersistenceImpl extends BasePersistenceImpl<Ticket>
 	 */
 	public List<Ticket> findAll(int start, int end,
 		OrderByComparator orderByComparator) throws SystemException {
-		Object[] finderArgs = new Object[] {
-				String.valueOf(start), String.valueOf(end),
-				String.valueOf(orderByComparator)
-			};
+		FinderPath finderPath = null;
+		Object[] finderArgs = new Object[] { start, end, orderByComparator };
 
-		List<Ticket> list = (List<Ticket>)FinderCacheUtil.getResult(FINDER_PATH_FIND_ALL,
+		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) &&
+				(orderByComparator == null)) {
+			finderPath = FINDER_PATH_WITHOUT_PAGINATION_FIND_ALL;
+			finderArgs = FINDER_ARGS_EMPTY;
+		}
+		else {
+			finderPath = FINDER_PATH_WITH_PAGINATION_FIND_ALL;
+			finderArgs = new Object[] { start, end, orderByComparator };
+		}
+
+		List<Ticket> list = (List<Ticket>)FinderCacheUtil.getResult(finderPath,
 				finderArgs, this);
 
 		if (list == null) {
@@ -662,14 +696,12 @@ public class TicketPersistenceImpl extends BasePersistenceImpl<Ticket>
 			}
 			finally {
 				if (list == null) {
-					FinderCacheUtil.removeResult(FINDER_PATH_FIND_ALL,
-						finderArgs);
+					FinderCacheUtil.removeResult(finderPath, finderArgs);
 				}
 				else {
 					cacheResult(list);
 
-					FinderCacheUtil.putResult(FINDER_PATH_FIND_ALL, finderArgs,
-						list);
+					FinderCacheUtil.putResult(finderPath, finderArgs, list);
 				}
 
 				closeSession(session);
@@ -683,13 +715,14 @@ public class TicketPersistenceImpl extends BasePersistenceImpl<Ticket>
 	 * Removes the ticket where key = &#63; from the database.
 	 *
 	 * @param key the key
+	 * @return the ticket that was removed
 	 * @throws SystemException if a system exception occurred
 	 */
-	public void removeByKey(String key)
+	public Ticket removeByKey(String key)
 		throws NoSuchTicketException, SystemException {
 		Ticket ticket = findByKey(key);
 
-		ticketPersistence.remove(ticket);
+		return remove(ticket);
 	}
 
 	/**
@@ -699,7 +732,7 @@ public class TicketPersistenceImpl extends BasePersistenceImpl<Ticket>
 	 */
 	public void removeAll() throws SystemException {
 		for (Ticket ticket : findAll()) {
-			ticketPersistence.remove(ticket);
+			remove(ticket);
 		}
 	}
 
@@ -775,10 +808,8 @@ public class TicketPersistenceImpl extends BasePersistenceImpl<Ticket>
 	 * @throws SystemException if a system exception occurred
 	 */
 	public int countAll() throws SystemException {
-		Object[] finderArgs = new Object[0];
-
 		Long count = (Long)FinderCacheUtil.getResult(FINDER_PATH_COUNT_ALL,
-				finderArgs, this);
+				FINDER_ARGS_EMPTY, this);
 
 		if (count == null) {
 			Session session = null;
@@ -798,8 +829,8 @@ public class TicketPersistenceImpl extends BasePersistenceImpl<Ticket>
 					count = Long.valueOf(0);
 				}
 
-				FinderCacheUtil.putResult(FINDER_PATH_COUNT_ALL, finderArgs,
-					count);
+				FinderCacheUtil.putResult(FINDER_PATH_COUNT_ALL,
+					FINDER_ARGS_EMPTY, count);
 
 				closeSession(session);
 			}
@@ -836,7 +867,7 @@ public class TicketPersistenceImpl extends BasePersistenceImpl<Ticket>
 	public void destroy() {
 		EntityCacheUtil.removeCache(TicketImpl.class.getName());
 		FinderCacheUtil.removeCache(FINDER_CLASS_NAME_ENTITY);
-		FinderCacheUtil.removeCache(FINDER_CLASS_NAME_LIST);
+		FinderCacheUtil.removeCache(FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
 	}
 
 	@BeanReference(type = AccountPersistence.class)
@@ -883,8 +914,6 @@ public class TicketPersistenceImpl extends BasePersistenceImpl<Ticket>
 	protected MembershipRequestPersistence membershipRequestPersistence;
 	@BeanReference(type = OrganizationPersistence.class)
 	protected OrganizationPersistence organizationPersistence;
-	@BeanReference(type = OrgGroupPermissionPersistence.class)
-	protected OrgGroupPermissionPersistence orgGroupPermissionPersistence;
 	@BeanReference(type = OrgGroupRolePersistence.class)
 	protected OrgGroupRolePersistence orgGroupRolePersistence;
 	@BeanReference(type = OrgLaborPersistence.class)
@@ -895,8 +924,6 @@ public class TicketPersistenceImpl extends BasePersistenceImpl<Ticket>
 	protected PasswordPolicyRelPersistence passwordPolicyRelPersistence;
 	@BeanReference(type = PasswordTrackerPersistence.class)
 	protected PasswordTrackerPersistence passwordTrackerPersistence;
-	@BeanReference(type = PermissionPersistence.class)
-	protected PermissionPersistence permissionPersistence;
 	@BeanReference(type = PhonePersistence.class)
 	protected PhonePersistence phonePersistence;
 	@BeanReference(type = PluginSettingPersistence.class)
@@ -917,14 +944,16 @@ public class TicketPersistenceImpl extends BasePersistenceImpl<Ticket>
 	protected RepositoryPersistence repositoryPersistence;
 	@BeanReference(type = RepositoryEntryPersistence.class)
 	protected RepositoryEntryPersistence repositoryEntryPersistence;
-	@BeanReference(type = ResourcePersistence.class)
-	protected ResourcePersistence resourcePersistence;
 	@BeanReference(type = ResourceActionPersistence.class)
 	protected ResourceActionPersistence resourceActionPersistence;
-	@BeanReference(type = ResourceCodePersistence.class)
-	protected ResourceCodePersistence resourceCodePersistence;
+	@BeanReference(type = ResourceBlockPersistence.class)
+	protected ResourceBlockPersistence resourceBlockPersistence;
+	@BeanReference(type = ResourceBlockPermissionPersistence.class)
+	protected ResourceBlockPermissionPersistence resourceBlockPermissionPersistence;
 	@BeanReference(type = ResourcePermissionPersistence.class)
 	protected ResourcePermissionPersistence resourcePermissionPersistence;
+	@BeanReference(type = ResourceTypePermissionPersistence.class)
+	protected ResourceTypePermissionPersistence resourceTypePermissionPersistence;
 	@BeanReference(type = RolePersistence.class)
 	protected RolePersistence rolePersistence;
 	@BeanReference(type = ServiceComponentPersistence.class)
@@ -976,10 +1005,12 @@ public class TicketPersistenceImpl extends BasePersistenceImpl<Ticket>
 	private static final boolean _HIBERNATE_CACHE_USE_SECOND_LEVEL_CACHE = com.liferay.portal.util.PropsValues.HIBERNATE_CACHE_USE_SECOND_LEVEL_CACHE;
 	private static Log _log = LogFactoryUtil.getLog(TicketPersistenceImpl.class);
 	private static Ticket _nullTicket = new TicketImpl() {
+			@Override
 			public Object clone() {
 				return this;
 			}
 
+			@Override
 			public CacheModel<Ticket> toCacheModel() {
 				return _nullTicketCacheModel;
 			}

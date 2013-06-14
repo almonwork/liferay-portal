@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,6 +14,8 @@
 
 package com.liferay.portlet.documentlibrary.service;
 
+import com.liferay.portal.service.ServiceWrapper;
+
 /**
  * <p>
  * This class is a wrapper for {@link DLSyncService}.
@@ -23,14 +25,34 @@ package com.liferay.portlet.documentlibrary.service;
  * @see       DLSyncService
  * @generated
  */
-public class DLSyncServiceWrapper implements DLSyncService {
+public class DLSyncServiceWrapper implements DLSyncService,
+	ServiceWrapper<DLSyncService> {
 	public DLSyncServiceWrapper(DLSyncService dlSyncService) {
 		_dlSyncService = dlSyncService;
 	}
 
+	/**
+	* Returns the Spring bean ID for this bean.
+	*
+	* @return the Spring bean ID for this bean
+	*/
+	public java.lang.String getBeanIdentifier() {
+		return _dlSyncService.getBeanIdentifier();
+	}
+
+	/**
+	* Sets the Spring bean ID for this bean.
+	*
+	* @param beanIdentifier the Spring bean ID for this bean
+	*/
+	public void setBeanIdentifier(java.lang.String beanIdentifier) {
+		_dlSyncService.setBeanIdentifier(beanIdentifier);
+	}
+
 	public com.liferay.portlet.documentlibrary.model.DLSyncUpdate getDLSyncUpdate(
 		long companyId, long repositoryId, java.util.Date lastAccessDate)
-		throws com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException {
 		return _dlSyncService.getDLSyncUpdate(companyId, repositoryId,
 			lastAccessDate);
 	}
@@ -56,11 +78,25 @@ public class DLSyncServiceWrapper implements DLSyncService {
 			deltaInputStream, size, serviceContext);
 	}
 
+	/**
+	 * @deprecated Renamed to {@link #getWrappedService}
+	 */
 	public DLSyncService getWrappedDLSyncService() {
 		return _dlSyncService;
 	}
 
+	/**
+	 * @deprecated Renamed to {@link #setWrappedService}
+	 */
 	public void setWrappedDLSyncService(DLSyncService dlSyncService) {
+		_dlSyncService = dlSyncService;
+	}
+
+	public DLSyncService getWrappedService() {
+		return _dlSyncService;
+	}
+
+	public void setWrappedService(DLSyncService dlSyncService) {
 		_dlSyncService = dlSyncService;
 	}
 

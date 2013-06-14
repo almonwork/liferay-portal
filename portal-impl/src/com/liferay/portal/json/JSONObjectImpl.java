@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -36,14 +36,14 @@ public class JSONObjectImpl implements JSONObject {
 		_jsonObject = new org.json.JSONObject();
 	}
 
-	public JSONObjectImpl(JSONObject jsonObj, String[] names)
+	public JSONObjectImpl(JSONObject jsonObject, String[] names)
 		throws JSONException {
 
 		try {
-			JSONObjectImpl jsonObjImpl = (JSONObjectImpl)jsonObj;
+			JSONObjectImpl jsonObjectImpl = (JSONObjectImpl)jsonObject;
 
 			_jsonObject = new org.json.JSONObject(
-				jsonObjImpl.getJSONObject(), names);
+				jsonObjectImpl.getJSONObject(), names);
 		}
 		catch (Exception e) {
 			throw new JSONException(e);
@@ -79,12 +79,24 @@ public class JSONObjectImpl implements JSONObject {
 		return _jsonObject.optBoolean(key);
 	}
 
+	public boolean getBoolean(String key, boolean defaultValue) {
+		return _jsonObject.optBoolean(key, defaultValue);
+	}
+
 	public double getDouble(String key) {
 		return _jsonObject.optDouble(key);
 	}
 
+	public double getDouble(String key, double defaultValue) {
+		return _jsonObject.optDouble(key, defaultValue);
+	}
+
 	public int getInt(String key) {
 		return _jsonObject.optInt(key);
+	}
+
+	public int getInt(String key, int defaultValue) {
+		return _jsonObject.optInt(key, defaultValue);
 	}
 
 	public JSONArray getJSONArray(String key) {
@@ -115,8 +127,16 @@ public class JSONObjectImpl implements JSONObject {
 		return _jsonObject.optLong(key);
 	}
 
+	public long getLong(String key, long defaultValue) {
+		return _jsonObject.optLong(key, defaultValue);
+	}
+
 	public String getString(String key) {
 		return _jsonObject.optString(key);
+	}
+
+	public String getString(String key, String defaultValue) {
+		return _jsonObject.optString(key, defaultValue);
 	}
 
 	public boolean has(String key) {
@@ -140,6 +160,19 @@ public class JSONObjectImpl implements JSONObject {
 	}
 
 	public JSONObject put(String key, boolean value) {
+		try {
+			_jsonObject.put(key, value);
+		}
+		catch (Exception e) {
+			if (_log.isWarnEnabled()) {
+				_log.warn(e, e);
+			}
+		}
+
+		return this;
+	}
+
+	public JSONObject put(String key, Date value) {
 		try {
 			_jsonObject.put(key, value);
 		}
@@ -178,32 +211,6 @@ public class JSONObjectImpl implements JSONObject {
 		return this;
 	}
 
-	public JSONObject put(String key, long value) {
-		try {
-			_jsonObject.put(key, value);
-		}
-		catch (Exception e) {
-			if (_log.isWarnEnabled()) {
-				_log.warn(e, e);
-			}
-		}
-
-		return this;
-	}
-
-	public JSONObject put(String key, Date value) {
-		try {
-			_jsonObject.put(key, value);
-		}
-		catch (Exception e) {
-			if (_log.isWarnEnabled()) {
-				_log.warn(e, e);
-			}
-		}
-
-		return this;
-	}
-
 	public JSONObject put(String key, JSONArray value) {
 		try {
 			_jsonObject.put(key, ((JSONArrayImpl)value).getJSONArray());
@@ -220,6 +227,19 @@ public class JSONObjectImpl implements JSONObject {
 	public JSONObject put(String key, JSONObject value) {
 		try {
 			_jsonObject.put(key, ((JSONObjectImpl)value).getJSONObject());
+		}
+		catch (Exception e) {
+			if (_log.isWarnEnabled()) {
+				_log.warn(e, e);
+			}
+		}
+
+		return this;
+	}
+
+	public JSONObject put(String key, long value) {
+		try {
+			_jsonObject.put(key, value);
 		}
 		catch (Exception e) {
 			if (_log.isWarnEnabled()) {

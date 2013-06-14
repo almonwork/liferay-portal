@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -62,6 +62,9 @@ public class BasePersistenceImpl<T extends BaseModel<T>>
 	public static final String COUNT_COLUMN_NAME = "COUNT_VALUE";
 
 	public void clearCache() {
+	}
+
+	public void clearCache(List<T> model) {
 	}
 
 	public void clearCache(T model) {
@@ -233,7 +236,7 @@ public class BasePersistenceImpl<T extends BaseModel<T>>
 	public void unregisterListener(ModelListener<T> listener) {
 		List<ModelListener<T>> listenersList = ListUtil.fromArray(listeners);
 
-		ListUtil.remove(listenersList, listener);
+		listenersList.remove(listener);
 
 		listeners = listenersList.toArray(
 			new ModelListener[listenersList.size()]);
@@ -293,7 +296,7 @@ public class BasePersistenceImpl<T extends BaseModel<T>>
 			query.append(orderByFields[i]);
 
 			if ((i + 1) < orderByFields.length) {
-				if (orderByComparator.isAscending()) {
+				if (orderByComparator.isAscending(orderByFields[i])) {
 					query.append(ORDER_BY_ASC_HAS_NEXT);
 				}
 				else {
@@ -301,7 +304,7 @@ public class BasePersistenceImpl<T extends BaseModel<T>>
 				}
 			}
 			else {
-				if (orderByComparator.isAscending()) {
+				if (orderByComparator.isAscending(orderByFields[i])) {
 					query.append(ORDER_BY_ASC);
 				}
 				else {
@@ -342,6 +345,8 @@ public class BasePersistenceImpl<T extends BaseModel<T>>
 		throw new UnsupportedOperationException();
 	}
 
+	protected static final Object[] FINDER_ARGS_EMPTY = new Object[0];
+
 	protected static final String ORDER_BY_ASC = " ASC";
 
 	protected static final String ORDER_BY_ASC_HAS_NEXT = " ASC, ";
@@ -354,13 +359,13 @@ public class BasePersistenceImpl<T extends BaseModel<T>>
 
 	protected static final String WHERE_AND = " AND ";
 
-	protected static final String WHERE_LESSER_THAN = " <= ? ";
-
-	protected static final String WHERE_LESSER_THAN_HAS_NEXT = " <= ? AND ";
-
 	protected static final String WHERE_GREATER_THAN = " >= ? ";
 
 	protected static final String WHERE_GREATER_THAN_HAS_NEXT = " >= ? AND ";
+
+	protected static final String WHERE_LESSER_THAN = " <= ? ";
+
+	protected static final String WHERE_LESSER_THAN_HAS_NEXT = " <= ? AND ";
 
 	protected static final String WHERE_OR = " OR ";
 

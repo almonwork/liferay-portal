@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,6 +14,12 @@
 
 package com.liferay.portlet.polls.model;
 
+import com.liferay.portal.model.ModelWrapper;
+
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * <p>
  * This class is a wrapper for {@link PollsQuestion}.
@@ -23,7 +29,8 @@ package com.liferay.portlet.polls.model;
  * @see       PollsQuestion
  * @generated
  */
-public class PollsQuestionWrapper implements PollsQuestion {
+public class PollsQuestionWrapper implements PollsQuestion,
+	ModelWrapper<PollsQuestion> {
 	public PollsQuestionWrapper(PollsQuestion pollsQuestion) {
 		_pollsQuestion = pollsQuestion;
 	}
@@ -34,6 +41,99 @@ public class PollsQuestionWrapper implements PollsQuestion {
 
 	public String getModelClassName() {
 		return PollsQuestion.class.getName();
+	}
+
+	public Map<String, Object> getModelAttributes() {
+		Map<String, Object> attributes = new HashMap<String, Object>();
+
+		attributes.put("uuid", getUuid());
+		attributes.put("questionId", getQuestionId());
+		attributes.put("groupId", getGroupId());
+		attributes.put("companyId", getCompanyId());
+		attributes.put("userId", getUserId());
+		attributes.put("userName", getUserName());
+		attributes.put("createDate", getCreateDate());
+		attributes.put("modifiedDate", getModifiedDate());
+		attributes.put("title", getTitle());
+		attributes.put("description", getDescription());
+		attributes.put("expirationDate", getExpirationDate());
+		attributes.put("lastVoteDate", getLastVoteDate());
+
+		return attributes;
+	}
+
+	public void setModelAttributes(Map<String, Object> attributes) {
+		String uuid = (String)attributes.get("uuid");
+
+		if (uuid != null) {
+			setUuid(uuid);
+		}
+
+		Long questionId = (Long)attributes.get("questionId");
+
+		if (questionId != null) {
+			setQuestionId(questionId);
+		}
+
+		Long groupId = (Long)attributes.get("groupId");
+
+		if (groupId != null) {
+			setGroupId(groupId);
+		}
+
+		Long companyId = (Long)attributes.get("companyId");
+
+		if (companyId != null) {
+			setCompanyId(companyId);
+		}
+
+		Long userId = (Long)attributes.get("userId");
+
+		if (userId != null) {
+			setUserId(userId);
+		}
+
+		String userName = (String)attributes.get("userName");
+
+		if (userName != null) {
+			setUserName(userName);
+		}
+
+		Date createDate = (Date)attributes.get("createDate");
+
+		if (createDate != null) {
+			setCreateDate(createDate);
+		}
+
+		Date modifiedDate = (Date)attributes.get("modifiedDate");
+
+		if (modifiedDate != null) {
+			setModifiedDate(modifiedDate);
+		}
+
+		String title = (String)attributes.get("title");
+
+		if (title != null) {
+			setTitle(title);
+		}
+
+		String description = (String)attributes.get("description");
+
+		if (description != null) {
+			setDescription(description);
+		}
+
+		Date expirationDate = (Date)attributes.get("expirationDate");
+
+		if (expirationDate != null) {
+			setExpirationDate(expirationDate);
+		}
+
+		Date lastVoteDate = (Date)attributes.get("lastVoteDate");
+
+		if (lastVoteDate != null) {
+			setLastVoteDate(lastVoteDate);
+		}
 	}
 
 	/**
@@ -270,6 +370,14 @@ public class PollsQuestionWrapper implements PollsQuestion {
 		return _pollsQuestion.getTitle(languageId, useDefault);
 	}
 
+	public java.lang.String getTitleCurrentLanguageId() {
+		return _pollsQuestion.getTitleCurrentLanguageId();
+	}
+
+	public java.lang.String getTitleCurrentValue() {
+		return _pollsQuestion.getTitleCurrentValue();
+	}
+
 	/**
 	* Returns a map of the locales and localized titles of this polls question.
 	*
@@ -308,6 +416,10 @@ public class PollsQuestionWrapper implements PollsQuestion {
 	public void setTitle(java.lang.String title, java.util.Locale locale,
 		java.util.Locale defaultLocale) {
 		_pollsQuestion.setTitle(title, locale, defaultLocale);
+	}
+
+	public void setTitleCurrentLanguageId(java.lang.String languageId) {
+		_pollsQuestion.setTitleCurrentLanguageId(languageId);
 	}
 
 	/**
@@ -385,6 +497,14 @@ public class PollsQuestionWrapper implements PollsQuestion {
 		return _pollsQuestion.getDescription(languageId, useDefault);
 	}
 
+	public java.lang.String getDescriptionCurrentLanguageId() {
+		return _pollsQuestion.getDescriptionCurrentLanguageId();
+	}
+
+	public java.lang.String getDescriptionCurrentValue() {
+		return _pollsQuestion.getDescriptionCurrentValue();
+	}
+
 	/**
 	* Returns a map of the locales and localized descriptions of this polls question.
 	*
@@ -424,6 +544,10 @@ public class PollsQuestionWrapper implements PollsQuestion {
 	public void setDescription(java.lang.String description,
 		java.util.Locale locale, java.util.Locale defaultLocale) {
 		_pollsQuestion.setDescription(description, locale, defaultLocale);
+	}
+
+	public void setDescriptionCurrentLanguageId(java.lang.String languageId) {
+		_pollsQuestion.setDescriptionCurrentLanguageId(languageId);
 	}
 
 	/**
@@ -504,10 +628,6 @@ public class PollsQuestionWrapper implements PollsQuestion {
 		return _pollsQuestion.isEscapedModel();
 	}
 
-	public void setEscapedModel(boolean escapedModel) {
-		_pollsQuestion.setEscapedModel(escapedModel);
-	}
-
 	public java.io.Serializable getPrimaryKeyObj() {
 		return _pollsQuestion.getPrimaryKeyObj();
 	}
@@ -582,7 +702,14 @@ public class PollsQuestionWrapper implements PollsQuestion {
 		return _pollsQuestion.isExpired(serviceContext, defaultCreateDate);
 	}
 
+	/**
+	 * @deprecated Renamed to {@link #getWrappedModel}
+	 */
 	public PollsQuestion getWrappedPollsQuestion() {
+		return _pollsQuestion;
+	}
+
+	public PollsQuestion getWrappedModel() {
 		return _pollsQuestion;
 	}
 

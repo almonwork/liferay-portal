@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -22,13 +22,13 @@ import com.liferay.portal.model.UserGroup;
  */
 public class UserGroupDescriptionComparator extends OrderByComparator {
 
-	public static String ORDER_BY_ASC =
+	public static final String ORDER_BY_ASC =
 		"UserGroup.description ASC, UserGroup.name ASC";
 
-	public static String ORDER_BY_DESC =
+	public static final String ORDER_BY_DESC =
 		"UserGroup.description DESC, UserGroup.name DESC";
 
-	public static String[] ORDER_BY_FIELDS = {"description", "name"};
+	public static final String[] ORDER_BY_FIELDS = {"description", "name"};
 
 	public UserGroupDescriptionComparator() {
 		this(false);

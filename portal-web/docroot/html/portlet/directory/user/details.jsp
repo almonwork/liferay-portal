@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -32,7 +32,7 @@ for (int i = 1; i<organizations.size(); i++) {
 }
 %>
 
-<h2><%= HtmlUtil.escape(selUser.getFullName()) %></h2>
+<h2><%= selUser.getFullName() %></h2>
 
 <div class="details">
 	<img alt="<liferay-ui:message key="avatar" />" class="avatar" id="<portlet:namespace />avatar" src="<%= selUser.getPortraitURL(themeDisplay) %>" />

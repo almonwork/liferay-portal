@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -24,46 +24,52 @@ LayoutSet publicLayoutSet = LayoutSetLocalServiceUtil.getLayoutSet(group.getGrou
 
 LayoutSetPrototype privateLayoutSetPrototype = null;
 
-boolean privateLayoutSetPrototypeInheritance = false;
+boolean privateLayoutSetPrototypeLinkEnabled = false;
 
 LayoutSetPrototype publicLayoutSetPrototype = null;
 
-boolean publicLayoutSetPrototypeInheritance = false;
+boolean publicLayoutSetPrototypeLinkEnabled = false;
 
 if (Validator.isNotNull(privateLayoutSet.getLayoutSetPrototypeUuid())) {
-	privateLayoutSetPrototype = LayoutSetPrototypeLocalServiceUtil.getLayoutSetPrototypeByUuid(privateLayoutSet.getLayoutSetPrototypeUuid());
+	privateLayoutSetPrototype = LayoutSetPrototypeLocalServiceUtil.getLayoutSetPrototypeByUuidAndCompanyId(privateLayoutSet.getLayoutSetPrototypeUuid(), company.getCompanyId());
 
-	privateLayoutSetPrototypeInheritance = privateLayoutSet.getLayoutSetPrototypeLinkEnabled();
+	privateLayoutSetPrototypeLinkEnabled = privateLayoutSet.isLayoutSetPrototypeLinkEnabled();
 }
 
 if (Validator.isNotNull(publicLayoutSet.getLayoutSetPrototypeUuid())) {
-	publicLayoutSetPrototype = LayoutSetPrototypeLocalServiceUtil.getLayoutSetPrototypeByUuid(publicLayoutSet.getLayoutSetPrototypeUuid());
+	publicLayoutSetPrototype = LayoutSetPrototypeLocalServiceUtil.getLayoutSetPrototypeByUuidAndCompanyId(publicLayoutSet.getLayoutSetPrototypeUuid(), company.getCompanyId());
 
-	publicLayoutSetPrototypeInheritance = publicLayoutSet.getLayoutSetPrototypeLinkEnabled();
+	publicLayoutSetPrototypeLinkEnabled = publicLayoutSet.isLayoutSetPrototypeLinkEnabled();
 }
 %>
+
+<liferay-ui:error-marker key="errorSection" value="siteTempate" />
+
+<c:if test="<%= (publicLayoutSetPrototype == null) && (privateLayoutSetPrototype == null) %>">
+	<div class="portlet-msg-info">
+		<liferay-ui:message key="this-site-is-not-related-to-a-site-template" />
+	</div>
+</c:if>
 
 <aui:fieldset>
 	<c:if test="<%= publicLayoutSetPrototype != null %>">
 		<aui:fieldset label="public-site-template">
 			<c:choose>
-				<c:when test="<%= publicLayoutSetPrototypeInheritance %>">
+				<c:when test="<%= publicLayoutSetPrototypeLinkEnabled %>">
 
 					<%
-					boolean allowModifications = GetterUtil.getBoolean(publicLayoutSetPrototype.getSettingsProperty("allowModifications"));
-					boolean allowLayoutAdditions = GetterUtil.getBoolean(publicLayoutSetPrototype.getSettingsProperty("allowLayoutAdditions"));
+					boolean layoutsUpdateable = GetterUtil.getBoolean(publicLayoutSetPrototype.getSettingsProperty("layoutsUpdateable"), true);
 					%>
 
-					<liferay-ui:message arguments="<%= new Object[] {publicLayoutSetPrototype.getName(locale)} %>" key="these-pages-are-linked-to-template-x" />
+					<liferay-ui:message arguments="<%= new Object[] {HtmlUtil.escape(publicLayoutSetPrototype.getName(locale))} %>" key="these-pages-are-linked-to-site-template-x" />
 
 					<aui:field-wrapper label="site-template-settings">
-						<aui:input disabled="<%= true %>" name="active" value="<%= publicLayoutSetPrototype.isActive() %>" type="checkbox" />
-						<aui:input disabled="<%= true %>" name="allow-modifications" type="checkbox" value="<%= allowModifications %>" />
-						<aui:input disabled="<%= true %>" name="allow-adding-pages" type="checkbox" value="<%= allowLayoutAdditions %>" />
+						<aui:input disabled="<%= true %>" name="active" type="checkbox" value="<%= publicLayoutSetPrototype.isActive() %>" />
+						<aui:input disabled="<%= true %>" name="site-template-allows-modifications" type="checkbox" value="<%= layoutsUpdateable %>" />
 					</aui:field-wrapper>
 				</c:when>
 				<c:otherwise>
-					<liferay-ui:message arguments="<%= new Object[] {publicLayoutSetPrototype.getName(locale)} %>" key="this-site-was-cloned-from-template-x" />
+					<liferay-ui:message arguments="<%= new Object[] {publicLayoutSetPrototype.getName(locale)} %>" key="this-site-was-cloned-from-site-template-x" />
 				</c:otherwise>
 			</c:choose>
 		</aui:fieldset>
@@ -72,23 +78,21 @@ if (Validator.isNotNull(publicLayoutSet.getLayoutSetPrototypeUuid())) {
 	<c:if test="<%= privateLayoutSetPrototype != null %>">
 		<aui:fieldset label="private-site-template">
 			<c:choose>
-				<c:when test="<%= privateLayoutSetPrototypeInheritance %>">
+				<c:when test="<%= privateLayoutSetPrototypeLinkEnabled %>">
 
 					<%
-					boolean allowModifications = GetterUtil.getBoolean(privateLayoutSetPrototype.getSettingsProperty("allowModifications"));
-					boolean allowLayoutAdditions = GetterUtil.getBoolean(privateLayoutSetPrototype.getSettingsProperty("allowLayoutAdditions"));
+					boolean layoutsUpdateable = GetterUtil.getBoolean(privateLayoutSetPrototype.getSettingsProperty("layoutsUpdateable"), true);
 					%>
 
-					<liferay-ui:message arguments="<%= new Object[] {privateLayoutSetPrototype.getName(locale)} %>" key="these-pages-are-linked-to-template-x" />
+					<liferay-ui:message arguments="<%= new Object[] {HtmlUtil.escape(privateLayoutSetPrototype.getName(locale))} %>" key="these-pages-are-linked-to-site-template-x" />
 
 					<aui:field-wrapper label="site-template-settings">
 						<aui:input disabled="<%= true %>" name="active" type="checkbox" value="<%= privateLayoutSetPrototype.isActive() %>" />
-						<aui:input disabled="<%= true %>" name="template-allows-modification" type="checkbox" value="<%= allowModifications %>" />
-						<aui:input disabled="<%= true %>" name="template-allows-page-addition" type="checkbox" value="<%= allowLayoutAdditions %>" />
+						<aui:input disabled="<%= true %>" name="site-template-allows-modifications" type="checkbox" value="<%= layoutsUpdateable %>" />
 					</aui:field-wrapper>
 				</c:when>
 				<c:otherwise>
-					<liferay-ui:message arguments="<%= new Object[] {privateLayoutSetPrototype.getName(locale)} %>" key="this-site-was-cloned-from-template-x" />
+					<liferay-ui:message arguments="<%= new Object[] {privateLayoutSetPrototype.getName(locale)} %>" key="this-site-was-cloned-from-site-template-x" />
 				</c:otherwise>
 			</c:choose>
 		</aui:fieldset>

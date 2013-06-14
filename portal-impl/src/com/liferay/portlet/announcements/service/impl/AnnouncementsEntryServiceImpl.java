@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -25,7 +25,6 @@ import com.liferay.portal.security.permission.ActionKeys;
 import com.liferay.portal.security.permission.PermissionChecker;
 import com.liferay.portal.service.permission.GroupPermissionUtil;
 import com.liferay.portal.service.permission.OrganizationPermissionUtil;
-import com.liferay.portal.service.permission.PortletPermissionUtil;
 import com.liferay.portal.service.permission.RolePermissionUtil;
 import com.liferay.portal.service.permission.UserGroupPermissionUtil;
 import com.liferay.portal.util.PortalUtil;
@@ -52,9 +51,16 @@ public class AnnouncementsEntryServiceImpl
 
 		PermissionChecker permissionChecker = getPermissionChecker();
 
-		PortletPermissionUtil.check(
-			permissionChecker, plid, PortletKeys.ANNOUNCEMENTS,
-			ActionKeys.ADD_ENTRY);
+		if (alert) {
+			AnnouncementsEntryPermission.check(
+				permissionChecker, plid, PortletKeys.ALERTS,
+				ActionKeys.ADD_ENTRY);
+		}
+		else {
+			AnnouncementsEntryPermission.check(
+				permissionChecker, plid, PortletKeys.ANNOUNCEMENTS,
+				ActionKeys.ADD_ENTRY);
+		}
 
 		if (classNameId == 0) {
 			if (!permissionChecker.isOmniadmin()) {
@@ -115,12 +121,11 @@ public class AnnouncementsEntryServiceImpl
 	}
 
 	public AnnouncementsEntry updateEntry(
-			long entryId, String title, String content, String url,
-			String type, int displayDateMonth, int displayDateDay,
-			int displayDateYear, int displayDateHour, int displayDateMinute,
-			int expirationDateMonth, int expirationDateDay,
-			int expirationDateYear, int expirationDateHour,
-			int expirationDateMinute, int priority)
+			long entryId, String title, String content, String url, String type,
+			int displayDateMonth, int displayDateDay, int displayDateYear,
+			int displayDateHour, int displayDateMinute, int expirationDateMonth,
+			int expirationDateDay, int expirationDateYear,
+			int expirationDateHour, int expirationDateMinute, int priority)
 		throws PortalException, SystemException {
 
 		AnnouncementsEntryPermission.check(

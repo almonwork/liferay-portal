@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -25,7 +25,6 @@ import com.liferay.portal.service.base.EmailAddressLocalServiceBaseImpl;
 import com.liferay.portal.util.PortalUtil;
 
 import java.util.Date;
-import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -69,23 +68,6 @@ public class EmailAddressLocalServiceImpl
 		return emailAddress;
 	}
 
-	@Override
-	public void deleteEmailAddress(EmailAddress emailAddress)
-		throws SystemException {
-
-		emailAddressPersistence.remove(emailAddress);
-	}
-
-	@Override
-	public void deleteEmailAddress(long emailAddressId)
-		throws PortalException, SystemException {
-
-		EmailAddress emailAddress = emailAddressPersistence.findByPrimaryKey(
-			emailAddressId);
-
-		deleteEmailAddress(emailAddress);
-	}
-
 	public void deleteEmailAddresses(
 			long companyId, String className, long classPK)
 		throws SystemException {
@@ -98,13 +80,6 @@ public class EmailAddressLocalServiceImpl
 		for (EmailAddress emailAddress : emailAddresses) {
 			deleteEmailAddress(emailAddress);
 		}
-	}
-
-	@Override
-	public EmailAddress getEmailAddress(long emailAddressId)
-		throws PortalException, SystemException {
-
-		return emailAddressPersistence.findByPrimaryKey(emailAddressId);
 	}
 
 	public List<EmailAddress> getEmailAddresses() throws SystemException {
@@ -141,8 +116,34 @@ public class EmailAddressLocalServiceImpl
 	}
 
 	protected void validate(
-			long emailAddressId, long companyId, long classNameId,
-			long classPK, String address, int typeId, boolean primary)
+			long emailAddressId, long companyId, long classNameId, long classPK,
+			boolean primary)
+		throws SystemException {
+
+		// Check to make sure there isn't another emailAddress with the same
+		// company id, class name, and class pk that also has primary set to
+		// true
+
+		if (primary) {
+			List<EmailAddress> emailAddresses =
+				emailAddressPersistence.findByC_C_C_P(
+					companyId, classNameId, classPK, primary);
+
+			for (EmailAddress emailAddress : emailAddresses) {
+				if ((emailAddressId <= 0) ||
+					(emailAddress.getEmailAddressId() != emailAddressId)) {
+
+					emailAddress.setPrimary(false);
+
+					emailAddressPersistence.update(emailAddress, false);
+				}
+			}
+		}
+	}
+
+	protected void validate(
+			long emailAddressId, long companyId, long classNameId, long classPK,
+			String address, int typeId, boolean primary)
 		throws PortalException, SystemException {
 
 		if (!Validator.isEmailAddress(address)) {
@@ -151,8 +152,7 @@ public class EmailAddressLocalServiceImpl
 
 		if (emailAddressId > 0) {
 			EmailAddress emailAddress =
-				emailAddressPersistence.findByPrimaryKey(
-					emailAddressId);
+				emailAddressPersistence.findByPrimaryKey(emailAddressId);
 
 			companyId = emailAddress.getCompanyId();
 			classNameId = emailAddress.getClassNameId();
@@ -163,33 +163,6 @@ public class EmailAddressLocalServiceImpl
 			typeId, classNameId, ListTypeConstants.EMAIL_ADDRESS);
 
 		validate(emailAddressId, companyId, classNameId, classPK, primary);
-	}
-
-	protected void validate(
-			long emailAddressId, long companyId, long classNameId, long classPK,
-			boolean primary)
-		throws SystemException {
-
-		// Check to make sure there isn't another emailAddress with the same
-		// company id, class name, and class pk that also has primary set to
-		// true
-
-		if (primary) {
-			Iterator<EmailAddress> itr = emailAddressPersistence.findByC_C_C_P(
-				companyId, classNameId, classPK, primary).iterator();
-
-			while (itr.hasNext()) {
-				EmailAddress emailAddress = itr.next();
-
-				if ((emailAddressId <= 0) ||
-					(emailAddress.getEmailAddressId() != emailAddressId)) {
-
-					emailAddress.setPrimary(false);
-
-					emailAddressPersistence.update(emailAddress, false);
-				}
-			}
-		}
 	}
 
 }

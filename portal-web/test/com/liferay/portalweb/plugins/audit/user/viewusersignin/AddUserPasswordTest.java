@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -28,9 +28,10 @@ public class AddUserPasswordTest extends BaseTestCase {
 			switch (label) {
 			case 1:
 				selenium.open("/web/guest/home/");
+				loadRequiredJavaScriptModules();
 
 				for (int second = 0;; second++) {
-					if (second >= 60) {
+					if (second >= 90) {
 						fail("timeout");
 					}
 
@@ -45,14 +46,20 @@ public class AddUserPasswordTest extends BaseTestCase {
 					Thread.sleep(1000);
 				}
 
-				selenium.saveScreenShotAndSource();
 				selenium.clickAt("link=Control Panel",
-					RuntimeVariables.replace(""));
+					RuntimeVariables.replace("Control Panel"));
 				selenium.waitForPageToLoad("30000");
-				selenium.saveScreenShotAndSource();
-				selenium.clickAt("link=Users", RuntimeVariables.replace(""));
+				loadRequiredJavaScriptModules();
+				selenium.clickAt("link=Users and Organizations",
+					RuntimeVariables.replace("Users and Organizations"));
 				selenium.waitForPageToLoad("30000");
-				selenium.saveScreenShotAndSource();
+				loadRequiredJavaScriptModules();
+				assertEquals(RuntimeVariables.replace("Search All Users"),
+					selenium.getText("//a[@id='_125_allUsersLink']"));
+				selenium.clickAt("//a[@id='_125_allUsersLink']",
+					RuntimeVariables.replace("Search All Users"));
+				selenium.waitForPageToLoad("30000");
+				loadRequiredJavaScriptModules();
 
 				boolean basic1Visible = selenium.isVisible("link=\u00ab Basic");
 
@@ -63,29 +70,33 @@ public class AddUserPasswordTest extends BaseTestCase {
 				}
 
 				selenium.clickAt("link=\u00ab Basic",
-					RuntimeVariables.replace(""));
+					RuntimeVariables.replace("\u00ab Basic"));
 
 			case 2:
-				selenium.type("_125_keywords",
-					RuntimeVariables.replace("selenium"));
-				selenium.saveScreenShotAndSource();
+				selenium.type("//input[@name='_125_keywords']",
+					RuntimeVariables.replace("selenium01"));
 				selenium.clickAt("//input[@value='Search']",
-					RuntimeVariables.replace(""));
+					RuntimeVariables.replace("Search"));
 				selenium.waitForPageToLoad("30000");
-				selenium.saveScreenShotAndSource();
+				loadRequiredJavaScriptModules();
+				assertEquals(RuntimeVariables.replace("selen01"),
+					selenium.getText("//td[2]/a"));
 				selenium.clickAt("//td[2]/a",
-					RuntimeVariables.replace("User Name"));
+					RuntimeVariables.replace("selen01"));
 				selenium.waitForPageToLoad("30000");
-				selenium.saveScreenShotAndSource();
-				selenium.clickAt("passwordLink", RuntimeVariables.replace(""));
+				loadRequiredJavaScriptModules();
+				assertTrue(selenium.isPartialText(
+						"//a[@id='_125_passwordLink']", "Password"));
+				selenium.clickAt("//a[@id='_125_passwordLink']",
+					RuntimeVariables.replace("Password"));
 
 				for (int second = 0;; second++) {
-					if (second >= 60) {
+					if (second >= 90) {
 						fail("timeout");
 					}
 
 					try {
-						if (selenium.isVisible("_125_password1")) {
+						if (selenium.isVisible("//input[@id='_125_password1']")) {
 							break;
 						}
 					}
@@ -95,18 +106,17 @@ public class AddUserPasswordTest extends BaseTestCase {
 					Thread.sleep(1000);
 				}
 
-				selenium.saveScreenShotAndSource();
-				selenium.type("_125_password1", RuntimeVariables.replace("test"));
-				selenium.saveScreenShotAndSource();
-				selenium.type("_125_password2", RuntimeVariables.replace("test"));
-				selenium.saveScreenShotAndSource();
+				selenium.type("//input[@id='_125_password1']",
+					RuntimeVariables.replace("test"));
+				selenium.type("//input[@id='_125_password2']",
+					RuntimeVariables.replace("test"));
 				selenium.clickAt("//input[@value='Save']",
-					RuntimeVariables.replace(""));
+					RuntimeVariables.replace("Save"));
 				selenium.waitForPageToLoad("30000");
-				selenium.saveScreenShotAndSource();
+				loadRequiredJavaScriptModules();
 				assertEquals(RuntimeVariables.replace(
 						"Your request completed successfully."),
-					selenium.getText("//section/div/div/div/div[1]"));
+					selenium.getText("//div[@class='portlet-msg-success']"));
 
 			case 100:
 				label = -1;

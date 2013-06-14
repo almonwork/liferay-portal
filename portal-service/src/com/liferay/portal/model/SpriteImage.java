@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -32,8 +32,8 @@ public class SpriteImage implements Serializable {
 		_width = width;
 	}
 
-	public String getSpriteFileName() {
-		return _spriteFileName;
+	public int getHeight() {
+		return _height;
 	}
 
 	public String getImageFileName() {
@@ -44,18 +44,18 @@ public class SpriteImage implements Serializable {
 		return _offset;
 	}
 
-	public int getHeight() {
-		return _height;
+	public String getSpriteFileName() {
+		return _spriteFileName;
 	}
 
 	public int getWidth() {
 		return _width;
 	}
 
-	private String _spriteFileName;
+	private int _height;
 	private String _imageFileName;
 	private int _offset;
-	private int _height;
+	private String _spriteFileName;
 	private int _width;
 
 }

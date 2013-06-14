@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -21,22 +21,77 @@ import com.liferay.portal.model.Plugin;
 import com.liferay.portal.security.permission.ActionKeys;
 import com.liferay.portal.service.base.LayoutSetServiceBaseImpl;
 import com.liferay.portal.service.permission.GroupPermissionUtil;
+import com.liferay.portal.service.permission.PortalPermissionUtil;
 
-import java.io.File;
+import java.io.InputStream;
 
 /**
  * @author Brian Wing Shun Chan
  */
 public class LayoutSetServiceImpl extends LayoutSetServiceBaseImpl {
 
-	public void updateLogo(
-			long groupId, boolean privateLayout, boolean logo, File file)
+	/**
+	 * Updates the state of the layout set prototype link.
+	 *
+	 * <p>
+	 * <strong>Important:</strong> Setting
+	 * <code>layoutSetPrototypeLinkEnabled</code> to <code>true</code> and
+	 * <code>layoutSetPrototypeUuid</code> to <code>null</code> when the layout
+	 * set prototype's current uuid is <code>null</code> will result in an
+	 * <code>IllegalStateException</code>.
+	 * </p>
+	 *
+	 * @param  groupId the primary key of the group
+	 * @param  privateLayout whether the layout set is private to the group
+	 * @param  layoutSetPrototypeLinkEnabled whether the layout set prototype is
+	 *         link enabled
+	 * @param  layoutSetPrototypeUuid the uuid of the layout set prototype to
+	 *         link with
+	 * @throws PortalException if a portal exception occurred
+	 * @throws SystemException if a system exception occurred
+	 */
+	public void updateLayoutSetPrototypeLinkEnabled(
+			long groupId, boolean privateLayout,
+			boolean layoutSetPrototypeLinkEnabled,
+			String layoutSetPrototypeUuid)
 		throws PortalException, SystemException {
 
 		GroupPermissionUtil.check(
-			getPermissionChecker(), groupId, ActionKeys.MANAGE_LAYOUTS);
+			getPermissionChecker(), groupId, ActionKeys.UPDATE);
 
-		layoutSetLocalService.updateLogo(groupId, privateLayout, logo, file);
+		LayoutSet layoutSet = layoutSetLocalService.getLayoutSet(
+			groupId, privateLayout);
+
+		if (layoutSet.isLayoutSetPrototypeLinkEnabled() &&
+			!layoutSetPrototypeLinkEnabled) {
+
+			PortalPermissionUtil.check(
+				getPermissionChecker(), ActionKeys.UNLINK_LAYOUT_SET_PROTOTYPE);
+		}
+
+		layoutSetLocalService.updateLayoutSetPrototypeLinkEnabled(
+			groupId, privateLayout, layoutSetPrototypeLinkEnabled,
+			layoutSetPrototypeUuid);
+	}
+
+	public void updateLogo(
+			long groupId, boolean privateLayout, boolean logo,
+			InputStream inputStream)
+		throws PortalException, SystemException {
+
+		updateLogo(groupId, privateLayout, logo, inputStream, true);
+	}
+
+	public void updateLogo(
+			long groupId, boolean privateLayout, boolean logo,
+			InputStream inputStream, boolean cleanUpStream)
+		throws PortalException, SystemException {
+
+		GroupPermissionUtil.check(
+			getPermissionChecker(), groupId, ActionKeys.UPDATE);
+
+		layoutSetLocalService.updateLogo(
+			groupId, privateLayout, logo, inputStream, cleanUpStream);
 	}
 
 	public LayoutSet updateLookAndFeel(
@@ -45,7 +100,7 @@ public class LayoutSetServiceImpl extends LayoutSetServiceBaseImpl {
 		throws PortalException, SystemException {
 
 		GroupPermissionUtil.check(
-			getPermissionChecker(), groupId, ActionKeys.MANAGE_LAYOUTS);
+			getPermissionChecker(), groupId, ActionKeys.UPDATE);
 
 		pluginSettingLocalService.checkPermission(
 			getUserId(), themeId, Plugin.TYPE_THEME);
@@ -59,7 +114,7 @@ public class LayoutSetServiceImpl extends LayoutSetServiceBaseImpl {
 		throws PortalException, SystemException {
 
 		GroupPermissionUtil.check(
-			getPermissionChecker(), groupId, ActionKeys.MANAGE_LAYOUTS);
+			getPermissionChecker(), groupId, ActionKeys.UPDATE);
 
 		return layoutSetLocalService.updateSettings(
 			groupId, privateLayout, settings);

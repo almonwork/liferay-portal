@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -53,7 +53,7 @@ public class TokensTransformerListener extends BaseTransformerListener {
 			_log.debug("onScript");
 		}
 
-		return replace(s);
+		return s;
 	}
 
 	@Override
@@ -114,13 +114,11 @@ public class TokensTransformerListener extends BaseTransformerListener {
 		}
 
 		s = StringUtil.replace(
-			s,
-			escapedKeysList.toArray(new String[escapedKeysList.size()]),
+			s, escapedKeysList.toArray(new String[escapedKeysList.size()]),
 			escapedValuesList.toArray(new String[escapedValuesList.size()]));
 
 		s = StringUtil.replace(
-			s,
-			keysList.toArray(new String[keysList.size()]),
+			s, keysList.toArray(new String[keysList.size()]),
 			valuesList.toArray(new String[valuesList.size()]));
 
 		s = StringUtil.replace(

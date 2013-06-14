@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -120,15 +120,29 @@ public interface DLSyncModel extends BaseModel<DLSync> {
 	 *
 	 * @return the file ID of this d l sync
 	 */
-	@AutoEscape
-	public String getFileId();
+	public long getFileId();
 
 	/**
 	 * Sets the file ID of this d l sync.
 	 *
 	 * @param fileId the file ID of this d l sync
 	 */
-	public void setFileId(String fileId);
+	public void setFileId(long fileId);
+
+	/**
+	 * Returns the file uuid of this d l sync.
+	 *
+	 * @return the file uuid of this d l sync
+	 */
+	@AutoEscape
+	public String getFileUuid();
+
+	/**
+	 * Sets the file uuid of this d l sync.
+	 *
+	 * @param fileUuid the file uuid of this d l sync
+	 */
+	public void setFileUuid(String fileUuid);
 
 	/**
 	 * Returns the repository ID of this d l sync.
@@ -143,6 +157,50 @@ public interface DLSyncModel extends BaseModel<DLSync> {
 	 * @param repositoryId the repository ID of this d l sync
 	 */
 	public void setRepositoryId(long repositoryId);
+
+	/**
+	 * Returns the parent folder ID of this d l sync.
+	 *
+	 * @return the parent folder ID of this d l sync
+	 */
+	public long getParentFolderId();
+
+	/**
+	 * Sets the parent folder ID of this d l sync.
+	 *
+	 * @param parentFolderId the parent folder ID of this d l sync
+	 */
+	public void setParentFolderId(long parentFolderId);
+
+	/**
+	 * Returns the name of this d l sync.
+	 *
+	 * @return the name of this d l sync
+	 */
+	@AutoEscape
+	public String getName();
+
+	/**
+	 * Sets the name of this d l sync.
+	 *
+	 * @param name the name of this d l sync
+	 */
+	public void setName(String name);
+
+	/**
+	 * Returns the description of this d l sync.
+	 *
+	 * @return the description of this d l sync
+	 */
+	@AutoEscape
+	public String getDescription();
+
+	/**
+	 * Sets the description of this d l sync.
+	 *
+	 * @param description the description of this d l sync
+	 */
+	public void setDescription(String description);
 
 	/**
 	 * Returns the event of this d l sync.
@@ -174,6 +232,21 @@ public interface DLSyncModel extends BaseModel<DLSync> {
 	 */
 	public void setType(String type);
 
+	/**
+	 * Returns the version of this d l sync.
+	 *
+	 * @return the version of this d l sync
+	 */
+	@AutoEscape
+	public String getVersion();
+
+	/**
+	 * Sets the version of this d l sync.
+	 *
+	 * @param version the version of this d l sync
+	 */
+	public void setVersion(String version);
+
 	public boolean isNew();
 
 	public void setNew(boolean n);
@@ -183,8 +256,6 @@ public interface DLSyncModel extends BaseModel<DLSync> {
 	public void setCachedModel(boolean cachedModel);
 
 	public boolean isEscapedModel();
-
-	public void setEscapedModel(boolean escapedModel);
 
 	public Serializable getPrimaryKeyObj();
 

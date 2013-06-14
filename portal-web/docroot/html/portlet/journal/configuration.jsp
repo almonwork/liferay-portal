@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -25,8 +25,8 @@ String portletResource = ParamUtil.getString(request, "portletResource");
 
 PortletPreferences portletSetup = PortletPreferencesFactoryUtil.getPortletSetup(request, portletResource);
 
-String emailFromName = ParamUtil.getString(request, "emailFromName", JournalUtil.getEmailFromName(portletSetup));
-String emailFromAddress = ParamUtil.getString(request, "emailFromAddress", JournalUtil.getEmailFromAddress(portletSetup));
+String emailFromName = ParamUtil.getString(request, "emailFromName", JournalUtil.getEmailFromName(portletSetup, company.getCompanyId()));
+String emailFromAddress = ParamUtil.getString(request, "emailFromAddress", JournalUtil.getEmailFromAddress(portletSetup, company.getCompanyId()));
 
 String emailArticleAddedSubject = ParamUtil.getString(request, "emailArticleAddedSubject", JournalUtil.getEmailArticleAddedSubject(portletSetup));
 String emailArticleAddedBody = ParamUtil.getString(request, "emailArticleAddedBody", JournalUtil.getEmailArticleAddedBody(portletSetup));
@@ -75,7 +75,7 @@ else if (tabs2.equals("web-content-updated-email")) {
 }
 %>
 
-<liferay-portlet:renderURL var="portletURL" portletConfiguration="true">
+<liferay-portlet:renderURL portletConfiguration="true" var="portletURL">
 	<portlet:param name="tabs2" value="<%= tabs2 %>" />
 	<portlet:param name="redirect" value="<%= redirect %>" />
 </liferay-portlet:renderURL>
@@ -87,8 +87,16 @@ else if (tabs2.equals("web-content-updated-email")) {
 	<aui:input name="tabs2" type="hidden" value="<%= tabs2 %>" />
 	<aui:input name="redirect" type="hidden" value="<%= redirect %>" />
 
+	<%
+	String tabs1Names = "email-from,web-content-added-email,web-content-updated-email";
+
+	if (WorkflowDefinitionLinkLocalServiceUtil.hasWorkflowDefinitionLink(themeDisplay.getCompanyId(), scopeGroupId, JournalArticle.class.getName())) {
+		tabs1Names = tabs1Names.concat(",web-content-approval-denied-email,web-content-approval-granted-email,web-content-approval-requested-email,web-content-review-email");
+	}
+	%>
+
 	<liferay-ui:tabs
-		names="email-from,web-content-added-email,web-content-approval-denied-email,web-content-approval-granted-email,web-content-approval-requested-email,web-content-review-email,web-content-updated-email"
+		names="<%= tabs1Names %>"
 		param="tabs2"
 		url="<%= portletURL %>"
 	/>
@@ -184,7 +192,7 @@ else if (tabs2.equals("web-content-updated-email")) {
 						<liferay-ui:message key="the-web-content-title" />
 					</dd>
 
-					<c:if test='<%= tabs2.startsWith("web-content-added-") || tabs2.startsWith("web-content-approval-") || tabs2.startsWith("web-content-updated-") %>'>
+					<c:if test='<%= tabs2.startsWith("web-content-added-") || tabs2.startsWith("web-content-approval-") || tabs2.startsWith("web-content-review-") || tabs2.startsWith("web-content-updated-") %>'>
 						<dt>
 							[$ARTICLE_URL$]
 						</dt>

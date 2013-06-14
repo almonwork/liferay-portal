@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,6 +14,8 @@
 
 package com.liferay.portlet.messageboards.service;
 
+import com.liferay.portal.service.ServiceWrapper;
+
 /**
  * <p>
  * This class is a wrapper for {@link MBDiscussionLocalService}.
@@ -23,7 +25,8 @@ package com.liferay.portlet.messageboards.service;
  * @see       MBDiscussionLocalService
  * @generated
  */
-public class MBDiscussionLocalServiceWrapper implements MBDiscussionLocalService {
+public class MBDiscussionLocalServiceWrapper implements MBDiscussionLocalService,
+	ServiceWrapper<MBDiscussionLocalService> {
 	public MBDiscussionLocalServiceWrapper(
 		MBDiscussionLocalService mbDiscussionLocalService) {
 		_mbDiscussionLocalService = mbDiscussionLocalService;
@@ -57,25 +60,32 @@ public class MBDiscussionLocalServiceWrapper implements MBDiscussionLocalService
 	* Deletes the message boards discussion with the primary key from the database. Also notifies the appropriate model listeners.
 	*
 	* @param discussionId the primary key of the message boards discussion
+	* @return the message boards discussion that was removed
 	* @throws PortalException if a message boards discussion with the primary key could not be found
 	* @throws SystemException if a system exception occurred
 	*/
-	public void deleteMBDiscussion(long discussionId)
+	public com.liferay.portlet.messageboards.model.MBDiscussion deleteMBDiscussion(
+		long discussionId)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException {
-		_mbDiscussionLocalService.deleteMBDiscussion(discussionId);
+		return _mbDiscussionLocalService.deleteMBDiscussion(discussionId);
 	}
 
 	/**
 	* Deletes the message boards discussion from the database. Also notifies the appropriate model listeners.
 	*
 	* @param mbDiscussion the message boards discussion
+	* @return the message boards discussion that was removed
 	* @throws SystemException if a system exception occurred
 	*/
-	public void deleteMBDiscussion(
+	public com.liferay.portlet.messageboards.model.MBDiscussion deleteMBDiscussion(
 		com.liferay.portlet.messageboards.model.MBDiscussion mbDiscussion)
 		throws com.liferay.portal.kernel.exception.SystemException {
-		_mbDiscussionLocalService.deleteMBDiscussion(mbDiscussion);
+		return _mbDiscussionLocalService.deleteMBDiscussion(mbDiscussion);
+	}
+
+	public com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery() {
+		return _mbDiscussionLocalService.dynamicQuery();
 	}
 
 	/**
@@ -147,6 +157,12 @@ public class MBDiscussionLocalServiceWrapper implements MBDiscussionLocalService
 		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery)
 		throws com.liferay.portal.kernel.exception.SystemException {
 		return _mbDiscussionLocalService.dynamicQueryCount(dynamicQuery);
+	}
+
+	public com.liferay.portlet.messageboards.model.MBDiscussion fetchMBDiscussion(
+		long discussionId)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return _mbDiscussionLocalService.fetchMBDiscussion(discussionId);
 	}
 
 	/**
@@ -274,11 +290,26 @@ public class MBDiscussionLocalServiceWrapper implements MBDiscussionLocalService
 		return _mbDiscussionLocalService.getThreadDiscussion(threadId);
 	}
 
+	/**
+	 * @deprecated Renamed to {@link #getWrappedService}
+	 */
 	public MBDiscussionLocalService getWrappedMBDiscussionLocalService() {
 		return _mbDiscussionLocalService;
 	}
 
+	/**
+	 * @deprecated Renamed to {@link #setWrappedService}
+	 */
 	public void setWrappedMBDiscussionLocalService(
+		MBDiscussionLocalService mbDiscussionLocalService) {
+		_mbDiscussionLocalService = mbDiscussionLocalService;
+	}
+
+	public MBDiscussionLocalService getWrappedService() {
+		return _mbDiscussionLocalService;
+	}
+
+	public void setWrappedService(
 		MBDiscussionLocalService mbDiscussionLocalService) {
 		_mbDiscussionLocalService = mbDiscussionLocalService;
 	}

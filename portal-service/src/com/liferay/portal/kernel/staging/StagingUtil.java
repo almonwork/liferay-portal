@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -17,9 +17,12 @@ package com.liferay.portal.kernel.staging;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.lar.PortletDataContext;
+import com.liferay.portal.kernel.security.pacl.permission.PortalRuntimePermission;
+import com.liferay.portal.kernel.workflow.WorkflowTask;
 import com.liferay.portal.kernel.xml.Element;
 import com.liferay.portal.model.Group;
 import com.liferay.portal.model.Layout;
+import com.liferay.portal.model.LayoutRevision;
 import com.liferay.portal.model.Portlet;
 import com.liferay.portal.model.User;
 import com.liferay.portal.service.ServiceContext;
@@ -36,6 +39,15 @@ import javax.servlet.http.HttpServletRequest;
  * @author Raymond Augé
  */
 public class StagingUtil {
+
+	public static String buildRemoteURL(
+		String remoteAddress, int remotePort, String remotePathContext,
+		boolean secureConnection, long remoteGroupId, boolean privateLayout) {
+
+		return getStaging().buildRemoteURL(
+			remoteAddress, remotePort, remotePathContext, secureConnection,
+			remoteGroupId, privateLayout);
+	}
 
 	public static void copyFromLive(PortletRequest PortletRequest)
 		throws Exception {
@@ -64,15 +76,15 @@ public class StagingUtil {
 	public static void copyRemoteLayouts(
 			long sourceGroupId, boolean privateLayout,
 			Map<Long, Boolean> layoutIdMap, Map<String, String[]> parameterMap,
-			String remoteAddress, int remotePort, boolean secureConnection,
-			long remoteGroupId, boolean remotePrivateLayout, Date startDate,
-			Date endDate)
+			String remoteAddress, int remotePort, String remotePathContext,
+			boolean secureConnection, long remoteGroupId,
+			boolean remotePrivateLayout, Date startDate, Date endDate)
 		throws Exception {
 
 		getStaging().copyRemoteLayouts(
 			sourceGroupId, privateLayout, layoutIdMap, parameterMap,
-			remoteAddress, remotePort, secureConnection, remoteGroupId,
-			remotePrivateLayout, startDate, endDate);
+			remoteAddress, remotePort, remotePathContext, secureConnection,
+			remoteGroupId, remotePrivateLayout, startDate, endDate);
 	}
 
 	public static void deleteLastImportSettings(
@@ -128,14 +140,27 @@ public class StagingUtil {
 	public static void enableRemoteStaging(
 			long userId, Group scopeGroup, Group liveGroup,
 			boolean branchingPublic, boolean branchingPrivate,
-			String remoteAddress, long remoteGroupId, int remotePort,
-			boolean secureConnection, ServiceContext serviceContext)
+			String remoteAddress, int remotePort, String remotePathContext,
+			boolean secureConnection, long remoteGroupId,
+			ServiceContext serviceContext)
 		throws Exception {
 
 		getStaging().enableRemoteStaging(
 			userId, scopeGroup, liveGroup, branchingPublic, branchingPrivate,
-			remoteAddress, remoteGroupId, remotePort, secureConnection,
-			serviceContext);
+			remoteAddress, remotePort, remotePathContext, secureConnection,
+			remoteGroupId, serviceContext);
+	}
+
+	public static Group getLiveGroup(long groupId)
+		throws PortalException, SystemException {
+
+		return getStaging().getLiveGroup(groupId);
+	}
+
+	public static long getLiveGroupId(long groupId)
+		throws PortalException, SystemException {
+
+		return getStaging().getLiveGroupId(groupId);
 	}
 
 	public static List<Layout> getMissingParentLayouts(
@@ -147,7 +172,7 @@ public class StagingUtil {
 
 	public static long getRecentLayoutRevisionId(
 			HttpServletRequest request, long layoutSetBranchId, long plid)
-		throws PortalException, SystemException{
+		throws PortalException, SystemException {
 
 		return getStaging().getRecentLayoutRevisionId(
 			request, layoutSetBranchId, plid);
@@ -161,14 +186,16 @@ public class StagingUtil {
 			user, layoutSetBranchId, plid);
 	}
 
-	public static long getRecentLayoutSetBranchId(HttpServletRequest request) {
-		return getStaging().getRecentLayoutSetBranchId(request);
+	public static long getRecentLayoutSetBranchId(
+		HttpServletRequest request, long layoutSetId) {
+
+		return getStaging().getRecentLayoutSetBranchId(request, layoutSetId);
 	}
 
-	public static long getRecentLayoutSetBranchId(User user)
+	public static long getRecentLayoutSetBranchId(User user, long layoutSetId)
 		throws SystemException {
 
-		return getStaging().getRecentLayoutSetBranchId(user);
+		return getStaging().getRecentLayoutSetBranchId(user, layoutSetId);
 	}
 
 	public static String getSchedulerGroupName(
@@ -178,6 +205,8 @@ public class StagingUtil {
 	}
 
 	public static Staging getStaging() {
+		PortalRuntimePermission.checkGetBeanProperty(StagingUtil.class);
+
 		return _staging;
 	}
 
@@ -189,6 +218,20 @@ public class StagingUtil {
 		PortletRequest PortletRequest) {
 
 		return getStaging().getStagingParameters(PortletRequest);
+	}
+
+	public static WorkflowTask getWorkflowTask(
+			long userId, LayoutRevision layoutRevision)
+		throws PortalException, SystemException {
+
+		return getStaging().getWorkflowTask(userId, layoutRevision);
+	}
+
+	public static boolean hasWorkflowTask(
+			long userId, LayoutRevision layoutRevision)
+		throws PortalException, SystemException {
+
+		return getStaging().hasWorkflowTask(userId, layoutRevision);
 	}
 
 	public static boolean isIncomplete(Layout layout, long layoutSetBranchId) {
@@ -307,16 +350,18 @@ public class StagingUtil {
 	}
 
 	public static void setRecentLayoutSetBranchId(
-		HttpServletRequest request, long layoutSetBranchId) {
+		HttpServletRequest request, long layoutSetId, long layoutSetBranchId) {
 
-		getStaging().setRecentLayoutSetBranchId(request, layoutSetBranchId);
+		getStaging().setRecentLayoutSetBranchId(
+			request, layoutSetId, layoutSetBranchId);
 	}
 
 	public static void setRecentLayoutSetBranchId(
-			User user, long layoutSetBranchId)
+			User user, long layoutSetId, long layoutSetBranchId)
 		throws SystemException {
 
-		getStaging().setRecentLayoutSetBranchId(user, layoutSetBranchId);
+		getStaging().setRecentLayoutSetBranchId(
+			user, layoutSetId, layoutSetBranchId);
 	}
 
 	public static void unscheduleCopyFromLive(PortletRequest PortletRequest)
@@ -354,6 +399,8 @@ public class StagingUtil {
 	}
 
 	public void setStaging(Staging staging) {
+		PortalRuntimePermission.checkSetBeanProperty(getClass());
+
 		_staging = staging;
 	}
 

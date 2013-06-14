@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -33,10 +33,6 @@ public class ProtectedPrincipal implements Principal, Serializable {
 		_name = name;
 	}
 
-	public String getName() {
-		return _name;
-	}
-
 	@Override
 	public boolean equals(Object obj) {
 		if (obj == null) {
@@ -60,6 +56,10 @@ public class ProtectedPrincipal implements Principal, Serializable {
 		else {
 			return false;
 		}
+	}
+
+	public String getName() {
+		return _name;
 	}
 
 	@Override

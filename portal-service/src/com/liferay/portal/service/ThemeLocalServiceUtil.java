@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -15,7 +15,6 @@
 package com.liferay.portal.service;
 
 import com.liferay.portal.kernel.bean.PortalBeanLocatorUtil;
-import com.liferay.portal.kernel.util.MethodCache;
 import com.liferay.portal.kernel.util.ReferenceRegistry;
 
 /**
@@ -54,6 +53,16 @@ public class ThemeLocalServiceUtil {
 	*/
 	public static void setBeanIdentifier(java.lang.String beanIdentifier) {
 		getService().setBeanIdentifier(beanIdentifier);
+	}
+
+	public static com.liferay.portal.model.ColorScheme fetchColorScheme(
+		long companyId, java.lang.String themeId, java.lang.String colorSchemeId) {
+		return getService().fetchColorScheme(companyId, themeId, colorSchemeId);
+	}
+
+	public static com.liferay.portal.model.Theme fetchTheme(long companyId,
+		java.lang.String themeId) {
+		return getService().fetchTheme(companyId, themeId);
 	}
 
 	public static com.liferay.portal.model.ColorScheme getColorScheme(
@@ -117,20 +126,15 @@ public class ThemeLocalServiceUtil {
 
 			ReferenceRegistry.registerReference(ThemeLocalServiceUtil.class,
 				"_service");
-			MethodCache.remove(ThemeLocalService.class);
 		}
 
 		return _service;
 	}
 
+	/**
+	 * @deprecated
+	 */
 	public void setService(ThemeLocalService service) {
-		MethodCache.remove(ThemeLocalService.class);
-
-		_service = service;
-
-		ReferenceRegistry.registerReference(ThemeLocalServiceUtil.class,
-			"_service");
-		MethodCache.remove(ThemeLocalService.class);
 	}
 
 	private static ThemeLocalService _service;

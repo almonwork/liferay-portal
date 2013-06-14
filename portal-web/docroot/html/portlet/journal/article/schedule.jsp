@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -54,7 +54,7 @@ if (article != null) {
 	String taglibNeverExpireOnClick = renderResponse.getNamespace() + "disableInputDate('expirationDate', this.checked);";
 	%>
 
-	<aui:input inlineLabel="left" label="never-auto-expire" name="neverExpire" value="<%= neverExpire %>" onClick="<%= taglibNeverExpireOnClick %>" type="checkbox" />
+	<aui:input label="never-auto-expire" name="neverExpire" onClick="<%= taglibNeverExpireOnClick %>" type="checkbox" value="<%= neverExpire %>" />
 
 	<aui:input disabled="<%= neverReview %>" formName="fm1" name="reviewDate" />
 
@@ -62,7 +62,7 @@ if (article != null) {
 	String taglibNeverReviewOnClick = renderResponse.getNamespace() + "disableInputDate('reviewDate', this.checked);";
 	%>
 
-	<aui:input inlineLabel="left" name="neverReview" value="<%= neverReview %>" onClick="<%= taglibNeverReviewOnClick %>" type="checkbox" />
+	<aui:input name="neverReview" onClick="<%= taglibNeverReviewOnClick %>" type="checkbox" value="<%= neverReview %>" />
 </aui:fieldset>
 
 <aui:script>

@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -23,17 +23,24 @@ if (Validator.isNotNull(cssClass)) {
 	cssClassHtml = "class=\"".concat(cssClass).concat("\"");
 }
 
-if (themeDisplay.isThemeImagesFastLoad() && !auiImage) {
+if (Validator.isNotNull(src) && themeDisplay.isThemeImagesFastLoad() && !auiImage) {
 	SpriteImage spriteImage = null;
 	String spriteFileName = null;
+	String spriteFileURL = null;
 
 	String imageFileName = StringUtil.replace(src, "common/../", "");
 
-	String imagesPath = theme.getContextPath().concat(theme.getImagesPath());
+	if (imageFileName.contains(Http.PROTOCOL_DELIMITER)) {
+		URL imageURL = new URL(imageFileName);
+
+		imageFileName = imageURL.getPath();
+	}
+
+	String contextPath = theme.getContextPath();
+
+	String imagesPath = contextPath.concat(theme.getImagesPath());
 
 	if (imageFileName.startsWith(imagesPath)) {
-		imageFileName = imageFileName.substring(imagesPath.length());
-
 		spriteImage = theme.getSpriteImage(imageFileName);
 
 		if (spriteImage != null) {
@@ -43,7 +50,9 @@ if (themeDisplay.isThemeImagesFastLoad() && !auiImage) {
 				spriteFileName = StringUtil.replace(spriteFileName, ".png", ".gif");
 			}
 
-			spriteFileName = themeDisplay.getPathThemeImages().concat(spriteFileName);
+			String cndBaseURL = themeDisplay.getCDNBaseURL();
+
+			spriteFileURL = cndBaseURL.concat(spriteFileName);
 		}
 	}
 
@@ -57,14 +66,6 @@ if (themeDisplay.isThemeImagesFastLoad() && !auiImage) {
 		if (portlet != null) {
 			PortletApp portletApp = portlet.getPortletApp();
 
-			imageFileName = src;
-
-			if ((portletApp.isWARFile() || !portlet.getContextPath().equals(StringPool.SLASH)) &&
-				imageFileName.startsWith(portlet.getContextPath())) {
-
-				imageFileName = imageFileName.substring(portlet.getContextPath().length());
-			}
-
 			spriteImage = portletApp.getSpriteImage(imageFileName);
 
 			if (spriteImage != null) {
@@ -74,19 +75,23 @@ if (themeDisplay.isThemeImagesFastLoad() && !auiImage) {
 					spriteFileName = StringUtil.replace(spriteFileName, ".png", ".gif");
 				}
 
-				spriteFileName = portlet.getStaticResourcePath().concat(spriteFileName);
+				String cndBaseURL = themeDisplay.getCDNBaseURL();
+
+				spriteFileURL = cndBaseURL.concat(spriteFileName);
 			}
 		}
 	}
 
 	if (spriteImage != null) {
-		src = themeDisplay.getPathThemeImages().concat("/spacer.png");
+		String themeImagesPath = themeDisplay.getPathThemeImages();
+
+		src = themeImagesPath.concat("/spacer.png");
 
 		StringBundler sb = new StringBundler(10);
 
 		sb.append(details);
 		sb.append(" style=\"background-image: url('");
-		sb.append(spriteFileName);
+		sb.append(spriteFileURL);
 		sb.append("'); background-position: 50% -");
 		sb.append(spriteImage.getOffset());
 		sb.append("px; background-repeat: no-repeat; height: ");
@@ -118,25 +123,27 @@ boolean urlIsNotNull = Validator.isNotNull(url);
 %>
 
 <liferay-util:buffer var="linkContent">
-	<c:choose>
-		<c:when test="<%= urlIsNotNull %>">
-			<img class="<%= imgClass %>" src="<%= src %>" <%= details %> />
-		</c:when>
-		<c:otherwise>
-			<img class="<%= imgClass %>" id="<%= id %>" src="<%= src %>" <%= details %> />
-		</c:otherwise>
-	</c:choose>
+	<c:if test="<%= Validator.isNotNull(src) %>">
+		<c:choose>
+			<c:when test="<%= urlIsNotNull %>">
+				<img class="<%= imgClass %>" src="<%= src %>" <%= details %> />
+			</c:when>
+			<c:otherwise>
+				<img class="<%= imgClass %>" id="<%= id %>" src="<%= src %>" <%= details %> />
+			</c:otherwise>
+		</c:choose>
+	</c:if>
 
 	<c:choose>
 		<c:when test="<%= (iconMenuIconCount != null) && ((iconMenuSingleIcon == null) || iconMenuShowWhenSingleIcon) %>">
-			<liferay-ui:message key="<%= message %>" />
+			<liferay-ui:message key="<%= message %>" localizeKey="<%= localizeMessage %>" />
 		</c:when>
 		<c:when test="<%= (iconListIconCount != null) && ((iconListSingleIcon == null) || iconListShowWhenSingleIcon) %>">
-			<span class="taglib-text"><liferay-ui:message key="<%= message %>" /></span>
+			<span class="taglib-text"><liferay-ui:message key="<%= message %>" localizeKey="<%= localizeMessage %>" /></span>
 		</c:when>
 		<c:otherwise>
 			<c:if test="<%= label %>">
-				<span class="taglib-text"><liferay-ui:message key="<%= message %>" /></span>
+				<span class="taglib-text"><liferay-ui:message key="<%= message %>" localizeKey="<%= localizeMessage %>" /></span>
 			</c:if>
 		</c:otherwise>
 	</c:choose>
@@ -147,7 +154,7 @@ boolean urlIsNotNull = Validator.isNotNull(url);
 		<li <%= cssClassHtml %>>
 			<c:choose>
 				<c:when test="<%= urlIsNotNull %>">
-					<aui:a cssClass="taglib-icon" href="<%= url %>" id="<%= id %>" lang="<%= lang %>" target="<%= target %>">
+					<aui:a cssClass="taglib-icon" data="<%= data %>" href="<%= url %>" id="<%= id %>" lang="<%= lang %>" target="<%= target %>">
 						<%= linkContent %>
 					</aui:a>
 				</c:when>
@@ -161,7 +168,7 @@ boolean urlIsNotNull = Validator.isNotNull(url);
 		<li <%= cssClassHtml %>>
 			<c:choose>
 				<c:when test="<%= urlIsNotNull %>">
-					<aui:a cssClass="taglib-icon" href="<%= url %>" id="<%= id %>" lang="<%= lang %>" target="<%= target %>">
+					<aui:a cssClass="taglib-icon" data="<%= data %>" href="<%= url %>" id="<%= id %>" lang="<%= lang %>" onClick='<%= Validator.isNotNull(onClick) ? onClick : "" %>' target="<%= target %>">
 						<%= linkContent %>
 					</aui:a>
 				</c:when>
@@ -175,7 +182,7 @@ boolean urlIsNotNull = Validator.isNotNull(url);
 		<span <%= cssClassHtml %> >
 			<c:choose>
 				<c:when test="<%= urlIsNotNull %>">
-					<aui:a cssClass="taglib-icon" href="<%= url %>" id="<%= id %>" lang="<%= lang %>" target="<%= target %>">
+					<aui:a cssClass="taglib-icon" data="<%= data %>" href="<%= url %>" id="<%= id %>" lang="<%= lang %>" onClick='<%= Validator.isNotNull(onClick) ? onClick : "" %>' target="<%= target %>">
 						<%= linkContent %>
 					</aui:a>
 				</c:when>

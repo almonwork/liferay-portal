@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -16,10 +16,10 @@
 
 <%@ include file="/html/portlet/init.jsp" %>
 
-<%@ page import="com.liferay.portlet.asset.NoSuchVocabularyException" %>
-<%@ page import="com.liferay.portlet.asset.model.AssetVocabulary" %>
-<%@ page import="com.liferay.portlet.asset.service.AssetVocabularyLocalServiceUtil" %>
-<%@ page import="com.liferay.portlet.asset.service.AssetVocabularyServiceUtil" %>
+<%@ page import="com.liferay.portlet.asset.NoSuchVocabularyException" %><%@
+page import="com.liferay.portlet.asset.model.AssetVocabulary" %><%@
+page import="com.liferay.portlet.asset.service.AssetVocabularyLocalServiceUtil" %><%@
+page import="com.liferay.portlet.asset.service.AssetVocabularyServiceUtil" %>
 
 <%
 PortletPreferences preferences = renderRequest.getPreferences();
@@ -45,6 +45,8 @@ boolean allAssetVocabularies = GetterUtil.getBoolean(preferences.getValue("allAs
 long[] assetVocabularyIds = availableAssetVocabularyIds;
 
 if (!allAssetVocabularies && preferences.getValues("assetVocabularyIds", null) != null) {
-	assetVocabularyIds = GetterUtil.getLongValues(preferences.getValues("assetVocabularyIds", null));
+	assetVocabularyIds = StringUtil.split(preferences.getValue("assetVocabularyIds", null), 0L);
 }
 %>
+
+<%@ include file="/html/portlet/asset_categories_navigation/init-ext.jsp" %>

@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -22,7 +22,45 @@ long layoutSetBranchId = ParamUtil.getLong(request, "layoutSetBranchId");
 List<LayoutRevision> layoutRevisions = LayoutRevisionLocalServiceUtil.getChildLayoutRevisions(layoutSetBranchId, LayoutRevisionConstants.DEFAULT_PARENT_LAYOUT_REVISION_ID, plid, QueryUtil.ALL_POS, QueryUtil.ALL_POS, new LayoutRevisionCreateDateComparator(true));
 
 long layoutRevisionId = StagingUtil.getRecentLayoutRevisionId(request, layoutSetBranchId, plid);
+
+LayoutRevision currentLayoutRevision = null;
+
+if (layoutRevisionId <= 0) {
+	LayoutBranch layoutBranch = LayoutBranchLocalServiceUtil.getMasterLayoutBranch(layoutSetBranchId, plid);
+
+	currentLayoutRevision = LayoutRevisionLocalServiceUtil.getLayoutRevision(layoutSetBranchId, layoutBranch.getLayoutBranchId(), plid);
+
+	layoutRevisionId = currentLayoutRevision.getLayoutRevisionId();
+}
+else {
+	currentLayoutRevision = LayoutRevisionLocalServiceUtil.getLayoutRevision(layoutRevisionId);
+}
+
+request.setAttribute("view_layout_branches.jsp-currenttLayoutBranchId", String.valueOf(currentLayoutRevision.getLayoutBranchId()));
 %>
+
+<liferay-ui:success key="pageVariationAdded" message="page-variation-was-added" />
+<liferay-ui:success key="pageVariationDeleted" message="page-variation-was-deleted" />
+<liferay-ui:success key="pageVariationUpdated" message="page-variation-was-updated" />
+
+<liferay-ui:error exception="<%= LayoutBranchNameException.class %>">
+
+	<%
+	LayoutBranchNameException lbne = (LayoutBranchNameException)errorException;
+	%>
+
+	<c:if test="<%= lbne.getType() == LayoutBranchNameException.DUPLICATE %>">
+		<liferay-ui:message key="a-page-variation-with-that-name-already-exists" />
+	</c:if>
+
+	<c:if test="<%= lbne.getType() == LayoutBranchNameException.TOO_LONG %>">
+		<liferay-ui:message arguments="<%= new Object[] {4, 100} %>" key="please-enter-a-value-between-x-and-x-characters-long" />
+	</c:if>
+
+	<c:if test="<%= lbne.getType() == LayoutBranchNameException.TOO_SHORT %>">
+		<liferay-ui:message arguments="<%= new Object[] {4, 100} %>" key="please-enter-a-value-between-x-and-x-characters-long" />
+	</c:if>
+</liferay-ui:error>
 
 <div class="portlet-msg-info">
 	<liferay-ui:message key="page-variations-help" />
@@ -37,7 +75,7 @@ long layoutRevisionId = StagingUtil.getRecentLayoutRevisionId(request, layoutSet
 	</liferay-util:html-top>
 
 	<%
-	String taglibOnClick = "javascript:Liferay.Staging.Branching.addBranch('" + LanguageUtil.get(pageContext, "add-page-variation") + "');";
+	String taglibOnClick = "javascript:Liferay.StagingBar.addBranch('" + LanguageUtil.get(pageContext, "add-page-variation") + "');";
 	%>
 
 	<aui:button-row>
@@ -71,14 +109,18 @@ long layoutRevisionId = StagingUtil.getRecentLayoutRevisionId(request, layoutSet
 				<%
 				String layoutBranchName = layoutBranch.getName();
 
-				if (layoutRevision.isHead()) {
+				if (layoutRevision.getLayoutBranchId() == currentLayoutRevision.getLayoutBranchId()) {
 					buffer.append("<strong>");
 				}
 
 				buffer.append(LanguageUtil.get(pageContext, layoutBranchName));
 
-				if (layoutRevision.isHead()) {
-					buffer.append(" (*)</strong>");
+				if (layoutBranch.isMaster()) {
+					buffer.append(" (*)");
+				}
+
+				if (layoutRevision.getLayoutBranchId() == currentLayoutRevision.getLayoutBranchId()) {
+					buffer.append("</strong>");
 				}
 				%>
 
@@ -94,14 +136,15 @@ long layoutRevisionId = StagingUtil.getRecentLayoutRevisionId(request, layoutSet
 			/>
 		</liferay-ui:search-container-row>
 
-		<liferay-ui:search-iterator searchContainer="<%= searchContainer %>" paginate="<%= false %>" />
+		<liferay-ui:search-iterator paginate="<%= false %>" searchContainer="<%= searchContainer %>" />
 	</liferay-ui:search-container>
 </div>
 
-<aui:script position="inline" use="liferay-staging">
-	Liferay.Staging.Branching.init(
+<aui:script position="inline" use="liferay-staging-branch">
+	Liferay.StagingBar.init(
 		{
-			namespace: '<portlet:namespace />'
+			namespace: '<portlet:namespace />',
+			portletId: '<%= portletDisplay.getId() %>'
 		}
 	);
 </aui:script>

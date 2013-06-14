@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -16,7 +16,7 @@
 
 <div id="<portlet:namespace />saveStructureTemplateDialogWrapper" style="display: none;">
 	<aui:fieldset>
-		<div id="<portlet:namespace />saveStructureTemplateDialog" class="save-structure-template-dialog">
+		<div class="save-structure-template-dialog" id="<portlet:namespace />saveStructureTemplateDialog">
 			<div class="portlet-msg-success save-structure-message aui-helper-hidden" id="<portlet:namespace />saveStructureMessage">
 				<liferay-ui:message key="your-request-processed-successfully" />
 			</div>
@@ -25,7 +25,7 @@
 
 			<aui:input cssClass="save-structure-name lfr-input-text-container" label="structure-name" name="saveStructureStructureName" size="50" type="text" />
 
-			<aui:input cssClass="save-structure-description" cols="80" label="description" name="saveStructureStructureDescription" rows="6" type="textarea" />
+			<aui:input cols="80" cssClass="save-structure-description" label="description" name="saveStructureStructureDescription" rows="6" type="textarea" />
 
 			<aui:a href="#" id="showStructureIdContainer"><liferay-ui:message key="change-structure-id" /> &raquo;</aui:a>
 
@@ -58,8 +58,7 @@
 				<aui:option label="select-box" value="list" />
 				<aui:option label="multi-selection-list" value="multi-list" />
 				<aui:option label="image-uploader" value="image" />
-				<aui:option label="image-gallery" value="image_gallery" />
-				<aui:option label="document-library" value="document_library" />
+				<aui:option label="documents-and-media" value="document_library" />
 				<aui:option label="link-to-page" value="link_to_layout" />
 				<aui:option label="selection-break" value="selection_break" />
 			</aui:select>
@@ -113,33 +112,16 @@
 			<aui:input cssClass="journal-image-field lfr-input-text-container flexible" label="" name="text" size="40" type="file" />
 		</div>
 
-		<div dataType="image_gallery">
-			<aui:input cssClass="lfr-input-text-container" inlineField="<%= true %>" label="" name="text" size="55" type="text" />
-
-			<portlet:renderURL windowState="<%= LiferayWindowState.POP_UP.toString() %>" var="selectIGURL">
-				<portlet:param name="struts_action" value="/journal/select_image_gallery" />
-				<portlet:param name="groupId" value="<%= String.valueOf(groupId) %>" />
-			</portlet:renderURL>
-
-			<%
-			Map<String,Object> data = new HashMap<String,Object>();
-
-			data.put("ImagegalleryUrl", selectIGURL);
-			%>
-
-			<aui:button cssClass="journal-imagegallery-button" data="<%= data %>" value="select" />
-		</div>
-
 		<div dataType="document_library">
 			<aui:input cssClass="lfr-input-text-container" inlineField="<%= true %>" label="" name="text" size="55" type="text" />
 
-			<portlet:renderURL windowState="<%= LiferayWindowState.POP_UP.toString() %>" var="selectDLURL">
+			<portlet:renderURL var="selectDLURL" windowState="<%= LiferayWindowState.POP_UP.toString() %>">
 				<portlet:param name="struts_action" value="/journal/select_document_library" />
 				<portlet:param name="groupId" value="<%= String.valueOf(groupId) %>" />
 			</portlet:renderURL>
 
 			<%
-			data = new HashMap<String,Object>();
+			Map<String,Object> data = new HashMap<String,Object>();
 
 			data.put("DocumentlibraryUrl", selectDLURL);
 			%>
@@ -220,7 +202,7 @@
 					String[] nodeValues = StringUtil.split(layoutDesc, '|');
 
 					long objId = GetterUtil.getLong(nodeValues[3]);
-					String name = nodeValues[4];
+					String name = HtmlUtil.escape(nodeValues[4]);
 
 					int depth2 = 0;
 

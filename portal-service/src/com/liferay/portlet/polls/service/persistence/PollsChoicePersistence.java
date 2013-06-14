@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,7 +14,6 @@
 
 package com.liferay.portlet.polls.service.persistence;
 
-import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.service.persistence.BasePersistence;
 
 import com.liferay.portlet.polls.model.PollsChoice;
@@ -417,9 +416,11 @@ public interface PollsChoicePersistence extends BasePersistence<PollsChoice> {
 	*
 	* @param questionId the question ID
 	* @param name the name
+	* @return the polls choice that was removed
 	* @throws SystemException if a system exception occurred
 	*/
-	public void removeByQ_N(long questionId, java.lang.String name)
+	public com.liferay.portlet.polls.model.PollsChoice removeByQ_N(
+		long questionId, java.lang.String name)
 		throws com.liferay.portal.kernel.exception.SystemException,
 			com.liferay.portlet.polls.NoSuchChoiceException;
 
@@ -470,7 +471,4 @@ public interface PollsChoicePersistence extends BasePersistence<PollsChoice> {
 	*/
 	public int countAll()
 		throws com.liferay.portal.kernel.exception.SystemException;
-
-	public PollsChoice remove(PollsChoice pollsChoice)
-		throws SystemException;
 }

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -19,6 +19,7 @@ import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.json.JSON;
 import com.liferay.portal.kernel.util.DateUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.ProxyUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
@@ -35,13 +36,13 @@ import com.liferay.portlet.expando.util.ExpandoBridgeFactoryUtil;
 
 import java.io.Serializable;
 
-import java.lang.reflect.Proxy;
-
 import java.sql.Types;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * The base model implementation for the DLFileVersion service. Represents a row in the &quot;DLFileVersion&quot; database table, with each column mapped to a property of this class.
@@ -66,13 +67,16 @@ public class DLFileVersionModelImpl extends BaseModelImpl<DLFileVersion>
 	 */
 	public static final String TABLE_NAME = "DLFileVersion";
 	public static final Object[][] TABLE_COLUMNS = {
+			{ "uuid_", Types.VARCHAR },
 			{ "fileVersionId", Types.BIGINT },
 			{ "groupId", Types.BIGINT },
 			{ "companyId", Types.BIGINT },
 			{ "userId", Types.BIGINT },
 			{ "userName", Types.VARCHAR },
 			{ "createDate", Types.TIMESTAMP },
+			{ "modifiedDate", Types.TIMESTAMP },
 			{ "repositoryId", Types.BIGINT },
+			{ "folderId", Types.BIGINT },
 			{ "fileEntryId", Types.BIGINT },
 			{ "extension", Types.VARCHAR },
 			{ "mimeType", Types.VARCHAR },
@@ -88,7 +92,7 @@ public class DLFileVersionModelImpl extends BaseModelImpl<DLFileVersion>
 			{ "statusByUserName", Types.VARCHAR },
 			{ "statusDate", Types.TIMESTAMP }
 		};
-	public static final String TABLE_SQL_CREATE = "create table DLFileVersion (fileVersionId LONG not null primary key,groupId LONG,companyId LONG,userId LONG,userName VARCHAR(75) null,createDate DATE null,repositoryId LONG,fileEntryId LONG,extension VARCHAR(75) null,mimeType VARCHAR(75) null,title VARCHAR(255) null,description STRING null,changeLog VARCHAR(75) null,extraSettings TEXT null,fileEntryTypeId LONG,version VARCHAR(75) null,size_ LONG,status INTEGER,statusByUserId LONG,statusByUserName VARCHAR(75) null,statusDate DATE null)";
+	public static final String TABLE_SQL_CREATE = "create table DLFileVersion (uuid_ VARCHAR(75) null,fileVersionId LONG not null primary key,groupId LONG,companyId LONG,userId LONG,userName VARCHAR(75) null,createDate DATE null,modifiedDate DATE null,repositoryId LONG,folderId LONG,fileEntryId LONG,extension VARCHAR(75) null,mimeType VARCHAR(75) null,title VARCHAR(255) null,description STRING null,changeLog VARCHAR(75) null,extraSettings TEXT null,fileEntryTypeId LONG,version VARCHAR(75) null,size_ LONG,status INTEGER,statusByUserId LONG,statusByUserName VARCHAR(75) null,statusDate DATE null)";
 	public static final String TABLE_SQL_DROP = "drop table DLFileVersion";
 	public static final String ORDER_BY_JPQL = " ORDER BY dlFileVersion.fileEntryId DESC, dlFileVersion.createDate DESC";
 	public static final String ORDER_BY_SQL = " ORDER BY DLFileVersion.fileEntryId DESC, DLFileVersion.createDate DESC";
@@ -101,6 +105,16 @@ public class DLFileVersionModelImpl extends BaseModelImpl<DLFileVersion>
 	public static final boolean FINDER_CACHE_ENABLED = GetterUtil.getBoolean(com.liferay.portal.util.PropsUtil.get(
 				"value.object.finder.cache.enabled.com.liferay.portlet.documentlibrary.model.DLFileVersion"),
 			true);
+	public static final boolean COLUMN_BITMASK_ENABLED = GetterUtil.getBoolean(com.liferay.portal.util.PropsUtil.get(
+				"value.object.column.bitmask.enabled.com.liferay.portlet.documentlibrary.model.DLFileVersion"),
+			true);
+	public static long COMPANYID_COLUMN_BITMASK = 1L;
+	public static long FILEENTRYID_COLUMN_BITMASK = 2L;
+	public static long FOLDERID_COLUMN_BITMASK = 4L;
+	public static long GROUPID_COLUMN_BITMASK = 8L;
+	public static long STATUS_COLUMN_BITMASK = 16L;
+	public static long UUID_COLUMN_BITMASK = 32L;
+	public static long VERSION_COLUMN_BITMASK = 64L;
 
 	/**
 	 * Converts the soap model instance into a normal model instance.
@@ -111,13 +125,16 @@ public class DLFileVersionModelImpl extends BaseModelImpl<DLFileVersion>
 	public static DLFileVersion toModel(DLFileVersionSoap soapModel) {
 		DLFileVersion model = new DLFileVersionImpl();
 
+		model.setUuid(soapModel.getUuid());
 		model.setFileVersionId(soapModel.getFileVersionId());
 		model.setGroupId(soapModel.getGroupId());
 		model.setCompanyId(soapModel.getCompanyId());
 		model.setUserId(soapModel.getUserId());
 		model.setUserName(soapModel.getUserName());
 		model.setCreateDate(soapModel.getCreateDate());
+		model.setModifiedDate(soapModel.getModifiedDate());
 		model.setRepositoryId(soapModel.getRepositoryId());
+		model.setFolderId(soapModel.getFolderId());
 		model.setFileEntryId(soapModel.getFileEntryId());
 		model.setExtension(soapModel.getExtension());
 		model.setMimeType(soapModel.getMimeType());
@@ -152,14 +169,6 @@ public class DLFileVersionModelImpl extends BaseModelImpl<DLFileVersion>
 		return models;
 	}
 
-	public Class<?> getModelClass() {
-		return DLFileVersion.class;
-	}
-
-	public String getModelClassName() {
-		return DLFileVersion.class.getName();
-	}
-
 	public static final long LOCK_EXPIRATION_TIME = GetterUtil.getLong(com.liferay.portal.util.PropsUtil.get(
 				"lock.expiration.time.com.liferay.portlet.documentlibrary.model.DLFileVersion"));
 
@@ -182,6 +191,215 @@ public class DLFileVersionModelImpl extends BaseModelImpl<DLFileVersion>
 		setPrimaryKey(((Long)primaryKeyObj).longValue());
 	}
 
+	public Class<?> getModelClass() {
+		return DLFileVersion.class;
+	}
+
+	public String getModelClassName() {
+		return DLFileVersion.class.getName();
+	}
+
+	@Override
+	public Map<String, Object> getModelAttributes() {
+		Map<String, Object> attributes = new HashMap<String, Object>();
+
+		attributes.put("uuid", getUuid());
+		attributes.put("fileVersionId", getFileVersionId());
+		attributes.put("groupId", getGroupId());
+		attributes.put("companyId", getCompanyId());
+		attributes.put("userId", getUserId());
+		attributes.put("userName", getUserName());
+		attributes.put("createDate", getCreateDate());
+		attributes.put("modifiedDate", getModifiedDate());
+		attributes.put("repositoryId", getRepositoryId());
+		attributes.put("folderId", getFolderId());
+		attributes.put("fileEntryId", getFileEntryId());
+		attributes.put("extension", getExtension());
+		attributes.put("mimeType", getMimeType());
+		attributes.put("title", getTitle());
+		attributes.put("description", getDescription());
+		attributes.put("changeLog", getChangeLog());
+		attributes.put("extraSettings", getExtraSettings());
+		attributes.put("fileEntryTypeId", getFileEntryTypeId());
+		attributes.put("version", getVersion());
+		attributes.put("size", getSize());
+		attributes.put("status", getStatus());
+		attributes.put("statusByUserId", getStatusByUserId());
+		attributes.put("statusByUserName", getStatusByUserName());
+		attributes.put("statusDate", getStatusDate());
+
+		return attributes;
+	}
+
+	@Override
+	public void setModelAttributes(Map<String, Object> attributes) {
+		String uuid = (String)attributes.get("uuid");
+
+		if (uuid != null) {
+			setUuid(uuid);
+		}
+
+		Long fileVersionId = (Long)attributes.get("fileVersionId");
+
+		if (fileVersionId != null) {
+			setFileVersionId(fileVersionId);
+		}
+
+		Long groupId = (Long)attributes.get("groupId");
+
+		if (groupId != null) {
+			setGroupId(groupId);
+		}
+
+		Long companyId = (Long)attributes.get("companyId");
+
+		if (companyId != null) {
+			setCompanyId(companyId);
+		}
+
+		Long userId = (Long)attributes.get("userId");
+
+		if (userId != null) {
+			setUserId(userId);
+		}
+
+		String userName = (String)attributes.get("userName");
+
+		if (userName != null) {
+			setUserName(userName);
+		}
+
+		Date createDate = (Date)attributes.get("createDate");
+
+		if (createDate != null) {
+			setCreateDate(createDate);
+		}
+
+		Date modifiedDate = (Date)attributes.get("modifiedDate");
+
+		if (modifiedDate != null) {
+			setModifiedDate(modifiedDate);
+		}
+
+		Long repositoryId = (Long)attributes.get("repositoryId");
+
+		if (repositoryId != null) {
+			setRepositoryId(repositoryId);
+		}
+
+		Long folderId = (Long)attributes.get("folderId");
+
+		if (folderId != null) {
+			setFolderId(folderId);
+		}
+
+		Long fileEntryId = (Long)attributes.get("fileEntryId");
+
+		if (fileEntryId != null) {
+			setFileEntryId(fileEntryId);
+		}
+
+		String extension = (String)attributes.get("extension");
+
+		if (extension != null) {
+			setExtension(extension);
+		}
+
+		String mimeType = (String)attributes.get("mimeType");
+
+		if (mimeType != null) {
+			setMimeType(mimeType);
+		}
+
+		String title = (String)attributes.get("title");
+
+		if (title != null) {
+			setTitle(title);
+		}
+
+		String description = (String)attributes.get("description");
+
+		if (description != null) {
+			setDescription(description);
+		}
+
+		String changeLog = (String)attributes.get("changeLog");
+
+		if (changeLog != null) {
+			setChangeLog(changeLog);
+		}
+
+		String extraSettings = (String)attributes.get("extraSettings");
+
+		if (extraSettings != null) {
+			setExtraSettings(extraSettings);
+		}
+
+		Long fileEntryTypeId = (Long)attributes.get("fileEntryTypeId");
+
+		if (fileEntryTypeId != null) {
+			setFileEntryTypeId(fileEntryTypeId);
+		}
+
+		String version = (String)attributes.get("version");
+
+		if (version != null) {
+			setVersion(version);
+		}
+
+		Long size = (Long)attributes.get("size");
+
+		if (size != null) {
+			setSize(size);
+		}
+
+		Integer status = (Integer)attributes.get("status");
+
+		if (status != null) {
+			setStatus(status);
+		}
+
+		Long statusByUserId = (Long)attributes.get("statusByUserId");
+
+		if (statusByUserId != null) {
+			setStatusByUserId(statusByUserId);
+		}
+
+		String statusByUserName = (String)attributes.get("statusByUserName");
+
+		if (statusByUserName != null) {
+			setStatusByUserName(statusByUserName);
+		}
+
+		Date statusDate = (Date)attributes.get("statusDate");
+
+		if (statusDate != null) {
+			setStatusDate(statusDate);
+		}
+	}
+
+	@JSON
+	public String getUuid() {
+		if (_uuid == null) {
+			return StringPool.BLANK;
+		}
+		else {
+			return _uuid;
+		}
+	}
+
+	public void setUuid(String uuid) {
+		if (_originalUuid == null) {
+			_originalUuid = _uuid;
+		}
+
+		_uuid = uuid;
+	}
+
+	public String getOriginalUuid() {
+		return GetterUtil.getString(_originalUuid);
+	}
+
 	@JSON
 	public long getFileVersionId() {
 		return _fileVersionId;
@@ -197,7 +415,19 @@ public class DLFileVersionModelImpl extends BaseModelImpl<DLFileVersion>
 	}
 
 	public void setGroupId(long groupId) {
+		_columnBitmask |= GROUPID_COLUMN_BITMASK;
+
+		if (!_setOriginalGroupId) {
+			_setOriginalGroupId = true;
+
+			_originalGroupId = _groupId;
+		}
+
 		_groupId = groupId;
+	}
+
+	public long getOriginalGroupId() {
+		return _originalGroupId;
 	}
 
 	@JSON
@@ -206,7 +436,19 @@ public class DLFileVersionModelImpl extends BaseModelImpl<DLFileVersion>
 	}
 
 	public void setCompanyId(long companyId) {
+		_columnBitmask |= COMPANYID_COLUMN_BITMASK;
+
+		if (!_setOriginalCompanyId) {
+			_setOriginalCompanyId = true;
+
+			_originalCompanyId = _companyId;
+		}
+
 		_companyId = companyId;
+	}
+
+	public long getOriginalCompanyId() {
+		return _originalCompanyId;
 	}
 
 	@JSON
@@ -246,7 +488,18 @@ public class DLFileVersionModelImpl extends BaseModelImpl<DLFileVersion>
 	}
 
 	public void setCreateDate(Date createDate) {
+		_columnBitmask = -1L;
+
 		_createDate = createDate;
+	}
+
+	@JSON
+	public Date getModifiedDate() {
+		return _modifiedDate;
+	}
+
+	public void setModifiedDate(Date modifiedDate) {
+		_modifiedDate = modifiedDate;
 	}
 
 	@JSON
@@ -259,11 +512,34 @@ public class DLFileVersionModelImpl extends BaseModelImpl<DLFileVersion>
 	}
 
 	@JSON
+	public long getFolderId() {
+		return _folderId;
+	}
+
+	public void setFolderId(long folderId) {
+		_columnBitmask |= FOLDERID_COLUMN_BITMASK;
+
+		if (!_setOriginalFolderId) {
+			_setOriginalFolderId = true;
+
+			_originalFolderId = _folderId;
+		}
+
+		_folderId = folderId;
+	}
+
+	public long getOriginalFolderId() {
+		return _originalFolderId;
+	}
+
+	@JSON
 	public long getFileEntryId() {
 		return _fileEntryId;
 	}
 
 	public void setFileEntryId(long fileEntryId) {
+		_columnBitmask = -1L;
+
 		if (!_setOriginalFileEntryId) {
 			_setOriginalFileEntryId = true;
 
@@ -381,6 +657,8 @@ public class DLFileVersionModelImpl extends BaseModelImpl<DLFileVersion>
 	}
 
 	public void setVersion(String version) {
+		_columnBitmask |= VERSION_COLUMN_BITMASK;
+
 		if (_originalVersion == null) {
 			_originalVersion = _version;
 		}
@@ -407,7 +685,19 @@ public class DLFileVersionModelImpl extends BaseModelImpl<DLFileVersion>
 	}
 
 	public void setStatus(int status) {
+		_columnBitmask |= STATUS_COLUMN_BITMASK;
+
+		if (!_setOriginalStatus) {
+			_setOriginalStatus = true;
+
+			_originalStatus = _status;
+		}
+
 		_status = status;
+	}
+
+	public int getOriginalStatus() {
+		return _originalStatus;
 	}
 
 	@JSON
@@ -485,6 +775,15 @@ public class DLFileVersionModelImpl extends BaseModelImpl<DLFileVersion>
 		}
 	}
 
+	public boolean isInTrash() {
+		if (getStatus() == WorkflowConstants.STATUS_IN_TRASH) {
+			return true;
+		}
+		else {
+			return false;
+		}
+	}
+
 	public boolean isPending() {
 		if (getStatus() == WorkflowConstants.STATUS_PENDING) {
 			return true;
@@ -494,48 +793,48 @@ public class DLFileVersionModelImpl extends BaseModelImpl<DLFileVersion>
 		}
 	}
 
+	public long getColumnBitmask() {
+		return _columnBitmask;
+	}
+
 	@Override
 	public DLFileVersion toEscapedModel() {
-		if (isEscapedModel()) {
-			return (DLFileVersion)this;
+		if (_escapedModelProxy == null) {
+			_escapedModelProxy = (DLFileVersion)ProxyUtil.newProxyInstance(_classLoader,
+					_escapedModelProxyInterfaces,
+					new AutoEscapeBeanHandler(this));
 		}
-		else {
-			if (_escapedModelProxy == null) {
-				_escapedModelProxy = (DLFileVersion)Proxy.newProxyInstance(_classLoader,
-						_escapedModelProxyInterfaces,
-						new AutoEscapeBeanHandler(this));
-			}
 
-			return _escapedModelProxy;
-		}
+		return _escapedModelProxy;
 	}
 
 	@Override
 	public ExpandoBridge getExpandoBridge() {
-		if (_expandoBridge == null) {
-			_expandoBridge = ExpandoBridgeFactoryUtil.getExpandoBridge(getCompanyId(),
-					DLFileVersion.class.getName(), getPrimaryKey());
-		}
-
-		return _expandoBridge;
+		return ExpandoBridgeFactoryUtil.getExpandoBridge(getCompanyId(),
+			DLFileVersion.class.getName(), getPrimaryKey());
 	}
 
 	@Override
 	public void setExpandoBridgeAttributes(ServiceContext serviceContext) {
-		getExpandoBridge().setAttributes(serviceContext);
+		ExpandoBridge expandoBridge = getExpandoBridge();
+
+		expandoBridge.setAttributes(serviceContext);
 	}
 
 	@Override
 	public Object clone() {
 		DLFileVersionImpl dlFileVersionImpl = new DLFileVersionImpl();
 
+		dlFileVersionImpl.setUuid(getUuid());
 		dlFileVersionImpl.setFileVersionId(getFileVersionId());
 		dlFileVersionImpl.setGroupId(getGroupId());
 		dlFileVersionImpl.setCompanyId(getCompanyId());
 		dlFileVersionImpl.setUserId(getUserId());
 		dlFileVersionImpl.setUserName(getUserName());
 		dlFileVersionImpl.setCreateDate(getCreateDate());
+		dlFileVersionImpl.setModifiedDate(getModifiedDate());
 		dlFileVersionImpl.setRepositoryId(getRepositoryId());
+		dlFileVersionImpl.setFolderId(getFolderId());
 		dlFileVersionImpl.setFileEntryId(getFileEntryId());
 		dlFileVersionImpl.setExtension(getExtension());
 		dlFileVersionImpl.setMimeType(getMimeType());
@@ -621,16 +920,44 @@ public class DLFileVersionModelImpl extends BaseModelImpl<DLFileVersion>
 	public void resetOriginalValues() {
 		DLFileVersionModelImpl dlFileVersionModelImpl = this;
 
+		dlFileVersionModelImpl._originalUuid = dlFileVersionModelImpl._uuid;
+
+		dlFileVersionModelImpl._originalGroupId = dlFileVersionModelImpl._groupId;
+
+		dlFileVersionModelImpl._setOriginalGroupId = false;
+
+		dlFileVersionModelImpl._originalCompanyId = dlFileVersionModelImpl._companyId;
+
+		dlFileVersionModelImpl._setOriginalCompanyId = false;
+
+		dlFileVersionModelImpl._originalFolderId = dlFileVersionModelImpl._folderId;
+
+		dlFileVersionModelImpl._setOriginalFolderId = false;
+
 		dlFileVersionModelImpl._originalFileEntryId = dlFileVersionModelImpl._fileEntryId;
 
 		dlFileVersionModelImpl._setOriginalFileEntryId = false;
 
 		dlFileVersionModelImpl._originalVersion = dlFileVersionModelImpl._version;
+
+		dlFileVersionModelImpl._originalStatus = dlFileVersionModelImpl._status;
+
+		dlFileVersionModelImpl._setOriginalStatus = false;
+
+		dlFileVersionModelImpl._columnBitmask = 0;
 	}
 
 	@Override
 	public CacheModel<DLFileVersion> toCacheModel() {
 		DLFileVersionCacheModel dlFileVersionCacheModel = new DLFileVersionCacheModel();
+
+		dlFileVersionCacheModel.uuid = getUuid();
+
+		String uuid = dlFileVersionCacheModel.uuid;
+
+		if ((uuid != null) && (uuid.length() == 0)) {
+			dlFileVersionCacheModel.uuid = null;
+		}
 
 		dlFileVersionCacheModel.fileVersionId = getFileVersionId();
 
@@ -657,7 +984,18 @@ public class DLFileVersionModelImpl extends BaseModelImpl<DLFileVersion>
 			dlFileVersionCacheModel.createDate = Long.MIN_VALUE;
 		}
 
+		Date modifiedDate = getModifiedDate();
+
+		if (modifiedDate != null) {
+			dlFileVersionCacheModel.modifiedDate = modifiedDate.getTime();
+		}
+		else {
+			dlFileVersionCacheModel.modifiedDate = Long.MIN_VALUE;
+		}
+
 		dlFileVersionCacheModel.repositoryId = getRepositoryId();
+
+		dlFileVersionCacheModel.folderId = getFolderId();
 
 		dlFileVersionCacheModel.fileEntryId = getFileEntryId();
 
@@ -747,9 +1085,11 @@ public class DLFileVersionModelImpl extends BaseModelImpl<DLFileVersion>
 
 	@Override
 	public String toString() {
-		StringBundler sb = new StringBundler(43);
+		StringBundler sb = new StringBundler(49);
 
-		sb.append("{fileVersionId=");
+		sb.append("{uuid=");
+		sb.append(getUuid());
+		sb.append(", fileVersionId=");
 		sb.append(getFileVersionId());
 		sb.append(", groupId=");
 		sb.append(getGroupId());
@@ -761,8 +1101,12 @@ public class DLFileVersionModelImpl extends BaseModelImpl<DLFileVersion>
 		sb.append(getUserName());
 		sb.append(", createDate=");
 		sb.append(getCreateDate());
+		sb.append(", modifiedDate=");
+		sb.append(getModifiedDate());
 		sb.append(", repositoryId=");
 		sb.append(getRepositoryId());
+		sb.append(", folderId=");
+		sb.append(getFolderId());
 		sb.append(", fileEntryId=");
 		sb.append(getFileEntryId());
 		sb.append(", extension=");
@@ -797,12 +1141,16 @@ public class DLFileVersionModelImpl extends BaseModelImpl<DLFileVersion>
 	}
 
 	public String toXmlString() {
-		StringBundler sb = new StringBundler(67);
+		StringBundler sb = new StringBundler(76);
 
 		sb.append("<model><model-name>");
 		sb.append("com.liferay.portlet.documentlibrary.model.DLFileVersion");
 		sb.append("</model-name>");
 
+		sb.append(
+			"<column><column-name>uuid</column-name><column-value><![CDATA[");
+		sb.append(getUuid());
+		sb.append("]]></column-value></column>");
 		sb.append(
 			"<column><column-name>fileVersionId</column-name><column-value><![CDATA[");
 		sb.append(getFileVersionId());
@@ -828,8 +1176,16 @@ public class DLFileVersionModelImpl extends BaseModelImpl<DLFileVersion>
 		sb.append(getCreateDate());
 		sb.append("]]></column-value></column>");
 		sb.append(
+			"<column><column-name>modifiedDate</column-name><column-value><![CDATA[");
+		sb.append(getModifiedDate());
+		sb.append("]]></column-value></column>");
+		sb.append(
 			"<column><column-name>repositoryId</column-name><column-value><![CDATA[");
 		sb.append(getRepositoryId());
+		sb.append("]]></column-value></column>");
+		sb.append(
+			"<column><column-name>folderId</column-name><column-value><![CDATA[");
+		sb.append(getFolderId());
 		sb.append("]]></column-value></column>");
 		sb.append(
 			"<column><column-name>fileEntryId</column-name><column-value><![CDATA[");
@@ -897,14 +1253,24 @@ public class DLFileVersionModelImpl extends BaseModelImpl<DLFileVersion>
 	private static Class<?>[] _escapedModelProxyInterfaces = new Class[] {
 			DLFileVersion.class
 		};
+	private String _uuid;
+	private String _originalUuid;
 	private long _fileVersionId;
 	private long _groupId;
+	private long _originalGroupId;
+	private boolean _setOriginalGroupId;
 	private long _companyId;
+	private long _originalCompanyId;
+	private boolean _setOriginalCompanyId;
 	private long _userId;
 	private String _userUuid;
 	private String _userName;
 	private Date _createDate;
+	private Date _modifiedDate;
 	private long _repositoryId;
+	private long _folderId;
+	private long _originalFolderId;
+	private boolean _setOriginalFolderId;
 	private long _fileEntryId;
 	private long _originalFileEntryId;
 	private boolean _setOriginalFileEntryId;
@@ -919,10 +1285,12 @@ public class DLFileVersionModelImpl extends BaseModelImpl<DLFileVersion>
 	private String _originalVersion;
 	private long _size;
 	private int _status;
+	private int _originalStatus;
+	private boolean _setOriginalStatus;
 	private long _statusByUserId;
 	private String _statusByUserUuid;
 	private String _statusByUserName;
 	private Date _statusDate;
-	private transient ExpandoBridge _expandoBridge;
+	private long _columnBitmask;
 	private DLFileVersion _escapedModelProxy;
 }

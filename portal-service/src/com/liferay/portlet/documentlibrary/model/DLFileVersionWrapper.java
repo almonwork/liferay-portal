@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,6 +14,12 @@
 
 package com.liferay.portlet.documentlibrary.model;
 
+import com.liferay.portal.model.ModelWrapper;
+
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * <p>
  * This class is a wrapper for {@link DLFileVersion}.
@@ -23,7 +29,8 @@ package com.liferay.portlet.documentlibrary.model;
  * @see       DLFileVersion
  * @generated
  */
-public class DLFileVersionWrapper implements DLFileVersion {
+public class DLFileVersionWrapper implements DLFileVersion,
+	ModelWrapper<DLFileVersion> {
 	public DLFileVersionWrapper(DLFileVersion dlFileVersion) {
 		_dlFileVersion = dlFileVersion;
 	}
@@ -34,6 +41,183 @@ public class DLFileVersionWrapper implements DLFileVersion {
 
 	public String getModelClassName() {
 		return DLFileVersion.class.getName();
+	}
+
+	public Map<String, Object> getModelAttributes() {
+		Map<String, Object> attributes = new HashMap<String, Object>();
+
+		attributes.put("uuid", getUuid());
+		attributes.put("fileVersionId", getFileVersionId());
+		attributes.put("groupId", getGroupId());
+		attributes.put("companyId", getCompanyId());
+		attributes.put("userId", getUserId());
+		attributes.put("userName", getUserName());
+		attributes.put("createDate", getCreateDate());
+		attributes.put("modifiedDate", getModifiedDate());
+		attributes.put("repositoryId", getRepositoryId());
+		attributes.put("folderId", getFolderId());
+		attributes.put("fileEntryId", getFileEntryId());
+		attributes.put("extension", getExtension());
+		attributes.put("mimeType", getMimeType());
+		attributes.put("title", getTitle());
+		attributes.put("description", getDescription());
+		attributes.put("changeLog", getChangeLog());
+		attributes.put("extraSettings", getExtraSettings());
+		attributes.put("fileEntryTypeId", getFileEntryTypeId());
+		attributes.put("version", getVersion());
+		attributes.put("size", getSize());
+		attributes.put("status", getStatus());
+		attributes.put("statusByUserId", getStatusByUserId());
+		attributes.put("statusByUserName", getStatusByUserName());
+		attributes.put("statusDate", getStatusDate());
+
+		return attributes;
+	}
+
+	public void setModelAttributes(Map<String, Object> attributes) {
+		String uuid = (String)attributes.get("uuid");
+
+		if (uuid != null) {
+			setUuid(uuid);
+		}
+
+		Long fileVersionId = (Long)attributes.get("fileVersionId");
+
+		if (fileVersionId != null) {
+			setFileVersionId(fileVersionId);
+		}
+
+		Long groupId = (Long)attributes.get("groupId");
+
+		if (groupId != null) {
+			setGroupId(groupId);
+		}
+
+		Long companyId = (Long)attributes.get("companyId");
+
+		if (companyId != null) {
+			setCompanyId(companyId);
+		}
+
+		Long userId = (Long)attributes.get("userId");
+
+		if (userId != null) {
+			setUserId(userId);
+		}
+
+		String userName = (String)attributes.get("userName");
+
+		if (userName != null) {
+			setUserName(userName);
+		}
+
+		Date createDate = (Date)attributes.get("createDate");
+
+		if (createDate != null) {
+			setCreateDate(createDate);
+		}
+
+		Date modifiedDate = (Date)attributes.get("modifiedDate");
+
+		if (modifiedDate != null) {
+			setModifiedDate(modifiedDate);
+		}
+
+		Long repositoryId = (Long)attributes.get("repositoryId");
+
+		if (repositoryId != null) {
+			setRepositoryId(repositoryId);
+		}
+
+		Long folderId = (Long)attributes.get("folderId");
+
+		if (folderId != null) {
+			setFolderId(folderId);
+		}
+
+		Long fileEntryId = (Long)attributes.get("fileEntryId");
+
+		if (fileEntryId != null) {
+			setFileEntryId(fileEntryId);
+		}
+
+		String extension = (String)attributes.get("extension");
+
+		if (extension != null) {
+			setExtension(extension);
+		}
+
+		String mimeType = (String)attributes.get("mimeType");
+
+		if (mimeType != null) {
+			setMimeType(mimeType);
+		}
+
+		String title = (String)attributes.get("title");
+
+		if (title != null) {
+			setTitle(title);
+		}
+
+		String description = (String)attributes.get("description");
+
+		if (description != null) {
+			setDescription(description);
+		}
+
+		String changeLog = (String)attributes.get("changeLog");
+
+		if (changeLog != null) {
+			setChangeLog(changeLog);
+		}
+
+		String extraSettings = (String)attributes.get("extraSettings");
+
+		if (extraSettings != null) {
+			setExtraSettings(extraSettings);
+		}
+
+		Long fileEntryTypeId = (Long)attributes.get("fileEntryTypeId");
+
+		if (fileEntryTypeId != null) {
+			setFileEntryTypeId(fileEntryTypeId);
+		}
+
+		String version = (String)attributes.get("version");
+
+		if (version != null) {
+			setVersion(version);
+		}
+
+		Long size = (Long)attributes.get("size");
+
+		if (size != null) {
+			setSize(size);
+		}
+
+		Integer status = (Integer)attributes.get("status");
+
+		if (status != null) {
+			setStatus(status);
+		}
+
+		Long statusByUserId = (Long)attributes.get("statusByUserId");
+
+		if (statusByUserId != null) {
+			setStatusByUserId(statusByUserId);
+		}
+
+		String statusByUserName = (String)attributes.get("statusByUserName");
+
+		if (statusByUserName != null) {
+			setStatusByUserName(statusByUserName);
+		}
+
+		Date statusDate = (Date)attributes.get("statusDate");
+
+		if (statusDate != null) {
+			setStatusDate(statusDate);
+		}
 	}
 
 	/**
@@ -52,6 +236,24 @@ public class DLFileVersionWrapper implements DLFileVersion {
 	*/
 	public void setPrimaryKey(long primaryKey) {
 		_dlFileVersion.setPrimaryKey(primaryKey);
+	}
+
+	/**
+	* Returns the uuid of this document library file version.
+	*
+	* @return the uuid of this document library file version
+	*/
+	public java.lang.String getUuid() {
+		return _dlFileVersion.getUuid();
+	}
+
+	/**
+	* Sets the uuid of this document library file version.
+	*
+	* @param uuid the uuid of this document library file version
+	*/
+	public void setUuid(java.lang.String uuid) {
+		_dlFileVersion.setUuid(uuid);
 	}
 
 	/**
@@ -183,6 +385,24 @@ public class DLFileVersionWrapper implements DLFileVersion {
 	}
 
 	/**
+	* Returns the modified date of this document library file version.
+	*
+	* @return the modified date of this document library file version
+	*/
+	public java.util.Date getModifiedDate() {
+		return _dlFileVersion.getModifiedDate();
+	}
+
+	/**
+	* Sets the modified date of this document library file version.
+	*
+	* @param modifiedDate the modified date of this document library file version
+	*/
+	public void setModifiedDate(java.util.Date modifiedDate) {
+		_dlFileVersion.setModifiedDate(modifiedDate);
+	}
+
+	/**
 	* Returns the repository ID of this document library file version.
 	*
 	* @return the repository ID of this document library file version
@@ -198,6 +418,24 @@ public class DLFileVersionWrapper implements DLFileVersion {
 	*/
 	public void setRepositoryId(long repositoryId) {
 		_dlFileVersion.setRepositoryId(repositoryId);
+	}
+
+	/**
+	* Returns the folder ID of this document library file version.
+	*
+	* @return the folder ID of this document library file version
+	*/
+	public long getFolderId() {
+		return _dlFileVersion.getFolderId();
+	}
+
+	/**
+	* Sets the folder ID of this document library file version.
+	*
+	* @param folderId the folder ID of this document library file version
+	*/
+	public void setFolderId(long folderId) {
+		_dlFileVersion.setFolderId(folderId);
 	}
 
 	/**
@@ -507,6 +745,15 @@ public class DLFileVersionWrapper implements DLFileVersion {
 	}
 
 	/**
+	* Returns <code>true</code> if this document library file version is in the Recycle Bin.
+	*
+	* @return <code>true</code> if this document library file version is in the Recycle Bin; <code>false</code> otherwise
+	*/
+	public boolean isInTrash() {
+		return _dlFileVersion.isInTrash();
+	}
+
+	/**
 	* Returns <code>true</code> if this document library file version is pending.
 	*
 	* @return <code>true</code> if this document library file version is pending; <code>false</code> otherwise
@@ -533,10 +780,6 @@ public class DLFileVersionWrapper implements DLFileVersion {
 
 	public boolean isEscapedModel() {
 		return _dlFileVersion.isEscapedModel();
-	}
-
-	public void setEscapedModel(boolean escapedModel) {
-		_dlFileVersion.setEscapedModel(escapedModel);
 	}
 
 	public java.io.Serializable getPrimaryKeyObj() {
@@ -593,6 +836,12 @@ public class DLFileVersionWrapper implements DLFileVersion {
 		_dlFileVersion.persist();
 	}
 
+	public java.io.InputStream getContentStream(boolean incrementCounter)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException {
+		return _dlFileVersion.getContentStream(incrementCounter);
+	}
+
 	public com.liferay.portal.kernel.util.UnicodeProperties getExtraSettingsProperties() {
 		return _dlFileVersion.getExtraSettingsProperties();
 	}
@@ -603,16 +852,8 @@ public class DLFileVersionWrapper implements DLFileVersion {
 		return _dlFileVersion.getFileEntry();
 	}
 
-	public com.liferay.portlet.documentlibrary.model.DLFolder getFolder()
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+	public com.liferay.portlet.documentlibrary.model.DLFolder getFolder() {
 		return _dlFileVersion.getFolder();
-	}
-
-	public long getFolderId()
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
-		return _dlFileVersion.getFolderId();
 	}
 
 	public java.lang.String getIcon() {
@@ -624,7 +865,14 @@ public class DLFileVersionWrapper implements DLFileVersion {
 		_dlFileVersion.setExtraSettingsProperties(extraSettingsProperties);
 	}
 
+	/**
+	 * @deprecated Renamed to {@link #getWrappedModel}
+	 */
 	public DLFileVersion getWrappedDLFileVersion() {
+		return _dlFileVersion;
+	}
+
+	public DLFileVersion getWrappedModel() {
 		return _dlFileVersion;
 	}
 

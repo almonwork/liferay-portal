@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -18,12 +18,13 @@ import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.repository.model.FileVersion;
-import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.security.auth.PrincipalThreadLocal;
 import com.liferay.portlet.documentlibrary.model.DLFileVersion;
 import com.liferay.portlet.documentlibrary.service.DLFileEntryLocalServiceUtil;
+import com.liferay.portlet.documentlibrary.util.DLAppUtil;
 import com.liferay.portlet.expando.model.ExpandoBridge;
 
+import java.io.File;
 import java.io.InputStream;
 import java.io.Serializable;
 
@@ -64,13 +65,7 @@ public class LiferayFileVersion extends LiferayModel implements FileVersion {
 	public InputStream getContentStream(boolean incrementCounter)
 		throws PortalException, SystemException {
 
-		String name = PrincipalThreadLocal.getName();
-
-		long userId = GetterUtil.getLong(name);
-
-		return DLFileEntryLocalServiceUtil.getFileAsStream(
-			userId, _dlFileVersion.getFileEntryId(),
-			_dlFileVersion.getVersion(), incrementCounter);
+		return _dlFileVersion.getContentStream(incrementCounter);
 	}
 
 	public Date getCreateDate() {
@@ -92,6 +87,14 @@ public class LiferayFileVersion extends LiferayModel implements FileVersion {
 
 	public String getExtraSettings() {
 		return _dlFileVersion.getExtraSettings();
+	}
+
+	public File getFile(boolean incrementCounter)
+		throws PortalException, SystemException {
+
+		return DLFileEntryLocalServiceUtil.getFile(
+			PrincipalThreadLocal.getUserId(), _dlFileVersion.getFileEntryId(),
+			_dlFileVersion.getVersion(), incrementCounter);
 	}
 
 	public FileEntry getFileEntry() throws PortalException, SystemException {
@@ -132,7 +135,7 @@ public class LiferayFileVersion extends LiferayModel implements FileVersion {
 	}
 
 	public Date getModifiedDate() {
-		return getCreateDate();
+		return _dlFileVersion.getModifiedDate();
 	}
 
 	@Override
@@ -173,7 +176,7 @@ public class LiferayFileVersion extends LiferayModel implements FileVersion {
 	}
 
 	public String getTitle() {
-		return _dlFileVersion.getTitle();
+		return DLAppUtil.stripTrashNamespace(_dlFileVersion.getTitle());
 	}
 
 	public long getUserId() {
@@ -186,6 +189,10 @@ public class LiferayFileVersion extends LiferayModel implements FileVersion {
 
 	public String getUserUuid() throws SystemException {
 		return _dlFileVersion.getUserUuid();
+	}
+
+	public String getUuid() {
+		return _dlFileVersion.getUuid();
 	}
 
 	public String getVersion() {
@@ -215,6 +222,10 @@ public class LiferayFileVersion extends LiferayModel implements FileVersion {
 
 	public boolean isExpired() {
 		return _dlFileVersion.isExpired();
+	}
+
+	public boolean isInTrash() {
+		return _dlFileVersion.isInTrash();
 	}
 
 	public boolean isPending() {

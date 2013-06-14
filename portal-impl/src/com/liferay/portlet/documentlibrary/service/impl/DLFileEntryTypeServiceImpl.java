@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -16,6 +16,7 @@ package com.liferay.portlet.documentlibrary.service.impl;
 
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
+import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.security.permission.ActionKeys;
 import com.liferay.portal.service.ServiceContext;
 import com.liferay.portlet.documentlibrary.model.DLFileEntryType;
@@ -61,16 +62,34 @@ public class DLFileEntryTypeServiceImpl extends DLFileEntryTypeServiceBaseImpl {
 		return dlFileEntryTypeLocalService.getFileEntryType(fileEntryTypeId);
 	}
 
-	public List<DLFileEntryType> getFileEntryTypes(
-			long groupId, int start, int end)
+	public List<DLFileEntryType> getFileEntryTypes(long[] groupIds)
 		throws SystemException {
 
-		return dlFileEntryTypePersistence.filterFindByGroupId(
-			groupId, start, end);
+		return dlFileEntryTypePersistence.filterFindByGroupId(groupIds);
 	}
 
-	public int getFileEntryTypesCount(long groupId) throws SystemException {
-		return dlFileEntryTypePersistence.filterCountByGroupId(groupId);
+	public int getFileEntryTypesCount(long[] groupIds) throws SystemException {
+		return dlFileEntryTypePersistence.filterCountByGroupId(groupIds);
+	}
+
+	public List<DLFileEntryType> search(
+			long companyId, long[] groupIds, String keywords,
+			boolean includeBasicFileEntryType, int start, int end,
+			OrderByComparator orderByComparator)
+		throws SystemException {
+
+		return dlFileEntryTypeFinder.filterFindByKeywords(
+			companyId, groupIds, keywords, includeBasicFileEntryType, start,
+			end, orderByComparator);
+	}
+
+	public int searchCount(
+			long companyId, long[] groupIds, String keywords,
+			boolean includeBasicFileEntryType)
+		throws SystemException {
+
+		return dlFileEntryTypeFinder.filterCountByKeywords(
+			companyId, groupIds, keywords, includeBasicFileEntryType);
 	}
 
 	public void updateFileEntryType(
@@ -82,7 +101,7 @@ public class DLFileEntryTypeServiceImpl extends DLFileEntryTypeServiceBaseImpl {
 			getPermissionChecker(), fileEntryTypeId, ActionKeys.UPDATE);
 
 		dlFileEntryTypeLocalService.updateFileEntryType(
-			fileEntryTypeId, name, description, ddmStructureIds,
+			getUserId(), fileEntryTypeId, name, description, ddmStructureIds,
 			serviceContext);
 	}
 

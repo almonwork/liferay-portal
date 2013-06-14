@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -93,42 +93,6 @@ public class MonitoringPortlet implements InvokerPortlet {
 		_singleDestinationMessageSender = singleDestinationMessageSender;
 	}
 
-	public InvokerPortlet create(
-			com.liferay.portal.model.Portlet portletModel, Portlet portlet,
-			PortletConfig portletConfig, PortletContext portletContext,
-			boolean checkAuthToken, boolean facesPortlet, boolean strutsPortlet,
-			boolean strutsBridgePortlet)
-		throws PortletException {
-
-		InvokerPortlet invokerPortlet = _invokerPortlet.create(
-			portletModel, portlet, portletContext);
-
-		MonitoringPortlet monitoringPortlet = new MonitoringPortlet(
-			invokerPortlet, _singleDestinationMessageSender);
-
-		monitoringPortlet.prepare(
-			portletModel, portlet, portletConfig, portletContext,
-			checkAuthToken, facesPortlet, strutsPortlet, strutsBridgePortlet);
-
-		return monitoringPortlet;
-	}
-
-	public InvokerPortlet create(
-			com.liferay.portal.model.Portlet portletModel, Portlet portlet,
-			PortletContext portletContext)
-		throws PortletException {
-
-		InvokerPortlet invokerPortlet = _invokerPortlet.create(
-			portletModel, portlet, portletContext);
-
-		MonitoringPortlet monitoringPortlet = new MonitoringPortlet(
-			invokerPortlet, _singleDestinationMessageSender);
-
-		monitoringPortlet.prepare(portletModel, portlet, portletContext);
-
-		return monitoringPortlet;
-	}
-
 	public void destroy() {
 		_invokerPortlet.destroy();
 	}
@@ -173,10 +137,6 @@ public class MonitoringPortlet implements InvokerPortlet {
 		return _invokerPortlet.isCheckAuthToken();
 	}
 
-	public boolean isDestroyable() {
-		return _invokerPortlet.isDestroyable();
-	}
-
 	public boolean isFacesPortlet() {
 		return _invokerPortlet.isFacesPortlet();
 	}
@@ -187,26 +147,6 @@ public class MonitoringPortlet implements InvokerPortlet {
 
 	public boolean isStrutsPortlet() {
 		return _invokerPortlet.isStrutsPortlet();
-	}
-
-	public void prepare(
-			com.liferay.portal.model.Portlet portletModel, Portlet portlet,
-			PortletConfig portletConfig, PortletContext portletContext,
-			boolean checkAuthToken, boolean facesPortlet, boolean strutsPortlet,
-			boolean strutsBridgePortlet)
-		throws PortletException {
-
-		_invokerPortlet.prepare(
-			portletModel, portlet, portletConfig, portletContext,
-			checkAuthToken, facesPortlet, strutsPortlet, strutsBridgePortlet);
-	}
-
-	public void prepare(
-			com.liferay.portal.model.Portlet portletModel, Portlet portlet,
-			PortletContext portletContext)
-		throws PortletException {
-
-		_invokerPortlet.prepare(portletModel, portlet, portletContext);
 	}
 
 	public void processAction(

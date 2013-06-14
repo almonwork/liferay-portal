@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,8 +14,8 @@
 
 package com.liferay.portalweb.portal;
 
-import com.liferay.portalweb.portal.dbupgrade.sampledata606.address.AddressTests;
-import com.liferay.portalweb.portal.login.LoginTests;
+import com.liferay.portalweb.portal.dbupgrade.sampledata606.address.AddressTestPlan;
+import com.liferay.portalweb.portal.dbupgrade.sampledata606.login.LoginTests;
 
 import junit.framework.Test;
 import junit.framework.TestSuite;
@@ -23,13 +23,13 @@ import junit.framework.TestSuite;
 /**
  * @author Brian Wing Shun Chan
  */
-public class DBUpgradeAddress606TestSuite extends BaseTests {
+public class DBUpgradeAddress606TestSuite extends BaseTestSuite {
 
 	public static Test suite() {
 		TestSuite testSuite = new TestSuite();
 
 		testSuite.addTest(LoginTests.suite());
-		testSuite.addTest(AddressTests.suite());
+		testSuite.addTest(AddressTestPlan.suite());
 
 		testSuite.addTestSuite(StopSeleniumTest.class);
 

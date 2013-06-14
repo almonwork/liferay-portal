@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -20,7 +20,10 @@ import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
+import com.liferay.portal.kernel.util.StringBundler;
+import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.model.Layout;
@@ -30,7 +33,9 @@ import com.liferay.portlet.asset.model.AssetCategory;
 import com.liferay.portlet.asset.service.AssetCategoryLocalServiceUtil;
 import com.liferay.portlet.asset.service.AssetTagLocalServiceUtil;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 import javax.portlet.PortletRequest;
 
@@ -41,31 +46,7 @@ import javax.portlet.PortletRequest;
  */
 public class AssetEntryQuery {
 
-	public AssetEntryQuery(AssetEntryQuery assetEntryQuery) {
-		setAllCategoryIds(assetEntryQuery.getAllCategoryIds());
-		setAllTagIds(assetEntryQuery.getAllTagIds());
-		setAnyCategoryIds(assetEntryQuery.getAnyCategoryIds());
-		setAnyTagIds(assetEntryQuery.getAnyTagIds());
-		setClassNameIds(assetEntryQuery.getClassNameIds());
-		setEnd(assetEntryQuery.getEnd());
-		setExcludeZeroViewCount(assetEntryQuery.isExcludeZeroViewCount());
-		setExpirationDate(assetEntryQuery.getExpirationDate());
-		setGroupIds(assetEntryQuery.getGroupIds());
-		setLayout(assetEntryQuery.getLayout());
-		setNotAllCategoryIds(assetEntryQuery.getNotAllCategoryIds());
-		setNotAllTagIds(assetEntryQuery.getNotAllTagIds());
-		setNotAnyCategoryIds(assetEntryQuery.getNotAnyCategoryIds());
-		setNotAnyTagIds(assetEntryQuery.getNotAnyTagIds());
-		setOrderByCol1(assetEntryQuery.getOrderByCol1());
-		setOrderByCol2(assetEntryQuery.getOrderByCol2());
-		setOrderByType1(assetEntryQuery.getOrderByType1());
-		setOrderByType2(assetEntryQuery.getOrderByType2());
-		setPublishDate(assetEntryQuery.getPublishDate());
-		setStart(assetEntryQuery.getStart());
-		setVisible(assetEntryQuery.isVisible());
-	}
-
-	public static String[] ORDER_BY_COLUMNS = new String[] {
+	public static final String[] ORDER_BY_COLUMNS = new String[] {
 		"title", "createDate", "modifiedDate", "publishDate", "expirationDate",
 		"priority", "viewCount", "ratings"
 	};
@@ -98,6 +79,33 @@ public class AssetEntryQuery {
 
 		_expirationDate = now;
 		_publishDate = now;
+	}
+
+	public AssetEntryQuery(AssetEntryQuery assetEntryQuery) {
+		setAllCategoryIds(assetEntryQuery.getAllCategoryIds());
+		setAllTagIdsArray(assetEntryQuery.getAllTagIdsArray());
+		setAnyCategoryIds(assetEntryQuery.getAnyCategoryIds());
+		setAnyTagIds(assetEntryQuery.getAnyTagIds());
+		setClassNameIds(assetEntryQuery.getClassNameIds());
+		setClassTypeIds(assetEntryQuery.getClassTypeIds());
+		setEnablePermissions(assetEntryQuery.isEnablePermissions());
+		setEnd(assetEntryQuery.getEnd());
+		setExcludeZeroViewCount(assetEntryQuery.isExcludeZeroViewCount());
+		setExpirationDate(assetEntryQuery.getExpirationDate());
+		setGroupIds(assetEntryQuery.getGroupIds());
+		setLayout(assetEntryQuery.getLayout());
+		setLinkedAssetEntryId(assetEntryQuery.getLinkedAssetEntryId());
+		setNotAllCategoryIds(assetEntryQuery.getNotAllCategoryIds());
+		setNotAllTagIdsArray(assetEntryQuery.getNotAllTagIdsArray());
+		setNotAnyCategoryIds(assetEntryQuery.getNotAnyCategoryIds());
+		setNotAnyTagIds(assetEntryQuery.getNotAnyTagIds());
+		setOrderByCol1(assetEntryQuery.getOrderByCol1());
+		setOrderByCol2(assetEntryQuery.getOrderByCol2());
+		setOrderByType1(assetEntryQuery.getOrderByType1());
+		setOrderByType2(assetEntryQuery.getOrderByType2());
+		setPublishDate(assetEntryQuery.getPublishDate());
+		setStart(assetEntryQuery.getStart());
+		setVisible(assetEntryQuery.isVisible());
 	}
 
 	public AssetEntryQuery(
@@ -133,6 +141,8 @@ public class AssetEntryQuery {
 		if (Validator.isNotNull(tagName)) {
 			_allTagIds = AssetTagLocalServiceUtil.getTagIds(
 				themeDisplay.getParentGroupId(), new String[] {tagName});
+
+			_allTagIdsArray = new long[][] {_allTagIds};
 		}
 	}
 
@@ -141,6 +151,27 @@ public class AssetEntryQuery {
 
 		this(
 			new long[] {PortalUtil.getClassNameId(className)}, searchContainer);
+	}
+
+	public void addAllTagIdsArray(long[] allTagsIds) {
+		if (allTagsIds.length == 0) {
+			return;
+		}
+
+		_allTagIdsArray = ArrayUtil.append(_allTagIdsArray, allTagsIds);
+
+		_allTagIds = _flattenTagIds(_allTagIdsArray);
+	}
+
+	public void addNotAllTagIdsArray(long[] notAllTagsIds) {
+		if (notAllTagsIds.length == 0) {
+			return;
+		}
+
+		_notAllTagIdsArray = ArrayUtil.append(
+			_notAllTagIdsArray, notAllTagsIds);
+
+		_notAllTagIds = _flattenTagIds(_notAllTagIdsArray);
 	}
 
 	public long[] getAllCategoryIds() {
@@ -153,6 +184,10 @@ public class AssetEntryQuery {
 
 	public long[] getAllTagIds() {
 		return _allTagIds;
+	}
+
+	public long[][] getAllTagIdsArray() {
+		return _allTagIdsArray;
 	}
 
 	public long[] getAnyCategoryIds() {
@@ -171,12 +206,8 @@ public class AssetEntryQuery {
 		return _classNameIds;
 	}
 
-	public Layout getLayout() {
-		return _layout;
-	}
-
-	public long getLinkedAssetEntryId() {
-		return _linkedAssetEntryId;
+	public long[] getClassTypeIds() {
+		return _classTypeIds;
 	}
 
 	public int getEnd() {
@@ -191,6 +222,14 @@ public class AssetEntryQuery {
 		return _groupIds;
 	}
 
+	public Layout getLayout() {
+		return _layout;
+	}
+
+	public long getLinkedAssetEntryId() {
+		return _linkedAssetEntryId;
+	}
+
 	public long[] getNotAllCategoryIds() {
 		return _notAllCategoryIds;
 	}
@@ -201,6 +240,10 @@ public class AssetEntryQuery {
 
 	public long[] getNotAllTagIds() {
 		return _notAllTagIds;
+	}
+
+	public long[][] getNotAllTagIdsArray() {
+		return _notAllTagIdsArray;
 	}
 
 	public long[] getNotAnyCategoryIds() {
@@ -239,6 +282,10 @@ public class AssetEntryQuery {
 		return _start;
 	}
 
+	public boolean isEnablePermissions() {
+		return _enablePermissions;
+	}
+
 	public boolean isExcludeZeroViewCount() {
 		return _excludeZeroViewCount;
 	}
@@ -249,96 +296,254 @@ public class AssetEntryQuery {
 
 	public void setAllCategoryIds(long[] allCategoryIds) {
 		_allCategoryIds = allCategoryIds;
+
+		_toString = null;
 	}
 
 	public void setAllTagIds(long[] allTagIds) {
 		_allTagIds = allTagIds;
+
+		_allTagIdsArray = new long[][] {_allTagIds};
+
+		_toString = null;
+	}
+
+	public void setAllTagIdsArray(long[][] allTagIdsArray) {
+		_allTagIdsArray = allTagIdsArray;
+
+		_allTagIds = _flattenTagIds(allTagIdsArray);
+
+		_toString = null;
 	}
 
 	public void setAnyCategoryIds(long[] anyCategoryIds) {
 		_anyCategoryIds = anyCategoryIds;
+
+		_toString = null;
 	}
 
 	public void setAnyTagIds(long[] anyTagIds) {
 		_anyTagIds = anyTagIds;
+
+		_toString = null;
 	}
 
 	public void setClassName(String className) {
 		long classNameId = PortalUtil.getClassNameId(className);
 
 		_classNameIds = new long[] {classNameId};
+
+		_toString = null;
 	}
 
 	public void setClassNameIds(long[] classNameIds) {
 		_classNameIds = classNameIds;
+
+		_toString = null;
 	}
 
-	public void setLayout(Layout layout) {
-		_layout = layout;
+	public void setClassTypeIds(long[] classTypeIds) {
+		_classTypeIds = classTypeIds;
+
+		_toString = null;
 	}
 
-	public void setLinkedAssetEntryId(long linkedAssetEntryId) {
-		_linkedAssetEntryId = linkedAssetEntryId;
+	public void setEnablePermissions(boolean enablePermissions) {
+		_enablePermissions = enablePermissions;
 	}
 
 	public void setEnd(int end) {
 		_end = end;
+
+		_toString = null;
 	}
 
 	public void setExcludeZeroViewCount(boolean excludeZeroViewCount) {
 		_excludeZeroViewCount = excludeZeroViewCount;
+
+		_toString = null;
 	}
 
 	public void setExpirationDate(Date expirationDate) {
 		_expirationDate = expirationDate;
+
+		_toString = null;
 	}
 
 	public void setGroupIds(long[] groupIds) {
 		_groupIds = groupIds;
+
+		_toString = null;
+	}
+
+	public void setLayout(Layout layout) {
+		_layout = layout;
+
+		_toString = null;
+	}
+
+	public void setLinkedAssetEntryId(long linkedAssetEntryId) {
+		_linkedAssetEntryId = linkedAssetEntryId;
+
+		_toString = null;
 	}
 
 	public void setNotAllCategoryIds(long[] notAllCategoryIds) {
 		_notAllCategoryIds = notAllCategoryIds;
+
+		_toString = null;
 	}
 
 	public void setNotAllTagIds(long[] notAllTagIds) {
 		_notAllTagIds = notAllTagIds;
+
+		_notAllTagIdsArray = new long[][] {_notAllTagIds};
+
+		_toString = null;
+	}
+
+	public void setNotAllTagIdsArray(long[][] notAllTagIdsArray) {
+		_notAllTagIdsArray = notAllTagIdsArray;
+
+		_notAllTagIds = _flattenTagIds(notAllTagIdsArray);
+
+		_toString = null;
 	}
 
 	public void setNotAnyCategoryIds(long[] notAnyCategoryIds) {
 		_notAnyCategoryIds = notAnyCategoryIds;
+
+		_toString = null;
 	}
 
 	public void setNotAnyTagIds(long[] notAnyTagIds) {
 		_notAnyTagIds = notAnyTagIds;
+
+		_toString = null;
 	}
 
 	public void setOrderByCol1(String orderByCol1) {
 		_orderByCol1 = orderByCol1;
+
+		_toString = null;
 	}
 
 	public void setOrderByCol2(String orderByCol2) {
 		_orderByCol2 = orderByCol2;
+
+		_toString = null;
 	}
 
 	public void setOrderByType1(String orderByType1) {
 		_orderByType1 = orderByType1;
+
+		_toString = null;
 	}
 
 	public void setOrderByType2(String orderByType2) {
 		_orderByType2 = orderByType2;
+
+		_toString = null;
 	}
 
 	public void setPublishDate(Date publishDate) {
 		_publishDate = publishDate;
+
+		_toString = null;
 	}
 
 	public void setStart(int start) {
 		_start = start;
+
+		_toString = null;
 	}
 
 	public void setVisible(Boolean visible) {
 		_visible = visible;
+
+		_toString = null;
+	}
+
+	@Override
+	public String toString() {
+		if (_toString != null) {
+			return _toString;
+		}
+
+		StringBundler sb = new StringBundler(47);
+
+		sb.append("{allCategoryIds=");
+		sb.append(StringUtil.merge(_allCategoryIds));
+		sb.append(", allTagIds=");
+		sb.append(StringUtil.merge(_allTagIds));
+		sb.append(", anyCategoryIds=");
+		sb.append(StringUtil.merge(_anyCategoryIds));
+		sb.append(", anyTagIds=");
+		sb.append(StringUtil.merge(_anyTagIds));
+		sb.append(", classNameIds=");
+		sb.append(StringUtil.merge(_classNameIds));
+		sb.append(", classTypeIds=");
+		sb.append(StringUtil.merge(_classTypeIds));
+
+		if (_layout != null) {
+			sb.append(", layout=");
+			sb.append(_layout.getPlid());
+		}
+
+		sb.append(", end=");
+		sb.append(_end);
+		sb.append(", excludeZeroViewCount=");
+		sb.append(_excludeZeroViewCount);
+		sb.append(", expirationDate=");
+		sb.append(_expirationDate);
+		sb.append(", groupIds=");
+		sb.append(StringUtil.merge(_groupIds));
+		sb.append(", linkedAssetEntryId=");
+		sb.append(_linkedAssetEntryId);
+		sb.append(", notAllCategoryIds=");
+		sb.append(StringUtil.merge(_notAllCategoryIds));
+		sb.append(", notAllTagIds=");
+		sb.append(StringUtil.merge(_notAllTagIds));
+		sb.append(", notAnyCategoryIds=");
+		sb.append(StringUtil.merge(_notAnyCategoryIds));
+		sb.append(", notAnyTagIds=");
+		sb.append(StringUtil.merge(_notAnyTagIds));
+		sb.append(", orderByCol1=");
+		sb.append(_orderByCol1);
+		sb.append(", orderByCol2=");
+		sb.append(_orderByCol2);
+		sb.append(", orderByType1=");
+		sb.append(_orderByType1);
+		sb.append(", orderByType2=");
+		sb.append(_orderByType2);
+		sb.append(", publishDate=");
+		sb.append(_publishDate);
+		sb.append(", start=");
+		sb.append(_start);
+		sb.append(", visible=");
+		sb.append(_visible);
+		sb.append("}");
+
+		_toString = sb.toString();
+
+		return _toString;
+	}
+
+	private long[] _flattenTagIds(long[][] tagIdsArray) {
+		List<Long> tagIdsList = new ArrayList<Long>();
+
+		for (int i = 0; i < tagIdsArray.length; i++) {
+			long[] tagIds = tagIdsArray[i];
+
+			for (int j = 0; j < tagIds.length; j++) {
+				long tagId = tagIds[j];
+
+				tagIdsList.add(tagId);
+			}
+		}
+
+		return ArrayUtil.toArray(
+			tagIdsList.toArray(new Long[tagIdsList.size()]));
 	}
 
 	private long[] _getLeftAndRightCategoryIds(long[] categoryIds) {
@@ -367,17 +572,21 @@ public class AssetEntryQuery {
 
 	private long[] _allCategoryIds = new long[0];
 	private long[] _allTagIds = new long[0];
+	private long[][] _allTagIdsArray = new long[0][];
 	private long[] _anyCategoryIds = new long[0];
 	private long[] _anyTagIds = new long[0];
 	private long[] _classNameIds = new long[0];
-	private Layout _layout;
+	private long[] _classTypeIds = new long[0];
+	private boolean _enablePermissions;
 	private int _end = QueryUtil.ALL_POS;
 	private boolean _excludeZeroViewCount;
 	private Date _expirationDate;
 	private long[] _groupIds = new long[0];
+	private Layout _layout;
 	private long _linkedAssetEntryId = 0;
 	private long[] _notAllCategoryIds = new long[0];
 	private long[] _notAllTagIds = new long[0];
+	private long[][] _notAllTagIdsArray = new long[0][];
 	private long[] _notAnyCategoryIds = new long[0];
 	private long[] _notAnyTagIds = new long[0];
 	private String _orderByCol1;
@@ -386,6 +595,7 @@ public class AssetEntryQuery {
 	private String _orderByType2;
 	private Date _publishDate;
 	private int _start = QueryUtil.ALL_POS;
+	private String _toString;
 	private Boolean _visible = Boolean.TRUE;
 
 }

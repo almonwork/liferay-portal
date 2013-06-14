@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -134,7 +134,7 @@ Format timeFormat = FastDateFormatFactoryUtil.getSimpleDateFormat("HH:mm", local
 			<div class="row-fields">
 				<aui:input name='<%= "orgLaborId" + orgLaborsIndex %>' type="hidden" />
 
-				<aui:select label="type" name='<%= "orgLaborTypeId" + orgLaborsIndex %>' listType="<%= ListTypeConstants.ORGANIZATION_SERVICE %>" />
+				<aui:select label="type" listType="<%= ListTypeConstants.ORGANIZATION_SERVICE %>" name='<%= "orgLaborTypeId" + orgLaborsIndex %>' />
 
 				<table class="org-labor-table">
 				<tr>

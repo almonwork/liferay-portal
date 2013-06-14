@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -16,6 +16,7 @@ package com.liferay.portlet.shopping.model.impl;
 
 import com.liferay.portal.kernel.bean.AutoEscapeBeanHandler;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.ProxyUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.model.CacheModel;
 import com.liferay.portal.model.impl.BaseModelImpl;
@@ -28,9 +29,10 @@ import com.liferay.portlet.shopping.model.ShoppingItemPriceModel;
 
 import java.io.Serializable;
 
-import java.lang.reflect.Proxy;
-
 import java.sql.Types;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * The base model implementation for the ShoppingItemPrice service. Represents a row in the &quot;ShoppingItemPrice&quot; database table, with each column mapped to a property of this class.
@@ -78,15 +80,10 @@ public class ShoppingItemPriceModelImpl extends BaseModelImpl<ShoppingItemPrice>
 	public static final boolean FINDER_CACHE_ENABLED = GetterUtil.getBoolean(com.liferay.portal.util.PropsUtil.get(
 				"value.object.finder.cache.enabled.com.liferay.portlet.shopping.model.ShoppingItemPrice"),
 			true);
-
-	public Class<?> getModelClass() {
-		return ShoppingItemPrice.class;
-	}
-
-	public String getModelClassName() {
-		return ShoppingItemPrice.class.getName();
-	}
-
+	public static final boolean COLUMN_BITMASK_ENABLED = GetterUtil.getBoolean(com.liferay.portal.util.PropsUtil.get(
+				"value.object.column.bitmask.enabled.com.liferay.portlet.shopping.model.ShoppingItemPrice"),
+			true);
+	public static long ITEMID_COLUMN_BITMASK = 1L;
 	public static final long LOCK_EXPIRATION_TIME = GetterUtil.getLong(com.liferay.portal.util.PropsUtil.get(
 				"lock.expiration.time.com.liferay.portlet.shopping.model.ShoppingItemPrice"));
 
@@ -109,11 +106,103 @@ public class ShoppingItemPriceModelImpl extends BaseModelImpl<ShoppingItemPrice>
 		setPrimaryKey(((Long)primaryKeyObj).longValue());
 	}
 
+	public Class<?> getModelClass() {
+		return ShoppingItemPrice.class;
+	}
+
+	public String getModelClassName() {
+		return ShoppingItemPrice.class.getName();
+	}
+
+	@Override
+	public Map<String, Object> getModelAttributes() {
+		Map<String, Object> attributes = new HashMap<String, Object>();
+
+		attributes.put("itemPriceId", getItemPriceId());
+		attributes.put("itemId", getItemId());
+		attributes.put("minQuantity", getMinQuantity());
+		attributes.put("maxQuantity", getMaxQuantity());
+		attributes.put("price", getPrice());
+		attributes.put("discount", getDiscount());
+		attributes.put("taxable", getTaxable());
+		attributes.put("shipping", getShipping());
+		attributes.put("useShippingFormula", getUseShippingFormula());
+		attributes.put("status", getStatus());
+
+		return attributes;
+	}
+
+	@Override
+	public void setModelAttributes(Map<String, Object> attributes) {
+		Long itemPriceId = (Long)attributes.get("itemPriceId");
+
+		if (itemPriceId != null) {
+			setItemPriceId(itemPriceId);
+		}
+
+		Long itemId = (Long)attributes.get("itemId");
+
+		if (itemId != null) {
+			setItemId(itemId);
+		}
+
+		Integer minQuantity = (Integer)attributes.get("minQuantity");
+
+		if (minQuantity != null) {
+			setMinQuantity(minQuantity);
+		}
+
+		Integer maxQuantity = (Integer)attributes.get("maxQuantity");
+
+		if (maxQuantity != null) {
+			setMaxQuantity(maxQuantity);
+		}
+
+		Double price = (Double)attributes.get("price");
+
+		if (price != null) {
+			setPrice(price);
+		}
+
+		Double discount = (Double)attributes.get("discount");
+
+		if (discount != null) {
+			setDiscount(discount);
+		}
+
+		Boolean taxable = (Boolean)attributes.get("taxable");
+
+		if (taxable != null) {
+			setTaxable(taxable);
+		}
+
+		Double shipping = (Double)attributes.get("shipping");
+
+		if (shipping != null) {
+			setShipping(shipping);
+		}
+
+		Boolean useShippingFormula = (Boolean)attributes.get(
+				"useShippingFormula");
+
+		if (useShippingFormula != null) {
+			setUseShippingFormula(useShippingFormula);
+		}
+
+		Integer status = (Integer)attributes.get("status");
+
+		if (status != null) {
+			setStatus(status);
+		}
+	}
+
 	public long getItemPriceId() {
 		return _itemPriceId;
 	}
 
 	public void setItemPriceId(long itemPriceId) {
+		_columnBitmask = -1L;
+
 		_itemPriceId = itemPriceId;
 	}
 
@@ -122,7 +211,19 @@ public class ShoppingItemPriceModelImpl extends BaseModelImpl<ShoppingItemPrice>
 	}
 
 	public void setItemId(long itemId) {
+		_columnBitmask = -1L;
+
+		if (!_setOriginalItemId) {
+			_setOriginalItemId = true;
+
+			_originalItemId = _itemId;
+		}
+
 		_itemId = itemId;
+	}
+
+	public long getOriginalItemId() {
+		return _originalItemId;
 	}
 
 	public int getMinQuantity() {
@@ -197,35 +298,32 @@ public class ShoppingItemPriceModelImpl extends BaseModelImpl<ShoppingItemPrice>
 		_status = status;
 	}
 
+	public long getColumnBitmask() {
+		return _columnBitmask;
+	}
+
 	@Override
 	public ShoppingItemPrice toEscapedModel() {
-		if (isEscapedModel()) {
-			return (ShoppingItemPrice)this;
+		if (_escapedModelProxy == null) {
+			_escapedModelProxy = (ShoppingItemPrice)ProxyUtil.newProxyInstance(_classLoader,
+					_escapedModelProxyInterfaces,
+					new AutoEscapeBeanHandler(this));
 		}
-		else {
-			if (_escapedModelProxy == null) {
-				_escapedModelProxy = (ShoppingItemPrice)Proxy.newProxyInstance(_classLoader,
-						_escapedModelProxyInterfaces,
-						new AutoEscapeBeanHandler(this));
-			}
 
-			return _escapedModelProxy;
-		}
+		return _escapedModelProxy;
 	}
 
 	@Override
 	public ExpandoBridge getExpandoBridge() {
-		if (_expandoBridge == null) {
-			_expandoBridge = ExpandoBridgeFactoryUtil.getExpandoBridge(0,
-					ShoppingItemPrice.class.getName(), getPrimaryKey());
-		}
-
-		return _expandoBridge;
+		return ExpandoBridgeFactoryUtil.getExpandoBridge(0,
+			ShoppingItemPrice.class.getName(), getPrimaryKey());
 	}
 
 	@Override
 	public void setExpandoBridgeAttributes(ServiceContext serviceContext) {
-		getExpandoBridge().setAttributes(serviceContext);
+		ExpandoBridge expandoBridge = getExpandoBridge();
+
+		expandoBridge.setAttributes(serviceContext);
 	}
 
 	@Override
@@ -314,6 +412,13 @@ public class ShoppingItemPriceModelImpl extends BaseModelImpl<ShoppingItemPrice>
 
 	@Override
 	public void resetOriginalValues() {
+		ShoppingItemPriceModelImpl shoppingItemPriceModelImpl = this;
+
+		shoppingItemPriceModelImpl._originalItemId = shoppingItemPriceModelImpl._itemId;
+
+		shoppingItemPriceModelImpl._setOriginalItemId = false;
+
+		shoppingItemPriceModelImpl._columnBitmask = 0;
 	}
 
 	@Override
@@ -431,6 +536,8 @@ public class ShoppingItemPriceModelImpl extends BaseModelImpl<ShoppingItemPrice>
 		};
 	private long _itemPriceId;
 	private long _itemId;
+	private long _originalItemId;
+	private boolean _setOriginalItemId;
 	private int _minQuantity;
 	private int _maxQuantity;
 	private double _price;
@@ -439,6 +546,6 @@ public class ShoppingItemPriceModelImpl extends BaseModelImpl<ShoppingItemPrice>
 	private double _shipping;
 	private boolean _useShippingFormula;
 	private int _status;
-	private transient ExpandoBridge _expandoBridge;
+	private long _columnBitmask;
 	private ShoppingItemPrice _escapedModelProxy;
 }

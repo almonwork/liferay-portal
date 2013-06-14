@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -41,13 +41,13 @@ public class BlogsStatsUserFinderImpl
 	extends BasePersistenceImpl<BlogsStatsUser>
 	implements BlogsStatsUserFinder {
 
-	public static String COUNT_BY_ORGANIZATION_IDS =
+	public static final String COUNT_BY_ORGANIZATION_IDS =
 		BlogsStatsUserFinder.class.getName() + ".countByOrganizationIds";
 
-	public static String FIND_BY_GROUP_IDS =
+	public static final String FIND_BY_GROUP_IDS =
 		BlogsStatsUserFinder.class.getName() + ".findByGroupIds";
 
-	public static String FIND_BY_ORGANIZATION_IDS =
+	public static final String FIND_BY_ORGANIZATION_IDS =
 		BlogsStatsUserFinder.class.getName() + ".findByOrganizationIds";
 
 	public int countByOrganizationId(long organizationId)
@@ -86,7 +86,7 @@ public class BlogsStatsUserFinderImpl
 				qPos.add(organizationId);
 			}
 
-			Iterator<Long> itr = q.list().iterator();
+			Iterator<Long> itr = q.iterate();
 
 			if (itr.hasNext()) {
 				Long count = itr.next();

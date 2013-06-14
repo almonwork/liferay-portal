@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -33,6 +33,36 @@ Team team = (Team)row.getObject();
 		<liferay-ui:icon
 			image="edit"
 			url="<%= editURL %>"
+		/>
+	</c:if>
+
+	<c:if test="<%= TeamPermissionUtil.contains(permissionChecker, team.getTeamId(), ActionKeys.PERMISSIONS) %>">
+
+		<%
+		Role role = team.getRole();
+
+		int roleType = RoleConstants.TYPE_SITE;
+
+		Group group = GroupServiceUtil.getGroup(team.getGroupId());
+
+		if (group.isOrganization()) {
+			roleType = RoleConstants.TYPE_ORGANIZATION;
+		}
+
+		int[] roleTypes = {RoleConstants.TYPE_REGULAR, roleType};
+		%>
+
+		<liferay-security:permissionsURL
+			modelResource="<%= Role.class.getName() %>"
+			modelResourceDescription="<%= team.getName() %>"
+			resourcePrimKey="<%= String.valueOf(role.getRoleId()) %>"
+			roleTypes="<%= roleTypes %>"
+			var="permissionsURL"
+		/>
+
+		<liferay-ui:icon
+			image="permissions"
+			url="<%= permissionsURL %>"
 		/>
 	</c:if>
 

@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -17,6 +17,8 @@
 <%@ include file="/html/portlet/journal_articles/init.jsp" %>
 
 <%
+String redirect = ParamUtil.getString(request, "redirect");
+
 String articleId = ParamUtil.getString(request, "articleId");
 double version = ParamUtil.getDouble(request, "version");
 %>
@@ -56,7 +58,7 @@ double version = ParamUtil.getDouble(request, "version");
 
 		headerNames.clear();
 
-		headerNames.add("name");
+		headerNames.add("title");
 		headerNames.add("display-date");
 		headerNames.add("author");
 
@@ -77,6 +79,7 @@ double version = ParamUtil.getDouble(request, "version");
 		searchTerms.setAdvancedSearch(true);
 
 		List<JournalArticle> results = null;
+		int total = 0;
 		%>
 
 		<c:choose>
@@ -119,7 +122,26 @@ double version = ParamUtil.getDouble(request, "version");
 				articleURL.setParameter("articleId", article.getArticleId());
 				articleURL.setParameter("version", String.valueOf(article.getVersion()));
 
-				rowHREF = articleURL.toString();
+				if (pageUrl.equals("viewInContext")) {
+					AssetRendererFactory assetRendererFactory = AssetRendererFactoryRegistryUtil.getAssetRendererFactoryByClassName(JournalArticle.class.getName());
+
+					AssetRenderer assetRenderer = assetRendererFactory.getAssetRenderer(article.getId());
+
+					String viewFullContentURLString = articleURL.toString();
+
+					viewFullContentURLString = HttpUtil.setParameter(viewFullContentURLString, "redirect", currentURL);
+
+					rowHREF = assetRenderer.getURLViewInContext(liferayPortletRequest, liferayPortletResponse, viewFullContentURLString);
+
+					rowHREF = HttpUtil.setParameter(rowHREF, "redirect", currentURL);
+
+					if (Validator.isNull(rowHREF)) {
+						rowHREF = articleURL.toString();
+					}
+				}
+				else {
+					rowHREF = articleURL.toString();
+				}
 			}
 
 			String target = null;
@@ -190,7 +212,7 @@ double version = ParamUtil.getDouble(request, "version");
 		JournalArticle article = null;
 
 		try {
-			article = JournalArticleLocalServiceUtil.getLatestArticle(scopeGroupId, articleId, WorkflowConstants.STATUS_ANY);
+			article = JournalArticleLocalServiceUtil.getArticle(groupId, articleId, version);
 
 			boolean expired = article.isExpired();
 
@@ -205,6 +227,18 @@ double version = ParamUtil.getDouble(request, "version");
 
 			<c:choose>
 				<c:when test="<%= (articleDisplay != null) && !expired %>">
+					<c:if test='<%= pageUrl.equals("normal") %>'>
+						<portlet:renderURL var="backURL">
+							<portlet:param name="struts_action" value="/journal_articles/view" />
+							<portlet:param name="redirect" value="<%= redirect %>" />
+						</portlet:renderURL>
+
+						<liferay-ui:header
+							backURL="<%= backURL %>"
+							localizeTitle="<%= false %>"
+							title="<%= article.getTitle(locale) %>"
+						/>
+					</c:if>
 
 					<%
 					AssetEntryServiceUtil.incrementViewCounter(JournalArticle.class.getName(), articleDisplay.getResourcePrimKey());
@@ -229,6 +263,7 @@ double version = ParamUtil.getDouble(request, "version");
 							cur="<%= articleDisplay.getCurrentPage() %>"
 							curParam='<%= "page" %>'
 							delta="<%= 1 %>"
+							id="articleDisplayPages"
 							maxPages="<%= 25 %>"
 							total="<%= articleDisplay.getNumberOfPages() %>"
 							type="article"

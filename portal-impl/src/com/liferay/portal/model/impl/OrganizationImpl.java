@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -25,7 +25,10 @@ import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.LocalizationUtil;
 import com.liferay.portal.kernel.util.PropsKeys;
 import com.liferay.portal.kernel.util.SetUtil;
+import com.liferay.portal.kernel.util.StringBundler;
+import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
+import com.liferay.portal.kernel.util.UniqueList;
 import com.liferay.portal.model.Address;
 import com.liferay.portal.model.Group;
 import com.liferay.portal.model.LayoutSet;
@@ -39,7 +42,6 @@ import com.liferay.portal.service.PortalPreferencesLocalServiceUtil;
 import com.liferay.portal.util.PortletKeys;
 import com.liferay.portal.util.PropsUtil;
 import com.liferay.portal.util.PropsValues;
-import com.liferay.util.UniqueList;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -91,6 +93,14 @@ public class OrganizationImpl extends OrganizationBaseImpl {
 	}
 
 	public OrganizationImpl() {
+	}
+
+	public String buildTreePath() throws PortalException, SystemException {
+		StringBundler sb = new StringBundler();
+
+		buildTreePath(sb, this);
+
+		return sb.toString();
 	}
 
 	public Address getAddress() {
@@ -167,6 +177,12 @@ public class OrganizationImpl extends OrganizationBaseImpl {
 		}
 
 		return new GroupImpl();
+	}
+
+	public long getGroupId() {
+		Group group = getGroup();
+
+		return group.getGroupId();
 	}
 
 	public long getLogoId() {
@@ -336,6 +352,20 @@ public class OrganizationImpl extends OrganizationBaseImpl {
 		}
 		else {
 			return false;
+		}
+	}
+
+	protected void buildTreePath(StringBundler sb, Organization organization)
+		throws PortalException, SystemException {
+
+		if (organization == null) {
+			sb.append(StringPool.SLASH);
+		}
+		else {
+			buildTreePath(sb, organization.getParentOrganization());
+
+			sb.append(organization.getOrganizationId());
+			sb.append(StringPool.SLASH);
 		}
 	}
 

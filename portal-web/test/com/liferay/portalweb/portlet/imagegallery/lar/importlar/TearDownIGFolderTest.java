@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -28,9 +28,10 @@ public class TearDownIGFolderTest extends BaseTestCase {
 			switch (label) {
 			case 1:
 				selenium.open("/web/guest/home/");
+				loadRequiredJavaScriptModules();
 
 				for (int second = 0;; second++) {
-					if (second >= 60) {
+					if (second >= 90) {
 						fail("timeout");
 					}
 
@@ -45,14 +46,13 @@ public class TearDownIGFolderTest extends BaseTestCase {
 					Thread.sleep(1000);
 				}
 
-				selenium.saveScreenShotAndSource();
 				selenium.clickAt("link=Image Gallery Test Page",
-					RuntimeVariables.replace(""));
+					RuntimeVariables.replace("Image Gallery Test Page"));
 				selenium.waitForPageToLoad("30000");
-				selenium.saveScreenShotAndSource();
+				loadRequiredJavaScriptModules();
 
 				boolean igFolder1Present = selenium.isElementPresent(
-						"//td[4]/span/ul/li/strong/a");
+						"//div[2]/a/span");
 
 				if (!igFolder1Present) {
 					label = 2;
@@ -60,17 +60,24 @@ public class TearDownIGFolderTest extends BaseTestCase {
 					continue;
 				}
 
-				selenium.clickAt("//td[4]/span/ul/li/strong/a",
-					RuntimeVariables.replace(""));
+				selenium.clickAt("//div[2]/a/span",
+					RuntimeVariables.replace("MG Folder1 Name"));
+				selenium.waitForPageToLoad("30000");
+				loadRequiredJavaScriptModules();
+				assertEquals(RuntimeVariables.replace("Delete"),
+					selenium.getText(
+						"//div[contains(@class,'lfr-component lfr-menu-list')]/ul/li[4]/a"));
+				selenium.clickAt("//div[contains(@class,'lfr-component lfr-menu-list')]/ul/li[4]/a",
+					RuntimeVariables.replace("Delete"));
 
 				for (int second = 0;; second++) {
-					if (second >= 60) {
+					if (second >= 90) {
 						fail("timeout");
 					}
 
 					try {
-						if (selenium.isElementPresent(
-									"//div[@class='lfr-component lfr-menu-list']/ul/li[3]/a")) {
+						if ("Are you sure you want to delete this?".equals(
+									selenium.getConfirmation())) {
 							break;
 						}
 					}
@@ -80,18 +87,10 @@ public class TearDownIGFolderTest extends BaseTestCase {
 					Thread.sleep(1000);
 				}
 
-				selenium.saveScreenShotAndSource();
-				selenium.click(RuntimeVariables.replace(
-						"//div[@class='lfr-component lfr-menu-list']/ul/li[3]/a"));
-				selenium.waitForPageToLoad("30000");
-				assertTrue(selenium.getConfirmation()
-								   .matches("^Are you sure you want to delete this[\\s\\S]$"));
-				selenium.saveScreenShotAndSource();
-
-			case 2:
+				Thread.sleep(5000);
 
 				boolean igFolder2Present = selenium.isElementPresent(
-						"//td[4]/span/ul/li/strong/a");
+						"//div[2]/a/span");
 
 				if (!igFolder2Present) {
 					label = 3;
@@ -99,17 +98,24 @@ public class TearDownIGFolderTest extends BaseTestCase {
 					continue;
 				}
 
-				selenium.clickAt("//td[4]/span/ul/li/strong/a",
-					RuntimeVariables.replace(""));
+				selenium.clickAt("//div[2]/a/span",
+					RuntimeVariables.replace("MG Folder2 Name"));
+				selenium.waitForPageToLoad("30000");
+				loadRequiredJavaScriptModules();
+				assertEquals(RuntimeVariables.replace("Delete"),
+					selenium.getText(
+						"//div[contains(@class,'lfr-component lfr-menu-list')]/ul/li[4]/a"));
+				selenium.clickAt("//div[contains(@class,'lfr-component lfr-menu-list')]/ul/li[4]/a",
+					RuntimeVariables.replace("Delete"));
 
 				for (int second = 0;; second++) {
-					if (second >= 60) {
+					if (second >= 90) {
 						fail("timeout");
 					}
 
 					try {
-						if (selenium.isElementPresent(
-									"//div[@class='lfr-component lfr-menu-list']/ul/li[3]/a")) {
+						if ("Are you sure you want to delete this?".equals(
+									selenium.getConfirmation())) {
 							break;
 						}
 					}
@@ -119,18 +125,10 @@ public class TearDownIGFolderTest extends BaseTestCase {
 					Thread.sleep(1000);
 				}
 
-				selenium.saveScreenShotAndSource();
-				selenium.click(RuntimeVariables.replace(
-						"//div[@class='lfr-component lfr-menu-list']/ul/li[3]/a"));
-				selenium.waitForPageToLoad("30000");
-				assertTrue(selenium.getConfirmation()
-								   .matches("^Are you sure you want to delete this[\\s\\S]$"));
-				selenium.saveScreenShotAndSource();
-
-			case 3:
+				Thread.sleep(5000);
 
 				boolean igFolder3Present = selenium.isElementPresent(
-						"//td[4]/span/ul/li/strong/a");
+						"//div[2]/a/span");
 
 				if (!igFolder3Present) {
 					label = 4;
@@ -138,17 +136,24 @@ public class TearDownIGFolderTest extends BaseTestCase {
 					continue;
 				}
 
-				selenium.clickAt("//td[4]/span/ul/li/strong/a",
-					RuntimeVariables.replace(""));
+				selenium.clickAt("//div[2]/a/span",
+					RuntimeVariables.replace("MG Folder3 Name"));
+				selenium.waitForPageToLoad("30000");
+				loadRequiredJavaScriptModules();
+				assertEquals(RuntimeVariables.replace("Delete"),
+					selenium.getText(
+						"//div[contains(@class,'lfr-component lfr-menu-list')]/ul/li[4]/a"));
+				selenium.clickAt("//div[contains(@class,'lfr-component lfr-menu-list')]/ul/li[4]/a",
+					RuntimeVariables.replace("Delete"));
 
 				for (int second = 0;; second++) {
-					if (second >= 60) {
+					if (second >= 90) {
 						fail("timeout");
 					}
 
 					try {
-						if (selenium.isElementPresent(
-									"//div[@class='lfr-component lfr-menu-list']/ul/li[3]/a")) {
+						if ("Are you sure you want to delete this?".equals(
+									selenium.getConfirmation())) {
 							break;
 						}
 					}
@@ -158,18 +163,10 @@ public class TearDownIGFolderTest extends BaseTestCase {
 					Thread.sleep(1000);
 				}
 
-				selenium.saveScreenShotAndSource();
-				selenium.click(RuntimeVariables.replace(
-						"//div[@class='lfr-component lfr-menu-list']/ul/li[3]/a"));
-				selenium.waitForPageToLoad("30000");
-				assertTrue(selenium.getConfirmation()
-								   .matches("^Are you sure you want to delete this[\\s\\S]$"));
-				selenium.saveScreenShotAndSource();
-
-			case 4:
+				Thread.sleep(5000);
 
 				boolean igFolder4Present = selenium.isElementPresent(
-						"//td[4]/span/ul/li/strong/a");
+						"//div[2]/a/span");
 
 				if (!igFolder4Present) {
 					label = 5;
@@ -177,17 +174,24 @@ public class TearDownIGFolderTest extends BaseTestCase {
 					continue;
 				}
 
-				selenium.clickAt("//td[4]/span/ul/li/strong/a",
-					RuntimeVariables.replace(""));
+				selenium.clickAt("//div[2]/a/span",
+					RuntimeVariables.replace("MG Folder4 Name"));
+				selenium.waitForPageToLoad("30000");
+				loadRequiredJavaScriptModules();
+				assertEquals(RuntimeVariables.replace("Delete"),
+					selenium.getText(
+						"//div[contains(@class,'lfr-component lfr-menu-list')]/ul/li[4]/a"));
+				selenium.clickAt("//div[contains(@class,'lfr-component lfr-menu-list')]/ul/li[4]/a",
+					RuntimeVariables.replace("Delete"));
 
 				for (int second = 0;; second++) {
-					if (second >= 60) {
+					if (second >= 90) {
 						fail("timeout");
 					}
 
 					try {
-						if (selenium.isElementPresent(
-									"//div[@class='lfr-component lfr-menu-list']/ul/li[3]/a")) {
+						if ("Are you sure you want to delete this?".equals(
+									selenium.getConfirmation())) {
 							break;
 						}
 					}
@@ -197,18 +201,10 @@ public class TearDownIGFolderTest extends BaseTestCase {
 					Thread.sleep(1000);
 				}
 
-				selenium.saveScreenShotAndSource();
-				selenium.click(RuntimeVariables.replace(
-						"//div[@class='lfr-component lfr-menu-list']/ul/li[3]/a"));
-				selenium.waitForPageToLoad("30000");
-				assertTrue(selenium.getConfirmation()
-								   .matches("^Are you sure you want to delete this[\\s\\S]$"));
-				selenium.saveScreenShotAndSource();
-
-			case 5:
+				Thread.sleep(5000);
 
 				boolean igFolder5Present = selenium.isElementPresent(
-						"//td[4]/span/ul/li/strong/a");
+						"//div[2]/a/span");
 
 				if (!igFolder5Present) {
 					label = 6;
@@ -216,17 +212,24 @@ public class TearDownIGFolderTest extends BaseTestCase {
 					continue;
 				}
 
-				selenium.clickAt("//td[4]/span/ul/li/strong/a",
-					RuntimeVariables.replace(""));
+				selenium.clickAt("//div[2]/a/span",
+					RuntimeVariables.replace("MG Folder5 Name"));
+				selenium.waitForPageToLoad("30000");
+				loadRequiredJavaScriptModules();
+				assertEquals(RuntimeVariables.replace("Delete"),
+					selenium.getText(
+						"//div[contains(@class,'lfr-component lfr-menu-list')]/ul/li[4]/a"));
+				selenium.clickAt("//div[contains(@class,'lfr-component lfr-menu-list')]/ul/li[4]/a",
+					RuntimeVariables.replace("Delete"));
 
 				for (int second = 0;; second++) {
-					if (second >= 60) {
+					if (second >= 90) {
 						fail("timeout");
 					}
 
 					try {
-						if (selenium.isElementPresent(
-									"//div[@class='lfr-component lfr-menu-list']/ul/li[3]/a")) {
+						if ("Are you sure you want to delete this?".equals(
+									selenium.getConfirmation())) {
 							break;
 						}
 					}
@@ -236,14 +239,10 @@ public class TearDownIGFolderTest extends BaseTestCase {
 					Thread.sleep(1000);
 				}
 
-				selenium.saveScreenShotAndSource();
-				selenium.click(RuntimeVariables.replace(
-						"//div[@class='lfr-component lfr-menu-list']/ul/li[3]/a"));
-				selenium.waitForPageToLoad("30000");
-				assertTrue(selenium.getConfirmation()
-								   .matches("^Are you sure you want to delete this[\\s\\S]$"));
-				selenium.saveScreenShotAndSource();
-
+			case 2:
+			case 3:
+			case 4:
+			case 5:
 			case 6:
 			case 100:
 				label = -1;

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,6 +14,12 @@
 
 package com.liferay.portlet.messageboards.model;
 
+import com.liferay.portal.model.ModelWrapper;
+
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * <p>
  * This class is a wrapper for {@link MBThread}.
@@ -23,7 +29,7 @@ package com.liferay.portlet.messageboards.model;
  * @see       MBThread
  * @generated
  */
-public class MBThreadWrapper implements MBThread {
+public class MBThreadWrapper implements MBThread, ModelWrapper<MBThread> {
 	public MBThreadWrapper(MBThread mbThread) {
 		_mbThread = mbThread;
 	}
@@ -34,6 +40,127 @@ public class MBThreadWrapper implements MBThread {
 
 	public String getModelClassName() {
 		return MBThread.class.getName();
+	}
+
+	public Map<String, Object> getModelAttributes() {
+		Map<String, Object> attributes = new HashMap<String, Object>();
+
+		attributes.put("threadId", getThreadId());
+		attributes.put("groupId", getGroupId());
+		attributes.put("companyId", getCompanyId());
+		attributes.put("categoryId", getCategoryId());
+		attributes.put("rootMessageId", getRootMessageId());
+		attributes.put("rootMessageUserId", getRootMessageUserId());
+		attributes.put("messageCount", getMessageCount());
+		attributes.put("viewCount", getViewCount());
+		attributes.put("lastPostByUserId", getLastPostByUserId());
+		attributes.put("lastPostDate", getLastPostDate());
+		attributes.put("priority", getPriority());
+		attributes.put("question", getQuestion());
+		attributes.put("status", getStatus());
+		attributes.put("statusByUserId", getStatusByUserId());
+		attributes.put("statusByUserName", getStatusByUserName());
+		attributes.put("statusDate", getStatusDate());
+
+		return attributes;
+	}
+
+	public void setModelAttributes(Map<String, Object> attributes) {
+		Long threadId = (Long)attributes.get("threadId");
+
+		if (threadId != null) {
+			setThreadId(threadId);
+		}
+
+		Long groupId = (Long)attributes.get("groupId");
+
+		if (groupId != null) {
+			setGroupId(groupId);
+		}
+
+		Long companyId = (Long)attributes.get("companyId");
+
+		if (companyId != null) {
+			setCompanyId(companyId);
+		}
+
+		Long categoryId = (Long)attributes.get("categoryId");
+
+		if (categoryId != null) {
+			setCategoryId(categoryId);
+		}
+
+		Long rootMessageId = (Long)attributes.get("rootMessageId");
+
+		if (rootMessageId != null) {
+			setRootMessageId(rootMessageId);
+		}
+
+		Long rootMessageUserId = (Long)attributes.get("rootMessageUserId");
+
+		if (rootMessageUserId != null) {
+			setRootMessageUserId(rootMessageUserId);
+		}
+
+		Integer messageCount = (Integer)attributes.get("messageCount");
+
+		if (messageCount != null) {
+			setMessageCount(messageCount);
+		}
+
+		Integer viewCount = (Integer)attributes.get("viewCount");
+
+		if (viewCount != null) {
+			setViewCount(viewCount);
+		}
+
+		Long lastPostByUserId = (Long)attributes.get("lastPostByUserId");
+
+		if (lastPostByUserId != null) {
+			setLastPostByUserId(lastPostByUserId);
+		}
+
+		Date lastPostDate = (Date)attributes.get("lastPostDate");
+
+		if (lastPostDate != null) {
+			setLastPostDate(lastPostDate);
+		}
+
+		Double priority = (Double)attributes.get("priority");
+
+		if (priority != null) {
+			setPriority(priority);
+		}
+
+		Boolean question = (Boolean)attributes.get("question");
+
+		if (question != null) {
+			setQuestion(question);
+		}
+
+		Integer status = (Integer)attributes.get("status");
+
+		if (status != null) {
+			setStatus(status);
+		}
+
+		Long statusByUserId = (Long)attributes.get("statusByUserId");
+
+		if (statusByUserId != null) {
+			setStatusByUserId(statusByUserId);
+		}
+
+		String statusByUserName = (String)attributes.get("statusByUserName");
+
+		if (statusByUserName != null) {
+			setStatusByUserName(statusByUserName);
+		}
+
+		Date statusDate = (Date)attributes.get("statusDate");
+
+		if (statusDate != null) {
+			setStatusDate(statusDate);
+		}
 	}
 
 	/**
@@ -293,6 +420,33 @@ public class MBThreadWrapper implements MBThread {
 	}
 
 	/**
+	* Returns the question of this message boards thread.
+	*
+	* @return the question of this message boards thread
+	*/
+	public boolean getQuestion() {
+		return _mbThread.getQuestion();
+	}
+
+	/**
+	* Returns <code>true</code> if this message boards thread is question.
+	*
+	* @return <code>true</code> if this message boards thread is question; <code>false</code> otherwise
+	*/
+	public boolean isQuestion() {
+		return _mbThread.isQuestion();
+	}
+
+	/**
+	* Sets whether this message boards thread is question.
+	*
+	* @param question the question of this message boards thread
+	*/
+	public void setQuestion(boolean question) {
+		_mbThread.setQuestion(question);
+	}
+
+	/**
 	* Returns the status of this message boards thread.
 	*
 	* @return the status of this message boards thread
@@ -419,6 +573,15 @@ public class MBThreadWrapper implements MBThread {
 	}
 
 	/**
+	* Returns <code>true</code> if this message boards thread is in the Recycle Bin.
+	*
+	* @return <code>true</code> if this message boards thread is in the Recycle Bin; <code>false</code> otherwise
+	*/
+	public boolean isInTrash() {
+		return _mbThread.isInTrash();
+	}
+
+	/**
 	* Returns <code>true</code> if this message boards thread is pending.
 	*
 	* @return <code>true</code> if this message boards thread is pending; <code>false</code> otherwise
@@ -445,10 +608,6 @@ public class MBThreadWrapper implements MBThread {
 
 	public boolean isEscapedModel() {
 		return _mbThread.isEscapedModel();
-	}
-
-	public void setEscapedModel(boolean escapedModel) {
-		_mbThread.setEscapedModel(escapedModel);
 	}
 
 	public java.io.Serializable getPrimaryKeyObj() {
@@ -521,7 +680,14 @@ public class MBThreadWrapper implements MBThread {
 		return _mbThread.isLocked();
 	}
 
+	/**
+	 * @deprecated Renamed to {@link #getWrappedModel}
+	 */
 	public MBThread getWrappedMBThread() {
+		return _mbThread;
+	}
+
+	public MBThread getWrappedModel() {
 		return _mbThread;
 	}
 

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -15,7 +15,6 @@
 package com.liferay.portlet.softwarecatalog.service;
 
 import com.liferay.portal.kernel.bean.PortalBeanLocatorUtil;
-import com.liferay.portal.kernel.util.MethodCache;
 import com.liferay.portal.kernel.util.ReferenceRegistry;
 
 /**
@@ -66,25 +65,32 @@ public class SCFrameworkVersionLocalServiceUtil {
 	* Deletes the s c framework version with the primary key from the database. Also notifies the appropriate model listeners.
 	*
 	* @param frameworkVersionId the primary key of the s c framework version
+	* @return the s c framework version that was removed
 	* @throws PortalException if a s c framework version with the primary key could not be found
 	* @throws SystemException if a system exception occurred
 	*/
-	public static void deleteSCFrameworkVersion(long frameworkVersionId)
+	public static com.liferay.portlet.softwarecatalog.model.SCFrameworkVersion deleteSCFrameworkVersion(
+		long frameworkVersionId)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException {
-		getService().deleteSCFrameworkVersion(frameworkVersionId);
+		return getService().deleteSCFrameworkVersion(frameworkVersionId);
 	}
 
 	/**
 	* Deletes the s c framework version from the database. Also notifies the appropriate model listeners.
 	*
 	* @param scFrameworkVersion the s c framework version
+	* @return the s c framework version that was removed
 	* @throws SystemException if a system exception occurred
 	*/
-	public static void deleteSCFrameworkVersion(
+	public static com.liferay.portlet.softwarecatalog.model.SCFrameworkVersion deleteSCFrameworkVersion(
 		com.liferay.portlet.softwarecatalog.model.SCFrameworkVersion scFrameworkVersion)
 		throws com.liferay.portal.kernel.exception.SystemException {
-		getService().deleteSCFrameworkVersion(scFrameworkVersion);
+		return getService().deleteSCFrameworkVersion(scFrameworkVersion);
+	}
+
+	public static com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery() {
+		return getService().dynamicQuery();
 	}
 
 	/**
@@ -156,6 +162,12 @@ public class SCFrameworkVersionLocalServiceUtil {
 		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery)
 		throws com.liferay.portal.kernel.exception.SystemException {
 		return getService().dynamicQueryCount(dynamicQuery);
+	}
+
+	public static com.liferay.portlet.softwarecatalog.model.SCFrameworkVersion fetchSCFrameworkVersion(
+		long frameworkVersionId)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getService().fetchSCFrameworkVersion(frameworkVersionId);
 	}
 
 	/**
@@ -378,20 +390,15 @@ public class SCFrameworkVersionLocalServiceUtil {
 
 			ReferenceRegistry.registerReference(SCFrameworkVersionLocalServiceUtil.class,
 				"_service");
-			MethodCache.remove(SCFrameworkVersionLocalService.class);
 		}
 
 		return _service;
 	}
 
+	/**
+	 * @deprecated
+	 */
 	public void setService(SCFrameworkVersionLocalService service) {
-		MethodCache.remove(SCFrameworkVersionLocalService.class);
-
-		_service = service;
-
-		ReferenceRegistry.registerReference(SCFrameworkVersionLocalServiceUtil.class,
-			"_service");
-		MethodCache.remove(SCFrameworkVersionLocalService.class);
 	}
 
 	private static SCFrameworkVersionLocalService _service;

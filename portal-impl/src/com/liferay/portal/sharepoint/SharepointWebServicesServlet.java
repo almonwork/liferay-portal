@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -16,6 +16,7 @@ package com.liferay.portal.sharepoint;
 
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.servlet.HttpHeaders;
 import com.liferay.portal.kernel.servlet.ServletResponseUtil;
 import com.liferay.portal.kernel.util.ContentTypes;
 import com.liferay.portal.kernel.util.StringBundler;
@@ -32,6 +33,12 @@ public class SharepointWebServicesServlet extends HttpServlet {
 	@Override
 	protected void doPost(
 		HttpServletRequest request, HttpServletResponse response) {
+
+		if (_log.isInfoEnabled()) {
+			_log.info(
+				request.getHeader(HttpHeaders.USER_AGENT) + " " +
+					request.getMethod() + " " + request.getRequestURI());
+		}
 
 		try {
 			String uri = request.getRequestURI();

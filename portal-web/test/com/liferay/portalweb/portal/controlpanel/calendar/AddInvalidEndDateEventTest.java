@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -23,14 +23,18 @@ import com.liferay.portalweb.portal.util.RuntimeVariables;
 public class AddInvalidEndDateEventTest extends BaseTestCase {
 	public void testAddInvalidEndDateEvent() throws Exception {
 		selenium.open("/web/guest/home/");
+		loadRequiredJavaScriptModules();
+		assertEquals(RuntimeVariables.replace("Go to"),
+			selenium.getText("//li[@id='_145_mySites']/a/span"));
+		selenium.mouseOver("//li[@id='_145_mySites']/a/span");
 
 		for (int second = 0;; second++) {
-			if (second >= 60) {
+			if (second >= 90) {
 				fail("timeout");
 			}
 
 			try {
-				if (selenium.isElementPresent("link=Control Panel")) {
+				if (selenium.isVisible("link=Control Panel")) {
 					break;
 				}
 			}
@@ -40,66 +44,29 @@ public class AddInvalidEndDateEventTest extends BaseTestCase {
 			Thread.sleep(1000);
 		}
 
-		selenium.saveScreenShotAndSource();
-		selenium.clickAt("link=Control Panel", RuntimeVariables.replace(""));
+		selenium.clickAt("link=Control Panel",
+			RuntimeVariables.replace("Control Panel"));
 		selenium.waitForPageToLoad("30000");
-		selenium.saveScreenShotAndSource();
-		selenium.clickAt("link=Calendar", RuntimeVariables.replace(""));
+		loadRequiredJavaScriptModules();
+		selenium.clickAt("link=Calendar", RuntimeVariables.replace("Calendar"));
 		selenium.waitForPageToLoad("30000");
-		selenium.saveScreenShotAndSource();
-
-		for (int second = 0;; second++) {
-			if (second >= 60) {
-				fail("timeout");
-			}
-
-			try {
-				if (selenium.isVisible("//input[@value='Add Event']")) {
-					break;
-				}
-			}
-			catch (Exception e) {
-			}
-
-			Thread.sleep(1000);
-		}
-
-		selenium.saveScreenShotAndSource();
+		loadRequiredJavaScriptModules();
 		selenium.clickAt("//input[@value='Add Event']",
-			RuntimeVariables.replace(""));
+			RuntimeVariables.replace("Add Event"));
 		selenium.waitForPageToLoad("30000");
-		selenium.saveScreenShotAndSource();
-
-		for (int second = 0;; second++) {
-			if (second >= 60) {
-				fail("timeout");
-			}
-
-			try {
-				if (selenium.isVisible("_8_title")) {
-					break;
-				}
-			}
-			catch (Exception e) {
-			}
-
-			Thread.sleep(1000);
-		}
-
-		selenium.saveScreenShotAndSource();
-		selenium.type("_8_title",
+		loadRequiredJavaScriptModules();
+		selenium.type("//input[@id='_8_title']",
 			RuntimeVariables.replace("Invalid End Date Test Event"));
-		selenium.saveScreenShotAndSource();
 		selenium.clickAt("//input[@name='_8_recurrenceType' and @value='3']",
-			RuntimeVariables.replace(""));
+			RuntimeVariables.replace("Repeat Daily"));
 
 		for (int second = 0;; second++) {
-			if (second >= 60) {
+			if (second >= 90) {
 				fail("timeout");
 			}
 
 			try {
-				if (selenium.isElementPresent("_8_dailyInterval")) {
+				if (selenium.isVisible("//input[@id='_8_dailyInterval']")) {
 					break;
 				}
 			}
@@ -109,16 +76,14 @@ public class AddInvalidEndDateEventTest extends BaseTestCase {
 			Thread.sleep(1000);
 		}
 
-		selenium.saveScreenShotAndSource();
-		selenium.type("_8_dailyInterval", RuntimeVariables.replace("1"));
-		selenium.saveScreenShotAndSource();
-		selenium.clickAt("_8_endDateMonth",
+		selenium.type("//input[@id='_8_dailyInterval']",
+			RuntimeVariables.replace("1"));
+		selenium.clickAt("//select[@id='_8_endDateMonth']",
 			RuntimeVariables.replace("End Date Month"));
-		selenium.select("_8_endDateMonth",
+		selenium.select("//select[@id='_8_endDateMonth']",
 			RuntimeVariables.replace("label=February"));
-		Thread.sleep(5000);
-		selenium.select("_8_endDateMonth",
+		selenium.select("//select[@id='_8_endDateMonth']",
 			RuntimeVariables.replace("label=February"));
-		assertFalse(selenium.isPartialText("_8_endDateDay", "30"));
+		assertFalse(selenium.isPartialText("//select[@id='_8_endDateDay']", "30"));
 	}
 }

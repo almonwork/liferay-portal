@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,6 +14,10 @@
 
 package com.liferay.portal.model;
 
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * <p>
  * This class is a wrapper for {@link Ticket}.
@@ -23,7 +27,7 @@ package com.liferay.portal.model;
  * @see       Ticket
  * @generated
  */
-public class TicketWrapper implements Ticket {
+public class TicketWrapper implements Ticket, ModelWrapper<Ticket> {
 	public TicketWrapper(Ticket ticket) {
 		_ticket = ticket;
 	}
@@ -34,6 +38,78 @@ public class TicketWrapper implements Ticket {
 
 	public String getModelClassName() {
 		return Ticket.class.getName();
+	}
+
+	public Map<String, Object> getModelAttributes() {
+		Map<String, Object> attributes = new HashMap<String, Object>();
+
+		attributes.put("ticketId", getTicketId());
+		attributes.put("companyId", getCompanyId());
+		attributes.put("createDate", getCreateDate());
+		attributes.put("classNameId", getClassNameId());
+		attributes.put("classPK", getClassPK());
+		attributes.put("key", getKey());
+		attributes.put("type", getType());
+		attributes.put("extraInfo", getExtraInfo());
+		attributes.put("expirationDate", getExpirationDate());
+
+		return attributes;
+	}
+
+	public void setModelAttributes(Map<String, Object> attributes) {
+		Long ticketId = (Long)attributes.get("ticketId");
+
+		if (ticketId != null) {
+			setTicketId(ticketId);
+		}
+
+		Long companyId = (Long)attributes.get("companyId");
+
+		if (companyId != null) {
+			setCompanyId(companyId);
+		}
+
+		Date createDate = (Date)attributes.get("createDate");
+
+		if (createDate != null) {
+			setCreateDate(createDate);
+		}
+
+		Long classNameId = (Long)attributes.get("classNameId");
+
+		if (classNameId != null) {
+			setClassNameId(classNameId);
+		}
+
+		Long classPK = (Long)attributes.get("classPK");
+
+		if (classPK != null) {
+			setClassPK(classPK);
+		}
+
+		String key = (String)attributes.get("key");
+
+		if (key != null) {
+			setKey(key);
+		}
+
+		Integer type = (Integer)attributes.get("type");
+
+		if (type != null) {
+			setType(type);
+		}
+
+		String extraInfo = (String)attributes.get("extraInfo");
+
+		if (extraInfo != null) {
+			setExtraInfo(extraInfo);
+		}
+
+		Date expirationDate = (Date)attributes.get("expirationDate");
+
+		if (expirationDate != null) {
+			setExpirationDate(expirationDate);
+		}
 	}
 
 	/**
@@ -115,6 +191,10 @@ public class TicketWrapper implements Ticket {
 	*/
 	public java.lang.String getClassName() {
 		return _ticket.getClassName();
+	}
+
+	public void setClassName(java.lang.String className) {
+		_ticket.setClassName(className);
 	}
 
 	/**
@@ -245,10 +325,6 @@ public class TicketWrapper implements Ticket {
 		return _ticket.isEscapedModel();
 	}
 
-	public void setEscapedModel(boolean escapedModel) {
-		_ticket.setEscapedModel(escapedModel);
-	}
-
 	public java.io.Serializable getPrimaryKeyObj() {
 		return _ticket.getPrimaryKeyObj();
 	}
@@ -306,7 +382,14 @@ public class TicketWrapper implements Ticket {
 		return _ticket.isExpired();
 	}
 
+	/**
+	 * @deprecated Renamed to {@link #getWrappedModel}
+	 */
 	public Ticket getWrappedTicket() {
+		return _ticket;
+	}
+
+	public Ticket getWrappedModel() {
 		return _ticket;
 	}
 

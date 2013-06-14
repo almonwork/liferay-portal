@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -23,7 +23,8 @@ package com.liferay.portal.service;
  * @see       PortletLocalService
  * @generated
  */
-public class PortletLocalServiceWrapper implements PortletLocalService {
+public class PortletLocalServiceWrapper implements PortletLocalService,
+	ServiceWrapper<PortletLocalService> {
 	public PortletLocalServiceWrapper(PortletLocalService portletLocalService) {
 		_portletLocalService = portletLocalService;
 	}
@@ -55,24 +56,31 @@ public class PortletLocalServiceWrapper implements PortletLocalService {
 	* Deletes the portlet with the primary key from the database. Also notifies the appropriate model listeners.
 	*
 	* @param id the primary key of the portlet
+	* @return the portlet that was removed
 	* @throws PortalException if a portlet with the primary key could not be found
 	* @throws SystemException if a system exception occurred
 	*/
-	public void deletePortlet(long id)
+	public com.liferay.portal.model.Portlet deletePortlet(long id)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException {
-		_portletLocalService.deletePortlet(id);
+		return _portletLocalService.deletePortlet(id);
 	}
 
 	/**
 	* Deletes the portlet from the database. Also notifies the appropriate model listeners.
 	*
 	* @param portlet the portlet
+	* @return the portlet that was removed
 	* @throws SystemException if a system exception occurred
 	*/
-	public void deletePortlet(com.liferay.portal.model.Portlet portlet)
+	public com.liferay.portal.model.Portlet deletePortlet(
+		com.liferay.portal.model.Portlet portlet)
 		throws com.liferay.portal.kernel.exception.SystemException {
-		_portletLocalService.deletePortlet(portlet);
+		return _portletLocalService.deletePortlet(portlet);
+	}
+
+	public com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery() {
+		return _portletLocalService.dynamicQuery();
 	}
 
 	/**
@@ -144,6 +152,11 @@ public class PortletLocalServiceWrapper implements PortletLocalService {
 		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery)
 		throws com.liferay.portal.kernel.exception.SystemException {
 		return _portletLocalService.dynamicQueryCount(dynamicQuery);
+	}
+
+	public com.liferay.portal.model.Portlet fetchPortlet(long id)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return _portletLocalService.fetchPortlet(id);
 	}
 
 	/**
@@ -261,6 +274,10 @@ public class PortletLocalServiceWrapper implements PortletLocalService {
 		_portletLocalService.clearCache();
 	}
 
+	public void clearCompanyPortletsPool() {
+		_portletLocalService.clearCompanyPortletsPool();
+	}
+
 	/**
 	* @deprecated {@link #clonePortlet(String)}
 	*/
@@ -354,6 +371,10 @@ public class PortletLocalServiceWrapper implements PortletLocalService {
 			showPortal);
 	}
 
+	public java.util.List<com.liferay.portal.model.Portlet> getScopablePortlets() {
+		return _portletLocalService.getScopablePortlets();
+	}
+
 	public com.liferay.portal.model.PortletCategory getWARDisplay(
 		java.lang.String servletContextName, java.lang.String xml)
 		throws com.liferay.portal.kernel.exception.SystemException {
@@ -379,6 +400,16 @@ public class PortletLocalServiceWrapper implements PortletLocalService {
 			xmls, pluginPackage);
 	}
 
+	public java.util.Map<java.lang.String, com.liferay.portal.model.Portlet> loadGetPortletsPool(
+		long companyId)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return _portletLocalService.loadGetPortletsPool(companyId);
+	}
+
+	public void removeCompanyPortletsPool(long companyId) {
+		_portletLocalService.removeCompanyPortletsPool(companyId);
+	}
+
 	public com.liferay.portal.model.Portlet updatePortlet(long companyId,
 		java.lang.String portletId, java.lang.String roles, boolean active)
 		throws com.liferay.portal.kernel.exception.SystemException {
@@ -386,12 +417,26 @@ public class PortletLocalServiceWrapper implements PortletLocalService {
 			active);
 	}
 
+	/**
+	 * @deprecated Renamed to {@link #getWrappedService}
+	 */
 	public PortletLocalService getWrappedPortletLocalService() {
 		return _portletLocalService;
 	}
 
+	/**
+	 * @deprecated Renamed to {@link #setWrappedService}
+	 */
 	public void setWrappedPortletLocalService(
 		PortletLocalService portletLocalService) {
+		_portletLocalService = portletLocalService;
+	}
+
+	public PortletLocalService getWrappedService() {
+		return _portletLocalService;
+	}
+
+	public void setWrappedService(PortletLocalService portletLocalService) {
 		_portletLocalService = portletLocalService;
 	}
 

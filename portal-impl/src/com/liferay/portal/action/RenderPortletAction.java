@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,18 +14,19 @@
 
 package com.liferay.portal.action;
 
+import com.liferay.portal.kernel.portlet.PortletContainerUtil;
 import com.liferay.portal.kernel.portlet.WindowStateFactory;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.model.Layout;
 import com.liferay.portal.model.Portlet;
 import com.liferay.portal.model.User;
 import com.liferay.portal.service.PortletLocalServiceUtil;
+import com.liferay.portal.theme.ThemeDisplay;
 import com.liferay.portal.util.PortalUtil;
 import com.liferay.portal.util.WebKeys;
 
 import javax.portlet.WindowState;
 
-import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -45,8 +46,10 @@ public class RenderPortletAction extends Action {
 			HttpServletResponse response)
 		throws Exception {
 
-		ServletContext servletContext = (ServletContext)request.getAttribute(
-			WebKeys.CTX);
+		ThemeDisplay themeDisplay = (ThemeDisplay)request.getAttribute(
+			WebKeys.THEME_DISPLAY);
+
+		themeDisplay.setAjax(true);
 
 		String ajaxId = request.getParameter("ajax_id");
 
@@ -58,7 +61,6 @@ public class RenderPortletAction extends Action {
 		Portlet portlet = PortletLocalServiceUtil.getPortletById(
 			companyId, portletId);
 
-		String queryString = null;
 		String columnId = ParamUtil.getString(request, "p_p_col_id");
 		int columnPos = ParamUtil.getInteger(request, "p_p_col_pos");
 		int columnCount = ParamUtil.getInteger(request, "p_p_col_count");
@@ -83,9 +85,10 @@ public class RenderPortletAction extends Action {
 		PortalUtil.updateWindowState(
 			portletId, user, layout, windowState, request);
 
-		PortalUtil.renderPortlet(
-			servletContext, request, response, portlet, queryString, columnId,
-			new Integer(columnPos), new Integer(columnCount), true);
+		request = PortletContainerUtil.setupOptionalRenderParameters(
+			request, null, columnId, columnPos, columnCount);
+
+		PortletContainerUtil.render(request, response, portlet);
 
 		return null;
 	}

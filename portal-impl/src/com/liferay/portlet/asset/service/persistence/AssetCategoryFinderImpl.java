@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -22,13 +22,16 @@ import com.liferay.portal.kernel.dao.orm.Type;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.util.CharPool;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
+import com.liferay.portal.security.permission.InlineSQLHelperUtil;
 import com.liferay.portal.service.persistence.impl.BasePersistenceImpl;
 import com.liferay.portlet.asset.NoSuchCategoryException;
 import com.liferay.portlet.asset.model.AssetCategory;
 import com.liferay.portlet.asset.model.AssetEntry;
+import com.liferay.portlet.asset.model.AssetVocabulary;
 import com.liferay.portlet.asset.model.impl.AssetCategoryImpl;
 import com.liferay.util.dao.orm.CustomSQLUtil;
 
@@ -44,22 +47,28 @@ import java.util.List;
 public class AssetCategoryFinderImpl
 	extends BasePersistenceImpl<AssetCategory> implements AssetCategoryFinder {
 
-	public static String COUNT_BY_G_C_N =
+	public static final String COUNT_BY_G_C_N =
 		AssetCategoryFinder.class.getName() + ".countByG_C_N";
 
-	public static String COUNT_BY_G_N_P =
+	public static final String COUNT_BY_G_N_V =
+		AssetCategoryFinder.class.getName() + ".countByG_N_V";
+
+	public static final String COUNT_BY_G_N_P =
 		AssetCategoryFinder.class.getName() + ".countByG_N_P";
 
-	public static String FIND_BY_ENTRY_ID =
+	public static final String FIND_BY_ENTRY_ID =
 		AssetCategoryFinder.class.getName() + ".findByEntryId";
 
-	public static String FIND_BY_G_N =
+	public static final String FIND_BY_G_N =
 		AssetCategoryFinder.class.getName() + ".findByG_N";
 
-	public static String FIND_BY_C_C =
+	public static final String FIND_BY_C_C =
 		AssetCategoryFinder.class.getName() + ".findByC_C";
 
-	public static String FIND_BY_G_N_P =
+	public static final String FIND_BY_G_N_V =
+		AssetCategoryFinder.class.getName() + ".findByG_N_V";
+
+	public static final String FIND_BY_G_N_P =
 		AssetCategoryFinder.class.getName() + ".findByG_N_P";
 
 	public int countByG_C_N(long groupId, long classNameId, String name)
@@ -83,7 +92,7 @@ public class AssetCategoryFinderImpl
 			qPos.add(name);
 			qPos.add(name);
 
-			Iterator<Long> itr = q.list().iterator();
+			Iterator<Long> itr = q.iterate();
 
 			if (itr.hasNext()) {
 				Long count = itr.next();
@@ -101,6 +110,12 @@ public class AssetCategoryFinderImpl
 		finally {
 			closeSession(session);
 		}
+	}
+
+	public int countByG_N_V(long groupId, String name, long vocabularyId)
+		throws SystemException {
+
+		return doCountByG_N_V(groupId, name, vocabularyId, false);
 	}
 
 	public int countByG_N_P(
@@ -121,11 +136,12 @@ public class AssetCategoryFinderImpl
 			QueryPos qPos = QueryPos.getInstance(q);
 
 			setJoin(qPos, categoryProperties);
+
 			qPos.add(groupId);
 			qPos.add(name);
 			qPos.add(name);
 
-			Iterator<Long> itr = q.list().iterator();
+			Iterator<Long> itr = q.iterate();
 
 			if (itr.hasNext()) {
 				Long count = itr.next();
@@ -143,6 +159,21 @@ public class AssetCategoryFinderImpl
 		finally {
 			closeSession(session);
 		}
+	}
+
+	public int filterCountByG_N_V(long groupId, String name, long vocabularyId)
+		throws SystemException {
+
+		return doCountByG_N_V(groupId, name, vocabularyId, true);
+	}
+
+	public List<AssetCategory> filterFindByG_N_V(
+			long groupId, String name, long vocabularyId, int start, int end,
+			OrderByComparator obc)
+		throws SystemException {
+
+		return doFindByG_N_V(
+			groupId, name, vocabularyId, start, end, obc, true);
 	}
 
 	public List<AssetCategory> findByEntryId(long entryId)
@@ -195,26 +226,11 @@ public class AssetCategoryFinderImpl
 			qPos.add(groupId);
 			qPos.add(name);
 
-			List<AssetCategory> list = q.list();
+			List<AssetCategory> categories = q.list();
 
-			if (list.size() == 0) {
-				StringBundler sb = new StringBundler(6);
-
-				sb.append("No AssetCategory exists with the key ");
-				sb.append("{groupId=");
-				sb.append(groupId);
-				sb.append(", name=");
-				sb.append(name);
-				sb.append("}");
-
-				throw new NoSuchCategoryException(sb.toString());
+			if (!categories.isEmpty()) {
+				return categories.get(0);
 			}
-			else {
-				return list.get(0);
-			}
-		}
-		catch (NoSuchCategoryException nsee) {
-			throw nsee;
 		}
 		catch (Exception e) {
 			throw new SystemException(e);
@@ -222,6 +238,17 @@ public class AssetCategoryFinderImpl
 		finally {
 			closeSession(session);
 		}
+
+		StringBundler sb = new StringBundler(6);
+
+		sb.append("No AssetCategory exists with the key ");
+		sb.append("{groupId=");
+		sb.append(groupId);
+		sb.append(", name=");
+		sb.append(name);
+		sb.append("}");
+
+		throw new NoSuchCategoryException(sb.toString());
 	}
 
 	public List<AssetCategory> findByC_C(long classNameId, long classPK)
@@ -230,8 +257,7 @@ public class AssetCategoryFinderImpl
 		Session session = null;
 
 		try {
-			AssetEntry entry = AssetEntryUtil.fetchByC_C(
-				classNameId, classPK);
+			AssetEntry entry = AssetEntryUtil.fetchByC_C(classNameId, classPK);
 
 			if (entry == null) {
 				return Collections.emptyList();
@@ -258,6 +284,15 @@ public class AssetCategoryFinderImpl
 		finally {
 			closeSession(session);
 		}
+	}
+
+	public List<AssetCategory> findByG_N_V(
+			long groupId, String name, long vocabularyId, int start, int end,
+			OrderByComparator obc)
+		throws SystemException {
+
+		return doFindByG_N_V(
+			groupId, name, vocabularyId, start, end, obc, false);
 	}
 
 	public List<AssetCategory> findByG_N_P(
@@ -291,9 +326,103 @@ public class AssetCategoryFinderImpl
 			QueryPos qPos = QueryPos.getInstance(q);
 
 			setJoin(qPos, categoryProperties);
+
 			qPos.add(groupId);
 			qPos.add(name);
 			qPos.add(name);
+
+			return (List<AssetCategory>)QueryUtil.list(
+				q, getDialect(), start, end);
+		}
+		catch (Exception e) {
+			throw new SystemException(e);
+		}
+		finally {
+			closeSession(session);
+		}
+	}
+
+	protected int doCountByG_N_V(
+			long groupId, String name, long vocabularyId,
+			boolean inlineSQLHelper)
+		throws SystemException {
+
+		Session session = null;
+
+		try {
+			session = openSession();
+
+			String sql = CustomSQLUtil.get(COUNT_BY_G_N_V);
+
+			if (inlineSQLHelper) {
+				sql = InlineSQLHelperUtil.replacePermissionCheck(
+					sql, AssetCategory.class.getName(),
+					"AssetCategory.categoryId", groupId);
+			}
+
+			SQLQuery q = session.createSQLQuery(sql);
+
+			q.addScalar(COUNT_COLUMN_NAME, Type.LONG);
+
+			QueryPos qPos = QueryPos.getInstance(q);
+
+			qPos.add(groupId);
+			qPos.add(name);
+			qPos.add(name);
+			qPos.add(vocabularyId);
+
+			Iterator<Long> itr = q.iterate();
+
+			if (itr.hasNext()) {
+				Long count = itr.next();
+
+				if (count != null) {
+					return count.intValue();
+				}
+			}
+
+			return 0;
+		}
+		catch (Exception e) {
+			throw new SystemException(e);
+		}
+		finally {
+			closeSession(session);
+		}
+	}
+
+	protected List<AssetCategory> doFindByG_N_V(
+			long groupId, String name, long vocabularyId, int start, int end,
+			OrderByComparator obc, boolean inlineSQLHelper)
+		throws SystemException {
+
+		name = name.trim().toLowerCase();
+
+		Session session = null;
+
+		try {
+			session = openSession();
+
+			String sql = CustomSQLUtil.get(FIND_BY_G_N_V);
+
+			sql = CustomSQLUtil.replaceOrderBy(sql, obc);
+
+			if (inlineSQLHelper) {
+				sql = InlineSQLHelperUtil.replacePermissionCheck(
+					sql, AssetVocabulary.class.getName(),
+					"AssetCategory.categoryId", groupId);
+			}
+
+			SQLQuery q = session.createSQLQuery(sql);
+
+			q.addEntity("AssetCategory", AssetCategoryImpl.class);
+
+			QueryPos qPos = QueryPos.getInstance(q);
+
+			qPos.add(groupId);
+			qPos.add(name);
+			qPos.add(name);
+			qPos.add(vocabularyId);
 
 			return (List<AssetCategory>)QueryUtil.list(
 				q, getDialect(), start, end);

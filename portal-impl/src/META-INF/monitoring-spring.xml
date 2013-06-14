@@ -4,8 +4,9 @@
 	default-destroy-method="destroy"
 	default-init-method="afterPropertiesSet"
 	xmlns="http://www.springframework.org/schema/beans"
+	xmlns:util="http://www.springframework.org/schema/util"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-3.0.xsd"
 >
 	<bean id="chainableMethodAdviceInjector.serviceMonitorAdvice" class="com.liferay.portal.spring.aop.ChainableMethodAdviceInjector">
 		<property name="injectCondition" value="true" />
@@ -118,6 +119,9 @@
 				<entry key="com.liferay.portal.monitoring:classification=instrumentation,name=ServiceManager" value-ref="com.liferay.portal.monitoring.jmx.ServiceManager" />
 			</map>
 		</property>
+		<property name="registrationBehavior">
+			<util:constant static-field="org.springframework.jmx.support.MBeanRegistrationSupport.REGISTRATION_IGNORE_EXISTING" />
+		</property>
 		<property name="server" ref="mBeanServer" />
 	</bean>
 
@@ -155,14 +159,13 @@
 		<property name="destinationName" value="liferay/monitoring" />
 		<property name="messageSender" ref="com.liferay.portal.kernel.messaging.sender.MessageSender" />
 	</bean>
-	<bean id="com.liferay.portlet.MonitoringPortlet" class="com.liferay.portlet.MonitoringPortlet">
-		<property name="invokerPortlet" ref="com.liferay.portlet.InvokerPortletImpl" />
+	<bean id="com.liferay.portlet.MonitoringPortletFactoryImpl" class="com.liferay.portlet.MonitoringPortletFactoryImpl">
 		<property name="singleDestinationMessageSender" ref="messageSender.monitoring" />
 	</bean>
 	<bean id="com.liferay.portlet.PortletInstanceFactoryUtil" class="com.liferay.portlet.PortletInstanceFactoryUtil">
 		<property name="portletInstanceFactory">
 			<bean class="com.liferay.portlet.PortletInstanceFactoryImpl">
-				<property name="internalInvokerPortletPrototype" ref="com.liferay.portlet.MonitoringPortlet" />
+				<property name="invokerPortletFactory" ref="com.liferay.portlet.MonitoringPortletFactoryImpl" />
 			</bean>
 		</property>
 	</bean>

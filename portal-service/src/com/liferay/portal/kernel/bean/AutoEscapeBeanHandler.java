@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -45,7 +45,7 @@ public class AutoEscapeBeanHandler implements InvocationHandler {
 		return _bean;
 	}
 
-	public Object invoke(Object proxy, Method method, Object[] args)
+	public Object invoke(Object proxy, Method method, Object[] arguments)
 		throws Throwable {
 
 		String methodName = method.getName();
@@ -58,11 +58,14 @@ public class AutoEscapeBeanHandler implements InvocationHandler {
 		if (methodName.endsWith("isEscapedModel")) {
 			return true;
 		}
+		else if (methodName.endsWith("toEscapedModel")) {
+			return proxy;
+		}
 
 		Object result = null;
 
 		try {
-			result = method.invoke(_bean, args);
+			result = method.invoke(_bean, arguments);
 		}
 		catch (InvocationTargetException ite) {
 			throw ite.getTargetException();

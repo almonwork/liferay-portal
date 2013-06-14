@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -51,8 +51,7 @@ public class GroupConstants {
 
 	public static final String TYPE_SITE_SYSTEM_LABEL = "system";
 
-	public static final String USER_PERSONAL_SITE =
-		"User Personal Site";
+	public static final String USER_PERSONAL_SITE = "User Personal Site";
 
 	public static final String USER_PERSONAL_SITE_FRIENDLY_URL =
 		"/personal_site";

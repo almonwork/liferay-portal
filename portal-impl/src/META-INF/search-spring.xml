@@ -31,23 +31,27 @@
 
 	<!-- Util -->
 
-	<bean id="com.liferay.portal.kernel.search.BooleanClauseFactory" class="com.liferay.portal.search.generic.BooleanClauseFactoryImpl" />
-	<bean id="com.liferay.portal.kernel.search.BooleanClauseFactoryUtil" class="com.liferay.portal.kernel.search.BooleanClauseFactoryUtil">
-		<property name="booleanClauseFactory" ref="com.liferay.portal.kernel.search.BooleanClauseFactory" />
+	<bean id="com.liferay.portal.kernel.repository.cmis.search.CMISSearchQueryBuilder" class="com.liferay.portal.kernel.repository.cmis.search.BaseCmisSearchQueryBuilder" />
+	<bean id="com.liferay.portal.kernel.repository.cmis.search.CMISSearchQueryBuilderUtil" class="com.liferay.portal.kernel.repository.cmis.search.CMISSearchQueryBuilderUtil">
+		<property name="cmisSearchQueryBuilder" ref="com.liferay.portal.kernel.repository.cmis.search.CMISSearchQueryBuilder" />
 	</bean>
-	<bean id="com.liferay.portal.kernel.search.BooleanQueryFactoryUtil" class="com.liferay.portal.kernel.search.BooleanQueryFactoryUtil">
-		<property name="genericQueryFactory">
-			<bean class="com.liferay.portal.search.generic.BooleanQueryFactoryImpl" />
-		</property>
-		<property name="luceneBasedQueryFactory">
-			<bean class="com.liferay.portal.search.lucene.BooleanQueryFactoryImpl" />
-		</property>
+	<bean id="com.liferay.portal.kernel.repository.search.RepositorySearchQueryBuilder" class="com.liferay.portal.repository.search.RepositorySearchQueryBuilderImpl">
+		<property name="analyzer" ref="org.apache.lucene.analysis.KeywordAnalyzer" />
+	</bean>
+	<bean id="com.liferay.portal.kernel.repository.search.RepositorySearchQueryBuilderUtil" class="com.liferay.portal.kernel.repository.search.RepositorySearchQueryBuilderUtil">
+		<property name="repositorySearchQueryBuilder" ref="com.liferay.portal.kernel.repository.search.RepositorySearchQueryBuilder" />
 	</bean>
 	<bean id="com.liferay.portal.kernel.search.QueryTranslator" class="com.liferay.portal.search.lucene.QueryTranslatorImpl" />
 	<bean id="com.liferay.portal.kernel.search.QueryTranslatorUtil" class="com.liferay.portal.kernel.search.QueryTranslatorUtil">
 		<property name="queryTranslator" ref="com.liferay.portal.kernel.search.QueryTranslator" />
 	</bean>
 	<bean id="com.liferay.portal.kernel.search.SearchEngineUtil" class="com.liferay.portal.kernel.search.SearchEngineUtil">
+		<property name="excludedEntryClassNames">
+			<list>
+				<value>com.liferay.portal.kernel.plugin.PluginPackage</value>
+				<value>com.liferay.portlet.asset.model.AssetEntry</value>
+			</list>
+		</property>
 		<property name="searchPermissionChecker" ref="com.liferay.portal.kernel.search.SearchPermissionChecker" />
 	</bean>
 	<bean id="com.liferay.portal.kernel.search.SearchPermissionChecker" class="com.liferay.portal.search.SearchPermissionCheckerImpl" />
@@ -59,20 +63,22 @@
 	<bean id="com.liferay.portal.kernel.search.StringQueryFactoryUtil" class="com.liferay.portal.kernel.search.StringQueryFactoryUtil">
 		<property name="stringQueryFactory" ref="com.liferay.portal.kernel.search.StringQueryFactory" />
 	</bean>
-	<bean id="com.liferay.portal.kernel.search.TermQueryFactoryUtil" class="com.liferay.portal.kernel.search.TermQueryFactoryUtil">
-		<property name="genericQueryFactory">
+
+	<!-- Generic search engine -->
+
+	<bean id="com.liferay.portal.search.generic.GenericSearchEngineImpl" class="com.liferay.portal.kernel.search.BaseSearchEngine">
+		<property name="booleanClauseFactory" >
+			<bean class="com.liferay.portal.search.generic.BooleanClauseFactoryImpl" />
+		</property>
+		<property name="booleanQueryFactory" >
+			<bean class="com.liferay.portal.search.generic.BooleanQueryFactoryImpl" />
+		</property>
+		<property name="luceneBased" value="false" />
+		<property name="termQueryFactory">
 			<bean class="com.liferay.portal.search.generic.TermQueryFactoryImpl" />
 		</property>
-		<property name="luceneBasedQueryFactory">
-			<bean class="com.liferay.portal.search.lucene.TermQueryFactoryImpl" />
-		</property>
-	</bean>
-	<bean id="com.liferay.portal.kernel.search.TermRangeQueryFactoryUtil" class="com.liferay.portal.kernel.search.TermRangeQueryFactoryUtil">
-		<property name="genericQueryFactory">
+		<property name="termRangeQueryFactory">
 			<bean class="com.liferay.portal.search.generic.TermRangeQueryFactoryImpl" />
-		</property>
-		<property name="luceneBasedQueryFactory">
-			<bean class="com.liferay.portal.search.lucene.TermRangeQueryFactoryImpl" />
 		</property>
 	</bean>
 
@@ -81,6 +87,12 @@
 	<bean id="com.liferay.portal.search.lucene.LuceneIndexSearcherImpl" class="com.liferay.portal.search.lucene.LuceneIndexSearcherImpl" />
 	<bean id="com.liferay.portal.search.lucene.LuceneIndexWriterImpl" class="com.liferay.portal.search.lucene.LuceneIndexWriterImpl" />
 	<bean id="com.liferay.portal.search.lucene.LuceneSearchEngineImpl" class="com.liferay.portal.kernel.search.BaseSearchEngine">
+		<property name="booleanClauseFactory" >
+			<bean class="com.liferay.portal.search.generic.BooleanClauseFactoryImpl" />
+		</property>
+		<property name="booleanQueryFactory" >
+			<bean class="com.liferay.portal.search.lucene.BooleanQueryFactoryImpl" />
+		</property>
 		<property name="clusteredWrite" value="true" />
 		<property name="clusteredWritePriority">
 			<util:constant static-field="com.liferay.portal.kernel.cluster.Priority.LEVEL5" />
@@ -88,11 +100,16 @@
 		<property name="indexSearcher" ref="com.liferay.portal.search.lucene.LuceneIndexSearcherImpl" />
 		<property name="indexWriter" ref="com.liferay.portal.search.lucene.LuceneIndexWriterImpl" />
 		<property name="luceneBased" value="true" />
-		<property name="name" value="SYSTEM_ENGINE" />
+		<property name="termQueryFactory">
+			<bean class="com.liferay.portal.search.lucene.TermQueryFactoryImpl" />
+		</property>
+		<property name="termRangeQueryFactory">
+			<bean class="com.liferay.portal.search.lucene.TermRangeQueryFactoryImpl" />
+		</property>
 		<property name="vendor" value="Lucene" />
 	</bean>
 	<bean id="com.liferay.portal.search.lucene.LuceneHelperImpl" class="com.liferay.portal.search.lucene.LuceneHelperImpl">
-		<property name="analyzer" ref="com.liferay.portal.search.lucene.PerFieldAnalyzerWrapper" />
+		<property name="analyzer" ref="com.liferay.portal.search.lucene.PerFieldAnalyzer" />
 		<property name="version" ref="org.apache.lucene.util.Version" />
 	</bean>
 	<bean id="com.liferay.portal.search.lucene.LuceneHelperUtil" class="com.liferay.portal.search.lucene.LuceneHelperUtil">
@@ -101,19 +118,19 @@
 
 	<!-- Lucene analyzers -->
 
-	<bean id="com.liferay.portal.search.lucene.PerFieldAnalyzerWrapper" class="com.liferay.portal.search.lucene.PerFieldAnalyzerWrapper">
+	<bean id="com.liferay.portal.search.lucene.PerFieldAnalyzer" class="com.liferay.portal.search.lucene.PerFieldAnalyzer">
 		<constructor-arg>
 			<ref bean="org.apache.lucene.analysis.standard.StandardAnalyzer" />
 		</constructor-arg>
 		<constructor-arg>
-			<util:map>
-				<entry key="assetCategoryNames" value-ref="org.apache.lucene.analysis.KeywordAnalyzer" />
-				<entry key="assetTagNames" value-ref="org.apache.lucene.analysis.KeywordAnalyzer" />
+			<util:map map-class="java.util.LinkedHashMap">
+				<entry key="assetCategoryTitles(_.+)?" value-ref="com.liferay.portal.search.lucene.LikeKeywordAnalyzer" />
+				<entry key="assetTagNames" value-ref="com.liferay.portal.search.lucene.LikeKeywordAnalyzer" />
 				<entry key="entryClassName" value-ref="org.apache.lucene.analysis.KeywordAnalyzer" />
 				<entry key="extension" value-ref="org.apache.lucene.analysis.KeywordAnalyzer" />
 				<entry key="installedVersion" value-ref="org.apache.lucene.analysis.KeywordAnalyzer" />
 				<entry key="layoutUuid" value-ref="org.apache.lucene.analysis.KeywordAnalyzer" />
-				<entry key="license" value-ref="org.apache.lucene.analysis.KeywordAnalyzer" />
+				<entry key="license" value-ref="com.liferay.portal.search.lucene.LikeKeywordAnalyzer" />
 				<!--<entry key="path">
 					<bean id="org.apache.lucene.analysis.miscellaneous.PatternAnalyzer" class="org.apache.lucene.analysis.miscellaneous.PatternAnalyzer">
 						<constructor-arg ref="org.apache.lucene.util.Version" />
@@ -128,12 +145,14 @@
 						</constructor-arg>
 					</bean>
 				</entry>-->
+				<entry key="path" value-ref="org.apache.lucene.analysis.KeywordAnalyzer" />
 				<entry key="status" value-ref="org.apache.lucene.analysis.KeywordAnalyzer" />
 				<entry key="structureId" value-ref="org.apache.lucene.analysis.KeywordAnalyzer" />
-				<entry key="tag" value-ref="org.apache.lucene.analysis.KeywordAnalyzer" />
+				<entry key="tag" value-ref="com.liferay.portal.search.lucene.LikeKeywordAnalyzer" />
 				<entry key="templateId" value-ref="org.apache.lucene.analysis.KeywordAnalyzer" />
+				<entry key="treePath" value-ref="com.liferay.portal.search.lucene.LikeKeywordAnalyzer" />
 				<entry key="type" value-ref="org.apache.lucene.analysis.KeywordAnalyzer" />
-				<entry key="userName" value-ref="org.apache.lucene.analysis.KeywordAnalyzer" />
+				<entry key="userName" value-ref="com.liferay.portal.search.lucene.LikeKeywordAnalyzer" />
 				<entry key=".*_ar" value-ref="org.apache.lucene.analysis.ar.ArabicAnalyzer" />
 				<entry key=".*_pt_BR" value-ref="org.apache.lucene.analysis.br.BrazilianAnalyzer" />
 				<entry key=".*_zh_CN" value-ref="org.apache.lucene.analysis.cjk.CJKAnalyzer" />
@@ -149,6 +168,7 @@
 			</util:map>
 		</constructor-arg>
 	</bean>
+	<bean id="com.liferay.portal.search.lucene.LikeKeywordAnalyzer" class="com.liferay.portal.search.lucene.LikeKeywordAnalyzer" />
 	<bean id="org.apache.lucene.analysis.KeywordAnalyzer" class="org.apache.lucene.analysis.KeywordAnalyzer" />
 	<bean id="org.apache.lucene.analysis.WhitespaceAnalyzer" class="org.apache.lucene.analysis.WhitespaceAnalyzer" />
 	<bean id="org.apache.lucene.analysis.ar.ArabicAnalyzer" class="org.apache.lucene.analysis.ar.ArabicAnalyzer">
@@ -188,19 +208,21 @@
 		<constructor-arg ref="org.apache.lucene.util.Version" />
 	</bean>
 	<bean id="org.apache.lucene.util.Version" class="org.apache.lucene.util.Version" factory-method="valueOf">
-		<constructor-arg value="LUCENE_30" />
+		<constructor-arg value="LUCENE_35" />
 	</bean>
 
 	<!-- Configurator -->
 
 	<bean id="searchEngineConfigurator.core" class="com.liferay.portal.kernel.search.DefaultSearchEngineConfigurator">
+		<property name="defaultSearchEngineId" value="SYSTEM_ENGINE" />
 		<property name="indexSearcher" ref="com.liferay.portal.kernel.search.IndexSearcherProxyBean" />
 		<property name="indexWriter" ref="com.liferay.portal.kernel.search.IndexWriterProxyBean" />
 		<property name="messageBus" ref="com.liferay.portal.kernel.messaging.MessageBus" />
 		<property name="searchEngines">
-			<list>
-				<ref bean="com.liferay.portal.search.lucene.LuceneSearchEngineImpl" />
-			</list>
+			<util:map>
+				<entry key="GENERIC_ENGINE" value-ref="com.liferay.portal.search.generic.GenericSearchEngineImpl" />
+				<entry key="SYSTEM_ENGINE" value-ref="com.liferay.portal.search.lucene.LuceneSearchEngineImpl" />
+			</util:map>
 		</property>
 	</bean>
 </beans>

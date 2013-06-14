@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -16,34 +16,7 @@
 
 <%@ include file="/html/portlet/wiki/init.jsp" %>
 
-<%
-long categoryId = GetterUtil.getLong(ParamUtil.getString(request, "categoryId"));
-
-String categoryName = null;
-String vocabularyName = null;
-
-if (categoryId != 0) {
-	AssetCategory assetCategory = AssetCategoryLocalServiceUtil.getAssetCategory(categoryId);
-
-	assetCategory = assetCategory.toEscapedModel();
-
-	categoryName = assetCategory.getName();
-
-	AssetVocabulary assetVocabulary = AssetVocabularyLocalServiceUtil.getAssetVocabulary(assetCategory.getVocabularyId());
-
-	assetVocabulary = assetVocabulary.toEscapedModel();
-
-	vocabularyName = assetVocabulary.getName();
-}
-%>
-
 <liferay-util:include page="/html/portlet/wiki/top_links.jsp" />
-
-<liferay-ui:header
-	escapeXml="<%= false %>"
-	localizeTitle="<%= false %>"
-	title='<%= LanguageUtil.format(pageContext, "pages-with-x-x", new String[] {vocabularyName, categoryName}) %>'
-/>
 
 <liferay-util:include page="/html/portlet/wiki/page_iterator.jsp">
 	<liferay-util:param name="type" value="categorized_pages" />

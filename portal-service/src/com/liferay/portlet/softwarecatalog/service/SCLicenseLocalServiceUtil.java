@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -15,7 +15,6 @@
 package com.liferay.portlet.softwarecatalog.service;
 
 import com.liferay.portal.kernel.bean.PortalBeanLocatorUtil;
-import com.liferay.portal.kernel.util.MethodCache;
 import com.liferay.portal.kernel.util.ReferenceRegistry;
 
 /**
@@ -66,25 +65,32 @@ public class SCLicenseLocalServiceUtil {
 	* Deletes the s c license with the primary key from the database. Also notifies the appropriate model listeners.
 	*
 	* @param licenseId the primary key of the s c license
+	* @return the s c license that was removed
 	* @throws PortalException if a s c license with the primary key could not be found
 	* @throws SystemException if a system exception occurred
 	*/
-	public static void deleteSCLicense(long licenseId)
+	public static com.liferay.portlet.softwarecatalog.model.SCLicense deleteSCLicense(
+		long licenseId)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException {
-		getService().deleteSCLicense(licenseId);
+		return getService().deleteSCLicense(licenseId);
 	}
 
 	/**
 	* Deletes the s c license from the database. Also notifies the appropriate model listeners.
 	*
 	* @param scLicense the s c license
+	* @return the s c license that was removed
 	* @throws SystemException if a system exception occurred
 	*/
-	public static void deleteSCLicense(
+	public static com.liferay.portlet.softwarecatalog.model.SCLicense deleteSCLicense(
 		com.liferay.portlet.softwarecatalog.model.SCLicense scLicense)
 		throws com.liferay.portal.kernel.exception.SystemException {
-		getService().deleteSCLicense(scLicense);
+		return getService().deleteSCLicense(scLicense);
+	}
+
+	public static com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery() {
+		return getService().dynamicQuery();
 	}
 
 	/**
@@ -156,6 +162,12 @@ public class SCLicenseLocalServiceUtil {
 		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery)
 		throws com.liferay.portal.kernel.exception.SystemException {
 		return getService().dynamicQueryCount(dynamicQuery);
+	}
+
+	public static com.liferay.portlet.softwarecatalog.model.SCLicense fetchSCLicense(
+		long licenseId)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getService().fetchSCLicense(licenseId);
 	}
 
 	/**
@@ -338,20 +350,15 @@ public class SCLicenseLocalServiceUtil {
 
 			ReferenceRegistry.registerReference(SCLicenseLocalServiceUtil.class,
 				"_service");
-			MethodCache.remove(SCLicenseLocalService.class);
 		}
 
 		return _service;
 	}
 
+	/**
+	 * @deprecated
+	 */
 	public void setService(SCLicenseLocalService service) {
-		MethodCache.remove(SCLicenseLocalService.class);
-
-		_service = service;
-
-		ReferenceRegistry.registerReference(SCLicenseLocalServiceUtil.class,
-			"_service");
-		MethodCache.remove(SCLicenseLocalService.class);
 	}
 
 	private static SCLicenseLocalService _service;

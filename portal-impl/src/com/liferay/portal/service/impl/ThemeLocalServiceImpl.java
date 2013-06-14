@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -15,12 +15,14 @@
 package com.liferay.portal.service.impl;
 
 import com.liferay.portal.kernel.exception.SystemException;
+import com.liferay.portal.kernel.image.SpriteProcessor;
 import com.liferay.portal.kernel.image.SpriteProcessorUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.plugin.PluginPackage;
 import com.liferay.portal.kernel.plugin.Version;
 import com.liferay.portal.kernel.servlet.ServletContextUtil;
+import com.liferay.portal.kernel.util.ContextPathUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.ReleaseInfo;
@@ -47,7 +49,7 @@ import com.liferay.portal.util.PortalUtil;
 import com.liferay.portal.util.PropsValues;
 import com.liferay.util.ContextReplace;
 
-import java.io.File;
+import java.net.URL;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -63,8 +65,33 @@ import javax.servlet.ServletContext;
 /**
  * @author Brian Wing Shun Chan
  * @author Jorge Ferrer
+ * @author Raymond Augé
  */
 public class ThemeLocalServiceImpl extends ThemeLocalServiceBaseImpl {
+
+	public ColorScheme fetchColorScheme(
+		long companyId, String themeId, String colorSchemeId) {
+
+		colorSchemeId = GetterUtil.getString(colorSchemeId);
+
+		Theme theme = fetchTheme(companyId, themeId);
+
+		if (theme == null) {
+			return null;
+		}
+
+		Map<String, ColorScheme> colorSchemesMap = theme.getColorSchemesMap();
+
+		return colorSchemesMap.get(colorSchemeId);
+	}
+
+	public Theme fetchTheme(long companyId, String themeId) {
+		themeId = GetterUtil.getString(themeId);
+
+		Map<String, Theme> themes = _getThemes(companyId);
+
+		return themes.get(themeId);
+	}
 
 	public ColorScheme getColorScheme(
 			long companyId, String themeId, String colorSchemeId,
@@ -115,7 +142,9 @@ public class ThemeLocalServiceImpl extends ThemeLocalServiceBaseImpl {
 
 		themeId = GetterUtil.getString(themeId);
 
-		Theme theme = _getThemes(companyId).get(themeId);
+		Map<String, Theme> themes = _getThemes(companyId);
+
+		Theme theme = themes.get(themeId);
 
 		if (theme == null) {
 			if (_log.isWarnEnabled()) {
@@ -143,16 +172,13 @@ public class ThemeLocalServiceImpl extends ThemeLocalServiceBaseImpl {
 				return null;
 			}
 
-			_log.error(
-				"No theme found for default theme id " + themeId +
-					". Returning a random theme.");
+			if (!themeId.contains(PortletConstants.WAR_SEPARATOR)) {
+				_log.error(
+					"No theme found for default theme id " + themeId +
+						". Returning a random theme.");
+			}
 
-			Iterator<Map.Entry<String, Theme>> itr =
-				_themes.entrySet().iterator();
-
-			while (itr.hasNext()) {
-				Map.Entry<String, Theme> entry = itr.next();
-
+			for (Map.Entry<String, Theme> entry : _themes.entrySet()) {
 				theme = entry.getValue();
 			}
 		}
@@ -161,9 +187,11 @@ public class ThemeLocalServiceImpl extends ThemeLocalServiceBaseImpl {
 	}
 
 	public List<Theme> getThemes(long companyId) {
-		List<Theme> themes = ListUtil.fromMapValues(_getThemes(companyId));
+		Map<String, Theme> themes = _getThemes(companyId);
 
-		return ListUtil.sort(themes);
+		List<Theme> themesList = ListUtil.fromMapValues(themes);
+
+		return ListUtil.sort(themesList);
 	}
 
 	public List<Theme> getThemes(
@@ -172,16 +200,15 @@ public class ThemeLocalServiceImpl extends ThemeLocalServiceBaseImpl {
 
 		List<Theme> themes = getThemes(companyId);
 
-		themes = (List<Theme>)PluginUtil.restrictPlugins(
-			themes, companyId, userId);
+		themes = PluginUtil.restrictPlugins(themes, companyId, userId);
 
 		Iterator<Theme> itr = themes.iterator();
 
 		while (itr.hasNext()) {
 			Theme theme = itr.next();
 
-			if ((theme.getThemeId().equals("controlpanel")) ||
-				(!theme.isGroupAvailable(groupId)) ||
+			if (theme.getThemeId().equals("controlpanel") ||
+				!theme.isGroupAvailable(groupId) ||
 				(theme.isWapTheme() != wapTheme)) {
 
 				itr.remove();
@@ -225,10 +252,10 @@ public class ThemeLocalServiceImpl extends ThemeLocalServiceBaseImpl {
 		List<String> themeIdsList = new ArrayList<String>();
 
 		try {
-			for (int i = 0; i < xmls.length; i++) {
+			for (String xml : xmls) {
 				Set<String> themeIds = _readThemes(
 					servletContextName, servletContext, themesPath,
-					loadFromServletContext, xmls[i], pluginPackage);
+					loadFromServletContext, xml, pluginPackage);
 
 				for (String themeId : themeIds) {
 					if (!themeIdsList.contains(themeId)) {
@@ -539,8 +566,6 @@ public class ThemeLocalServiceImpl extends ThemeLocalServiceBaseImpl {
 
 			if (theme == null) {
 				theme = new ThemeImpl(themeId);
-
-				_themes.put(themeId, theme);
 			}
 
 			theme.setTimestamp(timestamp);
@@ -635,8 +660,10 @@ public class ThemeLocalServiceImpl extends ThemeLocalServiceBaseImpl {
 						settingElement.attributeValue("options"));
 					String type = settingElement.attributeValue("type");
 					String value = settingElement.attributeValue("value");
+					String script = settingElement.getTextTrim();
 
-					theme.addSetting(key, value, configurable, type, options);
+					theme.addSetting(
+						key, value, configurable, type, options, script);
 				}
 			}
 
@@ -678,13 +705,17 @@ public class ThemeLocalServiceImpl extends ThemeLocalServiceBaseImpl {
 
 				if (customElement != null) {
 					layoutTemplateLocalService.readLayoutTemplate(
-						servletContextName, servletContext, null,
-						customElement, false, themeId, pluginPackage);
+						servletContextName, servletContext, null, customElement,
+						false, themeId, pluginPackage);
 				}
 			}
 
 			if (!theme.isWapTheme()) {
 				_setSpriteImages(servletContext, theme, imagesPath);
+			}
+
+			if (!_themes.containsKey(themeId)) {
+				_themes.put(themeId, theme);
 			}
 		}
 
@@ -695,6 +726,10 @@ public class ThemeLocalServiceImpl extends ThemeLocalServiceBaseImpl {
 			ServletContext servletContext, Theme theme, String resourcePath)
 		throws Exception {
 
+		if (!resourcePath.startsWith(StringPool.SLASH)) {
+			resourcePath = StringPool.SLASH.concat(resourcePath);
+		}
+
 		Set<String> resourcePaths = servletContext.getResourcePaths(
 			resourcePath);
 
@@ -702,18 +737,17 @@ public class ThemeLocalServiceImpl extends ThemeLocalServiceBaseImpl {
 			return;
 		}
 
-		List<File> images = new ArrayList<File>(resourcePaths.size());
+		List<URL> imageURLs = new ArrayList<URL>(resourcePaths.size());
 
 		for (String curResourcePath : resourcePaths) {
 			if (curResourcePath.endsWith(StringPool.SLASH)) {
 				_setSpriteImages(servletContext, theme, curResourcePath);
 			}
 			else if (curResourcePath.endsWith(".png")) {
-				String realPath = ServletContextUtil.getRealPath(
-					servletContext, curResourcePath);
+				URL imageURL = servletContext.getResource(curResourcePath);
 
-				if (realPath != null) {
-					images.add(new File(realPath));
+				if (imageURL != null) {
+					imageURLs.add(imageURL);
 				}
 				else {
 					if (ServerDetector.isTomcat()) {
@@ -729,24 +763,25 @@ public class ThemeLocalServiceImpl extends ThemeLocalServiceBaseImpl {
 			}
 		}
 
-		String spriteFileName = PropsValues.SPRITE_FILE_NAME;
-		String spritePropertiesFileName =
-			PropsValues.SPRITE_PROPERTIES_FILE_NAME;
-		String spritePropertiesRootPath = ServletContextUtil.getRealPath(
-			servletContext, theme.getImagesPath());
+		String spriteFileName = resourcePath.concat(
+			PropsValues.SPRITE_FILE_NAME);
+		String spritePropertiesFileName = resourcePath.concat(
+			PropsValues.SPRITE_PROPERTIES_FILE_NAME);
+		URL spritePropertiesRootURL = servletContext.getResource(
+			StringPool.SLASH);
 
 		Properties spriteProperties = SpriteProcessorUtil.generate(
-			images, spriteFileName, spritePropertiesFileName,
-			spritePropertiesRootPath, 16, 16, 10240);
+			servletContext, imageURLs, spriteFileName, spritePropertiesFileName,
+			spritePropertiesRootURL, 16, 16, 10240);
 
 		if (spriteProperties == null) {
 			return;
 		}
 
-		spriteFileName =
-			resourcePath.substring(
-				theme.getImagesPath().length(), resourcePath.length()) +
-			spriteFileName;
+		String contextPath = ContextPathUtil.getContextPath(servletContext);
+
+		spriteFileName = contextPath.concat(SpriteProcessor.PATH).concat(
+			spriteFileName);
 
 		theme.setSpriteImages(spriteFileName, spriteProperties);
 	}

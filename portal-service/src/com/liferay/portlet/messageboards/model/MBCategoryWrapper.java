@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,6 +14,12 @@
 
 package com.liferay.portlet.messageboards.model;
 
+import com.liferay.portal.model.ModelWrapper;
+
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * <p>
  * This class is a wrapper for {@link MBCategory}.
@@ -23,7 +29,7 @@ package com.liferay.portlet.messageboards.model;
  * @see       MBCategory
  * @generated
  */
-public class MBCategoryWrapper implements MBCategory {
+public class MBCategoryWrapper implements MBCategory, ModelWrapper<MBCategory> {
 	public MBCategoryWrapper(MBCategory mbCategory) {
 		_mbCategory = mbCategory;
 	}
@@ -34,6 +40,120 @@ public class MBCategoryWrapper implements MBCategory {
 
 	public String getModelClassName() {
 		return MBCategory.class.getName();
+	}
+
+	public Map<String, Object> getModelAttributes() {
+		Map<String, Object> attributes = new HashMap<String, Object>();
+
+		attributes.put("uuid", getUuid());
+		attributes.put("categoryId", getCategoryId());
+		attributes.put("groupId", getGroupId());
+		attributes.put("companyId", getCompanyId());
+		attributes.put("userId", getUserId());
+		attributes.put("userName", getUserName());
+		attributes.put("createDate", getCreateDate());
+		attributes.put("modifiedDate", getModifiedDate());
+		attributes.put("parentCategoryId", getParentCategoryId());
+		attributes.put("name", getName());
+		attributes.put("description", getDescription());
+		attributes.put("displayStyle", getDisplayStyle());
+		attributes.put("threadCount", getThreadCount());
+		attributes.put("messageCount", getMessageCount());
+		attributes.put("lastPostDate", getLastPostDate());
+
+		return attributes;
+	}
+
+	public void setModelAttributes(Map<String, Object> attributes) {
+		String uuid = (String)attributes.get("uuid");
+
+		if (uuid != null) {
+			setUuid(uuid);
+		}
+
+		Long categoryId = (Long)attributes.get("categoryId");
+
+		if (categoryId != null) {
+			setCategoryId(categoryId);
+		}
+
+		Long groupId = (Long)attributes.get("groupId");
+
+		if (groupId != null) {
+			setGroupId(groupId);
+		}
+
+		Long companyId = (Long)attributes.get("companyId");
+
+		if (companyId != null) {
+			setCompanyId(companyId);
+		}
+
+		Long userId = (Long)attributes.get("userId");
+
+		if (userId != null) {
+			setUserId(userId);
+		}
+
+		String userName = (String)attributes.get("userName");
+
+		if (userName != null) {
+			setUserName(userName);
+		}
+
+		Date createDate = (Date)attributes.get("createDate");
+
+		if (createDate != null) {
+			setCreateDate(createDate);
+		}
+
+		Date modifiedDate = (Date)attributes.get("modifiedDate");
+
+		if (modifiedDate != null) {
+			setModifiedDate(modifiedDate);
+		}
+
+		Long parentCategoryId = (Long)attributes.get("parentCategoryId");
+
+		if (parentCategoryId != null) {
+			setParentCategoryId(parentCategoryId);
+		}
+
+		String name = (String)attributes.get("name");
+
+		if (name != null) {
+			setName(name);
+		}
+
+		String description = (String)attributes.get("description");
+
+		if (description != null) {
+			setDescription(description);
+		}
+
+		String displayStyle = (String)attributes.get("displayStyle");
+
+		if (displayStyle != null) {
+			setDisplayStyle(displayStyle);
+		}
+
+		Integer threadCount = (Integer)attributes.get("threadCount");
+
+		if (threadCount != null) {
+			setThreadCount(threadCount);
+		}
+
+		Integer messageCount = (Integer)attributes.get("messageCount");
+
+		if (messageCount != null) {
+			setMessageCount(messageCount);
+		}
+
+		Date lastPostDate = (Date)attributes.get("lastPostDate");
+
+		if (lastPostDate != null) {
+			setLastPostDate(lastPostDate);
+		}
 	}
 
 	/**
@@ -364,10 +484,6 @@ public class MBCategoryWrapper implements MBCategory {
 		return _mbCategory.isEscapedModel();
 	}
 
-	public void setEscapedModel(boolean escapedModel) {
-		_mbCategory.setEscapedModel(escapedModel);
-	}
-
 	public java.io.Serializable getPrimaryKeyObj() {
 		return _mbCategory.getPrimaryKeyObj();
 	}
@@ -438,7 +554,14 @@ public class MBCategoryWrapper implements MBCategory {
 		return _mbCategory.isRoot();
 	}
 
+	/**
+	 * @deprecated Renamed to {@link #getWrappedModel}
+	 */
 	public MBCategory getWrappedMBCategory() {
+		return _mbCategory;
+	}
+
+	public MBCategory getWrappedModel() {
 		return _mbCategory;
 	}
 

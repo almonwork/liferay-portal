@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -99,8 +99,7 @@ public class BookmarksFolderServiceImpl extends BookmarksFolderServiceBaseImpl {
 		throws SystemException {
 
 		List<BookmarksFolder> folders =
-			bookmarksFolderPersistence.filterFindByG_P(
-				groupId, folderId);
+			bookmarksFolderPersistence.filterFindByG_P(groupId, folderId);
 
 		for (BookmarksFolder folder : folders) {
 			folderIds.add(folder.getFolderId());
@@ -111,9 +110,8 @@ public class BookmarksFolderServiceImpl extends BookmarksFolderServiceBaseImpl {
 	}
 
 	public BookmarksFolder updateFolder(
-			long folderId, long parentFolderId, String name,
-			String description, boolean mergeWithParentFolder,
-			ServiceContext serviceContext)
+			long folderId, long parentFolderId, String name, String description,
+			boolean mergeWithParentFolder, ServiceContext serviceContext)
 		throws PortalException, SystemException {
 
 		BookmarksFolder folder = bookmarksFolderLocalService.getFolder(

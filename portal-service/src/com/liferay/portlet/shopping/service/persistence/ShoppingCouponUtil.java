@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -92,14 +92,6 @@ public class ShoppingCouponUtil {
 		return getPersistence()
 				   .findWithDynamicQuery(dynamicQuery, start, end,
 			orderByComparator);
-	}
-
-	/**
-	 * @see com.liferay.portal.service.persistence.BasePersistence#remove(com.liferay.portal.model.BaseModel)
-	 */
-	public static ShoppingCoupon remove(ShoppingCoupon shoppingCoupon)
-		throws SystemException {
-		return getPersistence().remove(shoppingCoupon);
 	}
 
 	/**
@@ -425,12 +417,14 @@ public class ShoppingCouponUtil {
 	* Removes the shopping coupon where code = &#63; from the database.
 	*
 	* @param code the code
+	* @return the shopping coupon that was removed
 	* @throws SystemException if a system exception occurred
 	*/
-	public static void removeByCode(java.lang.String code)
+	public static com.liferay.portlet.shopping.model.ShoppingCoupon removeByCode(
+		java.lang.String code)
 		throws com.liferay.portal.kernel.exception.SystemException,
 			com.liferay.portlet.shopping.NoSuchCouponException {
-		getPersistence().removeByCode(code);
+		return getPersistence().removeByCode(code);
 	}
 
 	/**
@@ -489,11 +483,10 @@ public class ShoppingCouponUtil {
 		return _persistence;
 	}
 
+	/**
+	 * @deprecated
+	 */
 	public void setPersistence(ShoppingCouponPersistence persistence) {
-		_persistence = persistence;
-
-		ReferenceRegistry.registerReference(ShoppingCouponUtil.class,
-			"_persistence");
 	}
 
 	private static ShoppingCouponPersistence _persistence;

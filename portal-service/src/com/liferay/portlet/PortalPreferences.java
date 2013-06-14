@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -23,15 +23,14 @@ public interface PortalPreferences extends Serializable {
 
 	public String getValue(String namespace, String key);
 
-	public String getValue(
-		String namespace, String key, String defaultValue);
-
-	public boolean isSignedIn();
+	public String getValue(String namespace, String key, String defaultValue);
 
 	public String[] getValues(String namespace, String key);
 
 	public String[] getValues(
 		String namespace, String key, String[] defaultValue);
+
+	public boolean isSignedIn();
 
 	public void resetValues(String namespace);
 
@@ -40,5 +39,7 @@ public interface PortalPreferences extends Serializable {
 	public void setValue(String namespace, String key, String value);
 
 	public void setValues(String namespace, String key, String[] values);
+
+	public int size();
 
 }

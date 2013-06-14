@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -15,7 +15,6 @@
 package com.liferay.portlet.ratings.service;
 
 import com.liferay.portal.kernel.bean.PortalBeanLocatorUtil;
-import com.liferay.portal.kernel.util.MethodCache;
 import com.liferay.portal.kernel.util.ReferenceRegistry;
 
 /**
@@ -66,25 +65,32 @@ public class RatingsStatsLocalServiceUtil {
 	* Deletes the ratings stats with the primary key from the database. Also notifies the appropriate model listeners.
 	*
 	* @param statsId the primary key of the ratings stats
+	* @return the ratings stats that was removed
 	* @throws PortalException if a ratings stats with the primary key could not be found
 	* @throws SystemException if a system exception occurred
 	*/
-	public static void deleteRatingsStats(long statsId)
+	public static com.liferay.portlet.ratings.model.RatingsStats deleteRatingsStats(
+		long statsId)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException {
-		getService().deleteRatingsStats(statsId);
+		return getService().deleteRatingsStats(statsId);
 	}
 
 	/**
 	* Deletes the ratings stats from the database. Also notifies the appropriate model listeners.
 	*
 	* @param ratingsStats the ratings stats
+	* @return the ratings stats that was removed
 	* @throws SystemException if a system exception occurred
 	*/
-	public static void deleteRatingsStats(
+	public static com.liferay.portlet.ratings.model.RatingsStats deleteRatingsStats(
 		com.liferay.portlet.ratings.model.RatingsStats ratingsStats)
 		throws com.liferay.portal.kernel.exception.SystemException {
-		getService().deleteRatingsStats(ratingsStats);
+		return getService().deleteRatingsStats(ratingsStats);
+	}
+
+	public static com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery() {
+		return getService().dynamicQuery();
 	}
 
 	/**
@@ -156,6 +162,12 @@ public class RatingsStatsLocalServiceUtil {
 		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery)
 		throws com.liferay.portal.kernel.exception.SystemException {
 		return getService().dynamicQueryCount(dynamicQuery);
+	}
+
+	public static com.liferay.portlet.ratings.model.RatingsStats fetchRatingsStats(
+		long statsId)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getService().fetchRatingsStats(statsId);
 	}
 
 	/**
@@ -291,20 +303,15 @@ public class RatingsStatsLocalServiceUtil {
 
 			ReferenceRegistry.registerReference(RatingsStatsLocalServiceUtil.class,
 				"_service");
-			MethodCache.remove(RatingsStatsLocalService.class);
 		}
 
 		return _service;
 	}
 
+	/**
+	 * @deprecated
+	 */
 	public void setService(RatingsStatsLocalService service) {
-		MethodCache.remove(RatingsStatsLocalService.class);
-
-		_service = service;
-
-		ReferenceRegistry.registerReference(RatingsStatsLocalServiceUtil.class,
-			"_service");
-		MethodCache.remove(RatingsStatsLocalService.class);
 	}
 
 	private static RatingsStatsLocalService _service;

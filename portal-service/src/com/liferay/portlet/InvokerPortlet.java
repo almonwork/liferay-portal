@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -25,22 +25,12 @@ import javax.portlet.ResourceServingPortlet;
  * @author Michael Young
  */
 public interface InvokerPortlet
-	extends Cloneable, EventPortlet, Portlet, ResourceServingPortlet {
+	extends EventPortlet, Portlet, ResourceServingPortlet {
 
 	public static final String INIT_INVOKER_PORTLET_NAME =
 		"com.liferay.portal.invokerPortletName";
 
-	public InvokerPortlet create(
-			com.liferay.portal.model.Portlet portletModel, Portlet portlet,
-			PortletContext portletContext)
-		throws PortletException;
-
-	public InvokerPortlet create(
-			com.liferay.portal.model.Portlet portletModel, Portlet portlet,
-			PortletConfig portletConfig, PortletContext portletContext,
-			boolean checkAuthToken, boolean facesPortlet, boolean strutsPortlet,
-			boolean strutsBridgePortlet)
-		throws PortletException;
+	public Integer getExpCache();
 
 	public Portlet getPortlet();
 
@@ -52,29 +42,13 @@ public interface InvokerPortlet
 
 	public Portlet getPortletInstance();
 
-	public Integer getExpCache();
-
 	public boolean isCheckAuthToken();
-
-	public boolean isDestroyable();
 
 	public boolean isFacesPortlet();
 
 	public boolean isStrutsBridgePortlet();
 
 	public boolean isStrutsPortlet();
-
-	public void prepare(
-			com.liferay.portal.model.Portlet portletModel, Portlet portlet,
-			PortletContext portletContext)
-		throws PortletException;
-
-	public void prepare(
-			com.liferay.portal.model.Portlet portletModel, Portlet portlet,
-			PortletConfig portletConfig, PortletContext portletContext,
-			boolean checkAuthToken, boolean facesPortlet, boolean strutsPortlet,
-			boolean strutsBridgePortlet)
-		throws PortletException;
 
 	public void setPortletFilters() throws PortletException;
 

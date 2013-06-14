@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -28,11 +28,14 @@ import javax.portlet.filter.RenderRequestWrapper;
 
 /**
  * @author Brian Wing Shun Chan
+ * @see    DynamicActionRequest
+ * @see    DynamicEventRequest
+ * @see    DynamicResourceRequest
  */
 public class DynamicRenderRequest extends RenderRequestWrapper {
 
 	public DynamicRenderRequest(RenderRequest renderRequest) {
-		this(renderRequest, new HashMap<String, String[]>(), true);
+		this(renderRequest, null, true);
 	}
 
 	public DynamicRenderRequest(
@@ -42,7 +45,7 @@ public class DynamicRenderRequest extends RenderRequestWrapper {
 	}
 
 	public DynamicRenderRequest(RenderRequest renderRequest, boolean inherit) {
-		this(renderRequest, new HashMap<String, String[]>(), inherit);
+		this(renderRequest, null, inherit);
 	}
 
 	public DynamicRenderRequest(
@@ -55,9 +58,7 @@ public class DynamicRenderRequest extends RenderRequestWrapper {
 		_inherit = inherit;
 
 		if (params != null) {
-			for (Map.Entry<String, String[]> entry : params.entrySet()) {
-				_params.put(entry.getKey(), entry.getValue());
-			}
+			_params.putAll(params);
 		}
 
 		if (_inherit && (renderRequest instanceof DynamicRenderRequest)) {
@@ -68,25 +69,26 @@ public class DynamicRenderRequest extends RenderRequestWrapper {
 
 			params = dynamicRenderRequest.getDynamicParameterMap();
 
-			if (params != null) {
-				for (Map.Entry<String, String[]> entry : params.entrySet()) {
-					String name = entry.getKey();
-					String[] oldValues = entry.getValue();
+			for (Map.Entry<String, String[]> entry : params.entrySet()) {
+				String name = entry.getKey();
+				String[] oldValues = entry.getValue();
 
-					String[] curValues = _params.get(name);
+				String[] curValues = _params.get(name);
 
-					if (curValues == null) {
-						_params.put(name, oldValues);
-					}
-					else {
-						String[] newValues = ArrayUtil.append(
-							oldValues, curValues);
+				if (curValues == null) {
+					_params.put(name, oldValues);
+				}
+				else {
+					String[] newValues = ArrayUtil.append(oldValues, curValues);
 
-						_params.put(name, newValues);
-					}
+					_params.put(name, newValues);
 				}
 			}
 		}
+	}
+
+	public Map<String, String[]> getDynamicParameterMap() {
+		return _params;
 	}
 
 	@Override
@@ -109,13 +111,11 @@ public class DynamicRenderRequest extends RenderRequestWrapper {
 	public Map<String, String[]> getParameterMap() {
 		Map<String, String[]> map = new HashMap<String, String[]>();
 
-		Enumeration<String> enu = getParameterNames();
-
-		while (enu.hasMoreElements()) {
-			String s = enu.nextElement();
-
-			map.put(s, getParameterValues(s));
+		if (_inherit) {
+			map.putAll(super.getParameterMap());
 		}
+
+		map.putAll(_params);
 
 		return map;
 	}
@@ -156,11 +156,7 @@ public class DynamicRenderRequest extends RenderRequestWrapper {
 		_params.put(name, values);
 	}
 
-	public Map<String, String[]> getDynamicParameterMap() {
-		return _params;
-	}
-
-	private Map<String, String[]> _params;
 	private boolean _inherit;
+	private Map<String, String[]> _params;
 
 }

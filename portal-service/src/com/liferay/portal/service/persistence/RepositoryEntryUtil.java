@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -91,14 +91,6 @@ public class RepositoryEntryUtil {
 		return getPersistence()
 				   .findWithDynamicQuery(dynamicQuery, start, end,
 			orderByComparator);
-	}
-
-	/**
-	 * @see com.liferay.portal.service.persistence.BasePersistence#remove(com.liferay.portal.model.BaseModel)
-	 */
-	public static RepositoryEntry remove(RepositoryEntry repositoryEntry)
-		throws SystemException {
-		return getPersistence().remove(repositoryEntry);
 	}
 
 	/**
@@ -595,12 +587,14 @@ public class RepositoryEntryUtil {
 	*
 	* @param uuid the uuid
 	* @param groupId the group ID
+	* @return the repository entry that was removed
 	* @throws SystemException if a system exception occurred
 	*/
-	public static void removeByUUID_G(java.lang.String uuid, long groupId)
+	public static com.liferay.portal.model.RepositoryEntry removeByUUID_G(
+		java.lang.String uuid, long groupId)
 		throws com.liferay.portal.NoSuchRepositoryEntryException,
 			com.liferay.portal.kernel.exception.SystemException {
-		getPersistence().removeByUUID_G(uuid, groupId);
+		return getPersistence().removeByUUID_G(uuid, groupId);
 	}
 
 	/**
@@ -619,12 +613,14 @@ public class RepositoryEntryUtil {
 	*
 	* @param repositoryId the repository ID
 	* @param mappedId the mapped ID
+	* @return the repository entry that was removed
 	* @throws SystemException if a system exception occurred
 	*/
-	public static void removeByR_M(long repositoryId, java.lang.String mappedId)
+	public static com.liferay.portal.model.RepositoryEntry removeByR_M(
+		long repositoryId, java.lang.String mappedId)
 		throws com.liferay.portal.NoSuchRepositoryEntryException,
 			com.liferay.portal.kernel.exception.SystemException {
-		getPersistence().removeByR_M(repositoryId, mappedId);
+		return getPersistence().removeByR_M(repositoryId, mappedId);
 	}
 
 	/**
@@ -709,11 +705,10 @@ public class RepositoryEntryUtil {
 		return _persistence;
 	}
 
+	/**
+	 * @deprecated
+	 */
 	public void setPersistence(RepositoryEntryPersistence persistence) {
-		_persistence = persistence;
-
-		ReferenceRegistry.registerReference(RepositoryEntryUtil.class,
-			"_persistence");
 	}
 
 	private static RepositoryEntryPersistence _persistence;

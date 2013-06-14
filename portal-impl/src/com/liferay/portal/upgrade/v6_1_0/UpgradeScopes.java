@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -46,10 +46,10 @@ public class UpgradeScopes extends BaseUpgradePortletPreferences {
 				companyId, ownerId, ownerType, plid, portletId, xml);
 
 		boolean hasScopeType = GetterUtil.getBoolean(
-			portletPreferences.getValue("lfr-scope-type", "false"));
+			portletPreferences.getValue("lfrScopeType", "false"));
 
 		if (!hasScopeType) {
-			portletPreferences.setValue("lfr-scope-type", "layout");
+			portletPreferences.setValue("lfrScopeType", "layout");
 		}
 
 		return PortletPreferencesFactoryUtil.toXML(portletPreferences);

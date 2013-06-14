@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -19,8 +19,8 @@ package com.liferay.portal.kernel.search;
  */
 public class DocumentComparatorOrderBy {
 
-	public DocumentComparatorOrderBy(String name, boolean asc,
-									 boolean caseSensitive) {
+	public DocumentComparatorOrderBy(
+		String name, boolean asc, boolean caseSensitive) {
 
 		_name = name;
 		_asc = asc;
@@ -39,8 +39,8 @@ public class DocumentComparatorOrderBy {
 		return _caseSensitive;
 	}
 
-	private String _name;
 	private boolean _asc;
 	private boolean _caseSensitive;
+	private String _name;
 
 }

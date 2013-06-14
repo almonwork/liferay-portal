@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,6 +14,12 @@
 
 package com.liferay.portlet.documentlibrary.model;
 
+import com.liferay.portal.model.ModelWrapper;
+
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * <p>
  * This class is a wrapper for {@link DLFileRank}.
@@ -23,7 +29,7 @@ package com.liferay.portlet.documentlibrary.model;
  * @see       DLFileRank
  * @generated
  */
-public class DLFileRankWrapper implements DLFileRank {
+public class DLFileRankWrapper implements DLFileRank, ModelWrapper<DLFileRank> {
 	public DLFileRankWrapper(DLFileRank dlFileRank) {
 		_dlFileRank = dlFileRank;
 	}
@@ -34,6 +40,64 @@ public class DLFileRankWrapper implements DLFileRank {
 
 	public String getModelClassName() {
 		return DLFileRank.class.getName();
+	}
+
+	public Map<String, Object> getModelAttributes() {
+		Map<String, Object> attributes = new HashMap<String, Object>();
+
+		attributes.put("fileRankId", getFileRankId());
+		attributes.put("groupId", getGroupId());
+		attributes.put("companyId", getCompanyId());
+		attributes.put("userId", getUserId());
+		attributes.put("createDate", getCreateDate());
+		attributes.put("fileEntryId", getFileEntryId());
+		attributes.put("active", getActive());
+
+		return attributes;
+	}
+
+	public void setModelAttributes(Map<String, Object> attributes) {
+		Long fileRankId = (Long)attributes.get("fileRankId");
+
+		if (fileRankId != null) {
+			setFileRankId(fileRankId);
+		}
+
+		Long groupId = (Long)attributes.get("groupId");
+
+		if (groupId != null) {
+			setGroupId(groupId);
+		}
+
+		Long companyId = (Long)attributes.get("companyId");
+
+		if (companyId != null) {
+			setCompanyId(companyId);
+		}
+
+		Long userId = (Long)attributes.get("userId");
+
+		if (userId != null) {
+			setUserId(userId);
+		}
+
+		Date createDate = (Date)attributes.get("createDate");
+
+		if (createDate != null) {
+			setCreateDate(createDate);
+		}
+
+		Long fileEntryId = (Long)attributes.get("fileEntryId");
+
+		if (fileEntryId != null) {
+			setFileEntryId(fileEntryId);
+		}
+
+		Boolean active = (Boolean)attributes.get("active");
+
+		if (active != null) {
+			setActive(active);
+		}
 	}
 
 	/**
@@ -182,6 +246,33 @@ public class DLFileRankWrapper implements DLFileRank {
 		_dlFileRank.setFileEntryId(fileEntryId);
 	}
 
+	/**
+	* Returns the active of this document library file rank.
+	*
+	* @return the active of this document library file rank
+	*/
+	public boolean getActive() {
+		return _dlFileRank.getActive();
+	}
+
+	/**
+	* Returns <code>true</code> if this document library file rank is active.
+	*
+	* @return <code>true</code> if this document library file rank is active; <code>false</code> otherwise
+	*/
+	public boolean isActive() {
+		return _dlFileRank.isActive();
+	}
+
+	/**
+	* Sets whether this document library file rank is active.
+	*
+	* @param active the active of this document library file rank
+	*/
+	public void setActive(boolean active) {
+		_dlFileRank.setActive(active);
+	}
+
 	public boolean isNew() {
 		return _dlFileRank.isNew();
 	}
@@ -200,10 +291,6 @@ public class DLFileRankWrapper implements DLFileRank {
 
 	public boolean isEscapedModel() {
 		return _dlFileRank.isEscapedModel();
-	}
-
-	public void setEscapedModel(boolean escapedModel) {
-		_dlFileRank.setEscapedModel(escapedModel);
 	}
 
 	public java.io.Serializable getPrimaryKeyObj() {
@@ -260,7 +347,14 @@ public class DLFileRankWrapper implements DLFileRank {
 		_dlFileRank.persist();
 	}
 
+	/**
+	 * @deprecated Renamed to {@link #getWrappedModel}
+	 */
 	public DLFileRank getWrappedDLFileRank() {
+		return _dlFileRank;
+	}
+
+	public DLFileRank getWrappedModel() {
 		return _dlFileRank;
 	}
 

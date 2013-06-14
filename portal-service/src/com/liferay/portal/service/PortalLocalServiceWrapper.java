@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -23,7 +23,8 @@ package com.liferay.portal.service;
  * @see       PortalLocalService
  * @generated
  */
-public class PortalLocalServiceWrapper implements PortalLocalService {
+public class PortalLocalServiceWrapper implements PortalLocalService,
+	ServiceWrapper<PortalLocalService> {
 	public PortalLocalServiceWrapper(PortalLocalService portalLocalService) {
 		_portalLocalService = portalLocalService;
 	}
@@ -46,12 +47,26 @@ public class PortalLocalServiceWrapper implements PortalLocalService {
 		_portalLocalService.setBeanIdentifier(beanIdentifier);
 	}
 
+	/**
+	 * @deprecated Renamed to {@link #getWrappedService}
+	 */
 	public PortalLocalService getWrappedPortalLocalService() {
 		return _portalLocalService;
 	}
 
+	/**
+	 * @deprecated Renamed to {@link #setWrappedService}
+	 */
 	public void setWrappedPortalLocalService(
 		PortalLocalService portalLocalService) {
+		_portalLocalService = portalLocalService;
+	}
+
+	public PortalLocalService getWrappedService() {
+		return _portalLocalService;
+	}
+
+	public void setWrappedService(PortalLocalService portalLocalService) {
 		_portalLocalService = portalLocalService;
 	}
 

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -23,12 +23,10 @@ import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
-import com.liferay.portal.model.User;
 import com.liferay.portal.security.auth.CompanyThreadLocal;
 import com.liferay.portal.service.ServiceContext;
 import com.liferay.portal.util.PortletKeys;
 import com.liferay.portlet.journal.model.JournalArticle;
-import com.liferay.portlet.journal.service.JournalArticleLocalServiceUtil;
 import com.liferay.portlet.journal.service.JournalArticleServiceUtil;
 import com.liferay.portlet.journal.util.comparator.ArticleVersionComparator;
 
@@ -125,6 +123,7 @@ public class JournalArticleAtomCollectionProvider
 			return journalArticles;
 		}
 
+		long folderId = 0;
 		long classNameId = 0;
 		String keywords = null;
 		Double version = null;
@@ -138,8 +137,8 @@ public class JournalArticleAtomCollectionProvider
 
 		OrderByComparator obc = new ArticleVersionComparator();
 
-		int count = JournalArticleLocalServiceUtil.searchCount(
-			companyId, groupId, classNameId, keywords,  version, type,
+		int count = JournalArticleServiceUtil.searchCount(
+			companyId, groupId, folderId, classNameId, keywords, version, type,
 			structureId, templateId, displayDateGT, displayDateLT, status,
 			reviewDate);
 
@@ -147,8 +146,8 @@ public class JournalArticleAtomCollectionProvider
 
 		AtomUtil.saveAtomPagerInRequest(atomRequestContext, atomPager);
 
-		journalArticles = JournalArticleLocalServiceUtil.search(
-			companyId, groupId, classNameId, keywords,  version, type,
+		journalArticles = JournalArticleServiceUtil.search(
+			companyId, groupId, folderId, classNameId, keywords, version, type,
 			structureId, templateId, displayDateGT, displayDateLT, status,
 			reviewDate, atomPager.getStart(), atomPager.getEnd() + 1, obc);
 
@@ -161,9 +160,8 @@ public class JournalArticleAtomCollectionProvider
 			AtomRequestContext atomRequestContext)
 		throws Exception {
 
-		User user = AtomUtil.getUser(atomRequestContext);
-
 		long groupId = atomRequestContext.getLongParameter("groupId");
+		long folderId = 0;
 		long classNameId = 0;
 		long classPK = 0;
 		String articleId = StringPool.BLANK;
@@ -214,21 +212,21 @@ public class JournalArticleAtomCollectionProvider
 		serviceContext.setScopeGroupId(groupId);
 
 		JournalArticle journalArticle = JournalArticleServiceUtil.addArticle(
-			groupId, classNameId, classPK, articleId, autoArticleId, titleMap,
-			descriptionMap, content, type, structureId, templateId, layoutUuid,
-			displayDateMonth, displayDateDay, displayDateYear, displayDateHour,
-			displayDateMinute, expirationDateMonth, expirationDateDay,
-			expirationDateYear, expirationDateHour, expirationDateMinute,
-			neverExpire, reviewDateMonth, reviewDateDay, reviewDateYear,
-			reviewDateHour, reviewDateMinute, neverReview, indexable,
-			articleURL, serviceContext);
+			groupId, folderId, classNameId, classPK, articleId, autoArticleId,
+			titleMap, descriptionMap, content, type, structureId, templateId,
+			layoutUuid, displayDateMonth, displayDateDay, displayDateYear,
+			displayDateHour, displayDateMinute, expirationDateMonth,
+			expirationDateDay, expirationDateYear, expirationDateHour,
+			expirationDateMinute, neverExpire, reviewDateMonth, reviewDateDay,
+			reviewDateYear, reviewDateHour, reviewDateMinute, neverReview,
+			indexable, articleURL, serviceContext);
 
 		double version = journalArticle.getVersion();
 		int status = WorkflowConstants.STATUS_APPROVED;
 
-		journalArticle = JournalArticleLocalServiceUtil.updateStatus(
-			user.getUserId(), groupId, journalArticle.getArticleId(), version,
-			status, articleURL, serviceContext);
+		journalArticle = JournalArticleServiceUtil.updateStatus(
+			groupId, journalArticle.getArticleId(), version, status, articleURL,
+			serviceContext);
 
 		return journalArticle;
 	}
@@ -239,9 +237,8 @@ public class JournalArticleAtomCollectionProvider
 			String content, Date date, AtomRequestContext atomRequestContext)
 		throws Exception {
 
-		User user = AtomUtil.getUser(atomRequestContext);
-
 		long groupId = journalArticle.getGroupId();
+		long folderId = journalArticle.getFolderId();
 		String articleId = journalArticle.getArticleId();
 		double version = journalArticle.getVersion();
 
@@ -250,14 +247,14 @@ public class JournalArticleAtomCollectionProvider
 		serviceContext.setScopeGroupId(groupId);
 
 		journalArticle = JournalArticleServiceUtil.updateArticle(
-			groupId, articleId, version, content, serviceContext);
+			groupId, folderId, articleId, version, content, serviceContext);
 
 		int status = WorkflowConstants.STATUS_APPROVED;
 		String articleURL = StringPool.BLANK;
 
-		JournalArticleLocalServiceUtil.updateStatus(
-			user.getUserId(), groupId, journalArticle.getArticleId(),
-			journalArticle.getVersion(), status, articleURL, serviceContext);
+		JournalArticleServiceUtil.updateStatus(
+			groupId, journalArticle.getArticleId(), journalArticle.getVersion(),
+			status, articleURL, serviceContext);
 	}
 
 	private static final String _COLLECTION_NAME = "web-content";

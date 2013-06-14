@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,28 +14,39 @@
 
 package com.liferay.portal.kernel.uuid;
 
+import com.liferay.portal.kernel.security.pacl.permission.PortalRuntimePermission;
+
 /**
  * @author Brian Wing Shun Chan
+ * @author Raymond Augé
  */
 public class PortalUUIDUtil {
 
 	public static String fromJsSafeUuid(String jsSafeUuid) {
-		return _portalUUID.fromJsSafeUuid(jsSafeUuid);
+		return getPortalUUID().fromJsSafeUuid(jsSafeUuid);
 	}
 
 	public static String generate() {
 		return getPortalUUID().generate();
 	}
 
+	public static String generate(byte[] bytes) {
+		return getPortalUUID().generate(bytes);
+	}
+
 	public static PortalUUID getPortalUUID() {
+		PortalRuntimePermission.checkGetBeanProperty(PortalUUIDUtil.class);
+
 		return _portalUUID;
 	}
 
 	public static String toJsSafeUuid(String uuid) {
-		return _portalUUID.toJsSafeUuid(uuid);
+		return getPortalUUID().toJsSafeUuid(uuid);
 	}
 
 	public void setPortalUUID(PortalUUID portalUUID) {
+		PortalRuntimePermission.checkSetBeanProperty(getClass());
+
 		_portalUUID = portalUUID;
 	}
 

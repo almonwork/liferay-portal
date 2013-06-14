@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -46,7 +46,7 @@ public class ArticleSearch extends SearchContainer<JournalArticle> {
 
 	static {
 		headerNames.add("id");
-		headerNames.add("name");
+		headerNames.add("title");
 		//headerNames.add("version");
 		headerNames.add("modified-date");
 		headerNames.add("display-date");
@@ -94,6 +94,8 @@ public class ArticleSearch extends SearchContainer<JournalArticle> {
 		iteratorURL.setParameter(
 			ArticleDisplayTerms.GROUP_ID,
 			String.valueOf(displayTerms.getGroupId()));
+		iteratorURL.setParameter(
+			ArticleDisplayTerms.NAVIGATION, displayTerms.getNavigation());
 		iteratorURL.setParameter(
 			ArticleDisplayTerms.STATUS, displayTerms.getStatus());
 		iteratorURL.setParameter(

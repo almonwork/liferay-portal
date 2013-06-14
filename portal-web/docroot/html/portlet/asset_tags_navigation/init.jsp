@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -16,8 +16,8 @@
 
 <%@ include file="/html/portlet/init.jsp" %>
 
-<%@ page import="com.liferay.portlet.asset.AssetRendererFactoryRegistryUtil" %>
-<%@ page import="com.liferay.portlet.asset.model.AssetRendererFactory" %>
+<%@ page import="com.liferay.portlet.asset.AssetRendererFactoryRegistryUtil" %><%@
+page import="com.liferay.portlet.asset.model.AssetRendererFactory" %>
 
 <%
 PortletPreferences preferences = renderRequest.getPreferences();
@@ -34,3 +34,5 @@ int maxAssetTags = PrefsParamUtil.getInteger(preferences, request, "maxAssetTags
 boolean showAssetCount = PrefsParamUtil.getBoolean(preferences, request, "showAssetCount");
 boolean showZeroAssetCount = PrefsParamUtil.getBoolean(preferences, request, "showZeroAssetCount");
 %>
+
+<%@ include file="/html/portlet/asset_tags_navigation/init-ext.jsp" %>

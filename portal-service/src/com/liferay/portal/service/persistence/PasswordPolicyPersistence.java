@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,7 +14,6 @@
 
 package com.liferay.portal.service.persistence;
 
-import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.model.PasswordPolicy;
 
 /**
@@ -226,9 +225,11 @@ public interface PasswordPolicyPersistence extends BasePersistence<PasswordPolic
 	*
 	* @param companyId the company ID
 	* @param defaultPolicy the default policy
+	* @return the password policy that was removed
 	* @throws SystemException if a system exception occurred
 	*/
-	public void removeByC_DP(long companyId, boolean defaultPolicy)
+	public com.liferay.portal.model.PasswordPolicy removeByC_DP(
+		long companyId, boolean defaultPolicy)
 		throws com.liferay.portal.NoSuchPasswordPolicyException,
 			com.liferay.portal.kernel.exception.SystemException;
 
@@ -237,9 +238,11 @@ public interface PasswordPolicyPersistence extends BasePersistence<PasswordPolic
 	*
 	* @param companyId the company ID
 	* @param name the name
+	* @return the password policy that was removed
 	* @throws SystemException if a system exception occurred
 	*/
-	public void removeByC_N(long companyId, java.lang.String name)
+	public com.liferay.portal.model.PasswordPolicy removeByC_N(long companyId,
+		java.lang.String name)
 		throws com.liferay.portal.NoSuchPasswordPolicyException,
 			com.liferay.portal.kernel.exception.SystemException;
 
@@ -281,7 +284,4 @@ public interface PasswordPolicyPersistence extends BasePersistence<PasswordPolic
 	*/
 	public int countAll()
 		throws com.liferay.portal.kernel.exception.SystemException;
-
-	public PasswordPolicy remove(PasswordPolicy passwordPolicy)
-		throws SystemException;
 }

@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -114,7 +114,7 @@ userTracker = userTracker.toEscapedModel();
 								}
 							%>
 
-								<tr class="<%= className %>" style="font-size: xx-small;" onMouseEnter="this.className = '<%= classHoverName %>';" onMouseLeave="this.className = '<%= className %>';">
+								<tr class="<%= className %>" onMouseEnter="this.className = '<%= classHoverName %>';" onMouseLeave="this.className = '<%= className %>';" style="font-size: xx-small;">
 									<td class="lfr-top">
 										<%= StringUtil.replace(userTrackerPath.getPath(), "&", "& ") %>
 									</td>
@@ -142,21 +142,17 @@ userTracker = userTracker.toEscapedModel();
 								try {
 									int counter = 0;
 
-									Set sortedAttrNames = new TreeSet();
+									Set<String> sortedAttrNames = new TreeSet<String>();
 
-									Enumeration enu = userSession.getAttributeNames();
+									Enumeration<String> enu = userSession.getAttributeNames();
 
 									while (enu.hasMoreElements()) {
-										String attrName = (String)enu.nextElement();
+										String attrName = enu.nextElement();
 
 										sortedAttrNames.add(attrName);
 									}
 
-									Iterator itr = sortedAttrNames.iterator();
-
-									while (itr.hasNext()) {
-										String attrName = (String)itr.next();
-
+									for (String attrName : sortedAttrNames) {
 										String className = "portlet-section-body results-row";
 										String classHoverName = "portlet-section-body-hover results-row hover";
 
@@ -166,7 +162,7 @@ userTracker = userTracker.toEscapedModel();
 										}
 							%>
 
-										<tr class="<%= className %>" style="font-size: xx-small;" onMouseEnter="this.className = '<%= classHoverName %>';" onMouseLeave="this.className = '<%= className %>';">
+										<tr class="<%= className %>" onMouseEnter="this.className = '<%= classHoverName %>';" onMouseLeave="this.className = '<%= className %>';" style="font-size: xx-small;">
 											<td class="lfr-top">
 												<%= attrName %>
 											</td>

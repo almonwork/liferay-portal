@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -16,8 +16,10 @@ package com.liferay.portal.upgrade;
 
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.search.SearchEngineUtil;
 import com.liferay.portal.kernel.upgrade.UpgradeException;
 import com.liferay.portal.kernel.upgrade.UpgradeProcess;
+import com.liferay.portal.util.PropsValues;
 
 /**
  * @author Brian Wing Shun Chan
@@ -31,15 +33,36 @@ public class UpgradeProcessUtil {
 			ClassLoader classLoader)
 		throws UpgradeException {
 
+		return upgradeProcess(
+			buildNumber, upgradeProcessClassNames, classLoader,
+			PropsValues.INDEX_ON_UPGRADE);
+	}
+
+	public static boolean upgradeProcess(
+			int buildNumber, String[] upgradeProcessClassNames,
+			ClassLoader classLoader, boolean indexOnUpgrade)
+		throws UpgradeException {
+
 		boolean ranUpgradeProcess = false;
 
-		for (String upgradeProcessClassName : upgradeProcessClassNames) {
-			boolean tempRanUpgradeProcess = _upgradeProcess(
-				buildNumber, upgradeProcessClassName, classLoader);
+		boolean tempIndexReadOnly = SearchEngineUtil.isIndexReadOnly();
 
-			if (tempRanUpgradeProcess) {
-				ranUpgradeProcess = true;
+		if (indexOnUpgrade) {
+			SearchEngineUtil.setIndexReadOnly(true);
+		}
+
+		try {
+			for (String upgradeProcessClassName : upgradeProcessClassNames) {
+				boolean tempRanUpgradeProcess = _upgradeProcess(
+					buildNumber, upgradeProcessClassName, classLoader);
+
+				if (tempRanUpgradeProcess) {
+					ranUpgradeProcess = true;
+				}
 			}
+		}
+		finally {
+			SearchEngineUtil.setIndexReadOnly(tempIndexReadOnly);
 		}
 
 		return ranUpgradeProcess;

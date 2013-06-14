@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -43,9 +43,9 @@ public class CharPool {
 
 	public static final char EXCLAMATION = '!';
 
-	public static final char GREATER_THAN = '>';
-
 	public static final char FORWARD_SLASH = '/';
+
+	public static final char GREATER_THAN = '>';
 
 	public static final char LESS_THAN = '<';
 

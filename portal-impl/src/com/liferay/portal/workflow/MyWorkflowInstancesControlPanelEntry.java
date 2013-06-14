@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -31,7 +31,7 @@ public class MyWorkflowInstancesControlPanelEntry
 
 		if (WorkflowInstanceManagerUtil.getWorkflowInstanceCount(
 				permissionChecker.getCompanyId(), permissionChecker.getUserId(),
-				null, null, Boolean.FALSE) > 0) {
+				null, null, null) > 0) {
 
 			return true;
 		}

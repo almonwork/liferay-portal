@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -23,15 +23,3 @@
 		<aui:button type="submit" value="search" />
 	</span>
 </div>
-
-<aui:button-row>
-	<aui:button onClick='<%= renderResponse.getNamespace() + "addFileEntryType();" %>' value="add-document-type" />
-</aui:button-row>
-
-<aui:script>
-	function <portlet:namespace />addFileEntryType() {
-		var url = '<portlet:renderURL><portlet:param name="struts_action" value="/document_library/edit_file_entry_type" /><portlet:param name="redirect" value="<%= currentURL %>" /></portlet:renderURL>';
-
-		submitForm(document.hrefFm, url);
-	}
-</aui:script>

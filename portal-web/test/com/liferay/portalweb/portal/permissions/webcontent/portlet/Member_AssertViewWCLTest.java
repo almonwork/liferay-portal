@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -23,14 +23,16 @@ import com.liferay.portalweb.portal.util.RuntimeVariables;
 public class Member_AssertViewWCLTest extends BaseTestCase {
 	public void testMember_AssertViewWCL() throws Exception {
 		selenium.open("/web/guest/home/");
+		loadRequiredJavaScriptModules();
 
 		for (int second = 0;; second++) {
-			if (second >= 60) {
+			if (second >= 90) {
 				fail("timeout");
 			}
 
 			try {
-				if (selenium.isElementPresent("link=Web Content List Test Page")) {
+				if (selenium.isElementPresent(
+							"link=Web Content List Permissions Page")) {
 					break;
 				}
 			}
@@ -40,11 +42,10 @@ public class Member_AssertViewWCLTest extends BaseTestCase {
 			Thread.sleep(1000);
 		}
 
-		selenium.saveScreenShotAndSource();
-		selenium.clickAt("link=Web Content List Test Page",
-			RuntimeVariables.replace(""));
+		selenium.clickAt("link=Web Content List Permissions Page",
+			RuntimeVariables.replace("Web Content List Permissions Page"));
 		selenium.waitForPageToLoad("30000");
-		selenium.saveScreenShotAndSource();
+		loadRequiredJavaScriptModules();
 		assertFalse(selenium.isTextPresent(
 				"You do not have the roles required to access this portlet."));
 	}

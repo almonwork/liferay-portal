@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -23,9 +23,10 @@ import com.liferay.portalweb.portal.util.RuntimeVariables;
 public class AddTemplateTest extends BaseTestCase {
 	public void testAddTemplate() throws Exception {
 		selenium.open("/web/guest/home/");
+		loadRequiredJavaScriptModules();
 
 		for (int second = 0;; second++) {
-			if (second >= 60) {
+			if (second >= 90) {
 				fail("timeout");
 			}
 
@@ -40,38 +41,35 @@ public class AddTemplateTest extends BaseTestCase {
 			Thread.sleep(1000);
 		}
 
-		selenium.saveScreenShotAndSource();
-		selenium.clickAt("link=Control Panel", RuntimeVariables.replace(""));
+		selenium.clickAt("link=Control Panel",
+			RuntimeVariables.replace("Control Panel"));
 		selenium.waitForPageToLoad("30000");
-		selenium.saveScreenShotAndSource();
-		assertEquals(RuntimeVariables.replace("Web Content"),
-			selenium.getText("//div[2]/div[2]/div[2]/ul/li[3]/a"));
-		selenium.clickAt("//div[2]/div[2]/div[2]/ul/li[3]/a",
+		loadRequiredJavaScriptModules();
+		selenium.clickAt("link=Web Content",
 			RuntimeVariables.replace("Web Content"));
 		selenium.waitForPageToLoad("30000");
-		selenium.saveScreenShotAndSource();
-		selenium.clickAt("link=Templates", RuntimeVariables.replace(""));
+		loadRequiredJavaScriptModules();
+		selenium.clickAt("link=Templates", RuntimeVariables.replace("Templates"));
 		selenium.waitForPageToLoad("30000");
-		selenium.saveScreenShotAndSource();
+		loadRequiredJavaScriptModules();
 		selenium.clickAt("//input[@value='Add Template']",
-			RuntimeVariables.replace(""));
+			RuntimeVariables.replace("Add Template"));
 		selenium.waitForPageToLoad("30000");
-		selenium.saveScreenShotAndSource();
-		selenium.type("_15_name",
+		loadRequiredJavaScriptModules();
+		selenium.type("//input[@id='_15_name_en_US']",
 			RuntimeVariables.replace("Web Content Template Name"));
-		selenium.saveScreenShotAndSource();
-		selenium.type("_15_description",
+		selenium.type("//textarea[@id='_15_description_en_US']",
 			RuntimeVariables.replace("Web Content Template Description"));
-		selenium.saveScreenShotAndSource();
-		selenium.clickAt("_15_editorButton", RuntimeVariables.replace(""));
+		selenium.clickAt("//input[@id='_15_editorButton']",
+			RuntimeVariables.replace("Launch Editor"));
 
 		for (int second = 0;; second++) {
-			if (second >= 60) {
+			if (second >= 90) {
 				fail("timeout");
 			}
 
 			try {
-				if (selenium.isVisible("//textarea[@id='_15_xslContent']")) {
+				if (selenium.isVisible("//textarea[@id='_15_plainEditorField']")) {
 					break;
 				}
 			}
@@ -81,14 +79,15 @@ public class AddTemplateTest extends BaseTestCase {
 			Thread.sleep(1000);
 		}
 
-		selenium.saveScreenShotAndSource();
-		selenium.type("//textarea[@id='_15_xslContent']",
+		selenium.clickAt("//textarea[@id='_15_plainEditorField']",
+			RuntimeVariables.replace(""));
+		Thread.sleep(5000);
+		selenium.type("//textarea[@id='_15_plainEditorField']",
 			RuntimeVariables.replace(
 				"<h1>$title.getData()</h1>\n\n<a href=\"$ltp.getUrl()\">See Page</a>"));
-		selenium.saveScreenShotAndSource();
 
 		for (int second = 0;; second++) {
-			if (second >= 60) {
+			if (second >= 90) {
 				fail("timeout");
 			}
 
@@ -103,17 +102,20 @@ public class AddTemplateTest extends BaseTestCase {
 			Thread.sleep(1000);
 		}
 
-		selenium.saveScreenShotAndSource();
 		selenium.click("//input[@value='Update']");
 		Thread.sleep(5000);
-		selenium.clickAt("//input[@value='Save']", RuntimeVariables.replace(""));
+		selenium.clickAt("//input[@value='Save']",
+			RuntimeVariables.replace("Save"));
 		selenium.waitForPageToLoad("30000");
-		selenium.saveScreenShotAndSource();
+		loadRequiredJavaScriptModules();
 		assertEquals(RuntimeVariables.replace(
 				"Your request completed successfully."),
-			selenium.getText("//section/div/div/div/div"));
-		assertEquals(RuntimeVariables.replace(
-				"Web Content Template Name\n Web Content Template Description"),
+			selenium.getText("//div[@class='portlet-msg-success']"));
+		assertTrue(selenium.isElementPresent("//td[2]/a"));
+		assertEquals(RuntimeVariables.replace("Web Content Template Name"),
 			selenium.getText("//td[3]/a"));
+		assertEquals(RuntimeVariables.replace(
+				"Web Content Template Description"),
+			selenium.getText("//td[4]/a"));
 	}
 }

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -34,14 +34,12 @@ public class UpgradeGroup extends UpgradeProcess {
 	}
 
 	protected Object[] getLayout(long plid) throws Exception {
-		Object[] layout = null;
-
 		Connection con = null;
 		PreparedStatement ps = null;
 		ResultSet rs = null;
 
 		try {
-			con = DataAccess.getConnection();
+			con = DataAccess.getUpgradeOptimizedConnection();
 
 			ps = con.prepareStatement(_GET_LAYOUT);
 
@@ -49,17 +47,17 @@ public class UpgradeGroup extends UpgradeProcess {
 
 			rs = ps.executeQuery();
 
-			while (rs.next()) {
+			if (rs.next()) {
 				long groupId = rs.getLong("groupId");
 
-				layout = new Object[] {groupId};
+				return new Object[] {groupId};
 			}
+
+			return null;
 		}
 		finally {
 			DataAccess.cleanUp(con, ps, rs);
 		}
-
-		return layout;
 	}
 
 	protected void updateParentGroupId() throws Exception {
@@ -68,7 +66,7 @@ public class UpgradeGroup extends UpgradeProcess {
 		ResultSet rs = null;
 
 		try {
-			con = DataAccess.getConnection();
+			con = DataAccess.getUpgradeOptimizedConnection();
 
 			long classNameId = PortalUtil.getClassNameId(
 				Layout.class.getName());

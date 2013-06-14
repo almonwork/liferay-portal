@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -23,9 +23,10 @@ import com.liferay.portalweb.portal.util.RuntimeVariables;
 public class SaveSettingsStatusMessageTest extends BaseTestCase {
 	public void testSaveSettingsStatusMessage() throws Exception {
 		selenium.open("/web/guest/home/");
+		loadRequiredJavaScriptModules();
 
 		for (int second = 0;; second++) {
-			if (second >= 60) {
+			if (second >= 90) {
 				fail("timeout");
 			}
 
@@ -40,23 +41,24 @@ public class SaveSettingsStatusMessageTest extends BaseTestCase {
 			Thread.sleep(1000);
 		}
 
-		selenium.saveScreenShotAndSource();
-		selenium.clickAt("link=Test CLP Test Page", RuntimeVariables.replace(""));
+		selenium.clickAt("link=Test CLP Test Page",
+			RuntimeVariables.replace("Test CLP Test Page"));
 		selenium.waitForPageToLoad("30000");
-		selenium.saveScreenShotAndSource();
+		loadRequiredJavaScriptModules();
 		assertEquals(RuntimeVariables.replace(""),
 			selenium.getText(
 				"//div[@class='portlet-body']/table/tbody/tr[2]/td[7]"));
 		selenium.clickAt("//ul[@class='chat-tabs']/li[2]/div[1]/span",
-			RuntimeVariables.replace(""));
+			RuntimeVariables.replace("Settings"));
+		Thread.sleep(5000);
 
 		for (int second = 0;; second++) {
-			if (second >= 60) {
+			if (second >= 90) {
 				fail("timeout");
 			}
 
 			try {
-				if (selenium.isVisible("statusMessage")) {
+				if (selenium.isVisible("//input[@id='statusMessage']")) {
 					break;
 				}
 			}
@@ -66,14 +68,13 @@ public class SaveSettingsStatusMessageTest extends BaseTestCase {
 			Thread.sleep(1000);
 		}
 
-		selenium.saveScreenShotAndSource();
 		selenium.type("statusMessage",
 			RuntimeVariables.replace("status message."));
-		selenium.saveScreenShotAndSource();
-		selenium.clickAt("saveSettings", RuntimeVariables.replace(""));
+		selenium.clickAt("//input[@id='saveSettings']",
+			RuntimeVariables.replace("Save Settings"));
 
 		for (int second = 0;; second++) {
-			if (second >= 60) {
+			if (second >= 90) {
 				fail("timeout");
 			}
 
@@ -89,13 +90,13 @@ public class SaveSettingsStatusMessageTest extends BaseTestCase {
 			Thread.sleep(1000);
 		}
 
-		selenium.saveScreenShotAndSource();
 		assertFalse(selenium.isElementPresent(
 				"//li[@class='chat-settings saved']"));
 		selenium.open("/web/guest/home/");
+		loadRequiredJavaScriptModules();
 
 		for (int second = 0;; second++) {
-			if (second >= 60) {
+			if (second >= 90) {
 				fail("timeout");
 			}
 
@@ -110,10 +111,10 @@ public class SaveSettingsStatusMessageTest extends BaseTestCase {
 			Thread.sleep(1000);
 		}
 
-		selenium.saveScreenShotAndSource();
-		selenium.clickAt("link=Test CLP Test Page", RuntimeVariables.replace(""));
+		selenium.clickAt("link=Test CLP Test Page",
+			RuntimeVariables.replace("Test CLP Test Page"));
 		selenium.waitForPageToLoad("30000");
-		selenium.saveScreenShotAndSource();
+		loadRequiredJavaScriptModules();
 		assertEquals(RuntimeVariables.replace("status message."),
 			selenium.getText(
 				"//div[@class='portlet-body']/table/tbody/tr[2]/td[7]"));

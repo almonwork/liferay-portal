@@ -24,13 +24,23 @@
 	<td>Blogs Test Page2</td>
 </tr>
 <tr>
+	<td>pause</td>
+	<td>5000</td>
+	<td></td>
+</tr>
+<tr>
+	<td>waitForText</td>
+	<td>//span[@class='portlet-title-text']</td>
+	<td>Blogs (Blogs Test Page2)</td>
+</tr>
+<tr>
 	<td>assertText</td>
 	<td>//span[@class='portlet-title-text']</td>
 	<td>Blogs (Blogs Test Page2)</td>
 </tr>
 <tr>
 	<td>assertText</td>
-	<td>//div[@class='entry-title']/a</td>
+	<td>//div[@class='entry-title']/h2/a</td>
 	<td>Blogs Entry3 Title</td>
 </tr>
 <tr>
@@ -70,12 +80,17 @@
 </tr>
 <tr>
 	<td>selectAndWait</td>
-	<td>//select[@id='_33_page']</td>
+	<td>//select[@name='_33_page']</td>
 	<td>label=2</td>
 </tr>
 <tr>
+	<td>waitForText</td>
+	<td>//div[@class='entry-title']/h2/a</td>
+	<td>Blogs Entry2 Title</td>
+</tr>
+<tr>
 	<td>assertText</td>
-	<td>//div[@class='entry-title']/a</td>
+	<td>//div[@class='entry-title']/h2/a</td>
 	<td>Blogs Entry2 Title</td>
 </tr>
 <tr>
@@ -115,12 +130,17 @@
 </tr>
 <tr>
 	<td>selectAndWait</td>
-	<td>//select[@id='_33_page']</td>
+	<td>//select[@name='_33_page']</td>
 	<td>label=1</td>
 </tr>
 <tr>
+	<td>waitForText</td>
+	<td>//div[@class='entry-title']/h2/a</td>
+	<td>Blogs Entry3 Title</td>
+</tr>
+<tr>
 	<td>assertText</td>
-	<td>//div[@class='entry-title']/a</td>
+	<td>//div[@class='entry-title']/h2/a</td>
 	<td>Blogs Entry3 Title</td>
 </tr>
 <tr>
@@ -164,8 +184,13 @@
 	<td>Next</td>
 </tr>
 <tr>
+	<td>waitForText</td>
+	<td>//div[@class='entry-title']/h2/a</td>
+	<td>Blogs Entry2 Title</td>
+</tr>
+<tr>
 	<td>assertText</td>
-	<td>//div[@class='entry-title']/a</td>
+	<td>//div[@class='entry-title']/h2/a</td>
 	<td>Blogs Entry2 Title</td>
 </tr>
 <tr>
@@ -209,8 +234,13 @@
 	<td>Previous</td>
 </tr>
 <tr>
+	<td>waitForText</td>
+	<td>//div[@class='entry-title']/h2/a</td>
+	<td>Blogs Entry3 Title</td>
+</tr>
+<tr>
 	<td>assertText</td>
-	<td>//div[@class='entry-title']/a</td>
+	<td>//div[@class='entry-title']/h2/a</td>
 	<td>Blogs Entry3 Title</td>
 </tr>
 <tr>
@@ -254,8 +284,13 @@
 	<td>Last</td>
 </tr>
 <tr>
+	<td>waitForText</td>
+	<td>//div[@class='entry-title']/h2/a</td>
+	<td>Blogs Entry2 Title</td>
+</tr>
+<tr>
 	<td>assertText</td>
-	<td>//div[@class='entry-title']/a</td>
+	<td>//div[@class='entry-title']/h2/a</td>
 	<td>Blogs Entry2 Title</td>
 </tr>
 <tr>
@@ -299,8 +334,13 @@
 	<td>First</td>
 </tr>
 <tr>
+	<td>waitForText</td>
+	<td>//div[@class='entry-title']/h2/a</td>
+	<td>Blogs Entry3 Title</td>
+</tr>
+<tr>
 	<td>assertText</td>
-	<td>//div[@class='entry-title']/a</td>
+	<td>//div[@class='entry-title']/h2/a</td>
 	<td>Blogs Entry3 Title</td>
 </tr>
 <tr>
@@ -354,13 +394,23 @@
 	<td>Blogs Test Page3</td>
 </tr>
 <tr>
-	<td>assertText</td>
+	<td>waitForText</td>
 	<td>//span[@class='portlet-title-text']</td>
 	<td>Blogs (Blogs Test Page2)</td>
 </tr>
 <tr>
 	<td>assertText</td>
-	<td>//div[@class='entry-title']/a</td>
+	<td>//span[@class='portlet-title-text']</td>
+	<td>Blogs (Blogs Test Page2)</td>
+</tr>
+<tr>
+	<td>waitForText</td>
+	<td>//div[@class='entry-title']/h2/a</td>
+	<td>Blogs Entry3 Title</td>
+</tr>
+<tr>
+	<td>assertText</td>
+	<td>//div[@class='entry-title']/h2/a</td>
 	<td>Blogs Entry3 Title</td>
 </tr>
 <tr>
@@ -400,12 +450,17 @@
 </tr>
 <tr>
 	<td>selectAndWait</td>
-	<td>//select[@id='_33_page']</td>
+	<td>//select[@name='_33_page']</td>
 	<td>label=2</td>
 </tr>
 <tr>
+	<td>waitForText</td>
+	<td>//div[@class='entry-title']/h2/a</td>
+	<td>Blogs Entry2 Title</td>
+</tr>
+<tr>
 	<td>assertText</td>
-	<td>//div[@class='entry-title']/a</td>
+	<td>//div[@class='entry-title']/h2/a</td>
 	<td>Blogs Entry2 Title</td>
 </tr>
 <tr>
@@ -445,12 +500,17 @@
 </tr>
 <tr>
 	<td>selectAndWait</td>
-	<td>//select[@id='_33_page']</td>
+	<td>//select[@name='_33_page']</td>
 	<td>label=1</td>
 </tr>
 <tr>
+	<td>waitForText</td>
+	<td>//div[@class='entry-title']/h2/a</td>
+	<td>Blogs Entry3 Title</td>
+</tr>
+<tr>
 	<td>assertText</td>
-	<td>//div[@class='entry-title']/a</td>
+	<td>//div[@class='entry-title']/h2/a</td>
 	<td>Blogs Entry3 Title</td>
 </tr>
 <tr>
@@ -494,8 +554,13 @@
 	<td>Next</td>
 </tr>
 <tr>
+	<td>waitForText</td>
+	<td>//div[@class='entry-title']/h2/a</td>
+	<td>Blogs Entry2 Title</td>
+</tr>
+<tr>
 	<td>assertText</td>
-	<td>//div[@class='entry-title']/a</td>
+	<td>//div[@class='entry-title']/h2/a</td>
 	<td>Blogs Entry2 Title</td>
 </tr>
 <tr>
@@ -539,8 +604,13 @@
 	<td>Previous</td>
 </tr>
 <tr>
+	<td>waitForText</td>
+	<td>//div[@class='entry-title']/h2/a</td>
+	<td>Blogs Entry3 Title</td>
+</tr>
+<tr>
 	<td>assertText</td>
-	<td>//div[@class='entry-title']/a</td>
+	<td>//div[@class='entry-title']/h2/a</td>
 	<td>Blogs Entry3 Title</td>
 </tr>
 <tr>
@@ -584,8 +654,13 @@
 	<td>Last</td>
 </tr>
 <tr>
+	<td>waitForText</td>
+	<td>//div[@class='entry-title']/h2/a</td>
+	<td>Blogs Entry2 Title</td>
+</tr>
+<tr>
 	<td>assertText</td>
-	<td>//div[@class='entry-title']/a</td>
+	<td>//div[@class='entry-title']/h2/a</td>
 	<td>Blogs Entry2 Title</td>
 </tr>
 <tr>
@@ -629,8 +704,13 @@
 	<td>First</td>
 </tr>
 <tr>
+	<td>waitForText</td>
+	<td>//div[@class='entry-title']/h2/a</td>
+	<td>Blogs Entry3 Title</td>
+</tr>
+<tr>
 	<td>assertText</td>
-	<td>//div[@class='entry-title']/a</td>
+	<td>//div[@class='entry-title']/h2/a</td>
 	<td>Blogs Entry3 Title</td>
 </tr>
 <tr>
@@ -668,7 +748,6 @@
 	<td>//a[@class='last']</td>
 	<td>Last</td>
 </tr>
-
 </tbody></table>
 </body>
 </html>

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -16,8 +16,10 @@ package com.liferay.portlet.messageboards.model.impl;
 
 import com.liferay.portal.kernel.bean.AutoEscapeBeanHandler;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.ProxyUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
+import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.model.CacheModel;
 import com.liferay.portal.model.impl.BaseModelImpl;
 import com.liferay.portal.service.ServiceContext;
@@ -30,9 +32,10 @@ import com.liferay.portlet.messageboards.model.MBDiscussionModel;
 
 import java.io.Serializable;
 
-import java.lang.reflect.Proxy;
-
 import java.sql.Types;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * The base model implementation for the MBDiscussion service. Represents a row in the &quot;MBDiscussion&quot; database table, with each column mapped to a property of this class.
@@ -72,15 +75,12 @@ public class MBDiscussionModelImpl extends BaseModelImpl<MBDiscussion>
 	public static final boolean FINDER_CACHE_ENABLED = GetterUtil.getBoolean(com.liferay.portal.util.PropsUtil.get(
 				"value.object.finder.cache.enabled.com.liferay.portlet.messageboards.model.MBDiscussion"),
 			true);
-
-	public Class<?> getModelClass() {
-		return MBDiscussion.class;
-	}
-
-	public String getModelClassName() {
-		return MBDiscussion.class.getName();
-	}
-
+	public static final boolean COLUMN_BITMASK_ENABLED = GetterUtil.getBoolean(com.liferay.portal.util.PropsUtil.get(
+				"value.object.column.bitmask.enabled.com.liferay.portlet.messageboards.model.MBDiscussion"),
+			true);
+	public static long CLASSNAMEID_COLUMN_BITMASK = 1L;
+	public static long CLASSPK_COLUMN_BITMASK = 2L;
+	public static long THREADID_COLUMN_BITMASK = 4L;
 	public static final long LOCK_EXPIRATION_TIME = GetterUtil.getLong(com.liferay.portal.util.PropsUtil.get(
 				"lock.expiration.time.com.liferay.portlet.messageboards.model.MBDiscussion"));
 
@@ -103,6 +103,53 @@ public class MBDiscussionModelImpl extends BaseModelImpl<MBDiscussion>
 		setPrimaryKey(((Long)primaryKeyObj).longValue());
 	}
 
+	public Class<?> getModelClass() {
+		return MBDiscussion.class;
+	}
+
+	public String getModelClassName() {
+		return MBDiscussion.class.getName();
+	}
+
+	@Override
+	public Map<String, Object> getModelAttributes() {
+		Map<String, Object> attributes = new HashMap<String, Object>();
+
+		attributes.put("discussionId", getDiscussionId());
+		attributes.put("classNameId", getClassNameId());
+		attributes.put("classPK", getClassPK());
+		attributes.put("threadId", getThreadId());
+
+		return attributes;
+	}
+
+	@Override
+	public void setModelAttributes(Map<String, Object> attributes) {
+		Long discussionId = (Long)attributes.get("discussionId");
+
+		if (discussionId != null) {
+			setDiscussionId(discussionId);
+		}
+
+		Long classNameId = (Long)attributes.get("classNameId");
+
+		if (classNameId != null) {
+			setClassNameId(classNameId);
+		}
+
+		Long classPK = (Long)attributes.get("classPK");
+
+		if (classPK != null) {
+			setClassPK(classPK);
+		}
+
+		Long threadId = (Long)attributes.get("threadId");
+
+		if (threadId != null) {
+			setThreadId(threadId);
+		}
+	}
+
 	public long getDiscussionId() {
 		return _discussionId;
 	}
@@ -119,11 +166,23 @@ public class MBDiscussionModelImpl extends BaseModelImpl<MBDiscussion>
 		return PortalUtil.getClassName(getClassNameId());
 	}
 
+	public void setClassName(String className) {
+		long classNameId = 0;
+
+		if (Validator.isNotNull(className)) {
+			classNameId = PortalUtil.getClassNameId(className);
+		}
+
+		setClassNameId(classNameId);
+	}
+
 	public long getClassNameId() {
 		return _classNameId;
 	}
 
 	public void setClassNameId(long classNameId) {
+		_columnBitmask |= CLASSNAMEID_COLUMN_BITMASK;
+
 		if (!_setOriginalClassNameId) {
 			_setOriginalClassNameId = true;
 
@@ -142,6 +201,8 @@ public class MBDiscussionModelImpl extends BaseModelImpl<MBDiscussion>
 	}
 
 	public void setClassPK(long classPK) {
+		_columnBitmask |= CLASSPK_COLUMN_BITMASK;
+
 		if (!_setOriginalClassPK) {
 			_setOriginalClassPK = true;
 
@@ -160,6 +221,8 @@ public class MBDiscussionModelImpl extends BaseModelImpl<MBDiscussion>
 	}
 
 	public void setThreadId(long threadId) {
+		_columnBitmask |= THREADID_COLUMN_BITMASK;
+
 		if (!_setOriginalThreadId) {
 			_setOriginalThreadId = true;
 
@@ -173,35 +236,32 @@ public class MBDiscussionModelImpl extends BaseModelImpl<MBDiscussion>
 		return _originalThreadId;
 	}
 
+	public long getColumnBitmask() {
+		return _columnBitmask;
+	}
+
 	@Override
 	public MBDiscussion toEscapedModel() {
-		if (isEscapedModel()) {
-			return (MBDiscussion)this;
+		if (_escapedModelProxy == null) {
+			_escapedModelProxy = (MBDiscussion)ProxyUtil.newProxyInstance(_classLoader,
+					_escapedModelProxyInterfaces,
+					new AutoEscapeBeanHandler(this));
 		}
-		else {
-			if (_escapedModelProxy == null) {
-				_escapedModelProxy = (MBDiscussion)Proxy.newProxyInstance(_classLoader,
-						_escapedModelProxyInterfaces,
-						new AutoEscapeBeanHandler(this));
-			}
 
-			return _escapedModelProxy;
-		}
+		return _escapedModelProxy;
 	}
 
 	@Override
 	public ExpandoBridge getExpandoBridge() {
-		if (_expandoBridge == null) {
-			_expandoBridge = ExpandoBridgeFactoryUtil.getExpandoBridge(0,
-					MBDiscussion.class.getName(), getPrimaryKey());
-		}
-
-		return _expandoBridge;
+		return ExpandoBridgeFactoryUtil.getExpandoBridge(0,
+			MBDiscussion.class.getName(), getPrimaryKey());
 	}
 
 	@Override
 	public void setExpandoBridgeAttributes(ServiceContext serviceContext) {
-		getExpandoBridge().setAttributes(serviceContext);
+		ExpandoBridge expandoBridge = getExpandoBridge();
+
+		expandoBridge.setAttributes(serviceContext);
 	}
 
 	@Override
@@ -277,6 +337,8 @@ public class MBDiscussionModelImpl extends BaseModelImpl<MBDiscussion>
 		mbDiscussionModelImpl._originalThreadId = mbDiscussionModelImpl._threadId;
 
 		mbDiscussionModelImpl._setOriginalThreadId = false;
+
+		mbDiscussionModelImpl._columnBitmask = 0;
 	}
 
 	@Override
@@ -354,6 +416,6 @@ public class MBDiscussionModelImpl extends BaseModelImpl<MBDiscussion>
 	private long _threadId;
 	private long _originalThreadId;
 	private boolean _setOriginalThreadId;
-	private transient ExpandoBridge _expandoBridge;
+	private long _columnBitmask;
 	private MBDiscussion _escapedModelProxy;
 }

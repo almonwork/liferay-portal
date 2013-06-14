@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,6 +14,8 @@
 
 package com.liferay.portlet.journal.service;
 
+import com.liferay.portal.service.ServiceWrapper;
+
 /**
  * <p>
  * This class is a wrapper for {@link JournalArticleResourceLocalService}.
@@ -24,7 +26,8 @@ package com.liferay.portlet.journal.service;
  * @generated
  */
 public class JournalArticleResourceLocalServiceWrapper
-	implements JournalArticleResourceLocalService {
+	implements JournalArticleResourceLocalService,
+		ServiceWrapper<JournalArticleResourceLocalService> {
 	public JournalArticleResourceLocalServiceWrapper(
 		JournalArticleResourceLocalService journalArticleResourceLocalService) {
 		_journalArticleResourceLocalService = journalArticleResourceLocalService;
@@ -58,25 +61,32 @@ public class JournalArticleResourceLocalServiceWrapper
 	* Deletes the journal article resource with the primary key from the database. Also notifies the appropriate model listeners.
 	*
 	* @param resourcePrimKey the primary key of the journal article resource
+	* @return the journal article resource that was removed
 	* @throws PortalException if a journal article resource with the primary key could not be found
 	* @throws SystemException if a system exception occurred
 	*/
-	public void deleteJournalArticleResource(long resourcePrimKey)
+	public com.liferay.portlet.journal.model.JournalArticleResource deleteJournalArticleResource(
+		long resourcePrimKey)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException {
-		_journalArticleResourceLocalService.deleteJournalArticleResource(resourcePrimKey);
+		return _journalArticleResourceLocalService.deleteJournalArticleResource(resourcePrimKey);
 	}
 
 	/**
 	* Deletes the journal article resource from the database. Also notifies the appropriate model listeners.
 	*
 	* @param journalArticleResource the journal article resource
+	* @return the journal article resource that was removed
 	* @throws SystemException if a system exception occurred
 	*/
-	public void deleteJournalArticleResource(
+	public com.liferay.portlet.journal.model.JournalArticleResource deleteJournalArticleResource(
 		com.liferay.portlet.journal.model.JournalArticleResource journalArticleResource)
 		throws com.liferay.portal.kernel.exception.SystemException {
-		_journalArticleResourceLocalService.deleteJournalArticleResource(journalArticleResource);
+		return _journalArticleResourceLocalService.deleteJournalArticleResource(journalArticleResource);
+	}
+
+	public com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery() {
+		return _journalArticleResourceLocalService.dynamicQuery();
 	}
 
 	/**
@@ -149,6 +159,12 @@ public class JournalArticleResourceLocalServiceWrapper
 		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery)
 		throws com.liferay.portal.kernel.exception.SystemException {
 		return _journalArticleResourceLocalService.dynamicQueryCount(dynamicQuery);
+	}
+
+	public com.liferay.portlet.journal.model.JournalArticleResource fetchJournalArticleResource(
+		long resourcePrimKey)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return _journalArticleResourceLocalService.fetchJournalArticleResource(resourcePrimKey);
 	}
 
 	/**
@@ -301,11 +317,26 @@ public class JournalArticleResourceLocalServiceWrapper
 		return _journalArticleResourceLocalService.getArticleResources(groupId);
 	}
 
+	/**
+	 * @deprecated Renamed to {@link #getWrappedService}
+	 */
 	public JournalArticleResourceLocalService getWrappedJournalArticleResourceLocalService() {
 		return _journalArticleResourceLocalService;
 	}
 
+	/**
+	 * @deprecated Renamed to {@link #setWrappedService}
+	 */
 	public void setWrappedJournalArticleResourceLocalService(
+		JournalArticleResourceLocalService journalArticleResourceLocalService) {
+		_journalArticleResourceLocalService = journalArticleResourceLocalService;
+	}
+
+	public JournalArticleResourceLocalService getWrappedService() {
+		return _journalArticleResourceLocalService;
+	}
+
+	public void setWrappedService(
 		JournalArticleResourceLocalService journalArticleResourceLocalService) {
 		_journalArticleResourceLocalService = journalArticleResourceLocalService;
 	}

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -17,6 +17,7 @@ package com.liferay.portal.model.impl;
 import com.liferay.portal.kernel.bean.AutoEscapeBeanHandler;
 import com.liferay.portal.kernel.json.JSON;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.ProxyUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.model.CacheModel;
@@ -30,12 +31,12 @@ import com.liferay.portlet.expando.util.ExpandoBridgeFactoryUtil;
 
 import java.io.Serializable;
 
-import java.lang.reflect.Proxy;
-
 import java.sql.Types;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * The base model implementation for the Organization service. Represents a row in the &quot;Organization_&quot; database table, with each column mapped to a property of this class.
@@ -63,8 +64,7 @@ public class OrganizationModelImpl extends BaseModelImpl<Organization>
 			{ "organizationId", Types.BIGINT },
 			{ "companyId", Types.BIGINT },
 			{ "parentOrganizationId", Types.BIGINT },
-			{ "leftOrganizationId", Types.BIGINT },
-			{ "rightOrganizationId", Types.BIGINT },
+			{ "treePath", Types.VARCHAR },
 			{ "name", Types.VARCHAR },
 			{ "type_", Types.VARCHAR },
 			{ "recursable", Types.BOOLEAN },
@@ -73,7 +73,7 @@ public class OrganizationModelImpl extends BaseModelImpl<Organization>
 			{ "statusId", Types.INTEGER },
 			{ "comments", Types.VARCHAR }
 		};
-	public static final String TABLE_SQL_CREATE = "create table Organization_ (organizationId LONG not null primary key,companyId LONG,parentOrganizationId LONG,leftOrganizationId LONG,rightOrganizationId LONG,name VARCHAR(100) null,type_ VARCHAR(75) null,recursable BOOLEAN,regionId LONG,countryId LONG,statusId INTEGER,comments STRING null)";
+	public static final String TABLE_SQL_CREATE = "create table Organization_ (organizationId LONG not null primary key,companyId LONG,parentOrganizationId LONG,treePath STRING null,name VARCHAR(100) null,type_ VARCHAR(75) null,recursable BOOLEAN,regionId LONG,countryId LONG,statusId INTEGER,comments STRING null)";
 	public static final String TABLE_SQL_DROP = "drop table Organization_";
 	public static final String ORDER_BY_JPQL = " ORDER BY organization.name ASC";
 	public static final String ORDER_BY_SQL = " ORDER BY Organization_.name ASC";
@@ -86,6 +86,12 @@ public class OrganizationModelImpl extends BaseModelImpl<Organization>
 	public static final boolean FINDER_CACHE_ENABLED = GetterUtil.getBoolean(com.liferay.portal.util.PropsUtil.get(
 				"value.object.finder.cache.enabled.com.liferay.portal.model.Organization"),
 			true);
+	public static final boolean COLUMN_BITMASK_ENABLED = GetterUtil.getBoolean(com.liferay.portal.util.PropsUtil.get(
+				"value.object.column.bitmask.enabled.com.liferay.portal.model.Organization"),
+			true);
+	public static long COMPANYID_COLUMN_BITMASK = 1L;
+	public static long NAME_COLUMN_BITMASK = 2L;
+	public static long PARENTORGANIZATIONID_COLUMN_BITMASK = 4L;
 
 	/**
 	 * Converts the soap model instance into a normal model instance.
@@ -99,8 +105,7 @@ public class OrganizationModelImpl extends BaseModelImpl<Organization>
 		model.setOrganizationId(soapModel.getOrganizationId());
 		model.setCompanyId(soapModel.getCompanyId());
 		model.setParentOrganizationId(soapModel.getParentOrganizationId());
-		model.setLeftOrganizationId(soapModel.getLeftOrganizationId());
-		model.setRightOrganizationId(soapModel.getRightOrganizationId());
+		model.setTreePath(soapModel.getTreePath());
 		model.setName(soapModel.getName());
 		model.setType(soapModel.getType());
 		model.setRecursable(soapModel.getRecursable());
@@ -128,18 +133,22 @@ public class OrganizationModelImpl extends BaseModelImpl<Organization>
 		return models;
 	}
 
-	public Class<?> getModelClass() {
-		return Organization.class;
-	}
-
-	public String getModelClassName() {
-		return Organization.class.getName();
-	}
-
-	public static final String MAPPING_TABLE_GROUPS_ORGS_NAME = com.liferay.portal.model.impl.GroupModelImpl.MAPPING_TABLE_GROUPS_ORGS_NAME;
-	public static final boolean FINDER_CACHE_ENABLED_GROUPS_ORGS = com.liferay.portal.model.impl.GroupModelImpl.FINDER_CACHE_ENABLED_GROUPS_ORGS;
-	public static final String MAPPING_TABLE_USERS_ORGS_NAME = com.liferay.portal.model.impl.UserModelImpl.MAPPING_TABLE_USERS_ORGS_NAME;
-	public static final boolean FINDER_CACHE_ENABLED_USERS_ORGS = com.liferay.portal.model.impl.UserModelImpl.FINDER_CACHE_ENABLED_USERS_ORGS;
+	public static final String MAPPING_TABLE_GROUPS_ORGS_NAME = "Groups_Orgs";
+	public static final Object[][] MAPPING_TABLE_GROUPS_ORGS_COLUMNS = {
+			{ "groupId", Types.BIGINT },
+			{ "organizationId", Types.BIGINT }
+		};
+	public static final String MAPPING_TABLE_GROUPS_ORGS_SQL_CREATE = "create table Groups_Orgs (groupId LONG not null,organizationId LONG not null,primary key (groupId, organizationId))";
+	public static final boolean FINDER_CACHE_ENABLED_GROUPS_ORGS = GetterUtil.getBoolean(com.liferay.portal.util.PropsUtil.get(
+				"value.object.finder.cache.enabled.Groups_Orgs"), true);
+	public static final String MAPPING_TABLE_USERS_ORGS_NAME = "Users_Orgs";
+	public static final Object[][] MAPPING_TABLE_USERS_ORGS_COLUMNS = {
+			{ "userId", Types.BIGINT },
+			{ "organizationId", Types.BIGINT }
+		};
+	public static final String MAPPING_TABLE_USERS_ORGS_SQL_CREATE = "create table Users_Orgs (userId LONG not null,organizationId LONG not null,primary key (userId, organizationId))";
+	public static final boolean FINDER_CACHE_ENABLED_USERS_ORGS = GetterUtil.getBoolean(com.liferay.portal.util.PropsUtil.get(
+				"value.object.finder.cache.enabled.Users_Orgs"), true);
 	public static final long LOCK_EXPIRATION_TIME = GetterUtil.getLong(com.liferay.portal.util.PropsUtil.get(
 				"lock.expiration.time.com.liferay.portal.model.Organization"));
 
@@ -162,6 +171,102 @@ public class OrganizationModelImpl extends BaseModelImpl<Organization>
 		setPrimaryKey(((Long)primaryKeyObj).longValue());
 	}
 
+	public Class<?> getModelClass() {
+		return Organization.class;
+	}
+
+	public String getModelClassName() {
+		return Organization.class.getName();
+	}
+
+	@Override
+	public Map<String, Object> getModelAttributes() {
+		Map<String, Object> attributes = new HashMap<String, Object>();
+
+		attributes.put("organizationId", getOrganizationId());
+		attributes.put("companyId", getCompanyId());
+		attributes.put("parentOrganizationId", getParentOrganizationId());
+		attributes.put("treePath", getTreePath());
+		attributes.put("name", getName());
+		attributes.put("type", getType());
+		attributes.put("recursable", getRecursable());
+		attributes.put("regionId", getRegionId());
+		attributes.put("countryId", getCountryId());
+		attributes.put("statusId", getStatusId());
+		attributes.put("comments", getComments());
+
+		return attributes;
+	}
+
+	@Override
+	public void setModelAttributes(Map<String, Object> attributes) {
+		Long organizationId = (Long)attributes.get("organizationId");
+
+		if (organizationId != null) {
+			setOrganizationId(organizationId);
+		}
+
+		Long companyId = (Long)attributes.get("companyId");
+
+		if (companyId != null) {
+			setCompanyId(companyId);
+		}
+
+		Long parentOrganizationId = (Long)attributes.get("parentOrganizationId");
+
+		if (parentOrganizationId != null) {
+			setParentOrganizationId(parentOrganizationId);
+		}
+
+		String treePath = (String)attributes.get("treePath");
+
+		if (treePath != null) {
+			setTreePath(treePath);
+		}
+
+		String name = (String)attributes.get("name");
+
+		if (name != null) {
+			setName(name);
+		}
+
+		String type = (String)attributes.get("type");
+
+		if (type != null) {
+			setType(type);
+		}
+
+		Boolean recursable = (Boolean)attributes.get("recursable");
+
+		if (recursable != null) {
+			setRecursable(recursable);
+		}
+
+		Long regionId = (Long)attributes.get("regionId");
+
+		if (regionId != null) {
+			setRegionId(regionId);
+		}
+
+		Long countryId = (Long)attributes.get("countryId");
+
+		if (countryId != null) {
+			setCountryId(countryId);
+		}
+
+		Integer statusId = (Integer)attributes.get("statusId");
+
+		if (statusId != null) {
+			setStatusId(statusId);
+		}
+
+		String comments = (String)attributes.get("comments");
+
+		if (comments != null) {
+			setComments(comments);
+		}
+	}
+
 	@JSON
 	public long getOrganizationId() {
 		return _organizationId;
@@ -177,6 +282,8 @@ public class OrganizationModelImpl extends BaseModelImpl<Organization>
 	}
 
 	public void setCompanyId(long companyId) {
+		_columnBitmask |= COMPANYID_COLUMN_BITMASK;
+
 		if (!_setOriginalCompanyId) {
 			_setOriginalCompanyId = true;
 
@@ -196,6 +303,8 @@ public class OrganizationModelImpl extends BaseModelImpl<Organization>
 	}
 
 	public void setParentOrganizationId(long parentOrganizationId) {
+		_columnBitmask |= PARENTORGANIZATIONID_COLUMN_BITMASK;
+
 		if (!_setOriginalParentOrganizationId) {
 			_setOriginalParentOrganizationId = true;
 
@@ -210,21 +319,17 @@ public class OrganizationModelImpl extends BaseModelImpl<Organization>
 	}
 
 	@JSON
-	public long getLeftOrganizationId() {
-		return _leftOrganizationId;
+	public String getTreePath() {
+		if (_treePath == null) {
+			return StringPool.BLANK;
+		}
+		else {
+			return _treePath;
+		}
 	}
 
-	public void setLeftOrganizationId(long leftOrganizationId) {
-		_leftOrganizationId = leftOrganizationId;
-	}
-
-	@JSON
-	public long getRightOrganizationId() {
-		return _rightOrganizationId;
-	}
-
-	public void setRightOrganizationId(long rightOrganizationId) {
-		_rightOrganizationId = rightOrganizationId;
+	public void setTreePath(String treePath) {
+		_treePath = treePath;
 	}
 
 	@JSON
@@ -238,6 +343,8 @@ public class OrganizationModelImpl extends BaseModelImpl<Organization>
 	}
 
 	public void setName(String name) {
+		_columnBitmask = -1L;
+
 		if (_originalName == null) {
 			_originalName = _name;
 		}
@@ -317,35 +424,32 @@ public class OrganizationModelImpl extends BaseModelImpl<Organization>
 		_comments = comments;
 	}
 
+	public long getColumnBitmask() {
+		return _columnBitmask;
+	}
+
 	@Override
 	public Organization toEscapedModel() {
-		if (isEscapedModel()) {
-			return (Organization)this;
+		if (_escapedModelProxy == null) {
+			_escapedModelProxy = (Organization)ProxyUtil.newProxyInstance(_classLoader,
+					_escapedModelProxyInterfaces,
+					new AutoEscapeBeanHandler(this));
 		}
-		else {
-			if (_escapedModelProxy == null) {
-				_escapedModelProxy = (Organization)Proxy.newProxyInstance(_classLoader,
-						_escapedModelProxyInterfaces,
-						new AutoEscapeBeanHandler(this));
-			}
 
-			return _escapedModelProxy;
-		}
+		return _escapedModelProxy;
 	}
 
 	@Override
 	public ExpandoBridge getExpandoBridge() {
-		if (_expandoBridge == null) {
-			_expandoBridge = ExpandoBridgeFactoryUtil.getExpandoBridge(getCompanyId(),
-					Organization.class.getName(), getPrimaryKey());
-		}
-
-		return _expandoBridge;
+		return ExpandoBridgeFactoryUtil.getExpandoBridge(getCompanyId(),
+			Organization.class.getName(), getPrimaryKey());
 	}
 
 	@Override
 	public void setExpandoBridgeAttributes(ServiceContext serviceContext) {
-		getExpandoBridge().setAttributes(serviceContext);
+		ExpandoBridge expandoBridge = getExpandoBridge();
+
+		expandoBridge.setAttributes(serviceContext);
 	}
 
 	@Override
@@ -355,8 +459,7 @@ public class OrganizationModelImpl extends BaseModelImpl<Organization>
 		organizationImpl.setOrganizationId(getOrganizationId());
 		organizationImpl.setCompanyId(getCompanyId());
 		organizationImpl.setParentOrganizationId(getParentOrganizationId());
-		organizationImpl.setLeftOrganizationId(getLeftOrganizationId());
-		organizationImpl.setRightOrganizationId(getRightOrganizationId());
+		organizationImpl.setTreePath(getTreePath());
 		organizationImpl.setName(getName());
 		organizationImpl.setType(getType());
 		organizationImpl.setRecursable(getRecursable());
@@ -425,6 +528,8 @@ public class OrganizationModelImpl extends BaseModelImpl<Organization>
 		organizationModelImpl._setOriginalParentOrganizationId = false;
 
 		organizationModelImpl._originalName = organizationModelImpl._name;
+
+		organizationModelImpl._columnBitmask = 0;
 	}
 
 	@Override
@@ -437,9 +542,13 @@ public class OrganizationModelImpl extends BaseModelImpl<Organization>
 
 		organizationCacheModel.parentOrganizationId = getParentOrganizationId();
 
-		organizationCacheModel.leftOrganizationId = getLeftOrganizationId();
+		organizationCacheModel.treePath = getTreePath();
 
-		organizationCacheModel.rightOrganizationId = getRightOrganizationId();
+		String treePath = organizationCacheModel.treePath;
+
+		if ((treePath != null) && (treePath.length() == 0)) {
+			organizationCacheModel.treePath = null;
+		}
 
 		organizationCacheModel.name = getName();
 
@@ -478,7 +587,7 @@ public class OrganizationModelImpl extends BaseModelImpl<Organization>
 
 	@Override
 	public String toString() {
-		StringBundler sb = new StringBundler(25);
+		StringBundler sb = new StringBundler(23);
 
 		sb.append("{organizationId=");
 		sb.append(getOrganizationId());
@@ -486,10 +595,8 @@ public class OrganizationModelImpl extends BaseModelImpl<Organization>
 		sb.append(getCompanyId());
 		sb.append(", parentOrganizationId=");
 		sb.append(getParentOrganizationId());
-		sb.append(", leftOrganizationId=");
-		sb.append(getLeftOrganizationId());
-		sb.append(", rightOrganizationId=");
-		sb.append(getRightOrganizationId());
+		sb.append(", treePath=");
+		sb.append(getTreePath());
 		sb.append(", name=");
 		sb.append(getName());
 		sb.append(", type=");
@@ -510,7 +617,7 @@ public class OrganizationModelImpl extends BaseModelImpl<Organization>
 	}
 
 	public String toXmlString() {
-		StringBundler sb = new StringBundler(40);
+		StringBundler sb = new StringBundler(37);
 
 		sb.append("<model><model-name>");
 		sb.append("com.liferay.portal.model.Organization");
@@ -529,12 +636,8 @@ public class OrganizationModelImpl extends BaseModelImpl<Organization>
 		sb.append(getParentOrganizationId());
 		sb.append("]]></column-value></column>");
 		sb.append(
-			"<column><column-name>leftOrganizationId</column-name><column-value><![CDATA[");
-		sb.append(getLeftOrganizationId());
-		sb.append("]]></column-value></column>");
-		sb.append(
-			"<column><column-name>rightOrganizationId</column-name><column-value><![CDATA[");
-		sb.append(getRightOrganizationId());
+			"<column><column-name>treePath</column-name><column-value><![CDATA[");
+		sb.append(getTreePath());
 		sb.append("]]></column-value></column>");
 		sb.append(
 			"<column><column-name>name</column-name><column-value><![CDATA[");
@@ -581,8 +684,7 @@ public class OrganizationModelImpl extends BaseModelImpl<Organization>
 	private long _parentOrganizationId;
 	private long _originalParentOrganizationId;
 	private boolean _setOriginalParentOrganizationId;
-	private long _leftOrganizationId;
-	private long _rightOrganizationId;
+	private String _treePath;
 	private String _name;
 	private String _originalName;
 	private String _type;
@@ -591,6 +693,6 @@ public class OrganizationModelImpl extends BaseModelImpl<Organization>
 	private long _countryId;
 	private int _statusId;
 	private String _comments;
-	private transient ExpandoBridge _expandoBridge;
+	private long _columnBitmask;
 	private Organization _escapedModelProxy;
 }

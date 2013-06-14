@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,6 +14,12 @@
 
 package com.liferay.portlet.asset.model;
 
+import com.liferay.portal.model.ModelWrapper;
+
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * <p>
  * This class is a wrapper for {@link AssetTag}.
@@ -23,7 +29,7 @@ package com.liferay.portlet.asset.model;
  * @see       AssetTag
  * @generated
  */
-public class AssetTagWrapper implements AssetTag {
+public class AssetTagWrapper implements AssetTag, ModelWrapper<AssetTag> {
 	public AssetTagWrapper(AssetTag assetTag) {
 		_assetTag = assetTag;
 	}
@@ -34,6 +40,78 @@ public class AssetTagWrapper implements AssetTag {
 
 	public String getModelClassName() {
 		return AssetTag.class.getName();
+	}
+
+	public Map<String, Object> getModelAttributes() {
+		Map<String, Object> attributes = new HashMap<String, Object>();
+
+		attributes.put("tagId", getTagId());
+		attributes.put("groupId", getGroupId());
+		attributes.put("companyId", getCompanyId());
+		attributes.put("userId", getUserId());
+		attributes.put("userName", getUserName());
+		attributes.put("createDate", getCreateDate());
+		attributes.put("modifiedDate", getModifiedDate());
+		attributes.put("name", getName());
+		attributes.put("assetCount", getAssetCount());
+
+		return attributes;
+	}
+
+	public void setModelAttributes(Map<String, Object> attributes) {
+		Long tagId = (Long)attributes.get("tagId");
+
+		if (tagId != null) {
+			setTagId(tagId);
+		}
+
+		Long groupId = (Long)attributes.get("groupId");
+
+		if (groupId != null) {
+			setGroupId(groupId);
+		}
+
+		Long companyId = (Long)attributes.get("companyId");
+
+		if (companyId != null) {
+			setCompanyId(companyId);
+		}
+
+		Long userId = (Long)attributes.get("userId");
+
+		if (userId != null) {
+			setUserId(userId);
+		}
+
+		String userName = (String)attributes.get("userName");
+
+		if (userName != null) {
+			setUserName(userName);
+		}
+
+		Date createDate = (Date)attributes.get("createDate");
+
+		if (createDate != null) {
+			setCreateDate(createDate);
+		}
+
+		Date modifiedDate = (Date)attributes.get("modifiedDate");
+
+		if (modifiedDate != null) {
+			setModifiedDate(modifiedDate);
+		}
+
+		String name = (String)attributes.get("name");
+
+		if (name != null) {
+			setName(name);
+		}
+
+		Integer assetCount = (Integer)attributes.get("assetCount");
+
+		if (assetCount != null) {
+			setAssetCount(assetCount);
+		}
 	}
 
 	/**
@@ -256,10 +334,6 @@ public class AssetTagWrapper implements AssetTag {
 		return _assetTag.isEscapedModel();
 	}
 
-	public void setEscapedModel(boolean escapedModel) {
-		_assetTag.setEscapedModel(escapedModel);
-	}
-
 	public java.io.Serializable getPrimaryKeyObj() {
 		return _assetTag.getPrimaryKeyObj();
 	}
@@ -313,7 +387,14 @@ public class AssetTagWrapper implements AssetTag {
 		_assetTag.persist();
 	}
 
+	/**
+	 * @deprecated Renamed to {@link #getWrappedModel}
+	 */
 	public AssetTag getWrappedAssetTag() {
+		return _assetTag;
+	}
+
+	public AssetTag getWrappedModel() {
 		return _assetTag;
 	}
 

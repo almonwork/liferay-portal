@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,8 +14,11 @@
 
 package com.liferay.portal.kernel.bean;
 
+import java.util.Map;
+
 /**
  * @author Brian Wing Shun Chan
+ * @author Miguel Pastor
  */
 public interface BeanLocator {
 
@@ -24,6 +27,9 @@ public interface BeanLocator {
 	public String[] getNames();
 
 	public Class<?> getType(String name) throws BeanLocatorException;
+
+	public <T> Map<String, T> locate(Class<T> clazz)
+		throws BeanLocatorException;
 
 	public Object locate(String name) throws BeanLocatorException;
 

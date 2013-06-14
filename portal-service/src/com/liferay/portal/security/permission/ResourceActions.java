@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -17,10 +17,8 @@ package com.liferay.portal.security.permission;
 import com.liferay.portal.NoSuchResourceActionException;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.model.Group;
-import com.liferay.portal.model.Permission;
 import com.liferay.portal.model.Portlet;
 import com.liferay.portal.model.Role;
-import com.liferay.portlet.social.model.SocialEquityActionMapping;
 
 import java.io.InputStream;
 
@@ -43,8 +41,6 @@ public interface ResourceActions {
 	public String getAction(PageContext pageContext, String action);
 
 	public String getActionNamePrefix();
-
-	public List<String> getActions(List<Permission> permissions);
 
 	public List<String> getActionsNames(
 		PageContext pageContext, List<String> actions);
@@ -114,14 +110,6 @@ public interface ResourceActions {
 	public List<Role> getRoles(
 			long companyId, Group group, String modelResource, int[] roleTypes)
 		throws SystemException;
-
-	public SocialEquityActionMapping getSocialEquityActionMapping(
-		String name, String actionId);
-
-	public List<SocialEquityActionMapping> getSocialEquityActionMappings(
-		String name);
-
-	public String[] getSocialEquityClassNames();
 
 	public boolean hasModelResourceActions(String name);
 

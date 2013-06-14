@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -17,7 +17,6 @@ package com.liferay.portlet.pollsdisplay.action;
 import com.liferay.portal.kernel.servlet.SessionErrors;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.StringPool;
-import com.liferay.portal.security.auth.PrincipalException;
 import com.liferay.portal.struts.PortletAction;
 import com.liferay.portal.util.WebKeys;
 import com.liferay.portlet.polls.NoSuchQuestionException;
@@ -50,21 +49,22 @@ public class ViewAction extends PortletAction {
 			long questionId = GetterUtil.getLong(
 				preferences.getValue("questionId", StringPool.BLANK));
 
-			PollsQuestion question =
-				PollsQuestionServiceUtil.getQuestion(questionId);
+			if (questionId > 0) {
+				PollsQuestion question = PollsQuestionServiceUtil.getQuestion(
+					questionId);
 
-			renderRequest.setAttribute(WebKeys.POLLS_QUESTION, question);
+				renderRequest.setAttribute(WebKeys.POLLS_QUESTION, question);
+			}
+		}
+		catch (Exception e) {
+			if (!(e instanceof NoSuchQuestionException)) {
+				SessionErrors.add(renderRequest, e.getClass());
 
-			return mapping.findForward("portlet.polls_display.view");
+				return mapping.findForward("portlet.polls_display.error");
+			}
 		}
-		catch (NoSuchQuestionException nsqe) {
-			return mapping.findForward("/portal/portlet_not_setup");
-		}
-		catch (PrincipalException pe) {
-			SessionErrors.add(renderRequest, pe.getClass().getName());
 
-			return mapping.findForward("portlet.polls_display.error");
-		}
+		return mapping.findForward("portlet.polls_display.view");
 	}
 
 }

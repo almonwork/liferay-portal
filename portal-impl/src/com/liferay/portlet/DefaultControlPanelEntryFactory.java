@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -16,7 +16,7 @@ package com.liferay.portlet;
 
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
-import com.liferay.portal.kernel.util.PortalClassLoaderUtil;
+import com.liferay.portal.security.pacl.PACLClassLoaderUtil;
 import com.liferay.portal.util.PropsValues;
 
 /**
@@ -32,7 +32,8 @@ public class DefaultControlPanelEntryFactory {
 						PropsValues.CONTROL_PANEL_DEFAULT_ENTRY_CLASS);
 			}
 
-			ClassLoader classLoader = PortalClassLoaderUtil.getClassLoader();
+			ClassLoader classLoader =
+				PACLClassLoaderUtil.getPortalClassLoader();
 
 			try {
 				_controlPanelEntry = (ControlPanelEntry)classLoader.loadClass(
@@ -45,8 +46,7 @@ public class DefaultControlPanelEntryFactory {
 		}
 
 		if (_log.isDebugEnabled()) {
-			_log.debug(
-				"Return " + _controlPanelEntry.getClass().getName());
+			_log.debug("Return " + _controlPanelEntry.getClass().getName());
 		}
 
 		return _controlPanelEntry;

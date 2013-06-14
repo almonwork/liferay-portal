@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -32,6 +32,14 @@ public class UpgradeAsset extends UpgradeProcess {
 
 	@Override
 	protected void doUpgrade() throws Exception {
+		try {
+			runSQL(
+				"create unique index IX_1E9D371D on AssetEntry (classNameId, " +
+					"classPK)");
+		}
+		catch (Exception e) {
+		}
+
 		updateAssetEntry("com.liferay.portal.model.User", "User_", "userId");
 		updateAssetEntry(
 			"com.liferay.portlet.blogs.model.BlogsEntry", "BlogsEntry",
@@ -74,7 +82,7 @@ public class UpgradeAsset extends UpgradeProcess {
 		ResultSet rs = null;
 
 		try {
-			con = DataAccess.getConnection();
+			con = DataAccess.getUpgradeOptimizedConnection();
 
 			ps = con.prepareStatement(
 				"select uuid_ from " + tableName + " where " + columnName1 +
@@ -103,7 +111,7 @@ public class UpgradeAsset extends UpgradeProcess {
 		PreparedStatement ps = null;
 
 		try {
-			con = DataAccess.getConnection();
+			con = DataAccess.getUpgradeOptimizedConnection();
 
 			ps = con.prepareStatement(
 				"update AssetEntry set classUuid = ? where classNameId = ? " +
@@ -155,7 +163,7 @@ public class UpgradeAsset extends UpgradeProcess {
 		ResultSet rs = null;
 
 		try {
-			con = DataAccess.getConnection();
+			con = DataAccess.getUpgradeOptimizedConnection();
 
 			ps = con.prepareStatement(
 				"select classPK from AssetEntry where classNameId = ?");

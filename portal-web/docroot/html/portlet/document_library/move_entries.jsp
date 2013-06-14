@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -21,21 +21,23 @@ String redirect = ParamUtil.getString(request, "redirect");
 
 String referringPortletResource = ParamUtil.getString(request, "referringPortletResource");
 
+long newFolderId = ParamUtil.getLong(request, "newFolderId");
+
+String fileShortcutIds = ParamUtil.getString(request, "fileShortcutIds");
+
 List<Folder> folders = (List<Folder>)request.getAttribute(WebKeys.DOCUMENT_LIBRARY_FOLDERS);
 
-List<Folder> validMoveFolders = new ArrayList<Folder>();
 List<Folder> invalidMoveFolders = new ArrayList<Folder>();
+List<Folder> validMoveFolders = new ArrayList<Folder>();
 
-if (!folders.isEmpty()) {
-	for (Folder curFolder : folders) {
-		boolean movePermission = DLFolderPermission.contains(permissionChecker, curFolder, ActionKeys.UPDATE) && (!curFolder.isLocked() || curFolder.hasLock());
+for (Folder curFolder : folders) {
+	boolean movePermission = DLFolderPermission.contains(permissionChecker, curFolder, ActionKeys.UPDATE) && (!curFolder.isLocked() || curFolder.hasLock());
 
-		if (movePermission) {
-			validMoveFolders.add(curFolder);
-		}
-		else {
-			invalidMoveFolders.add(curFolder);
-		}
+	if (movePermission) {
+		validMoveFolders.add(curFolder);
+	}
+	else {
+		invalidMoveFolders.add(curFolder);
 	}
 }
 
@@ -55,30 +57,31 @@ else {
 List<FileEntry> validMoveFileEntries = new ArrayList<FileEntry>();
 List<FileEntry> invalidMoveFileEntries = new ArrayList<FileEntry>();
 
-if (!fileEntries.isEmpty()) {
-	for (FileEntry curFileEntry : fileEntries) {
-		boolean movePermission = DLFileEntryPermission.contains(permissionChecker, curFileEntry, ActionKeys.UPDATE) && (!curFileEntry.isCheckedOut() || curFileEntry.hasLock());
+for (FileEntry curFileEntry : fileEntries) {
+	boolean movePermission = DLFileEntryPermission.contains(permissionChecker, curFileEntry, ActionKeys.UPDATE) && (!curFileEntry.isCheckedOut() || curFileEntry.hasLock());
 
-		if (movePermission) {
-			validMoveFileEntries.add(curFileEntry);
-		}
-		else {
-			invalidMoveFileEntries.add(curFileEntry);
-		}
+	if (movePermission) {
+		validMoveFileEntries.add(curFileEntry);
+	}
+	else {
+		invalidMoveFileEntries.add(curFileEntry);
 	}
 }
 
-long folderId = 0;
+List<DLFileShortcut> fileShortcuts = (List<DLFileShortcut>)request.getAttribute(WebKeys.DOCUMENT_LIBRARY_FILE_SHORTCUTS);
 
-if (!fileEntries.isEmpty()) {
-	fileEntry = fileEntries.get(0);
+List<DLFileShortcut> invalidShortcutEntries = new ArrayList<DLFileShortcut>();
+List<DLFileShortcut> validShortcutEntries = new ArrayList<DLFileShortcut>();
 
-	folderId = fileEntry.getFolderId();
-}
-else if (!folders.isEmpty()) {
-	Folder folder = folders.get(0);
+for (DLFileShortcut curFileShortcut : fileShortcuts) {
+	boolean movePermission = DLFileShortcutPermission.contains(permissionChecker, curFileShortcut, ActionKeys.UPDATE);
 
-	folderId = folder.getFolderId();
+	if (movePermission) {
+		validShortcutEntries.add(curFileShortcut);
+	}
+	else {
+		invalidShortcutEntries.add(curFileShortcut);
+	}
 }
 %>
 
@@ -93,7 +96,7 @@ else if (!folders.isEmpty()) {
 <aui:form action="<%= moveFileEntryURL %>" enctype="multipart/form-data" method="post" name="fm" onSubmit='<%= "event.preventDefault(); " + renderResponse.getNamespace() + "saveFileEntry(false);" %>'>
 	<aui:input name="<%= Constants.CMD %>" type="hidden" value="<%= Constants.MOVE %>" />
 	<aui:input name="redirect" type="hidden" value="<%= redirect %>" />
-	<aui:input name="newFolderId" type="hidden" value="<%= DLFolderConstants.DEFAULT_PARENT_FOLDER_ID %>" />
+	<aui:input name="newFolderId" type="hidden" value="<%= newFolderId %>" />
 
 	<liferay-ui:header
 		backURL="<%= redirect %>"
@@ -113,12 +116,11 @@ else if (!folders.isEmpty()) {
 			<ul class="lfr-component">
 
 				<%
-				for (int i = 0; i < validMoveFolders.size(); i++) {
-					Folder folder = validMoveFolders.get(i);
+				for (Folder folder : validMoveFolders) {
 				%>
 
 					<li class="move-folder">
-						<span class=folder-title>
+						<span class="folder-title">
 							<%= folder.getName() %>
 						</span>
 					</li>
@@ -179,12 +181,11 @@ else if (!folders.isEmpty()) {
 			<ul class="lfr-component">
 
 				<%
-				for (int i = 0; i < validMoveFileEntries.size(); i++) {
-					FileEntry validMoveFileEntry = validMoveFileEntries.get(i);
+				for (FileEntry validMoveFileEntry : validMoveFileEntries) {
 				%>
 
 					<li class="move-file">
-						<span class=file-title>
+						<span class="file-title" title="<%= validMoveFileEntry.getTitle() %>">
 							<%= validMoveFileEntry.getTitle() %>
 						</span>
 					</li>
@@ -211,7 +212,7 @@ else if (!folders.isEmpty()) {
 				%>
 
 					<li class="move-file move-error">
-						<span class="file-title">
+						<span class="file-title" title="<%= invalidMoveFileEntry.getTitle() %>">
 							<%= invalidMoveFileEntry.getTitle() %>
 						</span>
 
@@ -237,35 +238,92 @@ else if (!folders.isEmpty()) {
 
 	<aui:input name="fileEntryIds" type="hidden" value='<%= ListUtil.toString(validMoveFileEntries, FileEntry.FILE_ENTRY_ID_ACCESSOR) %>' />
 
+	<c:if test="<%= !validShortcutEntries.isEmpty() %>">
+		<div class="move-list-info">
+			<h4><%= LanguageUtil.format(pageContext, "x-shortcuts-ready-to-be-moved", validShortcutEntries.size()) %></h4>
+		</div>
+
+		<div class="move-list">
+			<ul class="lfr-component">
+
+				<%
+				for (DLFileShortcut fileShortcut : validShortcutEntries) {
+				%>
+
+					<li class="move-file">
+						<span class="file-title">
+							<%= fileShortcut.getToTitle() + " (" + LanguageUtil.get(themeDisplay.getLocale(), "shortcut") + ")" %>
+						</span>
+					</li>
+
+				<%
+				}
+				%>
+
+			</ul>
+		</div>
+	</c:if>
+
+	<c:if test="<%= !invalidShortcutEntries.isEmpty() %>">
+		<div class="move-list-info">
+			<h4><%= LanguageUtil.format(pageContext, "x-shortcuts-cannot-be-moved", invalidShortcutEntries.size()) %></h4>
+		</div>
+
+		<div class="move-list">
+			<ul class="lfr-component">
+
+				<%
+				for (DLFileShortcut fileShortcut : invalidShortcutEntries) {
+				%>
+
+					<li class="move-file move-error">
+						<span class="file-title">
+							<%= fileShortcut.getToTitle() + " (" + LanguageUtil.get(themeDisplay.getLocale(), "shortcut") + ")" %>
+						</span>
+
+						<span class="error-message">
+							<%= LanguageUtil.get(pageContext, "you-do-not-have-the-required-permissions") %>
+						</span>
+					</li>
+
+				<%
+				}
+				%>
+
+			</ul>
+		</div>
+	</c:if>
+
+	<aui:input name="fileShortcutIds" type="hidden" value="<%= fileShortcutIds %>" />
+
 	<aui:fieldset>
 
 		<%
 		String folderName = StringPool.BLANK;
 
-		if (folderId > 0) {
-			Folder folder = DLAppLocalServiceUtil.getFolder(folderId);
+		if (newFolderId > 0) {
+			Folder folder = DLAppLocalServiceUtil.getFolder(newFolderId);
 
 			folder = folder.toEscapedModel();
 
-			folderId = folder.getFolderId();
 			folderName = folder.getName();
 		}
 		else {
-			folderName = LanguageUtil.get(pageContext, "documents-home");
+			folderName = LanguageUtil.get(pageContext, "home");
 		}
 		%>
 
 		<portlet:renderURL var="viewFolderURL">
 			<portlet:param name="struts_action" value="/document_library/view" />
-			<portlet:param name="folderId" value="<%= String.valueOf(folderId) %>" />
+			<portlet:param name="folderId" value="<%= String.valueOf(newFolderId) %>" />
 		</portlet:renderURL>
 
 		<aui:field-wrapper label="new-folder">
 			<aui:a href="<%= viewFolderURL %>" id="folderName"><%= folderName %></aui:a>
 
-			<portlet:renderURL windowState="<%= LiferayWindowState.POP_UP.toString() %>" var="selectFolderURL">
+			<portlet:renderURL var="selectFolderURL" windowState="<%= LiferayWindowState.POP_UP.toString() %>">
 				<portlet:param name="struts_action" value="/document_library/select_folder" />
-				<portlet:param name="folderId" value="<%= String.valueOf(folderId) %>" />
+				<portlet:param name="folderId" value="<%= String.valueOf(newFolderId) %>" />
 			</portlet:renderURL>
 
 			<%
@@ -289,12 +347,14 @@ else if (!folders.isEmpty()) {
 	}
 
 	function <portlet:namespace />selectFolder(folderId, folderName) {
-		document.<portlet:namespace />fm.<portlet:namespace />newFolderId.value = folderId;
+		var folderData = {
+			idString: 'newFolderId',
+			idValue: folderId,
+			nameString: 'folderName',
+			nameValue: folderName
+		};
 
-		var nameEl = document.getElementById("<portlet:namespace />folderName");
-
-		nameEl.href = "javascript:location = '<portlet:renderURL><portlet:param name="struts_action" value="/document_library/view" /></portlet:renderURL>&<portlet:namespace />folderId=" + folderId + "'; void('');";
-		nameEl.innerHTML = folderName + "&nbsp;";
+		Liferay.Util.selectFolder(folderData, '<portlet:renderURL><portlet:param name="struts_action" value="/document_library/view" /></portlet:renderURL>', '<portlet:namespace />');
 	}
 
 	<c:if test="<%= windowState.equals(WindowState.MAXIMIZED) %>">

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,6 +14,12 @@
 
 package com.liferay.portlet.messageboards.model;
 
+import com.liferay.portal.model.ModelWrapper;
+
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * <p>
  * This class is a wrapper for {@link MBMessage}.
@@ -23,7 +29,7 @@ package com.liferay.portlet.messageboards.model;
  * @see       MBMessage
  * @generated
  */
-public class MBMessageWrapper implements MBMessage {
+public class MBMessageWrapper implements MBMessage, ModelWrapper<MBMessage> {
 	public MBMessageWrapper(MBMessage mbMessage) {
 		_mbMessage = mbMessage;
 	}
@@ -34,6 +40,197 @@ public class MBMessageWrapper implements MBMessage {
 
 	public String getModelClassName() {
 		return MBMessage.class.getName();
+	}
+
+	public Map<String, Object> getModelAttributes() {
+		Map<String, Object> attributes = new HashMap<String, Object>();
+
+		attributes.put("uuid", getUuid());
+		attributes.put("messageId", getMessageId());
+		attributes.put("groupId", getGroupId());
+		attributes.put("companyId", getCompanyId());
+		attributes.put("userId", getUserId());
+		attributes.put("userName", getUserName());
+		attributes.put("createDate", getCreateDate());
+		attributes.put("modifiedDate", getModifiedDate());
+		attributes.put("classNameId", getClassNameId());
+		attributes.put("classPK", getClassPK());
+		attributes.put("categoryId", getCategoryId());
+		attributes.put("threadId", getThreadId());
+		attributes.put("rootMessageId", getRootMessageId());
+		attributes.put("parentMessageId", getParentMessageId());
+		attributes.put("subject", getSubject());
+		attributes.put("body", getBody());
+		attributes.put("format", getFormat());
+		attributes.put("attachments", getAttachments());
+		attributes.put("anonymous", getAnonymous());
+		attributes.put("priority", getPriority());
+		attributes.put("allowPingbacks", getAllowPingbacks());
+		attributes.put("answer", getAnswer());
+		attributes.put("status", getStatus());
+		attributes.put("statusByUserId", getStatusByUserId());
+		attributes.put("statusByUserName", getStatusByUserName());
+		attributes.put("statusDate", getStatusDate());
+
+		return attributes;
+	}
+
+	public void setModelAttributes(Map<String, Object> attributes) {
+		String uuid = (String)attributes.get("uuid");
+
+		if (uuid != null) {
+			setUuid(uuid);
+		}
+
+		Long messageId = (Long)attributes.get("messageId");
+
+		if (messageId != null) {
+			setMessageId(messageId);
+		}
+
+		Long groupId = (Long)attributes.get("groupId");
+
+		if (groupId != null) {
+			setGroupId(groupId);
+		}
+
+		Long companyId = (Long)attributes.get("companyId");
+
+		if (companyId != null) {
+			setCompanyId(companyId);
+		}
+
+		Long userId = (Long)attributes.get("userId");
+
+		if (userId != null) {
+			setUserId(userId);
+		}
+
+		String userName = (String)attributes.get("userName");
+
+		if (userName != null) {
+			setUserName(userName);
+		}
+
+		Date createDate = (Date)attributes.get("createDate");
+
+		if (createDate != null) {
+			setCreateDate(createDate);
+		}
+
+		Date modifiedDate = (Date)attributes.get("modifiedDate");
+
+		if (modifiedDate != null) {
+			setModifiedDate(modifiedDate);
+		}
+
+		Long classNameId = (Long)attributes.get("classNameId");
+
+		if (classNameId != null) {
+			setClassNameId(classNameId);
+		}
+
+		Long classPK = (Long)attributes.get("classPK");
+
+		if (classPK != null) {
+			setClassPK(classPK);
+		}
+
+		Long categoryId = (Long)attributes.get("categoryId");
+
+		if (categoryId != null) {
+			setCategoryId(categoryId);
+		}
+
+		Long threadId = (Long)attributes.get("threadId");
+
+		if (threadId != null) {
+			setThreadId(threadId);
+		}
+
+		Long rootMessageId = (Long)attributes.get("rootMessageId");
+
+		if (rootMessageId != null) {
+			setRootMessageId(rootMessageId);
+		}
+
+		Long parentMessageId = (Long)attributes.get("parentMessageId");
+
+		if (parentMessageId != null) {
+			setParentMessageId(parentMessageId);
+		}
+
+		String subject = (String)attributes.get("subject");
+
+		if (subject != null) {
+			setSubject(subject);
+		}
+
+		String body = (String)attributes.get("body");
+
+		if (body != null) {
+			setBody(body);
+		}
+
+		String format = (String)attributes.get("format");
+
+		if (format != null) {
+			setFormat(format);
+		}
+
+		Boolean attachments = (Boolean)attributes.get("attachments");
+
+		if (attachments != null) {
+			setAttachments(attachments);
+		}
+
+		Boolean anonymous = (Boolean)attributes.get("anonymous");
+
+		if (anonymous != null) {
+			setAnonymous(anonymous);
+		}
+
+		Double priority = (Double)attributes.get("priority");
+
+		if (priority != null) {
+			setPriority(priority);
+		}
+
+		Boolean allowPingbacks = (Boolean)attributes.get("allowPingbacks");
+
+		if (allowPingbacks != null) {
+			setAllowPingbacks(allowPingbacks);
+		}
+
+		Boolean answer = (Boolean)attributes.get("answer");
+
+		if (answer != null) {
+			setAnswer(answer);
+		}
+
+		Integer status = (Integer)attributes.get("status");
+
+		if (status != null) {
+			setStatus(status);
+		}
+
+		Long statusByUserId = (Long)attributes.get("statusByUserId");
+
+		if (statusByUserId != null) {
+			setStatusByUserId(statusByUserId);
+		}
+
+		String statusByUserName = (String)attributes.get("statusByUserName");
+
+		if (statusByUserName != null) {
+			setStatusByUserName(statusByUserName);
+		}
+
+		Date statusDate = (Date)attributes.get("statusDate");
+
+		if (statusDate != null) {
+			setStatusDate(statusDate);
+		}
 	}
 
 	/**
@@ -225,6 +422,10 @@ public class MBMessageWrapper implements MBMessage {
 	*/
 	public java.lang.String getClassName() {
 		return _mbMessage.getClassName();
+	}
+
+	public void setClassName(java.lang.String className) {
+		_mbMessage.setClassName(className);
 	}
 
 	/**
@@ -489,6 +690,33 @@ public class MBMessageWrapper implements MBMessage {
 	}
 
 	/**
+	* Returns the answer of this message-boards message.
+	*
+	* @return the answer of this message-boards message
+	*/
+	public boolean getAnswer() {
+		return _mbMessage.getAnswer();
+	}
+
+	/**
+	* Returns <code>true</code> if this message-boards message is answer.
+	*
+	* @return <code>true</code> if this message-boards message is answer; <code>false</code> otherwise
+	*/
+	public boolean isAnswer() {
+		return _mbMessage.isAnswer();
+	}
+
+	/**
+	* Sets whether this message-boards message is answer.
+	*
+	* @param answer the answer of this message-boards message
+	*/
+	public void setAnswer(boolean answer) {
+		_mbMessage.setAnswer(answer);
+	}
+
+	/**
 	* Returns the status of this message-boards message.
 	*
 	* @return the status of this message-boards message
@@ -615,6 +843,15 @@ public class MBMessageWrapper implements MBMessage {
 	}
 
 	/**
+	* Returns <code>true</code> if this message-boards message is in the Recycle Bin.
+	*
+	* @return <code>true</code> if this message-boards message is in the Recycle Bin; <code>false</code> otherwise
+	*/
+	public boolean isInTrash() {
+		return _mbMessage.isInTrash();
+	}
+
+	/**
 	* Returns <code>true</code> if this message-boards message is pending.
 	*
 	* @return <code>true</code> if this message-boards message is pending; <code>false</code> otherwise
@@ -641,10 +878,6 @@ public class MBMessageWrapper implements MBMessage {
 
 	public boolean isEscapedModel() {
 		return _mbMessage.isEscapedModel();
-	}
-
-	public void setEscapedModel(boolean escapedModel) {
-		_mbMessage.setEscapedModel(escapedModel);
 	}
 
 	public java.io.Serializable getPrimaryKeyObj() {
@@ -758,7 +991,14 @@ public class MBMessageWrapper implements MBMessage {
 		_mbMessage.setAttachmentsDir(attachmentsDir);
 	}
 
+	/**
+	 * @deprecated Renamed to {@link #getWrappedModel}
+	 */
 	public MBMessage getWrappedMBMessage() {
+		return _mbMessage;
+	}
+
+	public MBMessage getWrappedModel() {
 		return _mbMessage;
 	}
 

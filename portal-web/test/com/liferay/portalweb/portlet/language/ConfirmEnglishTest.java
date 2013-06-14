@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -22,11 +22,39 @@ import com.liferay.portalweb.portal.util.RuntimeVariables;
  */
 public class ConfirmEnglishTest extends BaseTestCase {
 	public void testConfirmEnglish() throws Exception {
-		selenium.clickAt("//img[@alt='English (United States)']",
-			RuntimeVariables.replace(""));
-		selenium.clickAt("//img[@alt='English (United States)']",
-			RuntimeVariables.replace(""));
+		selenium.open("/web/guest/home/");
+		loadRequiredJavaScriptModules();
+
+		for (int second = 0;; second++) {
+			if (second >= 90) {
+				fail("timeout");
+			}
+
+			try {
+				if (selenium.isVisible("link=Language Test Page")) {
+					break;
+				}
+			}
+			catch (Exception e) {
+			}
+
+			Thread.sleep(1000);
+		}
+
+		selenium.clickAt("link=Language Test Page",
+			RuntimeVariables.replace("Language Test Page"));
 		selenium.waitForPageToLoad("30000");
-		selenium.saveScreenShotAndSource();
+		loadRequiredJavaScriptModules();
+		assertEquals(RuntimeVariables.replace("Add"),
+			selenium.getText("//li[@id='_145_addContent']/a/span"));
+		assertEquals(RuntimeVariables.replace("Manage"),
+			selenium.getText("//li[@id='_145_manageContent']/a/span"));
+		assertEquals(RuntimeVariables.replace("Go to"),
+			selenium.getText("//li[@id='_145_mySites']/a/span"));
+		assertEquals(RuntimeVariables.replace("(Sign Out)"),
+			selenium.getText("//span[@class='sign-out']"));
+		assertEquals(RuntimeVariables.replace("Language Test Page"),
+			selenium.getText(
+				"//ul[@class='breadcrumbs breadcrumbs-horizontal lfr-component']/li[2]/span/a"));
 	}
 }

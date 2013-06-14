@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -91,14 +91,6 @@ public class LayoutSetUtil {
 		return getPersistence()
 				   .findWithDynamicQuery(dynamicQuery, start, end,
 			orderByComparator);
-	}
-
-	/**
-	 * @see com.liferay.portal.service.persistence.BasePersistence#remove(com.liferay.portal.model.BaseModel)
-	 */
-	public static LayoutSet remove(LayoutSet layoutSet)
-		throws SystemException {
-		return getPersistence().remove(layoutSet);
 	}
 
 	/**
@@ -565,12 +557,14 @@ public class LayoutSetUtil {
 	*
 	* @param groupId the group ID
 	* @param privateLayout the private layout
+	* @return the layout set that was removed
 	* @throws SystemException if a system exception occurred
 	*/
-	public static void removeByG_P(long groupId, boolean privateLayout)
+	public static com.liferay.portal.model.LayoutSet removeByG_P(long groupId,
+		boolean privateLayout)
 		throws com.liferay.portal.NoSuchLayoutSetException,
 			com.liferay.portal.kernel.exception.SystemException {
-		getPersistence().removeByG_P(groupId, privateLayout);
+		return getPersistence().removeByG_P(groupId, privateLayout);
 	}
 
 	/**
@@ -644,10 +638,10 @@ public class LayoutSetUtil {
 		return _persistence;
 	}
 
+	/**
+	 * @deprecated
+	 */
 	public void setPersistence(LayoutSetPersistence persistence) {
-		_persistence = persistence;
-
-		ReferenceRegistry.registerReference(LayoutSetUtil.class, "_persistence");
 	}
 
 	private static LayoutSetPersistence _persistence;

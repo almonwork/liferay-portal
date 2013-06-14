@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -37,7 +37,8 @@ import java.util.Date;
  * @see com.liferay.portal.model.impl.ContactModelImpl
  * @generated
  */
-public interface ContactModel extends AuditedModel, BaseModel<Contact> {
+public interface ContactModel extends AttachedModel, AuditedModel,
+	BaseModel<Contact> {
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
@@ -159,6 +160,43 @@ public interface ContactModel extends AuditedModel, BaseModel<Contact> {
 	public void setModifiedDate(Date modifiedDate);
 
 	/**
+	 * Returns the fully qualified class name of this contact.
+	 *
+	 * @return the fully qualified class name of this contact
+	 */
+	public String getClassName();
+
+	public void setClassName(String className);
+
+	/**
+	 * Returns the class name ID of this contact.
+	 *
+	 * @return the class name ID of this contact
+	 */
+	public long getClassNameId();
+
+	/**
+	 * Sets the class name ID of this contact.
+	 *
+	 * @param classNameId the class name ID of this contact
+	 */
+	public void setClassNameId(long classNameId);
+
+	/**
+	 * Returns the class p k of this contact.
+	 *
+	 * @return the class p k of this contact
+	 */
+	public long getClassPK();
+
+	/**
+	 * Sets the class p k of this contact.
+	 *
+	 * @param classPK the class p k of this contact
+	 */
+	public void setClassPK(long classPK);
+
+	/**
 	 * Returns the account ID of this contact.
 	 *
 	 * @return the account ID of this contact
@@ -185,6 +223,21 @@ public interface ContactModel extends AuditedModel, BaseModel<Contact> {
 	 * @param parentContactId the parent contact ID of this contact
 	 */
 	public void setParentContactId(long parentContactId);
+
+	/**
+	 * Returns the email address of this contact.
+	 *
+	 * @return the email address of this contact
+	 */
+	@AutoEscape
+	public String getEmailAddress();
+
+	/**
+	 * Sets the email address of this contact.
+	 *
+	 * @param emailAddress the email address of this contact
+	 */
+	public void setEmailAddress(String emailAddress);
 
 	/**
 	 * Returns the first name of this contact.
@@ -528,8 +581,6 @@ public interface ContactModel extends AuditedModel, BaseModel<Contact> {
 	public void setCachedModel(boolean cachedModel);
 
 	public boolean isEscapedModel();
-
-	public void setEscapedModel(boolean escapedModel);
 
 	public Serializable getPrimaryKeyObj();
 

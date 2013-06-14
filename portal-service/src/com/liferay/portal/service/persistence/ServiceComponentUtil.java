@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -91,14 +91,6 @@ public class ServiceComponentUtil {
 		return getPersistence()
 				   .findWithDynamicQuery(dynamicQuery, start, end,
 			orderByComparator);
-	}
-
-	/**
-	 * @see com.liferay.portal.service.persistence.BasePersistence#remove(com.liferay.portal.model.BaseModel)
-	 */
-	public static ServiceComponent remove(ServiceComponent serviceComponent)
-		throws SystemException {
-		return getPersistence().remove(serviceComponent);
 	}
 
 	/**
@@ -434,13 +426,14 @@ public class ServiceComponentUtil {
 	*
 	* @param buildNamespace the build namespace
 	* @param buildNumber the build number
+	* @return the service component that was removed
 	* @throws SystemException if a system exception occurred
 	*/
-	public static void removeByBNS_BNU(java.lang.String buildNamespace,
-		long buildNumber)
+	public static com.liferay.portal.model.ServiceComponent removeByBNS_BNU(
+		java.lang.String buildNamespace, long buildNumber)
 		throws com.liferay.portal.NoSuchServiceComponentException,
 			com.liferay.portal.kernel.exception.SystemException {
-		getPersistence().removeByBNS_BNU(buildNamespace, buildNumber);
+		return getPersistence().removeByBNS_BNU(buildNamespace, buildNumber);
 	}
 
 	/**
@@ -501,11 +494,10 @@ public class ServiceComponentUtil {
 		return _persistence;
 	}
 
+	/**
+	 * @deprecated
+	 */
 	public void setPersistence(ServiceComponentPersistence persistence) {
-		_persistence = persistence;
-
-		ReferenceRegistry.registerReference(ServiceComponentUtil.class,
-			"_persistence");
 	}
 
 	private static ServiceComponentPersistence _persistence;

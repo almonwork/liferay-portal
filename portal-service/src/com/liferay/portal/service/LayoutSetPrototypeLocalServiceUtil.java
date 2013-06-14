@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -15,7 +15,6 @@
 package com.liferay.portal.service;
 
 import com.liferay.portal.kernel.bean.PortalBeanLocatorUtil;
-import com.liferay.portal.kernel.util.MethodCache;
 import com.liferay.portal.kernel.util.ReferenceRegistry;
 
 /**
@@ -66,27 +65,34 @@ public class LayoutSetPrototypeLocalServiceUtil {
 	* Deletes the layout set prototype with the primary key from the database. Also notifies the appropriate model listeners.
 	*
 	* @param layoutSetPrototypeId the primary key of the layout set prototype
+	* @return the layout set prototype that was removed
 	* @throws PortalException if a layout set prototype with the primary key could not be found
 	* @throws SystemException if a system exception occurred
 	*/
-	public static void deleteLayoutSetPrototype(long layoutSetPrototypeId)
+	public static com.liferay.portal.model.LayoutSetPrototype deleteLayoutSetPrototype(
+		long layoutSetPrototypeId)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException {
-		getService().deleteLayoutSetPrototype(layoutSetPrototypeId);
+		return getService().deleteLayoutSetPrototype(layoutSetPrototypeId);
 	}
 
 	/**
 	* Deletes the layout set prototype from the database. Also notifies the appropriate model listeners.
 	*
 	* @param layoutSetPrototype the layout set prototype
+	* @return the layout set prototype that was removed
 	* @throws PortalException
 	* @throws SystemException if a system exception occurred
 	*/
-	public static void deleteLayoutSetPrototype(
+	public static com.liferay.portal.model.LayoutSetPrototype deleteLayoutSetPrototype(
 		com.liferay.portal.model.LayoutSetPrototype layoutSetPrototype)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException {
-		getService().deleteLayoutSetPrototype(layoutSetPrototype);
+		return getService().deleteLayoutSetPrototype(layoutSetPrototype);
+	}
+
+	public static com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery() {
+		return getService().dynamicQuery();
 	}
 
 	/**
@@ -158,6 +164,12 @@ public class LayoutSetPrototypeLocalServiceUtil {
 		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery)
 		throws com.liferay.portal.kernel.exception.SystemException {
 		return getService().dynamicQueryCount(dynamicQuery);
+	}
+
+	public static com.liferay.portal.model.LayoutSetPrototype fetchLayoutSetPrototype(
+		long layoutSetPrototypeId)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getService().fetchLayoutSetPrototype(layoutSetPrototypeId);
 	}
 
 	/**
@@ -261,21 +273,32 @@ public class LayoutSetPrototypeLocalServiceUtil {
 		long userId, long companyId,
 		java.util.Map<java.util.Locale, java.lang.String> nameMap,
 		java.lang.String description, boolean active,
-		boolean allowModifications, boolean allowLayoutAddition,
+		boolean layoutsUpdateable,
 		com.liferay.portal.service.ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException {
 		return getService()
 				   .addLayoutSetPrototype(userId, companyId, nameMap,
-			description, active, allowModifications, allowLayoutAddition,
-			serviceContext);
+			description, active, layoutsUpdateable, serviceContext);
 	}
 
+	/**
+	* @deprecated {@link #getLayoutSetPrototypeByUuidAndCompanyId(String,
+	long)}
+	*/
 	public static com.liferay.portal.model.LayoutSetPrototype getLayoutSetPrototypeByUuid(
 		java.lang.String uuid)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException {
 		return getService().getLayoutSetPrototypeByUuid(uuid);
+	}
+
+	public static com.liferay.portal.model.LayoutSetPrototype getLayoutSetPrototypeByUuidAndCompanyId(
+		java.lang.String uuid, long companyId)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException {
+		return getService()
+				   .getLayoutSetPrototypeByUuidAndCompanyId(uuid, companyId);
 	}
 
 	public static java.util.List<com.liferay.portal.model.LayoutSetPrototype> search(
@@ -294,14 +317,13 @@ public class LayoutSetPrototypeLocalServiceUtil {
 		long layoutSetPrototypeId,
 		java.util.Map<java.util.Locale, java.lang.String> nameMap,
 		java.lang.String description, boolean active,
-		boolean allowModifications, boolean allowLayoutAddition,
+		boolean layoutsUpdateable,
 		com.liferay.portal.service.ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException {
 		return getService()
 				   .updateLayoutSetPrototype(layoutSetPrototypeId, nameMap,
-			description, active, allowModifications, allowLayoutAddition,
-			serviceContext);
+			description, active, layoutsUpdateable, serviceContext);
 	}
 
 	public static com.liferay.portal.model.LayoutSetPrototype updateLayoutSetPrototype(
@@ -318,20 +340,15 @@ public class LayoutSetPrototypeLocalServiceUtil {
 
 			ReferenceRegistry.registerReference(LayoutSetPrototypeLocalServiceUtil.class,
 				"_service");
-			MethodCache.remove(LayoutSetPrototypeLocalService.class);
 		}
 
 		return _service;
 	}
 
+	/**
+	 * @deprecated
+	 */
 	public void setService(LayoutSetPrototypeLocalService service) {
-		MethodCache.remove(LayoutSetPrototypeLocalService.class);
-
-		_service = service;
-
-		ReferenceRegistry.registerReference(LayoutSetPrototypeLocalServiceUtil.class,
-			"_service");
-		MethodCache.remove(LayoutSetPrototypeLocalService.class);
 	}
 
 	private static LayoutSetPrototypeLocalService _service;

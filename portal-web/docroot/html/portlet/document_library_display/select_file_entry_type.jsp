@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -23,20 +23,10 @@ String backURL = ParamUtil.getString(request, "backURL");
 long repositoryId = ParamUtil.getLong(request, "repositoryId");
 long folderId = ParamUtil.getLong(request, "folderId");
 
-List<DLFileEntryType> fileEntryTypes = new ArrayList<DLFileEntryType>();
-
-DLFileEntryType basicDocumentType = DLFileEntryTypeLocalServiceUtil.createDLFileEntryType(0);
-
-basicDocumentType.setName(LanguageUtil.get(pageContext, "basic-document"));
-
-fileEntryTypes.add(basicDocumentType);
-
-fileEntryTypes.addAll(DLFileEntryTypeServiceUtil.getFileEntryTypes(scopeGroupId, QueryUtil.ALL_POS, QueryUtil.ALL_POS));
+List<DLFileEntryType> fileEntryTypes = DLFileEntryTypeLocalServiceUtil.getFolderFileEntryTypes(DLUtil.getGroupIds(themeDisplay), folderId, true);
 %>
 
-<liferay-ui:search-container
-	id='<%= renderResponse.getNamespace() + "fileEntryTypesSearchContainer" %>'
->
+<liferay-ui:search-container>
 	<liferay-ui:search-container-results
 		results="<%= fileEntryTypes %>"
 	/>
@@ -56,7 +46,7 @@ fileEntryTypes.addAll(DLFileEntryTypeServiceUtil.getFileEntryTypes(scopeGroupId,
 </liferay-ui:search-container>
 
 <aui:script use="liferay-portlet-url,liferay-search-container">
-	var searchContainer = Liferay.SearchContainer.get('<portlet:namespace />fileEntryTypesSearchContainer');
+	var searchContainer = Liferay.SearchContainer.get('<portlet:namespace />dlFileEntryTypesSearchContainer');
 
 	searchContainer.get('contentBox').delegate(
 		'click',

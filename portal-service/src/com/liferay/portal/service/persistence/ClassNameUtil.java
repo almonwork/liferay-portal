@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -91,14 +91,6 @@ public class ClassNameUtil {
 		return getPersistence()
 				   .findWithDynamicQuery(dynamicQuery, start, end,
 			orderByComparator);
-	}
-
-	/**
-	 * @see com.liferay.portal.service.persistence.BasePersistence#remove(com.liferay.portal.model.BaseModel)
-	 */
-	public static ClassName remove(ClassName className)
-		throws SystemException {
-		return getPersistence().remove(className);
 	}
 
 	/**
@@ -289,12 +281,14 @@ public class ClassNameUtil {
 	* Removes the class name where value = &#63; from the database.
 	*
 	* @param value the value
+	* @return the class name that was removed
 	* @throws SystemException if a system exception occurred
 	*/
-	public static void removeByValue(java.lang.String value)
+	public static com.liferay.portal.model.ClassName removeByValue(
+		java.lang.String value)
 		throws com.liferay.portal.NoSuchClassNameException,
 			com.liferay.portal.kernel.exception.SystemException {
-		getPersistence().removeByValue(value);
+		return getPersistence().removeByValue(value);
 	}
 
 	/**
@@ -341,10 +335,10 @@ public class ClassNameUtil {
 		return _persistence;
 	}
 
+	/**
+	 * @deprecated
+	 */
 	public void setPersistence(ClassNamePersistence persistence) {
-		_persistence = persistence;
-
-		ReferenceRegistry.registerReference(ClassNameUtil.class, "_persistence");
 	}
 
 	private static ClassNamePersistence _persistence;

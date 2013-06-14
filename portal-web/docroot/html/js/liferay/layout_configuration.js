@@ -17,7 +17,7 @@
 
 				var url = themeDisplay.getPathMain() + '/portal/render_portlet';
 
-				var dialog = new A.Dialog(
+				dialog = new A.Dialog(
 					{
 						on: {
 							visibleChange: function(event) {
@@ -64,6 +64,10 @@
 		function(A) {
 			var DDM = A.DD.DDM;
 			var Layout = Liferay.Layout;
+
+			var CSS_REPAINT = 'lfr-helper-repaint';
+
+			var FORCE_REPAINT = (Liferay.Browser.isIe() && Liferay.Browser.getMajorVersion() === 9);
 
 			A.mix(
 				LayoutConfiguration,
@@ -124,6 +128,10 @@
 								}
 							);
 
+							var body = A.getBody();
+
+							var repaintTask = A.debounce(body.toggleClass, 10, body, CSS_REPAINT);
+
 							new A.LiveSearch(
 								{
 									after: {
@@ -140,6 +148,10 @@
 												instance.categoryContainers.show();
 
 												instance.portlets.show();
+											}
+
+											if (FORCE_REPAINT) {
+												repaintTask();
 											}
 										}
 									},
@@ -178,7 +190,6 @@
 							}
 
 							var beforePortletLoaded = null;
-							var onComplete = null;
 							var placeHolder = A.Node.create('<div class="loading-animation" />');
 
 							if (options) {
@@ -211,14 +222,6 @@
 
 							var portletOptions = {
 								beforePortletLoaded: beforePortletLoaded,
-								onComplete: function(portletBoundary) {
-									Layout.syncDraggableClassUI();
-									Layout.updatePortletDropZones(portletBoundary);
-
-									if (onComplete) {
-										onComplete.apply(this, arguments);
-									}
-								},
 								plid: plid,
 								placeHolder: placeHolder,
 								portletId: portletId,
@@ -331,7 +334,7 @@
 							on: Layout.DEFAULT_LAYOUT_OPTIONS.on
 						};
 
-						if (layoutOptions.freeForm) {
+						if (themeDisplay.isFreeformLayout()) {
 							portletItem = new Layout.FreeFormPortletItem(portletItemOptions);
 						}
 						else {
@@ -558,8 +561,7 @@
 		},
 		'',
 		{
-			requires: ['aui-live-search', 'dd', 'liferay-layout'],
-			use: []
+			requires: ['aui-live-search', 'dd', 'liferay-layout']
 		}
 	);
 

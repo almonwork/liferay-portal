@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -106,7 +106,7 @@ public class InternetAddressUtil {
 			for (int i = 0; i < addresses.length; i++) {
 				sb.append(toString(addresses[i]));
 
-				if (i < addresses.length - 1) {
+				if (i < (addresses.length - 1)) {
 					sb.append(StringPool.COMMA);
 					sb.append(StringPool.NBSP);
 				}

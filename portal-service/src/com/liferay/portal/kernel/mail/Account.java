@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -23,18 +23,6 @@ import java.io.Serializable;
  */
 public abstract class Account implements Serializable {
 
-	public static final String PROTOCOL_IMAP = "imap";
-
-	public static final String PROTOCOL_IMAPS = "imaps";
-
-	public static final String PROTOCOL_POP = "pop3";
-
-	public static final String PROTOCOL_POPS = "pop3s";
-
-	public static final String PROTOCOL_SMTP = "smtp";
-
-	public static final String PROTOCOL_SMTPS = "smtps";
-
 	public static final int PORT_IMAP = 143;
 
 	public static final int PORT_IMAPS = 993;
@@ -46,6 +34,18 @@ public abstract class Account implements Serializable {
 	public static final int PORT_SMTP = 25;
 
 	public static final int PORT_SMTPS = 465;
+
+	public static final String PROTOCOL_IMAP = "imap";
+
+	public static final String PROTOCOL_IMAPS = "imaps";
+
+	public static final String PROTOCOL_POP = "pop3";
+
+	public static final String PROTOCOL_POPS = "pop3s";
+
+	public static final String PROTOCOL_SMTP = "smtp";
+
+	public static final String PROTOCOL_SMTPS = "smtps";
 
 	public static Account getInstance(String protocol) {
 		return getInstance(protocol, 0);
@@ -124,9 +124,7 @@ public abstract class Account implements Serializable {
 	}
 
 	public boolean isRequiresAuthentication() {
-		if (Validator.isNotNull(_user) &&
-			Validator.isNotNull(_password)) {
-
+		if (Validator.isNotNull(_user) && Validator.isNotNull(_password)) {
 			return true;
 		}
 		else {

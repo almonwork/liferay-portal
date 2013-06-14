@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -68,22 +68,28 @@ public class ReleasePersistenceImpl extends BasePersistenceImpl<Release>
 	 * Never modify or reference this class directly. Always use {@link ReleaseUtil} to access the release persistence. Modify <code>service.xml</code> and rerun ServiceBuilder to regenerate this class.
 	 */
 	public static final String FINDER_CLASS_NAME_ENTITY = ReleaseImpl.class.getName();
-	public static final String FINDER_CLASS_NAME_LIST = FINDER_CLASS_NAME_ENTITY +
-		".List";
+	public static final String FINDER_CLASS_NAME_LIST_WITH_PAGINATION = FINDER_CLASS_NAME_ENTITY +
+		".List1";
+	public static final String FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION = FINDER_CLASS_NAME_ENTITY +
+		".List2";
 	public static final FinderPath FINDER_PATH_FETCH_BY_SERVLETCONTEXTNAME = new FinderPath(ReleaseModelImpl.ENTITY_CACHE_ENABLED,
 			ReleaseModelImpl.FINDER_CACHE_ENABLED, ReleaseImpl.class,
 			FINDER_CLASS_NAME_ENTITY, "fetchByServletContextName",
-			new String[] { String.class.getName() });
+			new String[] { String.class.getName() },
+			ReleaseModelImpl.SERVLETCONTEXTNAME_COLUMN_BITMASK);
 	public static final FinderPath FINDER_PATH_COUNT_BY_SERVLETCONTEXTNAME = new FinderPath(ReleaseModelImpl.ENTITY_CACHE_ENABLED,
 			ReleaseModelImpl.FINDER_CACHE_ENABLED, Long.class,
-			FINDER_CLASS_NAME_LIST, "countByServletContextName",
-			new String[] { String.class.getName() });
-	public static final FinderPath FINDER_PATH_FIND_ALL = new FinderPath(ReleaseModelImpl.ENTITY_CACHE_ENABLED,
+			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION,
+			"countByServletContextName", new String[] { String.class.getName() });
+	public static final FinderPath FINDER_PATH_WITH_PAGINATION_FIND_ALL = new FinderPath(ReleaseModelImpl.ENTITY_CACHE_ENABLED,
 			ReleaseModelImpl.FINDER_CACHE_ENABLED, ReleaseImpl.class,
-			FINDER_CLASS_NAME_LIST, "findAll", new String[0]);
+			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findAll", new String[0]);
+	public static final FinderPath FINDER_PATH_WITHOUT_PAGINATION_FIND_ALL = new FinderPath(ReleaseModelImpl.ENTITY_CACHE_ENABLED,
+			ReleaseModelImpl.FINDER_CACHE_ENABLED, ReleaseImpl.class,
+			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findAll", new String[0]);
 	public static final FinderPath FINDER_PATH_COUNT_ALL = new FinderPath(ReleaseModelImpl.ENTITY_CACHE_ENABLED,
 			ReleaseModelImpl.FINDER_CACHE_ENABLED, Long.class,
-			FINDER_CLASS_NAME_LIST, "countAll", new String[0]);
+			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countAll", new String[0]);
 
 	/**
 	 * Caches the release in the entity cache if it is enabled.
@@ -109,8 +115,11 @@ public class ReleasePersistenceImpl extends BasePersistenceImpl<Release>
 		for (Release release : releases) {
 			if (EntityCacheUtil.getResult(
 						ReleaseModelImpl.ENTITY_CACHE_ENABLED,
-						ReleaseImpl.class, release.getPrimaryKey(), this) == null) {
+						ReleaseImpl.class, release.getPrimaryKey()) == null) {
 				cacheResult(release);
+			}
+			else {
+				release.resetOriginalValues();
 			}
 		}
 	}
@@ -129,8 +138,10 @@ public class ReleasePersistenceImpl extends BasePersistenceImpl<Release>
 		}
 
 		EntityCacheUtil.clearCache(ReleaseImpl.class.getName());
+
 		FinderCacheUtil.clearCache(FINDER_CLASS_NAME_ENTITY);
-		FinderCacheUtil.clearCache(FINDER_CLASS_NAME_LIST);
+		FinderCacheUtil.clearCache(FINDER_CLASS_NAME_LIST_WITH_PAGINATION);
+		FinderCacheUtil.clearCache(FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
 	}
 
 	/**
@@ -145,6 +156,26 @@ public class ReleasePersistenceImpl extends BasePersistenceImpl<Release>
 		EntityCacheUtil.removeResult(ReleaseModelImpl.ENTITY_CACHE_ENABLED,
 			ReleaseImpl.class, release.getPrimaryKey());
 
+		FinderCacheUtil.clearCache(FINDER_CLASS_NAME_LIST_WITH_PAGINATION);
+		FinderCacheUtil.clearCache(FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
+
+		clearUniqueFindersCache(release);
+	}
+
+	@Override
+	public void clearCache(List<Release> releases) {
+		FinderCacheUtil.clearCache(FINDER_CLASS_NAME_LIST_WITH_PAGINATION);
+		FinderCacheUtil.clearCache(FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
+
+		for (Release release : releases) {
+			EntityCacheUtil.removeResult(ReleaseModelImpl.ENTITY_CACHE_ENABLED,
+				ReleaseImpl.class, release.getPrimaryKey());
+
+			clearUniqueFindersCache(release);
+		}
+	}
+
+	protected void clearUniqueFindersCache(Release release) {
 		FinderCacheUtil.removeResult(FINDER_PATH_FETCH_BY_SERVLETCONTEXTNAME,
 			new Object[] { release.getServletContextName() });
 	}
@@ -167,20 +198,6 @@ public class ReleasePersistenceImpl extends BasePersistenceImpl<Release>
 	/**
 	 * Removes the release with the primary key from the database. Also notifies the appropriate model listeners.
 	 *
-	 * @param primaryKey the primary key of the release
-	 * @return the release that was removed
-	 * @throws com.liferay.portal.NoSuchModelException if a release with the primary key could not be found
-	 * @throws SystemException if a system exception occurred
-	 */
-	@Override
-	public Release remove(Serializable primaryKey)
-		throws NoSuchModelException, SystemException {
-		return remove(((Long)primaryKey).longValue());
-	}
-
-	/**
-	 * Removes the release with the primary key from the database. Also notifies the appropriate model listeners.
-	 *
 	 * @param releaseId the primary key of the release
 	 * @return the release that was removed
 	 * @throws com.liferay.portal.NoSuchReleaseException if a release with the primary key could not be found
@@ -188,24 +205,37 @@ public class ReleasePersistenceImpl extends BasePersistenceImpl<Release>
 	 */
 	public Release remove(long releaseId)
 		throws NoSuchReleaseException, SystemException {
+		return remove(Long.valueOf(releaseId));
+	}
+
+	/**
+	 * Removes the release with the primary key from the database. Also notifies the appropriate model listeners.
+	 *
+	 * @param primaryKey the primary key of the release
+	 * @return the release that was removed
+	 * @throws com.liferay.portal.NoSuchReleaseException if a release with the primary key could not be found
+	 * @throws SystemException if a system exception occurred
+	 */
+	@Override
+	public Release remove(Serializable primaryKey)
+		throws NoSuchReleaseException, SystemException {
 		Session session = null;
 
 		try {
 			session = openSession();
 
-			Release release = (Release)session.get(ReleaseImpl.class,
-					Long.valueOf(releaseId));
+			Release release = (Release)session.get(ReleaseImpl.class, primaryKey);
 
 			if (release == null) {
 				if (_log.isWarnEnabled()) {
-					_log.warn(_NO_SUCH_ENTITY_WITH_PRIMARY_KEY + releaseId);
+					_log.warn(_NO_SUCH_ENTITY_WITH_PRIMARY_KEY + primaryKey);
 				}
 
 				throw new NoSuchReleaseException(_NO_SUCH_ENTITY_WITH_PRIMARY_KEY +
-					releaseId);
+					primaryKey);
 			}
 
-			return releasePersistence.remove(release);
+			return remove(release);
 		}
 		catch (NoSuchReleaseException nsee) {
 			throw nsee;
@@ -216,18 +246,6 @@ public class ReleasePersistenceImpl extends BasePersistenceImpl<Release>
 		finally {
 			closeSession(session);
 		}
-	}
-
-	/**
-	 * Removes the release from the database. Also notifies the appropriate model listeners.
-	 *
-	 * @param release the release
-	 * @return the release that was removed
-	 * @throws SystemException if a system exception occurred
-	 */
-	@Override
-	public Release remove(Release release) throws SystemException {
-		return super.remove(release);
 	}
 
 	@Override
@@ -248,15 +266,7 @@ public class ReleasePersistenceImpl extends BasePersistenceImpl<Release>
 			closeSession(session);
 		}
 
-		FinderCacheUtil.clearCache(FINDER_CLASS_NAME_LIST);
-
-		ReleaseModelImpl releaseModelImpl = (ReleaseModelImpl)release;
-
-		FinderCacheUtil.removeResult(FINDER_PATH_FETCH_BY_SERVLETCONTEXTNAME,
-			new Object[] { releaseModelImpl.getServletContextName() });
-
-		EntityCacheUtil.removeResult(ReleaseModelImpl.ENTITY_CACHE_ENABLED,
-			ReleaseImpl.class, release.getPrimaryKey());
+		clearCache(release);
 
 		return release;
 	}
@@ -286,23 +296,35 @@ public class ReleasePersistenceImpl extends BasePersistenceImpl<Release>
 			closeSession(session);
 		}
 
-		FinderCacheUtil.clearCache(FINDER_CLASS_NAME_LIST);
+		FinderCacheUtil.clearCache(FINDER_CLASS_NAME_LIST_WITH_PAGINATION);
+
+		if (isNew || !ReleaseModelImpl.COLUMN_BITMASK_ENABLED) {
+			FinderCacheUtil.clearCache(FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
+		}
 
 		EntityCacheUtil.putResult(ReleaseModelImpl.ENTITY_CACHE_ENABLED,
 			ReleaseImpl.class, release.getPrimaryKey(), release);
 
-		if (!isNew &&
-				(!Validator.equals(release.getServletContextName(),
-					releaseModelImpl.getOriginalServletContextName()))) {
-			FinderCacheUtil.removeResult(FINDER_PATH_FETCH_BY_SERVLETCONTEXTNAME,
-				new Object[] { releaseModelImpl.getOriginalServletContextName() });
-		}
-
-		if (isNew ||
-				(!Validator.equals(release.getServletContextName(),
-					releaseModelImpl.getOriginalServletContextName()))) {
+		if (isNew) {
 			FinderCacheUtil.putResult(FINDER_PATH_FETCH_BY_SERVLETCONTEXTNAME,
 				new Object[] { release.getServletContextName() }, release);
+		}
+		else {
+			if ((releaseModelImpl.getColumnBitmask() &
+					FINDER_PATH_FETCH_BY_SERVLETCONTEXTNAME.getColumnBitmask()) != 0) {
+				Object[] args = new Object[] {
+						releaseModelImpl.getOriginalServletContextName()
+					};
+
+				FinderCacheUtil.removeResult(FINDER_PATH_COUNT_BY_SERVLETCONTEXTNAME,
+					args);
+
+				FinderCacheUtil.removeResult(FINDER_PATH_FETCH_BY_SERVLETCONTEXTNAME,
+					args);
+
+				FinderCacheUtil.putResult(FINDER_PATH_FETCH_BY_SERVLETCONTEXTNAME,
+					new Object[] { release.getServletContextName() }, release);
+			}
 		}
 
 		return release;
@@ -325,6 +347,7 @@ public class ReleasePersistenceImpl extends BasePersistenceImpl<Release>
 		releaseImpl.setBuildNumber(release.getBuildNumber());
 		releaseImpl.setBuildDate(release.getBuildDate());
 		releaseImpl.setVerified(release.isVerified());
+		releaseImpl.setState(release.getState());
 		releaseImpl.setTestString(release.getTestString());
 
 		return releaseImpl;
@@ -390,7 +413,7 @@ public class ReleasePersistenceImpl extends BasePersistenceImpl<Release>
 	 */
 	public Release fetchByPrimaryKey(long releaseId) throws SystemException {
 		Release release = (Release)EntityCacheUtil.getResult(ReleaseModelImpl.ENTITY_CACHE_ENABLED,
-				ReleaseImpl.class, releaseId, this);
+				ReleaseImpl.class, releaseId);
 
 		if (release == _nullRelease) {
 			return null;
@@ -489,6 +512,15 @@ public class ReleasePersistenceImpl extends BasePersistenceImpl<Release>
 		if (retrieveFromCache) {
 			result = FinderCacheUtil.getResult(FINDER_PATH_FETCH_BY_SERVLETCONTEXTNAME,
 					finderArgs, this);
+		}
+
+		if (result instanceof Release) {
+			Release release = (Release)result;
+
+			if (!Validator.equals(servletContextName,
+						release.getServletContextName())) {
+				result = null;
+			}
 		}
 
 		if (result == null) {
@@ -611,12 +643,20 @@ public class ReleasePersistenceImpl extends BasePersistenceImpl<Release>
 	 */
 	public List<Release> findAll(int start, int end,
 		OrderByComparator orderByComparator) throws SystemException {
-		Object[] finderArgs = new Object[] {
-				String.valueOf(start), String.valueOf(end),
-				String.valueOf(orderByComparator)
-			};
+		FinderPath finderPath = null;
+		Object[] finderArgs = new Object[] { start, end, orderByComparator };
 
-		List<Release> list = (List<Release>)FinderCacheUtil.getResult(FINDER_PATH_FIND_ALL,
+		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) &&
+				(orderByComparator == null)) {
+			finderPath = FINDER_PATH_WITHOUT_PAGINATION_FIND_ALL;
+			finderArgs = FINDER_ARGS_EMPTY;
+		}
+		else {
+			finderPath = FINDER_PATH_WITH_PAGINATION_FIND_ALL;
+			finderArgs = new Object[] { start, end, orderByComparator };
+		}
+
+		List<Release> list = (List<Release>)FinderCacheUtil.getResult(finderPath,
 				finderArgs, this);
 
 		if (list == null) {
@@ -661,14 +701,12 @@ public class ReleasePersistenceImpl extends BasePersistenceImpl<Release>
 			}
 			finally {
 				if (list == null) {
-					FinderCacheUtil.removeResult(FINDER_PATH_FIND_ALL,
-						finderArgs);
+					FinderCacheUtil.removeResult(finderPath, finderArgs);
 				}
 				else {
 					cacheResult(list);
 
-					FinderCacheUtil.putResult(FINDER_PATH_FIND_ALL, finderArgs,
-						list);
+					FinderCacheUtil.putResult(finderPath, finderArgs, list);
 				}
 
 				closeSession(session);
@@ -682,13 +720,14 @@ public class ReleasePersistenceImpl extends BasePersistenceImpl<Release>
 	 * Removes the release where servletContextName = &#63; from the database.
 	 *
 	 * @param servletContextName the servlet context name
+	 * @return the release that was removed
 	 * @throws SystemException if a system exception occurred
 	 */
-	public void removeByServletContextName(String servletContextName)
+	public Release removeByServletContextName(String servletContextName)
 		throws NoSuchReleaseException, SystemException {
 		Release release = findByServletContextName(servletContextName);
 
-		releasePersistence.remove(release);
+		return remove(release);
 	}
 
 	/**
@@ -698,7 +737,7 @@ public class ReleasePersistenceImpl extends BasePersistenceImpl<Release>
 	 */
 	public void removeAll() throws SystemException {
 		for (Release release : findAll()) {
-			releasePersistence.remove(release);
+			remove(release);
 		}
 	}
 
@@ -775,10 +814,8 @@ public class ReleasePersistenceImpl extends BasePersistenceImpl<Release>
 	 * @throws SystemException if a system exception occurred
 	 */
 	public int countAll() throws SystemException {
-		Object[] finderArgs = new Object[0];
-
 		Long count = (Long)FinderCacheUtil.getResult(FINDER_PATH_COUNT_ALL,
-				finderArgs, this);
+				FINDER_ARGS_EMPTY, this);
 
 		if (count == null) {
 			Session session = null;
@@ -798,8 +835,8 @@ public class ReleasePersistenceImpl extends BasePersistenceImpl<Release>
 					count = Long.valueOf(0);
 				}
 
-				FinderCacheUtil.putResult(FINDER_PATH_COUNT_ALL, finderArgs,
-					count);
+				FinderCacheUtil.putResult(FINDER_PATH_COUNT_ALL,
+					FINDER_ARGS_EMPTY, count);
 
 				closeSession(session);
 			}
@@ -836,7 +873,7 @@ public class ReleasePersistenceImpl extends BasePersistenceImpl<Release>
 	public void destroy() {
 		EntityCacheUtil.removeCache(ReleaseImpl.class.getName());
 		FinderCacheUtil.removeCache(FINDER_CLASS_NAME_ENTITY);
-		FinderCacheUtil.removeCache(FINDER_CLASS_NAME_LIST);
+		FinderCacheUtil.removeCache(FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
 	}
 
 	@BeanReference(type = AccountPersistence.class)
@@ -883,8 +920,6 @@ public class ReleasePersistenceImpl extends BasePersistenceImpl<Release>
 	protected MembershipRequestPersistence membershipRequestPersistence;
 	@BeanReference(type = OrganizationPersistence.class)
 	protected OrganizationPersistence organizationPersistence;
-	@BeanReference(type = OrgGroupPermissionPersistence.class)
-	protected OrgGroupPermissionPersistence orgGroupPermissionPersistence;
 	@BeanReference(type = OrgGroupRolePersistence.class)
 	protected OrgGroupRolePersistence orgGroupRolePersistence;
 	@BeanReference(type = OrgLaborPersistence.class)
@@ -895,8 +930,6 @@ public class ReleasePersistenceImpl extends BasePersistenceImpl<Release>
 	protected PasswordPolicyRelPersistence passwordPolicyRelPersistence;
 	@BeanReference(type = PasswordTrackerPersistence.class)
 	protected PasswordTrackerPersistence passwordTrackerPersistence;
-	@BeanReference(type = PermissionPersistence.class)
-	protected PermissionPersistence permissionPersistence;
 	@BeanReference(type = PhonePersistence.class)
 	protected PhonePersistence phonePersistence;
 	@BeanReference(type = PluginSettingPersistence.class)
@@ -917,14 +950,16 @@ public class ReleasePersistenceImpl extends BasePersistenceImpl<Release>
 	protected RepositoryPersistence repositoryPersistence;
 	@BeanReference(type = RepositoryEntryPersistence.class)
 	protected RepositoryEntryPersistence repositoryEntryPersistence;
-	@BeanReference(type = ResourcePersistence.class)
-	protected ResourcePersistence resourcePersistence;
 	@BeanReference(type = ResourceActionPersistence.class)
 	protected ResourceActionPersistence resourceActionPersistence;
-	@BeanReference(type = ResourceCodePersistence.class)
-	protected ResourceCodePersistence resourceCodePersistence;
+	@BeanReference(type = ResourceBlockPersistence.class)
+	protected ResourceBlockPersistence resourceBlockPersistence;
+	@BeanReference(type = ResourceBlockPermissionPersistence.class)
+	protected ResourceBlockPermissionPersistence resourceBlockPermissionPersistence;
 	@BeanReference(type = ResourcePermissionPersistence.class)
 	protected ResourcePermissionPersistence resourcePermissionPersistence;
+	@BeanReference(type = ResourceTypePermissionPersistence.class)
+	protected ResourceTypePermissionPersistence resourceTypePermissionPersistence;
 	@BeanReference(type = RolePersistence.class)
 	protected RolePersistence rolePersistence;
 	@BeanReference(type = ServiceComponentPersistence.class)
@@ -970,19 +1005,21 @@ public class ReleasePersistenceImpl extends BasePersistenceImpl<Release>
 	private static final String _FINDER_COLUMN_SERVLETCONTEXTNAME_SERVLETCONTEXTNAME_1 =
 		"release.servletContextName IS NULL";
 	private static final String _FINDER_COLUMN_SERVLETCONTEXTNAME_SERVLETCONTEXTNAME_2 =
-		"release.servletContextName = ?";
+		"lower(release.servletContextName) = lower(CAST_TEXT(?))";
 	private static final String _FINDER_COLUMN_SERVLETCONTEXTNAME_SERVLETCONTEXTNAME_3 =
-		"(release.servletContextName IS NULL OR release.servletContextName = ?)";
+		"(release.servletContextName IS NULL OR lower(release.servletContextName) = lower(CAST_TEXT(?)))";
 	private static final String _ORDER_BY_ENTITY_ALIAS = "release.";
 	private static final String _NO_SUCH_ENTITY_WITH_PRIMARY_KEY = "No Release exists with the primary key ";
 	private static final String _NO_SUCH_ENTITY_WITH_KEY = "No Release exists with the key {";
 	private static final boolean _HIBERNATE_CACHE_USE_SECOND_LEVEL_CACHE = com.liferay.portal.util.PropsValues.HIBERNATE_CACHE_USE_SECOND_LEVEL_CACHE;
 	private static Log _log = LogFactoryUtil.getLog(ReleasePersistenceImpl.class);
 	private static Release _nullRelease = new ReleaseImpl() {
+			@Override
 			public Object clone() {
 				return this;
 			}
 
+			@Override
 			public CacheModel<Release> toCacheModel() {
 				return _nullReleaseCacheModel;
 			}

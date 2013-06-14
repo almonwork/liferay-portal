@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,6 +14,8 @@
 
 package com.liferay.portlet.social.service;
 
+import com.liferay.portal.service.ServiceWrapper;
+
 /**
  * <p>
  * This class is a wrapper for {@link SocialRequestInterpreterLocalService}.
@@ -24,7 +26,8 @@ package com.liferay.portlet.social.service;
  * @generated
  */
 public class SocialRequestInterpreterLocalServiceWrapper
-	implements SocialRequestInterpreterLocalService {
+	implements SocialRequestInterpreterLocalService,
+		ServiceWrapper<SocialRequestInterpreterLocalService> {
 	public SocialRequestInterpreterLocalServiceWrapper(
 		SocialRequestInterpreterLocalService socialRequestInterpreterLocalService) {
 		_socialRequestInterpreterLocalService = socialRequestInterpreterLocalService;
@@ -48,16 +51,44 @@ public class SocialRequestInterpreterLocalServiceWrapper
 		_socialRequestInterpreterLocalService.setBeanIdentifier(beanIdentifier);
 	}
 
+	/**
+	* Adds the social request interpreter to the list of available
+	* interpreters.
+	*
+	* @param requestInterpreter the social request interpreter
+	*/
 	public void addRequestInterpreter(
 		com.liferay.portlet.social.model.SocialRequestInterpreter requestInterpreter) {
 		_socialRequestInterpreterLocalService.addRequestInterpreter(requestInterpreter);
 	}
 
+	/**
+	* Removes the social request interpreter from the list of available
+	* interpreters.
+	*
+	* @param requestInterpreter the social request interpreter
+	*/
 	public void deleteRequestInterpreter(
 		com.liferay.portlet.social.model.SocialRequestInterpreter requestInterpreter) {
 		_socialRequestInterpreterLocalService.deleteRequestInterpreter(requestInterpreter);
 	}
 
+	/**
+	* Creates a human readable request feed entry for the social request using
+	* an available compatible request interpreter.
+	*
+	* <p>
+	* This method finds the appropriate interpreter for the request by going
+	* through the available interpreters to find one that can handle the asset
+	* type of the request.
+	* </p>
+	*
+	* @param request the social request to be translated to human readable
+	form
+	* @param themeDisplay the theme display needed by interpreters to create
+	links and get localized text fragments
+	* @return the social request feed entry
+	*/
 	public com.liferay.portlet.social.model.SocialRequestFeedEntry interpret(
 		com.liferay.portlet.social.model.SocialRequest request,
 		com.liferay.portal.theme.ThemeDisplay themeDisplay) {
@@ -65,6 +96,20 @@ public class SocialRequestInterpreterLocalServiceWrapper
 			themeDisplay);
 	}
 
+	/**
+	* Processes the confirmation of the social request.
+	*
+	* <p>
+	* Confirmations are handled by finding the appropriate social request
+	* interpreter and calling its processConfirmation() method. To find the
+	* appropriate interpreter this method goes through the available
+	* interpreters to find one that can handle the asset type of the request.
+	* </p>
+	*
+	* @param request the social request being confirmed
+	* @param themeDisplay the theme display needed by interpreters to create
+	links and get localized text fragments
+	*/
 	public void processConfirmation(
 		com.liferay.portlet.social.model.SocialRequest request,
 		com.liferay.portal.theme.ThemeDisplay themeDisplay) {
@@ -72,6 +117,21 @@ public class SocialRequestInterpreterLocalServiceWrapper
 			themeDisplay);
 	}
 
+	/**
+	* Processes the rejection of the social request.
+	*
+	* <p>
+	* Rejections are handled by finding the appropriate social request
+	* interpreters and calling their processRejection() methods. To find the
+	* appropriate interpreters this method goes through the available
+	* interpreters and asks them if they can handle the asset type of the
+	* request.
+	* </p>
+	*
+	* @param request the social request being rejected
+	* @param themeDisplay the theme display needed by interpreters to create
+	links and get localized text fragments
+	*/
 	public void processRejection(
 		com.liferay.portlet.social.model.SocialRequest request,
 		com.liferay.portal.theme.ThemeDisplay themeDisplay) {
@@ -79,11 +139,26 @@ public class SocialRequestInterpreterLocalServiceWrapper
 			themeDisplay);
 	}
 
+	/**
+	 * @deprecated Renamed to {@link #getWrappedService}
+	 */
 	public SocialRequestInterpreterLocalService getWrappedSocialRequestInterpreterLocalService() {
 		return _socialRequestInterpreterLocalService;
 	}
 
+	/**
+	 * @deprecated Renamed to {@link #setWrappedService}
+	 */
 	public void setWrappedSocialRequestInterpreterLocalService(
+		SocialRequestInterpreterLocalService socialRequestInterpreterLocalService) {
+		_socialRequestInterpreterLocalService = socialRequestInterpreterLocalService;
+	}
+
+	public SocialRequestInterpreterLocalService getWrappedService() {
+		return _socialRequestInterpreterLocalService;
+	}
+
+	public void setWrappedService(
 		SocialRequestInterpreterLocalService socialRequestInterpreterLocalService) {
 		_socialRequestInterpreterLocalService = socialRequestInterpreterLocalService;
 	}

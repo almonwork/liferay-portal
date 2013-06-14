@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -60,6 +60,7 @@ public class UpgradeProcess_5_2_8_to_6_0_5 extends UpgradeProcess {
 
 		upgrade(com.liferay.portal.upgrade.v6_0_3.UpgradeAsset.class);
 		upgrade(com.liferay.portal.upgrade.v6_0_3.UpgradeAssetPublisher.class);
+		upgrade(com.liferay.portal.upgrade.v6_0_3.UpgradeDocumentLibrary.class);
 		upgrade(UpgradeLookAndFeel.class);
 		upgrade(UpgradePermission.class);
 		upgrade(UpgradeScopes.class);

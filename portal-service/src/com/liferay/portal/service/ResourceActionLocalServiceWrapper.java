@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -24,7 +24,8 @@ package com.liferay.portal.service;
  * @generated
  */
 public class ResourceActionLocalServiceWrapper
-	implements ResourceActionLocalService {
+	implements ResourceActionLocalService,
+		ServiceWrapper<ResourceActionLocalService> {
 	public ResourceActionLocalServiceWrapper(
 		ResourceActionLocalService resourceActionLocalService) {
 		_resourceActionLocalService = resourceActionLocalService;
@@ -58,25 +59,32 @@ public class ResourceActionLocalServiceWrapper
 	* Deletes the resource action with the primary key from the database. Also notifies the appropriate model listeners.
 	*
 	* @param resourceActionId the primary key of the resource action
+	* @return the resource action that was removed
 	* @throws PortalException if a resource action with the primary key could not be found
 	* @throws SystemException if a system exception occurred
 	*/
-	public void deleteResourceAction(long resourceActionId)
+	public com.liferay.portal.model.ResourceAction deleteResourceAction(
+		long resourceActionId)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException {
-		_resourceActionLocalService.deleteResourceAction(resourceActionId);
+		return _resourceActionLocalService.deleteResourceAction(resourceActionId);
 	}
 
 	/**
 	* Deletes the resource action from the database. Also notifies the appropriate model listeners.
 	*
 	* @param resourceAction the resource action
+	* @return the resource action that was removed
 	* @throws SystemException if a system exception occurred
 	*/
-	public void deleteResourceAction(
+	public com.liferay.portal.model.ResourceAction deleteResourceAction(
 		com.liferay.portal.model.ResourceAction resourceAction)
 		throws com.liferay.portal.kernel.exception.SystemException {
-		_resourceActionLocalService.deleteResourceAction(resourceAction);
+		return _resourceActionLocalService.deleteResourceAction(resourceAction);
+	}
+
+	public com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery() {
+		return _resourceActionLocalService.dynamicQuery();
 	}
 
 	/**
@@ -148,6 +156,12 @@ public class ResourceActionLocalServiceWrapper
 		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery)
 		throws com.liferay.portal.kernel.exception.SystemException {
 		return _resourceActionLocalService.dynamicQueryCount(dynamicQuery);
+	}
+
+	public com.liferay.portal.model.ResourceAction fetchResourceAction(
+		long resourceActionId)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return _resourceActionLocalService.fetchResourceAction(resourceActionId);
 	}
 
 	/**
@@ -265,6 +279,11 @@ public class ResourceActionLocalServiceWrapper
 			addDefaultActions);
 	}
 
+	public com.liferay.portal.model.ResourceAction fetchResourceAction(
+		java.lang.String name, java.lang.String actionId) {
+		return _resourceActionLocalService.fetchResourceAction(name, actionId);
+	}
+
 	public com.liferay.portal.model.ResourceAction getResourceAction(
 		java.lang.String name, java.lang.String actionId)
 		throws com.liferay.portal.kernel.exception.PortalException {
@@ -277,11 +296,26 @@ public class ResourceActionLocalServiceWrapper
 		return _resourceActionLocalService.getResourceActions(name);
 	}
 
+	/**
+	 * @deprecated Renamed to {@link #getWrappedService}
+	 */
 	public ResourceActionLocalService getWrappedResourceActionLocalService() {
 		return _resourceActionLocalService;
 	}
 
+	/**
+	 * @deprecated Renamed to {@link #setWrappedService}
+	 */
 	public void setWrappedResourceActionLocalService(
+		ResourceActionLocalService resourceActionLocalService) {
+		_resourceActionLocalService = resourceActionLocalService;
+	}
+
+	public ResourceActionLocalService getWrappedService() {
+		return _resourceActionLocalService;
+	}
+
+	public void setWrappedService(
 		ResourceActionLocalService resourceActionLocalService) {
 		_resourceActionLocalService = resourceActionLocalService;
 	}

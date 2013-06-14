@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -15,7 +15,6 @@
 package com.liferay.portlet.wiki.service;
 
 import com.liferay.portal.kernel.bean.PortalBeanLocatorUtil;
-import com.liferay.portal.kernel.util.MethodCache;
 import com.liferay.portal.kernel.util.ReferenceRegistry;
 
 /**
@@ -37,6 +36,25 @@ public class WikiNodeServiceUtil {
 	 *
 	 * Never modify this class directly. Add custom service methods to {@link com.liferay.portlet.wiki.service.impl.WikiNodeServiceImpl} and rerun ServiceBuilder to regenerate this class.
 	 */
+
+	/**
+	* Returns the Spring bean ID for this bean.
+	*
+	* @return the Spring bean ID for this bean
+	*/
+	public static java.lang.String getBeanIdentifier() {
+		return getService().getBeanIdentifier();
+	}
+
+	/**
+	* Sets the Spring bean ID for this bean.
+	*
+	* @param beanIdentifier the Spring bean ID for this bean
+	*/
+	public static void setBeanIdentifier(java.lang.String beanIdentifier) {
+		getService().setBeanIdentifier(beanIdentifier);
+	}
+
 	public static com.liferay.portlet.wiki.model.WikiNode addNode(
 		java.lang.String name, java.lang.String description,
 		com.liferay.portal.service.ServiceContext serviceContext)
@@ -65,11 +83,11 @@ public class WikiNodeServiceUtil {
 	}
 
 	public static void importPages(long nodeId, java.lang.String importer,
-		java.io.File[] files,
+		java.io.InputStream[] inputStreams,
 		java.util.Map<java.lang.String, java.lang.String[]> options)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException {
-		getService().importPages(nodeId, importer, files, options);
+		getService().importPages(nodeId, importer, inputStreams, options);
 	}
 
 	public static void subscribeNode(long nodeId)
@@ -98,20 +116,15 @@ public class WikiNodeServiceUtil {
 
 			ReferenceRegistry.registerReference(WikiNodeServiceUtil.class,
 				"_service");
-			MethodCache.remove(WikiNodeService.class);
 		}
 
 		return _service;
 	}
 
+	/**
+	 * @deprecated
+	 */
 	public void setService(WikiNodeService service) {
-		MethodCache.remove(WikiNodeService.class);
-
-		_service = service;
-
-		ReferenceRegistry.registerReference(WikiNodeServiceUtil.class,
-			"_service");
-		MethodCache.remove(WikiNodeService.class);
 	}
 
 	private static WikiNodeService _service;

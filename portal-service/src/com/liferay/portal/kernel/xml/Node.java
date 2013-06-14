@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -31,6 +31,8 @@ public interface Node extends Serializable {
 
 	public Node asXPathResult(Element parent);
 
+	public String compactString() throws IOException;
+
 	public Node detach();
 
 	public String formattedString() throws IOException;
@@ -38,6 +40,10 @@ public interface Node extends Serializable {
 	public String formattedString(String indent) throws IOException;
 
 	public String formattedString(String indent, boolean expandEmptyElements)
+		throws IOException;
+
+	public String formattedString(
+			String indent, boolean expandEmptyElements, boolean trimText)
 		throws IOException;
 
 	public Document getDocument();
@@ -62,22 +68,22 @@ public interface Node extends Serializable {
 
 	public boolean isReadOnly();
 
-	public boolean matches(String xpathExpression);
+	public boolean matches(String xPathExpression);
 
-	public Number numberValueOf(String xpathExpression);
+	public Number numberValueOf(String xPathExpression);
 
-	public List<Node> selectNodes(String xpathExpression);
-
-	public List<Node> selectNodes(
-		String xpathExpression, String comparisonXPathExpression);
+	public List<Node> selectNodes(String xPathExpression);
 
 	public List<Node> selectNodes(
-		String xpathExpression, String comparisonXPathExpression,
+		String xPathExpression, String comparisonXPathExpression);
+
+	public List<Node> selectNodes(
+		String xPathExpression, String comparisonXPathExpression,
 		boolean removeDuplicates);
 
-	public Object selectObject(String xpathExpression);
+	public Object selectObject(String xPathExpression);
 
-	public Node selectSingleNode(String xpathExpression);
+	public Node selectSingleNode(String xPathExpression);
 
 	public void setName(String name);
 
@@ -85,7 +91,7 @@ public interface Node extends Serializable {
 
 	public boolean supportsParent();
 
-	public String valueOf(String xpathExpression);
+	public String valueOf(String xPathExpression);
 
 	public void write(Writer writer) throws IOException;
 

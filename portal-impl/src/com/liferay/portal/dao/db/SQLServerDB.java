@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -61,22 +61,19 @@ public class SQLServerDB extends BaseDB {
 	}
 
 	@Override
-	public List<Index> getIndexes() throws SQLException {
+	public List<Index> getIndexes(Connection con) throws SQLException {
 		List<Index> indexes = new ArrayList<Index>();
 
-		Connection con = null;
 		PreparedStatement ps = null;
 		ResultSet rs = null;
 
 		try {
-			con = DataAccess.getConnection();
-
 			DatabaseMetaData databaseMetaData = con.getMetaData();
 
 			if (databaseMetaData.getDatabaseMajorVersion() <=
 					_SQL_SERVER_2000) {
 
-				return null;
+				return indexes;
 			}
 
 			StringBundler sb = new StringBundler(6);
@@ -103,7 +100,7 @@ public class SQLServerDB extends BaseDB {
 			}
 		}
 		finally {
-			DataAccess.cleanUp(con, ps, rs);
+			DataAccess.cleanUp(null, ps, rs);
 		}
 
 		return indexes;
@@ -214,13 +211,10 @@ public class SQLServerDB extends BaseDB {
 		return sb.toString();
 	}
 
-	private static String[] _SQL_SERVER = {
-		"--", "1", "0",
-		"'19700101'", "GetDate()",
-		" image", " bit", " datetime",
-		" float", " int", " bigint",
-		" nvarchar(2000)", " ntext", " nvarchar",
-		"  identity(1,1)", "go"
+	private static final String[] _SQL_SERVER = {
+		"--", "1", "0", "'19700101'", "GetDate()", " image", " image", " bit",
+		" datetime", " float", " int", " bigint", " nvarchar(2000)", " ntext",
+		" nvarchar", "  identity(1,1)", "go"
 	};
 
 	private static final int _SQL_SERVER_2000 = 8;

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -22,7 +22,7 @@ import com.liferay.portal.model.Group;
 import com.liferay.portal.model.User;
 import com.liferay.portal.security.permission.PermissionChecker;
 import com.liferay.portal.service.GroupLocalServiceUtil;
-import com.liferay.portal.service.UserServiceUtil;
+import com.liferay.portal.service.UserLocalServiceUtil;
 import com.liferay.portal.service.permission.UserPermissionUtil;
 import com.liferay.portal.theme.ThemeDisplay;
 import com.liferay.portlet.asset.model.AssetRenderer;
@@ -42,17 +42,18 @@ public class UserAssetRendererFactory extends BaseAssetRendererFactory {
 	public AssetRenderer getAssetRenderer(long classPK, int type)
 		throws PortalException, SystemException {
 
-		User user = UserServiceUtil.getUserById(classPK);
+		User user = UserLocalServiceUtil.getUserById(classPK);
 
 		return new UserAssetRenderer(user);
 	}
 
+	@Override
 	public AssetRenderer getAssetRenderer(long groupId, String urlTitle)
 		throws PortalException, SystemException {
 
 		Group group = GroupLocalServiceUtil.getGroup(groupId);
 
-		User user = UserServiceUtil.getUserByScreenName(
+		User user = UserLocalServiceUtil.getUserByScreenName(
 			group.getCompanyId(), urlTitle);
 
 		return new UserAssetRenderer(user);
@@ -84,8 +85,15 @@ public class UserAssetRendererFactory extends BaseAssetRendererFactory {
 	}
 
 	@Override
+	public boolean isSelectable() {
+		return _SELECTABLE;
+	}
+
+	@Override
 	protected String getIconPath(ThemeDisplay themeDisplay) {
 		return themeDisplay.getPathThemeImages() + "/common/user_icon.png";
 	}
+
+	private static final boolean _SELECTABLE = false;
 
 }

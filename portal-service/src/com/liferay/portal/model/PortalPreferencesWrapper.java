@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,6 +14,9 @@
 
 package com.liferay.portal.model;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * <p>
  * This class is a wrapper for {@link PortalPreferences}.
@@ -23,7 +26,8 @@ package com.liferay.portal.model;
  * @see       PortalPreferences
  * @generated
  */
-public class PortalPreferencesWrapper implements PortalPreferences {
+public class PortalPreferencesWrapper implements PortalPreferences,
+	ModelWrapper<PortalPreferences> {
 	public PortalPreferencesWrapper(PortalPreferences portalPreferences) {
 		_portalPreferences = portalPreferences;
 	}
@@ -34,6 +38,43 @@ public class PortalPreferencesWrapper implements PortalPreferences {
 
 	public String getModelClassName() {
 		return PortalPreferences.class.getName();
+	}
+
+	public Map<String, Object> getModelAttributes() {
+		Map<String, Object> attributes = new HashMap<String, Object>();
+
+		attributes.put("portalPreferencesId", getPortalPreferencesId());
+		attributes.put("ownerId", getOwnerId());
+		attributes.put("ownerType", getOwnerType());
+		attributes.put("preferences", getPreferences());
+
+		return attributes;
+	}
+
+	public void setModelAttributes(Map<String, Object> attributes) {
+		Long portalPreferencesId = (Long)attributes.get("portalPreferencesId");
+
+		if (portalPreferencesId != null) {
+			setPortalPreferencesId(portalPreferencesId);
+		}
+
+		Long ownerId = (Long)attributes.get("ownerId");
+
+		if (ownerId != null) {
+			setOwnerId(ownerId);
+		}
+
+		Integer ownerType = (Integer)attributes.get("ownerType");
+
+		if (ownerType != null) {
+			setOwnerType(ownerType);
+		}
+
+		String preferences = (String)attributes.get("preferences");
+
+		if (preferences != null) {
+			setPreferences(preferences);
+		}
 	}
 
 	/**
@@ -146,10 +187,6 @@ public class PortalPreferencesWrapper implements PortalPreferences {
 		return _portalPreferences.isEscapedModel();
 	}
 
-	public void setEscapedModel(boolean escapedModel) {
-		_portalPreferences.setEscapedModel(escapedModel);
-	}
-
 	public java.io.Serializable getPrimaryKeyObj() {
 		return _portalPreferences.getPrimaryKeyObj();
 	}
@@ -204,7 +241,14 @@ public class PortalPreferencesWrapper implements PortalPreferences {
 		_portalPreferences.persist();
 	}
 
+	/**
+	 * @deprecated Renamed to {@link #getWrappedModel}
+	 */
 	public PortalPreferences getWrappedPortalPreferences() {
+		return _portalPreferences;
+	}
+
+	public PortalPreferences getWrappedModel() {
 		return _portalPreferences;
 	}
 

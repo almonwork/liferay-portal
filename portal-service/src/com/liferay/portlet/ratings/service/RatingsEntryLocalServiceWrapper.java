@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,6 +14,8 @@
 
 package com.liferay.portlet.ratings.service;
 
+import com.liferay.portal.service.ServiceWrapper;
+
 /**
  * <p>
  * This class is a wrapper for {@link RatingsEntryLocalService}.
@@ -23,7 +25,8 @@ package com.liferay.portlet.ratings.service;
  * @see       RatingsEntryLocalService
  * @generated
  */
-public class RatingsEntryLocalServiceWrapper implements RatingsEntryLocalService {
+public class RatingsEntryLocalServiceWrapper implements RatingsEntryLocalService,
+	ServiceWrapper<RatingsEntryLocalService> {
 	public RatingsEntryLocalServiceWrapper(
 		RatingsEntryLocalService ratingsEntryLocalService) {
 		_ratingsEntryLocalService = ratingsEntryLocalService;
@@ -57,25 +60,32 @@ public class RatingsEntryLocalServiceWrapper implements RatingsEntryLocalService
 	* Deletes the ratings entry with the primary key from the database. Also notifies the appropriate model listeners.
 	*
 	* @param entryId the primary key of the ratings entry
+	* @return the ratings entry that was removed
 	* @throws PortalException if a ratings entry with the primary key could not be found
 	* @throws SystemException if a system exception occurred
 	*/
-	public void deleteRatingsEntry(long entryId)
+	public com.liferay.portlet.ratings.model.RatingsEntry deleteRatingsEntry(
+		long entryId)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException {
-		_ratingsEntryLocalService.deleteRatingsEntry(entryId);
+		return _ratingsEntryLocalService.deleteRatingsEntry(entryId);
 	}
 
 	/**
 	* Deletes the ratings entry from the database. Also notifies the appropriate model listeners.
 	*
 	* @param ratingsEntry the ratings entry
+	* @return the ratings entry that was removed
 	* @throws SystemException if a system exception occurred
 	*/
-	public void deleteRatingsEntry(
+	public com.liferay.portlet.ratings.model.RatingsEntry deleteRatingsEntry(
 		com.liferay.portlet.ratings.model.RatingsEntry ratingsEntry)
 		throws com.liferay.portal.kernel.exception.SystemException {
-		_ratingsEntryLocalService.deleteRatingsEntry(ratingsEntry);
+		return _ratingsEntryLocalService.deleteRatingsEntry(ratingsEntry);
+	}
+
+	public com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery() {
+		return _ratingsEntryLocalService.dynamicQuery();
 	}
 
 	/**
@@ -147,6 +157,12 @@ public class RatingsEntryLocalServiceWrapper implements RatingsEntryLocalService
 		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery)
 		throws com.liferay.portal.kernel.exception.SystemException {
 		return _ratingsEntryLocalService.dynamicQueryCount(dynamicQuery);
+	}
+
+	public com.liferay.portlet.ratings.model.RatingsEntry fetchRatingsEntry(
+		long entryId)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return _ratingsEntryLocalService.fetchRatingsEntry(entryId);
 	}
 
 	/**
@@ -253,6 +269,12 @@ public class RatingsEntryLocalServiceWrapper implements RatingsEntryLocalService
 		_ratingsEntryLocalService.deleteEntry(userId, className, classPK);
 	}
 
+	public com.liferay.portlet.ratings.model.RatingsEntry fetchEntry(
+		long userId, java.lang.String className, long classPK)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return _ratingsEntryLocalService.fetchEntry(userId, className, classPK);
+	}
+
 	public java.util.List<com.liferay.portlet.ratings.model.RatingsEntry> getEntries(
 		long userId, java.lang.String className,
 		java.util.List<java.lang.Long> classPKs)
@@ -295,11 +317,26 @@ public class RatingsEntryLocalServiceWrapper implements RatingsEntryLocalService
 			classPK, score, serviceContext);
 	}
 
+	/**
+	 * @deprecated Renamed to {@link #getWrappedService}
+	 */
 	public RatingsEntryLocalService getWrappedRatingsEntryLocalService() {
 		return _ratingsEntryLocalService;
 	}
 
+	/**
+	 * @deprecated Renamed to {@link #setWrappedService}
+	 */
 	public void setWrappedRatingsEntryLocalService(
+		RatingsEntryLocalService ratingsEntryLocalService) {
+		_ratingsEntryLocalService = ratingsEntryLocalService;
+	}
+
+	public RatingsEntryLocalService getWrappedService() {
+		return _ratingsEntryLocalService;
+	}
+
+	public void setWrappedService(
 		RatingsEntryLocalService ratingsEntryLocalService) {
 		_ratingsEntryLocalService = ratingsEntryLocalService;
 	}

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,38 +14,26 @@
 
 package com.liferay.portal.model;
 
-import com.liferay.portal.kernel.util.Accessor;
-
 /**
- * The extended model interface for the Permission service. Represents a row in the &quot;Permission_&quot; database table, with each column mapped to a property of this class.
- *
  * @author Brian Wing Shun Chan
- * @see PermissionModel
- * @see com.liferay.portal.model.impl.PermissionImpl
- * @see com.liferay.portal.model.impl.PermissionModelImpl
- * @generated
+ * @see    com.liferay.portal.model.impl.PermissionImpl
  */
-public interface Permission extends PermissionModel, PersistedModel {
-	/*
-	 * NOTE FOR DEVELOPERS:
-	 *
-	 * Never modify this interface directly. Add methods to {@link com.liferay.portal.model.impl.PermissionImpl} and rerun ServiceBuilder to automatically copy the method declarations to this interface.
-	 */
-	public static final Accessor<Permission, Long> PERMISSION_ID_ACCESSOR = new Accessor<Permission, Long>() {
-			public Long get(Permission permission) {
-				return permission.getPermissionId();
-			}
-		};
+public interface Permission {
 
-	public java.lang.String getName();
+	public String getActionId();
 
-	public java.lang.String getPrimKey();
+	public String getName();
+
+	public String getPrimKey();
 
 	public int getScope();
 
-	public void setName(java.lang.String name);
+	public void setActionId(String actionId);
 
-	public void setPrimKey(java.lang.String primKey);
+	public void setName(String name);
+
+	public void setPrimKey(String primKey);
 
 	public void setScope(int scope);
+
 }

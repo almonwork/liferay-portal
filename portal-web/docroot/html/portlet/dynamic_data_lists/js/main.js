@@ -1,15 +1,9 @@
-AUI().add(
+AUI.add(
 	'liferay-portlet-dynamic-data-lists',
 	function(A) {
 		var AArray = A.Array;
 
 		var Lang = A.Lang;
-
-		var DDL = Liferay.Service.DDL;
-
-		var DDLRecord = DDL.DDLRecord;
-
-		var DDLRecordSet = DDL.DDLRecordSet;
 
 		var getObjectKeys = A.Object.keys;
 
@@ -17,7 +11,135 @@ AUI().add(
 
 		var EMPTY_FN = A.Lang.emptyFn;
 
+		var STR_COMMA = ',';
+
 		var STR_EMPTY = '';
+
+		var DLFileEntryCellEditor = A.Component.create(
+			{
+				NAME: 'document-library-file-entry-cell-editor',
+
+				EXTENDS: A.BaseCellEditor,
+
+				prototype: {
+					ELEMENT_TEMPLATE: '<input type="hidden" />',
+
+					initializer: function() {
+						var instance = this;
+
+						window[Liferay.Util.getPortletNamespace('15') + 'selectDocumentLibrary'] = A.bind(instance._selectFileEntry, instance);
+					},
+
+					getElementsValue: function() {
+						var instance = this;
+
+						return instance.get('value');
+					},
+
+					_defInitToolbarFn: function() {
+						var instance = this;
+
+						DLFileEntryCellEditor.superclass._defInitToolbarFn.apply(instance, arguments);
+
+						instance.toolbar.add(
+							{
+								handler: A.bind(instance._handleChooseEvent, instance),
+								label: Liferay.Language.get('choose')
+							},
+							1
+						);
+					},
+
+					_handleChooseEvent: function() {
+						var instance = this;
+
+						var uri = Liferay.Util.addParams(
+							{
+								groupId: themeDisplay.getScopeGroupId(),
+								p_p_id: '15',
+								p_p_state: 'pop_up',
+								struts_action: '/journal/select_document_library'
+							},
+							themeDisplay.getURLControlPanel()
+						);
+
+						Liferay.Util.openWindow(
+							{
+								id: 'selectDocumentLibrary',
+								title: Liferay.Language.get('javax.portlet.title.20'),
+								uri: uri
+							}
+						);
+					},
+
+					_selectFileEntry: function(url, uuid, title, version) {
+						var instance = this;
+
+						instance.selectedTitle = title;
+						instance.selectedURL = url;
+
+						instance.set(
+							'value',
+							JSON.stringify(
+								{
+									groupId: themeDisplay.getScopeGroupId(),
+									uuid: uuid,
+									title: title,
+									version: version
+								}
+							)
+						);
+					},
+
+					_syncFileLabel: function(title, url) {
+						var instance = this;
+
+						var contentBox = instance.get('contentBox');
+
+						var linkNode = contentBox.one('a');
+
+						if (!linkNode) {
+							linkNode = A.Node.create('<a></a>');
+
+							contentBox.prepend(linkNode);
+						}
+
+						linkNode.setAttribute('href', url);
+						linkNode.setContent(title);
+					},
+
+					_uiSetValue: function(val) {
+						var instance = this;
+
+						if (val) {
+							var selectedTitle = instance.selectedTitle;
+							var selectedURL = instance.selectedURL;
+
+							if (selectedTitle && selectedURL) {
+								instance._syncFileLabel(selectedTitle, selectedURL);
+							}
+							else {
+								SpreadSheet.Util.getFileEntry(
+									val,
+									function(fileEntry) {
+										var url = SpreadSheet.Util.getFileEntryURL(fileEntry);
+
+										instance._syncFileLabel(fileEntry.title, url);
+									}
+								);
+							}
+						}
+						else {
+							instance._syncFileLabel(STR_EMPTY, STR_EMPTY);
+
+							val = STR_EMPTY;
+						}
+
+						instance.elements.val(val);
+					}
+				}
+			}
+		);
 
 		var SpreadSheet = A.Component.create(
 			{
@@ -27,7 +149,7 @@ AUI().add(
 						value: STR_EMPTY
 					},
 
-					recordSetId: {
+					recordsetId: {
 						validator: Lang.isNumber,
 						value: 0
 					},
@@ -38,6 +160,8 @@ AUI().add(
 					}
 				},
 
+				CSS_PREFIX: '',
+
 				DATATYPE_VALIDATOR: {
 					'date': 'date',
 					'double': 'number',
@@ -47,7 +171,7 @@ AUI().add(
 
 				EXTENDS: A.DataTable.Base,
 
-				NAME: 'spreadsheet',
+				NAME: A.DataTable.Base.NAME,
 
 				TYPE_EDITOR: {
 					'checkbox': A.CheckboxCellEditor,
@@ -65,58 +189,24 @@ AUI().add(
 					initializer: function() {
 						var instance = this;
 
-						var recordSet = instance.get('recordSet');
+						var recordset = instance.get('recordset');
 
-						recordSet.on('update', instance._onRecordUpdate, instance);
+						recordset.on('update', instance._onRecordUpdate, instance);
 					},
 
 					addEmptyRows: function(num) {
 						var instance = this;
 
 						var columnset = instance.get('columnset');
-						var recordSet = instance.get('recordSet');
+						var recordset = instance.get('recordset');
 
 						var emptyRows = SpreadSheet.buildEmptyRecords(num, getObjectKeys(columnset.keyHash));
 
-						recordSet.add(emptyRows);
+						recordset.add(emptyRows);
 
-						instance._uiSetRecordset(recordSet);
+						instance._uiSetRecordset(recordset);
 
 						instance._fixPluginsUI();
-					},
-
-					addRecord: function(displayIndex, fieldsMap, callback) {
-						var instance = this;
-
-						callback = (callback && A.bind(callback, instance)) || EMPTY_FN;
-
-						var recordSetId = instance.get('recordSetId');
-
-						var serviceParameterTypes = [
-							'long',
-							'long',
-							'int',
-							'java.util.Map<java.lang.String, java.io.Serializable>',
-							'com.liferay.portal.service.ServiceContext'
-						];
-
-						DDLRecord.addRecord(
-							{
-								groupId: themeDisplay.getScopeGroupId(),
-								recordSetId: recordSetId,
-								displayIndex: displayIndex,
-								fieldsMap: JSON.stringify(fieldsMap),
-								serviceContext: JSON.stringify(
-									{
-										scopeGroupId: themeDisplay.getScopeGroupId(),
-										userId: themeDisplay.getUserId(),
-										workflowAction: Liferay.Workflow.ACTION_PUBLISH
-									}
-								),
-								serviceParameterTypes: A.JSON.stringify(serviceParameterTypes)
-							},
-							callback
-						);
 					},
 
 					updateMinDisplayRows: function(minDisplayRows, callback) {
@@ -124,11 +214,12 @@ AUI().add(
 
 						callback = (callback && A.bind(callback, instance)) || EMPTY_FN;
 
-						var recordSetId = instance.get('recordSetId');
+						var recordsetId = instance.get('recordsetId');
 
-						DDLRecordSet.updateMinDisplayRows(
+						Liferay.Service(
+							'/ddlrecordset/update-min-display-rows',
 							{
-								recordSetId: recordSetId,
+								recordSetId: recordsetId,
 								minDisplayRows: minDisplayRows,
 								serviceContext: JSON.stringify(
 									{
@@ -141,42 +232,32 @@ AUI().add(
 						);
 					},
 
-					updateRecord: function(recordId, displayIndex, fieldsMap, merge, callback) {
+					_editCell: function(event) {
 						var instance = this;
 
-						callback = (callback && A.bind(callback, instance)) || EMPTY_FN;
+						SpreadSheet.superclass._editCell.apply(instance, arguments);
 
-						var serviceParameterTypes = [
-							'long',
-							'int',
-							'java.util.Map<java.lang.String, java.io.Serializable>',
-							'boolean',
-							'com.liferay.portal.service.ServiceContext'
-						];
+						var column = event.column;
+						var record = event.record;
 
-						DDLRecord.updateRecord(
-							{
-								recordId: recordId,
-								displayIndex: displayIndex,
-								fieldsMap: JSON.stringify(fieldsMap),
-								merge: merge,
-								serviceContext: JSON.stringify(
-									{
-										scopeGroupId: themeDisplay.getScopeGroupId(),
-										userId: themeDisplay.getUserId(),
-										workflowAction: Liferay.Workflow.ACTION_PUBLISH
-									}
-								),
-								serviceParameterTypes: A.JSON.stringify(serviceParameterTypes)
-							},
-							callback
-						);
+						var recordset = instance.get('recordset');
+						var recordsetId = instance.get('recordsetId');
+						var structure = instance.get('structure');
+
+						var editor = instance.getCellEditor(record, column);
+
+						if (editor) {
+							editor.set('record', record);
+							editor.set('recordset', recordset);
+							editor.set('recordsetId', recordsetId);
+							editor.set('structure', structure);
+						}
 					},
 
 					_normalizeRecordData: function(data) {
 						var instance = this;
 
-						var recordSet = instance.get('recordSet');
+						var recordset = instance.get('recordset');
 						var structure = instance.get('structure');
 
 						var normalized = {};
@@ -184,15 +265,17 @@ AUI().add(
 						A.each(
 							data,
 							function(item, index, collection) {
-								var field = SpreadSheet.findStructureFieldByAttribute(structure, 'key', index);
+								var field = SpreadSheet.findStructureFieldByAttribute(structure, 'name', index);
 
 								if (field !== null) {
 									var type = field.type;
 
 									if ((type === 'radio') || (type === 'select')) {
-										var option = SpreadSheet.findStructureFieldByAttribute(field.options, 'label', item);
+										if (!Lang.isArray(item)) {
+											item = AArray(item);
+										}
 
-										item = option.value;
+										item = JSON.stringify(item);
 									}
 								}
 
@@ -200,6 +283,7 @@ AUI().add(
 							}
 						);
 
+						delete normalized.classPK;
 						delete normalized.displayIndex;
 						delete normalized.recordId;
 
@@ -215,6 +299,8 @@ AUI().add(
 					_onRecordUpdate: function(event) {
 						var instance = this;
 
+						var recordsetId = instance.get('recordsetId');
+
 						var recordIndex = event.index;
 
 						AArray.each(
@@ -224,16 +310,17 @@ AUI().add(
 
 								var fieldsMap = instance._normalizeRecordData(data);
 
-								if (data.recordId > 0) {
-									instance.updateRecord(data.recordId, recordIndex, fieldsMap, true);
+								if (data.classPK > 0) {
+									SpreadSheet.updateRecord(data.classPK, recordIndex, fieldsMap, true);
 								}
 								else {
-									instance.addRecord(
+									SpreadSheet.addRecord(
+										recordsetId,
 										recordIndex,
 										fieldsMap,
 										function(json) {
 											if (json.recordId > 0) {
-												data.recordId = json.recordId;
+												data.classPK = json.recordId;
 											}
 										}
 									);
@@ -243,52 +330,197 @@ AUI().add(
 					}
 				},
 
+				addRecord: function(recordsetId, displayIndex, fieldsMap, callback) {
+					var instance = this;
+
+					callback = (callback && A.bind(callback, instance)) || EMPTY_FN;
+
+					Liferay.Service(
+						'/ddlrecord/add-record',
+						{
+							groupId: themeDisplay.getScopeGroupId(),
+							recordSetId: recordsetId,
+							displayIndex: displayIndex,
+							fieldsMap: JSON.stringify(fieldsMap),
+							serviceContext: JSON.stringify(
+								{
+									scopeGroupId: themeDisplay.getScopeGroupId(),
+									userId: themeDisplay.getUserId(),
+									workflowAction: Liferay.Workflow.ACTION_PUBLISH
+								}
+							)
+						},
+						callback
+					);
+				},
+
 				buildDataTableColumnset: function(columnset, structure, editable) {
 					var instance = this;
 
 					AArray.each(
 						columnset,
 						function(item, index, collection) {
-							item.key = item.name;
+							var dataType = item.dataType;
+							var label = item.label;
+							var name = item.name;
+							var type = item.type;
+
+							item.key = name;
+
+							var EditorClass = instance.TYPE_EDITOR[type] || A.TextCellEditor;
+
+							var config = {
+								elementName: name,
+								validator: {
+									rules: {}
+								}
+							};
+
+							var required = item.required;
+
+							var structureField;
+
+							if (required) {
+								item.label += ' (' + Liferay.Language.get('required') + ')';
+							}
+
+							if (type === 'checkbox') {
+								config.options = {
+									'true': Liferay.Language.get('true')
+								};
+
+								config.inputFormatter = function(value) {
+									return String(value.length > 0);
+								};
+
+								item.formatter = function(obj) {
+									var data = obj.record.get('data');
+
+									var value = data[name];
+
+									if (value === 'true') {
+										value = Liferay.Language.get('true');
+									}
+									else if (value === 'false') {
+										value = Liferay.Language.get('false');
+									}
+
+									return value;
+								};
+							}
+							else if (type === 'ddm-date') {
+								config.inputFormatter = function(value) {
+									var date = A.DataType.Date.parse(value);
+
+									var dateValue = STR_EMPTY;
+
+									if (date) {
+										dateValue = date.getTime();
+									}
+
+									return dateValue;
+								};
+
+								item.formatter = function(obj) {
+									var data = obj.record.get('data');
+
+									var value = data[name];
+
+									if (value !== STR_EMPTY) {
+										value = parseInt(value, 10);
+
+										value = A.DataType.Date.format(new Date(value));
+									}
+
+									return value;
+								};
+							}
+							else if (type === 'ddm-documentlibrary') {
+								item.formatter = function(obj) {
+									var data = obj.record.get('data');
+
+									var label = STR_EMPTY;
+									var value = data[name];
+
+									if (value !== STR_EMPTY) {
+										var fileData = SpreadSheet.Util.parseJSON(value);
+
+										if (fileData.title) {
+											label = fileData.title;
+										}
+									}
+
+									return label;
+								};
+							}
+							else if (type === 'ddm-fileupload') {
+								item.formatter = function(obj) {
+									var data = obj.record.get('data');
+
+									var label = STR_EMPTY;
+									var value = data[name];
+
+									if (value !== STR_EMPTY) {
+										var fileData = SpreadSheet.Util.parseJSON(value);
+
+										if (fileData.classPK) {
+											label = fileData.name;
+										}
+									}
+
+									return label;
+								};
+
+								structureField = instance.findStructureFieldByAttribute(structure, 'name', name);
+
+								config.validator.rules[name] = {
+									acceptFiles: structureField.acceptFiles,
+									requiredFields: true
+								};
+							}
+							else if ((type === 'radio') || (type === 'select')) {
+								structureField = instance.findStructureFieldByAttribute(structure, 'name', name);
+
+								var multiple = A.DataType.Boolean.parse(structureField.multiple);
+								var options = instance.getCellEditorOptions(structureField.options);
+
+								item.formatter = function(obj) {
+									var data = obj.record.get('data');
+
+									var label = [];
+									var value = data[name];
+
+									AArray.each(
+										value,
+										function(item1, index1, collection1) {
+											label.push(options[item1]);
+										}
+									);
+
+									return label.join(', ');
+								};
+
+								config.inputFormatter = AArray;
+								config.multiple = multiple;
+								config.options = options;
+							}
+
+							var validatorRuleName = instance.DATATYPE_VALIDATOR[dataType];
+
+							var validatorRules = config.validator.rules;
+
+							validatorRules[name] = A.mix(
+								{
+									required: required
+								},
+								validatorRules[name]
+							);
+
+							if (validatorRuleName) {
+								validatorRules[name][validatorRuleName] = true;
+							}
 
 							if (editable && item.editable) {
-								var dataType = item.dataType;
-								var label = item.label;
-								var required = item.required;
-								var type = item.type;
-
-								var EditorClass = instance.TYPE_EDITOR[type] || A.TextCellEditor;
-
-								var config = {
-									validator: {
-										rules: {}
-									}
-								};
-
-								var elementName = 'value';
-
-								if (type === 'checkbox') {
-									elementName = label;
-
-									config.options = [label];
-								}
-								else if ((type === 'radio') || (type === 'select')) {
-									var structureField = instance.findStructureFieldByAttribute(structure, 'key', item.key);
-
-									config.options = instance.getCellEditorOptions(structureField.options);
-								}
-
-								var validatorRules = config.validator.rules;
-								var validatorRuleName = instance.DATATYPE_VALIDATOR[dataType];
-
-								validatorRules[elementName] = {
-									required: required
-								};
-
-								if (validatorRuleName) {
-									validatorRules[elementName][validatorRuleName] = true;
-								}
-
 								item.editor = new EditorClass(config);
 							}
 						}
@@ -330,7 +562,7 @@ AUI().add(
 					AArray.each(
 						options,
 						function(item, index, collection) {
-							normalized[item.label] = item.label;
+							normalized[item.value] = item.label;
 						}
 					);
 
@@ -350,14 +582,85 @@ AUI().add(
 					);
 
 					return recordModel;
+				},
+
+				updateRecord: function(recordId, displayIndex, fieldsMap, merge, callback) {
+					var instance = this;
+
+					callback = (callback && A.bind(callback, instance)) || EMPTY_FN;
+
+					Liferay.Service(
+						'/ddlrecord/update-record',
+						{
+							recordId: recordId,
+							displayIndex: displayIndex,
+							fieldsMap: JSON.stringify(fieldsMap),
+							mergeFields: merge,
+							serviceContext: JSON.stringify(
+								{
+									scopeGroupId: themeDisplay.getScopeGroupId(),
+									userId: themeDisplay.getUserId(),
+									workflowAction: Liferay.Workflow.ACTION_PUBLISH
+								}
+							)
+						},
+						callback
+					);
 				}
 			}
 		);
+
+		SpreadSheet.Util = {
+			getFileEntry: function(fileJSON, callback) {
+				var instance = this;
+
+				fileJSON = instance.parseJSON(fileJSON);
+
+				Liferay.Service(
+					'/dlapp/get-file-entry-by-uuid-and-group-id',
+					{
+						uuid: fileJSON.uuid,
+						groupId: fileJSON.groupId
+					},
+					callback
+				);
+			},
+
+			getFileEntryURL: function(fileEntry) {
+				var instance = this;
+
+				var buffer = [
+					themeDisplay.getPathContext(),
+					'documents',
+					fileEntry.groupId,
+					fileEntry.folderId,
+					encodeURIComponent(fileEntry.title)
+				];
+
+				return buffer.join('/');
+			},
+
+			parseJSON: function(value) {
+				var instance = this;
+
+				var data = {};
+
+				try {
+					data = JSON.parse(value);
+				}
+				catch (e) {
+				}
+
+				return data;
+			}
+		};
+
+		SpreadSheet.TYPE_EDITOR['ddm-documentlibrary'] = DLFileEntryCellEditor;
 
 		Liferay.SpreadSheet = SpreadSheet;
 	},
 	'',
 	{
-		requires: ['aui-datatable']
+		requires: ['aui-arraysort', 'aui-datatable', 'json', 'liferay-portlet-url']
 	}
 );

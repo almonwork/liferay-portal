@@ -14,11 +14,6 @@
 	<td></td>
 </tr>
 <tr>
-	<td>waitForElementPresent</td>
-	<td>link=Web Content Display Test Page</td>
-	<td>Web Content Display Test Page</td>
-</tr>
-<tr>
 	<td>clickAtAndWait</td>
 	<td>link=Web Content Display Test Page</td>
 	<td>Web Content Display Test Page</td>
@@ -36,17 +31,12 @@
 <tr>
 	<td>assertText</td>
 	<td>//h1[@class='header-title']</td>
-	<td>Web Content Name</td>
+	<td>WC WebContent Title</td>
 </tr>
 <tr>
-	<td>pause</td>
-	<td>5000</td>
-	<td></td>
-</tr>
-<tr>
-	<td>selectWindow</td>
-	<td>null</td>
-	<td></td>
+	<td>waitForElementPresent</td>
+	<td>//textarea[@id='_15__15_structure_el_TextAreaField_content' and @style='display: none;']</td>
+	<td>Text Area</td>
 </tr>
 <tr>
 	<td>waitForVisible</td>
@@ -61,7 +51,7 @@
 <tr>
 	<td>assertText</td>
 	<td>//body</td>
-	<td>Web Content Content</td>
+	<td>WC WebContent Content</td>
 </tr>
 <tr>
 	<td>selectFrame</td>
@@ -69,19 +59,89 @@
 	<td>top</td>
 </tr>
 <tr>
+	<td>assertText</td>
+	<td>//span[@title='Add Translation']/ul/li/strong/a/span</td>
+	<td>Add Translation</td>
+</tr>
+<tr>
+	<td>clickAt</td>
+	<td>//span[@title='Add Translation']/ul/li/strong/a/span</td>
+	<td>Add Translation</td>
+</tr>
+<tr>
+	<td>waitForVisible</td>
+	<td>//div[@class='lfr-component lfr-menu-list']/ul/li[contains(.,'Chinese (China)')]/a</td>
+	<td>Chinese (China)</td>
+</tr>
+<tr>
+	<td>assertText</td>
+	<td>//div[@class='lfr-component lfr-menu-list']/ul/li[contains(.,'Chinese (China)')]/a</td>
+	<td>Chinese (China)</td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>//div[@class='lfr-component lfr-menu-list']/ul/li[contains(.,'Chinese (China)')]/a</td>
+	<td>Chinese (China)</td>
+</tr>
+<tr>
+	<td>waitForVisible</td>
+	<td>//iframe[@id='_15_zh_CN']</td>
+	<td>Web Content Translation</td>
+</tr>
+<tr>
+	<td>selectFrame</td>
+	<td>//iframe[@id='_15_zh_CN']</td>
+	<td>Web Content Translation</td>
+</tr>
+<tr>
 	<td>waitForElementPresent</td>
-	<td>//select[@id='_15_languageIdSelect']</td>
-	<td></td>
+	<td>//textarea[@id='_15__15_structure_el_TextAreaField_content' and @style='display: none;']</td>
+	<td>Text Area</td>
 </tr>
 <tr>
-	<td>selectAndWait</td>
-	<td>//select[@id='_15_languageIdSelect']</td>
-	<td>label=Chinese (China)</td>
+	<td>waitForVisible</td>
+	<td>//span[.='Source']</td>
+	<td>Source</td>
 </tr>
 <tr>
-	<td>pause</td>
-	<td>5000</td>
-	<td></td>
+	<td>assertText</td>
+	<td>//span[.='Source']</td>
+	<td>Source</td>
+</tr>
+<tr>
+	<td>clickAt</td>
+	<td>//span[.='Source']</td>
+	<td>Source</td>
+</tr>
+<tr>
+	<td>waitForVisible</td>
+	<td>//a[@class='cke_button_source cke_on']</td>
+	<td>Source Button On</td>
+</tr>
+<tr>
+	<td>waitForVisible</td>
+	<td>//td[@id='cke_contents__15__15_structure_el_TextAreaField_content']/textarea</td>
+	<td>CK Editor</td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>//td[@id='cke_contents__15__15_structure_el_TextAreaField_content']/textarea</td>
+	<td>世界您好 Page Description</td>
+</tr>
+<tr>
+	<td>assertText</td>
+	<td>//span[.='Source']</td>
+	<td>Source</td>
+</tr>
+<tr>
+	<td>clickAt</td>
+	<td>//span[.='Source']</td>
+	<td>Source</td>
+</tr>
+<tr>
+	<td>waitForElementPresent</td>
+	<td>//textarea[@id='_15__15_structure_el_TextAreaField_content' and @style='display: none;']</td>
+	<td>Text Area</td>
 </tr>
 <tr>
 	<td>waitForVisible</td>
@@ -94,7 +154,7 @@
 	<td>CK Editor</td>
 </tr>
 <tr>
-	<td>type</td>
+	<td>waitForText</td>
 	<td>//body</td>
 	<td>世界您好 Page Description</td>
 </tr>
@@ -104,41 +164,30 @@
 	<td>top</td>
 </tr>
 <tr>
-	<td>assertElementPresent</td>
-	<td>//span[2]/div/span/span/span/input[2]</td>
-	<td>Localized</td>
+	<td>clickAtAndWait</td>
+	<td>//input[@id='_15_translateButton']</td>
+	<td>Save</td>
 </tr>
 <tr>
-	<td>store</td>
-	<td>eval(selenium.isChecked('//span[2]/div/span/span/span/input[2]'))</td>
-	<td>localizedPageDescriptionChecked</td>
+	<td>assertText</td>
+	<td>//a[@class='lfr-token journal-article-translation-zh_CN']</td>
+	<td>Chinese (China)</td>
 </tr>
 <tr>
-	<td>gotoIf</td>
-	<td>${localizedPageDescriptionChecked}</td>
-	<td>LocalizedPageDescriptionChecked</td>
-</tr>
-<tr>
-	<td>clickAt</td>
-	<td>//span[2]/div/span/span/span/input[2]</td>
-	<td></td>
-</tr>
-<tr>
-	<td>label</td>
-	<td>LocalizedPageDescriptionChecked</td>
-	<td></td>
-</tr>
-<tr>
-	<td>assertChecked</td>
-	<td>//span[2]/div/span/span/span/input[2]</td>
-	<td>Localized</td>
+	<td>waitForElementPresent</td>
+	<td>//textarea[@id='_15__15_structure_el_TextAreaField_content' and @style='display: none;']</td>
+	<td>Text Area</td>
 </tr>
 <tr>
 	<td>clickAtAndWait</td>
 	<td>//input[@value='Publish']</td>
 	<td>Publish</td>
 </tr>
-
+<tr>
+	<td>assertText</td>
+	<td>//div[@class='journal-content-article']/p</td>
+	<td>WC WebContent Content</td>
+</tr>
 </tbody></table>
 </body>
 </html>

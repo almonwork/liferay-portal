@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -22,18 +22,18 @@ import com.liferay.portal.kernel.dao.jdbc.SqlUpdate;
 import com.liferay.portal.kernel.dao.jdbc.SqlUpdateFactoryUtil;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.util.InfrastructureUtil;
+import com.liferay.portal.service.BaseServiceImpl;
 import com.liferay.portal.service.LockLocalService;
+import com.liferay.portal.service.RepositoryEntryLocalService;
+import com.liferay.portal.service.RepositoryLocalService;
 import com.liferay.portal.service.RepositoryService;
 import com.liferay.portal.service.ResourceLocalService;
-import com.liferay.portal.service.ResourceService;
 import com.liferay.portal.service.UserLocalService;
 import com.liferay.portal.service.UserService;
-import com.liferay.portal.service.base.PrincipalBean;
+import com.liferay.portal.service.persistence.LockFinder;
 import com.liferay.portal.service.persistence.LockPersistence;
 import com.liferay.portal.service.persistence.RepositoryEntryPersistence;
 import com.liferay.portal.service.persistence.RepositoryPersistence;
-import com.liferay.portal.service.persistence.ResourceFinder;
-import com.liferay.portal.service.persistence.ResourcePersistence;
 import com.liferay.portal.service.persistence.UserFinder;
 import com.liferay.portal.service.persistence.UserPersistence;
 
@@ -55,7 +55,6 @@ import com.liferay.portlet.documentlibrary.service.DLFolderLocalService;
 import com.liferay.portlet.documentlibrary.service.DLFolderService;
 import com.liferay.portlet.documentlibrary.service.DLSyncLocalService;
 import com.liferay.portlet.documentlibrary.service.DLSyncService;
-import com.liferay.portlet.documentlibrary.service.persistence.DLContentFinder;
 import com.liferay.portlet.documentlibrary.service.persistence.DLContentPersistence;
 import com.liferay.portlet.documentlibrary.service.persistence.DLFileEntryFinder;
 import com.liferay.portlet.documentlibrary.service.persistence.DLFileEntryMetadataPersistence;
@@ -68,6 +67,7 @@ import com.liferay.portlet.documentlibrary.service.persistence.DLFileShortcutPer
 import com.liferay.portlet.documentlibrary.service.persistence.DLFileVersionPersistence;
 import com.liferay.portlet.documentlibrary.service.persistence.DLFolderFinder;
 import com.liferay.portlet.documentlibrary.service.persistence.DLFolderPersistence;
+import com.liferay.portlet.documentlibrary.service.persistence.DLSyncFinder;
 import com.liferay.portlet.documentlibrary.service.persistence.DLSyncPersistence;
 
 import javax.sql.DataSource;
@@ -84,7 +84,7 @@ import javax.sql.DataSource;
  * @see com.liferay.portlet.documentlibrary.service.DLAppServiceUtil
  * @generated
  */
-public abstract class DLAppServiceBaseImpl extends PrincipalBean
+public abstract class DLAppServiceBaseImpl extends BaseServiceImpl
 	implements DLAppService, IdentifiableBean {
 	/*
 	 * NOTE FOR DEVELOPERS:
@@ -183,24 +183,6 @@ public abstract class DLAppServiceBaseImpl extends PrincipalBean
 	public void setDLContentPersistence(
 		DLContentPersistence dlContentPersistence) {
 		this.dlContentPersistence = dlContentPersistence;
-	}
-
-	/**
-	 * Returns the document library content finder.
-	 *
-	 * @return the document library content finder
-	 */
-	public DLContentFinder getDLContentFinder() {
-		return dlContentFinder;
-	}
-
-	/**
-	 * Sets the document library content finder.
-	 *
-	 * @param dlContentFinder the document library content finder
-	 */
-	public void setDLContentFinder(DLContentFinder dlContentFinder) {
-		this.dlContentFinder = dlContentFinder;
 	}
 
 	/**
@@ -689,6 +671,24 @@ public abstract class DLAppServiceBaseImpl extends PrincipalBean
 	}
 
 	/**
+	 * Returns the d l sync finder.
+	 *
+	 * @return the d l sync finder
+	 */
+	public DLSyncFinder getDLSyncFinder() {
+		return dlSyncFinder;
+	}
+
+	/**
+	 * Sets the d l sync finder.
+	 *
+	 * @param dlSyncFinder the d l sync finder
+	 */
+	public void setDLSyncFinder(DLSyncFinder dlSyncFinder) {
+		this.dlSyncFinder = dlSyncFinder;
+	}
+
+	/**
 	 * Returns the counter local service.
 	 *
 	 * @return the counter local service
@@ -743,6 +743,43 @@ public abstract class DLAppServiceBaseImpl extends PrincipalBean
 	}
 
 	/**
+	 * Returns the lock finder.
+	 *
+	 * @return the lock finder
+	 */
+	public LockFinder getLockFinder() {
+		return lockFinder;
+	}
+
+	/**
+	 * Sets the lock finder.
+	 *
+	 * @param lockFinder the lock finder
+	 */
+	public void setLockFinder(LockFinder lockFinder) {
+		this.lockFinder = lockFinder;
+	}
+
+	/**
+	 * Returns the repository local service.
+	 *
+	 * @return the repository local service
+	 */
+	public RepositoryLocalService getRepositoryLocalService() {
+		return repositoryLocalService;
+	}
+
+	/**
+	 * Sets the repository local service.
+	 *
+	 * @param repositoryLocalService the repository local service
+	 */
+	public void setRepositoryLocalService(
+		RepositoryLocalService repositoryLocalService) {
+		this.repositoryLocalService = repositoryLocalService;
+	}
+
+	/**
 	 * Returns the repository remote service.
 	 *
 	 * @return the repository remote service
@@ -777,6 +814,25 @@ public abstract class DLAppServiceBaseImpl extends PrincipalBean
 	public void setRepositoryPersistence(
 		RepositoryPersistence repositoryPersistence) {
 		this.repositoryPersistence = repositoryPersistence;
+	}
+
+	/**
+	 * Returns the repository entry local service.
+	 *
+	 * @return the repository entry local service
+	 */
+	public RepositoryEntryLocalService getRepositoryEntryLocalService() {
+		return repositoryEntryLocalService;
+	}
+
+	/**
+	 * Sets the repository entry local service.
+	 *
+	 * @param repositoryEntryLocalService the repository entry local service
+	 */
+	public void setRepositoryEntryLocalService(
+		RepositoryEntryLocalService repositoryEntryLocalService) {
+		this.repositoryEntryLocalService = repositoryEntryLocalService;
 	}
 
 	/**
@@ -815,60 +871,6 @@ public abstract class DLAppServiceBaseImpl extends PrincipalBean
 	public void setResourceLocalService(
 		ResourceLocalService resourceLocalService) {
 		this.resourceLocalService = resourceLocalService;
-	}
-
-	/**
-	 * Returns the resource remote service.
-	 *
-	 * @return the resource remote service
-	 */
-	public ResourceService getResourceService() {
-		return resourceService;
-	}
-
-	/**
-	 * Sets the resource remote service.
-	 *
-	 * @param resourceService the resource remote service
-	 */
-	public void setResourceService(ResourceService resourceService) {
-		this.resourceService = resourceService;
-	}
-
-	/**
-	 * Returns the resource persistence.
-	 *
-	 * @return the resource persistence
-	 */
-	public ResourcePersistence getResourcePersistence() {
-		return resourcePersistence;
-	}
-
-	/**
-	 * Sets the resource persistence.
-	 *
-	 * @param resourcePersistence the resource persistence
-	 */
-	public void setResourcePersistence(ResourcePersistence resourcePersistence) {
-		this.resourcePersistence = resourcePersistence;
-	}
-
-	/**
-	 * Returns the resource finder.
-	 *
-	 * @return the resource finder
-	 */
-	public ResourceFinder getResourceFinder() {
-		return resourceFinder;
-	}
-
-	/**
-	 * Sets the resource finder.
-	 *
-	 * @param resourceFinder the resource finder
-	 */
-	public void setResourceFinder(ResourceFinder resourceFinder) {
-		this.resourceFinder = resourceFinder;
 	}
 
 	/**
@@ -996,8 +998,6 @@ public abstract class DLAppServiceBaseImpl extends PrincipalBean
 	protected DLContentLocalService dlContentLocalService;
 	@BeanReference(type = DLContentPersistence.class)
 	protected DLContentPersistence dlContentPersistence;
-	@BeanReference(type = DLContentFinder.class)
-	protected DLContentFinder dlContentFinder;
 	@BeanReference(type = DLFileEntryLocalService.class)
 	protected DLFileEntryLocalService dlFileEntryLocalService;
 	@BeanReference(type = DLFileEntryService.class)
@@ -1050,26 +1050,28 @@ public abstract class DLAppServiceBaseImpl extends PrincipalBean
 	protected DLSyncService dlSyncService;
 	@BeanReference(type = DLSyncPersistence.class)
 	protected DLSyncPersistence dlSyncPersistence;
+	@BeanReference(type = DLSyncFinder.class)
+	protected DLSyncFinder dlSyncFinder;
 	@BeanReference(type = CounterLocalService.class)
 	protected CounterLocalService counterLocalService;
 	@BeanReference(type = LockLocalService.class)
 	protected LockLocalService lockLocalService;
 	@BeanReference(type = LockPersistence.class)
 	protected LockPersistence lockPersistence;
+	@BeanReference(type = LockFinder.class)
+	protected LockFinder lockFinder;
+	@BeanReference(type = RepositoryLocalService.class)
+	protected RepositoryLocalService repositoryLocalService;
 	@BeanReference(type = RepositoryService.class)
 	protected RepositoryService repositoryService;
 	@BeanReference(type = RepositoryPersistence.class)
 	protected RepositoryPersistence repositoryPersistence;
+	@BeanReference(type = RepositoryEntryLocalService.class)
+	protected RepositoryEntryLocalService repositoryEntryLocalService;
 	@BeanReference(type = RepositoryEntryPersistence.class)
 	protected RepositoryEntryPersistence repositoryEntryPersistence;
 	@BeanReference(type = ResourceLocalService.class)
 	protected ResourceLocalService resourceLocalService;
-	@BeanReference(type = ResourceService.class)
-	protected ResourceService resourceService;
-	@BeanReference(type = ResourcePersistence.class)
-	protected ResourcePersistence resourcePersistence;
-	@BeanReference(type = ResourceFinder.class)
-	protected ResourceFinder resourceFinder;
 	@BeanReference(type = UserLocalService.class)
 	protected UserLocalService userLocalService;
 	@BeanReference(type = UserService.class)

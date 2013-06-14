@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -26,7 +26,7 @@ public class IconCloseTag extends IconTag {
 
 	@Override
 	protected String getPage() {
-		if (FileAvailabilityUtil.isAvailable(getServletContext(), _PAGE)) {
+		if (FileAvailabilityUtil.isAvailable(servletContext, _PAGE)) {
 			return _PAGE;
 		}
 
@@ -40,6 +40,13 @@ public class IconCloseTag extends IconTag {
 		setCssClass("portlet-close portlet-close-icon");
 		setImage("../portlet/close");
 		setMessage("remove");
+
+		String onClick =
+			"Liferay.Portlet.close('#p_p_id_".concat(
+				portletDisplay.getId()).concat("_'); return false;");
+
+		setOnClick(onClick);
+
 		setToolTip(false);
 		setUrl(portletDisplay.getURLClose());
 

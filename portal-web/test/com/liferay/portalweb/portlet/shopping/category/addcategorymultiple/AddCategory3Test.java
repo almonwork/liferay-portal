@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -23,14 +23,15 @@ import com.liferay.portalweb.portal.util.RuntimeVariables;
 public class AddCategory3Test extends BaseTestCase {
 	public void testAddCategory3() throws Exception {
 		selenium.open("/web/guest/home/");
+		loadRequiredJavaScriptModules();
 
 		for (int second = 0;; second++) {
-			if (second >= 60) {
+			if (second >= 90) {
 				fail("timeout");
 			}
 
 			try {
-				if (selenium.isElementPresent("link=Shopping Test Page")) {
+				if (selenium.isVisible("link=Shopping Test Page")) {
 					break;
 				}
 			}
@@ -40,25 +41,37 @@ public class AddCategory3Test extends BaseTestCase {
 			Thread.sleep(1000);
 		}
 
-		selenium.saveScreenShotAndSource();
-		selenium.clickAt("link=Shopping Test Page", RuntimeVariables.replace(""));
+		selenium.clickAt("link=Shopping Test Page",
+			RuntimeVariables.replace("Shopping Test Page"));
 		selenium.waitForPageToLoad("30000");
-		selenium.saveScreenShotAndSource();
+		loadRequiredJavaScriptModules();
+		selenium.clickAt("link=Categories",
+			RuntimeVariables.replace("Categories"));
+		selenium.waitForPageToLoad("30000");
+		loadRequiredJavaScriptModules();
 		selenium.clickAt("//input[@value='Add Category']",
-			RuntimeVariables.replace(""));
+			RuntimeVariables.replace("Add Category"));
 		selenium.waitForPageToLoad("30000");
-		selenium.saveScreenShotAndSource();
-		selenium.type("_34_name", RuntimeVariables.replace("Category3 Test3"));
-		selenium.saveScreenShotAndSource();
-		selenium.type("_34_description",
-			RuntimeVariables.replace("This is a category3 test3."));
-		selenium.saveScreenShotAndSource();
-		selenium.clickAt("//input[@value='Save']", RuntimeVariables.replace(""));
+		loadRequiredJavaScriptModules();
+		selenium.type("//input[@id='_34_name']",
+			RuntimeVariables.replace("Shopping Category3 Name"));
+		selenium.type("//textarea[@id='_34_description']",
+			RuntimeVariables.replace("Shopping Category3 Description"));
+		selenium.clickAt("//input[@value='Save']",
+			RuntimeVariables.replace("Save"));
 		selenium.waitForPageToLoad("30000");
-		selenium.saveScreenShotAndSource();
-		assertTrue(selenium.isTextPresent(
-				"Your request completed successfully."));
-		assertTrue(selenium.isTextPresent("Category3 Test3"));
-		assertTrue(selenium.isTextPresent("This is a category3 test3."));
+		loadRequiredJavaScriptModules();
+		assertEquals(RuntimeVariables.replace(
+				"Your request completed successfully."),
+			selenium.getText("//div[@class='portlet-msg-success']"));
+		assertEquals(RuntimeVariables.replace(
+				"Shopping Category1 Name\nShopping Category1 Description"),
+			selenium.getText("//td[1]/a"));
+		assertEquals(RuntimeVariables.replace(
+				"Shopping Category2 Name\nShopping Category2 Description"),
+			selenium.getText("//tr[4]/td[1]/a"));
+		assertEquals(RuntimeVariables.replace(
+				"Shopping Category3 Name\nShopping Category3 Description"),
+			selenium.getText("//tr[5]/td[1]/a"));
 	}
 }

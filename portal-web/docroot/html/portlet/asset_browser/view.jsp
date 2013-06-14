@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -19,14 +19,16 @@
 <%
 long groupId = ParamUtil.getLong(request, "groupId");
 
-String typeSelection = request.getParameter("typeSelection");
-
+long refererAssetEntryId = ParamUtil.getLong(request, "refererAssetEntryId");
+String typeSelection = ParamUtil.getString(request, "typeSelection");
 String callback = ParamUtil.getString(request, "callback");
 
 PortletURL portletURL = renderResponse.createRenderURL();
 
-portletURL.setParameter("struts_action", "/portlet_configuration/search");
+portletURL.setParameter("struts_action", "/asset_browser/view");
+portletURL.setParameter("refererAssetEntryId", String.valueOf(refererAssetEntryId));
 portletURL.setParameter("typeSelection", typeSelection);
+portletURL.setParameter("callback", callback);
 %>
 
 <liferay-ui:header
@@ -47,7 +49,7 @@ portletURL.setParameter("typeSelection", typeSelection);
 		%>
 
 		<liferay-ui:search-form
-			page="/html/portlet/asset_browser/asset_search.jsp"
+			page="/html/portlet/asset_publisher/asset_search.jsp"
 			searchContainer="<%= searchContainer %>"
 		/>
 
@@ -78,33 +80,39 @@ portletURL.setParameter("typeSelection", typeSelection);
 				assetEntryId = GetterUtil.getLong(doc.get(Field.ENTRY_CLASS_PK));
 			}
 
-			AssetEntry assetEntry = AssetEntryLocalServiceUtil.getEntry(typeSelection, assetEntryId);
+			AssetEntry assetEntry = AssetEntryLocalServiceUtil.fetchEntry(typeSelection, assetEntryId);
+
+			if ((assetEntry == null) || !assetEntry.isVisible()) {
+				continue;
+			}
 
 			assetEntry = assetEntry.toEscapedModel();
 
-			AssetRenderer assetRenderer = assetRendererFactory.getAssetRenderer(assetEntry.getClassPK());
+			String rowHREF = null;
 
-			StringBundler sb = new StringBundler(9);
+			if (assetEntry.getEntryId() != refererAssetEntryId) {
+				StringBundler sb = new StringBundler(9);
 
-			sb.append("javascript:Liferay.Util.getOpener().");
-			sb.append(callback);
-			sb.append("('");
-			sb.append(assetEntry.getEntryId());
-			sb.append("', '");
-			sb.append(ResourceActionsUtil.getModelResource(locale, assetEntry.getClassName()));
-			sb.append("', '");
-			sb.append(assetRenderer.getTitle(locale));
-			sb.append("');Liferay.Util.getWindow().close();");
+				sb.append("javascript:Liferay.Util.getOpener().");
+				sb.append(callback);
+				sb.append("('");
+				sb.append(assetEntry.getEntryId());
+				sb.append("', '");
+				sb.append(ResourceActionsUtil.getModelResource(locale, assetEntry.getClassName()));
+				sb.append("', '");
+				sb.append(assetEntry.getTitle(locale));
+				sb.append("');Liferay.Util.getWindow().close();");
 
-			String rowHREF = sb.toString();
+				rowHREF = sb.toString();
+			}
 
 			// Title
 
-			row.addText(assetRenderer.getTitle(locale), rowHREF);
+			row.addText(assetEntry.getTitle(locale), rowHREF);
 
 			// Description
 
-			row.addText(assetRenderer.getSummary(locale), rowHREF);
+			row.addText(assetEntry.getSummary(locale), rowHREF);
 
 			// User name
 

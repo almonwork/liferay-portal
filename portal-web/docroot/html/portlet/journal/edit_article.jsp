@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -55,12 +55,14 @@ JournalArticle article = (JournalArticle)request.getAttribute(WebKeys.JOURNAL_AR
 
 long groupId = BeanParamUtil.getLong(article, request, "groupId", scopeGroupId);
 
+long folderId = ParamUtil.getLong(request, "folderId", JournalFolderConstants.DEFAULT_PARENT_FOLDER_ID);
+
 long classNameId = BeanParamUtil.getLong(article, request, "classNameId");
 long classPK = BeanParamUtil.getLong(article, request, "classPK");
 
 String articleId = BeanParamUtil.getString(article, request, "articleId");
 
-double version = BeanParamUtil.getDouble(article, request, "version", JournalArticleConstants.DEFAULT_VERSION);
+double version = BeanParamUtil.getDouble(article, request, "version", JournalArticleConstants.VERSION_DEFAULT);
 
 String structureId = BeanParamUtil.getString(article, request, "structureId");
 
@@ -70,18 +72,11 @@ long structureGroupId = groupId;
 
 if (Validator.isNotNull(structureId)) {
 	try {
-		structure = JournalStructureLocalServiceUtil.getStructure(groupId, structureId);
-	}
-	catch (NoSuchStructureException nsse1) {
-		if (groupId != themeDisplay.getCompanyGroupId()) {
-			try {
-				structure = JournalStructureLocalServiceUtil.getStructure(themeDisplay.getCompanyGroupId(), structureId);
+		structure = JournalStructureLocalServiceUtil.getStructure(groupId, structureId, true);
 
-				structureGroupId = structure.getGroupId();
-			}
-			catch (NoSuchStructureException nsse2) {
-			}
-		}
+		structureGroupId = structure.getGroupId();
+	}
+	catch (NoSuchStructureException nsse) {
 	}
 }
 
@@ -95,12 +90,12 @@ if (Validator.isNotNull(toLanguageId)) {
 	languageId = toLanguageId;
 }
 
-if (article == null && Validator.isNull(defaultLanguageId)) {
+if ((article == null) && Validator.isNull(defaultLanguageId)) {
 	defaultLanguageId = languageId;
 }
 else {
 	if (Validator.isNull(defaultLanguageId)) {
-		defaultLanguageId =	article.getDefaultLocale();
+		defaultLanguageId = article.getDefaultLocale();
 	}
 }
 
@@ -109,7 +104,7 @@ String[] mainSections = PropsValues.JOURNAL_ARTICLE_FORM_ADD;
 if (Validator.isNotNull(toLanguageId)) {
 	mainSections = PropsValues.JOURNAL_ARTICLE_FORM_TRANSLATE;
 }
-else if (article != null) {
+else if ((article != null) && (article.getId() > 0)) {
 	mainSections = PropsValues.JOURNAL_ARTICLE_FORM_UPDATE;
 }
 
@@ -155,6 +150,7 @@ request.setAttribute("edit_article.jsp-toLanguageId", toLanguageId);
 	<aui:input name="backURL" type="hidden" value="<%= backURL %>" />
 	<aui:input name="referringPortletResource" type="hidden" value="<%= referringPortletResource %>" />
 	<aui:input name="groupId" type="hidden" value="<%= groupId %>" />
+	<aui:input name="folderId" type="hidden" value="<%= folderId %>" />
 	<aui:input name="classNameId" type="hidden" value="<%= classNameId %>" />
 	<aui:input name="classPK" type="hidden" value="<%= classPK %>" />
 	<aui:input name="articleId" type="hidden" value="<%= articleId %>" />
@@ -168,7 +164,7 @@ request.setAttribute("edit_article.jsp-toLanguageId", toLanguageId);
 
 	<liferay-ui:error exception="<%= ArticleContentSizeException.class %>" message="you-have-exceeded-the-maximum-article-content-size-allowed" />
 
-	<aui:model-context bean="<%= article %>" model="<%= JournalArticle.class %>" />
+	<aui:model-context bean="<%= article %>" defaultLanguageId="<%= defaultLanguageId %>" model="<%= JournalArticle.class %>" />
 
 	<table class="lfr-table" id="<portlet:namespace />journalArticleWrapper" width="100%">
 	<tr>
@@ -203,9 +199,12 @@ request.setAttribute("edit_article.jsp-toLanguageId", toLanguageId);
 				boolean approved = false;
 				boolean pending = false;
 
-				if (article != null) {
+				if ((article != null) && (version > 0)) {
 					approved = article.isApproved();
-					pending = article.isPending();
+
+					if (WorkflowDefinitionLinkLocalServiceUtil.hasWorkflowDefinitionLink(themeDisplay.getCompanyId(), scopeGroupId, JournalArticle.class.getName())) {
+						pending = article.isPending();
+					}
 				}
 				%>
 
@@ -267,7 +266,7 @@ request.setAttribute("edit_article.jsp-toLanguageId", toLanguageId);
 							String[] translations = article.getAvailableLocales();
 							%>
 
-							<aui:button name="removeArticleLocaleButton" onClick='<%= renderResponse.getNamespace() + "removeArticleLocale();" %>' value="remove-translation" disabled="<%= languageId.equals(defaultLanguageId) || !ArrayUtil.contains(translations, languageId) %>" />
+							<aui:button disabled="<%= languageId.equals(defaultLanguageId) || !ArrayUtil.contains(translations, languageId) %>" name="removeArticleLocaleButton" onClick='<%= renderResponse.getNamespace() + "removeArticleLocale();" %>' value="remove-translation" />
 						</c:otherwise>
 					</c:choose>
 					<aui:button href="<%= redirect %>" type="cancel" />
@@ -350,7 +349,7 @@ request.setAttribute("edit_article.jsp-toLanguageId", toLanguageId);
 	}
 
 	function <portlet:namespace />selectStructure(structureId, structureName, dialog) {
-		if (confirm('<%= UnicodeLanguageUtil.get(pageContext, "selecting-a-new-structure-will-change-the-available-input-fields-and-available-templates") %>') && 	document.<portlet:namespace />fm1.<portlet:namespace />structureId.value != structureId) {
+		if (confirm('<%= UnicodeLanguageUtil.get(pageContext, "selecting-a-new-structure-will-change-the-available-input-fields-and-available-templates") %>') && (document.<portlet:namespace />fm1.<portlet:namespace />structureId.value != structureId)) {
 			document.<portlet:namespace />fm1.<portlet:namespace />structureId.value = structureId;
 			document.<portlet:namespace />fm1.<portlet:namespace />templateId.value = "";
 
@@ -398,7 +397,7 @@ private String _getArticleImage(ThemeDisplay themeDisplay, JournalArticle articl
 			imageURL = article.getSmallImageURL();
 		}
 		else {
-			imageURL = themeDisplay.getPathImage() + "/journal/article?img_id=" + article.getSmallImageId() + "&t=" + ImageServletTokenUtil.getToken(article.getSmallImageId());
+			imageURL = themeDisplay.getPathImage() + "/journal/article?img_id=" + article.getSmallImageId() + "&t=" + WebServerServletTokenUtil.getToken(article.getSmallImageId());
 		}
 	}
 

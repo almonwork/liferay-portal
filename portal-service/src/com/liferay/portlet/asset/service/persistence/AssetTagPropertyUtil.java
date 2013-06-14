@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -92,14 +92,6 @@ public class AssetTagPropertyUtil {
 		return getPersistence()
 				   .findWithDynamicQuery(dynamicQuery, start, end,
 			orderByComparator);
-	}
-
-	/**
-	 * @see com.liferay.portal.service.persistence.BasePersistence#remove(com.liferay.portal.model.BaseModel)
-	 */
-	public static AssetTagProperty remove(AssetTagProperty assetTagProperty)
-		throws SystemException {
-		return getPersistence().remove(assetTagProperty);
 	}
 
 	/**
@@ -699,12 +691,14 @@ public class AssetTagPropertyUtil {
 	*
 	* @param tagId the tag ID
 	* @param key the key
+	* @return the asset tag property that was removed
 	* @throws SystemException if a system exception occurred
 	*/
-	public static void removeByT_K(long tagId, java.lang.String key)
+	public static com.liferay.portlet.asset.model.AssetTagProperty removeByT_K(
+		long tagId, java.lang.String key)
 		throws com.liferay.portal.kernel.exception.SystemException,
 			com.liferay.portlet.asset.NoSuchTagPropertyException {
-		getPersistence().removeByT_K(tagId, key);
+		return getPersistence().removeByT_K(tagId, key);
 	}
 
 	/**
@@ -789,11 +783,10 @@ public class AssetTagPropertyUtil {
 		return _persistence;
 	}
 
+	/**
+	 * @deprecated
+	 */
 	public void setPersistence(AssetTagPropertyPersistence persistence) {
-		_persistence = persistence;
-
-		ReferenceRegistry.registerReference(AssetTagPropertyUtil.class,
-			"_persistence");
 	}
 
 	private static AssetTagPropertyPersistence _persistence;

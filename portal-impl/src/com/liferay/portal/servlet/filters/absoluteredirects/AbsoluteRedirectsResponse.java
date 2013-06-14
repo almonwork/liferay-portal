@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -41,15 +41,17 @@ public class AbsoluteRedirectsResponse extends HttpServletResponseWrapper {
 
 	@Override
 	public void sendRedirect(String redirect) throws IOException {
-		if (redirect.charAt(0) == CharPool.SLASH) {
-			String portalURL = PortalUtil.getPortalURL(_request);
+		String portalURL = PortalUtil.getPortalURL(_request);
 
+		if (redirect.charAt(0) == CharPool.SLASH) {
 			if (Validator.isNotNull(portalURL)) {
 				redirect = portalURL.concat(redirect);
 			}
 		}
 
-		if (!CookieKeys.hasSessionId(_request)) {
+		if (!CookieKeys.hasSessionId(_request) &&
+			redirect.startsWith(portalURL)) {
+
 			redirect = PortalUtil.getURLWithSessionId(
 				redirect, _request.getSession().getId());
 		}

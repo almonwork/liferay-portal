@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -17,23 +17,23 @@
 <%@ include file="/html/portlet/document_library/init.jsp" %>
 
 <%
-Folder folder = (Folder)request.getAttribute(WebKeys.DOCUMENT_LIBRARY_FOLDER);
+String navigation = ParamUtil.getString(request, "navigation", "home");
 
-long defaultFolderId = GetterUtil.getLong(preferences.getValue("rootFolderId", StringPool.BLANK), DLFolderConstants.DEFAULT_PARENT_FOLDER_ID);
+Folder folder = (Folder)request.getAttribute(WebKeys.DOCUMENT_LIBRARY_FOLDER);
 
 long folderId = GetterUtil.getLong((String)request.getAttribute("view.jsp-folderId"));
 
 long repositoryId = GetterUtil.getLong((String)request.getAttribute("view.jsp-repositoryId"));
 
-long fileEntryTypeId = ParamUtil.getLong(request, "fileEntryTypeId");
+long fileEntryTypeId = ParamUtil.getLong(request, "fileEntryTypeId", -1);
+
+String dlFileEntryTypeName = LanguageUtil.get(pageContext, "basic-document");
 
 int status = WorkflowConstants.STATUS_APPROVED;
 
 if (permissionChecker.isCompanyAdmin() || permissionChecker.isGroupAdmin(scopeGroupId)) {
 	status = WorkflowConstants.STATUS_ANY;
 }
-
-String navigation = ParamUtil.getString(request, "navigation","documents-home");
 
 long categoryId = ParamUtil.getLong(request, "categoryId");
 String tagName = ParamUtil.getString(request, "tag");
@@ -43,14 +43,18 @@ boolean useAssetEntryQuery = (categoryId > 0) || Validator.isNotNull(tagName);
 String displayStyle = ParamUtil.getString(request, "displayStyle");
 
 if (Validator.isNull(displayStyle)) {
-	displayStyle = portalPreferences.getValue(PortletKeys.DOCUMENT_LIBRARY, "display-style", "icon");
+	displayStyle = portalPreferences.getValue(PortletKeys.DOCUMENT_LIBRARY, "display-style", PropsValues.DL_DEFAULT_DISPLAY_VIEW);
 }
 else {
 	boolean saveDisplayStyle = ParamUtil.getBoolean(request, "saveDisplayStyle");
 
-	if (saveDisplayStyle && ArrayUtil.contains(PropsValues.DL_DISPLAY_VIEWS, displayStyle)) {
+	if (saveDisplayStyle && ArrayUtil.contains(displayViews, displayStyle)) {
 		portalPreferences.setValue(PortletKeys.DOCUMENT_LIBRARY, "display-style", displayStyle);
 	}
+}
+
+if (!ArrayUtil.contains(displayViews, displayStyle)) {
+	displayStyle = displayViews[0];
 }
 
 PortletURL portletURL = liferayPortletResponse.createRenderURL();
@@ -59,53 +63,84 @@ portletURL.setParameter("struts_action", "/document_library/view");
 portletURL.setParameter("folderId", String.valueOf(folderId));
 portletURL.setParameter("displayStyle", String.valueOf(displayStyle));
 
-SearchContainer searchContainer = new SearchContainer(liferayPortletRequest, null, null, "cur2", fileEntriesPerPage, portletURL, null, null);
+SearchContainer searchContainer = new SearchContainer(liferayPortletRequest, null, null, "cur2", entriesPerPage, portletURL, null, null);
 
 List<String> headerNames = new ArrayList<String>();
 
-headerNames.add("name");
-headerNames.add("description");
-headerNames.add("size");
-headerNames.add("create-date");
-headerNames.add("modified-date");
-headerNames.add("read-count");
-headerNames.add(StringPool.BLANK);
+for (String headerName : entryColumns) {
+	if (headerName.equals("action")) {
+		headerName = StringPool.BLANK;
+	}
+	else if (headerName.equals("name")) {
+		headerName = "title";
+	}
+
+	headerNames.add(headerName);
+}
 
 searchContainer.setHeaderNames(headerNames);
 
-searchContainer.setRowChecker(new EntriesChecker(liferayPortletRequest, liferayPortletResponse));
+EntriesChecker entriesChecker = new EntriesChecker(liferayPortletRequest, liferayPortletResponse);
+
+entriesChecker.setCssClass("document-selector");
+
+searchContainer.setRowChecker(entriesChecker);
 
 Map<String, String> orderableHeaders = new HashMap<String, String>();
 
-orderableHeaders.put("name", "name");
+orderableHeaders.put("title", "title");
 orderableHeaders.put("size", "size");
 orderableHeaders.put("create-date", "creationDate");
 orderableHeaders.put("modified-date", "modifiedDate");
-orderableHeaders.put("read-count", "readCount");
+orderableHeaders.put("downloads", "downloads");
 
 String orderByCol = ParamUtil.getString(request, "orderByCol");
 String orderByType = ParamUtil.getString(request, "orderByType");
+
+if (Validator.isNull(orderByCol)) {
+	orderByCol = portalPreferences.getValue(PortletKeys.DOCUMENT_LIBRARY, "order-by-col", StringPool.BLANK);
+	orderByType = portalPreferences.getValue(PortletKeys.DOCUMENT_LIBRARY, "order-by-type", "asc");
+}
+else {
+	boolean saveOrderBy = ParamUtil.getBoolean(request, "saveOrderBy");
+
+	if (saveOrderBy) {
+		portalPreferences.setValue(PortletKeys.DOCUMENT_LIBRARY, "order-by-col", orderByCol);
+		portalPreferences.setValue(PortletKeys.DOCUMENT_LIBRARY, "order-by-type", orderByType);
+	}
+}
 
 OrderByComparator orderByComparator = DLUtil.getRepositoryModelOrderByComparator(orderByCol, orderByType);
 
 searchContainer.setOrderableHeaders(orderableHeaders);
 searchContainer.setOrderByCol(orderByCol);
-searchContainer.setOrderByType(orderByType);
 searchContainer.setOrderByComparator(orderByComparator);
+searchContainer.setOrderByJS("javascript:" + liferayPortletResponse.getNamespace() + "sortEntries('" + folderId + "', 'orderKey', 'orderByType');");
+searchContainer.setOrderByType(orderByType);
 
-int start = ParamUtil.getInteger(request, "start", searchContainer.getStart());
-int end = ParamUtil.getInteger(request, "end", searchContainer.getEnd());
+int entryStart = ParamUtil.getInteger(request, "entryStart", searchContainer.getStart());
+int entryEnd = ParamUtil.getInteger(request, "entryEnd", searchContainer.getEnd());
+
+int folderStart = ParamUtil.getInteger(request, "folderStart");
+int folderEnd = ParamUtil.getInteger(request, "folderEnd", SearchContainer.DEFAULT_DELTA);
 
 List results = null;
 int total = 0;
 
-if (fileEntryTypeId > 0) {
+if (fileEntryTypeId >= 0) {
 	Indexer indexer = IndexerRegistryUtil.getIndexer(DLFileEntryConstants.getClassName());
+
+	if (fileEntryTypeId > 0) {
+		DLFileEntryType dlFileEntryType = DLFileEntryTypeLocalServiceUtil.getFileEntryType(fileEntryTypeId);
+
+		dlFileEntryTypeName = dlFileEntryType.getName();
+	}
 
 	SearchContext searchContext = SearchContextFactory.getInstance(request);
 
-	searchContext.setEnd(searchContainer.getEnd());
-	searchContext.setStart(searchContainer.getStart());
+	searchContext.setAttribute("paginationType", "none");
+	searchContext.setEnd(entryEnd);
+	searchContext.setStart(entryStart);
 
 	Hits hits = indexer.search(searchContext);
 
@@ -123,7 +158,7 @@ if (fileEntryTypeId > 0) {
 		}
 		catch (Exception e) {
 			if (_log.isWarnEnabled()) {
-				_log.warn("Document library search index is stale and contains file entry {" + fileEntryId + "}");
+				_log.warn("Documents and Media search index is stale and contains file entry {" + fileEntryId + "}");
 			}
 
 			continue;
@@ -132,49 +167,49 @@ if (fileEntryTypeId > 0) {
 		results.add(fileEntry);
 	}
 
-	total = results.size();
+	total = hits.getLength();
 }
 else {
-	if (navigation.equals("documents-home")) {
+	if (navigation.equals("home")) {
 		if (useAssetEntryQuery) {
 			long[] classNameIds = {PortalUtil.getClassNameId(DLFileEntryConstants.getClassName()), PortalUtil.getClassNameId(DLFileShortcut.class.getName())};
 
 			AssetEntryQuery assetEntryQuery = new AssetEntryQuery(classNameIds, searchContainer);
 
+			assetEntryQuery.setEnd(entryEnd);
 			assetEntryQuery.setExcludeZeroViewCount(false);
+			assetEntryQuery.setStart(entryStart);
 
 			results = AssetEntryServiceUtil.getEntries(assetEntryQuery);
 			total = AssetEntryServiceUtil.getEntriesCount(assetEntryQuery);
 		}
 		else {
-			results = DLAppServiceUtil.getFoldersAndFileEntriesAndFileShortcuts(repositoryId, folderId, status, false, start, end, searchContainer.getOrderByComparator());
+			results = DLAppServiceUtil.getFoldersAndFileEntriesAndFileShortcuts(repositoryId, folderId, status, false, entryStart, entryEnd, searchContainer.getOrderByComparator());
 			total = DLAppServiceUtil.getFoldersAndFileEntriesAndFileShortcutsCount(repositoryId, folderId, status, false);
 		}
 	}
-	else if (navigation.equals("my-documents") || navigation.equals("recent-documents")) {
+	else if (navigation.equals("mine") || navigation.equals("recent")) {
 		long groupFileEntriesUserId = 0;
 
-		if (navigation.equals("my-documents") && themeDisplay.isSignedIn()) {
+		if (navigation.equals("mine") && themeDisplay.isSignedIn()) {
 			groupFileEntriesUserId = user.getUserId();
 		}
 
-		results= DLAppServiceUtil.getGroupFileEntries(repositoryId, groupFileEntriesUserId, defaultFolderId, start, end);
-		total= DLAppServiceUtil.getGroupFileEntriesCount(repositoryId, groupFileEntriesUserId, defaultFolderId);
+		results = DLAppServiceUtil.getGroupFileEntries(repositoryId, groupFileEntriesUserId, folderId, null, status, entryStart, entryEnd, null);
+		total = DLAppServiceUtil.getGroupFileEntriesCount(repositoryId, groupFileEntriesUserId, folderId, null, status);
 	}
 }
 
 searchContainer.setResults(results);
 searchContainer.setTotal(total);
+
+request.setAttribute("view.jsp-total", String.valueOf(total));
 %>
 
-<c:if test='<%= !displayStyle.equals("list") %>'>
-	<c:choose>
-		<c:when test="<%= results.isEmpty() %>">
-			<div class="portlet-msg-info">
-				<%= LanguageUtil.get(pageContext, "there-are-no-documents-in-this-folder") %>
-			</div>
-		</c:when>
-	</c:choose>
+<c:if test="<%= results.isEmpty() %>">
+	<div class="entries-empty portlet-msg-info">
+		<liferay-ui:message key="there-are-no-documents-or-media-files-in-this-folder" />
+	</div>
 </c:if>
 
 <%
@@ -195,10 +230,11 @@ for (int i = 0; i < results.size(); i++) {
 							PortletURL tempRowURL = liferayPortletResponse.createRenderURL();
 
 							tempRowURL.setParameter("struts_action", "/document_library/view_file_entry");
-							tempRowURL.setParameter("redirect", HttpUtil.addParameter(currentURL, liferayPortletResponse.getNamespace() + "showSiblings", true));
+							tempRowURL.setParameter("redirect", HttpUtil.removeParameter(currentURL, liferayPortletResponse.getNamespace() + "ajax"));
 							tempRowURL.setParameter("fileEntryId", String.valueOf(fileEntry.getFileEntryId()));
 
 							request.setAttribute("view_entries.jsp-fileEntry", fileEntry);
+							request.setAttribute("view_entries.jsp-fileShortcut", fileShortcut);
 
 							request.setAttribute("view_entries.jsp-tempRowURL", tempRowURL);
 							%>
@@ -223,39 +259,101 @@ for (int i = 0; i < results.size(); i++) {
 
 				<c:otherwise>
 					<liferay-util:buffer var="fileEntryTitle">
+
+						<%
+						Map<String, Object> data = new HashMap<String, Object>();
+
+						data.put("file-entry-id", fileEntry.getFileEntryId());
+
+						PortletURL rowURL = liferayPortletResponse.createRenderURL();
+
+						rowURL.setParameter("struts_action", "/document_library/view_file_entry");
+						rowURL.setParameter("redirect", HttpUtil.removeParameter(currentURL, liferayPortletResponse.getNamespace() + "ajax"));
+						rowURL.setParameter("fileEntryId", String.valueOf(fileEntry.getFileEntryId()));
+						%>
+
 						<liferay-ui:icon
-							image='<%= "../file_system/small/" + fileEntry.getExtension() %>'
+							cssClass="document-display-style selectable"
+							data="<%= data %>"
+							image='<%= "../file_system/small/" + DLUtil.getFileIcon(fileEntry.getExtension()) %>'
 							label="<%= true %>"
 							message="<%= fileEntry.getTitle() %>"
+							method="get"
+							url="<%= rowURL.toString() %>"
 						/>
+
+						<%
+						FileVersion latestFileVersion = fileEntry.getFileVersion();
+
+						if ((user.getUserId() == fileEntry.getUserId()) || permissionChecker.isCompanyAdmin() || permissionChecker.isGroupAdmin(scopeGroupId) || DLFileEntryPermission.contains(permissionChecker, fileEntry, ActionKeys.UPDATE)) {
+							latestFileVersion = fileEntry.getLatestFileVersion();
+						}
+						%>
+
+						<c:if test="<%= latestFileVersion.isDraft() || latestFileVersion.isPending() %>">
+
+							<%
+							String statusLabel = WorkflowConstants.toLabel(latestFileVersion.getStatus());
+							%>
+
+							<span class="workflow-status-<%= statusLabel %>">
+								(<liferay-ui:message key="<%= statusLabel %>" />)
+							</span>
+						</c:if>
 					</liferay-util:buffer>
 
 					<%
-					List resultRows = searchContainer.getResultRows();
+						List resultRows = searchContainer.getResultRows();
 
-					ResultRow row = new ResultRow(fileEntry, fileEntry.getFileEntryId(), i);
+											ResultRow row = null;
 
-					PortletURL rowURL = liferayPortletResponse.createRenderURL();
+											if (fileShortcut == null) {
+												row = new ResultRow(fileEntry, fileEntry.getFileEntryId(), i);
+											}
+											else {
+												row = new ResultRow(fileShortcut, fileShortcut.getFileShortcutId(), i);
+											}
 
-					rowURL.setParameter("struts_action", "/document_library/view_file_entry");
-					rowURL.setParameter("redirect", HttpUtil.addParameter(currentURL, liferayPortletResponse.getNamespace() + "showSiblings", true));
-					rowURL.setParameter("fileEntryId", String.valueOf(fileEntry.getFileEntryId()));
+											row.setClassName("document-display-style");
 
-					row.addText(fileEntryTitle, rowURL);
+											Map<String, Object> data = new HashMap<String, Object>();
 
-					row.addText(fileEntry.getDescription(), rowURL);
+											data.put("draggable", DLFileEntryPermission.contains(permissionChecker, fileEntry, ActionKeys.DELETE) || DLFileEntryPermission.contains(permissionChecker, fileEntry, ActionKeys.UPDATE));
+											data.put("title", fileEntry.getTitle());
 
-					row.addText(TextFormatter.formatKB(fileEntry.getSize(), locale) + "k");
+											row.setData(data);
 
-					row.addText(dateFormatDateTime.format(fileEntry.getCreateDate()));
+											for (String columnName : entryColumns) {
+												if (columnName.equals("action")) {
+													row.addJSP("/html/portlet/document_library/file_entry_action.jsp");
+												}
 
-					row.addText(dateFormatDateTime.format(fileEntry.getModifiedDate()));
+												if (columnName.equals("create-date")) {
+													row.addText(dateFormatDateTime.format(fileEntry.getCreateDate()));
+												}
 
-					row.addText(String.valueOf(fileEntry.getReadCount()));
+												if (columnName.equals("downloads")) {
+													row.addText(String.valueOf(fileEntry.getReadCount()));
+												}
 
-					row.addJSP("/html/portlet/document_library/file_entry_action.jsp");
+												if (columnName.equals("modified-date")) {
+													row.addText(dateFormatDateTime.format(fileEntry.getModifiedDate()));
+												}
 
-					resultRows.add(row);
+												if (columnName.equals("name")) {
+													TextSearchEntry folderTitleSearchEntry = new TextSearchEntry();
+
+													folderTitleSearchEntry.setName(fileEntryTitle);
+
+													row.addSearchEntry(folderTitleSearchEntry);
+												}
+
+												if (columnName.equals("size")) {
+													row.addText(TextFormatter.formatStorageSize(fileEntry.getSize(), locale));
+												}
+											}
+
+											resultRows.add(row);
 					%>
 
 				</c:otherwise>
@@ -263,22 +361,21 @@ for (int i = 0; i < results.size(); i++) {
 		</c:when>
 
 		<c:when test="<%= curFolder != null %>">
-			<liferay-portlet:resourceURL copyCurrentRenderParameters="<%= false %>" varImpl="viewEntriesURL">
-				<portlet:param name="struts_action" value="/document_library/view" />
-				<portlet:param name="folderId" value="<%= String.valueOf(curFolder.getFolderId()) %>" />
-				<portlet:param name="showSiblings" value="<%= Boolean.TRUE.toString() %>" />
-				<portlet:param name="viewAddButton" value="<%= Boolean.TRUE.toString() %>" />
-				<portlet:param name="viewBreadcrumb" value="<%= Boolean.TRUE.toString() %>" />
-				<portlet:param name="viewDisplayStyleButtons" value="<%= Boolean.TRUE.toString() %>" />
-				<portlet:param name="viewEntries" value="<%= Boolean.TRUE.toString() %>" />
-				<portlet:param name="viewFileEntrySearch" value="<%= Boolean.TRUE.toString() %>" />
-				<portlet:param name="viewFolders" value="<%= Boolean.TRUE.toString() %>" />
-				<portlet:param name="start" value="0" />
-				<portlet:param name="end" value="<%= String.valueOf(end - start) %>" />
-			</liferay-portlet:resourceURL>
+
+			<%
+			int foldersCount = DLAppServiceUtil.getFoldersCount(curFolder.getRepositoryId(), curFolder.getFolderId());
+			int fileEntriesCount = DLAppServiceUtil.getFileEntriesAndFileShortcutsCount(curFolder.getRepositoryId(), curFolder.getFolderId(), status);
+
+			String folderImage = "folder_empty";
+
+			if ((foldersCount + fileEntriesCount) > 0) {
+				folderImage = "folder_full_document";
+			}
+			%>
 
 			<c:choose>
 				<c:when test='<%= !displayStyle.equals("list") %>'>
+
 					<%
 					PortletURL tempRowURL = liferayPortletResponse.createRenderURL();
 
@@ -290,8 +387,9 @@ for (int i = 0; i < results.size(); i++) {
 					request.setAttribute("view_entries.jsp-folderId", String.valueOf(curFolder.getFolderId()));
 					request.setAttribute("view_entries.jsp-repositoryId", String.valueOf(curFolder.getRepositoryId()));
 
+					request.setAttribute("view_entries.jsp-folderImage", folderImage);
+
 					request.setAttribute("view_entries.jsp-tempRowURL", tempRowURL);
-					request.setAttribute("view_entries.jsp-viewEntriesURL", viewEntriesURL);
 					%>
 
 					<c:choose>
@@ -306,10 +404,27 @@ for (int i = 0; i < results.size(); i++) {
 				</c:when>
 				<c:otherwise>
 					<liferay-util:buffer var="folderTitle">
+
+						<%
+						Map<String, Object> data = new HashMap<String, Object>();
+
+						data.put("folder", true);
+						data.put("folder-id", curFolder.getFolderId());
+
+						PortletURL rowURL = liferayPortletResponse.createRenderURL();
+
+						rowURL.setParameter("struts_action", "/document_library/view");
+						rowURL.setParameter("redirect", currentURL);
+						rowURL.setParameter("folderId", String.valueOf(curFolder.getFolderId()));
+						%>
+
 						<liferay-ui:icon
-							image="folder"
+							data="<%= data %>"
+							image="<%= folderImage %>"
 							label="<%= true %>"
 							message="<%= curFolder.getName() %>"
+							method="get"
+							url="<%= rowURL.toString() %>"
 						/>
 					</liferay-util:buffer>
 
@@ -318,42 +433,46 @@ for (int i = 0; i < results.size(); i++) {
 
 					ResultRow row = new ResultRow(curFolder, curFolder.getPrimaryKey(), i);
 
-					PortletURL rowURL = liferayPortletResponse.createRenderURL();
+					row.setClassName("document-display-style");
 
-					rowURL.setParameter("struts_action", "/document_library/view");
-					rowURL.setParameter("redirect", currentURL);
-					rowURL.setParameter("folderId", String.valueOf(curFolder.getFolderId()));
+					Map<String, Object> data = new HashMap<String, Object>();
 
-					Map<String,Object> data = new HashMap<String,Object>();
-
+					data.put("draggable", DLFolderPermission.contains(permissionChecker, curFolder, ActionKeys.DELETE) || DLFolderPermission.contains(permissionChecker, curFolder, ActionKeys.UPDATE));
 					data.put("folder", true);
-					data.put("resource-url", viewEntriesURL);
+					data.put("folder-id", curFolder.getFolderId());
+					data.put("title", curFolder.getName());
 
-					TextSearchEntry folderTitleSearchEntry = new TextSearchEntry();
+					row.setData(data);
 
-					folderTitleSearchEntry.setData(data);
-					folderTitleSearchEntry.setHref(rowURL.toString());
-					folderTitleSearchEntry.setName(folderTitle);
+					for (String columnName : entryColumns) {
+						if (columnName.equals("action")) {
+							row.addJSP("/html/portlet/document_library/folder_action.jsp");
+						}
 
-					row.addSearchEntry(folderTitleSearchEntry);
+						if (columnName.equals("create-date")) {
+							row.addText(dateFormatDateTime.format(curFolder.getCreateDate()));
+						}
 
-					TextSearchEntry folderDescriptionSearchEntry = new TextSearchEntry();
+						if (columnName.equals("downloads")) {
+							row.addText("--");
+						}
 
-					folderDescriptionSearchEntry.setData(data);
-					folderDescriptionSearchEntry.setHref(rowURL.toString());
-					folderDescriptionSearchEntry.setName(folderTitle);
+						if (columnName.equals("modified-date")) {
+							row.addText(dateFormatDateTime.format(curFolder.getModifiedDate()));
+						}
 
-					row.addSearchEntry(folderDescriptionSearchEntry);
+						if (columnName.equals("name")) {
+							TextSearchEntry folderTitleSearchEntry = new TextSearchEntry();
 
-					row.addText(String.valueOf(0) + "k");
+							folderTitleSearchEntry.setName(folderTitle);
 
-					row.addText(dateFormatDateTime.format(curFolder.getCreateDate()));
+							row.addSearchEntry(folderTitleSearchEntry);
+						}
 
-					row.addText(dateFormatDateTime.format(curFolder.getModifiedDate()));
-
-					row.addText(String.valueOf(0));
-
-					row.addJSP("/html/portlet/document_library/folder_action.jsp");
+						if (columnName.equals("size")) {
+							row.addText("--");
+						}
+					}
 
 					resultRows.add(row);
 					%>
@@ -371,21 +490,18 @@ for (int i = 0; i < results.size(); i++) {
 	<liferay-ui:search-iterator paginate="<%= false %>" searchContainer="<%= searchContainer %>" />
 </c:if>
 
-<liferay-portlet:resourceURL varImpl="paginationURL">
-	<portlet:param name="struts_action" value="/document_library/view" />
-	<portlet:param name="folderId" value="<%= String.valueOf(folderId) %>" />
-	<portlet:param name="viewEntries" value="<%= Boolean.TRUE.toString() %>" />
-	<portlet:param name="viewFolders" value="<%= Boolean.TRUE.toString() %>" />
-	<portlet:param name="showSiblings" value="<%= Boolean.TRUE.toString() %>" />
-</liferay-portlet:resourceURL>
-
 <aui:script>
 	Liferay.fire(
-		'viewEntriesLoaded',
+		'<portlet:namespace />pageLoaded',
 		{
-			page: <%= end / (end - start) %>,
-			paginationURL: '<%= paginationURL %>',
-			total: <%= total %>
+			paginator: {
+				name: 'entryPaginator',
+				state: {
+					page: <%= (total == 0) ? 0 : (entryEnd / (entryEnd - entryStart)) %>,
+					rowsPerPage: <%= (entryEnd - entryStart) %>,
+					total: <%= total %>
+				}
+			}
 		}
 	);
 </aui:script>

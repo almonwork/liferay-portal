@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -44,27 +44,6 @@ import org.apache.struts.action.ActionMapping;
 public class GetMessageAttachmentAction extends PortletAction {
 
 	@Override
-	public ActionForward strutsExecute(
-			ActionMapping mapping, ActionForm form, HttpServletRequest request,
-			HttpServletResponse response)
-		throws Exception {
-
-		try {
-			long messageId = ParamUtil.getLong(request, "messageId");
-			String fileName = ParamUtil.getString(request, "attachment");
-
-			getFile(messageId, fileName, request, response);
-
-			return null;
-		}
-		catch (Exception e) {
-			PortalUtil.sendError(e, request, response);
-
-			return null;
-		}
-	}
-
-	@Override
 	public void processAction(
 			ActionMapping mapping, ActionForm form, PortletConfig portletConfig,
 			ActionRequest actionRequest, ActionResponse actionResponse)
@@ -85,6 +64,27 @@ public class GetMessageAttachmentAction extends PortletAction {
 		}
 		catch (Exception e) {
 			PortalUtil.sendError(e, actionRequest, actionResponse);
+		}
+	}
+
+	@Override
+	public ActionForward strutsExecute(
+			ActionMapping mapping, ActionForm form, HttpServletRequest request,
+			HttpServletResponse response)
+		throws Exception {
+
+		try {
+			long messageId = ParamUtil.getLong(request, "messageId");
+			String fileName = ParamUtil.getString(request, "attachment");
+
+			getFile(messageId, fileName, request, response);
+
+			return null;
+		}
+		catch (Exception e) {
+			PortalUtil.sendError(e, request, response);
+
+			return null;
 		}
 	}
 

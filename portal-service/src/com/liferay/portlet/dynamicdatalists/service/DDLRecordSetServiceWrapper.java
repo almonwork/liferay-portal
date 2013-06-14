@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,6 +14,8 @@
 
 package com.liferay.portlet.dynamicdatalists.service;
 
+import com.liferay.portal.service.ServiceWrapper;
+
 /**
  * <p>
  * This class is a wrapper for {@link DDLRecordSetService}.
@@ -23,21 +25,40 @@ package com.liferay.portlet.dynamicdatalists.service;
  * @see       DDLRecordSetService
  * @generated
  */
-public class DDLRecordSetServiceWrapper implements DDLRecordSetService {
+public class DDLRecordSetServiceWrapper implements DDLRecordSetService,
+	ServiceWrapper<DDLRecordSetService> {
 	public DDLRecordSetServiceWrapper(DDLRecordSetService ddlRecordSetService) {
 		_ddlRecordSetService = ddlRecordSetService;
+	}
+
+	/**
+	* Returns the Spring bean ID for this bean.
+	*
+	* @return the Spring bean ID for this bean
+	*/
+	public java.lang.String getBeanIdentifier() {
+		return _ddlRecordSetService.getBeanIdentifier();
+	}
+
+	/**
+	* Sets the Spring bean ID for this bean.
+	*
+	* @param beanIdentifier the Spring bean ID for this bean
+	*/
+	public void setBeanIdentifier(java.lang.String beanIdentifier) {
+		_ddlRecordSetService.setBeanIdentifier(beanIdentifier);
 	}
 
 	public com.liferay.portlet.dynamicdatalists.model.DDLRecordSet addRecordSet(
 		long groupId, long ddmStructureId, java.lang.String recordSetKey,
 		java.util.Map<java.util.Locale, java.lang.String> nameMap,
 		java.util.Map<java.util.Locale, java.lang.String> descriptionMap,
-		int minDisplayRows,
+		int minDisplayRows, int scope,
 		com.liferay.portal.service.ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException {
 		return _ddlRecordSetService.addRecordSet(groupId, ddmStructureId,
-			recordSetKey, nameMap, descriptionMap, minDisplayRows,
+			recordSetKey, nameMap, descriptionMap, minDisplayRows, scope,
 			serviceContext);
 	}
 
@@ -89,12 +110,26 @@ public class DDLRecordSetServiceWrapper implements DDLRecordSetService {
 			serviceContext);
 	}
 
+	/**
+	 * @deprecated Renamed to {@link #getWrappedService}
+	 */
 	public DDLRecordSetService getWrappedDDLRecordSetService() {
 		return _ddlRecordSetService;
 	}
 
+	/**
+	 * @deprecated Renamed to {@link #setWrappedService}
+	 */
 	public void setWrappedDDLRecordSetService(
 		DDLRecordSetService ddlRecordSetService) {
+		_ddlRecordSetService = ddlRecordSetService;
+	}
+
+	public DDLRecordSetService getWrappedService() {
+		return _ddlRecordSetService;
+	}
+
+	public void setWrappedService(DDLRecordSetService ddlRecordSetService) {
 		_ddlRecordSetService = ddlRecordSetService;
 	}
 

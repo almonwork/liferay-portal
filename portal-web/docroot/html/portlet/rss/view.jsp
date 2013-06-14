@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -38,7 +38,7 @@ for (int i = 0; i < urls.length; i++) {
 
 	boolean last = false;
 
-	if (i == urls.length - 1) {
+	if (i == (urls.length - 1)) {
 		last = true;
 	}
 %>
@@ -54,9 +54,9 @@ for (int i = 0; i < urls.length; i++) {
 </c:if>
 
 <aui:script use="aui-base">
-	var minusAlt = '<liferay-ui:message key="collapse" />';
+	var minusAlt = '<%= UnicodeLanguageUtil.get(pageContext, "collapse") %>';
 	var minusImage = '01_minus.png';
-	var plusAlt = '<liferay-ui:message key="expand" />';
+	var plusAlt = '<%= UnicodeLanguageUtil.get(pageContext, "expand") %>';
 	var plusImage = '01_plus.png';
 
 	A.all('.<portlet:namespace />entry-expander').on(

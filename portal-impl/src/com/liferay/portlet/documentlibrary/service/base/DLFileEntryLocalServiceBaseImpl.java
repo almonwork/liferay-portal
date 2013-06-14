@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -21,26 +21,26 @@ import com.liferay.portal.kernel.bean.IdentifiableBean;
 import com.liferay.portal.kernel.dao.jdbc.SqlUpdate;
 import com.liferay.portal.kernel.dao.jdbc.SqlUpdateFactoryUtil;
 import com.liferay.portal.kernel.dao.orm.DynamicQuery;
+import com.liferay.portal.kernel.dao.orm.DynamicQueryFactoryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
-import com.liferay.portal.kernel.search.Indexer;
-import com.liferay.portal.kernel.search.IndexerRegistryUtil;
-import com.liferay.portal.kernel.search.SearchException;
+import com.liferay.portal.kernel.search.Indexable;
+import com.liferay.portal.kernel.search.IndexableType;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.model.PersistedModel;
+import com.liferay.portal.service.BaseLocalServiceImpl;
+import com.liferay.portal.service.ImageLocalService;
+import com.liferay.portal.service.ImageService;
 import com.liferay.portal.service.LockLocalService;
 import com.liferay.portal.service.PersistedModelLocalServiceRegistry;
 import com.liferay.portal.service.ResourceLocalService;
-import com.liferay.portal.service.ResourceService;
 import com.liferay.portal.service.UserLocalService;
 import com.liferay.portal.service.UserService;
 import com.liferay.portal.service.WebDAVPropsLocalService;
 import com.liferay.portal.service.WorkflowInstanceLinkLocalService;
+import com.liferay.portal.service.persistence.ImagePersistence;
+import com.liferay.portal.service.persistence.LockFinder;
 import com.liferay.portal.service.persistence.LockPersistence;
-import com.liferay.portal.service.persistence.ResourceFinder;
-import com.liferay.portal.service.persistence.ResourcePersistence;
 import com.liferay.portal.service.persistence.UserFinder;
 import com.liferay.portal.service.persistence.UserPersistence;
 import com.liferay.portal.service.persistence.WebDAVPropsPersistence;
@@ -57,6 +57,7 @@ import com.liferay.portlet.asset.service.persistence.AssetCategoryFinder;
 import com.liferay.portlet.asset.service.persistence.AssetCategoryPersistence;
 import com.liferay.portlet.asset.service.persistence.AssetEntryFinder;
 import com.liferay.portlet.asset.service.persistence.AssetEntryPersistence;
+import com.liferay.portlet.asset.service.persistence.AssetLinkFinder;
 import com.liferay.portlet.asset.service.persistence.AssetLinkPersistence;
 import com.liferay.portlet.asset.service.persistence.AssetTagFinder;
 import com.liferay.portlet.asset.service.persistence.AssetTagPersistence;
@@ -79,7 +80,6 @@ import com.liferay.portlet.documentlibrary.service.DLFolderLocalService;
 import com.liferay.portlet.documentlibrary.service.DLFolderService;
 import com.liferay.portlet.documentlibrary.service.DLSyncLocalService;
 import com.liferay.portlet.documentlibrary.service.DLSyncService;
-import com.liferay.portlet.documentlibrary.service.persistence.DLContentFinder;
 import com.liferay.portlet.documentlibrary.service.persistence.DLContentPersistence;
 import com.liferay.portlet.documentlibrary.service.persistence.DLFileEntryFinder;
 import com.liferay.portlet.documentlibrary.service.persistence.DLFileEntryMetadataPersistence;
@@ -92,6 +92,7 @@ import com.liferay.portlet.documentlibrary.service.persistence.DLFileShortcutPer
 import com.liferay.portlet.documentlibrary.service.persistence.DLFileVersionPersistence;
 import com.liferay.portlet.documentlibrary.service.persistence.DLFolderFinder;
 import com.liferay.portlet.documentlibrary.service.persistence.DLFolderPersistence;
+import com.liferay.portlet.documentlibrary.service.persistence.DLSyncFinder;
 import com.liferay.portlet.documentlibrary.service.persistence.DLSyncPersistence;
 import com.liferay.portlet.dynamicdatamapping.service.DDMStructureLocalService;
 import com.liferay.portlet.dynamicdatamapping.service.DDMStructureService;
@@ -120,7 +121,8 @@ import javax.sql.DataSource;
  * @generated
  */
 public abstract class DLFileEntryLocalServiceBaseImpl
-	implements DLFileEntryLocalService, IdentifiableBean {
+	extends BaseLocalServiceImpl implements DLFileEntryLocalService,
+		IdentifiableBean {
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
@@ -134,26 +136,12 @@ public abstract class DLFileEntryLocalServiceBaseImpl
 	 * @return the document library file entry that was added
 	 * @throws SystemException if a system exception occurred
 	 */
+	@Indexable(type = IndexableType.REINDEX)
 	public DLFileEntry addDLFileEntry(DLFileEntry dlFileEntry)
 		throws SystemException {
 		dlFileEntry.setNew(true);
 
-		dlFileEntry = dlFileEntryPersistence.update(dlFileEntry, false);
-
-		Indexer indexer = IndexerRegistryUtil.getIndexer(getModelClassName());
-
-		if (indexer != null) {
-			try {
-				indexer.reindex(dlFileEntry);
-			}
-			catch (SearchException se) {
-				if (_log.isWarnEnabled()) {
-					_log.warn(se, se);
-				}
-			}
-		}
-
-		return dlFileEntry;
+		return dlFileEntryPersistence.update(dlFileEntry, false);
 	}
 
 	/**
@@ -170,49 +158,34 @@ public abstract class DLFileEntryLocalServiceBaseImpl
 	 * Deletes the document library file entry with the primary key from the database. Also notifies the appropriate model listeners.
 	 *
 	 * @param fileEntryId the primary key of the document library file entry
+	 * @return the document library file entry that was removed
 	 * @throws PortalException if a document library file entry with the primary key could not be found
 	 * @throws SystemException if a system exception occurred
 	 */
-	public void deleteDLFileEntry(long fileEntryId)
+	@Indexable(type = IndexableType.DELETE)
+	public DLFileEntry deleteDLFileEntry(long fileEntryId)
 		throws PortalException, SystemException {
-		DLFileEntry dlFileEntry = dlFileEntryPersistence.remove(fileEntryId);
-
-		Indexer indexer = IndexerRegistryUtil.getIndexer(getModelClassName());
-
-		if (indexer != null) {
-			try {
-				indexer.delete(dlFileEntry);
-			}
-			catch (SearchException se) {
-				if (_log.isWarnEnabled()) {
-					_log.warn(se, se);
-				}
-			}
-		}
+		return dlFileEntryPersistence.remove(fileEntryId);
 	}
 
 	/**
 	 * Deletes the document library file entry from the database. Also notifies the appropriate model listeners.
 	 *
 	 * @param dlFileEntry the document library file entry
+	 * @return the document library file entry that was removed
 	 * @throws SystemException if a system exception occurred
 	 */
-	public void deleteDLFileEntry(DLFileEntry dlFileEntry)
+	@Indexable(type = IndexableType.DELETE)
+	public DLFileEntry deleteDLFileEntry(DLFileEntry dlFileEntry)
 		throws SystemException {
-		dlFileEntryPersistence.remove(dlFileEntry);
+		return dlFileEntryPersistence.remove(dlFileEntry);
+	}
 
-		Indexer indexer = IndexerRegistryUtil.getIndexer(getModelClassName());
+	public DynamicQuery dynamicQuery() {
+		Class<?> clazz = getClass();
 
-		if (indexer != null) {
-			try {
-				indexer.delete(dlFileEntry);
-			}
-			catch (SearchException se) {
-				if (_log.isWarnEnabled()) {
-					_log.warn(se, se);
-				}
-			}
-		}
+		return DynamicQueryFactoryUtil.forClass(DLFileEntry.class,
+			clazz.getClassLoader());
 	}
 
 	/**
@@ -281,6 +254,11 @@ public abstract class DLFileEntryLocalServiceBaseImpl
 		return dlFileEntryPersistence.countWithDynamicQuery(dynamicQuery);
 	}
 
+	public DLFileEntry fetchDLFileEntry(long fileEntryId)
+		throws SystemException {
+		return dlFileEntryPersistence.fetchByPrimaryKey(fileEntryId);
+	}
+
 	/**
 	 * Returns the document library file entry with the primary key.
 	 *
@@ -347,6 +325,7 @@ public abstract class DLFileEntryLocalServiceBaseImpl
 	 * @return the document library file entry that was updated
 	 * @throws SystemException if a system exception occurred
 	 */
+	@Indexable(type = IndexableType.REINDEX)
 	public DLFileEntry updateDLFileEntry(DLFileEntry dlFileEntry)
 		throws SystemException {
 		return updateDLFileEntry(dlFileEntry, true);
@@ -360,26 +339,12 @@ public abstract class DLFileEntryLocalServiceBaseImpl
 	 * @return the document library file entry that was updated
 	 * @throws SystemException if a system exception occurred
 	 */
+	@Indexable(type = IndexableType.REINDEX)
 	public DLFileEntry updateDLFileEntry(DLFileEntry dlFileEntry, boolean merge)
 		throws SystemException {
 		dlFileEntry.setNew(false);
 
-		dlFileEntry = dlFileEntryPersistence.update(dlFileEntry, merge);
-
-		Indexer indexer = IndexerRegistryUtil.getIndexer(getModelClassName());
-
-		if (indexer != null) {
-			try {
-				indexer.reindex(dlFileEntry);
-			}
-			catch (SearchException se) {
-				if (_log.isWarnEnabled()) {
-					_log.warn(se, se);
-				}
-			}
-		}
-
-		return dlFileEntry;
+		return dlFileEntryPersistence.update(dlFileEntry, merge);
 	}
 
 	/**
@@ -473,24 +438,6 @@ public abstract class DLFileEntryLocalServiceBaseImpl
 	public void setDLContentPersistence(
 		DLContentPersistence dlContentPersistence) {
 		this.dlContentPersistence = dlContentPersistence;
-	}
-
-	/**
-	 * Returns the document library content finder.
-	 *
-	 * @return the document library content finder
-	 */
-	public DLContentFinder getDLContentFinder() {
-		return dlContentFinder;
-	}
-
-	/**
-	 * Sets the document library content finder.
-	 *
-	 * @param dlContentFinder the document library content finder
-	 */
-	public void setDLContentFinder(DLContentFinder dlContentFinder) {
-		this.dlContentFinder = dlContentFinder;
 	}
 
 	/**
@@ -979,6 +926,24 @@ public abstract class DLFileEntryLocalServiceBaseImpl
 	}
 
 	/**
+	 * Returns the d l sync finder.
+	 *
+	 * @return the d l sync finder
+	 */
+	public DLSyncFinder getDLSyncFinder() {
+		return dlSyncFinder;
+	}
+
+	/**
+	 * Sets the d l sync finder.
+	 *
+	 * @param dlSyncFinder the d l sync finder
+	 */
+	public void setDLSyncFinder(DLSyncFinder dlSyncFinder) {
+		this.dlSyncFinder = dlSyncFinder;
+	}
+
+	/**
 	 * Returns the counter local service.
 	 *
 	 * @return the counter local service
@@ -994,6 +959,60 @@ public abstract class DLFileEntryLocalServiceBaseImpl
 	 */
 	public void setCounterLocalService(CounterLocalService counterLocalService) {
 		this.counterLocalService = counterLocalService;
+	}
+
+	/**
+	 * Returns the image local service.
+	 *
+	 * @return the image local service
+	 */
+	public ImageLocalService getImageLocalService() {
+		return imageLocalService;
+	}
+
+	/**
+	 * Sets the image local service.
+	 *
+	 * @param imageLocalService the image local service
+	 */
+	public void setImageLocalService(ImageLocalService imageLocalService) {
+		this.imageLocalService = imageLocalService;
+	}
+
+	/**
+	 * Returns the image remote service.
+	 *
+	 * @return the image remote service
+	 */
+	public ImageService getImageService() {
+		return imageService;
+	}
+
+	/**
+	 * Sets the image remote service.
+	 *
+	 * @param imageService the image remote service
+	 */
+	public void setImageService(ImageService imageService) {
+		this.imageService = imageService;
+	}
+
+	/**
+	 * Returns the image persistence.
+	 *
+	 * @return the image persistence
+	 */
+	public ImagePersistence getImagePersistence() {
+		return imagePersistence;
+	}
+
+	/**
+	 * Sets the image persistence.
+	 *
+	 * @param imagePersistence the image persistence
+	 */
+	public void setImagePersistence(ImagePersistence imagePersistence) {
+		this.imagePersistence = imagePersistence;
 	}
 
 	/**
@@ -1033,6 +1052,24 @@ public abstract class DLFileEntryLocalServiceBaseImpl
 	}
 
 	/**
+	 * Returns the lock finder.
+	 *
+	 * @return the lock finder
+	 */
+	public LockFinder getLockFinder() {
+		return lockFinder;
+	}
+
+	/**
+	 * Sets the lock finder.
+	 *
+	 * @param lockFinder the lock finder
+	 */
+	public void setLockFinder(LockFinder lockFinder) {
+		this.lockFinder = lockFinder;
+	}
+
+	/**
 	 * Returns the resource local service.
 	 *
 	 * @return the resource local service
@@ -1049,60 +1086,6 @@ public abstract class DLFileEntryLocalServiceBaseImpl
 	public void setResourceLocalService(
 		ResourceLocalService resourceLocalService) {
 		this.resourceLocalService = resourceLocalService;
-	}
-
-	/**
-	 * Returns the resource remote service.
-	 *
-	 * @return the resource remote service
-	 */
-	public ResourceService getResourceService() {
-		return resourceService;
-	}
-
-	/**
-	 * Sets the resource remote service.
-	 *
-	 * @param resourceService the resource remote service
-	 */
-	public void setResourceService(ResourceService resourceService) {
-		this.resourceService = resourceService;
-	}
-
-	/**
-	 * Returns the resource persistence.
-	 *
-	 * @return the resource persistence
-	 */
-	public ResourcePersistence getResourcePersistence() {
-		return resourcePersistence;
-	}
-
-	/**
-	 * Sets the resource persistence.
-	 *
-	 * @param resourcePersistence the resource persistence
-	 */
-	public void setResourcePersistence(ResourcePersistence resourcePersistence) {
-		this.resourcePersistence = resourcePersistence;
-	}
-
-	/**
-	 * Returns the resource finder.
-	 *
-	 * @return the resource finder
-	 */
-	public ResourceFinder getResourceFinder() {
-		return resourceFinder;
-	}
-
-	/**
-	 * Sets the resource finder.
-	 *
-	 * @param resourceFinder the resource finder
-	 */
-	public void setResourceFinder(ResourceFinder resourceFinder) {
-		this.resourceFinder = resourceFinder;
 	}
 
 	/**
@@ -1441,6 +1424,24 @@ public abstract class DLFileEntryLocalServiceBaseImpl
 	}
 
 	/**
+	 * Returns the asset link finder.
+	 *
+	 * @return the asset link finder
+	 */
+	public AssetLinkFinder getAssetLinkFinder() {
+		return assetLinkFinder;
+	}
+
+	/**
+	 * Sets the asset link finder.
+	 *
+	 * @param assetLinkFinder the asset link finder
+	 */
+	public void setAssetLinkFinder(AssetLinkFinder assetLinkFinder) {
+		this.assetLinkFinder = assetLinkFinder;
+	}
+
+	/**
 	 * Returns the asset tag local service.
 	 *
 	 * @return the asset tag local service
@@ -1708,8 +1709,6 @@ public abstract class DLFileEntryLocalServiceBaseImpl
 	protected DLContentLocalService dlContentLocalService;
 	@BeanReference(type = DLContentPersistence.class)
 	protected DLContentPersistence dlContentPersistence;
-	@BeanReference(type = DLContentFinder.class)
-	protected DLContentFinder dlContentFinder;
 	@BeanReference(type = DLFileEntryLocalService.class)
 	protected DLFileEntryLocalService dlFileEntryLocalService;
 	@BeanReference(type = DLFileEntryService.class)
@@ -1762,20 +1761,24 @@ public abstract class DLFileEntryLocalServiceBaseImpl
 	protected DLSyncService dlSyncService;
 	@BeanReference(type = DLSyncPersistence.class)
 	protected DLSyncPersistence dlSyncPersistence;
+	@BeanReference(type = DLSyncFinder.class)
+	protected DLSyncFinder dlSyncFinder;
 	@BeanReference(type = CounterLocalService.class)
 	protected CounterLocalService counterLocalService;
+	@BeanReference(type = ImageLocalService.class)
+	protected ImageLocalService imageLocalService;
+	@BeanReference(type = ImageService.class)
+	protected ImageService imageService;
+	@BeanReference(type = ImagePersistence.class)
+	protected ImagePersistence imagePersistence;
 	@BeanReference(type = LockLocalService.class)
 	protected LockLocalService lockLocalService;
 	@BeanReference(type = LockPersistence.class)
 	protected LockPersistence lockPersistence;
+	@BeanReference(type = LockFinder.class)
+	protected LockFinder lockFinder;
 	@BeanReference(type = ResourceLocalService.class)
 	protected ResourceLocalService resourceLocalService;
-	@BeanReference(type = ResourceService.class)
-	protected ResourceService resourceService;
-	@BeanReference(type = ResourcePersistence.class)
-	protected ResourcePersistence resourcePersistence;
-	@BeanReference(type = ResourceFinder.class)
-	protected ResourceFinder resourceFinder;
 	@BeanReference(type = UserLocalService.class)
 	protected UserLocalService userLocalService;
 	@BeanReference(type = UserService.class)
@@ -1812,6 +1815,8 @@ public abstract class DLFileEntryLocalServiceBaseImpl
 	protected AssetLinkLocalService assetLinkLocalService;
 	@BeanReference(type = AssetLinkPersistence.class)
 	protected AssetLinkPersistence assetLinkPersistence;
+	@BeanReference(type = AssetLinkFinder.class)
+	protected AssetLinkFinder assetLinkFinder;
 	@BeanReference(type = AssetTagLocalService.class)
 	protected AssetTagLocalService assetTagLocalService;
 	@BeanReference(type = AssetTagService.class)
@@ -1836,6 +1841,5 @@ public abstract class DLFileEntryLocalServiceBaseImpl
 	protected ExpandoValuePersistence expandoValuePersistence;
 	@BeanReference(type = PersistedModelLocalServiceRegistry.class)
 	protected PersistedModelLocalServiceRegistry persistedModelLocalServiceRegistry;
-	private static Log _log = LogFactoryUtil.getLog(DLFileEntryLocalServiceBaseImpl.class);
 	private String _beanIdentifier;
 }

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -92,14 +92,6 @@ public class AnnouncementsDeliveryUtil {
 		return getPersistence()
 				   .findWithDynamicQuery(dynamicQuery, start, end,
 			orderByComparator);
-	}
-
-	/**
-	 * @see com.liferay.portal.service.persistence.BasePersistence#remove(com.liferay.portal.model.BaseModel)
-	 */
-	public static AnnouncementsDelivery remove(
-		AnnouncementsDelivery announcementsDelivery) throws SystemException {
-		return getPersistence().remove(announcementsDelivery);
 	}
 
 	/**
@@ -431,12 +423,14 @@ public class AnnouncementsDeliveryUtil {
 	*
 	* @param userId the user ID
 	* @param type the type
+	* @return the announcements delivery that was removed
 	* @throws SystemException if a system exception occurred
 	*/
-	public static void removeByU_T(long userId, java.lang.String type)
+	public static com.liferay.portlet.announcements.model.AnnouncementsDelivery removeByU_T(
+		long userId, java.lang.String type)
 		throws com.liferay.portal.kernel.exception.SystemException,
 			com.liferay.portlet.announcements.NoSuchDeliveryException {
-		getPersistence().removeByU_T(userId, type);
+		return getPersistence().removeByU_T(userId, type);
 	}
 
 	/**
@@ -496,11 +490,10 @@ public class AnnouncementsDeliveryUtil {
 		return _persistence;
 	}
 
+	/**
+	 * @deprecated
+	 */
 	public void setPersistence(AnnouncementsDeliveryPersistence persistence) {
-		_persistence = persistence;
-
-		ReferenceRegistry.registerReference(AnnouncementsDeliveryUtil.class,
-			"_persistence");
 	}
 
 	private static AnnouncementsDeliveryPersistence _persistence;

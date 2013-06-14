@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -26,4 +26,12 @@ if (Validator.isNotNull(portletResource)) {
 }
 
 String displayStyle = PrefsParamUtil.getString(preferences, renderRequest, "displayStyle", "horizontal");
+boolean showCurrentGroup = PrefsParamUtil.getBoolean(preferences, renderRequest, "showCurrentGroup", true);
+boolean showCurrentPortlet = PrefsParamUtil.getBoolean(preferences, renderRequest, "showCurrentPortlet", true);
+boolean showGuestGroup = PrefsParamUtil.getBoolean(preferences, renderRequest, "showGuestGroup", true);
+boolean showLayout = PrefsParamUtil.getBoolean(preferences, renderRequest, "showLayout", true);
+boolean showParentGroups = PrefsParamUtil.getBoolean(preferences, renderRequest, "showParentGroups", true);
+boolean showPortletBreadcrumb = PrefsParamUtil.getBoolean(preferences, renderRequest, "showPortletBreadcrumb", true);
 %>
+
+<%@ include file="/html/portlet/breadcrumb/init-ext.jsp" %>

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -16,6 +16,7 @@ package com.liferay.portlet.documentlibrary.model.impl;
 
 import com.liferay.portal.kernel.bean.AutoEscapeBeanHandler;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.ProxyUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.model.CacheModel;
@@ -31,10 +32,11 @@ import com.liferay.portlet.expando.util.ExpandoBridgeFactoryUtil;
 
 import java.io.Serializable;
 
-import java.lang.reflect.Proxy;
-
 import java.sql.Blob;
 import java.sql.Types;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * The base model implementation for the DLContent service. Represents a row in the &quot;DLContent&quot; database table, with each column mapped to a property of this class.
@@ -61,15 +63,16 @@ public class DLContentModelImpl extends BaseModelImpl<DLContent>
 			{ "contentId", Types.BIGINT },
 			{ "groupId", Types.BIGINT },
 			{ "companyId", Types.BIGINT },
-			{ "portletId", Types.VARCHAR },
 			{ "repositoryId", Types.BIGINT },
 			{ "path_", Types.VARCHAR },
 			{ "version", Types.VARCHAR },
 			{ "data_", Types.BLOB },
 			{ "size_", Types.BIGINT }
 		};
-	public static final String TABLE_SQL_CREATE = "create table DLContent (contentId LONG not null primary key,groupId LONG,companyId LONG,portletId VARCHAR(75) null,repositoryId LONG,path_ VARCHAR(255) null,version VARCHAR(75) null,data_ BLOB,size_ LONG)";
+	public static final String TABLE_SQL_CREATE = "create table DLContent (contentId LONG not null primary key,groupId LONG,companyId LONG,repositoryId LONG,path_ VARCHAR(255) null,version VARCHAR(75) null,data_ BLOB,size_ LONG)";
 	public static final String TABLE_SQL_DROP = "drop table DLContent";
+	public static final String ORDER_BY_JPQL = " ORDER BY dlContent.version DESC";
+	public static final String ORDER_BY_SQL = " ORDER BY DLContent.version DESC";
 	public static final String DATA_SOURCE = "liferayDataSource";
 	public static final String SESSION_FACTORY = "liferaySessionFactory";
 	public static final String TX_MANAGER = "liferayTransactionManager";
@@ -79,15 +82,13 @@ public class DLContentModelImpl extends BaseModelImpl<DLContent>
 	public static final boolean FINDER_CACHE_ENABLED = GetterUtil.getBoolean(com.liferay.portal.util.PropsUtil.get(
 				"value.object.finder.cache.enabled.com.liferay.portlet.documentlibrary.model.DLContent"),
 			true);
-
-	public Class<?> getModelClass() {
-		return DLContent.class;
-	}
-
-	public String getModelClassName() {
-		return DLContent.class.getName();
-	}
-
+	public static final boolean COLUMN_BITMASK_ENABLED = GetterUtil.getBoolean(com.liferay.portal.util.PropsUtil.get(
+				"value.object.column.bitmask.enabled.com.liferay.portlet.documentlibrary.model.DLContent"),
+			true);
+	public static long COMPANYID_COLUMN_BITMASK = 1L;
+	public static long PATH_COLUMN_BITMASK = 2L;
+	public static long REPOSITORYID_COLUMN_BITMASK = 4L;
+	public static long VERSION_COLUMN_BITMASK = 8L;
 	public static final long LOCK_EXPIRATION_TIME = GetterUtil.getLong(com.liferay.portal.util.PropsUtil.get(
 				"lock.expiration.time.com.liferay.portlet.documentlibrary.model.DLContent"));
 
@@ -108,6 +109,81 @@ public class DLContentModelImpl extends BaseModelImpl<DLContent>
 
 	public void setPrimaryKeyObj(Serializable primaryKeyObj) {
 		setPrimaryKey(((Long)primaryKeyObj).longValue());
+	}
+
+	public Class<?> getModelClass() {
+		return DLContent.class;
+	}
+
+	public String getModelClassName() {
+		return DLContent.class.getName();
+	}
+
+	@Override
+	public Map<String, Object> getModelAttributes() {
+		Map<String, Object> attributes = new HashMap<String, Object>();
+
+		attributes.put("contentId", getContentId());
+		attributes.put("groupId", getGroupId());
+		attributes.put("companyId", getCompanyId());
+		attributes.put("repositoryId", getRepositoryId());
+		attributes.put("path", getPath());
+		attributes.put("version", getVersion());
+		attributes.put("data", getData());
+		attributes.put("size", getSize());
+
+		return attributes;
+	}
+
+	@Override
+	public void setModelAttributes(Map<String, Object> attributes) {
+		Long contentId = (Long)attributes.get("contentId");
+
+		if (contentId != null) {
+			setContentId(contentId);
+		}
+
+		Long groupId = (Long)attributes.get("groupId");
+
+		if (groupId != null) {
+			setGroupId(groupId);
+		}
+
+		Long companyId = (Long)attributes.get("companyId");
+
+		if (companyId != null) {
+			setCompanyId(companyId);
+		}
+
+		Long repositoryId = (Long)attributes.get("repositoryId");
+
+		if (repositoryId != null) {
+			setRepositoryId(repositoryId);
+		}
+
+		String path = (String)attributes.get("path");
+
+		if (path != null) {
+			setPath(path);
+		}
+
+		String version = (String)attributes.get("version");
+
+		if (version != null) {
+			setVersion(version);
+		}
+
+		Blob data = (Blob)attributes.get("data");
+
+		if (data != null) {
+			setData(data);
+		}
+
+		Long size = (Long)attributes.get("size");
+
+		if (size != null) {
+			setSize(size);
+		}
 	}
 
 	public long getContentId() {
@@ -131,6 +207,8 @@ public class DLContentModelImpl extends BaseModelImpl<DLContent>
 	}
 
 	public void setCompanyId(long companyId) {
+		_columnBitmask |= COMPANYID_COLUMN_BITMASK;
+
 		if (!_setOriginalCompanyId) {
 			_setOriginalCompanyId = true;
 
@@ -144,32 +222,13 @@ public class DLContentModelImpl extends BaseModelImpl<DLContent>
 		return _originalCompanyId;
 	}
 
-	public String getPortletId() {
-		if (_portletId == null) {
-			return StringPool.BLANK;
-		}
-		else {
-			return _portletId;
-		}
-	}
-
-	public void setPortletId(String portletId) {
-		if (_originalPortletId == null) {
-			_originalPortletId = _portletId;
-		}
-
-		_portletId = portletId;
-	}
-
-	public String getOriginalPortletId() {
-		return GetterUtil.getString(_originalPortletId);
-	}
-
 	public long getRepositoryId() {
 		return _repositoryId;
 	}
 
 	public void setRepositoryId(long repositoryId) {
+		_columnBitmask |= REPOSITORYID_COLUMN_BITMASK;
+
 		if (!_setOriginalRepositoryId) {
 			_setOriginalRepositoryId = true;
 
@@ -193,6 +252,8 @@ public class DLContentModelImpl extends BaseModelImpl<DLContent>
 	}
 
 	public void setPath(String path) {
+		_columnBitmask |= PATH_COLUMN_BITMASK;
+
 		if (_originalPath == null) {
 			_originalPath = _path;
 		}
@@ -214,6 +275,8 @@ public class DLContentModelImpl extends BaseModelImpl<DLContent>
 	}
 
 	public void setVersion(String version) {
+		_columnBitmask = -1L;
+
 		if (_originalVersion == null) {
 			_originalVersion = _version;
 		}
@@ -229,16 +292,18 @@ public class DLContentModelImpl extends BaseModelImpl<DLContent>
 		if (_dataBlobModel == null) {
 			try {
 				_dataBlobModel = DLContentLocalServiceUtil.getDataBlobModel(getPrimaryKey());
-
-				if (_dataBlobModel != null) {
-					return _dataBlobModel.getDataBlob();
-				}
 			}
 			catch (Exception e) {
 			}
 		}
 
-		return null;
+		Blob blob = null;
+
+		if (_dataBlobModel != null) {
+			blob = _dataBlobModel.getDataBlob();
+		}
+
+		return blob;
 	}
 
 	public void setData(Blob data) {
@@ -258,35 +323,32 @@ public class DLContentModelImpl extends BaseModelImpl<DLContent>
 		_size = size;
 	}
 
+	public long getColumnBitmask() {
+		return _columnBitmask;
+	}
+
 	@Override
 	public DLContent toEscapedModel() {
-		if (isEscapedModel()) {
-			return (DLContent)this;
+		if (_escapedModelProxy == null) {
+			_escapedModelProxy = (DLContent)ProxyUtil.newProxyInstance(_classLoader,
+					_escapedModelProxyInterfaces,
+					new AutoEscapeBeanHandler(this));
 		}
-		else {
-			if (_escapedModelProxy == null) {
-				_escapedModelProxy = (DLContent)Proxy.newProxyInstance(_classLoader,
-						_escapedModelProxyInterfaces,
-						new AutoEscapeBeanHandler(this));
-			}
 
-			return _escapedModelProxy;
-		}
+		return _escapedModelProxy;
 	}
 
 	@Override
 	public ExpandoBridge getExpandoBridge() {
-		if (_expandoBridge == null) {
-			_expandoBridge = ExpandoBridgeFactoryUtil.getExpandoBridge(getCompanyId(),
-					DLContent.class.getName(), getPrimaryKey());
-		}
-
-		return _expandoBridge;
+		return ExpandoBridgeFactoryUtil.getExpandoBridge(getCompanyId(),
+			DLContent.class.getName(), getPrimaryKey());
 	}
 
 	@Override
 	public void setExpandoBridgeAttributes(ServiceContext serviceContext) {
-		getExpandoBridge().setAttributes(serviceContext);
+		ExpandoBridge expandoBridge = getExpandoBridge();
+
+		expandoBridge.setAttributes(serviceContext);
 	}
 
 	@Override
@@ -296,7 +358,6 @@ public class DLContentModelImpl extends BaseModelImpl<DLContent>
 		dlContentImpl.setContentId(getContentId());
 		dlContentImpl.setGroupId(getGroupId());
 		dlContentImpl.setCompanyId(getCompanyId());
-		dlContentImpl.setPortletId(getPortletId());
 		dlContentImpl.setRepositoryId(getRepositoryId());
 		dlContentImpl.setPath(getPath());
 		dlContentImpl.setVersion(getVersion());
@@ -308,17 +369,17 @@ public class DLContentModelImpl extends BaseModelImpl<DLContent>
 	}
 
 	public int compareTo(DLContent dlContent) {
-		long primaryKey = dlContent.getPrimaryKey();
+		int value = 0;
 
-		if (getPrimaryKey() < primaryKey) {
-			return -1;
+		value = getVersion().compareTo(dlContent.getVersion());
+
+		value = value * -1;
+
+		if (value != 0) {
+			return value;
 		}
-		else if (getPrimaryKey() > primaryKey) {
-			return 1;
-		}
-		else {
-			return 0;
-		}
+
+		return 0;
 	}
 
 	@Override
@@ -359,8 +420,6 @@ public class DLContentModelImpl extends BaseModelImpl<DLContent>
 
 		dlContentModelImpl._setOriginalCompanyId = false;
 
-		dlContentModelImpl._originalPortletId = dlContentModelImpl._portletId;
-
 		dlContentModelImpl._originalRepositoryId = dlContentModelImpl._repositoryId;
 
 		dlContentModelImpl._setOriginalRepositoryId = false;
@@ -369,7 +428,9 @@ public class DLContentModelImpl extends BaseModelImpl<DLContent>
 
 		dlContentModelImpl._originalVersion = dlContentModelImpl._version;
 
-		_dataBlobModel = null;
+		dlContentModelImpl._dataBlobModel = null;
+
+		dlContentModelImpl._columnBitmask = 0;
 	}
 
 	@Override
@@ -381,14 +442,6 @@ public class DLContentModelImpl extends BaseModelImpl<DLContent>
 		dlContentCacheModel.groupId = getGroupId();
 
 		dlContentCacheModel.companyId = getCompanyId();
-
-		dlContentCacheModel.portletId = getPortletId();
-
-		String portletId = dlContentCacheModel.portletId;
-
-		if ((portletId != null) && (portletId.length() == 0)) {
-			dlContentCacheModel.portletId = null;
-		}
 
 		dlContentCacheModel.repositoryId = getRepositoryId();
 
@@ -415,7 +468,7 @@ public class DLContentModelImpl extends BaseModelImpl<DLContent>
 
 	@Override
 	public String toString() {
-		StringBundler sb = new StringBundler(19);
+		StringBundler sb = new StringBundler(17);
 
 		sb.append("{contentId=");
 		sb.append(getContentId());
@@ -423,16 +476,12 @@ public class DLContentModelImpl extends BaseModelImpl<DLContent>
 		sb.append(getGroupId());
 		sb.append(", companyId=");
 		sb.append(getCompanyId());
-		sb.append(", portletId=");
-		sb.append(getPortletId());
 		sb.append(", repositoryId=");
 		sb.append(getRepositoryId());
 		sb.append(", path=");
 		sb.append(getPath());
 		sb.append(", version=");
 		sb.append(getVersion());
-		sb.append(", data=");
-		sb.append(getData());
 		sb.append(", size=");
 		sb.append(getSize());
 		sb.append("}");
@@ -441,7 +490,7 @@ public class DLContentModelImpl extends BaseModelImpl<DLContent>
 	}
 
 	public String toXmlString() {
-		StringBundler sb = new StringBundler(31);
+		StringBundler sb = new StringBundler(28);
 
 		sb.append("<model><model-name>");
 		sb.append("com.liferay.portlet.documentlibrary.model.DLContent");
@@ -460,10 +509,6 @@ public class DLContentModelImpl extends BaseModelImpl<DLContent>
 		sb.append(getCompanyId());
 		sb.append("]]></column-value></column>");
 		sb.append(
-			"<column><column-name>portletId</column-name><column-value><![CDATA[");
-		sb.append(getPortletId());
-		sb.append("]]></column-value></column>");
-		sb.append(
 			"<column><column-name>repositoryId</column-name><column-value><![CDATA[");
 		sb.append(getRepositoryId());
 		sb.append("]]></column-value></column>");
@@ -474,10 +519,6 @@ public class DLContentModelImpl extends BaseModelImpl<DLContent>
 		sb.append(
 			"<column><column-name>version</column-name><column-value><![CDATA[");
 		sb.append(getVersion());
-		sb.append("]]></column-value></column>");
-		sb.append(
-			"<column><column-name>data</column-name><column-value><![CDATA[");
-		sb.append(getData());
 		sb.append("]]></column-value></column>");
 		sb.append(
 			"<column><column-name>size</column-name><column-value><![CDATA[");
@@ -498,8 +539,6 @@ public class DLContentModelImpl extends BaseModelImpl<DLContent>
 	private long _companyId;
 	private long _originalCompanyId;
 	private boolean _setOriginalCompanyId;
-	private String _portletId;
-	private String _originalPortletId;
 	private long _repositoryId;
 	private long _originalRepositoryId;
 	private boolean _setOriginalRepositoryId;
@@ -509,6 +548,6 @@ public class DLContentModelImpl extends BaseModelImpl<DLContent>
 	private String _originalVersion;
 	private DLContentDataBlobModel _dataBlobModel;
 	private long _size;
-	private transient ExpandoBridge _expandoBridge;
+	private long _columnBitmask;
 	private DLContent _escapedModelProxy;
 }

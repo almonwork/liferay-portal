@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -15,7 +15,6 @@
 package com.liferay.portlet.documentlibrary.service;
 
 import com.liferay.portal.kernel.bean.PortalBeanLocatorUtil;
-import com.liferay.portal.kernel.util.MethodCache;
 import com.liferay.portal.kernel.util.ReferenceRegistry;
 
 /**
@@ -66,25 +65,32 @@ public class DLFileRankLocalServiceUtil {
 	* Deletes the document library file rank with the primary key from the database. Also notifies the appropriate model listeners.
 	*
 	* @param fileRankId the primary key of the document library file rank
+	* @return the document library file rank that was removed
 	* @throws PortalException if a document library file rank with the primary key could not be found
 	* @throws SystemException if a system exception occurred
 	*/
-	public static void deleteDLFileRank(long fileRankId)
+	public static com.liferay.portlet.documentlibrary.model.DLFileRank deleteDLFileRank(
+		long fileRankId)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException {
-		getService().deleteDLFileRank(fileRankId);
+		return getService().deleteDLFileRank(fileRankId);
 	}
 
 	/**
 	* Deletes the document library file rank from the database. Also notifies the appropriate model listeners.
 	*
 	* @param dlFileRank the document library file rank
+	* @return the document library file rank that was removed
 	* @throws SystemException if a system exception occurred
 	*/
-	public static void deleteDLFileRank(
+	public static com.liferay.portlet.documentlibrary.model.DLFileRank deleteDLFileRank(
 		com.liferay.portlet.documentlibrary.model.DLFileRank dlFileRank)
 		throws com.liferay.portal.kernel.exception.SystemException {
-		getService().deleteDLFileRank(dlFileRank);
+		return getService().deleteDLFileRank(dlFileRank);
+	}
+
+	public static com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery() {
+		return getService().dynamicQuery();
 	}
 
 	/**
@@ -156,6 +162,12 @@ public class DLFileRankLocalServiceUtil {
 		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery)
 		throws com.liferay.portal.kernel.exception.SystemException {
 		return getService().dynamicQueryCount(dynamicQuery);
+	}
+
+	public static com.liferay.portlet.documentlibrary.model.DLFileRank fetchDLFileRank(
+		long fileRankId)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getService().fetchDLFileRank(fileRankId);
 	}
 
 	/**
@@ -291,6 +303,28 @@ public class DLFileRankLocalServiceUtil {
 		getService().deleteFileRanksByUserId(userId);
 	}
 
+	public static void disableFileRanks(long fileEntryId)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		getService().disableFileRanks(fileEntryId);
+	}
+
+	public static void disableFileRanksByFolderId(long folderId)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException {
+		getService().disableFileRanksByFolderId(folderId);
+	}
+
+	public static void enableFileRanks(long fileEntryId)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		getService().enableFileRanks(fileEntryId);
+	}
+
+	public static void enableFileRanksByFolderId(long folderId)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException {
+		getService().enableFileRanksByFolderId(folderId);
+	}
+
 	public static java.util.List<com.liferay.portlet.documentlibrary.model.DLFileRank> getFileRanks(
 		long groupId, long userId)
 		throws com.liferay.portal.kernel.exception.SystemException {
@@ -312,20 +346,15 @@ public class DLFileRankLocalServiceUtil {
 
 			ReferenceRegistry.registerReference(DLFileRankLocalServiceUtil.class,
 				"_service");
-			MethodCache.remove(DLFileRankLocalService.class);
 		}
 
 		return _service;
 	}
 
+	/**
+	 * @deprecated
+	 */
 	public void setService(DLFileRankLocalService service) {
-		MethodCache.remove(DLFileRankLocalService.class);
-
-		_service = service;
-
-		ReferenceRegistry.registerReference(DLFileRankLocalServiceUtil.class,
-			"_service");
-		MethodCache.remove(DLFileRankLocalService.class);
 	}
 
 	private static DLFileRankLocalService _service;

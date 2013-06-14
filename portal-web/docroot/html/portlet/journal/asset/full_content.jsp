@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -32,7 +32,7 @@ boolean workflowAssetPreview = ParamUtil.getBoolean(request, "workflowAssetPrevi
 JournalArticleDisplay articleDisplay = null;
 
 if (!workflowAssetPreview && article.isApproved()) {
-	articleDisplay = JournalContentUtil.getDisplay(articleResource.getGroupId(), articleResource.getArticleId(), templateId, null, languageId, themeDisplay, articlePage, xmlRequest);
+	articleDisplay = JournalContentUtil.getDisplay(articleResource.getGroupId(), articleResource.getArticleId(), article.getVersion(), templateId, null, languageId, themeDisplay, articlePage, xmlRequest);
 }
 else {
 	articleDisplay = JournalArticleLocalServiceUtil.getArticleDisplay(article, null, null, languageId, 1, null, themeDisplay);
@@ -69,6 +69,7 @@ else {
 		cur="<%= articleDisplay.getCurrentPage() %>"
 		curParam="page"
 		delta="<%= 1 %>"
+		id="articleDisplayPages"
 		maxPages="<%= 25 %>"
 		total="<%= articleDisplay.getNumberOfPages() %>"
 		type="article"

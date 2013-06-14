@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -15,7 +15,6 @@
 package com.liferay.portlet.asset.service;
 
 import com.liferay.portal.kernel.bean.PortalBeanLocatorUtil;
-import com.liferay.portal.kernel.util.MethodCache;
 import com.liferay.portal.kernel.util.ReferenceRegistry;
 
 /**
@@ -37,6 +36,25 @@ public class AssetEntryServiceUtil {
 	 *
 	 * Never modify this class directly. Add custom service methods to {@link com.liferay.portlet.asset.service.impl.AssetEntryServiceImpl} and rerun ServiceBuilder to regenerate this class.
 	 */
+
+	/**
+	* Returns the Spring bean ID for this bean.
+	*
+	* @return the Spring bean ID for this bean
+	*/
+	public static java.lang.String getBeanIdentifier() {
+		return getService().getBeanIdentifier();
+	}
+
+	/**
+	* Sets the Spring bean ID for this bean.
+	*
+	* @param beanIdentifier the Spring bean ID for this bean
+	*/
+	public static void setBeanIdentifier(java.lang.String beanIdentifier) {
+		getService().setBeanIdentifier(beanIdentifier);
+	}
+
 	public static java.util.List<com.liferay.portlet.asset.model.AssetEntry> getCompanyEntries(
 		long companyId, int start, int end)
 		throws com.liferay.portal.kernel.exception.SystemException {
@@ -76,11 +94,11 @@ public class AssetEntryServiceUtil {
 		return getService().getEntry(entryId);
 	}
 
-	public static void incrementViewCounter(java.lang.String className,
-		long classPK)
+	public static com.liferay.portlet.asset.model.AssetEntry incrementViewCounter(
+		java.lang.String className, long classPK)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException {
-		getService().incrementViewCounter(className, classPK);
+		return getService().incrementViewCounter(className, classPK);
 	}
 
 	public static com.liferay.portlet.asset.model.AssetEntryDisplay[] searchEntryDisplays(
@@ -101,9 +119,14 @@ public class AssetEntryServiceUtil {
 			keywords, languageId);
 	}
 
+	/**
+	* @deprecated {@link #updateEntry(long, String, long, String, long, long[],
+	String[], boolean, Date, Date, Date, String, String, String,
+	String, String, String, int, int, Integer, boolean)}
+	*/
 	public static com.liferay.portlet.asset.model.AssetEntry updateEntry(
 		long groupId, java.lang.String className, long classPK,
-		java.lang.String classUuid, long[] categoryIds,
+		java.lang.String classUuid, long classTypeId, long[] categoryIds,
 		java.lang.String[] tagNames, boolean visible, java.util.Date startDate,
 		java.util.Date endDate, java.util.Date publishDate,
 		java.util.Date expirationDate, java.lang.String mimeType,
@@ -115,7 +138,25 @@ public class AssetEntryServiceUtil {
 			com.liferay.portal.kernel.exception.SystemException {
 		return getService()
 				   .updateEntry(groupId, className, classPK, classUuid,
-			categoryIds, tagNames, visible, startDate, endDate, publishDate,
+			classTypeId, categoryIds, tagNames, visible, startDate, endDate,
+			publishDate, expirationDate, mimeType, title, description, summary,
+			url, layoutUuid, height, width, priority, sync);
+	}
+
+	public static com.liferay.portlet.asset.model.AssetEntry updateEntry(
+		long groupId, java.lang.String className, long classPK,
+		java.lang.String classUuid, long classTypeId, long[] categoryIds,
+		java.lang.String[] tagNames, boolean visible, java.util.Date startDate,
+		java.util.Date endDate, java.util.Date expirationDate,
+		java.lang.String mimeType, java.lang.String title,
+		java.lang.String description, java.lang.String summary,
+		java.lang.String url, java.lang.String layoutUuid, int height,
+		int width, java.lang.Integer priority, boolean sync)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException {
+		return getService()
+				   .updateEntry(groupId, className, classPK, classUuid,
+			classTypeId, categoryIds, tagNames, visible, startDate, endDate,
 			expirationDate, mimeType, title, description, summary, url,
 			layoutUuid, height, width, priority, sync);
 	}
@@ -126,20 +167,15 @@ public class AssetEntryServiceUtil {
 
 			ReferenceRegistry.registerReference(AssetEntryServiceUtil.class,
 				"_service");
-			MethodCache.remove(AssetEntryService.class);
 		}
 
 		return _service;
 	}
 
+	/**
+	 * @deprecated
+	 */
 	public void setService(AssetEntryService service) {
-		MethodCache.remove(AssetEntryService.class);
-
-		_service = service;
-
-		ReferenceRegistry.registerReference(AssetEntryServiceUtil.class,
-			"_service");
-		MethodCache.remove(AssetEntryService.class);
 	}
 
 	private static AssetEntryService _service;

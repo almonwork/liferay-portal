@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -37,12 +37,26 @@ import com.liferay.portal.kernel.transaction.Transactional;
 @JSONWebService
 @Transactional(isolation = Isolation.PORTAL, rollbackFor =  {
 	PortalException.class, SystemException.class})
-public interface OrganizationService {
+public interface OrganizationService extends BaseService {
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this interface directly. Always use {@link OrganizationServiceUtil} to access the organization remote service. Add custom service methods to {@link com.liferay.portal.service.impl.OrganizationServiceImpl} and rerun ServiceBuilder to automatically copy the method declarations to this interface.
 	 */
+
+	/**
+	* Returns the Spring bean ID for this bean.
+	*
+	* @return the Spring bean ID for this bean
+	*/
+	public java.lang.String getBeanIdentifier();
+
+	/**
+	* Sets the Spring bean ID for this bean.
+	*
+	* @param beanIdentifier the Spring bean ID for this bean
+	*/
+	public void setBeanIdentifier(java.lang.String beanIdentifier);
 
 	/**
 	* Adds the organizations to the group.
@@ -84,8 +98,8 @@ public interface OrganizationService {
 	* @param phones the organization's phone numbers
 	* @param websites the organization's websites
 	* @param serviceContext the organization's service context (optionally
-	<code>null</code>). Can specify the organization's asset category
-	IDs, asset tag names, and expando bridge attributes.
+	<code>null</code>). Can set asset category IDs, asset tag names,
+	and expando bridge attributes for the organization.
 	* @return the organization
 	* @throws PortalException if a parent organization with the primary key
 	could not be found, if the organization's information was
@@ -127,8 +141,8 @@ public interface OrganizationService {
 	* @param site whether the organization is to be associated with a main
 	site
 	* @param serviceContext the organization's service context (optionally
-	<code>null</code>). Can specify the organization's asset category
-	IDs, asset tag names, and expando bridge attributes.
+	<code>null</code>). Can set asset category IDs, asset tag names,
+	and expando bridge attributes for the organization.
 	* @return the organization
 	* @throws PortalException if the parent organization with the primary key
 	could not be found, if the organization information was invalid,
@@ -229,7 +243,8 @@ public interface OrganizationService {
 	*/
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public long getOrganizationId(long companyId, java.lang.String name)
-		throws com.liferay.portal.kernel.exception.SystemException;
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException;
 
 	/**
 	* Returns all the organizations belonging to the parent organization.
@@ -301,24 +316,6 @@ public interface OrganizationService {
 			com.liferay.portal.kernel.exception.SystemException;
 
 	/**
-	* Returns all the organizations associated with the user, optionally
-	* including the organizations associated with the user groups to which the
-	* user belongs.
-	*
-	* @param userId the primary key of the user
-	* @param inheritUserGroups whether to include organizations associated
-	with the user groups to which the user belongs
-	* @return the organizations associated with the user
-	* @throws PortalException if a user with the primary key could not be found
-	* @throws SystemException if a system exception occurred
-	*/
-	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public java.util.List<com.liferay.portal.model.Organization> getUserOrganizations(
-		long userId, boolean inheritUserGroups)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException;
-
-	/**
 	* Sets the organizations in the group, removing and adding organizations to
 	* the group as necessary.
 	*
@@ -354,7 +351,7 @@ public interface OrganizationService {
 	* @param organizationIds the primary keys of the organizations
 	* @throws PortalException if a password policy or organization with the
 	primary key could not be found, or if the user did not have
-	permission to update the password policy.
+	permission to update the password policy
 	* @throws SystemException if a system exception occurred
 	*/
 	public void unsetPasswordPolicyOrganizations(long passwordPolicyId,
@@ -384,9 +381,9 @@ public interface OrganizationService {
 	* @param phones the organization's phone numbers
 	* @param websites the organization's websites
 	* @param serviceContext the organization's service context (optionally
-	<code>null</code>). Can specify the organization's replacement
-	asset category IDs, replacement asset tag names, and new expando
-	bridge attributes.
+	<code>null</code>). Can set asset category IDs and asset tag
+	names for the organization, and merge expando bridge attributes
+	for the organization.
 	* @return the organization
 	* @throws PortalException if an organization or parent organization with
 	the primary key could not be found, if the user did not have
@@ -424,9 +421,9 @@ public interface OrganizationService {
 	* @param site whether the organization is to be associated with a main
 	site
 	* @param serviceContext the organization's service context (optionally
-	<code>null</code>). Can specify the organization's replacement
-	asset category IDs, replacement asset tag names, and new expando
-	bridge attributes.
+	<code>null</code>). Can set asset category IDs and asset tag
+	names for the organization, and merge expando bridge attributes
+	for the organization.
 	* @return the organization
 	* @throws PortalException if an organization or parent organization with
 	the primary key could not be found, if the user did not have

@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -25,22 +25,18 @@ long productEntryId = BeanParamUtil.getLong(productEntry, request, "productEntry
 
 String type = BeanParamUtil.getString(productEntry, request, "type");
 
-Set licenseIds = new HashSet();
+Set<Long> licenseIds = new HashSet<Long>();
 
 if ((productEntry != null) && (request.getParameterValues("licenses") == null)) {
-	Iterator itr = productEntry.getLicenses().iterator();
-
-	while (itr.hasNext()) {
-		SCLicense license = (SCLicense)itr.next();
-
-		licenseIds.add(new Long(license.getLicenseId()));
+	for (SCLicense license : productEntry.getLicenses()) {
+		licenseIds.add(license.getLicenseId());
 	}
 }
 else {
 	long[] licenses = ParamUtil.getLongValues(request, "licenses");
 
 	for (int i = 0; i < licenses.length; i++) {
-		licenseIds.add(new Long(licenses[i]));
+		licenseIds.add(licenses[i]);
 	}
 }
 
@@ -76,7 +72,7 @@ int screenshotsCount = ParamUtil.getInteger(request, "screenshotsCount", product
 		<liferay-ui:message key="name" />
 	</td>
 	<td>
-		<liferay-ui:input-field model="<%= SCProductEntry.class %>" bean="<%= productEntry %>" field="name" />
+		<liferay-ui:input-field bean="<%= productEntry %>" field="name" model="<%= SCProductEntry.class %>" />
 	</td>
 </tr>
 <tr>
@@ -108,13 +104,10 @@ int screenshotsCount = ParamUtil.getInteger(request, "screenshotsCount", product
 			<optgroup label="<liferay-ui:message key="recommended-licenses" />">
 
 				<%
-				Iterator itr = SCLicenseLocalServiceUtil.getLicenses(true, true).iterator();
-
-				while (itr.hasNext()) {
-					SCLicense license = (SCLicense)itr.next();
+				for (SCLicense license : SCLicenseLocalServiceUtil.getLicenses(true, true)) {
 				%>
 
-					<option <%= licenseIds.contains(new Long(license.getLicenseId())) ? "selected" : "" %> value="<%= license.getLicenseId() %>"><%= license.getName() %></option>
+					<option <%= licenseIds.contains(license.getLicenseId()) ? "selected" : "" %> value="<%= license.getLicenseId() %>"><%= HtmlUtil.escape(license.getName()) %></option>
 
 				<%
 				}
@@ -125,13 +118,10 @@ int screenshotsCount = ParamUtil.getInteger(request, "screenshotsCount", product
 			<optgroup label="<liferay-ui:message key="other-licenses" />">
 
 				<%
-				itr = SCLicenseLocalServiceUtil.getLicenses(true, false).iterator();
-
-				while (itr.hasNext()) {
-					SCLicense license = (SCLicense)itr.next();
+				for (SCLicense license : SCLicenseLocalServiceUtil.getLicenses(true, false)) {
 				%>
 
-					<option <%= licenseIds.contains(new Long(license.getLicenseId())) ? "selected" : "" %> value="<%= license.getLicenseId() %>"><%= license.getName() %></option>
+					<option <%= licenseIds.contains(license.getLicenseId()) ? "selected" : "" %> value="<%= license.getLicenseId() %>"><%= HtmlUtil.escape(license.getName()) %></option>
 
 				<%
 				}
@@ -146,7 +136,7 @@ int screenshotsCount = ParamUtil.getInteger(request, "screenshotsCount", product
 		<liferay-ui:message key="author" />
 	</td>
 	<td>
-		<liferay-ui:input-field model="<%= SCProductEntry.class %>" bean="<%= productEntry %>" field="author" />
+		<liferay-ui:input-field bean="<%= productEntry %>" field="author" model="<%= SCProductEntry.class %>" />
 	</td>
 </tr>
 <tr>
@@ -154,7 +144,7 @@ int screenshotsCount = ParamUtil.getInteger(request, "screenshotsCount", product
 		<liferay-ui:message key="page-url" />
 	</td>
 	<td>
-		<liferay-ui:input-field model="<%= SCProductEntry.class %>" bean="<%= productEntry %>" field="pageURL" />
+		<liferay-ui:input-field bean="<%= productEntry %>" field="pageURL" model="<%= SCProductEntry.class %>" />
 	</td>
 </tr>
 <tr>
@@ -162,7 +152,7 @@ int screenshotsCount = ParamUtil.getInteger(request, "screenshotsCount", product
 		<liferay-ui:message key="tags" />
 	</td>
 	<td>
-		<liferay-ui:input-field model="<%= SCProductEntry.class %>" bean="<%= productEntry %>" field="tags" /> (<liferay-ui:message key="comma-delimited-list" />)
+		<liferay-ui:input-field bean="<%= productEntry %>" field="tags" model="<%= SCProductEntry.class %>" /> (<liferay-ui:message key="comma-delimited-list" />)
 	</td>
 </tr>
 <tr>
@@ -170,7 +160,7 @@ int screenshotsCount = ParamUtil.getInteger(request, "screenshotsCount", product
 		<liferay-ui:message key="short-description" />
 	</td>
 	<td>
-		<liferay-ui:input-field model="<%= SCProductEntry.class %>" bean="<%= productEntry %>" field="shortDescription" />
+		<liferay-ui:input-field bean="<%= productEntry %>" field="shortDescription" model="<%= SCProductEntry.class %>" />
 	</td>
 </tr>
 <tr>
@@ -178,7 +168,7 @@ int screenshotsCount = ParamUtil.getInteger(request, "screenshotsCount", product
 		<liferay-ui:message key="long-description" />
 	</td>
 	<td>
-		<liferay-ui:input-field model="<%= SCProductEntry.class %>" bean="<%= productEntry %>" field="longDescription" />
+		<liferay-ui:input-field bean="<%= productEntry %>" field="longDescription" model="<%= SCProductEntry.class %>" />
 	</td>
 </tr>
 
@@ -220,7 +210,7 @@ int screenshotsCount = ParamUtil.getInteger(request, "screenshotsCount", product
 		<liferay-ui:message key="site-id" />
 	</td>
 	<td>
-		<liferay-ui:input-field model="<%= SCProductEntry.class %>" bean="<%= productEntry %>" field="repoGroupId" />
+		<liferay-ui:input-field bean="<%= productEntry %>" field="repoGroupId" model="<%= SCProductEntry.class %>" />
 	</td>
 </tr>
 <tr>
@@ -228,7 +218,7 @@ int screenshotsCount = ParamUtil.getInteger(request, "screenshotsCount", product
 		<liferay-ui:message key="artifact-id" />
 	</td>
 	<td>
-		<liferay-ui:input-field model="<%= SCProductEntry.class %>" bean="<%= productEntry %>" field="repoArtifactId" />
+		<liferay-ui:input-field bean="<%= productEntry %>" field="repoArtifactId" model="<%= SCProductEntry.class %>" />
 	</td>
 </tr>
 </table>
@@ -263,10 +253,10 @@ for (int i = 0; i < screenshotsCount; i++) {
 				<table class="lfr-table">
 				<tr>
 					<td>
-						<aui:a href='<%= themeDisplay.getPathImage() + "/software_catalog?img_id=" + productScreenshot.getThumbnailId() + "&t=" + ImageServletTokenUtil.getToken(productScreenshot.getThumbnailId()) %>' target="_blank"><liferay-ui:message key="see-thumbnail" /></aui:a>
+						<aui:a href='<%= themeDisplay.getPathImage() + "/software_catalog?img_id=" + productScreenshot.getThumbnailId() + "&t=" + WebServerServletTokenUtil.getToken(productScreenshot.getThumbnailId()) %>' target="_blank"><liferay-ui:message key="see-thumbnail" /></aui:a>
 					</td>
 					<td>
-						<aui:a href='<%= themeDisplay.getPathImage() + "/software_catalog?img_id=" + productScreenshot.getFullImageId() + "&t=" + ImageServletTokenUtil.getToken(productScreenshot.getFullImageId()) %>' target="_blank"><liferay-ui:message key="see-full-image" /></aui:a>
+						<aui:a href='<%= themeDisplay.getPathImage() + "/software_catalog?img_id=" + productScreenshot.getFullImageId() + "&t=" + WebServerServletTokenUtil.getToken(productScreenshot.getFullImageId()) %>' target="_blank"><liferay-ui:message key="see-full-image" /></aui:a>
 					</td>
 				</tr>
 				<tr>
@@ -295,6 +285,7 @@ for (int i = 0; i < screenshotsCount; i++) {
 <%
 }
 %>
+
 </table>
 
 <input type="button" value="<liferay-ui:message key="add-screenshot" />" onClick="<portlet:namespace />addScreenShot();" />

@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -58,18 +58,18 @@ if (pluginType.equals(Plugin.TYPE_PORTLET)) {
 
 	<aui:fieldset>
 		<aui:field-wrapper label="module-id">
-			<%= moduleId %>
+			<%= HtmlUtil.escape(moduleId) %>
 		</aui:field-wrapper>
 
 		<aui:field-wrapper label="plugin-id">
 			<%= HtmlUtil.escape(pluginId) %>
 		</aui:field-wrapper>
 
-		<aui:input inlineLabel="left" name="active" type="checkbox" value="<%= active %>" />
+		<aui:input name="active" type="checkbox" value="<%= active %>" />
 
 		<c:choose>
 			<c:when test="<%= pluginType.equals(Plugin.TYPE_PORTLET) %>">
-				<aui:field-wrapper label="permissions" helpMessage="edit-plugin-permissions-help">
+				<aui:field-wrapper helpMessage="edit-plugin-permissions-help" label="permissions">
 
 					<%
 					List curActions = ResourceActionsUtil.getResourceActions(portlet.getPortletId(), null);
@@ -225,11 +225,6 @@ private List<Role> _filterRoles(List<Role> roles, String portletId, String actio
 }
 
 private boolean _hasPermission(Role role, String actionId, String resourceName, Integer scope) throws Exception {
-	if (PropsValues.PERMISSIONS_USER_CHECK_ALGORITHM == 6) {
-		return ResourcePermissionLocalServiceUtil.hasScopeResourcePermission(role.getCompanyId(), resourceName, scope, role.getRoleId(), actionId);
-	}
-	else {
-		return PermissionLocalServiceUtil.hasRolePermission(role.getRoleId(), role.getCompanyId(), resourceName, scope, actionId);
-	}
+	return ResourcePermissionLocalServiceUtil.hasScopeResourcePermission(role.getCompanyId(), resourceName, scope, role.getRoleId(), actionId);
 }
 %>

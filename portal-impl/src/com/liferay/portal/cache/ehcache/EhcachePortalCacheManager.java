@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -60,11 +60,11 @@ public class EhcachePortalCacheManager implements PortalCacheManager {
 			configurationPath = _DEFAULT_CLUSTERED_EHCACHE_CONFIG_FILE;
 		}
 
-		boolean usingDefault = configurationPath.equals(
+		_usingDefault = configurationPath.equals(
 			_DEFAULT_CLUSTERED_EHCACHE_CONFIG_FILE);
 
 		Configuration configuration = EhcacheConfigurationUtil.getConfiguration(
-			configurationPath, _clusterAware, usingDefault);
+			configurationPath, _clusterAware, _usingDefault);
 
 		_cacheManager = new CacheManager(configuration);
 
@@ -144,7 +144,7 @@ public class EhcachePortalCacheManager implements PortalCacheManager {
 
 	public void reconfigureCaches(URL configurationURL) {
 		Configuration configuration = EhcacheConfigurationUtil.getConfiguration(
-			configurationURL, _clusterAware);
+			configurationURL, _clusterAware, _usingDefault);
 
 		Map<String, CacheConfiguration> cacheConfigurations =
 			configuration.getCacheConfigurations();
@@ -251,16 +251,17 @@ public class EhcachePortalCacheManager implements PortalCacheManager {
 	private static Log _log = LogFactoryUtil.getLog(
 		EhcachePortalCacheManager.class);
 
-	private String _configPropertyKey;
 	private CacheManager _cacheManager;
 	private boolean _clusterAware;
+	private String _configPropertyKey;
 	private Map<String, EhcachePortalCache> _ehcachePortalCaches =
 		new HashMap<String, EhcachePortalCache>();
 	private ManagementService _managementService;
 	private MBeanServer _mBeanServer;
+	private boolean _registerCacheConfigurations = true;
 	private boolean _registerCacheManager = true;
 	private boolean _registerCaches = true;
-	private boolean _registerCacheConfigurations = true;
 	private boolean _registerCacheStatistics = true;
+	private boolean _usingDefault;
 
 }

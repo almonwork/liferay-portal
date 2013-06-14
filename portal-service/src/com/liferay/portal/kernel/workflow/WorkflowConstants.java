@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -16,6 +16,7 @@ package com.liferay.portal.kernel.workflow;
 
 /**
  * @author Jorge Ferrer
+ * @author Zsolt Berentey
  */
 public class WorkflowConstants {
 
@@ -62,6 +63,8 @@ public class WorkflowConstants {
 
 	public static final String LABEL_EXPIRED = "expired";
 
+	public static final String LABEL_IN_TRASH = "in-trash";
+
 	public static final String LABEL_INACTIVE = "inactive";
 
 	public static final String LABEL_INCOMPLETE = "incomplete";
@@ -77,6 +80,8 @@ public class WorkflowConstants {
 	public static final int STATUS_DRAFT = 2;
 
 	public static final int STATUS_EXPIRED = 3;
+
+	public static final int STATUS_IN_TRASH = 8;
 
 	public static final int STATUS_INACTIVE = 5;
 
@@ -99,6 +104,9 @@ public class WorkflowConstants {
 		}
 		else if (status == STATUS_EXPIRED) {
 			return LABEL_EXPIRED;
+		}
+		else if (status == STATUS_IN_TRASH) {
+			return LABEL_IN_TRASH;
 		}
 		else if (status == STATUS_INACTIVE) {
 			return LABEL_INACTIVE;
@@ -132,6 +140,9 @@ public class WorkflowConstants {
 		}
 		else if (label.equals(LABEL_INACTIVE)) {
 			return STATUS_INACTIVE;
+		}
+		else if (label.equals(LABEL_IN_TRASH)) {
+			return STATUS_IN_TRASH;
 		}
 		else if (label.equals(LABEL_INCOMPLETE)) {
 			return STATUS_INCOMPLETE;

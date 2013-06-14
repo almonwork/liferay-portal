@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -25,7 +25,7 @@ import com.liferay.portal.model.User;
 import com.liferay.portal.service.PasswordTrackerLocalServiceUtil;
 import com.liferay.portal.service.UserLocalServiceUtil;
 import com.liferay.portal.util.PropsValues;
-import com.liferay.portlet.words.util.WordsUtil;
+import com.liferay.portal.words.WordsUtil;
 import com.liferay.util.PwdGenerator;
 
 import java.util.Arrays;
@@ -85,7 +85,7 @@ public class PasswordPolicyToolkit extends BasicToolkit {
 
 		if (passwordPolicy.isCheckSyntax()) {
 			if (!passwordPolicy.isAllowDictionaryWords() &&
-					WordsUtil.isDictionaryWord(password1)) {
+				WordsUtil.isDictionaryWord(password1)) {
 
 				throw new UserPasswordException(
 					UserPasswordException.PASSWORD_CONTAINS_TRIVIAL_WORDS);
@@ -208,7 +208,7 @@ public class PasswordPolicyToolkit extends BasicToolkit {
 				passwordMinLength - (alphanumericMinLength +
 					passwordPolicy.getMinSymbols());
 
-			sb.append(PwdGenerator.getPassword(_completeCharset, count));
+			sb.append(PwdGenerator.getSecurePassword(_completeCharset, count));
 		}
 
 		Randomizer randomizer = Randomizer.getInstance();

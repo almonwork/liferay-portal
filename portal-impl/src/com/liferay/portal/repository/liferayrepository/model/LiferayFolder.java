@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -20,6 +20,7 @@ import com.liferay.portal.kernel.repository.model.Folder;
 import com.liferay.portal.security.permission.PermissionChecker;
 import com.liferay.portlet.documentlibrary.model.DLFolder;
 import com.liferay.portlet.documentlibrary.service.permission.DLFolderPermission;
+import com.liferay.portlet.documentlibrary.util.DLAppUtil;
 import com.liferay.portlet.expando.model.ExpandoBridge;
 
 import java.io.Serializable;
@@ -104,11 +105,11 @@ public class LiferayFolder extends LiferayModel implements Folder {
 	}
 
 	public Date getModifiedDate() {
-		return _dlFolder.getCreateDate();
+		return _dlFolder.getModifiedDate();
 	}
 
 	public String getName() {
-		return _dlFolder.getName();
+		return DLAppUtil.stripTrashNamespace(_dlFolder.getName());
 	}
 
 	public Folder getParentFolder() throws PortalException, SystemException {
@@ -180,20 +181,39 @@ public class LiferayFolder extends LiferayModel implements Folder {
 		return _dlFolder.isLocked();
 	}
 
-	public boolean isSupportsLocking() {
-		return true;
-	}
-
-	public boolean isSupportsMetadata() {
-		return true;
-	}
-
 	public boolean isMountPoint() {
 		return _dlFolder.isMountPoint();
 	}
 
 	public boolean isRoot() {
 		return _dlFolder.isRoot();
+	}
+
+	public boolean isSupportsLocking() {
+		if (isMountPoint()) {
+			return false;
+		}
+		else {
+			return true;
+		}
+	}
+
+	public boolean isSupportsMetadata() {
+		if (isMountPoint()) {
+			return false;
+		}
+		else {
+			return true;
+		}
+	}
+
+	public boolean isSupportsMultipleUpload() {
+		if (isMountPoint()) {
+			return false;
+		}
+		else {
+			return true;
+		}
 	}
 
 	public boolean isSupportsShortcuts() {
@@ -206,7 +226,12 @@ public class LiferayFolder extends LiferayModel implements Folder {
 	}
 
 	public boolean isSupportsSocial() {
-		return true;
+		if (isMountPoint()) {
+			return false;
+		}
+		else {
+			return true;
+		}
 	}
 
 	public void setCompanyId(long companyId) {

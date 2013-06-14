@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -23,7 +23,8 @@ package com.liferay.portal.service;
  * @see       ShardLocalService
  * @generated
  */
-public class ShardLocalServiceWrapper implements ShardLocalService {
+public class ShardLocalServiceWrapper implements ShardLocalService,
+	ServiceWrapper<ShardLocalService> {
 	public ShardLocalServiceWrapper(ShardLocalService shardLocalService) {
 		_shardLocalService = shardLocalService;
 	}
@@ -55,24 +56,31 @@ public class ShardLocalServiceWrapper implements ShardLocalService {
 	* Deletes the shard with the primary key from the database. Also notifies the appropriate model listeners.
 	*
 	* @param shardId the primary key of the shard
+	* @return the shard that was removed
 	* @throws PortalException if a shard with the primary key could not be found
 	* @throws SystemException if a system exception occurred
 	*/
-	public void deleteShard(long shardId)
+	public com.liferay.portal.model.Shard deleteShard(long shardId)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException {
-		_shardLocalService.deleteShard(shardId);
+		return _shardLocalService.deleteShard(shardId);
 	}
 
 	/**
 	* Deletes the shard from the database. Also notifies the appropriate model listeners.
 	*
 	* @param shard the shard
+	* @return the shard that was removed
 	* @throws SystemException if a system exception occurred
 	*/
-	public void deleteShard(com.liferay.portal.model.Shard shard)
+	public com.liferay.portal.model.Shard deleteShard(
+		com.liferay.portal.model.Shard shard)
 		throws com.liferay.portal.kernel.exception.SystemException {
-		_shardLocalService.deleteShard(shard);
+		return _shardLocalService.deleteShard(shard);
+	}
+
+	public com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery() {
+		return _shardLocalService.dynamicQuery();
 	}
 
 	/**
@@ -144,6 +152,11 @@ public class ShardLocalServiceWrapper implements ShardLocalService {
 		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery)
 		throws com.liferay.portal.kernel.exception.SystemException {
 		return _shardLocalService.dynamicQueryCount(dynamicQuery);
+	}
+
+	public com.liferay.portal.model.Shard fetchShard(long shardId)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return _shardLocalService.fetchShard(shardId);
 	}
 
 	/**
@@ -253,11 +266,25 @@ public class ShardLocalServiceWrapper implements ShardLocalService {
 		return _shardLocalService.getShard(className, classPK);
 	}
 
+	/**
+	 * @deprecated Renamed to {@link #getWrappedService}
+	 */
 	public ShardLocalService getWrappedShardLocalService() {
 		return _shardLocalService;
 	}
 
+	/**
+	 * @deprecated Renamed to {@link #setWrappedService}
+	 */
 	public void setWrappedShardLocalService(ShardLocalService shardLocalService) {
+		_shardLocalService = shardLocalService;
+	}
+
+	public ShardLocalService getWrappedService() {
+		return _shardLocalService;
+	}
+
+	public void setWrappedService(ShardLocalService shardLocalService) {
 		_shardLocalService = shardLocalService;
 	}
 

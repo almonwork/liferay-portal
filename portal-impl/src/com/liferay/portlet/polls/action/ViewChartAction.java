@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -57,48 +57,48 @@ public class ViewChartAction extends Action {
 			long questionId = ParamUtil.getLong(request, "questionId");
 
 			String chartType = ParamUtil.getString(request, "chartType", "pie");
-
-			CategoryDataset dataset = PollsUtil.getVotesDataset(questionId);
-
 			String chartName = themeDisplay.translate("vote-results");
 			String xName = themeDisplay.translate("choice");
 			String yName = themeDisplay.translate("votes");
 
-			JFreeChart chart = null;
+			CategoryDataset categoryDataset = PollsUtil.getVotesDataset(
+				questionId);
+
+			JFreeChart jFreeChat = null;
 
 			if (chartType.equals("area")) {
-				chart = ChartFactory.createAreaChart(
-					chartName, xName, yName, dataset,
+				jFreeChat = ChartFactory.createAreaChart(
+					chartName, xName, yName, categoryDataset,
 					PlotOrientation.VERTICAL, true, false, false);
 			}
 			else if (chartType.equals("horizontal_bar")) {
-				chart = ChartFactory.createBarChart(
-					chartName, xName, yName, dataset,
+				jFreeChat = ChartFactory.createBarChart(
+					chartName, xName, yName, categoryDataset,
 					PlotOrientation.HORIZONTAL, true, false, false);
 			}
 			else if (chartType.equals("line")) {
-				chart = ChartFactory.createLineChart(
-					chartName, xName, yName, dataset,
+				jFreeChat = ChartFactory.createLineChart(
+					chartName, xName, yName, categoryDataset,
 					PlotOrientation.VERTICAL, true, false, false);
 			}
 			else if (chartType.equals("vertical_bar")) {
-				chart = ChartFactory.createBarChart(
-					chartName, xName, yName, dataset,
+				jFreeChat = ChartFactory.createBarChart(
+					chartName, xName, yName, categoryDataset,
 					PlotOrientation.VERTICAL, true, false, false);
 			}
 			else {
-				PieDataset pieData =
-					DatasetUtilities.createPieDatasetForRow(dataset, 0);
+				PieDataset pieDataset = DatasetUtilities.createPieDatasetForRow(
+					categoryDataset, 0);
 
-				chart = ChartFactory.createPieChart(
-					chartName, pieData, true, false, false);
+				jFreeChat = ChartFactory.createPieChart(
+					chartName, pieDataset, true, false, false);
 			}
 
 			response.setContentType(ContentTypes.IMAGE_JPEG);
 
-			OutputStream os = response.getOutputStream();
+			OutputStream outputStream = response.getOutputStream();
 
-			ChartUtilities.writeChartAsJPEG(os, chart, 400, 400);
+			ChartUtilities.writeChartAsJPEG(outputStream, jFreeChat, 400, 400);
 
 			return null;
 		}

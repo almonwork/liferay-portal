@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -27,6 +27,7 @@ import com.liferay.portal.service.RoleLocalServiceUtil;
 import com.liferay.portal.service.RoleServiceUtil;
 import com.liferay.portal.service.UserGroupRoleLocalServiceUtil;
 import com.liferay.portal.service.permission.GroupPermissionUtil;
+import com.liferay.portal.service.permission.OrganizationPermissionUtil;
 import com.liferay.portal.theme.ThemeDisplay;
 import com.liferay.portal.util.PortalUtil;
 import com.liferay.portal.util.WebKeys;
@@ -40,9 +41,7 @@ import javax.servlet.http.HttpServletRequest;
  */
 public class ActionUtil {
 
-	public static void getRole(HttpServletRequest request)
-		throws Exception {
-
+	public static void getRole(HttpServletRequest request) throws Exception {
 		ThemeDisplay themeDisplay = (ThemeDisplay)request.getAttribute(
 			WebKeys.THEME_DISPLAY);
 
@@ -72,6 +71,9 @@ public class ActionUtil {
 				if (GroupPermissionUtil.contains(
 						permissionChecker, organizationGroupId,
 						ActionKeys.ASSIGN_USER_ROLES) ||
+					OrganizationPermissionUtil.contains(
+						permissionChecker, organizationId,
+						ActionKeys.ASSIGN_USER_ROLES) ||
 					UserGroupRoleLocalServiceUtil.hasUserGroupRole(
 						themeDisplay.getUserId(), organizationGroupId,
 						RoleConstants.ORGANIZATION_ADMINISTRATOR, true) ||
@@ -89,7 +91,7 @@ public class ActionUtil {
 				organizationId = organization.getParentOrganizationId();
 			}
 
-			if (roleId > 0 && (role == null)) {
+			if ((roleId > 0) && (role == null)) {
 				role = RoleServiceUtil.getRole(roleId);
 			}
 		}

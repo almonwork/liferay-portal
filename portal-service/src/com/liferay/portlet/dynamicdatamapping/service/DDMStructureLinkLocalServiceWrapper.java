@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,6 +14,8 @@
 
 package com.liferay.portlet.dynamicdatamapping.service;
 
+import com.liferay.portal.service.ServiceWrapper;
+
 /**
  * <p>
  * This class is a wrapper for {@link DDMStructureLinkLocalService}.
@@ -24,7 +26,8 @@ package com.liferay.portlet.dynamicdatamapping.service;
  * @generated
  */
 public class DDMStructureLinkLocalServiceWrapper
-	implements DDMStructureLinkLocalService {
+	implements DDMStructureLinkLocalService,
+		ServiceWrapper<DDMStructureLinkLocalService> {
 	public DDMStructureLinkLocalServiceWrapper(
 		DDMStructureLinkLocalService ddmStructureLinkLocalService) {
 		_ddmStructureLinkLocalService = ddmStructureLinkLocalService;
@@ -58,25 +61,32 @@ public class DDMStructureLinkLocalServiceWrapper
 	* Deletes the d d m structure link with the primary key from the database. Also notifies the appropriate model listeners.
 	*
 	* @param structureLinkId the primary key of the d d m structure link
+	* @return the d d m structure link that was removed
 	* @throws PortalException if a d d m structure link with the primary key could not be found
 	* @throws SystemException if a system exception occurred
 	*/
-	public void deleteDDMStructureLink(long structureLinkId)
+	public com.liferay.portlet.dynamicdatamapping.model.DDMStructureLink deleteDDMStructureLink(
+		long structureLinkId)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException {
-		_ddmStructureLinkLocalService.deleteDDMStructureLink(structureLinkId);
+		return _ddmStructureLinkLocalService.deleteDDMStructureLink(structureLinkId);
 	}
 
 	/**
 	* Deletes the d d m structure link from the database. Also notifies the appropriate model listeners.
 	*
 	* @param ddmStructureLink the d d m structure link
+	* @return the d d m structure link that was removed
 	* @throws SystemException if a system exception occurred
 	*/
-	public void deleteDDMStructureLink(
+	public com.liferay.portlet.dynamicdatamapping.model.DDMStructureLink deleteDDMStructureLink(
 		com.liferay.portlet.dynamicdatamapping.model.DDMStructureLink ddmStructureLink)
 		throws com.liferay.portal.kernel.exception.SystemException {
-		_ddmStructureLinkLocalService.deleteDDMStructureLink(ddmStructureLink);
+		return _ddmStructureLinkLocalService.deleteDDMStructureLink(ddmStructureLink);
+	}
+
+	public com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery() {
+		return _ddmStructureLinkLocalService.dynamicQuery();
 	}
 
 	/**
@@ -149,6 +159,12 @@ public class DDMStructureLinkLocalServiceWrapper
 		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery)
 		throws com.liferay.portal.kernel.exception.SystemException {
 		return _ddmStructureLinkLocalService.dynamicQueryCount(dynamicQuery);
+	}
+
+	public com.liferay.portlet.dynamicdatamapping.model.DDMStructureLink fetchDDMStructureLink(
+		long structureLinkId)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return _ddmStructureLinkLocalService.fetchDDMStructureLink(structureLinkId);
 	}
 
 	/**
@@ -315,11 +331,26 @@ public class DDMStructureLinkLocalServiceWrapper
 			classNameId, classPK, structureId);
 	}
 
+	/**
+	 * @deprecated Renamed to {@link #getWrappedService}
+	 */
 	public DDMStructureLinkLocalService getWrappedDDMStructureLinkLocalService() {
 		return _ddmStructureLinkLocalService;
 	}
 
+	/**
+	 * @deprecated Renamed to {@link #setWrappedService}
+	 */
 	public void setWrappedDDMStructureLinkLocalService(
+		DDMStructureLinkLocalService ddmStructureLinkLocalService) {
+		_ddmStructureLinkLocalService = ddmStructureLinkLocalService;
+	}
+
+	public DDMStructureLinkLocalService getWrappedService() {
+		return _ddmStructureLinkLocalService;
+	}
+
+	public void setWrappedService(
 		DDMStructureLinkLocalService ddmStructureLinkLocalService) {
 		_ddmStructureLinkLocalService = ddmStructureLinkLocalService;
 	}

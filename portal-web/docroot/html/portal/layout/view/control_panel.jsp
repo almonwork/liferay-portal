@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -49,14 +49,6 @@ if (ppid.equals(PortletKeys.PORTLET_CONFIGURATION)) {
 	}
 }
 
-if (ppid.equals(PortletKeys.EXPANDO)) {
-	String modelResource = ParamUtil.getString(request, PortalUtil.getPortletNamespace(ppid) + "modelResource");
-
-	if (modelResource.equals(User.class.getName()) || modelResource.equals(Organization.class.getName())) {
-		ppid = PortletKeys.USERS_ADMIN;
-	}
-}
-
 if (ppid.equals(PortletKeys.PLUGIN_INSTALLER)) {
 	ppid = PortletKeys.ADMIN_PLUGINS;
 }
@@ -83,7 +75,7 @@ request.setAttribute("control_panel.jsp-ppid", ppid);
 %>
 
 <c:choose>
-	<c:when test="<%= !themeDisplay.isStateExclusive() && !themeDisplay.isStatePopUp() %>">
+	<c:when test="<%= !themeDisplay.isStatePopUp() %>">
 
 		<%
 		String panelBodyCssClass = "panel-page-body";

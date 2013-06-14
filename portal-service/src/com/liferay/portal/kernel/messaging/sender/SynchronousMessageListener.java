@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -79,10 +79,10 @@ public class SynchronousMessageListener implements MessageListener {
 		}
 	}
 
-	private MessageBus _messageBus;
 	private Message _message;
-	private long _timeout;
+	private MessageBus _messageBus;
 	private String _responseId;
 	private Object _results;
+	private long _timeout;
 
 }

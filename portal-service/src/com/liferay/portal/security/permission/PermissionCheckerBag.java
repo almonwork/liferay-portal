@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -27,19 +27,19 @@ import java.util.List;
  */
 public interface PermissionCheckerBag extends Serializable {
 
-	public List<Group> getUserGroups();
-
-	public List<Organization> getUserOrgs();
-
-	public List<Group> getUserOrgGroups();
-
-	public List<Group> getUserUserGroupGroups();
-
 	public List<Group> getGroups();
 
 	public long[] getRoleIds();
 
 	public List<Role> getRoles();
+
+	public List<Group> getUserGroups();
+
+	public List<Group> getUserOrgGroups();
+
+	public List<Organization> getUserOrgs();
+
+	public List<Group> getUserUserGroupGroups();
 
 	/**
 	 * @deprecated As of 6.1, renamed to {@link #isGroupAdmin(PermissionChecker,
@@ -61,8 +61,16 @@ public interface PermissionCheckerBag extends Serializable {
 			PermissionChecker permissionChecker, Group group)
 		throws Exception;
 
+	public boolean isGroupMember(
+			PermissionChecker permissionChecker, Group group)
+		throws Exception;
+
 	public boolean isGroupOwner(
 			PermissionChecker permissionChecker, Group group)
+		throws Exception;
+
+	public boolean isOrganizationAdmin(
+			PermissionChecker permissionChecker, Organization organization)
 		throws Exception;
 
 }

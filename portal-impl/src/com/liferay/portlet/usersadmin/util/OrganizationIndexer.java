@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,12 +14,18 @@
 
 package com.liferay.portlet.usersadmin.util;
 
+import com.liferay.portal.kernel.dao.orm.DynamicQuery;
+import com.liferay.portal.kernel.dao.orm.DynamicQueryFactoryUtil;
+import com.liferay.portal.kernel.dao.orm.Projection;
+import com.liferay.portal.kernel.dao.orm.ProjectionFactoryUtil;
+import com.liferay.portal.kernel.dao.orm.ProjectionList;
+import com.liferay.portal.kernel.dao.orm.Property;
+import com.liferay.portal.kernel.dao.orm.PropertyFactoryUtil;
 import com.liferay.portal.kernel.search.BaseIndexer;
 import com.liferay.portal.kernel.search.BooleanClauseOccur;
 import com.liferay.portal.kernel.search.BooleanQuery;
 import com.liferay.portal.kernel.search.BooleanQueryFactoryUtil;
 import com.liferay.portal.kernel.search.Document;
-import com.liferay.portal.kernel.search.DocumentImpl;
 import com.liferay.portal.kernel.search.Field;
 import com.liferay.portal.kernel.search.SearchContext;
 import com.liferay.portal.kernel.search.SearchEngineUtil;
@@ -27,8 +33,10 @@ import com.liferay.portal.kernel.search.Summary;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.model.Organization;
+import com.liferay.portal.security.pacl.PACLClassLoaderUtil;
 import com.liferay.portal.service.OrganizationLocalServiceUtil;
 import com.liferay.portal.util.PortletKeys;
+import com.liferay.portal.util.PropsValues;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -52,11 +60,17 @@ public class OrganizationIndexer extends BaseIndexer {
 	public static final String PORTLET_ID = PortletKeys.USERS_ADMIN;
 
 	public OrganizationIndexer() {
+		setIndexerEnabled(PropsValues.ORGANIZATIONS_INDEXER_ENABLED);
+		setPermissionAware(true);
 		setStagingAware(false);
 	}
 
 	public String[] getClassNames() {
 		return CLASS_NAMES;
+	}
+
+	public String getPortletId() {
+		return PORTLET_ID;
 	}
 
 	@Override
@@ -67,31 +81,24 @@ public class OrganizationIndexer extends BaseIndexer {
 		LinkedHashMap<String, Object> params =
 			(LinkedHashMap<String, Object>)searchContext.getAttribute("params");
 
-		if (params != null) {
-			Long[][] leftAndRightOrganizationIds = (Long[][])params.get(
-				"organizationsTree");
+		if (params == null) {
+			return;
+		}
 
-			if (leftAndRightOrganizationIds != null) {
-				BooleanQuery organizationsTreeQuery =
-					BooleanQueryFactoryUtil.create(searchContext);
+		List<Organization> organizationsTree = (List<Organization>)params.get(
+			"organizationsTree");
 
-				if (leftAndRightOrganizationIds.length == 0) {
-					organizationsTreeQuery.addRequiredTerm(
-						Field.ORGANIZATION_ID, -1);
-				}
-				else if (leftAndRightOrganizationIds.length > 0) {
-					for (Long[] leftAndRightOrganizationId :
-							leftAndRightOrganizationIds) {
+		if ((organizationsTree != null) && !organizationsTree.isEmpty()) {
+			BooleanQuery booleanQuery = BooleanQueryFactoryUtil.create(
+				searchContext);
 
-						organizationsTreeQuery.addNumericRangeTerm(
-							"leftOrganizationId", leftAndRightOrganizationId[0],
-							leftAndRightOrganizationId[1]);
-					}
-				}
+			for (Organization organization : organizationsTree) {
+				String treePath = organization.buildTreePath();
 
-				contextQuery.add(
-					organizationsTreeQuery, BooleanClauseOccur.MUST);
+				booleanQuery.addTerm("treePath", treePath, true);
 			}
+
+			contextQuery.add(booleanQuery, BooleanClauseOccur.MUST);
 		}
 	}
 
@@ -100,15 +107,15 @@ public class OrganizationIndexer extends BaseIndexer {
 			BooleanQuery searchQuery, SearchContext searchContext)
 		throws Exception {
 
-		addSearchTerm(searchQuery, searchContext, "city", true);
-		addSearchTerm(searchQuery, searchContext, "country", true);
-		addSearchTerm(searchQuery, searchContext, "name", true);
+		addSearchTerm(searchQuery, searchContext, "city", false);
+		addSearchTerm(searchQuery, searchContext, "country", false);
+		addSearchTerm(searchQuery, searchContext, "name", false);
 		addSearchTerm(
 			searchQuery, searchContext, "parentOrganizationId", false);
-		addSearchTerm(searchQuery, searchContext, "region", true);
-		addSearchTerm(searchQuery, searchContext, "street", true);
-		addSearchTerm(searchQuery, searchContext, "type", true);
-		addSearchTerm(searchQuery, searchContext, "zip", true);
+		addSearchTerm(searchQuery, searchContext, "region", false);
+		addSearchTerm(searchQuery, searchContext, "street", false);
+		addSearchTerm(searchQuery, searchContext, "type", false);
+		addSearchTerm(searchQuery, searchContext, "zip", false);
 
 		LinkedHashMap<String, Object> params =
 			(LinkedHashMap<String, Object>)searchContext.getAttribute("params");
@@ -122,16 +129,20 @@ public class OrganizationIndexer extends BaseIndexer {
 		}
 	}
 
+	protected void addReindexCriteria(
+		DynamicQuery dynamicQuery, long companyId) {
+
+		Property property = PropertyFactoryUtil.forName("companyId");
+
+		dynamicQuery.add(property.eq(companyId));
+	}
+
 	@Override
 	protected void doDelete(Object obj) throws Exception {
 		Organization organization = (Organization)obj;
 
-		Document document = new DocumentImpl();
-
-		document.addUID(PORTLET_ID, organization.getOrganizationId());
-
-		SearchEngineUtil.deleteDocument(
-			organization.getCompanyId(), document.get(Field.UID));
+		deleteDocument(
+			organization.getCompanyId(), organization.getOrganizationId());
 	}
 
 	@Override
@@ -146,12 +157,12 @@ public class OrganizationIndexer extends BaseIndexer {
 			Field.ORGANIZATION_ID, organization.getOrganizationId());
 		document.addKeyword(Field.TYPE, organization.getType());
 
-		document.addNumber(
-			"leftOrganizationId", organization.getLeftOrganizationId());
 		document.addKeyword(
 			"parentOrganizationId", organization.getParentOrganizationId());
-		document.addNumber(
-			"rightOrganizationId", organization.getRightOrganizationId());
+
+		String treePath = organization.buildTreePath();
+
+		document.addKeyword("treePath", treePath);
 
 		populateAddresses(
 			document, organization.getAddresses(), organization.getRegionId(),
@@ -216,8 +227,12 @@ public class OrganizationIndexer extends BaseIndexer {
 
 			for (long organizationId : organizationIds) {
 				Organization organization =
-					OrganizationLocalServiceUtil.getOrganization(
+					OrganizationLocalServiceUtil.fetchOrganization(
 						organizationId);
+
+				if (organization == null) {
+					continue;
+				}
 
 				Document document = getDocument(organization);
 
@@ -240,7 +255,8 @@ public class OrganizationIndexer extends BaseIndexer {
 				long companyId = entry.getKey();
 				Collection<Document> documents = entry.getValue();
 
-				SearchEngineUtil.updateDocuments(companyId, documents);
+				SearchEngineUtil.updateDocuments(
+					getSearchEngineId(), companyId, documents);
 			}
 		}
 		else if (obj instanceof Organization) {
@@ -249,7 +265,7 @@ public class OrganizationIndexer extends BaseIndexer {
 			Document document = getDocument(organization);
 
 			SearchEngineUtil.updateDocument(
-				organization.getCompanyId(), document);
+				getSearchEngineId(), organization.getCompanyId(), document);
 		}
 	}
 
@@ -274,29 +290,72 @@ public class OrganizationIndexer extends BaseIndexer {
 	}
 
 	protected void reindexOrganizations(long companyId) throws Exception {
-		int count = OrganizationLocalServiceUtil.getOrganizationsCount();
+		DynamicQuery dynamicQuery = DynamicQueryFactoryUtil.forClass(
+			Organization.class, PACLClassLoaderUtil.getPortalClassLoader());
 
-		int pages = count / OrganizationIndexer.DEFAULT_INTERVAL;
+		Projection minOrganizationIdProjection = ProjectionFactoryUtil.min(
+			"organizationId");
+		Projection maxOrganizationIdProjection = ProjectionFactoryUtil.max(
+			"organizationId");
 
-		for (int i = 0; i <= pages; i++) {
-			int start = (i * OrganizationIndexer.DEFAULT_INTERVAL);
-			int end = start + OrganizationIndexer.DEFAULT_INTERVAL;
+		ProjectionList projectionList = ProjectionFactoryUtil.projectionList();
 
-			reindexOrganizations(companyId, start, end);
+		projectionList.add(minOrganizationIdProjection);
+		projectionList.add(maxOrganizationIdProjection);
+
+		dynamicQuery.setProjection(projectionList);
+
+		addReindexCriteria(dynamicQuery, companyId);
+
+		List<Object[]> results = OrganizationLocalServiceUtil.dynamicQuery(
+			dynamicQuery);
+
+		Object[] minAndMaxOrganizationIds = results.get(0);
+
+		if ((minAndMaxOrganizationIds[0] == null) ||
+			(minAndMaxOrganizationIds[1] == null)) {
+
+			return;
+		}
+
+		long minOrganizationId = (Long)minAndMaxOrganizationIds[0];
+		long maxOrganizationId = (Long)minAndMaxOrganizationIds[1];
+
+		long startOrganizationId = minOrganizationId;
+		long endOrganizationId = startOrganizationId + DEFAULT_INTERVAL;
+
+		while (startOrganizationId <= maxOrganizationId) {
+			reindexOrganizations(
+				companyId, startOrganizationId, endOrganizationId);
+
+			startOrganizationId = endOrganizationId;
+			endOrganizationId += DEFAULT_INTERVAL;
 		}
 	}
 
-	protected void reindexOrganizations(long companyId, int start, int end)
+	protected void reindexOrganizations(
+			long companyId, long startOrganizationId, long endOrganizationId)
 		throws Exception {
 
+		DynamicQuery dynamicQuery = DynamicQueryFactoryUtil.forClass(
+			Organization.class, PACLClassLoaderUtil.getPortalClassLoader());
+
+		Property property = PropertyFactoryUtil.forName("organizationId");
+
+		dynamicQuery.add(property.ge(startOrganizationId));
+		dynamicQuery.add(property.lt(endOrganizationId));
+
+		addReindexCriteria(dynamicQuery, companyId);
+
 		List<Organization> organizations =
-			OrganizationLocalServiceUtil.getOrganizations(start, end);
+			OrganizationLocalServiceUtil.dynamicQuery(dynamicQuery);
 
 		if (organizations.isEmpty()) {
 			return;
 		}
 
-		Collection<Document> documents = new ArrayList<Document>();
+		Collection<Document> documents = new ArrayList<Document>(
+			organizations.size());
 
 		for (Organization organization : organizations) {
 			Document document = getDocument(organization);
@@ -304,7 +363,8 @@ public class OrganizationIndexer extends BaseIndexer {
 			documents.add(document);
 		}
 
-		SearchEngineUtil.updateDocuments(companyId, documents);
+		SearchEngineUtil.updateDocuments(
+			getSearchEngineId(), companyId, documents);
 	}
 
 }

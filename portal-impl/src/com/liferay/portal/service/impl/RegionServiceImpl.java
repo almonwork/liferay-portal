@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -62,28 +62,40 @@ public class RegionServiceImpl extends RegionServiceBaseImpl {
 		return region;
 	}
 
-	public List<Region> getRegions() throws SystemException {
-		return regionPersistence.findAll();
-	}
-
-	public List<Region> getRegions(long countryId) throws SystemException {
-		return regionPersistence.findByCountryId(countryId);
-	}
-
-	public List<Region> getRegions(boolean active) throws SystemException {
-		return regionPersistence.findByActive(active);
-	}
-
-	public List<Region> getRegions(long countryId, boolean active)
+	public Region fetchRegion(long countryId, String regionCode)
 		throws SystemException {
 
-		return regionPersistence.findByC_A(countryId, active);
+		return regionPersistence.fetchByC_R(countryId, regionCode);
 	}
 
 	public Region getRegion(long regionId)
 		throws PortalException, SystemException {
 
 		return regionPersistence.findByPrimaryKey(regionId);
+	}
+
+	public Region getRegion(long countryId, String regionCode)
+		throws PortalException, SystemException {
+
+		return regionPersistence.findByC_R(countryId, regionCode);
+	}
+
+	public List<Region> getRegions() throws SystemException {
+		return regionPersistence.findAll();
+	}
+
+	public List<Region> getRegions(boolean active) throws SystemException {
+		return regionPersistence.findByActive(active);
+	}
+
+	public List<Region> getRegions(long countryId) throws SystemException {
+		return regionPersistence.findByCountryId(countryId);
+	}
+
+	public List<Region> getRegions(long countryId, boolean active)
+		throws SystemException {
+
+		return regionPersistence.findByC_A(countryId, active);
 	}
 
 }

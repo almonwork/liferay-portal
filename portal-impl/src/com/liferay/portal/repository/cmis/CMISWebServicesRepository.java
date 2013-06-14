@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -16,7 +16,7 @@ package com.liferay.portal.repository.cmis;
 
 import com.liferay.portal.InvalidRepositoryException;
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.repository.RepositoryException;
+import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.repository.cmis.CMISRepositoryHandler;
 import com.liferay.portal.kernel.repository.cmis.Session;
 import com.liferay.portal.kernel.util.LocaleUtil;
@@ -36,7 +36,7 @@ import org.apache.chemistry.opencmis.commons.enums.BindingType;
 public class CMISWebServicesRepository extends CMISRepositoryHandler {
 
 	@Override
-	public Session getSession() throws PortalException, RepositoryException {
+	public Session getSession() throws PortalException, SystemException {
 		Map<String, String> parameters = new HashMap<String, String>();
 
 		parameters.put(
@@ -46,10 +46,9 @@ public class CMISWebServicesRepository extends CMISRepositoryHandler {
 		Locale locale = LocaleUtil.getDefault();
 
 		parameters.put(
-			SessionParameter.LOCALE_ISO3166_COUNTRY,
-			locale.getCountry());
-		parameters.put(SessionParameter.LOCALE_ISO639_LANGUAGE,
-			locale.getLanguage());
+			SessionParameter.LOCALE_ISO3166_COUNTRY, locale.getCountry());
+		parameters.put(
+			SessionParameter.LOCALE_ISO639_LANGUAGE, locale.getLanguage());
 
 		String password = PrincipalThreadLocal.getPassword();
 
@@ -115,6 +114,25 @@ public class CMISWebServicesRepository extends CMISRepositoryHandler {
 
 	private static final String _REPOSITORY_ID = "REPOSITORY_ID";
 
+	private static final String[] _SUPPORTED_CONFIGURATIONS = {
+		_CONFIGURATION_WEBSERVICES
+	};
+
+	private static final String[][] _SUPPORTED_PARAMETERS = new String[][] {
+		{
+			CMISWebServicesRepository._REPOSITORY_ID,
+			CMISWebServicesRepository._WEBSERVICES_ACL_SERVICE,
+			CMISWebServicesRepository._WEBSERVICES_DISCOVERY_SERVICE,
+			CMISWebServicesRepository._WEBSERVICES_MULTIFILING_SERVICE,
+			CMISWebServicesRepository._WEBSERVICES_NAVIGATION_SERVICE,
+			CMISWebServicesRepository._WEBSERVICES_OBJECT_SERVICE,
+			CMISWebServicesRepository._WEBSERVICES_POLICY_SERVICE,
+			CMISWebServicesRepository._WEBSERVICES_RELATIONSHIP_SERVICE,
+			CMISWebServicesRepository._WEBSERVICES_REPOSITORY_SERVICE,
+			CMISWebServicesRepository._WEBSERVICES_VERSIONING_SERVICE
+		}
+	};
+
 	private static final String _WEBSERVICES_ACL_SERVICE =
 		"WEBSERVICES_ACL_SERVICE";
 
@@ -141,19 +159,5 @@ public class CMISWebServicesRepository extends CMISRepositoryHandler {
 
 	private static final String _WEBSERVICES_VERSIONING_SERVICE =
 		"WEBSERVICES_VERSIONING_SERVICE";
-
-	private static final String[] _SUPPORTED_CONFIGURATIONS = {
-		_CONFIGURATION_WEBSERVICES
-	};
-
-	private static final String[][] _SUPPORTED_PARAMETERS = {
-		{
-			_REPOSITORY_ID, _WEBSERVICES_ACL_SERVICE,
-			_WEBSERVICES_DISCOVERY_SERVICE, _WEBSERVICES_MULTIFILING_SERVICE,
-			_WEBSERVICES_NAVIGATION_SERVICE, _WEBSERVICES_OBJECT_SERVICE,
-			_WEBSERVICES_POLICY_SERVICE, _WEBSERVICES_RELATIONSHIP_SERVICE,
-			_WEBSERVICES_REPOSITORY_SERVICE, _WEBSERVICES_VERSIONING_SERVICE
-		}
-	};
 
 }

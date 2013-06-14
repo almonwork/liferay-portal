@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -19,6 +19,7 @@ import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.json.JSON;
 import com.liferay.portal.kernel.util.DateUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.ProxyUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.model.CacheModel;
@@ -34,13 +35,13 @@ import com.liferay.portlet.shopping.model.ShoppingOrderSoap;
 
 import java.io.Serializable;
 
-import java.lang.reflect.Proxy;
-
 import java.sql.Types;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * The base model implementation for the ShoppingOrder service. Represents a row in the &quot;ShoppingOrder&quot; database table, with each column mapped to a property of this class.
@@ -130,6 +131,14 @@ public class ShoppingOrderModelImpl extends BaseModelImpl<ShoppingOrder>
 	public static final boolean FINDER_CACHE_ENABLED = GetterUtil.getBoolean(com.liferay.portal.util.PropsUtil.get(
 				"value.object.finder.cache.enabled.com.liferay.portlet.shopping.model.ShoppingOrder"),
 			true);
+	public static final boolean COLUMN_BITMASK_ENABLED = GetterUtil.getBoolean(com.liferay.portal.util.PropsUtil.get(
+				"value.object.column.bitmask.enabled.com.liferay.portlet.shopping.model.ShoppingOrder"),
+			true);
+	public static long GROUPID_COLUMN_BITMASK = 1L;
+	public static long NUMBER_COLUMN_BITMASK = 2L;
+	public static long PPPAYMENTSTATUS_COLUMN_BITMASK = 4L;
+	public static long PPTXNID_COLUMN_BITMASK = 8L;
+	public static long USERID_COLUMN_BITMASK = 16L;
 
 	/**
 	 * Converts the soap model instance into a normal model instance.
@@ -211,14 +220,6 @@ public class ShoppingOrderModelImpl extends BaseModelImpl<ShoppingOrder>
 		return models;
 	}
 
-	public Class<?> getModelClass() {
-		return ShoppingOrder.class;
-	}
-
-	public String getModelClassName() {
-		return ShoppingOrder.class.getName();
-	}
-
 	public static final long LOCK_EXPIRATION_TIME = GetterUtil.getLong(com.liferay.portal.util.PropsUtil.get(
 				"lock.expiration.time.com.liferay.portlet.shopping.model.ShoppingOrder"));
 
@@ -241,6 +242,384 @@ public class ShoppingOrderModelImpl extends BaseModelImpl<ShoppingOrder>
 		setPrimaryKey(((Long)primaryKeyObj).longValue());
 	}
 
+	public Class<?> getModelClass() {
+		return ShoppingOrder.class;
+	}
+
+	public String getModelClassName() {
+		return ShoppingOrder.class.getName();
+	}
+
+	@Override
+	public Map<String, Object> getModelAttributes() {
+		Map<String, Object> attributes = new HashMap<String, Object>();
+
+		attributes.put("orderId", getOrderId());
+		attributes.put("groupId", getGroupId());
+		attributes.put("companyId", getCompanyId());
+		attributes.put("userId", getUserId());
+		attributes.put("userName", getUserName());
+		attributes.put("createDate", getCreateDate());
+		attributes.put("modifiedDate", getModifiedDate());
+		attributes.put("number", getNumber());
+		attributes.put("tax", getTax());
+		attributes.put("shipping", getShipping());
+		attributes.put("altShipping", getAltShipping());
+		attributes.put("requiresShipping", getRequiresShipping());
+		attributes.put("insure", getInsure());
+		attributes.put("insurance", getInsurance());
+		attributes.put("couponCodes", getCouponCodes());
+		attributes.put("couponDiscount", getCouponDiscount());
+		attributes.put("billingFirstName", getBillingFirstName());
+		attributes.put("billingLastName", getBillingLastName());
+		attributes.put("billingEmailAddress", getBillingEmailAddress());
+		attributes.put("billingCompany", getBillingCompany());
+		attributes.put("billingStreet", getBillingStreet());
+		attributes.put("billingCity", getBillingCity());
+		attributes.put("billingState", getBillingState());
+		attributes.put("billingZip", getBillingZip());
+		attributes.put("billingCountry", getBillingCountry());
+		attributes.put("billingPhone", getBillingPhone());
+		attributes.put("shipToBilling", getShipToBilling());
+		attributes.put("shippingFirstName", getShippingFirstName());
+		attributes.put("shippingLastName", getShippingLastName());
+		attributes.put("shippingEmailAddress", getShippingEmailAddress());
+		attributes.put("shippingCompany", getShippingCompany());
+		attributes.put("shippingStreet", getShippingStreet());
+		attributes.put("shippingCity", getShippingCity());
+		attributes.put("shippingState", getShippingState());
+		attributes.put("shippingZip", getShippingZip());
+		attributes.put("shippingCountry", getShippingCountry());
+		attributes.put("shippingPhone", getShippingPhone());
+		attributes.put("ccName", getCcName());
+		attributes.put("ccType", getCcType());
+		attributes.put("ccNumber", getCcNumber());
+		attributes.put("ccExpMonth", getCcExpMonth());
+		attributes.put("ccExpYear", getCcExpYear());
+		attributes.put("ccVerNumber", getCcVerNumber());
+		attributes.put("comments", getComments());
+		attributes.put("ppTxnId", getPpTxnId());
+		attributes.put("ppPaymentStatus", getPpPaymentStatus());
+		attributes.put("ppPaymentGross", getPpPaymentGross());
+		attributes.put("ppReceiverEmail", getPpReceiverEmail());
+		attributes.put("ppPayerEmail", getPpPayerEmail());
+		attributes.put("sendOrderEmail", getSendOrderEmail());
+		attributes.put("sendShippingEmail", getSendShippingEmail());
+
+		return attributes;
+	}
+
+	@Override
+	public void setModelAttributes(Map<String, Object> attributes) {
+		Long orderId = (Long)attributes.get("orderId");
+
+		if (orderId != null) {
+			setOrderId(orderId);
+		}
+
+		Long groupId = (Long)attributes.get("groupId");
+
+		if (groupId != null) {
+			setGroupId(groupId);
+		}
+
+		Long companyId = (Long)attributes.get("companyId");
+
+		if (companyId != null) {
+			setCompanyId(companyId);
+		}
+
+		Long userId = (Long)attributes.get("userId");
+
+		if (userId != null) {
+			setUserId(userId);
+		}
+
+		String userName = (String)attributes.get("userName");
+
+		if (userName != null) {
+			setUserName(userName);
+		}
+
+		Date createDate = (Date)attributes.get("createDate");
+
+		if (createDate != null) {
+			setCreateDate(createDate);
+		}
+
+		Date modifiedDate = (Date)attributes.get("modifiedDate");
+
+		if (modifiedDate != null) {
+			setModifiedDate(modifiedDate);
+		}
+
+		String number = (String)attributes.get("number");
+
+		if (number != null) {
+			setNumber(number);
+		}
+
+		Double tax = (Double)attributes.get("tax");
+
+		if (tax != null) {
+			setTax(tax);
+		}
+
+		Double shipping = (Double)attributes.get("shipping");
+
+		if (shipping != null) {
+			setShipping(shipping);
+		}
+
+		String altShipping = (String)attributes.get("altShipping");
+
+		if (altShipping != null) {
+			setAltShipping(altShipping);
+		}
+
+		Boolean requiresShipping = (Boolean)attributes.get("requiresShipping");
+
+		if (requiresShipping != null) {
+			setRequiresShipping(requiresShipping);
+		}
+
+		Boolean insure = (Boolean)attributes.get("insure");
+
+		if (insure != null) {
+			setInsure(insure);
+		}
+
+		Double insurance = (Double)attributes.get("insurance");
+
+		if (insurance != null) {
+			setInsurance(insurance);
+		}
+
+		String couponCodes = (String)attributes.get("couponCodes");
+
+		if (couponCodes != null) {
+			setCouponCodes(couponCodes);
+		}
+
+		Double couponDiscount = (Double)attributes.get("couponDiscount");
+
+		if (couponDiscount != null) {
+			setCouponDiscount(couponDiscount);
+		}
+
+		String billingFirstName = (String)attributes.get("billingFirstName");
+
+		if (billingFirstName != null) {
+			setBillingFirstName(billingFirstName);
+		}
+
+		String billingLastName = (String)attributes.get("billingLastName");
+
+		if (billingLastName != null) {
+			setBillingLastName(billingLastName);
+		}
+
+		String billingEmailAddress = (String)attributes.get(
+				"billingEmailAddress");
+
+		if (billingEmailAddress != null) {
+			setBillingEmailAddress(billingEmailAddress);
+		}
+
+		String billingCompany = (String)attributes.get("billingCompany");
+
+		if (billingCompany != null) {
+			setBillingCompany(billingCompany);
+		}
+
+		String billingStreet = (String)attributes.get("billingStreet");
+
+		if (billingStreet != null) {
+			setBillingStreet(billingStreet);
+		}
+
+		String billingCity = (String)attributes.get("billingCity");
+
+		if (billingCity != null) {
+			setBillingCity(billingCity);
+		}
+
+		String billingState = (String)attributes.get("billingState");
+
+		if (billingState != null) {
+			setBillingState(billingState);
+		}
+
+		String billingZip = (String)attributes.get("billingZip");
+
+		if (billingZip != null) {
+			setBillingZip(billingZip);
+		}
+
+		String billingCountry = (String)attributes.get("billingCountry");
+
+		if (billingCountry != null) {
+			setBillingCountry(billingCountry);
+		}
+
+		String billingPhone = (String)attributes.get("billingPhone");
+
+		if (billingPhone != null) {
+			setBillingPhone(billingPhone);
+		}
+
+		Boolean shipToBilling = (Boolean)attributes.get("shipToBilling");
+
+		if (shipToBilling != null) {
+			setShipToBilling(shipToBilling);
+		}
+
+		String shippingFirstName = (String)attributes.get("shippingFirstName");
+
+		if (shippingFirstName != null) {
+			setShippingFirstName(shippingFirstName);
+		}
+
+		String shippingLastName = (String)attributes.get("shippingLastName");
+
+		if (shippingLastName != null) {
+			setShippingLastName(shippingLastName);
+		}
+
+		String shippingEmailAddress = (String)attributes.get(
+				"shippingEmailAddress");
+
+		if (shippingEmailAddress != null) {
+			setShippingEmailAddress(shippingEmailAddress);
+		}
+
+		String shippingCompany = (String)attributes.get("shippingCompany");
+
+		if (shippingCompany != null) {
+			setShippingCompany(shippingCompany);
+		}
+
+		String shippingStreet = (String)attributes.get("shippingStreet");
+
+		if (shippingStreet != null) {
+			setShippingStreet(shippingStreet);
+		}
+
+		String shippingCity = (String)attributes.get("shippingCity");
+
+		if (shippingCity != null) {
+			setShippingCity(shippingCity);
+		}
+
+		String shippingState = (String)attributes.get("shippingState");
+
+		if (shippingState != null) {
+			setShippingState(shippingState);
+		}
+
+		String shippingZip = (String)attributes.get("shippingZip");
+
+		if (shippingZip != null) {
+			setShippingZip(shippingZip);
+		}
+
+		String shippingCountry = (String)attributes.get("shippingCountry");
+
+		if (shippingCountry != null) {
+			setShippingCountry(shippingCountry);
+		}
+
+		String shippingPhone = (String)attributes.get("shippingPhone");
+
+		if (shippingPhone != null) {
+			setShippingPhone(shippingPhone);
+		}
+
+		String ccName = (String)attributes.get("ccName");
+
+		if (ccName != null) {
+			setCcName(ccName);
+		}
+
+		String ccType = (String)attributes.get("ccType");
+
+		if (ccType != null) {
+			setCcType(ccType);
+		}
+
+		String ccNumber = (String)attributes.get("ccNumber");
+
+		if (ccNumber != null) {
+			setCcNumber(ccNumber);
+		}
+
+		Integer ccExpMonth = (Integer)attributes.get("ccExpMonth");
+
+		if (ccExpMonth != null) {
+			setCcExpMonth(ccExpMonth);
+		}
+
+		Integer ccExpYear = (Integer)attributes.get("ccExpYear");
+
+		if (ccExpYear != null) {
+			setCcExpYear(ccExpYear);
+		}
+
+		String ccVerNumber = (String)attributes.get("ccVerNumber");
+
+		if (ccVerNumber != null) {
+			setCcVerNumber(ccVerNumber);
+		}
+
+		String comments = (String)attributes.get("comments");
+
+		if (comments != null) {
+			setComments(comments);
+		}
+
+		String ppTxnId = (String)attributes.get("ppTxnId");
+
+		if (ppTxnId != null) {
+			setPpTxnId(ppTxnId);
+		}
+
+		String ppPaymentStatus = (String)attributes.get("ppPaymentStatus");
+
+		if (ppPaymentStatus != null) {
+			setPpPaymentStatus(ppPaymentStatus);
+		}
+
+		Double ppPaymentGross = (Double)attributes.get("ppPaymentGross");
+
+		if (ppPaymentGross != null) {
+			setPpPaymentGross(ppPaymentGross);
+		}
+
+		String ppReceiverEmail = (String)attributes.get("ppReceiverEmail");
+
+		if (ppReceiverEmail != null) {
+			setPpReceiverEmail(ppReceiverEmail);
+		}
+
+		String ppPayerEmail = (String)attributes.get("ppPayerEmail");
+
+		if (ppPayerEmail != null) {
+			setPpPayerEmail(ppPayerEmail);
+		}
+
+		Boolean sendOrderEmail = (Boolean)attributes.get("sendOrderEmail");
+
+		if (sendOrderEmail != null) {
+			setSendOrderEmail(sendOrderEmail);
+		}
+
+		Boolean sendShippingEmail = (Boolean)attributes.get("sendShippingEmail");
+
+		if (sendShippingEmail != null) {
+			setSendShippingEmail(sendShippingEmail);
+		}
+	}
+
 	@JSON
 	public long getOrderId() {
 		return _orderId;
@@ -256,7 +635,19 @@ public class ShoppingOrderModelImpl extends BaseModelImpl<ShoppingOrder>
 	}
 
 	public void setGroupId(long groupId) {
+		_columnBitmask |= GROUPID_COLUMN_BITMASK;
+
+		if (!_setOriginalGroupId) {
+			_setOriginalGroupId = true;
+
+			_originalGroupId = _groupId;
+		}
+
 		_groupId = groupId;
+	}
+
+	public long getOriginalGroupId() {
+		return _originalGroupId;
 	}
 
 	@JSON
@@ -274,6 +665,14 @@ public class ShoppingOrderModelImpl extends BaseModelImpl<ShoppingOrder>
 	}
 
 	public void setUserId(long userId) {
+		_columnBitmask |= USERID_COLUMN_BITMASK;
+
+		if (!_setOriginalUserId) {
+			_setOriginalUserId = true;
+
+			_originalUserId = _userId;
+		}
+
 		_userId = userId;
 	}
 
@@ -283,6 +682,10 @@ public class ShoppingOrderModelImpl extends BaseModelImpl<ShoppingOrder>
 
 	public void setUserUuid(String userUuid) {
 		_userUuid = userUuid;
+	}
+
+	public long getOriginalUserId() {
+		return _originalUserId;
 	}
 
 	@JSON
@@ -305,6 +708,8 @@ public class ShoppingOrderModelImpl extends BaseModelImpl<ShoppingOrder>
 	}
 
 	public void setCreateDate(Date createDate) {
+		_columnBitmask = -1L;
+
 		_createDate = createDate;
 	}
 
@@ -328,6 +733,8 @@ public class ShoppingOrderModelImpl extends BaseModelImpl<ShoppingOrder>
 	}
 
 	public void setNumber(String number) {
+		_columnBitmask |= NUMBER_COLUMN_BITMASK;
+
 		if (_originalNumber == null) {
 			_originalNumber = _number;
 		}
@@ -821,6 +1228,8 @@ public class ShoppingOrderModelImpl extends BaseModelImpl<ShoppingOrder>
 	}
 
 	public void setPpTxnId(String ppTxnId) {
+		_columnBitmask |= PPTXNID_COLUMN_BITMASK;
+
 		if (_originalPpTxnId == null) {
 			_originalPpTxnId = _ppTxnId;
 		}
@@ -843,7 +1252,17 @@ public class ShoppingOrderModelImpl extends BaseModelImpl<ShoppingOrder>
 	}
 
 	public void setPpPaymentStatus(String ppPaymentStatus) {
+		_columnBitmask |= PPPAYMENTSTATUS_COLUMN_BITMASK;
+
+		if (_originalPpPaymentStatus == null) {
+			_originalPpPaymentStatus = _ppPaymentStatus;
+		}
+
 		_ppPaymentStatus = ppPaymentStatus;
+	}
+
+	public String getOriginalPpPaymentStatus() {
+		return GetterUtil.getString(_originalPpPaymentStatus);
 	}
 
 	@JSON
@@ -909,35 +1328,32 @@ public class ShoppingOrderModelImpl extends BaseModelImpl<ShoppingOrder>
 		_sendShippingEmail = sendShippingEmail;
 	}
 
+	public long getColumnBitmask() {
+		return _columnBitmask;
+	}
+
 	@Override
 	public ShoppingOrder toEscapedModel() {
-		if (isEscapedModel()) {
-			return (ShoppingOrder)this;
+		if (_escapedModelProxy == null) {
+			_escapedModelProxy = (ShoppingOrder)ProxyUtil.newProxyInstance(_classLoader,
+					_escapedModelProxyInterfaces,
+					new AutoEscapeBeanHandler(this));
 		}
-		else {
-			if (_escapedModelProxy == null) {
-				_escapedModelProxy = (ShoppingOrder)Proxy.newProxyInstance(_classLoader,
-						_escapedModelProxyInterfaces,
-						new AutoEscapeBeanHandler(this));
-			}
 
-			return _escapedModelProxy;
-		}
+		return _escapedModelProxy;
 	}
 
 	@Override
 	public ExpandoBridge getExpandoBridge() {
-		if (_expandoBridge == null) {
-			_expandoBridge = ExpandoBridgeFactoryUtil.getExpandoBridge(getCompanyId(),
-					ShoppingOrder.class.getName(), getPrimaryKey());
-		}
-
-		return _expandoBridge;
+		return ExpandoBridgeFactoryUtil.getExpandoBridge(getCompanyId(),
+			ShoppingOrder.class.getName(), getPrimaryKey());
 	}
 
 	@Override
 	public void setExpandoBridgeAttributes(ServiceContext serviceContext) {
-		getExpandoBridge().setAttributes(serviceContext);
+		ExpandoBridge expandoBridge = getExpandoBridge();
+
+		expandoBridge.setAttributes(serviceContext);
 	}
 
 	@Override
@@ -1050,9 +1466,21 @@ public class ShoppingOrderModelImpl extends BaseModelImpl<ShoppingOrder>
 	public void resetOriginalValues() {
 		ShoppingOrderModelImpl shoppingOrderModelImpl = this;
 
+		shoppingOrderModelImpl._originalGroupId = shoppingOrderModelImpl._groupId;
+
+		shoppingOrderModelImpl._setOriginalGroupId = false;
+
+		shoppingOrderModelImpl._originalUserId = shoppingOrderModelImpl._userId;
+
+		shoppingOrderModelImpl._setOriginalUserId = false;
+
 		shoppingOrderModelImpl._originalNumber = shoppingOrderModelImpl._number;
 
 		shoppingOrderModelImpl._originalPpTxnId = shoppingOrderModelImpl._ppTxnId;
+
+		shoppingOrderModelImpl._originalPpPaymentStatus = shoppingOrderModelImpl._ppPaymentStatus;
+
+		shoppingOrderModelImpl._columnBitmask = 0;
 	}
 
 	@Override
@@ -1712,9 +2140,13 @@ public class ShoppingOrderModelImpl extends BaseModelImpl<ShoppingOrder>
 		};
 	private long _orderId;
 	private long _groupId;
+	private long _originalGroupId;
+	private boolean _setOriginalGroupId;
 	private long _companyId;
 	private long _userId;
 	private String _userUuid;
+	private long _originalUserId;
+	private boolean _setOriginalUserId;
 	private String _userName;
 	private Date _createDate;
 	private Date _modifiedDate;
@@ -1759,11 +2191,12 @@ public class ShoppingOrderModelImpl extends BaseModelImpl<ShoppingOrder>
 	private String _ppTxnId;
 	private String _originalPpTxnId;
 	private String _ppPaymentStatus;
+	private String _originalPpPaymentStatus;
 	private double _ppPaymentGross;
 	private String _ppReceiverEmail;
 	private String _ppPayerEmail;
 	private boolean _sendOrderEmail;
 	private boolean _sendShippingEmail;
-	private transient ExpandoBridge _expandoBridge;
+	private long _columnBitmask;
 	private ShoppingOrder _escapedModelProxy;
 }

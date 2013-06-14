@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -18,6 +18,7 @@ import com.liferay.portal.kernel.bean.AutoEscapeBeanHandler;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.json.JSON;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.ProxyUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.model.CacheModel;
@@ -33,13 +34,13 @@ import com.liferay.portlet.expando.util.ExpandoBridgeFactoryUtil;
 
 import java.io.Serializable;
 
-import java.lang.reflect.Proxy;
-
 import java.sql.Types;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * The base model implementation for the DDLRecord service. Represents a row in the &quot;DDLRecord&quot; database table, with each column mapped to a property of this class.
@@ -90,6 +91,14 @@ public class DDLRecordModelImpl extends BaseModelImpl<DDLRecord>
 	public static final boolean FINDER_CACHE_ENABLED = GetterUtil.getBoolean(com.liferay.portal.util.PropsUtil.get(
 				"value.object.finder.cache.enabled.com.liferay.portlet.dynamicdatalists.model.DDLRecord"),
 			true);
+	public static final boolean COLUMN_BITMASK_ENABLED = GetterUtil.getBoolean(com.liferay.portal.util.PropsUtil.get(
+				"value.object.column.bitmask.enabled.com.liferay.portlet.dynamicdatalists.model.DDLRecord"),
+			true);
+	public static long COMPANYID_COLUMN_BITMASK = 1L;
+	public static long GROUPID_COLUMN_BITMASK = 2L;
+	public static long RECORDSETID_COLUMN_BITMASK = 4L;
+	public static long USERID_COLUMN_BITMASK = 8L;
+	public static long UUID_COLUMN_BITMASK = 16L;
 
 	/**
 	 * Converts the soap model instance into a normal model instance.
@@ -134,14 +143,6 @@ public class DDLRecordModelImpl extends BaseModelImpl<DDLRecord>
 		return models;
 	}
 
-	public Class<?> getModelClass() {
-		return DDLRecord.class;
-	}
-
-	public String getModelClassName() {
-		return DDLRecord.class.getName();
-	}
-
 	public static final long LOCK_EXPIRATION_TIME = GetterUtil.getLong(com.liferay.portal.util.PropsUtil.get(
 				"lock.expiration.time.com.liferay.portlet.dynamicdatalists.model.DDLRecord"));
 
@@ -162,6 +163,123 @@ public class DDLRecordModelImpl extends BaseModelImpl<DDLRecord>
 
 	public void setPrimaryKeyObj(Serializable primaryKeyObj) {
 		setPrimaryKey(((Long)primaryKeyObj).longValue());
+	}
+
+	public Class<?> getModelClass() {
+		return DDLRecord.class;
+	}
+
+	public String getModelClassName() {
+		return DDLRecord.class.getName();
+	}
+
+	@Override
+	public Map<String, Object> getModelAttributes() {
+		Map<String, Object> attributes = new HashMap<String, Object>();
+
+		attributes.put("uuid", getUuid());
+		attributes.put("recordId", getRecordId());
+		attributes.put("groupId", getGroupId());
+		attributes.put("companyId", getCompanyId());
+		attributes.put("userId", getUserId());
+		attributes.put("userName", getUserName());
+		attributes.put("versionUserId", getVersionUserId());
+		attributes.put("versionUserName", getVersionUserName());
+		attributes.put("createDate", getCreateDate());
+		attributes.put("modifiedDate", getModifiedDate());
+		attributes.put("DDMStorageId", getDDMStorageId());
+		attributes.put("recordSetId", getRecordSetId());
+		attributes.put("version", getVersion());
+		attributes.put("displayIndex", getDisplayIndex());
+
+		return attributes;
+	}
+
+	@Override
+	public void setModelAttributes(Map<String, Object> attributes) {
+		String uuid = (String)attributes.get("uuid");
+
+		if (uuid != null) {
+			setUuid(uuid);
+		}
+
+		Long recordId = (Long)attributes.get("recordId");
+
+		if (recordId != null) {
+			setRecordId(recordId);
+		}
+
+		Long groupId = (Long)attributes.get("groupId");
+
+		if (groupId != null) {
+			setGroupId(groupId);
+		}
+
+		Long companyId = (Long)attributes.get("companyId");
+
+		if (companyId != null) {
+			setCompanyId(companyId);
+		}
+
+		Long userId = (Long)attributes.get("userId");
+
+		if (userId != null) {
+			setUserId(userId);
+		}
+
+		String userName = (String)attributes.get("userName");
+
+		if (userName != null) {
+			setUserName(userName);
+		}
+
+		Long versionUserId = (Long)attributes.get("versionUserId");
+
+		if (versionUserId != null) {
+			setVersionUserId(versionUserId);
+		}
+
+		String versionUserName = (String)attributes.get("versionUserName");
+
+		if (versionUserName != null) {
+			setVersionUserName(versionUserName);
+		}
+
+		Date createDate = (Date)attributes.get("createDate");
+
+		if (createDate != null) {
+			setCreateDate(createDate);
+		}
+
+		Date modifiedDate = (Date)attributes.get("modifiedDate");
+
+		if (modifiedDate != null) {
+			setModifiedDate(modifiedDate);
+		}
+
+		Long DDMStorageId = (Long)attributes.get("DDMStorageId");
+
+		if (DDMStorageId != null) {
+			setDDMStorageId(DDMStorageId);
+		}
+
+		Long recordSetId = (Long)attributes.get("recordSetId");
+
+		if (recordSetId != null) {
+			setRecordSetId(recordSetId);
+		}
+
+		String version = (String)attributes.get("version");
+
+		if (version != null) {
+			setVersion(version);
+		}
+
+		Integer displayIndex = (Integer)attributes.get("displayIndex");
+
+		if (displayIndex != null) {
+			setDisplayIndex(displayIndex);
+		}
 	}
 
 	@JSON
@@ -201,6 +319,8 @@ public class DDLRecordModelImpl extends BaseModelImpl<DDLRecord>
 	}
 
 	public void setGroupId(long groupId) {
+		_columnBitmask |= GROUPID_COLUMN_BITMASK;
+
 		if (!_setOriginalGroupId) {
 			_setOriginalGroupId = true;
 
@@ -220,7 +340,19 @@ public class DDLRecordModelImpl extends BaseModelImpl<DDLRecord>
 	}
 
 	public void setCompanyId(long companyId) {
+		_columnBitmask |= COMPANYID_COLUMN_BITMASK;
+
+		if (!_setOriginalCompanyId) {
+			_setOriginalCompanyId = true;
+
+			_originalCompanyId = _companyId;
+		}
+
 		_companyId = companyId;
+	}
+
+	public long getOriginalCompanyId() {
+		return _originalCompanyId;
 	}
 
 	@JSON
@@ -229,6 +361,14 @@ public class DDLRecordModelImpl extends BaseModelImpl<DDLRecord>
 	}
 
 	public void setUserId(long userId) {
+		_columnBitmask |= USERID_COLUMN_BITMASK;
+
+		if (!_setOriginalUserId) {
+			_setOriginalUserId = true;
+
+			_originalUserId = _userId;
+		}
+
 		_userId = userId;
 	}
 
@@ -238,6 +378,10 @@ public class DDLRecordModelImpl extends BaseModelImpl<DDLRecord>
 
 	public void setUserUuid(String userUuid) {
 		_userUuid = userUuid;
+	}
+
+	public long getOriginalUserId() {
+		return _originalUserId;
 	}
 
 	@JSON
@@ -319,7 +463,19 @@ public class DDLRecordModelImpl extends BaseModelImpl<DDLRecord>
 	}
 
 	public void setRecordSetId(long recordSetId) {
+		_columnBitmask |= RECORDSETID_COLUMN_BITMASK;
+
+		if (!_setOriginalRecordSetId) {
+			_setOriginalRecordSetId = true;
+
+			_originalRecordSetId = _recordSetId;
+		}
+
 		_recordSetId = recordSetId;
+	}
+
+	public long getOriginalRecordSetId() {
+		return _originalRecordSetId;
 	}
 
 	@JSON
@@ -345,35 +501,32 @@ public class DDLRecordModelImpl extends BaseModelImpl<DDLRecord>
 		_displayIndex = displayIndex;
 	}
 
+	public long getColumnBitmask() {
+		return _columnBitmask;
+	}
+
 	@Override
 	public DDLRecord toEscapedModel() {
-		if (isEscapedModel()) {
-			return (DDLRecord)this;
+		if (_escapedModelProxy == null) {
+			_escapedModelProxy = (DDLRecord)ProxyUtil.newProxyInstance(_classLoader,
+					_escapedModelProxyInterfaces,
+					new AutoEscapeBeanHandler(this));
 		}
-		else {
-			if (_escapedModelProxy == null) {
-				_escapedModelProxy = (DDLRecord)Proxy.newProxyInstance(_classLoader,
-						_escapedModelProxyInterfaces,
-						new AutoEscapeBeanHandler(this));
-			}
 
-			return _escapedModelProxy;
-		}
+		return _escapedModelProxy;
 	}
 
 	@Override
 	public ExpandoBridge getExpandoBridge() {
-		if (_expandoBridge == null) {
-			_expandoBridge = ExpandoBridgeFactoryUtil.getExpandoBridge(getCompanyId(),
-					DDLRecord.class.getName(), getPrimaryKey());
-		}
-
-		return _expandoBridge;
+		return ExpandoBridgeFactoryUtil.getExpandoBridge(getCompanyId(),
+			DDLRecord.class.getName(), getPrimaryKey());
 	}
 
 	@Override
 	public void setExpandoBridgeAttributes(ServiceContext serviceContext) {
-		getExpandoBridge().setAttributes(serviceContext);
+		ExpandoBridge expandoBridge = getExpandoBridge();
+
+		expandoBridge.setAttributes(serviceContext);
 	}
 
 	@Override
@@ -453,6 +606,20 @@ public class DDLRecordModelImpl extends BaseModelImpl<DDLRecord>
 		ddlRecordModelImpl._originalGroupId = ddlRecordModelImpl._groupId;
 
 		ddlRecordModelImpl._setOriginalGroupId = false;
+
+		ddlRecordModelImpl._originalCompanyId = ddlRecordModelImpl._companyId;
+
+		ddlRecordModelImpl._setOriginalCompanyId = false;
+
+		ddlRecordModelImpl._originalUserId = ddlRecordModelImpl._userId;
+
+		ddlRecordModelImpl._setOriginalUserId = false;
+
+		ddlRecordModelImpl._originalRecordSetId = ddlRecordModelImpl._recordSetId;
+
+		ddlRecordModelImpl._setOriginalRecordSetId = false;
+
+		ddlRecordModelImpl._columnBitmask = 0;
 	}
 
 	@Override
@@ -645,8 +812,12 @@ public class DDLRecordModelImpl extends BaseModelImpl<DDLRecord>
 	private long _originalGroupId;
 	private boolean _setOriginalGroupId;
 	private long _companyId;
+	private long _originalCompanyId;
+	private boolean _setOriginalCompanyId;
 	private long _userId;
 	private String _userUuid;
+	private long _originalUserId;
+	private boolean _setOriginalUserId;
 	private String _userName;
 	private long _versionUserId;
 	private String _versionUserUuid;
@@ -655,8 +826,10 @@ public class DDLRecordModelImpl extends BaseModelImpl<DDLRecord>
 	private Date _modifiedDate;
 	private long _DDMStorageId;
 	private long _recordSetId;
+	private long _originalRecordSetId;
+	private boolean _setOriginalRecordSetId;
 	private String _version;
 	private int _displayIndex;
-	private transient ExpandoBridge _expandoBridge;
+	private long _columnBitmask;
 	private DDLRecord _escapedModelProxy;
 }

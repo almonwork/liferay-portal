@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -21,11 +21,15 @@ import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.util.PropsKeys;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.UnicodeProperties;
+import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.model.ColorScheme;
 import com.liferay.portal.model.Group;
+import com.liferay.portal.model.LayoutSet;
+import com.liferay.portal.model.LayoutSetPrototype;
 import com.liferay.portal.model.Theme;
 import com.liferay.portal.model.VirtualHost;
 import com.liferay.portal.service.GroupLocalServiceUtil;
+import com.liferay.portal.service.LayoutSetPrototypeLocalServiceUtil;
 import com.liferay.portal.service.ThemeLocalServiceUtil;
 import com.liferay.portal.service.VirtualHostLocalServiceUtil;
 import com.liferay.portal.util.PrefsPropsUtil;
@@ -41,11 +45,6 @@ public class LayoutSetImpl extends LayoutSetBaseImpl {
 	public LayoutSetImpl() {
 	}
 
-	public Theme getTheme() throws SystemException {
-		return ThemeLocalServiceUtil.getTheme(
-			getCompanyId(), getThemeId(), false);
-	}
-
 	public ColorScheme getColorScheme() throws SystemException {
 		return ThemeLocalServiceUtil.getColorScheme(
 			getCompanyId(), getTheme().getThemeId(), getColorSchemeId(), false);
@@ -53,6 +52,53 @@ public class LayoutSetImpl extends LayoutSetBaseImpl {
 
 	public Group getGroup() throws PortalException, SystemException {
 		return GroupLocalServiceUtil.getGroup(getGroupId());
+	}
+
+	public long getLayoutSetPrototypeId()
+		throws PortalException, SystemException {
+
+		String layoutSetPrototypeUuid = getLayoutSetPrototypeUuid();
+
+		if (Validator.isNull(layoutSetPrototypeUuid)) {
+			return 0;
+		}
+
+		LayoutSetPrototype layoutSetPrototype =
+			LayoutSetPrototypeLocalServiceUtil.
+				getLayoutSetPrototypeByUuidAndCompanyId(
+					layoutSetPrototypeUuid, getCompanyId());
+
+		return layoutSetPrototype.getLayoutSetPrototypeId();
+	}
+
+	public long getLiveLogoId() {
+		long logoId = 0;
+
+		Group group = null;
+
+		try {
+			group = getGroup();
+
+			if (!group.isStagingGroup()) {
+				return logoId;
+			}
+		}
+		catch (Exception e) {
+			return logoId;
+		}
+
+		Group liveGroup = group.getLiveGroup();
+
+		LayoutSet liveLayoutSet = null;
+
+		if (isPrivateLayout()) {
+			liveLayoutSet = liveGroup.getPrivateLayoutSet();
+		}
+		else {
+			liveLayoutSet = liveGroup.getPublicLayoutSet();
+		}
+
+		return liveLayoutSet.getLogoId();
 	}
 
 	@Override
@@ -86,6 +132,11 @@ public class LayoutSetImpl extends LayoutSetBaseImpl {
 		return settingsProperties.getProperty(key);
 	}
 
+	public Theme getTheme() throws SystemException {
+		return ThemeLocalServiceUtil.getTheme(
+			getCompanyId(), getThemeId(), false);
+	}
+
 	public String getThemeSetting(String key, String device)
 		throws SystemException {
 
@@ -98,32 +149,7 @@ public class LayoutSetImpl extends LayoutSetBaseImpl {
 			return value;
 		}
 
-		Theme theme = null;
-
-		boolean controlPanel = false;
-
-		try {
-			Group group = getGroup();
-
-			controlPanel = group.isControlPanel();
-		}
-		catch (Exception e) {
-		}
-
-		if (controlPanel) {
-			String themeId = PrefsPropsUtil.getString(
-				getCompanyId(),
-				PropsKeys.CONTROL_PANEL_LAYOUT_REGULAR_THEME_ID);
-
-			theme = ThemeLocalServiceUtil.getTheme(
-				getCompanyId(), themeId, !device.equals("regular"));
-		}
-		else if (device.equals("regular")) {
-			theme = getTheme();
-		}
-		else {
-			theme = getWapTheme();
-		}
+		Theme theme = getTheme(device);
 
 		value = theme.getSetting(key);
 
@@ -148,15 +174,25 @@ public class LayoutSetImpl extends LayoutSetBaseImpl {
 		}
 	}
 
+	public ColorScheme getWapColorScheme() throws SystemException {
+		return ThemeLocalServiceUtil.getColorScheme(
+			getCompanyId(), getWapTheme().getThemeId(), getWapColorSchemeId(),
+			true);
+	}
+
 	public Theme getWapTheme() throws SystemException {
 		return ThemeLocalServiceUtil.getTheme(
 			getCompanyId(), getWapThemeId(), true);
 	}
 
-	public ColorScheme getWapColorScheme() throws SystemException {
-		return ThemeLocalServiceUtil.getColorScheme(
-			getCompanyId(), getWapTheme().getThemeId(), getWapColorSchemeId(),
-			true);
+	public boolean isLayoutSetPrototypeLinkActive() {
+		if (isLayoutSetPrototypeLinkEnabled() &&
+			Validator.isNotNull(getLayoutSetPrototypeUuid())) {
+
+			return true;
+		}
+
+		return false;
 	}
 
 	@Override
@@ -170,6 +206,33 @@ public class LayoutSetImpl extends LayoutSetBaseImpl {
 		_settingsProperties = settingsProperties;
 
 		super.setSettings(_settingsProperties.toString());
+	}
+
+	protected Theme getTheme(String device) throws SystemException {
+		boolean controlPanel = false;
+
+		try {
+			Group group = getGroup();
+
+			controlPanel = group.isControlPanel();
+		}
+		catch (Exception e) {
+		}
+
+		if (controlPanel) {
+			String themeId = PrefsPropsUtil.getString(
+				getCompanyId(),
+				PropsKeys.CONTROL_PANEL_LAYOUT_REGULAR_THEME_ID);
+
+			return ThemeLocalServiceUtil.getTheme(
+				getCompanyId(), themeId, !device.equals("regular"));
+		}
+		else if (device.equals("regular")) {
+			return getTheme();
+		}
+		else {
+			return getWapTheme();
+		}
 	}
 
 	private static Log _log = LogFactoryUtil.getLog(LayoutSetImpl.class);

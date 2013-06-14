@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -63,8 +63,9 @@ PortletURL portletURL = renderResponse.createRenderURL();
 
 						LayoutLister layoutLister = new LayoutLister();
 
-						String rootNodeName = layout.getGroup().getName();
-						LayoutView layoutView = layoutLister.getLayoutView(layout.getGroup().getGroupId(), layout.isPrivateLayout(), rootNodeName, locale);
+						Group group = layout.getGroup();
+
+						LayoutView layoutView = layoutLister.getLayoutView(layout.getGroup().getGroupId(), layout.isPrivateLayout(), group.getName(), locale);
 
 						List layoutList = layoutView.getList();
 
@@ -217,7 +218,9 @@ PortletURL portletURL = renderResponse.createRenderURL();
 											value = "0";
 										}
 									%>
+
 										<aui:option label="<%= value %>" />
+
 									<%
 									}
 								%>

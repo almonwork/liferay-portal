@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -41,25 +41,20 @@ public class WorkflowHandlerRegistryImpl implements WorkflowHandlerRegistry {
 	}
 
 	public void register(WorkflowHandler workflowHandler) {
-		synchronized (this) {
-			_workflowHandlerMap.put(
-				workflowHandler.getClassName(), workflowHandler);
+		_workflowHandlerMap.put(
+			workflowHandler.getClassName(), workflowHandler);
 
-			if (workflowHandler.isScopeable()) {
-				_scopeableWorkflowHandlerMap.put(
-					workflowHandler.getClassName(), workflowHandler);
-			}
+		if (workflowHandler.isScopeable()) {
+			_scopeableWorkflowHandlerMap.put(
+				workflowHandler.getClassName(), workflowHandler);
 		}
 	}
 
 	public void unregister(WorkflowHandler workflowHandler) {
-		synchronized (this) {
-			_workflowHandlerMap.remove(workflowHandler.getClassName());
+		_workflowHandlerMap.remove(workflowHandler.getClassName());
 
-			if (workflowHandler.isScopeable()) {
-				_scopeableWorkflowHandlerMap.remove(
-					workflowHandler.getClassName());
-			}
+		if (workflowHandler.isScopeable()) {
+			_scopeableWorkflowHandlerMap.remove(workflowHandler.getClassName());
 		}
 	}
 

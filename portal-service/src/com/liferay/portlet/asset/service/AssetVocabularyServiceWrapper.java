@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,6 +14,8 @@
 
 package com.liferay.portlet.asset.service;
 
+import com.liferay.portal.service.ServiceWrapper;
+
 /**
  * <p>
  * This class is a wrapper for {@link AssetVocabularyService}.
@@ -23,10 +25,29 @@ package com.liferay.portlet.asset.service;
  * @see       AssetVocabularyService
  * @generated
  */
-public class AssetVocabularyServiceWrapper implements AssetVocabularyService {
+public class AssetVocabularyServiceWrapper implements AssetVocabularyService,
+	ServiceWrapper<AssetVocabularyService> {
 	public AssetVocabularyServiceWrapper(
 		AssetVocabularyService assetVocabularyService) {
 		_assetVocabularyService = assetVocabularyService;
+	}
+
+	/**
+	* Returns the Spring bean ID for this bean.
+	*
+	* @return the Spring bean ID for this bean
+	*/
+	public java.lang.String getBeanIdentifier() {
+		return _assetVocabularyService.getBeanIdentifier();
+	}
+
+	/**
+	* Sets the Spring bean ID for this bean.
+	*
+	* @param beanIdentifier the Spring bean ID for this bean
+	*/
+	public void setBeanIdentifier(java.lang.String beanIdentifier) {
+		_assetVocabularyService.setBeanIdentifier(beanIdentifier);
 	}
 
 	/**
@@ -53,6 +74,12 @@ public class AssetVocabularyServiceWrapper implements AssetVocabularyService {
 			com.liferay.portal.kernel.exception.SystemException {
 		return _assetVocabularyService.addVocabulary(title, titleMap,
 			descriptionMap, settings, serviceContext);
+	}
+
+	public void deleteVocabularies(long[] vocabularyIds)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException {
+		_assetVocabularyService.deleteVocabularies(vocabularyIds);
 	}
 
 	public void deleteVocabulary(long vocabularyId)
@@ -87,6 +114,41 @@ public class AssetVocabularyServiceWrapper implements AssetVocabularyService {
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException {
 		return _assetVocabularyService.getGroupVocabularies(groupId);
+	}
+
+	public java.util.List<com.liferay.portlet.asset.model.AssetVocabulary> getGroupVocabularies(
+		long groupId, int start, int end,
+		com.liferay.portal.kernel.util.OrderByComparator obc)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return _assetVocabularyService.getGroupVocabularies(groupId, start,
+			end, obc);
+	}
+
+	public java.util.List<com.liferay.portlet.asset.model.AssetVocabulary> getGroupVocabularies(
+		long groupId, java.lang.String name, int start, int end,
+		com.liferay.portal.kernel.util.OrderByComparator obc)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return _assetVocabularyService.getGroupVocabularies(groupId, name,
+			start, end, obc);
+	}
+
+	public int getGroupVocabulariesCount(long groupId)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return _assetVocabularyService.getGroupVocabulariesCount(groupId);
+	}
+
+	public int getGroupVocabulariesCount(long groupId, java.lang.String name)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return _assetVocabularyService.getGroupVocabulariesCount(groupId, name);
+	}
+
+	public com.liferay.portal.kernel.json.JSONObject getJSONGroupVocabularies(
+		long groupId, java.lang.String name, int start, int end,
+		com.liferay.portal.kernel.util.OrderByComparator obc)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException {
+		return _assetVocabularyService.getJSONGroupVocabularies(groupId, name,
+			start, end, obc);
 	}
 
 	public java.util.List<com.liferay.portlet.asset.model.AssetVocabulary> getVocabularies(
@@ -130,12 +192,26 @@ public class AssetVocabularyServiceWrapper implements AssetVocabularyService {
 			titleMap, descriptionMap, settings, serviceContext);
 	}
 
+	/**
+	 * @deprecated Renamed to {@link #getWrappedService}
+	 */
 	public AssetVocabularyService getWrappedAssetVocabularyService() {
 		return _assetVocabularyService;
 	}
 
+	/**
+	 * @deprecated Renamed to {@link #setWrappedService}
+	 */
 	public void setWrappedAssetVocabularyService(
 		AssetVocabularyService assetVocabularyService) {
+		_assetVocabularyService = assetVocabularyService;
+	}
+
+	public AssetVocabularyService getWrappedService() {
+		return _assetVocabularyService;
+	}
+
+	public void setWrappedService(AssetVocabularyService assetVocabularyService) {
 		_assetVocabularyService = assetVocabularyService;
 	}
 

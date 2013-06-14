@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,7 +14,6 @@
 
 package com.liferay.portlet.messageboards.service.persistence;
 
-import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.service.persistence.BasePersistence;
 
 import com.liferay.portlet.messageboards.model.MBBan;
@@ -528,9 +527,11 @@ public interface MBBanPersistence extends BasePersistence<MBBan> {
 	*
 	* @param groupId the group ID
 	* @param banUserId the ban user ID
+	* @return the message boards ban that was removed
 	* @throws SystemException if a system exception occurred
 	*/
-	public void removeByG_B(long groupId, long banUserId)
+	public com.liferay.portlet.messageboards.model.MBBan removeByG_B(
+		long groupId, long banUserId)
 		throws com.liferay.portal.kernel.exception.SystemException,
 			com.liferay.portlet.messageboards.NoSuchBanException;
 
@@ -591,6 +592,4 @@ public interface MBBanPersistence extends BasePersistence<MBBan> {
 	*/
 	public int countAll()
 		throws com.liferay.portal.kernel.exception.SystemException;
-
-	public MBBan remove(MBBan mbBan) throws SystemException;
 }

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -104,51 +104,20 @@ public class PortalClassInvoker {
 	/**
 	 * @deprecated
 	 */
-	public static Object invoke(String className, String methodName, Object arg)
-		throws Exception {
-
-		return invoke(className, methodName, new Object[] {arg});
-	}
-
-	/**
-	 * @deprecated
-	 */
-	public static Object invoke(
-			String className, String methodName, Object arg1, Object arg2)
-		throws Exception {
-
-		return invoke(className, methodName, new Object[] {arg1, arg2});
-	}
-
-	/**
-	 * @deprecated
-	 */
-	public static Object invoke(
-			String className, String methodName, Object arg1, Object arg2,
-			Object arg3)
-		throws Exception {
-
-		return invoke(className, methodName, new Object[] {arg1, arg2, arg3});
-	}
-
-	/**
-	 * @deprecated
-	 */
-	public static Object invoke(
-			String className, String methodName, Object[] args)
-		throws Exception {
-
-		return invoke(className, methodName, args, true);
-	}
-
-	/**
-	 * @deprecated
-	 */
 	public static Object invoke(
 		String className, String methodName, boolean newInstance)
 		throws Exception {
 
 		return invoke(className, methodName, new Object[] {}, newInstance);
+	}
+
+	/**
+	 * @deprecated
+	 */
+	public static Object invoke(String className, String methodName, Object arg)
+		throws Exception {
+
+		return invoke(className, methodName, new Object[] {arg});
 	}
 
 	/**
@@ -166,12 +135,33 @@ public class PortalClassInvoker {
 	 * @deprecated
 	 */
 	public static Object invoke(
+			String className, String methodName, Object arg1, Object arg2)
+		throws Exception {
+
+		return invoke(className, methodName, new Object[] {arg1, arg2});
+	}
+
+	/**
+	 * @deprecated
+	 */
+	public static Object invoke(
 			String className, String methodName, Object arg1, Object arg2,
 			boolean newInstance)
 		throws Exception {
 
 		return invoke(
 			className, methodName, new Object[] {arg1, arg2}, newInstance);
+	}
+
+	/**
+	 * @deprecated
+	 */
+	public static Object invoke(
+			String className, String methodName, Object arg1, Object arg2,
+			Object arg3)
+		throws Exception {
+
+		return invoke(className, methodName, new Object[] {arg1, arg2, arg3});
 	}
 
 	/**
@@ -211,6 +201,16 @@ public class PortalClassInvoker {
 		return invoke(
 			className, methodName, new Object[] {arg1, arg2, arg3, arg4, arg5},
 			newInstance);
+	}
+
+	/**
+	 * @deprecated
+	 */
+	public static Object invoke(
+			String className, String methodName, Object[] args)
+		throws Exception {
+
+		return invoke(className, methodName, args, true);
 	}
 
 	/**

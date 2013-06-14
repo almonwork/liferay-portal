@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -23,14 +23,15 @@ import com.liferay.portalweb.portal.util.RuntimeVariables;
 public class AssertImportLARTest extends BaseTestCase {
 	public void testAssertImportLAR() throws Exception {
 		selenium.open("/web/guest/home/");
+		loadRequiredJavaScriptModules();
 
 		for (int second = 0;; second++) {
-			if (second >= 60) {
+			if (second >= 90) {
 				fail("timeout");
 			}
 
 			try {
-				if (selenium.isElementPresent("link=Image Gallery Test Page")) {
+				if (selenium.isVisible("link=Image Gallery Test Page")) {
 					break;
 				}
 			}
@@ -40,21 +41,23 @@ public class AssertImportLARTest extends BaseTestCase {
 			Thread.sleep(1000);
 		}
 
-		selenium.saveScreenShotAndSource();
 		selenium.clickAt("link=Image Gallery Test Page",
-			RuntimeVariables.replace(""));
+			RuntimeVariables.replace("Image Gallery Test Page"));
 		selenium.waitForPageToLoad("30000");
-		selenium.saveScreenShotAndSource();
+		loadRequiredJavaScriptModules();
+		Thread.sleep(5000);
+		assertEquals(RuntimeVariables.replace("Options"),
+			selenium.getText("//strong/a"));
+		selenium.clickAt("//strong/a", RuntimeVariables.replace("Options"));
 
 		for (int second = 0;; second++) {
-			if (second >= 60) {
+			if (second >= 90) {
 				fail("timeout");
 			}
 
 			try {
-				if (RuntimeVariables.replace(
-							"Test Folder\nThis is a test folder!")
-										.equals(selenium.getText("//td[1]/a[1]"))) {
+				if (selenium.isVisible(
+							"//div[@class='lfr-component lfr-menu-list']/ul/li[2]/a")) {
 					break;
 				}
 			}
@@ -64,69 +67,28 @@ public class AssertImportLARTest extends BaseTestCase {
 			Thread.sleep(1000);
 		}
 
-		selenium.saveScreenShotAndSource();
-		assertEquals(RuntimeVariables.replace(
-				"Test Folder\nThis is a test folder!"),
-			selenium.getText("//td[1]/a[1]"));
-
-		for (int second = 0;; second++) {
-			if (second >= 60) {
-				fail("timeout");
-			}
-
-			try {
-				if (RuntimeVariables.replace(
-							"Test3 Folder3\nThis is a test3 folder3.")
-										.equals(selenium.getText(
-								"//tr[4]/td[1]/a[1]"))) {
-					break;
-				}
-			}
-			catch (Exception e) {
-			}
-
-			Thread.sleep(1000);
-		}
-
-		selenium.saveScreenShotAndSource();
-		assertEquals(RuntimeVariables.replace(
-				"Test3 Folder3\nThis is a test3 folder3."),
-			selenium.getText("//tr[4]/td[1]/a[1]"));
-		selenium.clickAt("//a/strong", RuntimeVariables.replace(""));
-		selenium.waitForPageToLoad("30000");
-		selenium.saveScreenShotAndSource();
-
-		for (int second = 0;; second++) {
-			if (second >= 60) {
-				fail("timeout");
-			}
-
-			try {
-				if (RuntimeVariables.replace(
-							"Test Subfolder\nThis is a test subfolder!")
-										.equals(selenium.getText("//td[1]/a"))) {
-					break;
-				}
-			}
-			catch (Exception e) {
-			}
-
-			Thread.sleep(1000);
-		}
-
-		selenium.saveScreenShotAndSource();
-		assertEquals(RuntimeVariables.replace(
-				"Test Subfolder\nThis is a test subfolder!"),
-			selenium.getText("//td[1]/a"));
+		assertEquals(RuntimeVariables.replace("Configuration"),
+			selenium.getText(
+				"//div[@class='lfr-component lfr-menu-list']/ul/li[2]/a"));
+		selenium.clickAt("//div[@class='lfr-component lfr-menu-list']/ul/li[2]/a",
+			RuntimeVariables.replace("Configuration"));
+		Thread.sleep(5000);
+		assertTrue(selenium.isChecked("//input[@id='_86_showActionsCheckbox']"));
+		assertTrue(selenium.isChecked(
+				"//input[@id='_86_showFolderMenuCheckbox']"));
+		assertTrue(selenium.isChecked("//input[@id='_86_showTabsCheckbox']"));
+		assertTrue(selenium.isChecked(
+				"//input[@id='_86_showFoldersSearchCheckbox']"));
 		selenium.open("/web/guest/home/");
+		loadRequiredJavaScriptModules();
 
 		for (int second = 0;; second++) {
-			if (second >= 60) {
+			if (second >= 90) {
 				fail("timeout");
 			}
 
 			try {
-				if (selenium.isElementPresent("link=Image Gallery Test Page")) {
+				if (selenium.isVisible("link=Image Gallery Test Page")) {
 					break;
 				}
 			}
@@ -136,25 +98,30 @@ public class AssertImportLARTest extends BaseTestCase {
 			Thread.sleep(1000);
 		}
 
-		selenium.saveScreenShotAndSource();
 		selenium.clickAt("link=Image Gallery Test Page",
-			RuntimeVariables.replace(""));
+			RuntimeVariables.replace("Image Gallery Test Page"));
 		selenium.waitForPageToLoad("30000");
-		selenium.saveScreenShotAndSource();
-		selenium.clickAt("//tr[4]/td[1]/a[1]/strong",
-			RuntimeVariables.replace(""));
+		loadRequiredJavaScriptModules();
+		assertEquals(RuntimeVariables.replace("MG Folder1 Name"),
+			selenium.getText("xPath=(//span[@class='image-title'])[1]"));
+		assertEquals(RuntimeVariables.replace("MG Folder2 Name"),
+			selenium.getText("xPath=(//span[@class='image-title'])[2]"));
+		selenium.clickAt("xPath=(//span[@class='image-title'])[1]",
+			RuntimeVariables.replace("MG Folder1 Name"));
 		selenium.waitForPageToLoad("30000");
-		selenium.saveScreenShotAndSource();
+		loadRequiredJavaScriptModules();
+		assertEquals(RuntimeVariables.replace("MG Folder1 Subfolder Name"),
+			selenium.getText("xPath=(//span[@class='image-title'])[1]"));
+		selenium.open("/web/guest/home/");
+		loadRequiredJavaScriptModules();
 
 		for (int second = 0;; second++) {
-			if (second >= 60) {
+			if (second >= 90) {
 				fail("timeout");
 			}
 
 			try {
-				if (RuntimeVariables.replace(
-							"Test3 Subfolder3\nThis is a test3 subfolder3.")
-										.equals(selenium.getText("//td[1]/a"))) {
+				if (selenium.isVisible("link=Image Gallery Test Page")) {
 					break;
 				}
 			}
@@ -164,33 +131,46 @@ public class AssertImportLARTest extends BaseTestCase {
 			Thread.sleep(1000);
 		}
 
-		selenium.saveScreenShotAndSource();
+		selenium.clickAt("link=Image Gallery Test Page",
+			RuntimeVariables.replace("Image Gallery Test Page"));
+		selenium.waitForPageToLoad("30000");
+		loadRequiredJavaScriptModules();
+		assertEquals(RuntimeVariables.replace("MG Folder2 Name"),
+			selenium.getText("xPath=(//span[@class='image-title'])[2]"));
+		selenium.clickAt("xPath=(//span[@class='image-title'])[2]",
+			RuntimeVariables.replace("MG Folder2 Name"));
+		selenium.waitForPageToLoad("30000");
+		loadRequiredJavaScriptModules();
+		assertEquals(RuntimeVariables.replace("MG Folder2 Subfolder Name"),
+			selenium.getText("xPath=(//span[@class='image-title'])[1]"));
+		selenium.clickAt("xPath=(//span[@class='image-title'])[1]",
+			RuntimeVariables.replace("MG Folder2 Subfolder Name"));
+		selenium.waitForPageToLoad("30000");
+		loadRequiredJavaScriptModules();
+		assertEquals(RuntimeVariables.replace("MG Folder2 Subfolder Name"),
+			selenium.getText("//div/h1/span"));
+
+		for (int second = 0;; second++) {
+			if (second >= 90) {
+				fail("timeout");
+			}
+
+			try {
+				if (selenium.isVisible(
+							"//img[@alt='MG Folder2 Subfolder Image Title - MG Folder2 Subfolder Image Description']")) {
+					break;
+				}
+			}
+			catch (Exception e) {
+			}
+
+			Thread.sleep(1000);
+		}
+
+		assertTrue(selenium.isVisible(
+				"//img[@alt='MG Folder2 Subfolder Image Title - MG Folder2 Subfolder Image Description']"));
 		assertEquals(RuntimeVariables.replace(
-				"Test3 Subfolder3\nThis is a test3 subfolder3."),
-			selenium.getText("//td[1]/a"));
-		selenium.clickAt("//a/strong", RuntimeVariables.replace(""));
-		selenium.waitForPageToLoad("30000");
-		selenium.saveScreenShotAndSource();
-
-		for (int second = 0;; second++) {
-			if (second >= 60) {
-				fail("timeout");
-			}
-
-			try {
-				if (selenium.isElementPresent(
-							"//img[@alt='Test Image - This is the Liferay logo!']")) {
-					break;
-				}
-			}
-			catch (Exception e) {
-			}
-
-			Thread.sleep(1000);
-		}
-
-		selenium.saveScreenShotAndSource();
-		assertTrue(selenium.isElementPresent(
-				"//img[@alt='Test Image - This is the Liferay logo!']"));
+				"MG Folder2 Subfolder Image Title"),
+			selenium.getText("//span[@class='image-title']"));
 	}
 }

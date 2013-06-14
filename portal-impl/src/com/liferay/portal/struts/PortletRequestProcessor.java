@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -42,6 +42,8 @@ import java.lang.reflect.Constructor;
 
 import javax.portlet.ActionRequest;
 import javax.portlet.ActionResponse;
+import javax.portlet.EventRequest;
+import javax.portlet.EventResponse;
 import javax.portlet.PortletContext;
 import javax.portlet.PortletException;
 import javax.portlet.PortletRequest;
@@ -84,17 +86,11 @@ public class PortletRequestProcessor extends TilesRequestProcessor {
 			Class<?> clazz = Class.forName(className);
 
 			Constructor<?> constructor = clazz.getConstructor(
-				new Class[] {
-					ActionServlet.class, ModuleConfig.class
-				}
-			);
+				ActionServlet.class, ModuleConfig.class);
 
 			PortletRequestProcessor portletReqProcessor =
 				(PortletRequestProcessor)constructor.newInstance(
-					new Object[] {
-						servlet, moduleConfig
-					}
-				);
+					servlet, moduleConfig);
 
 			return portletReqProcessor;
 		}
@@ -193,13 +189,13 @@ public class PortletRequestProcessor extends TilesRequestProcessor {
 			int pos = forward.indexOf(CharPool.QUESTION);
 
 			if (pos != -1) {
-				queryString = forward.substring(pos + 1, forward.length());
+				queryString = forward.substring(pos + 1);
 				forward = forward.substring(0, pos);
 			}
 
 			ActionForward actionForward = actionMapping.findForward(forward);
 
-			if ((actionForward != null) && (actionForward.getRedirect())) {
+			if ((actionForward != null) && actionForward.getRedirect()) {
 				String forwardPath = actionForward.getPath();
 
 				if (forwardPath.startsWith(StringPool.SLASH)) {
@@ -216,6 +212,17 @@ public class PortletRequestProcessor extends TilesRequestProcessor {
 				actionResponse.sendRedirect(forwardPath);
 			}
 		}
+	}
+
+	public void process(EventRequest eventRequest, EventResponse eventResponse)
+		throws IOException, ServletException {
+
+		HttpServletRequest request = PortalUtil.getHttpServletRequest(
+			eventRequest);
+		HttpServletResponse response = PortalUtil.getHttpServletResponse(
+			eventResponse);
+
+		process(request, response);
 	}
 
 	public void process(
@@ -240,6 +247,88 @@ public class PortletRequestProcessor extends TilesRequestProcessor {
 			resourceResponse);
 
 		process(request, response);
+	}
+
+	@Override
+	public ActionMapping processMapping(
+		HttpServletRequest request, HttpServletResponse response, String path) {
+
+		if (path == null) {
+			return null;
+		}
+
+		ActionMapping actionMapping = null;
+
+		long companyId = PortalUtil.getCompanyId(request);
+
+		PortletConfigImpl portletConfigImpl =
+			(PortletConfigImpl)request.getAttribute(
+				JavaConstants.JAVAX_PORTLET_CONFIG);
+
+		try {
+			Portlet portlet = PortletLocalServiceUtil.getPortletById(
+				companyId, portletConfigImpl.getPortletId());
+
+			if (StrutsActionRegistryUtil.getAction(path) != null) {
+				actionMapping = (ActionMapping)moduleConfig.findActionConfig(
+					path);
+
+				if (actionMapping == null) {
+					actionMapping = new ActionMapping();
+
+					actionMapping.setModuleConfig(moduleConfig);
+					actionMapping.setPath(path);
+
+					request.setAttribute(Globals.MAPPING_KEY, actionMapping);
+				}
+			}
+			else if (moduleConfig.findActionConfig(path) != null) {
+				actionMapping = super.processMapping(request, response, path);
+			}
+			else if (Validator.isNotNull(portlet.getParentStrutsPath())) {
+				int pos = path.indexOf(StringPool.SLASH, 1);
+
+				String parentPath =
+					StringPool.SLASH + portlet.getParentStrutsPath() +
+						path.substring(pos);
+
+				if (StrutsActionRegistryUtil.getAction(parentPath) != null) {
+					actionMapping =
+						(ActionMapping)moduleConfig.findActionConfig(path);
+
+					if (actionMapping == null) {
+						actionMapping = new ActionMapping();
+
+						actionMapping.setModuleConfig(moduleConfig);
+						actionMapping.setPath(parentPath);
+
+						request.setAttribute(
+							Globals.MAPPING_KEY, actionMapping);
+					}
+				}
+				else if (moduleConfig.findActionConfig(parentPath) != null) {
+					actionMapping = super.processMapping(
+						request, response, parentPath);
+				}
+			}
+		}
+		catch (Exception e) {
+		}
+
+		if (actionMapping == null) {
+			MessageResources messageResources = getInternal();
+
+			String msg = messageResources.getMessage("processInvalid");
+
+			_log.error("User ID " + request.getRemoteUser());
+			_log.error("Current URL " + PortalUtil.getCurrentURL(request));
+			_log.error("Referer " + request.getHeader("Referer"));
+			_log.error("Remote address " + request.getRemoteAddr());
+
+			_log.error(msg + " " + path);
+		}
+
+		return actionMapping;
 	}
 
 	@Override
@@ -301,7 +390,7 @@ public class PortletRequestProcessor extends TilesRequestProcessor {
 		throws IOException {
 
 		PortletActionAdapter portletActionAdapter =
-			(PortletActionAdapter)StrutsActionRegistry.getAction(
+			(PortletActionAdapter)StrutsActionRegistryUtil.getAction(
 				actionMapping.getPath());
 
 		if (portletActionAdapter != null) {
@@ -390,88 +479,6 @@ public class PortletRequestProcessor extends TilesRequestProcessor {
 	}
 
 	@Override
-	public ActionMapping processMapping(
-		HttpServletRequest request, HttpServletResponse response, String path) {
-
-		if (path == null) {
-			return null;
-		}
-
-		ActionMapping actionMapping = null;
-
-		long companyId = PortalUtil.getCompanyId(request);
-
-		PortletConfigImpl portletConfigImpl =
-			(PortletConfigImpl)request.getAttribute(
-				JavaConstants.JAVAX_PORTLET_CONFIG);
-
-		try {
-			Portlet portlet = PortletLocalServiceUtil.getPortletById(
-				companyId, portletConfigImpl.getPortletId());
-
-			if (StrutsActionRegistry.getAction(path) != null) {
-				actionMapping = (ActionMapping)moduleConfig.findActionConfig(
-					path);
-
-				if (actionMapping == null) {
-					actionMapping = new ActionMapping();
-
-					actionMapping.setModuleConfig(moduleConfig);
-					actionMapping.setPath(path);
-
-					request.setAttribute(Globals.MAPPING_KEY, actionMapping);
-				}
-			}
-			else if (moduleConfig.findActionConfig(path) != null) {
-				actionMapping = super.processMapping(request, response, path);
-			}
-			else if (Validator.isNotNull(portlet.getParentStrutsPath())) {
-				int pos = path.indexOf(StringPool.SLASH, 1);
-
-				String parentPath =
-					StringPool.SLASH + portlet.getParentStrutsPath() +
-						path.substring(pos, path.length());
-
-				if (StrutsActionRegistry.getAction(parentPath) != null) {
-					actionMapping =
-						(ActionMapping)moduleConfig.findActionConfig(path);
-
-					if (actionMapping == null) {
-						actionMapping = new ActionMapping();
-
-						actionMapping.setModuleConfig(moduleConfig);
-						actionMapping.setPath(parentPath);
-
-						request.setAttribute(
-							Globals.MAPPING_KEY, actionMapping);
-					}
-				}
-				else if (moduleConfig.findActionConfig(parentPath) != null) {
-					actionMapping = super.processMapping(
-						request, response, parentPath);
-				}
-			}
-		}
-		catch (Exception e) {
-		}
-
-		if (actionMapping == null) {
-			MessageResources messageResources = getInternal();
-
-			String msg = messageResources.getMessage("processInvalid");
-
-			_log.error("User ID " + request.getRemoteUser());
-			_log.error("Current URL " + PortalUtil.getCurrentURL(request));
-			_log.error("Referer " + request.getHeader("Referer"));
-			_log.error("Remote address " + request.getRemoteAddr());
-
-			_log.error(msg + " " + path);
-		}
-
-		return actionMapping;
-	}
-
-	@Override
 	protected HttpServletRequest processMultipart(HttpServletRequest request) {
 
 		// Disable Struts from automatically wrapping a multipart request
@@ -510,6 +517,8 @@ public class PortletRequestProcessor extends TilesRequestProcessor {
 			if (_log.isDebugEnabled()) {
 				_log.debug("Processing path " + path);
 			}
+
+			request.removeAttribute(WebKeys.PORTLET_STRUTS_ACTION);
 		}
 
 		return path;
@@ -550,6 +559,7 @@ public class PortletRequestProcessor extends TilesRequestProcessor {
 
 			if (!strutsPath.equals(portlet.getStrutsPath()) &&
 				!strutsPath.equals(portlet.getParentStrutsPath())) {
+
 				if (_log.isWarnEnabled()) {
 					_log.warn(
 						"The struts path " + strutsPath + " does not belong " +
@@ -580,8 +590,8 @@ public class PortletRequestProcessor extends TilesRequestProcessor {
 				}
 			}
 			else if (!portlet.isActive()) {
-				ForwardConfig forwardConfig =
-					actionMapping.findForward(_PATH_PORTAL_PORTLET_INACTIVE);
+				ForwardConfig forwardConfig = actionMapping.findForward(
+					_PATH_PORTAL_PORTLET_INACTIVE);
 
 				if (!action) {
 					processForwardConfig(request, response, forwardConfig);
@@ -595,8 +605,8 @@ public class PortletRequestProcessor extends TilesRequestProcessor {
 				_log.warn(e.getMessage());
 			}
 
-			ForwardConfig forwardConfig =
-				actionMapping.findForward(_PATH_PORTAL_PORTLET_ACCESS_DENIED);
+			ForwardConfig forwardConfig = actionMapping.findForward(
+				_PATH_PORTAL_PORTLET_ACCESS_DENIED);
 
 			if (!action) {
 				processForwardConfig(request, response, forwardConfig);

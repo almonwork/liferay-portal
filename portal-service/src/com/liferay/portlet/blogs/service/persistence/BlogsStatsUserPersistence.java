@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,7 +14,6 @@
 
 package com.liferay.portlet.blogs.service.persistence;
 
-import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.service.persistence.BasePersistence;
 
 import com.liferay.portlet.blogs.model.BlogsStatsUser;
@@ -752,9 +751,11 @@ public interface BlogsStatsUserPersistence extends BasePersistence<BlogsStatsUse
 	*
 	* @param groupId the group ID
 	* @param userId the user ID
+	* @return the blogs stats user that was removed
 	* @throws SystemException if a system exception occurred
 	*/
-	public void removeByG_U(long groupId, long userId)
+	public com.liferay.portlet.blogs.model.BlogsStatsUser removeByG_U(
+		long groupId, long userId)
 		throws com.liferay.portal.kernel.exception.SystemException,
 			com.liferay.portlet.blogs.NoSuchStatsUserException;
 
@@ -868,7 +869,4 @@ public interface BlogsStatsUserPersistence extends BasePersistence<BlogsStatsUse
 	*/
 	public int countAll()
 		throws com.liferay.portal.kernel.exception.SystemException;
-
-	public BlogsStatsUser remove(BlogsStatsUser blogsStatsUser)
-		throws SystemException;
 }

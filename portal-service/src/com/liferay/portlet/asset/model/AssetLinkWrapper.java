@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,6 +14,12 @@
 
 package com.liferay.portlet.asset.model;
 
+import com.liferay.portal.model.ModelWrapper;
+
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * <p>
  * This class is a wrapper for {@link AssetLink}.
@@ -23,7 +29,7 @@ package com.liferay.portlet.asset.model;
  * @see       AssetLink
  * @generated
  */
-public class AssetLinkWrapper implements AssetLink {
+public class AssetLinkWrapper implements AssetLink, ModelWrapper<AssetLink> {
 	public AssetLinkWrapper(AssetLink assetLink) {
 		_assetLink = assetLink;
 	}
@@ -34,6 +40,78 @@ public class AssetLinkWrapper implements AssetLink {
 
 	public String getModelClassName() {
 		return AssetLink.class.getName();
+	}
+
+	public Map<String, Object> getModelAttributes() {
+		Map<String, Object> attributes = new HashMap<String, Object>();
+
+		attributes.put("linkId", getLinkId());
+		attributes.put("companyId", getCompanyId());
+		attributes.put("userId", getUserId());
+		attributes.put("userName", getUserName());
+		attributes.put("createDate", getCreateDate());
+		attributes.put("entryId1", getEntryId1());
+		attributes.put("entryId2", getEntryId2());
+		attributes.put("type", getType());
+		attributes.put("weight", getWeight());
+
+		return attributes;
+	}
+
+	public void setModelAttributes(Map<String, Object> attributes) {
+		Long linkId = (Long)attributes.get("linkId");
+
+		if (linkId != null) {
+			setLinkId(linkId);
+		}
+
+		Long companyId = (Long)attributes.get("companyId");
+
+		if (companyId != null) {
+			setCompanyId(companyId);
+		}
+
+		Long userId = (Long)attributes.get("userId");
+
+		if (userId != null) {
+			setUserId(userId);
+		}
+
+		String userName = (String)attributes.get("userName");
+
+		if (userName != null) {
+			setUserName(userName);
+		}
+
+		Date createDate = (Date)attributes.get("createDate");
+
+		if (createDate != null) {
+			setCreateDate(createDate);
+		}
+
+		Long entryId1 = (Long)attributes.get("entryId1");
+
+		if (entryId1 != null) {
+			setEntryId1(entryId1);
+		}
+
+		Long entryId2 = (Long)attributes.get("entryId2");
+
+		if (entryId2 != null) {
+			setEntryId2(entryId2);
+		}
+
+		Integer type = (Integer)attributes.get("type");
+
+		if (type != null) {
+			setType(type);
+		}
+
+		Integer weight = (Integer)attributes.get("weight");
+
+		if (weight != null) {
+			setWeight(weight);
+		}
 	}
 
 	/**
@@ -256,10 +334,6 @@ public class AssetLinkWrapper implements AssetLink {
 		return _assetLink.isEscapedModel();
 	}
 
-	public void setEscapedModel(boolean escapedModel) {
-		_assetLink.setEscapedModel(escapedModel);
-	}
-
 	public java.io.Serializable getPrimaryKeyObj() {
 		return _assetLink.getPrimaryKeyObj();
 	}
@@ -313,7 +387,14 @@ public class AssetLinkWrapper implements AssetLink {
 		_assetLink.persist();
 	}
 
+	/**
+	 * @deprecated Renamed to {@link #getWrappedModel}
+	 */
 	public AssetLink getWrappedAssetLink() {
+		return _assetLink;
+	}
+
+	public AssetLink getWrappedModel() {
 		return _assetLink;
 	}
 

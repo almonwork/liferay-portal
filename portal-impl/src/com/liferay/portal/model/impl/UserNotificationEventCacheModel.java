@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -19,6 +19,8 @@ import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.model.CacheModel;
 import com.liferay.portal.model.UserNotificationEvent;
 
+import java.io.Serializable;
+
 /**
  * The cache model class for representing UserNotificationEvent in entity cache.
  *
@@ -26,10 +28,11 @@ import com.liferay.portal.model.UserNotificationEvent;
  * @see UserNotificationEvent
  * @generated
  */
-public class UserNotificationEventCacheModel implements CacheModel<UserNotificationEvent> {
+public class UserNotificationEventCacheModel implements CacheModel<UserNotificationEvent>,
+	Serializable {
 	@Override
 	public String toString() {
-		StringBundler sb = new StringBundler(17);
+		StringBundler sb = new StringBundler(19);
 
 		sb.append("{uuid=");
 		sb.append(uuid);
@@ -47,6 +50,8 @@ public class UserNotificationEventCacheModel implements CacheModel<UserNotificat
 		sb.append(deliverBy);
 		sb.append(", payload=");
 		sb.append(payload);
+		sb.append(", archived=");
+		sb.append(archived);
 		sb.append("}");
 
 		return sb.toString();
@@ -83,6 +88,8 @@ public class UserNotificationEventCacheModel implements CacheModel<UserNotificat
 			userNotificationEventImpl.setPayload(payload);
 		}
 
+		userNotificationEventImpl.setArchived(archived);
+
 		userNotificationEventImpl.resetOriginalValues();
 
 		return userNotificationEventImpl;
@@ -96,4 +103,5 @@ public class UserNotificationEventCacheModel implements CacheModel<UserNotificat
 	public long timestamp;
 	public long deliverBy;
 	public String payload;
+	public boolean archived;
 }

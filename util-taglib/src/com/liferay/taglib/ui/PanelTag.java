@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -44,53 +44,75 @@ public class PanelTag extends IncludeTag {
 
 		String parentId = StringPool.BLANK;
 
-		try {
-			PanelFloatingContainerTag panelFloatingContainerTag	=
+		if (baseBodyTagSupport instanceof PanelContainerTag) {
+			PanelContainerTag panelContainerTag =
+				(PanelContainerTag)baseBodyTagSupport;
+
+			parentId = panelContainerTag.getId();
+		}
+		else if (baseBodyTagSupport instanceof PanelFloatingContainerTag) {
+			PanelFloatingContainerTag panelFloatingContainerTag =
 				(PanelFloatingContainerTag)baseBodyTagSupport;
 
 			parentId = panelFloatingContainerTag.getId();
 		}
-		catch (ClassCastException cce) {
-			try {
-				PanelContainerTag panelContainerTag	=
-					(PanelContainerTag)baseBodyTagSupport;
 
-				parentId = panelContainerTag.getId();
-			}
-			catch (ClassCastException ccee) {
-			}
-		}
-
- 		request.setAttribute("liferay-ui:panel:helpMessage", _helpMessage);
- 		request.setAttribute("liferay-ui:panel:id", _id);
- 		request.setAttribute("liferay-ui:panel:parentId", parentId);
- 		request.setAttribute("liferay-ui:panel:title", _title);
+		request.setAttribute("liferay-ui:panel:helpMessage", _helpMessage);
+		request.setAttribute("liferay-ui:panel:id", _id);
+		request.setAttribute("liferay-ui:panel:parentId", parentId);
+		request.setAttribute("liferay-ui:panel:title", _title);
 		request.setAttribute(
 			"liferay-ui:panel:collapsible", String.valueOf(_collapsible));
- 		request.setAttribute("liferay-ui:panel:defaultState", _defaultState);
- 		request.setAttribute(
+		request.setAttribute("liferay-ui:panel:defaultState", _defaultState);
+		request.setAttribute(
 			"liferay-ui:panel:persistState", String.valueOf(_persistState));
- 		request.setAttribute(
+		request.setAttribute(
 			"liferay-ui:panel:extended", String.valueOf(_extended));
- 		request.setAttribute("liferay-ui:panel:cssClass", _cssClass);
+		request.setAttribute("liferay-ui:panel:cssClass", _cssClass);
 
 		super.doStartTag();
 
 		return EVAL_BODY_INCLUDE;
 	}
 
-	@Override
-	protected String getStartPage() {
-		if (Validator.isNull(_startPage)) {
-			return _START_PAGE;
-		}
-		else {
-			return _startPage;
-		}
+	public void setCollapsible(boolean collapsible) {
+		_collapsible = collapsible;
+	}
+
+	public void setCssClass(String cssClass) {
+		_cssClass = cssClass;
+	}
+
+	public void setDefaultState(String defaultState) {
+		_defaultState = defaultState;
+	}
+
+	public void setEndPage(String endPage) {
+		_endPage = endPage;
+	}
+
+	public void setExtended(boolean extended) {
+		_extended = extended;
+	}
+
+	public void setHelpMessage(String helpMessage) {
+		_helpMessage = helpMessage;
+	}
+
+	public void setId(String id) {
+		_id = id;
+	}
+
+	public void setPersistState(boolean persistState) {
+		_persistState = persistState;
 	}
 
 	public void setStartPage(String startPage) {
 		_startPage = startPage;
+	}
+
+	public void setTitle(String title) {
+		_title = title;
 	}
 
 	@Override
@@ -103,55 +125,29 @@ public class PanelTag extends IncludeTag {
 		}
 	}
 
-	public void setEndPage(String endPage) {
-		_endPage = endPage;
+	@Override
+	protected String getStartPage() {
+		if (Validator.isNull(_startPage)) {
+			return _START_PAGE;
+		}
+		else {
+			return _startPage;
+		}
 	}
-
-	public void setHelpMessage(String helpMessage) {
-		_helpMessage = helpMessage;
-	}
-
-	public void setId(String id) {
-		_id = id;
-	}
-
- 	public void setTitle(String title) {
-		_title = title;
-	}
-
-	public void setCollapsible(boolean collapsible) {
-		_collapsible = collapsible;
-	}
-
- 	public void setDefaultState(String defaultState) {
-		_defaultState = defaultState;
-	}
-
-	public void setPersistState(boolean persistState) {
-		_persistState = persistState;
-	}
-
-	public void setExtended(boolean extended) {
-		_extended = extended;
-	}
-
-	public void setCssClass(String cssClass) {
-		_cssClass = cssClass;
-	}
-
-	private static final String _START_PAGE = "/html/taglib/ui/panel/start.jsp";
 
 	private static final String _END_PAGE = "/html/taglib/ui/panel/end.jsp";
 
-	private String _startPage;
-	private String _endPage;
-	private String _helpMessage;
- 	private String _id;
- 	private String _title;
+	private static final String _START_PAGE = "/html/taglib/ui/panel/start.jsp";
+
 	private boolean _collapsible = true;
- 	private String _defaultState = "open";
-	private boolean _persistState = true;
+	private String _cssClass = StringPool.BLANK;
+	private String _defaultState = "open";
+	private String _endPage;
 	private boolean _extended;
- 	private String _cssClass = StringPool.BLANK;
+	private String _helpMessage;
+	private String _id;
+	private boolean _persistState = true;
+	private String _startPage;
+	private String _title;
 
 }

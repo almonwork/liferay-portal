@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -23,9 +23,9 @@ public interface Constants {
 
 	public static final String ADD = "add";
 
-	public static final String ADD_TEMP = "add_temp";
-
 	public static final String ADD_MULTIPLE = "add_multiple";
+
+	public static final String ADD_TEMP = "add_temp";
 
 	public static final String APPROVE = "approve";
 
@@ -51,11 +51,17 @@ public interface Constants {
 
 	public static final String DELETE_TRANSLATION = "delete_translation";
 
+	public static final String DELETE_VERSIONS = "delete_versions";
+
 	public static final String EDIT = "edit";
+
+	public static final String EMPTY_TRASH = "empty_trash";
 
 	public static final String EXPIRE = "expire";
 
 	public static final String EXPORT = "export";
+
+	public static final String GET_TEMP = "get_temp";
 
 	public static final String IMPORT = "import";
 
@@ -69,6 +75,12 @@ public interface Constants {
 
 	public static final String MOVE = "move";
 
+	public static final String MOVE_FROM_TRASH = "move_from_trash";
+
+	public static final String MOVE_TO_TRASH = "move_to_trash";
+
+	public static final String OVERRIDE = "override";
+
 	public static final String PREVIEW = "preview";
 
 	public static final String PRINT = "print";
@@ -77,9 +89,11 @@ public interface Constants {
 
 	public static final String PUBLISH = "publish";
 
+	public static final String READ = "read";
+
 	public static final String REJECT = "reject";
 
-	public static final String READ = "read";
+	public static final String RENAME = "rename";
 
 	public static final String RESET = "reset";
 
@@ -99,6 +113,8 @@ public interface Constants {
 
 	public static final String SUBSCRIBE_TO_COMMENTS = "subscribe_to_comments";
 
+	public static final String TEST = "test";
+
 	public static final String TRANSLATE = "translate";
 
 	public static final String UNLOCK = "unlock";
@@ -110,7 +126,11 @@ public interface Constants {
 
 	public static final String UPDATE = "update";
 
+	public static final String UPDATE_AND_CHECKIN = "update_and_checkin";
+
 	public static final String VIEW = "view";
+
+	public static final String VOTE = "vote";
 
 	public static final String WRITE = "write";
 

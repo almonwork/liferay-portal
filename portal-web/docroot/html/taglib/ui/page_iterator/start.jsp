@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -23,6 +23,7 @@ String curParam = (String)request.getAttribute("liferay-ui:page-iterator:curPara
 int delta = GetterUtil.getInteger((String)request.getAttribute("liferay-ui:page-iterator:delta"));
 boolean deltaConfigurable = GetterUtil.getBoolean((String)request.getAttribute("liferay-ui:page-iterator:deltaConfigurable"));
 String deltaParam = (String)request.getAttribute("liferay-ui:page-iterator:deltaParam");
+String id = (String)request.getAttribute("liferay-ui:page-iterator:id");
 String jsCall = GetterUtil.getString((String)request.getAttribute("liferay-ui:page-iterator:jsCall"));
 int maxPages = GetterUtil.getInteger((String)request.getAttribute("liferay-ui:page-iterator:maxPages"));
 String target = (String)request.getAttribute("liferay-ui:page-iterator:target");
@@ -31,6 +32,10 @@ String type = (String)request.getAttribute("liferay-ui:page-iterator:type");
 String url = (String)request.getAttribute("liferay-ui:page-iterator:url");
 String urlAnchor = (String)request.getAttribute("liferay-ui:page-iterator:urlAnchor");
 int pages = GetterUtil.getInteger((String)request.getAttribute("liferay-ui:page-iterator:pages"));
+
+if (Validator.isNull(id)) {
+	id = PortalUtil.generateRandomKey(request, "taglib-page-iterator");
+}
 
 int start = (cur - 1) * delta;
 int end = cur * delta;
@@ -58,7 +63,7 @@ NumberFormat numberFormat = NumberFormat.getNumberInstance(locale);
 %>
 
 <c:if test='<%= type.equals("approximate") || type.equals("more") || type.equals("regular") || (type.equals("article") && (total > resultRowsSize)) %>'>
-	<div class="taglib-page-iterator">
+	<div class="taglib-page-iterator" id="<%= namespace + id %>">
 </c:if>
 
 <c:if test='<%= type.equals("approximate") || type.equals("more") || type.equals("regular") %>'>
@@ -120,7 +125,7 @@ NumberFormat numberFormat = NumberFormat.getNumberInstance(locale);
 	</div>
 </c:if>
 
-<c:if test="<%= total > delta %>">
+<c:if test="<%= (total > delta) || (total > PropsValues.SEARCH_CONTAINER_PAGE_DELTA_VALUES[0]) %>">
 	<div class="search-pages">
 		<c:if test='<%= type.equals("regular") %>'>
 			<c:if test="<%= PropsValues.SEARCH_CONTAINER_PAGE_DELTA_VALUES.length > 0 %>">
@@ -132,7 +137,7 @@ NumberFormat numberFormat = NumberFormat.getNumberInstance(locale);
 							<%= delta %>
 						</c:when>
 						<c:otherwise>
-							<aui:select changesContext="<%= true %>" inlineLabel="left" name="itemsPerPage" onchange='<%= namespace + deltaParam + "updateDelta(this);" %>'>
+							<aui:select changesContext="<%= true %>" id='<%= id + "_itemsPerPage" %>' inlineLabel="left" name="itemsPerPage" onchange='<%= namespace + deltaParam + "updateDelta(this);" %>'>
 
 								<%
 								for (int curDelta : PropsValues.SEARCH_CONTAINER_PAGE_DELTA_VALUES) {
@@ -170,7 +175,7 @@ NumberFormat numberFormat = NumberFormat.getNumberInstance(locale);
 						}
 						%>
 
-						<aui:select changesContext="<%= true %>" inlineLabel="left" name="page" onchange='<%= namespace + curParam + "updateCur(this);" %>' suffix='<%= suffix %>'>
+						<aui:select changesContext="<%= true %>" id='<%= id + "_page" %>' inlineLabel="left" name="page" onchange='<%= namespace + curParam + "updateCur(this);" %>' suffix='<%= suffix %>'>
 
 							<%
 							int pagesIteratorMax = maxPages;
@@ -361,7 +366,7 @@ private String _getHREF(String formName, String curParam, int cur, String jsCall
 	String href = null;
 
 	if (Validator.isNotNull(url)) {
-		href = url + curParam + "=" + cur + urlAnchor;
+		href = HtmlUtil.escape(url + curParam + "=" + cur + urlAnchor);
 	}
 	else {
 		href = "javascript:document." + formName + "." + curParam + ".value = '" + cur + "'; " + jsCall;

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,6 +14,8 @@
 
 package com.liferay.portal.xml;
 
+import com.liferay.portal.kernel.io.unsync.UnsyncByteArrayOutputStream;
+import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.xml.Document;
 import com.liferay.portal.kernel.xml.Element;
 import com.liferay.portal.kernel.xml.Node;
@@ -24,6 +26,9 @@ import java.io.IOException;
 import java.io.Writer;
 
 import java.util.List;
+
+import org.dom4j.io.OutputFormat;
+import org.dom4j.io.XMLWriter;
 
 /**
  * @author Brian Wing Shun Chan
@@ -51,6 +56,7 @@ public class NodeImpl implements Node {
 		if (node == null) {
 			return null;
 		}
+
 		if (node instanceof org.dom4j.Element) {
 			return new ElementImpl((org.dom4j.Element)node);
 		}
@@ -59,12 +65,27 @@ public class NodeImpl implements Node {
 		}
 	}
 
+	public String compactString() throws IOException {
+		UnsyncByteArrayOutputStream unsyncByteArrayOutputStream =
+			new UnsyncByteArrayOutputStream();
+
+		OutputFormat outputFormat = OutputFormat.createCompactFormat();
+
+		XMLWriter xmlWriter = new XMLWriter(
+			unsyncByteArrayOutputStream, outputFormat);
+
+		xmlWriter.write(_node);
+
+		return unsyncByteArrayOutputStream.toString(StringPool.UTF8);
+	}
+
 	public Node detach() {
 		org.dom4j.Node node = _node.detach();
 
 		if (node == null) {
 			return null;
 		}
+
 		if (node instanceof org.dom4j.Element) {
 			return new ElementImpl((org.dom4j.Element)node);
 		}
@@ -92,6 +113,14 @@ public class NodeImpl implements Node {
 		throws IOException {
 
 		return XMLFormatter.toString(_node, indent, expandEmptyElements);
+	}
+
+	public String formattedString(
+			String indent, boolean expandEmptyElements, boolean trimText)
+		throws IOException {
+
+		return XMLFormatter.toString(
+			_node, indent, expandEmptyElements, trimText);
 	}
 
 	public Document getDocument() {
@@ -165,36 +194,36 @@ public class NodeImpl implements Node {
 		return _node.isReadOnly();
 	}
 
-	public boolean matches(String xpathExpression) {
-		return _node.matches(xpathExpression);
+	public boolean matches(String xPathExpression) {
+		return _node.matches(xPathExpression);
 	}
 
-	public Number numberValueOf(String xpathExpression) {
-		return _node.numberValueOf(xpathExpression);
+	public Number numberValueOf(String xPathExpression) {
+		return _node.numberValueOf(xPathExpression);
 	}
 
-	public List<Node> selectNodes(String xpathExpression) {
-		return SAXReaderImpl.toNewNodes(_node.selectNodes(xpathExpression));
+	public List<Node> selectNodes(String xPathExpression) {
+		return SAXReaderImpl.toNewNodes(_node.selectNodes(xPathExpression));
 	}
 
 	public List<Node> selectNodes(
-		String xpathExpression, String comparisonXPathExpression) {
+		String xPathExpression, String comparisonXPathExpression) {
 
 		return SAXReaderImpl.toNewNodes(
-			_node.selectNodes(xpathExpression, comparisonXPathExpression));
+			_node.selectNodes(xPathExpression, comparisonXPathExpression));
 	}
 
 	public List<Node> selectNodes(
-		String xpathExpression, String comparisonXPathExpression,
+		String xPathExpression, String comparisonXPathExpression,
 		boolean removeDuplicates) {
 
 		return SAXReaderImpl.toNewNodes(
 			_node.selectNodes(
-				xpathExpression, comparisonXPathExpression, removeDuplicates));
+				xPathExpression, comparisonXPathExpression, removeDuplicates));
 	}
 
-	public Object selectObject(String xpathExpression) {
-		Object obj = _node.selectObject(xpathExpression);
+	public Object selectObject(String xPathExpression) {
+		Object obj = _node.selectObject(xPathExpression);
 
 		if (obj == null) {
 			return null;
@@ -207,12 +236,13 @@ public class NodeImpl implements Node {
 		}
 	}
 
-	public Node selectSingleNode(String xpathExpression) {
-		org.dom4j.Node node = _node.selectSingleNode(xpathExpression);
+	public Node selectSingleNode(String xPathExpression) {
+		org.dom4j.Node node = _node.selectSingleNode(xPathExpression);
 
 		if (node == null) {
 			return null;
 		}
+
 		if (node instanceof org.dom4j.Element) {
 			return new ElementImpl((org.dom4j.Element)node);
 		}
@@ -238,8 +268,8 @@ public class NodeImpl implements Node {
 		return _node.toString();
 	}
 
-	public String valueOf(String xpathExpression) {
-		return _node.valueOf(xpathExpression);
+	public String valueOf(String xPathExpression) {
+		return _node.valueOf(xPathExpression);
 	}
 
 	public void write(Writer writer) throws IOException {

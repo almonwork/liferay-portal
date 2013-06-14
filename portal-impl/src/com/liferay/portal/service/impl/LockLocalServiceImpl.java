@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -17,10 +17,12 @@ package com.liferay.portal.service.impl;
 import com.liferay.portal.DuplicateLockException;
 import com.liferay.portal.ExpiredLockException;
 import com.liferay.portal.NoSuchLockException;
+import com.liferay.portal.kernel.dao.orm.LockMode;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
-import com.liferay.portal.kernel.transaction.Isolation;
+import com.liferay.portal.kernel.transaction.Propagation;
 import com.liferay.portal.kernel.transaction.Transactional;
+import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.model.Lock;
 import com.liferay.portal.model.User;
 import com.liferay.portal.service.base.LockLocalServiceBaseImpl;
@@ -30,6 +32,7 @@ import java.util.List;
 
 /**
  * @author Brian Wing Shun Chan
+ * @author Shuyang Zhou
  */
 public class LockLocalServiceImpl extends LockLocalServiceBaseImpl {
 
@@ -49,7 +52,7 @@ public class LockLocalServiceImpl extends LockLocalServiceBaseImpl {
 		Lock lock = lockPersistence.findByC_K(className, key);
 
 		if (lock.isExpired()) {
-			unlock(className, key);
+			lockPersistence.remove(lock);
 
 			throw new ExpiredLockException();
 		}
@@ -57,10 +60,10 @@ public class LockLocalServiceImpl extends LockLocalServiceBaseImpl {
 		return lock;
 	}
 
-	public Lock getLockByUuid(String uuid)
+	public Lock getLockByUuidAndCompanyId(String uuid, long companyId)
 		throws PortalException, SystemException {
 
-		List<Lock> locks = lockPersistence.findByUuid(uuid);
+		List<Lock> locks = lockPersistence.findByUuid_C(uuid, companyId);
 
 		if (locks.isEmpty()) {
 			throw new NoSuchLockException();
@@ -70,49 +73,39 @@ public class LockLocalServiceImpl extends LockLocalServiceBaseImpl {
 	}
 
 	public boolean hasLock(long userId, String className, long key)
-		throws PortalException, SystemException {
+		throws SystemException {
 
 		return hasLock(userId, className, String.valueOf(key));
 	}
 
 	public boolean hasLock(long userId, String className, String key)
-		throws PortalException, SystemException {
+		throws SystemException {
 
-		try {
-			Lock lock = getLock(className, key);
+		Lock lock = fetchLock(className, key);
 
-			if (lock.getUserId() == userId) {
-				return true;
-			}
+		if ((lock != null) && (lock.getUserId() == userId)) {
+			return true;
 		}
-		catch (ExpiredLockException ele) {
+		else {
+			return false;
 		}
-		catch (NoSuchLockException nsle) {
-		}
-
-		return false;
 	}
 
-	public boolean isLocked(String className, long key)
-		throws PortalException, SystemException {
-
+	public boolean isLocked(String className, long key) throws SystemException {
 		return isLocked(className, String.valueOf(key));
 	}
 
 	public boolean isLocked(String className, String key)
-		throws PortalException, SystemException {
+		throws SystemException {
 
-		try {
-			getLock(className, key);
+		Lock lock = fetchLock(className, key);
 
+		if (lock == null) {
+			return false;
+		}
+		else {
 			return true;
 		}
-		catch (ExpiredLockException ele) {
-		}
-		catch (NoSuchLockException nsle) {
-		}
-
-		return false;
 	}
 
 	public Lock lock(
@@ -136,7 +129,7 @@ public class LockLocalServiceImpl extends LockLocalServiceBaseImpl {
 
 		if (lock != null) {
 			if (lock.isExpired()) {
-				unlock(className, key);
+				lockPersistence.remove(lock);
 
 				lock = null;
 			}
@@ -175,53 +168,22 @@ public class LockLocalServiceImpl extends LockLocalServiceBaseImpl {
 		return lock;
 	}
 
-	@Transactional(isolation = Isolation.SERIALIZABLE)
+	@Transactional(propagation = Propagation.REQUIRES_NEW)
 	public Lock lock(
 			String className, String key, String owner,
 			boolean retrieveFromCache)
 		throws SystemException {
 
-		Lock lock = lockPersistence.fetchByC_K(
-			className, key, retrieveFromCache);
-
-		if (lock == null) {
-			long lockId = counterLocalService.increment();
-
-			lock = lockPersistence.create(lockId);
-
-			lock.setCreateDate(new Date());
-			lock.setClassName(className);
-			lock.setKey(key);
-			lock.setOwner(owner);
-
-			lockPersistence.update(lock, false);
-
-			lock.setNew(true);
-		}
-
-		return lock;
+		return lock(className, key, null, owner, retrieveFromCache);
 	}
 
-	@Transactional(isolation = Isolation.SERIALIZABLE)
+	@Transactional(propagation = Propagation.REQUIRES_NEW)
 	public Lock lock(
 			String className, String key, String expectedOwner,
 			String updatedOwner, boolean retrieveFromCache)
 		throws SystemException {
 
-		Lock lock = lockPersistence.fetchByC_K(
-			className, key, retrieveFromCache);
-
-		if (lock != null) {
-			String owner = lock.getOwner();
-
-			if (!owner.equals(expectedOwner)) {
-				return lock;
-			}
-
-			lockPersistence.remove(lock);
-
-			lock = null;
-		}
+		Lock lock = lockFinder.fetchByC_K(className, key, LockMode.UPGRADE);
 
 		if (lock == null) {
 			long lockId = counterLocalService.increment();
@@ -237,16 +199,26 @@ public class LockLocalServiceImpl extends LockLocalServiceBaseImpl {
 
 			lock.setNew(true);
 		}
+		else if (Validator.equals(lock.getOwner(), expectedOwner)) {
+			lock.setCreateDate(new Date());
+			lock.setClassName(className);
+			lock.setKey(key);
+			lock.setOwner(updatedOwner);
+
+			lockPersistence.update(lock, false);
+
+			lock.setNew(true);
+		}
 
 		return lock;
 	}
 
-	public Lock refresh(String uuid, long expirationTime)
+	public Lock refresh(String uuid, long companyId, long expirationTime)
 		throws PortalException, SystemException {
 
 		Date now = new Date();
 
-		List<Lock> locks = lockPersistence.findByUuid(uuid);
+		List<Lock> locks = lockPersistence.findByUuid_C(uuid, companyId);
 
 		if (locks.isEmpty()) {
 			throw new NoSuchLockException();
@@ -280,22 +252,37 @@ public class LockLocalServiceImpl extends LockLocalServiceBaseImpl {
 		}
 	}
 
-	@Transactional(isolation = Isolation.SERIALIZABLE)
+	@Transactional(propagation = Propagation.REQUIRES_NEW)
 	public void unlock(
 			String className, String key, String owner,
 			boolean retrieveFromCache)
 		throws SystemException {
 
-		Lock lock = lockPersistence.fetchByC_K(
-			className, key, retrieveFromCache);
+		Lock lock = lockFinder.fetchByC_K(className, key, LockMode.UPGRADE);
 
 		if (lock == null) {
 			return;
 		}
 
-		if (lock.getOwner().equals(owner)) {
+		if (Validator.equals(lock.getOwner(), owner)) {
 			deleteLock(lock);
 		}
+	}
+
+	protected Lock fetchLock(String className, String key)
+		throws SystemException {
+
+		Lock lock = lockPersistence.fetchByC_K(className, key);
+
+		if (lock != null) {
+			if (lock.isExpired()) {
+				lockPersistence.remove(lock);
+
+				lock = null;
+			}
+		}
+
+		return lock;
 	}
 
 }

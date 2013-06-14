@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -19,7 +19,7 @@ import com.liferay.portal.kernel.lar.PortletDataContext;
 import com.liferay.portal.kernel.lar.PortletDataHandlerBoolean;
 import com.liferay.portal.kernel.lar.PortletDataHandlerControl;
 import com.liferay.portal.kernel.util.CalendarFactoryUtil;
-import com.liferay.portal.kernel.util.FileUtil;
+import com.liferay.portal.kernel.util.StreamUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
@@ -38,7 +38,7 @@ import com.liferay.portlet.blogs.service.BlogsEntryLocalServiceUtil;
 import com.liferay.portlet.blogs.service.persistence.BlogsEntryUtil;
 import com.liferay.portlet.journal.lar.JournalPortletDataHandlerImpl;
 
-import java.io.File;
+import java.io.InputStream;
 
 import java.util.Calendar;
 import java.util.List;
@@ -55,14 +55,30 @@ public class BlogsPortletDataHandlerImpl extends BasePortletDataHandler {
 	@Override
 	public PortletDataHandlerControl[] getExportControls() {
 		return new PortletDataHandlerControl[] {
-			_entries, _categories, _comments, _ratings, _tags
+			_entries
+		};
+	}
+
+	@Override
+	public PortletDataHandlerControl[] getExportMetadataControls() {
+		return new PortletDataHandlerControl[] {
+			new PortletDataHandlerBoolean(
+				_NAMESPACE, "blog-entries", true, _metadataControls)
 		};
 	}
 
 	@Override
 	public PortletDataHandlerControl[] getImportControls() {
 		return new PortletDataHandlerControl[] {
-			_entries, _categories, _comments, _ratings, _tags, _wordpress
+			_entries, _wordpress
+		};
+	}
+
+	@Override
+	public PortletDataHandlerControl[] getImportMetadataControls() {
+		return new PortletDataHandlerControl[] {
+			new PortletDataHandlerBoolean(
+				_NAMESPACE, "blog-entries", true, _metadataControls)
 		};
 	}
 
@@ -110,21 +126,25 @@ public class BlogsPortletDataHandlerImpl extends BasePortletDataHandler {
 
 		Element entriesElement = rootElement.addElement("entries");
 
+		Element dlFileEntryTypesElement = entriesElement.addElement(
+			"dl-file-entry-types");
 		Element dlFoldersElement = entriesElement.addElement("dl-folders");
 		Element dlFileEntriesElement = entriesElement.addElement(
 			"dl-file-entries");
 		Element dlFileRanksElement = entriesElement.addElement("dl-file-ranks");
-		Element igFoldersElement = entriesElement.addElement("ig-folders");
-		Element igImagesElement = entriesElement.addElement("ig-images");
+		Element dlRepositoriesElement = entriesElement.addElement(
+			"dl-repositories");
+		Element dlRepositoryEntriesElement = entriesElement.addElement(
+			"dl-repository-entries");
 
 		List<BlogsEntry> entries = BlogsEntryUtil.findByGroupId(
 			portletDataContext.getScopeGroupId());
 
 		for (BlogsEntry entry : entries) {
 			exportEntry(
-				portletDataContext, entriesElement, dlFoldersElement,
-				dlFileEntriesElement,dlFileRanksElement, igFoldersElement,
-				igImagesElement, entry, false);
+				portletDataContext, entriesElement, dlFileEntryTypesElement,
+				dlFoldersElement, dlFileEntriesElement, dlFileRanksElement,
+				dlRepositoriesElement, dlRepositoryEntriesElement, entry);
 		}
 
 		return document.formattedString();
@@ -176,16 +196,17 @@ public class BlogsPortletDataHandlerImpl extends BasePortletDataHandler {
 
 	protected void exportEntry(
 			PortletDataContext portletDataContext, Element entriesElement,
-			Element dlFoldersElement, Element dlFileEntriesElement,
-			Element dlFileRanksElement, Element igFoldersElement,
-			Element igImagesElement, BlogsEntry entry, boolean checkDateRange)
+			Element dlFileEntryTypesElement, Element dlFoldersElement,
+			Element dlFileEntriesElement, Element dlFileRanksElement,
+			Element dlRepositoriesElement, Element dlRepositoryEntriesElement,
+			BlogsEntry entry)
 		throws Exception {
 
 		if (!portletDataContext.isWithinDateRange(entry.getModifiedDate())) {
 			return;
 		}
 
-		if (entry.getStatus() != WorkflowConstants.STATUS_APPROVED) {
+		if (!entry.isApproved() && !entry.isInTrash()) {
 			return;
 		}
 
@@ -208,9 +229,9 @@ public class BlogsPortletDataHandlerImpl extends BasePortletDataHandler {
 		}
 
 		String content = JournalPortletDataHandlerImpl.exportReferencedContent(
-			portletDataContext, dlFoldersElement, dlFileEntriesElement,
-			dlFileRanksElement, igFoldersElement, igImagesElement, entryElement,
-			entry.getContent(), checkDateRange);
+			portletDataContext, dlFileEntryTypesElement, dlFoldersElement,
+			dlFileEntriesElement, dlFileRanksElement, dlRepositoriesElement,
+			dlRepositoryEntriesElement, entryElement, entry.getContent());
 
 		entry.setContent(content);
 
@@ -310,87 +331,100 @@ public class BlogsPortletDataHandlerImpl extends BasePortletDataHandler {
 		String[] trackbacks = StringUtil.split(entry.getTrackbacks());
 		int status = entry.getStatus();
 
-		ServiceContext serviceContext = portletDataContext.createServiceContext(
-			entryElement, entry, _NAMESPACE);
+		String smallImageFileName = null;
+		InputStream smallImageInputStream = null;
 
-		if (status != WorkflowConstants.STATUS_APPROVED) {
-			serviceContext.setWorkflowAction(
-				WorkflowConstants.ACTION_SAVE_DRAFT);
-		}
+		try {
+			String smallImagePath = entryElement.attributeValue(
+				"small-image-path");
 
-		File smallFile = null;
+			if (entry.isSmallImage() && Validator.isNotNull(smallImagePath)) {
+				smallImageFileName = String.valueOf(
+					entry.getSmallImageId()).concat(
+						StringPool.PERIOD).concat(entry.getSmallImageType());
+				smallImageInputStream =
+					portletDataContext.getZipEntryAsInputStream(smallImagePath);
+			}
 
-		String smallImagePath = entryElement.attributeValue("small-image-path");
+			ServiceContext serviceContext =
+				portletDataContext.createServiceContext(
+					entryElement, entry, _NAMESPACE);
 
-		if (entry.isSmallImage() && Validator.isNotNull(smallImagePath)) {
-			byte[] bytes = portletDataContext.getZipEntryAsByteArray(
-				smallImagePath);
+			if ((status != WorkflowConstants.STATUS_APPROVED) &&
+				(status != WorkflowConstants.STATUS_IN_TRASH)) {
 
-			smallFile = File.createTempFile(
-				String.valueOf(entry.getSmallImageId()),
-				StringPool.PERIOD + entry.getSmallImageType());
+				serviceContext.setWorkflowAction(
+					WorkflowConstants.ACTION_SAVE_DRAFT);
+			}
 
-			FileUtil.write(smallFile, bytes);
-		}
+			BlogsEntry importedEntry = null;
 
-		BlogsEntry importedEntry = null;
+			if (portletDataContext.isDataStrategyMirror()) {
+				BlogsEntry existingEntry = BlogsEntryUtil.fetchByUUID_G(
+					entry.getUuid(), portletDataContext.getScopeGroupId());
 
-		if (portletDataContext.isDataStrategyMirror()) {
-			BlogsEntry existingEntry = BlogsEntryUtil.fetchByUUID_G(
-				entry.getUuid(), portletDataContext.getScopeGroupId());
+				if (existingEntry == null) {
+					serviceContext.setUuid(entry.getUuid());
 
-			if (existingEntry == null) {
-				serviceContext.setUuid(entry.getUuid());
+					importedEntry = BlogsEntryLocalServiceUtil.addEntry(
+						userId, entry.getTitle(), entry.getDescription(),
+						entry.getContent(), displayDateMonth, displayDateDay,
+						displayDateYear, displayDateHour, displayDateMinute,
+						allowPingbacks, allowTrackbacks, trackbacks,
+						entry.isSmallImage(), entry.getSmallImageURL(),
+						smallImageFileName, smallImageInputStream,
+						serviceContext);
 
+					if (status == WorkflowConstants.STATUS_IN_TRASH) {
+						importedEntry =
+							BlogsEntryLocalServiceUtil.moveEntryToTrash(
+								userId, importedEntry);
+					}
+				}
+				else {
+					importedEntry = BlogsEntryLocalServiceUtil.updateEntry(
+						userId, existingEntry.getEntryId(), entry.getTitle(),
+						entry.getDescription(), entry.getContent(),
+						displayDateMonth, displayDateDay, displayDateYear,
+						displayDateHour, displayDateMinute, allowPingbacks,
+						allowTrackbacks, trackbacks, entry.getSmallImage(),
+						entry.getSmallImageURL(), smallImageFileName,
+						smallImageInputStream, serviceContext);
+				}
+			}
+			else {
 				importedEntry = BlogsEntryLocalServiceUtil.addEntry(
 					userId, entry.getTitle(), entry.getDescription(),
 					entry.getContent(), displayDateMonth, displayDateDay,
 					displayDateYear, displayDateHour, displayDateMinute,
 					allowPingbacks, allowTrackbacks, trackbacks,
-					entry.isSmallImage(), entry.getSmallImageURL(), smallFile,
-					serviceContext);
+					entry.getSmallImage(), entry.getSmallImageURL(),
+					smallImageFileName, smallImageInputStream, serviceContext);
 			}
-			else {
-				importedEntry = BlogsEntryLocalServiceUtil.updateEntry(
-					userId, existingEntry.getEntryId(), entry.getTitle(),
-					entry.getDescription(), entry.getContent(),
-					displayDateMonth, displayDateDay, displayDateYear,
-					displayDateHour, displayDateMinute, allowPingbacks,
-					allowTrackbacks, trackbacks, entry.getSmallImage(),
-					entry.getSmallImageURL(), smallFile, serviceContext);
-			}
+
+			portletDataContext.importClassedModel(
+				entry, importedEntry, _NAMESPACE);
 		}
-		else {
-			importedEntry = BlogsEntryLocalServiceUtil.addEntry(
-				userId, entry.getTitle(), entry.getDescription(),
-				entry.getContent(), displayDateMonth, displayDateDay,
-				displayDateYear, displayDateHour, displayDateMinute,
-				allowPingbacks, allowTrackbacks, trackbacks,
-				entry.getSmallImage(), entry.getSmallImageURL(), smallFile,
-				serviceContext);
+		finally {
+			StreamUtil.cleanUp(smallImageInputStream);
 		}
 
-		portletDataContext.importClassedModel(entry, importedEntry, _NAMESPACE);
 	}
 
 	private static final boolean _ALWAYS_EXPORTABLE = true;
 
 	private static final String _NAMESPACE = "blogs";
 
-	private static PortletDataHandlerBoolean _categories =
-		new PortletDataHandlerBoolean(_NAMESPACE, "categories");
-
-	private static PortletDataHandlerBoolean _comments =
-		new PortletDataHandlerBoolean(_NAMESPACE, "comments");
-
 	private static PortletDataHandlerBoolean _entries =
 		new PortletDataHandlerBoolean(_NAMESPACE, "entries", true, true);
 
-	private static PortletDataHandlerBoolean _ratings =
-		new PortletDataHandlerBoolean(_NAMESPACE, "ratings");
-
-	private static PortletDataHandlerBoolean _tags =
-		new PortletDataHandlerBoolean(_NAMESPACE, "tags");
+	private static PortletDataHandlerControl[] _metadataControls =
+		new PortletDataHandlerControl[] {
+			new PortletDataHandlerBoolean(_NAMESPACE, "categories"),
+			new PortletDataHandlerBoolean(_NAMESPACE, "comments"),
+			new PortletDataHandlerBoolean(_NAMESPACE, "ratings"),
+			new PortletDataHandlerBoolean(_NAMESPACE, "tags")
+		};
 
 	private static PortletDataHandlerBoolean _wordpress =
 		new PortletDataHandlerBoolean(_NAMESPACE, "wordpress");

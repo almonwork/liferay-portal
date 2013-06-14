@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -59,6 +59,8 @@ if (viewInContext) {
 	viewFullContentURLString = HttpUtil.setParameter(viewFullContentURLString, "redirect", currentURL);
 
 	viewURL = assetRenderer.getURLViewInContext(liferayPortletRequest, liferayPortletResponse, viewFullContentURLString);
+
+	viewURL = HttpUtil.setParameter(viewURL, "redirect", currentURL);
 }
 else {
 	viewURL = viewFullContentURL.toString();
@@ -73,17 +75,17 @@ String viewURLMessage = viewInContext ? assetRenderer.getViewInContextMessage() 
 viewURL = _checkViewURL(viewURL, currentURL, themeDisplay);
 %>
 
-<c:if test="<%= show && assetRenderer.hasViewPermission(permissionChecker) %>">
-	<div class="asset-abstract">
+<c:if test="<%= show %>">
+	<div class="asset-abstract <%= defaultAssetPublisher ? "default-asset-publisher" : StringPool.BLANK %>">
 		<liferay-util:include page="/html/portlet/asset_publisher/asset_actions.jsp" />
 
 		<h3 class="asset-title">
 			<c:choose>
 				<c:when test="<%= Validator.isNotNull(viewURL) %>">
-					<a href="<%= viewURL %>"><img alt="" src="<%= assetRendererFactory.getIconPath(renderRequest) %>" /> <%= HtmlUtil.escape(title) %></a>
+					<a href="<%= viewURL %>"><img alt="" src="<%= assetRenderer.getIconPath(renderRequest) %>" /> <%= HtmlUtil.escape(title) %></a>
 				</c:when>
 				<c:otherwise>
-					<img src="<%= assetRendererFactory.getIconPath(renderRequest) %>" alt="" /> <%= HtmlUtil.escape(title) %>
+					<img alt="" src="<%= assetRenderer.getIconPath(renderRequest) %>" /> <%= HtmlUtil.escape(title) %>
 				</c:otherwise>
 			</c:choose>
 		</h3>

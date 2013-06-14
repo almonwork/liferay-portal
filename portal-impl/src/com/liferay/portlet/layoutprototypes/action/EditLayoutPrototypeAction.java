@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -15,14 +15,17 @@
 package com.liferay.portlet.layoutprototypes.action;
 
 import com.liferay.portal.NoSuchLayoutPrototypeException;
+import com.liferay.portal.RequiredLayoutPrototypeException;
 import com.liferay.portal.kernel.servlet.SessionErrors;
 import com.liferay.portal.kernel.util.Constants;
 import com.liferay.portal.kernel.util.LocalizationUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.StringUtil;
+import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.security.auth.PrincipalException;
 import com.liferay.portal.service.LayoutPrototypeServiceUtil;
 import com.liferay.portal.struts.PortletAction;
+import com.liferay.portal.util.PortalUtil;
 
 import java.util.Locale;
 import java.util.Map;
@@ -39,6 +42,7 @@ import org.apache.struts.action.ActionMapping;
 
 /**
  * @author Jorge Ferrer
+ * @author Vilmos Papp
  */
 public class EditLayoutPrototypeAction extends PortletAction {
 
@@ -62,9 +66,19 @@ public class EditLayoutPrototypeAction extends PortletAction {
 		}
 		catch (Exception e) {
 			if (e instanceof PrincipalException) {
-				SessionErrors.add(actionRequest, e.getClass().getName());
+				SessionErrors.add(actionRequest, e.getClass());
 
 				setForward(actionRequest, "portlet.layout_prototypes.error");
+			}
+			else if (e instanceof RequiredLayoutPrototypeException) {
+				SessionErrors.add(actionRequest, e.getClass());
+
+				String redirect = PortalUtil.escapeRedirect(
+					ParamUtil.getString(actionRequest, "redirect"));
+
+				if (Validator.isNotNull(redirect)) {
+					actionResponse.sendRedirect(redirect);
+				}
 			}
 			else {
 				throw e;
@@ -85,7 +99,7 @@ public class EditLayoutPrototypeAction extends PortletAction {
 			if (e instanceof NoSuchLayoutPrototypeException ||
 				e instanceof PrincipalException) {
 
-				SessionErrors.add(renderRequest, e.getClass().getName());
+				SessionErrors.add(renderRequest, e.getClass());
 
 				return mapping.findForward("portlet.layout_prototypes.error");
 			}

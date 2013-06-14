@@ -14,49 +14,29 @@
 	<td></td>
 </tr>
 <tr>
-	<td>waitForVisible</td>
-	<td>link=Manage Pages Test Page</td>
-	<td></td>
-</tr>
-<tr>
-	<td>clickAtAndWait</td>
-	<td>link=Manage Pages Test Page</td>
-	<td></td>
-</tr>
-<tr>
 	<td>clickAt</td>
-	<td>main-content</td>
-	<td></td>
-</tr>
-<tr>
-	<td>clickAt</td>
-	<td>dockbar</td>
-	<td></td>
-</tr>
-<tr>
-	<td>clickAt</td>
-	<td>navigation</td>
-	<td></td>
+	<td>//div[@id='dockbar']</td>
+	<td>Dockbar</td>
 </tr>
 <tr>
 	<td>waitForElementPresent</td>
-	<td>//div[4]/div/ul/li[1]/a</td>
+	<td>//li[contains(@class,'manage-page')]/a</td>
 	<td>Manage Pages</td>
 </tr>
 <tr>
 	<td>clickAt</td>
-	<td>//div[4]/div/ul/li[1]/a</td>
+	<td>//li[contains(@class,'manage-page')]/a</td>
 	<td>Manage Pages</td>
 </tr>
 <tr>
-	<td>waitForPartialText</td>
-	<td>//div/div[3]/a</td>
-	<td>Liferay</td>
+	<td>waitForText</td>
+	<td>//a[@class='layout-tree']</td>
+	<td>Public Pages</td>
 </tr>
 <tr>
 	<td>assertText</td>
-	<td>//div/div[3]/a</td>
-	<td>Pages (Liferay)</td>
+	<td>//a[@class='layout-tree']</td>
+	<td>Public Pages</td>
 </tr>
 <tr>
 	<td>store</td>
@@ -71,7 +51,7 @@
 <tr>
 	<td>clickAt</td>
 	<td>//div[3]/ul/li/div/div[1]</td>
-	<td></td>
+	<td>Drop Down Arrow</td>
 </tr>
 <tr>
 	<td>label</td>
@@ -80,43 +60,68 @@
 </tr>
 <tr>
 	<td>waitForVisible</td>
-	<td>//li[2]/div/div[3]/a</td>
-	<td></td>
-</tr>
-<tr>
-	<td>clickAtAndWait</td>
-	<td>//li[2]/div/div[3]/a</td>
-	<td></td>
-</tr>
-<tr>
-	<td>waitForText</td>
-	<td>_88_type</td>
-	<td>Portlet Panel Embedded Web Content URL Link to Page</td>
-</tr>
-<tr>
-	<td>select</td>
-	<td>_88_type</td>
-	<td>label=Embedded</td>
+	<td>//li/ul/li[1]/div/div[3]/a</td>
+	<td>Welcome</td>
 </tr>
 <tr>
 	<td>assertText</td>
-	<td>_88_type</td>
-	<td>Portlet Panel Embedded Web Content URL Link to Page</td>
+	<td>//li/ul/li[1]/div/div[3]/a</td>
+	<td>Welcome</td>
+</tr>
+<tr>
+	<td>assertText</td>
+	<td>//li/ul/li[2]/div/div[3]/a</td>
+	<td>Manage Pages Test Page</td>
+</tr>
+<tr>
+	<td>clickAt</td>
+	<td>//li/ul/li[2]/div/div[3]/a</td>
+	<td>Manage Pages Test Page</td>
+</tr>
+<tr>
+	<td>waitForValue</td>
+	<td>//div[1]/fieldset/div/span[1]/span/span/span/input</td>
+	<td>Manage Pages Test Page</td>
+</tr>
+<tr>
+	<td>assertValue</td>
+	<td>//div[1]/fieldset/div/span[1]/span/span/span/input</td>
+	<td>Manage Pages Test Page</td>
+</tr>
+<tr>
+	<td>pause</td>
+	<td>5000</td>
+	<td></td>
+</tr>
+<tr>
+	<td>waitForPartialText</td>
+	<td>//select[@id='_88_type']</td>
+	<td>Embedded</td>
+</tr>
+<tr>
+	<td>select</td>
+	<td>//select[@id='_88_type']</td>
+	<td>Embedded</td>
+</tr>
+<tr>
+	<td>waitForVisible</td>
+	<td>//input[@id='_88_url']</td>
+	<td>URL Field</td>
 </tr>
 <tr>
 	<td>type</td>
-	<td>_88_url</td>
+	<td>//input[@id='_88_url']</td>
 	<td>http://www.liferay.com</td>
 </tr>
 <tr>
 	<td>clickAtAndWait</td>
 	<td>//input[@value='Save']</td>
-	<td></td>
+	<td>Save</td>
 </tr>
 <tr>
 	<td>assertText</td>
 	<td>//div[@class='portlet-msg-success']</td>
-	<td>Your request completed successfully.</td>
+	<td>Your request completed successfully. The page will be refreshed when you close this dialog. Alternatively you can hide this dialog.</td>
 </tr>
 <tr>
 	<td>open</td>
@@ -124,14 +129,14 @@
 	<td></td>
 </tr>
 <tr>
-	<td>waitForElementPresent</td>
+	<td>waitForVisible</td>
 	<td>link=Manage Pages Test Page</td>
-	<td></td>
+	<td>Manage Pages Test Page</td>
 </tr>
 <tr>
 	<td>clickAtAndWait</td>
 	<td>link=Manage Pages Test Page</td>
-	<td></td>
+	<td>Manage Pages Test Page</td>
 </tr>
 <tr>
 	<td>assertText</td>
@@ -139,11 +144,15 @@
 	<td>Manage Pages Test Page</td>
 </tr>
 <tr>
-	<td>assertElementPresent</td>
-	<td>//a[@id='logo']</td>
-	<td></td>
+	<td>waitForVisible</td>
+	<td>//img[@alt='Liferay']</td>
+	<td>Liferay</td>
 </tr>
-
+<tr>
+	<td>assertVisible</td>
+	<td>//img[@alt='Liferay']</td>
+	<td>Liferay</td>
+</tr>
 </tbody></table>
 </body>
 </html>

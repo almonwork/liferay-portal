@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -30,7 +30,6 @@ import com.liferay.portal.upgrade.v6_0_0.util.DLFileEntryVersionUpgradeColumnImp
 import com.liferay.portal.upgrade.v6_0_0.util.DLFileRankTable;
 import com.liferay.portal.upgrade.v6_0_0.util.DLFileShortcutTable;
 import com.liferay.portal.upgrade.v6_0_0.util.DLFileVersionTable;
-import com.liferay.portal.util.PortletKeys;
 import com.liferay.portlet.documentlibrary.NoSuchFileException;
 import com.liferay.portlet.documentlibrary.model.DLFolderConstants;
 import com.liferay.portlet.documentlibrary.store.DLStoreUtil;
@@ -57,7 +56,7 @@ public class UpgradeDocumentLibrary extends UpgradeProcess {
 		PreparedStatement ps = null;
 
 		try {
-			con = DataAccess.getConnection();
+			con = DataAccess.getUpgradeOptimizedConnection();
 
 			StringBundler sb = new StringBundler(5);
 
@@ -100,7 +99,7 @@ public class UpgradeDocumentLibrary extends UpgradeProcess {
 		ResultSet rs = null;
 
 		try {
-			con = DataAccess.getConnection();
+			con = DataAccess.getUpgradeOptimizedConnection();
 
 			ps = con.prepareStatement("select * from DLFileEntry");
 
@@ -109,14 +108,9 @@ public class UpgradeDocumentLibrary extends UpgradeProcess {
 			while (rs.next()) {
 				long companyId = rs.getLong("companyId");
 				long groupId = rs.getLong("groupId");
-				long userId = rs.getLong("userId");
-				String userName = rs.getString("userName");
 				long folderId = rs.getLong("folderId");
 				String name = rs.getString("name");
-				double version = rs.getDouble("version");
-				int size = rs.getInt("size_");
 
-				String portletId = PortletKeys.DOCUMENT_LIBRARY;
 				long repositoryId = folderId;
 
 				if (repositoryId ==
@@ -131,22 +125,19 @@ public class UpgradeDocumentLibrary extends UpgradeProcess {
 				if (!newName.equals(name)) {
 					try {
 						DLStoreUtil.updateFile(
-							companyId, portletId, groupId, repositoryId, name,
-							newName);
+							companyId, repositoryId, name, newName);
 					}
 					catch (NoSuchFileException nsfe) {
 						_log.error(nsfe);
 					}
 				}
-
-				addFileVersion(
-					groupId, companyId, userId, userName, folderId, name,
-					version, size);
 			}
 		}
 		finally {
 			DataAccess.cleanUp(con, ps, rs);
 		}
+
+		synchronizeFileVersions();
 
 		// DLFileEntry
 
@@ -200,6 +191,48 @@ public class UpgradeDocumentLibrary extends UpgradeProcess {
 		upgradeTable.setIndexesSQL(DLFileVersionTable.TABLE_SQL_ADD_INDEXES);
 
 		upgradeTable.updateTable();
+	}
+
+	protected void synchronizeFileVersions() throws Exception {
+		Connection con = null;
+		PreparedStatement ps = null;
+		ResultSet rs = null;
+
+		try {
+			con = DataAccess.getUpgradeOptimizedConnection();
+
+			StringBundler sb = new StringBundler(5);
+
+			sb.append("select * from DLFileEntry dlFileEntry where version ");
+			sb.append("not in (select version from DLFileVersion ");
+			sb.append("dlFileVersion where (dlFileVersion.folderId = ");
+			sb.append("dlFileEntry.folderId) and (dlFileVersion.name = ");
+			sb.append("dlFileEntry.name))");
+
+			String sql = sb.toString();
+
+			ps = con.prepareStatement(sql);
+
+			rs = ps.executeQuery();
+
+			while (rs.next()) {
+				long companyId = rs.getLong("companyId");
+				long groupId = rs.getLong("groupId");
+				long userId = rs.getLong("userId");
+				String userName = rs.getString("userName");
+				long folderId = rs.getLong("folderId");
+				String name = rs.getString("name");
+				double version = rs.getDouble("version");
+				int size = rs.getInt("size_");
+
+				addFileVersion(
+					groupId, companyId, userId, userName, folderId, name,
+					version, size);
+			}
+		}
+		finally {
+			DataAccess.cleanUp(con, ps);
+		}
 	}
 
 	private static Log _log = LogFactoryUtil.getLog(

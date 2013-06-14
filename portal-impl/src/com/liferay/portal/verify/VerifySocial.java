@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -54,7 +54,7 @@ public class VerifySocial extends VerifyProcess {
 		ResultSet rs = null;
 
 		try {
-			con = DataAccess.getConnection();
+			con = DataAccess.getUpgradeOptimizedConnection();
 
 			ps = con.prepareStatement(sql);
 
@@ -81,7 +81,7 @@ public class VerifySocial extends VerifyProcess {
 				if ((curGroupId == groupId) && (curUserId == userId) &&
 					(curClassNameId == classNameId) &&
 					(curClassPK == classPK) && (curType == type) &&
-					(curExtraData.equals(extraData)) &&
+					curExtraData.equals(extraData) &&
 					(curReceiverUserId == receiverUserId)) {
 
 					SocialActivityLocalServiceUtil.deleteActivity(
@@ -127,7 +127,7 @@ public class VerifySocial extends VerifyProcess {
 		ResultSet rs = null;
 
 		try {
-			con = DataAccess.getConnection();
+			con = DataAccess.getUpgradeOptimizedConnection();
 
 			ps = con.prepareStatement(sql);
 
@@ -154,7 +154,7 @@ public class VerifySocial extends VerifyProcess {
 				if ((curGroupId == groupId) && (curUserId == userId) &&
 					(curClassNameId == classNameId) &&
 					(curClassPK == classPK) && (curType == type) &&
-					(curExtraData.equals(extraData)) &&
+					curExtraData.equals(extraData) &&
 					(curReceiverUserId == receiverUserId)) {
 
 					SocialRequestLocalServiceUtil.deleteRequest(curRequestId);

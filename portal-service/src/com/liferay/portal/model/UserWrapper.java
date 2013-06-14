@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,6 +14,10 @@
 
 package com.liferay.portal.model;
 
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * <p>
  * This class is a wrapper for {@link User}.
@@ -23,7 +27,7 @@ package com.liferay.portal.model;
  * @see       User
  * @generated
  */
-public class UserWrapper implements User {
+public class UserWrapper implements User, ModelWrapper<User> {
 	public UserWrapper(User user) {
 		_user = user;
 	}
@@ -34,6 +38,293 @@ public class UserWrapper implements User {
 
 	public String getModelClassName() {
 		return User.class.getName();
+	}
+
+	public Map<String, Object> getModelAttributes() {
+		Map<String, Object> attributes = new HashMap<String, Object>();
+
+		attributes.put("uuid", getUuid());
+		attributes.put("userId", getUserId());
+		attributes.put("companyId", getCompanyId());
+		attributes.put("createDate", getCreateDate());
+		attributes.put("modifiedDate", getModifiedDate());
+		attributes.put("defaultUser", getDefaultUser());
+		attributes.put("contactId", getContactId());
+		attributes.put("password", getPassword());
+		attributes.put("passwordEncrypted", getPasswordEncrypted());
+		attributes.put("passwordReset", getPasswordReset());
+		attributes.put("passwordModifiedDate", getPasswordModifiedDate());
+		attributes.put("digest", getDigest());
+		attributes.put("reminderQueryQuestion", getReminderQueryQuestion());
+		attributes.put("reminderQueryAnswer", getReminderQueryAnswer());
+		attributes.put("graceLoginCount", getGraceLoginCount());
+		attributes.put("screenName", getScreenName());
+		attributes.put("emailAddress", getEmailAddress());
+		attributes.put("facebookId", getFacebookId());
+		attributes.put("openId", getOpenId());
+		attributes.put("portraitId", getPortraitId());
+		attributes.put("languageId", getLanguageId());
+		attributes.put("timeZoneId", getTimeZoneId());
+		attributes.put("greeting", getGreeting());
+		attributes.put("comments", getComments());
+		attributes.put("firstName", getFirstName());
+		attributes.put("middleName", getMiddleName());
+		attributes.put("lastName", getLastName());
+		attributes.put("jobTitle", getJobTitle());
+		attributes.put("loginDate", getLoginDate());
+		attributes.put("loginIP", getLoginIP());
+		attributes.put("lastLoginDate", getLastLoginDate());
+		attributes.put("lastLoginIP", getLastLoginIP());
+		attributes.put("lastFailedLoginDate", getLastFailedLoginDate());
+		attributes.put("failedLoginAttempts", getFailedLoginAttempts());
+		attributes.put("lockout", getLockout());
+		attributes.put("lockoutDate", getLockoutDate());
+		attributes.put("agreedToTermsOfUse", getAgreedToTermsOfUse());
+		attributes.put("emailAddressVerified", getEmailAddressVerified());
+		attributes.put("status", getStatus());
+
+		return attributes;
+	}
+
+	public void setModelAttributes(Map<String, Object> attributes) {
+		String uuid = (String)attributes.get("uuid");
+
+		if (uuid != null) {
+			setUuid(uuid);
+		}
+
+		Long userId = (Long)attributes.get("userId");
+
+		if (userId != null) {
+			setUserId(userId);
+		}
+
+		Long companyId = (Long)attributes.get("companyId");
+
+		if (companyId != null) {
+			setCompanyId(companyId);
+		}
+
+		Date createDate = (Date)attributes.get("createDate");
+
+		if (createDate != null) {
+			setCreateDate(createDate);
+		}
+
+		Date modifiedDate = (Date)attributes.get("modifiedDate");
+
+		if (modifiedDate != null) {
+			setModifiedDate(modifiedDate);
+		}
+
+		Boolean defaultUser = (Boolean)attributes.get("defaultUser");
+
+		if (defaultUser != null) {
+			setDefaultUser(defaultUser);
+		}
+
+		Long contactId = (Long)attributes.get("contactId");
+
+		if (contactId != null) {
+			setContactId(contactId);
+		}
+
+		String password = (String)attributes.get("password");
+
+		if (password != null) {
+			setPassword(password);
+		}
+
+		Boolean passwordEncrypted = (Boolean)attributes.get("passwordEncrypted");
+
+		if (passwordEncrypted != null) {
+			setPasswordEncrypted(passwordEncrypted);
+		}
+
+		Boolean passwordReset = (Boolean)attributes.get("passwordReset");
+
+		if (passwordReset != null) {
+			setPasswordReset(passwordReset);
+		}
+
+		Date passwordModifiedDate = (Date)attributes.get("passwordModifiedDate");
+
+		if (passwordModifiedDate != null) {
+			setPasswordModifiedDate(passwordModifiedDate);
+		}
+
+		String digest = (String)attributes.get("digest");
+
+		if (digest != null) {
+			setDigest(digest);
+		}
+
+		String reminderQueryQuestion = (String)attributes.get(
+				"reminderQueryQuestion");
+
+		if (reminderQueryQuestion != null) {
+			setReminderQueryQuestion(reminderQueryQuestion);
+		}
+
+		String reminderQueryAnswer = (String)attributes.get(
+				"reminderQueryAnswer");
+
+		if (reminderQueryAnswer != null) {
+			setReminderQueryAnswer(reminderQueryAnswer);
+		}
+
+		Integer graceLoginCount = (Integer)attributes.get("graceLoginCount");
+
+		if (graceLoginCount != null) {
+			setGraceLoginCount(graceLoginCount);
+		}
+
+		String screenName = (String)attributes.get("screenName");
+
+		if (screenName != null) {
+			setScreenName(screenName);
+		}
+
+		String emailAddress = (String)attributes.get("emailAddress");
+
+		if (emailAddress != null) {
+			setEmailAddress(emailAddress);
+		}
+
+		Long facebookId = (Long)attributes.get("facebookId");
+
+		if (facebookId != null) {
+			setFacebookId(facebookId);
+		}
+
+		String openId = (String)attributes.get("openId");
+
+		if (openId != null) {
+			setOpenId(openId);
+		}
+
+		Long portraitId = (Long)attributes.get("portraitId");
+
+		if (portraitId != null) {
+			setPortraitId(portraitId);
+		}
+
+		String languageId = (String)attributes.get("languageId");
+
+		if (languageId != null) {
+			setLanguageId(languageId);
+		}
+
+		String timeZoneId = (String)attributes.get("timeZoneId");
+
+		if (timeZoneId != null) {
+			setTimeZoneId(timeZoneId);
+		}
+
+		String greeting = (String)attributes.get("greeting");
+
+		if (greeting != null) {
+			setGreeting(greeting);
+		}
+
+		String comments = (String)attributes.get("comments");
+
+		if (comments != null) {
+			setComments(comments);
+		}
+
+		String firstName = (String)attributes.get("firstName");
+
+		if (firstName != null) {
+			setFirstName(firstName);
+		}
+
+		String middleName = (String)attributes.get("middleName");
+
+		if (middleName != null) {
+			setMiddleName(middleName);
+		}
+
+		String lastName = (String)attributes.get("lastName");
+
+		if (lastName != null) {
+			setLastName(lastName);
+		}
+
+		String jobTitle = (String)attributes.get("jobTitle");
+
+		if (jobTitle != null) {
+			setJobTitle(jobTitle);
+		}
+
+		Date loginDate = (Date)attributes.get("loginDate");
+
+		if (loginDate != null) {
+			setLoginDate(loginDate);
+		}
+
+		String loginIP = (String)attributes.get("loginIP");
+
+		if (loginIP != null) {
+			setLoginIP(loginIP);
+		}
+
+		Date lastLoginDate = (Date)attributes.get("lastLoginDate");
+
+		if (lastLoginDate != null) {
+			setLastLoginDate(lastLoginDate);
+		}
+
+		String lastLoginIP = (String)attributes.get("lastLoginIP");
+
+		if (lastLoginIP != null) {
+			setLastLoginIP(lastLoginIP);
+		}
+
+		Date lastFailedLoginDate = (Date)attributes.get("lastFailedLoginDate");
+
+		if (lastFailedLoginDate != null) {
+			setLastFailedLoginDate(lastFailedLoginDate);
+		}
+
+		Integer failedLoginAttempts = (Integer)attributes.get(
+				"failedLoginAttempts");
+
+		if (failedLoginAttempts != null) {
+			setFailedLoginAttempts(failedLoginAttempts);
+		}
+
+		Boolean lockout = (Boolean)attributes.get("lockout");
+
+		if (lockout != null) {
+			setLockout(lockout);
+		}
+
+		Date lockoutDate = (Date)attributes.get("lockoutDate");
+
+		if (lockoutDate != null) {
+			setLockoutDate(lockoutDate);
+		}
+
+		Boolean agreedToTermsOfUse = (Boolean)attributes.get(
+				"agreedToTermsOfUse");
+
+		if (agreedToTermsOfUse != null) {
+			setAgreedToTermsOfUse(agreedToTermsOfUse);
+		}
+
+		Boolean emailAddressVerified = (Boolean)attributes.get(
+				"emailAddressVerified");
+
+		if (emailAddressVerified != null) {
+			setEmailAddressVerified(emailAddressVerified);
+		}
+
+		Integer status = (Integer)attributes.get("status");
+
+		if (status != null) {
+			setStatus(status);
+		}
 	}
 
 	/**
@@ -850,10 +1141,6 @@ public class UserWrapper implements User {
 		return _user.isEscapedModel();
 	}
 
-	public void setEscapedModel(boolean escapedModel) {
-		_user.setEscapedModel(escapedModel);
-	}
-
 	public java.io.Serializable getPrimaryKeyObj() {
 		return _user.getPrimaryKeyObj();
 	}
@@ -938,6 +1225,13 @@ public class UserWrapper implements User {
 		return _user.getDisplayEmailAddress();
 	}
 
+	public java.lang.String getDisplayURL(java.lang.String portalURL,
+		java.lang.String mainPath)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException {
+		return _user.getDisplayURL(portalURL, mainPath);
+	}
+
 	public java.lang.String getDisplayURL(
 		com.liferay.portal.theme.ThemeDisplay themeDisplay)
 		throws com.liferay.portal.kernel.exception.PortalException,
@@ -945,11 +1239,9 @@ public class UserWrapper implements User {
 		return _user.getDisplayURL(themeDisplay);
 	}
 
-	public java.lang.String getDisplayURL(java.lang.String portalURL,
-		java.lang.String mainPath)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
-		return _user.getDisplayURL(portalURL, mainPath);
+	public java.util.List<com.liferay.portal.model.EmailAddress> getEmailAddresses()
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return _user.getEmailAddresses();
 	}
 
 	public boolean getFemale()
@@ -966,6 +1258,12 @@ public class UserWrapper implements User {
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException {
 		return _user.getGroup();
+	}
+
+	public long getGroupId()
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException {
+		return _user.getGroupId();
 	}
 
 	public long[] getGroupIds()
@@ -1002,10 +1300,24 @@ public class UserWrapper implements User {
 		return _user.getMySites();
 	}
 
+	public java.util.List<com.liferay.portal.model.Group> getMySites(
+		boolean includeControlPanel, int max)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException {
+		return _user.getMySites(includeControlPanel, max);
+	}
+
 	public java.util.List<com.liferay.portal.model.Group> getMySites(int max)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException {
 		return _user.getMySites(max);
+	}
+
+	public java.util.List<com.liferay.portal.model.Group> getMySites(
+		java.lang.String[] classNames, boolean includeControlPanel, int max)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException {
+		return _user.getMySites(classNames, includeControlPanel, max);
 	}
 
 	public java.util.List<com.liferay.portal.model.Group> getMySites(
@@ -1021,10 +1333,23 @@ public class UserWrapper implements User {
 		return _user.getOrganizationIds();
 	}
 
+	public long[] getOrganizationIds(boolean includeNonUser)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException {
+		return _user.getOrganizationIds(includeNonUser);
+	}
+
 	public java.util.List<com.liferay.portal.model.Organization> getOrganizations()
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException {
 		return _user.getOrganizations();
+	}
+
+	public java.util.List<com.liferay.portal.model.Organization> getOrganizations(
+		boolean includeIndirectlyAssociated)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException {
+		return _user.getOrganizations(includeIndirectlyAssociated);
 	}
 
 	public boolean getPasswordModified() {
@@ -1081,30 +1406,6 @@ public class UserWrapper implements User {
 		return _user.getRoles();
 	}
 
-	public double getSocialContributionEquity() {
-		return _user.getSocialContributionEquity();
-	}
-
-	public double getSocialContributionEquity(long groupId) {
-		return _user.getSocialContributionEquity(groupId);
-	}
-
-	public double getSocialParticipationEquity() {
-		return _user.getSocialParticipationEquity();
-	}
-
-	public double getSocialParticipationEquity(long groupId) {
-		return _user.getSocialParticipationEquity(groupId);
-	}
-
-	public double getSocialPersonalEquity() {
-		return _user.getSocialPersonalEquity();
-	}
-
-	public double getSocialPersonalEquity(long groupId) {
-		return _user.getSocialPersonalEquity(groupId);
-	}
-
 	public long[] getTeamIds()
 		throws com.liferay.portal.kernel.exception.SystemException {
 		return _user.getTeamIds();
@@ -1113,6 +1414,10 @@ public class UserWrapper implements User {
 	public java.util.List<com.liferay.portal.model.Team> getTeams()
 		throws com.liferay.portal.kernel.exception.SystemException {
 		return _user.getTeams();
+	}
+
+	public java.util.TimeZone getTimeZone() {
+		return _user.getTimeZone();
 	}
 
 	public long[] getUserGroupIds()
@@ -1125,8 +1430,9 @@ public class UserWrapper implements User {
 		return _user.getUserGroups();
 	}
 
-	public java.util.TimeZone getTimeZone() {
-		return _user.getTimeZone();
+	public java.util.List<com.liferay.portal.model.Website> getWebsites()
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return _user.getWebsites();
 	}
 
 	public boolean hasCompanyMx()
@@ -1197,20 +1503,14 @@ public class UserWrapper implements User {
 		_user.setPasswordUnencrypted(passwordUnencrypted);
 	}
 
-	public void updateSocialContributionEquity(long groupId, double value) {
-		_user.updateSocialContributionEquity(groupId, value);
-	}
-
-	public void updateSocialParticipationEquity(long groupId, double value) {
-		_user.updateSocialParticipationEquity(groupId, value);
-	}
-
-	public java.util.List<com.liferay.portal.model.Website> getWebsites()
-		throws com.liferay.portal.kernel.exception.SystemException {
-		return _user.getWebsites();
-	}
-
+	/**
+	 * @deprecated Renamed to {@link #getWrappedModel}
+	 */
 	public User getWrappedUser() {
+		return _user;
+	}
+
+	public User getWrappedModel() {
 		return _user;
 	}
 

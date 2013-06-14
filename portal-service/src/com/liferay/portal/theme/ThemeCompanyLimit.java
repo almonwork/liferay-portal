@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -33,28 +33,28 @@ public class ThemeCompanyLimit implements Serializable {
 		_excludes = new ArrayList<ThemeCompanyId>();
 	}
 
+	public List<ThemeCompanyId> getExcludes() {
+		return _excludes;
+	}
+
 	public List<ThemeCompanyId> getIncludes() {
 		return _includes;
 	}
 
-	public void setIncludes(List<? extends ThemeCompanyId> includes) {
-		_includes = (List<ThemeCompanyId>)includes;
+	public boolean isExcluded(long companyId) {
+		return _matches(_excludes, companyId);
 	}
 
 	public boolean isIncluded(long companyId) {
 		return _matches(_includes, companyId);
 	}
 
-	public List<ThemeCompanyId> getExcludes() {
-		return _excludes;
-	}
-
 	public void setExcludes(List<? extends ThemeCompanyId> excludes) {
 		_excludes = (List<ThemeCompanyId>)excludes;
 	}
 
-	public boolean isExcluded(long companyId) {
-		return _matches(_excludes, companyId);
+	public void setIncludes(List<? extends ThemeCompanyId> includes) {
+		_includes = (List<ThemeCompanyId>)includes;
 	}
 
 	private boolean _matches(
@@ -86,7 +86,7 @@ public class ThemeCompanyLimit implements Serializable {
 		return false;
 	}
 
-	private List<ThemeCompanyId> _includes;
 	private List<ThemeCompanyId> _excludes;
+	private List<ThemeCompanyId> _includes;
 
 }

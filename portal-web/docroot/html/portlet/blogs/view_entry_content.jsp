@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -45,24 +45,18 @@ AssetEntry assetEntry = (AssetEntry)request.getAttribute("view_entry_content.jsp
 					<portlet:param name="urlTitle" value="<%= entry.getUrlTitle() %>" />
 				</portlet:renderURL>
 
-				<c:if test='<%= strutsAction.equals("/blogs/view_entry") %>'>
-					<portlet:renderURL var="blogsURL">
-						<portlet:param name="struts_action" value="/blogs/view" />
-					</portlet:renderURL>
+				<c:if test='<%= !strutsAction.equals("/blogs/view_entry") %>'>
+					<div class="entry-title">
+						<h2><aui:a href="<%= viewEntryURL %>"><%= HtmlUtil.escape(entry.getTitle()) %></aui:a></h2>
+					</div>
 				</c:if>
-
-				<div class="entry-title">
-					<c:if test='<%= !strutsAction.equals("/blogs/view_entry") %>'>
-						<aui:a href="<%= viewEntryURL %>"><%= HtmlUtil.escape(entry.getTitle()) %></aui:a>
-					</c:if>
-				</div>
 
 				<div class="entry-date">
 					<%= dateFormatDateTime.format(entry.getDisplayDate()) %>
 				</div>
 			</div>
 
-			<portlet:renderURL windowState="<%= WindowState.NORMAL.toString() %>" var="bookmarkURL">
+			<portlet:renderURL var="bookmarkURL" windowState="<%= WindowState.NORMAL.toString() %>">
 				<portlet:param name="struts_action" value="/blogs/view_entry" />
 				<portlet:param name="urlTitle" value="<%= entry.getUrlTitle() %>" />
 			</portlet:renderURL>
@@ -72,7 +66,8 @@ AssetEntry assetEntry = (AssetEntry)request.getAttribute("view_entry_content.jsp
 					displayStyle="<%= socialBookmarksDisplayStyle %>"
 					target="_blank"
 					title="<%= entry.getTitle() %>"
-					url="<%= bookmarkURL.toString() %>"
+					types="<%= socialBookmarksTypes %>"
+					url="<%= PortalUtil.getCanonicalURL(bookmarkURL.toString(), themeDisplay, layout) %>"
 				/>
 			</c:if>
 
@@ -122,13 +117,14 @@ AssetEntry assetEntry = (AssetEntry)request.getAttribute("view_entry_content.jsp
 
 								<portlet:actionURL var="deleteEntryURL">
 									<portlet:param name="struts_action" value="/blogs/edit_entry" />
-									<portlet:param name="<%= Constants.CMD %>" value="<%= Constants.DELETE %>" />
+									<portlet:param name="<%= Constants.CMD %>" value="<%= Constants.MOVE_TO_TRASH %>" />
 									<portlet:param name="redirect" value="<%= viewURL %>" />
 									<portlet:param name="entryId" value="<%= String.valueOf(entry.getEntryId()) %>" />
 								</portlet:actionURL>
 
 								<liferay-ui:icon-delete
 									label="<%= true %>"
+									trash="<%= true %>"
 									url="<%= deleteEntryURL %>"
 								/>
 							</td>
@@ -141,7 +137,33 @@ AssetEntry assetEntry = (AssetEntry)request.getAttribute("view_entry_content.jsp
 			<div class="entry-body">
 				<c:choose>
 					<c:when test='<%= pageDisplayStyle.equals(RSSUtil.DISPLAY_STYLE_ABSTRACT) && !strutsAction.equals("/blogs/view_entry") %>'>
-						<%= StringUtil.shorten(HtmlUtil.stripHtml(entry.getContent()), pageAbstractLength) %>
+						<c:if test="<%= entry.isSmallImage() %>">
+
+							<%
+							String src = StringPool.BLANK;
+
+							if (Validator.isNotNull(entry.getSmallImageURL())) {
+								src = entry.getSmallImageURL();
+							}
+							else {
+								src = themeDisplay.getPathImage() + "/blogs/article?img_id=" + entry.getSmallImageId() + "&t=" + WebServerServletTokenUtil.getToken(entry.getSmallImageId());
+							}
+							%>
+
+							<div class="asset-small-image">
+								<img alt="" class="asset-small-image" src="<%= HtmlUtil.escape(src) %>" width="150" />
+							</div>
+						</c:if>
+
+						<%
+						String summary = entry.getDescription();
+
+						if (Validator.isNull(summary)) {
+							summary = entry.getContent();
+						}
+						%>
+
+						<%= StringUtil.shorten(HtmlUtil.stripHtml(summary), pageAbstractLength) %>
 
 						<br />
 
@@ -198,7 +220,7 @@ AssetEntry assetEntry = (AssetEntry)request.getAttribute("view_entry_content.jsp
 									<%= messagesCount %> <liferay-ui:message key='<%= (messagesCount == 1) ? "comment" : "comments" %>' />
 								</c:when>
 								<c:otherwise>
-									<aui:a href='<%= viewEntryURL + StringPool.POUND + renderResponse.getNamespace() + "messageScroll0" %>'><%= messagesCount %> <liferay-ui:message key='<%= (messagesCount == 1) ? "comment" : "comments" %>' /></aui:a>
+									<aui:a href='<%= PropsValues.PORTLET_URL_ANCHOR_ENABLE ? viewEntryURL : viewEntryURL + StringPool.POUND + "blogsCommentsPanelContainer" %>'><%= messagesCount %> <liferay-ui:message key='<%= (messagesCount == 1) ? "comment" : "comments" %>' /></aui:a>
 								</c:otherwise>
 							</c:choose>
 						</span>
@@ -234,6 +256,7 @@ AssetEntry assetEntry = (AssetEntry)request.getAttribute("view_entry_content.jsp
 					<c:if test="<%= enableRelatedAssets %>">
 						<div class="entry-links">
 							<liferay-ui:asset-links
+								assetEntryId="<%= (assetEntry != null) ? assetEntry.getEntryId() : 0 %>"
 								className="<%= BlogsEntry.class.getName() %>"
 								classPK="<%= entry.getEntryId() %>"
 							/>
@@ -245,7 +268,8 @@ AssetEntry assetEntry = (AssetEntry)request.getAttribute("view_entry_content.jsp
 							displayStyle="<%= socialBookmarksDisplayStyle %>"
 							target="_blank"
 							title="<%= entry.getTitle() %>"
-							url="<%= bookmarkURL.toString() %>"
+							types="<%= socialBookmarksTypes %>"
+							url="<%= PortalUtil.getCanonicalURL(bookmarkURL.toString(), themeDisplay, layout) %>"
 						/>
 					</c:if>
 

@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -22,7 +22,7 @@ String returnToFullPageURL = ParamUtil.getString(request, "returnToFullPageURL")
 
 PortletPreferences portletSetup = PortletPreferencesFactoryUtil.getLayoutPortletSetup(layout, portletResource);
 
-Set allPortletModes = selPortlet.getAllPortletModes();
+Set<String> allPortletModes = selPortlet.getAllPortletModes();
 %>
 
 <liferay-util:include page="/html/portlet/portlet_configuration/tabs1.jsp">
@@ -39,21 +39,17 @@ Set allPortletModes = selPortlet.getAllPortletModes();
 	<aui:input name="portletResource" type="hidden" value="<%= portletResource %>" />
 
 	<%
-	Iterator itr = allPortletModes.iterator();
-
-	while (itr.hasNext()) {
-		String curPortletMode = (String)itr.next();
-
-		String mobileDevicesParam = "portlet-setup-supported-clients-mobile-devices-" + curPortletMode;
+	for (String curPortletMode : allPortletModes) {
+		String mobileDevicesParam = "portletSetupSupportedClientsMobileDevices_" + curPortletMode;
 		boolean mobileDevicesDefault = selPortlet.hasPortletMode(ContentTypes.XHTML_MP, PortletModeFactory.getPortletMode(curPortletMode));
 
 		boolean mobileDevices = GetterUtil.getBoolean(portletSetup.getValue(mobileDevicesParam, String.valueOf(mobileDevicesDefault)));
 	%>
 
 		<aui:fieldset label='<%= LanguageUtil.get(pageContext, "portlet-mode") + ": " + LanguageUtil.get(pageContext, curPortletMode) %>'>
-			<aui:input inlineLabel="left" label="regular-browsers" name='<%= "regularBrowsersEnabled" + curPortletMode %>' type="checkbox" value="<%= true %>" disabled="<%= true %>" />
+			<aui:input disabled="<%= true %>" label="regular-browsers" name='<%= "regularBrowsersEnabled" + curPortletMode %>' type="checkbox" value="<%= true %>" />
 
-			<aui:input inlineLabel="left" label="mobile-devices" name="<%= mobileDevicesParam %>" type="checkbox" value="<%= mobileDevices %>" />
+			<aui:input label="mobile-devices" name="<%= mobileDevicesParam %>" type="checkbox" value="<%= mobileDevices %>" />
 		</aui:fieldset>
 
 	<%

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -15,7 +15,6 @@
 package com.liferay.portal.service;
 
 import com.liferay.portal.kernel.bean.PortalBeanLocatorUtil;
-import com.liferay.portal.kernel.util.MethodCache;
 import com.liferay.portal.kernel.util.ReferenceRegistry;
 
 /**
@@ -66,25 +65,32 @@ public class ClusterGroupLocalServiceUtil {
 	* Deletes the cluster group with the primary key from the database. Also notifies the appropriate model listeners.
 	*
 	* @param clusterGroupId the primary key of the cluster group
+	* @return the cluster group that was removed
 	* @throws PortalException if a cluster group with the primary key could not be found
 	* @throws SystemException if a system exception occurred
 	*/
-	public static void deleteClusterGroup(long clusterGroupId)
+	public static com.liferay.portal.model.ClusterGroup deleteClusterGroup(
+		long clusterGroupId)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException {
-		getService().deleteClusterGroup(clusterGroupId);
+		return getService().deleteClusterGroup(clusterGroupId);
 	}
 
 	/**
 	* Deletes the cluster group from the database. Also notifies the appropriate model listeners.
 	*
 	* @param clusterGroup the cluster group
+	* @return the cluster group that was removed
 	* @throws SystemException if a system exception occurred
 	*/
-	public static void deleteClusterGroup(
+	public static com.liferay.portal.model.ClusterGroup deleteClusterGroup(
 		com.liferay.portal.model.ClusterGroup clusterGroup)
 		throws com.liferay.portal.kernel.exception.SystemException {
-		getService().deleteClusterGroup(clusterGroup);
+		return getService().deleteClusterGroup(clusterGroup);
+	}
+
+	public static com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery() {
+		return getService().dynamicQuery();
 	}
 
 	/**
@@ -156,6 +162,12 @@ public class ClusterGroupLocalServiceUtil {
 		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery)
 		throws com.liferay.portal.kernel.exception.SystemException {
 		return getService().dynamicQueryCount(dynamicQuery);
+	}
+
+	public static com.liferay.portal.model.ClusterGroup fetchClusterGroup(
+		long clusterGroupId)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getService().fetchClusterGroup(clusterGroupId);
 	}
 
 	/**
@@ -272,20 +284,15 @@ public class ClusterGroupLocalServiceUtil {
 
 			ReferenceRegistry.registerReference(ClusterGroupLocalServiceUtil.class,
 				"_service");
-			MethodCache.remove(ClusterGroupLocalService.class);
 		}
 
 		return _service;
 	}
 
+	/**
+	 * @deprecated
+	 */
 	public void setService(ClusterGroupLocalService service) {
-		MethodCache.remove(ClusterGroupLocalService.class);
-
-		_service = service;
-
-		ReferenceRegistry.registerReference(ClusterGroupLocalServiceUtil.class,
-			"_service");
-		MethodCache.remove(ClusterGroupLocalService.class);
 	}
 
 	private static ClusterGroupLocalService _service;

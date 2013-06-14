@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -23,15 +23,16 @@ import com.liferay.portalweb.portal.util.RuntimeVariables;
 public class SA_AllowEditImagePermissionsTest extends BaseTestCase {
 	public void testSA_AllowEditImagePermissions() throws Exception {
 		selenium.open("/web/guest/home/");
+		loadRequiredJavaScriptModules();
 
 		for (int second = 0;; second++) {
-			if (second >= 60) {
+			if (second >= 90) {
 				fail("timeout");
 			}
 
 			try {
 				if (selenium.isElementPresent(
-							"link=Image Gallery Permissions Test Page")) {
+							"link=Media Gallery Permissions Test Page")) {
 					break;
 				}
 			}
@@ -41,19 +42,25 @@ public class SA_AllowEditImagePermissionsTest extends BaseTestCase {
 			Thread.sleep(1000);
 		}
 
-		selenium.saveScreenShotAndSource();
-		selenium.clickAt("link=Image Gallery Permissions Test Page",
-			RuntimeVariables.replace(""));
+		selenium.clickAt("link=Media Gallery Permissions Test Page",
+			RuntimeVariables.replace("Media Gallery Permissions Test Page"));
 		selenium.waitForPageToLoad("30000");
-		selenium.saveScreenShotAndSource();
-		selenium.clickAt("link=Portlet2 Temporary2 Folder2",
-			RuntimeVariables.replace(""));
+		loadRequiredJavaScriptModules();
+		assertEquals(RuntimeVariables.replace("Media Gallery Temporary Folder"),
+			selenium.getText("//a[@title='Media Gallery Temporary Folder - ']"));
+		selenium.clickAt("//a[@title='Media Gallery Temporary Folder - ']",
+			RuntimeVariables.replace("Media Gallery Temporary Folder"));
 		selenium.waitForPageToLoad("30000");
-		selenium.saveScreenShotAndSource();
-		selenium.clickAt("//div[2]/a/img", RuntimeVariables.replace(""));
+		loadRequiredJavaScriptModules();
+		assertEquals(RuntimeVariables.replace(
+				"Portlet Permissions Image 2 Test Title"),
+			selenium.getText(
+				"//a[@title='Portlet Permissions Image 2 Test Title - ']"));
+		selenium.clickAt("//a[@title='Portlet Permissions Image 2 Test Title - ']",
+			RuntimeVariables.replace("Portlet Permissions Image 2 Test Title"));
 
 		for (int second = 0;; second++) {
-			if (second >= 60) {
+			if (second >= 90) {
 				fail("timeout");
 			}
 
@@ -68,19 +75,21 @@ public class SA_AllowEditImagePermissionsTest extends BaseTestCase {
 			Thread.sleep(1000);
 		}
 
-		selenium.saveScreenShotAndSource();
 		selenium.clickAt("//img[@alt='Permissions']",
-			RuntimeVariables.replace(""));
+			RuntimeVariables.replace("Permissions"));
 		selenium.waitForPageToLoad("30000");
-		selenium.saveScreenShotAndSource();
-		selenium.check("//tr[7]/td[4]/input");
-		selenium.clickAt("//input[@value='Save']", RuntimeVariables.replace(""));
+		loadRequiredJavaScriptModules();
+		assertFalse(selenium.isChecked("//tr[5]/td[6]/input"));
+		selenium.clickAt("//tr[5]/td[6]/input",
+			RuntimeVariables.replace("Media Gallery Update"));
+		assertTrue(selenium.isChecked("//tr[5]/td[6]/input"));
+		selenium.clickAt("//input[@value='Save']",
+			RuntimeVariables.replace("Save"));
 		selenium.waitForPageToLoad("30000");
-		selenium.saveScreenShotAndSource();
+		loadRequiredJavaScriptModules();
 		assertEquals(RuntimeVariables.replace(
 				"Your request completed successfully."),
-			selenium.getText("//section/div/div/div/div[1]"));
-		assertTrue(selenium.isChecked("//tr[7]/td[4]/input"));
-		selenium.saveScreenShotAndSource();
+			selenium.getText("//div[@class='portlet-msg-success']"));
+		assertTrue(selenium.isChecked("//tr[5]/td[6]/input"));
 	}
 }

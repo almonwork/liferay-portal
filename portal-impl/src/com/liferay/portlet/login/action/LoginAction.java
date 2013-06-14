@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,6 +14,7 @@
 
 package com.liferay.portlet.login.action;
 
+import com.liferay.portal.CompanyMaxUsersException;
 import com.liferay.portal.CookieNotSupportedException;
 import com.liferay.portal.NoSuchUserException;
 import com.liferay.portal.PasswordExpiredException;
@@ -100,18 +101,18 @@ public class LoginAction extends PortletAction {
 				if (cause instanceof PasswordExpiredException ||
 					cause instanceof UserLockoutException) {
 
-					SessionErrors.add(
-						actionRequest, cause.getClass().getName());
+					SessionErrors.add(actionRequest, cause.getClass());
 				}
 				else {
 					if (_log.isInfoEnabled()) {
 						_log.info("Authentication failed");
 					}
 
-					SessionErrors.add(actionRequest, e.getClass().getName());
+					SessionErrors.add(actionRequest, e.getClass());
 				}
 			}
-			else if (e instanceof CookieNotSupportedException ||
+			else if (e instanceof CompanyMaxUsersException ||
+					 e instanceof CookieNotSupportedException ||
 					 e instanceof NoSuchUserException ||
 					 e instanceof PasswordExpiredException ||
 					 e instanceof UserEmailAddressException ||
@@ -120,7 +121,7 @@ public class LoginAction extends PortletAction {
 					 e instanceof UserPasswordException ||
 					 e instanceof UserScreenNameException) {
 
-				SessionErrors.add(actionRequest, e.getClass().getName());
+				SessionErrors.add(actionRequest, e.getClass());
 			}
 			else {
 				_log.error(e, e);
@@ -150,9 +151,9 @@ public class LoginAction extends PortletAction {
 
 		String portalURL = null;
 
-		if ((PropsValues.COMPANY_SECURITY_AUTH_REQUIRES_HTTPS) &&
-			(!PropsValues.SESSION_ENABLE_PHISHING_PROTECTION) &&
-			(httpsInitial != null) && (!httpsInitial.booleanValue())) {
+		if (PropsValues.COMPANY_SECURITY_AUTH_REQUIRES_HTTPS &&
+			!PropsValues.SESSION_ENABLE_PHISHING_PROTECTION &&
+			(httpsInitial != null) && !httpsInitial.booleanValue()) {
 
 			portalURL = PortalUtil.getPortalURL(request, false);
 		}

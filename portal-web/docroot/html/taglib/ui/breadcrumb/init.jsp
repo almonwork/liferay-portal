@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -85,8 +85,14 @@ private void _buildLayoutBreadcrumb(Layout selLayout, String selLayoutParam, boo
 	breadcrumbSB.append(layoutURL);
 	breadcrumbSB.append("\" ");
 
+	String layoutName = selLayout.getName(themeDisplay.getLocale());
+
 	if (selLayout.isTypeControlPanel()) {
 		breadcrumbSB.append(" target=\"_top\"");
+
+		if (layoutName.equals(LayoutConstants.NAME_CONTROL_PANEL_DEFAULT)) {
+			layoutName = LanguageUtil.get(themeDisplay.getLocale(), "control-panel");
+		}
 	}
 	else {
 		breadcrumbSB.append(target);
@@ -94,7 +100,7 @@ private void _buildLayoutBreadcrumb(Layout selLayout, String selLayoutParam, boo
 
 	breadcrumbSB.append(">");
 
-	breadcrumbSB.append(HtmlUtil.escape(selLayout.getName(themeDisplay.getLocale())));
+	breadcrumbSB.append(HtmlUtil.escape(layoutName));
 
 	breadcrumbSB.append("</a></span></li>");
 
@@ -135,7 +141,7 @@ private void _buildParentGroupsBreadcrumb(LayoutSet layoutSet, PortletURL portle
 	else if (group.isUser()) {
 		User groupUser = UserLocalServiceUtil.getUser(group.getClassPK());
 
-		List<Organization> organizations = OrganizationLocalServiceUtil.getUserOrganizations(groupUser.getUserId(), true);
+		List<Organization> organizations = OrganizationLocalServiceUtil.getUserOrganizations(groupUser.getUserId());
 
 		if (!organizations.isEmpty()) {
 			Organization organization = organizations.get(0);

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,6 +14,11 @@
 
 package com.liferay.portlet.expando.model;
 
+import com.liferay.portal.model.ModelWrapper;
+
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * <p>
  * This class is a wrapper for {@link ExpandoValue}.
@@ -23,7 +28,8 @@ package com.liferay.portlet.expando.model;
  * @see       ExpandoValue
  * @generated
  */
-public class ExpandoValueWrapper implements ExpandoValue {
+public class ExpandoValueWrapper implements ExpandoValue,
+	ModelWrapper<ExpandoValue> {
 	public ExpandoValueWrapper(ExpandoValue expandoValue) {
 		_expandoValue = expandoValue;
 	}
@@ -34,6 +40,71 @@ public class ExpandoValueWrapper implements ExpandoValue {
 
 	public String getModelClassName() {
 		return ExpandoValue.class.getName();
+	}
+
+	public Map<String, Object> getModelAttributes() {
+		Map<String, Object> attributes = new HashMap<String, Object>();
+
+		attributes.put("valueId", getValueId());
+		attributes.put("companyId", getCompanyId());
+		attributes.put("tableId", getTableId());
+		attributes.put("columnId", getColumnId());
+		attributes.put("rowId", getRowId());
+		attributes.put("classNameId", getClassNameId());
+		attributes.put("classPK", getClassPK());
+		attributes.put("data", getData());
+
+		return attributes;
+	}
+
+	public void setModelAttributes(Map<String, Object> attributes) {
+		Long valueId = (Long)attributes.get("valueId");
+
+		if (valueId != null) {
+			setValueId(valueId);
+		}
+
+		Long companyId = (Long)attributes.get("companyId");
+
+		if (companyId != null) {
+			setCompanyId(companyId);
+		}
+
+		Long tableId = (Long)attributes.get("tableId");
+
+		if (tableId != null) {
+			setTableId(tableId);
+		}
+
+		Long columnId = (Long)attributes.get("columnId");
+
+		if (columnId != null) {
+			setColumnId(columnId);
+		}
+
+		Long rowId = (Long)attributes.get("rowId");
+
+		if (rowId != null) {
+			setRowId(rowId);
+		}
+
+		Long classNameId = (Long)attributes.get("classNameId");
+
+		if (classNameId != null) {
+			setClassNameId(classNameId);
+		}
+
+		Long classPK = (Long)attributes.get("classPK");
+
+		if (classPK != null) {
+			setClassPK(classPK);
+		}
+
+		String data = (String)attributes.get("data");
+
+		if (data != null) {
+			setData(data);
+		}
 	}
 
 	/**
@@ -153,6 +224,10 @@ public class ExpandoValueWrapper implements ExpandoValue {
 		return _expandoValue.getClassName();
 	}
 
+	public void setClassName(java.lang.String className) {
+		_expandoValue.setClassName(className);
+	}
+
 	/**
 	* Returns the class name ID of this expando value.
 	*
@@ -225,10 +300,6 @@ public class ExpandoValueWrapper implements ExpandoValue {
 
 	public boolean isEscapedModel() {
 		return _expandoValue.isEscapedModel();
-	}
-
-	public void setEscapedModel(boolean escapedModel) {
-		_expandoValue.setEscapedModel(escapedModel);
 	}
 
 	public java.io.Serializable getPrimaryKeyObj() {
@@ -363,6 +434,24 @@ public class ExpandoValueWrapper implements ExpandoValue {
 		return _expandoValue.getLongArray();
 	}
 
+	public java.lang.Number getNumber()
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException {
+		return _expandoValue.getNumber();
+	}
+
+	public java.lang.Number[] getNumberArray()
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException {
+		return _expandoValue.getNumberArray();
+	}
+
+	public java.io.Serializable getSerializable()
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException {
+		return _expandoValue.getSerializable();
+	}
+
 	public short getShort()
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException {
@@ -397,6 +486,11 @@ public class ExpandoValueWrapper implements ExpandoValue {
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException {
 		_expandoValue.setBooleanArray(data);
+	}
+
+	public void setColumn(
+		com.liferay.portlet.expando.model.ExpandoColumn column) {
+		_expandoValue.setColumn(column);
 	}
 
 	public void setDate(java.util.Date data)
@@ -459,6 +553,18 @@ public class ExpandoValueWrapper implements ExpandoValue {
 		_expandoValue.setLongArray(data);
 	}
 
+	public void setNumber(java.lang.Number data)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException {
+		_expandoValue.setNumber(data);
+	}
+
+	public void setNumberArray(java.lang.Number[] data)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException {
+		_expandoValue.setNumberArray(data);
+	}
+
 	public void setShort(short data)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException {
@@ -483,7 +589,14 @@ public class ExpandoValueWrapper implements ExpandoValue {
 		_expandoValue.setStringArray(data);
 	}
 
+	/**
+	 * @deprecated Renamed to {@link #getWrappedModel}
+	 */
 	public ExpandoValue getWrappedExpandoValue() {
+		return _expandoValue;
+	}
+
+	public ExpandoValue getWrappedModel() {
 		return _expandoValue;
 	}
 

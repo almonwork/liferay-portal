@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -16,9 +16,11 @@ package com.liferay.portal.service.permission;
 
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
+import com.liferay.portal.model.Group;
 import com.liferay.portal.security.auth.PrincipalException;
 import com.liferay.portal.security.permission.ActionKeys;
 import com.liferay.portal.security.permission.PermissionChecker;
+import com.liferay.portal.service.GroupLocalServiceUtil;
 
 /**
  * @author Brian Wing Shun Chan
@@ -39,11 +41,17 @@ public class UserGroupRolePermissionImpl implements UserGroupRolePermission {
 			PermissionChecker permissionChecker, long groupId, long roleId)
 		throws PortalException, SystemException {
 
+		Group group = GroupLocalServiceUtil.getGroup(groupId);
+
 		if (permissionChecker.isGroupOwner(groupId) ||
 			GroupPermissionUtil.contains(
 				permissionChecker, groupId, ActionKeys.ASSIGN_USER_ROLES) ||
+			OrganizationPermissionUtil.contains(
+				permissionChecker, group.getOrganizationId(),
+				ActionKeys.ASSIGN_USER_ROLES) ||
 			RolePermissionUtil.contains(
-				permissionChecker, roleId, ActionKeys.ASSIGN_MEMBERS)) {
+				permissionChecker, groupId, roleId,
+				ActionKeys.ASSIGN_MEMBERS)) {
 
 			return true;
 		}

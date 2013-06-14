@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,6 +14,11 @@
 
 package com.liferay.portlet.messageboards.model;
 
+import com.liferay.portal.model.ModelWrapper;
+
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * <p>
  * This class is a wrapper for {@link MBDiscussion}.
@@ -23,7 +28,8 @@ package com.liferay.portlet.messageboards.model;
  * @see       MBDiscussion
  * @generated
  */
-public class MBDiscussionWrapper implements MBDiscussion {
+public class MBDiscussionWrapper implements MBDiscussion,
+	ModelWrapper<MBDiscussion> {
 	public MBDiscussionWrapper(MBDiscussion mbDiscussion) {
 		_mbDiscussion = mbDiscussion;
 	}
@@ -34,6 +40,43 @@ public class MBDiscussionWrapper implements MBDiscussion {
 
 	public String getModelClassName() {
 		return MBDiscussion.class.getName();
+	}
+
+	public Map<String, Object> getModelAttributes() {
+		Map<String, Object> attributes = new HashMap<String, Object>();
+
+		attributes.put("discussionId", getDiscussionId());
+		attributes.put("classNameId", getClassNameId());
+		attributes.put("classPK", getClassPK());
+		attributes.put("threadId", getThreadId());
+
+		return attributes;
+	}
+
+	public void setModelAttributes(Map<String, Object> attributes) {
+		Long discussionId = (Long)attributes.get("discussionId");
+
+		if (discussionId != null) {
+			setDiscussionId(discussionId);
+		}
+
+		Long classNameId = (Long)attributes.get("classNameId");
+
+		if (classNameId != null) {
+			setClassNameId(classNameId);
+		}
+
+		Long classPK = (Long)attributes.get("classPK");
+
+		if (classPK != null) {
+			setClassPK(classPK);
+		}
+
+		Long threadId = (Long)attributes.get("threadId");
+
+		if (threadId != null) {
+			setThreadId(threadId);
+		}
 	}
 
 	/**
@@ -79,6 +122,10 @@ public class MBDiscussionWrapper implements MBDiscussion {
 	*/
 	public java.lang.String getClassName() {
 		return _mbDiscussion.getClassName();
+	}
+
+	public void setClassName(java.lang.String className) {
+		_mbDiscussion.setClassName(className);
 	}
 
 	/**
@@ -155,10 +202,6 @@ public class MBDiscussionWrapper implements MBDiscussion {
 		return _mbDiscussion.isEscapedModel();
 	}
 
-	public void setEscapedModel(boolean escapedModel) {
-		_mbDiscussion.setEscapedModel(escapedModel);
-	}
-
 	public java.io.Serializable getPrimaryKeyObj() {
 		return _mbDiscussion.getPrimaryKeyObj();
 	}
@@ -213,7 +256,14 @@ public class MBDiscussionWrapper implements MBDiscussion {
 		_mbDiscussion.persist();
 	}
 
+	/**
+	 * @deprecated Renamed to {@link #getWrappedModel}
+	 */
 	public MBDiscussion getWrappedMBDiscussion() {
+		return _mbDiscussion;
+	}
+
+	public MBDiscussion getWrappedModel() {
 		return _mbDiscussion;
 	}
 

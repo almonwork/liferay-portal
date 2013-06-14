@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -91,14 +91,6 @@ public class OrganizationUtil {
 		return getPersistence()
 				   .findWithDynamicQuery(dynamicQuery, start, end,
 			orderByComparator);
-	}
-
-	/**
-	 * @see com.liferay.portal.service.persistence.BasePersistence#remove(com.liferay.portal.model.BaseModel)
-	 */
-	public static Organization remove(Organization organization)
-		throws SystemException {
-		return getPersistence().remove(organization);
 	}
 
 	/**
@@ -936,12 +928,14 @@ public class OrganizationUtil {
 	*
 	* @param companyId the company ID
 	* @param name the name
+	* @return the organization that was removed
 	* @throws SystemException if a system exception occurred
 	*/
-	public static void removeByC_N(long companyId, java.lang.String name)
+	public static com.liferay.portal.model.Organization removeByC_N(
+		long companyId, java.lang.String name)
 		throws com.liferay.portal.NoSuchOrganizationException,
 			com.liferay.portal.kernel.exception.SystemException {
-		getPersistence().removeByC_N(companyId, name);
+		return getPersistence().removeByC_N(companyId, name);
 	}
 
 	/**
@@ -1498,21 +1492,6 @@ public class OrganizationUtil {
 		getPersistence().setUsers(pk, users);
 	}
 
-	/**
-	* Rebuilds the organizations tree for the scope using the modified pre-order tree traversal algorithm.
-	*
-	* <p>
-	* Only call this method if the tree has become stale through operations other than normal CRUD. Under normal circumstances the tree is automatically rebuilt whenver necessary.
-	* </p>
-	*
-	* @param companyId the ID of the scope
-	* @param force whether to force the rebuild even if the tree is not stale
-	*/
-	public static void rebuildTree(long companyId, boolean force)
-		throws com.liferay.portal.kernel.exception.SystemException {
-		getPersistence().rebuildTree(companyId, force);
-	}
-
 	public static OrganizationPersistence getPersistence() {
 		if (_persistence == null) {
 			_persistence = (OrganizationPersistence)PortalBeanLocatorUtil.locate(OrganizationPersistence.class.getName());
@@ -1524,11 +1503,10 @@ public class OrganizationUtil {
 		return _persistence;
 	}
 
+	/**
+	 * @deprecated
+	 */
 	public void setPersistence(OrganizationPersistence persistence) {
-		_persistence = persistence;
-
-		ReferenceRegistry.registerReference(OrganizationUtil.class,
-			"_persistence");
 	}
 
 	private static OrganizationPersistence _persistence;

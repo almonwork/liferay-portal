@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -24,9 +24,10 @@ public class SelectExistingDLFolderDocumentAPActionsTest extends BaseTestCase {
 	public void testSelectExistingDLFolderDocumentAPActions()
 		throws Exception {
 		selenium.open("/web/guest/home/");
+		loadRequiredJavaScriptModules();
 
 		for (int second = 0;; second++) {
-			if (second >= 60) {
+			if (second >= 90) {
 				fail("timeout");
 			}
 
@@ -41,17 +42,18 @@ public class SelectExistingDLFolderDocumentAPActionsTest extends BaseTestCase {
 			Thread.sleep(1000);
 		}
 
-		selenium.saveScreenShotAndSource();
 		selenium.clickAt("link=Asset Publisher Test Page",
 			RuntimeVariables.replace("Asset Publisher Test Page"));
 		selenium.waitForPageToLoad("30000");
-		selenium.saveScreenShotAndSource();
+		loadRequiredJavaScriptModules();
+		Thread.sleep(5000);
 		assertEquals(RuntimeVariables.replace("Options"),
-			selenium.getText("//strong/a"));
-		selenium.clickAt("//strong/a", RuntimeVariables.replace("Options"));
+			selenium.getText("//span[@title='Options']/ul/li/strong/a"));
+		selenium.clickAt("//span[@title='Options']/ul/li/strong/a",
+			RuntimeVariables.replace("Options"));
 
 		for (int second = 0;; second++) {
-			if (second >= 60) {
+			if (second >= 90) {
 				fail("timeout");
 			}
 
@@ -67,20 +69,20 @@ public class SelectExistingDLFolderDocumentAPActionsTest extends BaseTestCase {
 			Thread.sleep(1000);
 		}
 
-		selenium.saveScreenShotAndSource();
 		assertEquals(RuntimeVariables.replace("Configuration"),
 			selenium.getText(
 				"//div[@class='lfr-component lfr-menu-list']/ul/li[2]/a"));
-		selenium.click("//div[@class='lfr-component lfr-menu-list']/ul/li[2]/a");
+		selenium.clickAt("//div[@class='lfr-component lfr-menu-list']/ul/li[2]/a",
+			RuntimeVariables.replace("Configuration"));
 		Thread.sleep(5000);
 
 		for (int second = 0;; second++) {
-			if (second >= 60) {
+			if (second >= 90) {
 				fail("timeout");
 			}
 
 			try {
-				if (selenium.isVisible("//div[2]/span/ul/li/strong/a")) {
+				if (selenium.isVisible("//iframe")) {
 					break;
 				}
 			}
@@ -90,20 +92,16 @@ public class SelectExistingDLFolderDocumentAPActionsTest extends BaseTestCase {
 			Thread.sleep(1000);
 		}
 
-		selenium.saveScreenShotAndSource();
-		assertEquals(RuntimeVariables.replace("Select Existing"),
-			selenium.getText("//div[2]/span/ul/li/strong/a"));
-		selenium.clickAt("//div[2]/span/ul/li/strong/a",
-			RuntimeVariables.replace("Select Existing"));
+		selenium.selectFrame("//iframe");
 
 		for (int second = 0;; second++) {
-			if (second >= 60) {
+			if (second >= 90) {
 				fail("timeout");
 			}
 
 			try {
 				if (selenium.isVisible(
-							"//div[@class='lfr-component lfr-menu-list']/ul/li[6]/a")) {
+							"//span[@title='Select Existing']/ul/li/strong/a/span")) {
 					break;
 				}
 			}
@@ -113,31 +111,55 @@ public class SelectExistingDLFolderDocumentAPActionsTest extends BaseTestCase {
 			Thread.sleep(1000);
 		}
 
-		selenium.saveScreenShotAndSource();
-		assertEquals(RuntimeVariables.replace("Document Library Document"),
+		assertEquals(RuntimeVariables.replace("Select Existing"),
 			selenium.getText(
-				"//div[@class='lfr-component lfr-menu-list']/ul/li[6]/a"));
+				"//span[@title='Select Existing']/ul/li/strong/a/span"));
+		selenium.clickAt("//span[@title='Select Existing']/ul/li/strong/a/span",
+			RuntimeVariables.replace("Select Existing"));
+
+		for (int second = 0;; second++) {
+			if (second >= 90) {
+				fail("timeout");
+			}
+
+			try {
+				if (selenium.isVisible(
+							"//div[@class='lfr-component lfr-menu-list']/ul/li[contains(.,'Documents and Media Document')]/a")) {
+					break;
+				}
+			}
+			catch (Exception e) {
+			}
+
+			Thread.sleep(1000);
+		}
+
+		assertEquals(RuntimeVariables.replace("Documents and Media Document"),
+			selenium.getText(
+				"//div[@class='lfr-component lfr-menu-list']/ul/li[contains(.,'Documents and Media Document')]/a"));
 		selenium.click(RuntimeVariables.replace(
-				"//div[@class='lfr-component lfr-menu-list']/ul/li[6]/a"));
+				"//div[@class='lfr-component lfr-menu-list']/ul/li[contains(.,'Documents and Media Document')]/a"));
 		selenium.waitForPageToLoad("30000");
-		selenium.saveScreenShotAndSource();
-		assertEquals(RuntimeVariables.replace("DL Folder Document Title"),
+		loadRequiredJavaScriptModules();
+		assertEquals(RuntimeVariables.replace("DM Folder Document Title"),
 			selenium.getText("//td[1]/a"));
 		selenium.clickAt("//td[1]/a",
-			RuntimeVariables.replace("DL Folder Document Title"));
+			RuntimeVariables.replace("DM Folder Document Title"));
 		selenium.waitForPageToLoad("30000");
-		selenium.saveScreenShotAndSource();
+		loadRequiredJavaScriptModules();
 		assertEquals(RuntimeVariables.replace(
 				"You have successfully updated the setup."),
 			selenium.getText("//div[@class='portlet-msg-success']"));
-		assertEquals(RuntimeVariables.replace("Document Library Document"),
+		assertEquals(RuntimeVariables.replace("Documents and Media Document"),
 			selenium.getText("//td[1]/a"));
-		assertEquals(RuntimeVariables.replace("DL Folder Document Title"),
+		assertEquals(RuntimeVariables.replace("DM Folder Document Title"),
 			selenium.getText("//td[2]/a"));
+		selenium.selectFrame("relative=top");
 		selenium.open("/web/guest/home/");
+		loadRequiredJavaScriptModules();
 
 		for (int second = 0;; second++) {
-			if (second >= 60) {
+			if (second >= 90) {
 				fail("timeout");
 			}
 
@@ -152,14 +174,13 @@ public class SelectExistingDLFolderDocumentAPActionsTest extends BaseTestCase {
 			Thread.sleep(1000);
 		}
 
-		selenium.saveScreenShotAndSource();
 		selenium.clickAt("link=Asset Publisher Test Page",
 			RuntimeVariables.replace("Asset Publisher Test Page"));
 		selenium.waitForPageToLoad("30000");
-		selenium.saveScreenShotAndSource();
-		assertEquals(RuntimeVariables.replace("DL Folder Document Title"),
+		loadRequiredJavaScriptModules();
+		assertEquals(RuntimeVariables.replace("DM Folder Document Title"),
 			selenium.getText("//h3[@class='asset-title']/a"));
-		assertEquals(RuntimeVariables.replace("DL Folder Document Title"),
+		assertEquals(RuntimeVariables.replace("DM Folder Document Title"),
 			selenium.getText("//div[@class='asset-resource-info']/span/a/span"));
 	}
 }

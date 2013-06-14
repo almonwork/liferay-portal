@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,6 +14,8 @@
 
 package com.liferay.portlet.ratings.service;
 
+import com.liferay.portal.service.ServiceWrapper;
+
 /**
  * <p>
  * This class is a wrapper for {@link RatingsEntryService}.
@@ -23,9 +25,28 @@ package com.liferay.portlet.ratings.service;
  * @see       RatingsEntryService
  * @generated
  */
-public class RatingsEntryServiceWrapper implements RatingsEntryService {
+public class RatingsEntryServiceWrapper implements RatingsEntryService,
+	ServiceWrapper<RatingsEntryService> {
 	public RatingsEntryServiceWrapper(RatingsEntryService ratingsEntryService) {
 		_ratingsEntryService = ratingsEntryService;
+	}
+
+	/**
+	* Returns the Spring bean ID for this bean.
+	*
+	* @return the Spring bean ID for this bean
+	*/
+	public java.lang.String getBeanIdentifier() {
+		return _ratingsEntryService.getBeanIdentifier();
+	}
+
+	/**
+	* Sets the Spring bean ID for this bean.
+	*
+	* @param beanIdentifier the Spring bean ID for this bean
+	*/
+	public void setBeanIdentifier(java.lang.String beanIdentifier) {
+		_ratingsEntryService.setBeanIdentifier(beanIdentifier);
 	}
 
 	public void deleteEntry(java.lang.String className, long classPK)
@@ -41,12 +62,26 @@ public class RatingsEntryServiceWrapper implements RatingsEntryService {
 		return _ratingsEntryService.updateEntry(className, classPK, score);
 	}
 
+	/**
+	 * @deprecated Renamed to {@link #getWrappedService}
+	 */
 	public RatingsEntryService getWrappedRatingsEntryService() {
 		return _ratingsEntryService;
 	}
 
+	/**
+	 * @deprecated Renamed to {@link #setWrappedService}
+	 */
 	public void setWrappedRatingsEntryService(
 		RatingsEntryService ratingsEntryService) {
+		_ratingsEntryService = ratingsEntryService;
+	}
+
+	public RatingsEntryService getWrappedService() {
+		return _ratingsEntryService;
+	}
+
+	public void setWrappedService(RatingsEntryService ratingsEntryService) {
 		_ratingsEntryService = ratingsEntryService;
 	}
 

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -42,13 +42,11 @@ public class ValidHtmlFilter extends BasePortalFilter {
 	public boolean isFilterEnabled(
 		HttpServletRequest request, HttpServletResponse response) {
 
-		if (isEnsureValidHtml(request, response) &&
-			!isAlreadyFiltered(request)) {
-
-			return true;
+		if (isAlreadyFiltered(request)) {
+			return false;
 		}
 		else {
-			return false;
+			return true;
 		}
 	}
 
@@ -63,21 +61,6 @@ public class ValidHtmlFilter extends BasePortalFilter {
 
 	protected boolean isAlreadyFiltered(HttpServletRequest request) {
 		if (request.getAttribute(SKIP_FILTER) != null) {
-			return true;
-		}
-		else {
-			return false;
-		}
-	}
-
-	protected boolean isEnsureValidHtml(
-		HttpServletRequest request, HttpServletResponse response) {
-
-		String contentType = response.getContentType();
-
-		if ((contentType != null) &&
-			contentType.startsWith(ContentTypes.TEXT_HTML)) {
-
 			return true;
 		}
 		else {
@@ -105,9 +88,19 @@ public class ValidHtmlFilter extends BasePortalFilter {
 		processFilter(
 			ValidHtmlFilter.class, request, stringServerResponse, filterChain);
 
-		String content = getContent(request, stringServerResponse.getString());
+		String contentType = response.getContentType();
 
-		ServletResponseUtil.write(response, content);
+		if ((contentType != null) &&
+			contentType.startsWith(ContentTypes.TEXT_HTML)) {
+
+			String content = getContent(
+				request, stringServerResponse.getString());
+
+			ServletResponseUtil.write(response, content);
+		}
+		else {
+			ServletResponseUtil.write(response, stringServerResponse);
+		}
 	}
 
 	private static final String _CLOSE_BODY = "</body>";

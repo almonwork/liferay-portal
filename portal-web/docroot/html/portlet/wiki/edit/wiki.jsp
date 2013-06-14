@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -26,8 +26,8 @@ String content = BeanParamUtil.getString(wikiPage, request, "content");
 <div align="right">
 	<liferay-ui:toggle
 		defaultShowContent="<%= false %>"
-		id="toggle_id_wiki_edit_wiki_syntax_help"
 		hideMessage='<%= LanguageUtil.get(pageContext, "hide-syntax-help") + " &raquo;" %>'
+		id="toggle_id_wiki_edit_wiki_syntax_help"
 		showMessage='<%= "&laquo; " + LanguageUtil.get(pageContext, "show-syntax-help") %>'
 	/>
 </div>
@@ -37,18 +37,35 @@ String content = BeanParamUtil.getString(wikiPage, request, "content");
 	<td class="lfr-top" width="70%">
 
 		<%
+		long resourcePrimKey = 0;
+
 		String attachmentURLPrefix = StringPool.BLANK;
 
 		if (wikiPage != null) {
+			resourcePrimKey = wikiPage.getResourcePrimKey();
+
 			attachmentURLPrefix = themeDisplay.getPortalURL() + themeDisplay.getPathMain() + "/wiki/get_page_attachment?p_l_id=" + themeDisplay.getPlid() + "&nodeId=" + wikiPage.getNodeId() + "&title=" + HttpUtil.encodeURL(wikiPage.getTitle()) + "&fileName=";
 		}
 
 		Map<String,String> configParams = new HashMap();
 
 		configParams.put("attachmentURLPrefix", attachmentURLPrefix);
+		configParams.put("wikiPageResourcePrimKey", String.valueOf(resourcePrimKey));
+
+		Map<String,String> fileBrowserParams = new HashMap();
+
+		fileBrowserParams.put("attachmentURLPrefix", attachmentURLPrefix);
+		fileBrowserParams.put("Type", "Attachment");
+		fileBrowserParams.put("wikiPageResourcePrimKey", String.valueOf(resourcePrimKey));
 		%>
 
-		<liferay-ui:input-editor configParams="<%= configParams %>" editorImpl="<%= EDITOR_WYSIWYG_IMPL_KEY %>" toolbarSet="creole" width="100%" />
+		<liferay-ui:input-editor
+			configParams="<%= configParams %>"
+			editorImpl="<%= EDITOR_WYSIWYG_IMPL_KEY %>"
+			fileBrowserParams="<%= fileBrowserParams %>"
+			toolbarSet="creole"
+			width="100%"
+		/>
 
 		<aui:input name="content" type="hidden" />
 	</td>

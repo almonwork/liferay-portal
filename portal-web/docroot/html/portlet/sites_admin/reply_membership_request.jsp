@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -45,13 +45,31 @@ MembershipRequest membershipRequest = (MembershipRequest)request.getAttribute(We
 	<liferay-ui:header
 		backURL="<%= redirect %>"
 		localizeTitle="<%= false %>"
-		title='<%= LanguageUtil.format(pageContext, "reply-membership-request-for-x", group.getDescriptiveName()) %>'
+		title='<%= LanguageUtil.format(pageContext, "reply-membership-request-for-x", group.getDescriptiveName(locale)) %>'
 	/>
 
 	<liferay-ui:error exception="<%= DuplicateGroupException.class %>" message="please-enter-a-unique-name" />
 	<liferay-ui:error exception="<%= GroupNameException.class %>" message="please-enter-a-valid-name" />
 	<liferay-ui:error exception="<%= MembershipRequestCommentsException.class %>" message="please-enter-valid-comments" />
-	<liferay-ui:error exception="<%= RequiredGroupException.class %>" message="old-group-name-is-a-required-system-group" />
+
+	<liferay-ui:error exception="<%= RequiredGroupException.class %>">
+
+		<%
+		RequiredGroupException rge = (RequiredGroupException)errorException;
+		%>
+
+		<c:if test="<%= rge.getType() == RequiredGroupException.CURRENT_GROUP %>">
+			<liferay-ui:message key="you-cannot-delete-this-site-because-you-are-currently-accessing-this-site" />
+		</c:if>
+
+		<c:if test="<%=rge.getType() == RequiredGroupException.PARENT_GROUP%>">
+			<liferay-ui:message key="you-cannot-delete-sites-that-have-subsites" />
+		</c:if>
+
+		<c:if test="<%= rge.getType() == RequiredGroupException.SYSTEM_GROUP %>">
+			<liferay-ui:message key="the-site-cannot-be-deleted-or-deactivated-because-it-is-a-required-system-site" />
+		</c:if>
+	</liferay-ui:error>
 
 	<aui:model-context bean="<%= membershipRequest %>" model="<%= MembershipRequest.class %>" />
 

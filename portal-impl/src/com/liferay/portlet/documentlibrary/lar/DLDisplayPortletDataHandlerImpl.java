@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -18,6 +18,7 @@ import com.liferay.portal.kernel.lar.BasePortletDataHandler;
 import com.liferay.portal.kernel.lar.PortletDataContext;
 import com.liferay.portal.kernel.lar.PortletDataHandlerBoolean;
 import com.liferay.portal.kernel.lar.PortletDataHandlerControl;
+import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.repository.model.Folder;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.MapUtil;
@@ -25,7 +26,10 @@ import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.xml.Document;
 import com.liferay.portal.kernel.xml.Element;
 import com.liferay.portal.kernel.xml.SAXReaderUtil;
+import com.liferay.portal.model.RepositoryEntry;
+import com.liferay.portal.util.PropsValues;
 import com.liferay.portlet.documentlibrary.model.DLFolderConstants;
+import com.liferay.portlet.documentlibrary.service.DLAppLocalServiceUtil;
 
 import java.util.List;
 import java.util.Map;
@@ -40,20 +44,38 @@ public class DLDisplayPortletDataHandlerImpl extends BasePortletDataHandler {
 	@Override
 	public PortletDataHandlerControl[] getExportControls() {
 		return new PortletDataHandlerControl[] {
-			_foldersAndDocuments, _shortcuts, _ranks, _comments, _ratings, _tags
+			_foldersAndDocuments, _shortcuts, _previewsAndThumbnails, _ranks
+		};
+	}
+
+	@Override
+	public PortletDataHandlerControl[] getExportMetadataControls() {
+		return new PortletDataHandlerControl[] {
+			new PortletDataHandlerBoolean(
+				_NAMESPACE, "folders-and-documents", true,
+				DLPortletDataHandlerImpl.getMetadataControls())
 		};
 	}
 
 	@Override
 	public PortletDataHandlerControl[] getImportControls() {
 		return new PortletDataHandlerControl[] {
-			_foldersAndDocuments, _shortcuts, _ranks, _comments, _ratings, _tags
+			_foldersAndDocuments, _shortcuts, _previewsAndThumbnails, _ranks
+		};
+	}
+
+	@Override
+	public PortletDataHandlerControl[] getImportMetadataControls() {
+		return new PortletDataHandlerControl[] {
+			new PortletDataHandlerBoolean(
+				_NAMESPACE, "folders-and-documents", true,
+				DLPortletDataHandlerImpl.getMetadataControls())
 		};
 	}
 
 	@Override
 	public boolean isPublishToLiveByDefault() {
-		return _PUBLISH_TO_LIVE_BY_DEFAULT;
+		return PropsValues.DL_PUBLISH_TO_LIVE_BY_DEFAULT;
 	}
 
 	@Override
@@ -92,10 +114,15 @@ public class DLDisplayPortletDataHandlerImpl extends BasePortletDataHandler {
 		Element rootElement = document.addElement(
 			"documentlibrary-display-data");
 
+		Element fileEntryTypesElement = rootElement.addElement(
+			"file-entry-types");
 		Element foldersElement = rootElement.addElement("folders");
 		Element fileEntriesElement = rootElement.addElement("file-entries");
 		Element fileShortcutsElement = rootElement.addElement("file-shortcuts");
 		Element fileRanksElement = rootElement.addElement("file-ranks");
+		Element repositoriesElement = rootElement.addElement("repositories");
+		Element repositoryEntriesElement = rootElement.addElement(
+			"repository-entries");
 
 		if (rootFolderId == DLFolderConstants.DEFAULT_PARENT_FOLDER_ID) {
 			List<Folder> folders = FolderUtil.findByRepositoryId(
@@ -103,19 +130,36 @@ public class DLDisplayPortletDataHandlerImpl extends BasePortletDataHandler {
 
 			for (Folder folder : folders) {
 				DLPortletDataHandlerImpl.exportFolder(
-					portletDataContext, foldersElement, fileEntriesElement,
-					fileShortcutsElement, fileRanksElement, folder, false);
+					portletDataContext, fileEntryTypesElement, foldersElement,
+					fileEntriesElement, fileShortcutsElement, fileRanksElement,
+					repositoriesElement, repositoryEntriesElement, folder,
+					false);
+			}
+
+			List<FileEntry> fileEntries = FileEntryUtil.findByR_F(
+				portletDataContext.getScopeGroupId(),
+				DLFolderConstants.DEFAULT_PARENT_FOLDER_ID);
+
+			for (FileEntry fileEntry : fileEntries) {
+				DLPortletDataHandlerImpl.exportFileEntry(
+					portletDataContext, fileEntryTypesElement, foldersElement,
+					fileEntriesElement, fileRanksElement, repositoriesElement,
+					repositoryEntriesElement, fileEntry, true);
 			}
 		}
 		else {
-			Folder folder = FolderUtil.findByPrimaryKey(rootFolderId);
+			Folder folder = DLAppLocalServiceUtil.getFolder(rootFolderId);
 
 			rootElement.addAttribute(
 				"root-folder-id", String.valueOf(folder.getFolderId()));
+			rootElement.addAttribute(
+				"default-repository",
+				String.valueOf(folder.isDefaultRepository()));
 
 			DLPortletDataHandlerImpl.exportFolder(
-				portletDataContext, foldersElement, fileEntriesElement,
-				fileShortcutsElement, fileRanksElement, folder, true);
+				portletDataContext, fileEntryTypesElement, foldersElement,
+				fileEntriesElement, fileShortcutsElement, fileRanksElement,
+				repositoriesElement, repositoryEntriesElement, folder, true);
 		}
 
 		return document.formattedString();
@@ -135,6 +179,16 @@ public class DLDisplayPortletDataHandlerImpl extends BasePortletDataHandler {
 		Document document = SAXReaderUtil.read(data);
 
 		Element rootElement = document.getRootElement();
+
+		Element fileEntryTypesElement = rootElement.element("file-entry-types");
+
+		List<Element> fileEntryTypeElements = fileEntryTypesElement.elements(
+			"file-entry-type");
+
+		for (Element fileEntryTypeElement : fileEntryTypeElements) {
+			DLPortletDataHandlerImpl.importFileEntryType(
+				portletDataContext, fileEntryTypeElement);
+		}
 
 		Element foldersElement = rootElement.element("folders");
 
@@ -179,14 +233,25 @@ public class DLDisplayPortletDataHandlerImpl extends BasePortletDataHandler {
 
 		long rootFolderId = GetterUtil.getLong(
 			rootElement.attributeValue("root-folder-id"));
+		boolean defaultRepository = GetterUtil.getBoolean(
+			rootElement.attributeValue("default-repository"), true);
 
 		if (rootFolderId > 0) {
-			Map<Long, Long> folderPKs =
-				(Map<Long, Long>)portletDataContext.getNewPrimaryKeysMap(
-					Folder.class);
+			Map<Long, Long> folderIds = null;
+
+			if (defaultRepository) {
+				folderIds =
+					(Map<Long, Long>)portletDataContext.getNewPrimaryKeysMap(
+						Folder.class);
+			}
+			else {
+				folderIds =
+					(Map<Long, Long>)portletDataContext.getNewPrimaryKeysMap(
+						RepositoryEntry.class);
+			}
 
 			rootFolderId = MapUtil.getLong(
-				folderPKs, rootFolderId, rootFolderId);
+				folderIds, rootFolderId, rootFolderId);
 
 			portletPreferences.setValue(
 				"rootFolderId", String.valueOf(rootFolderId));
@@ -197,25 +262,17 @@ public class DLDisplayPortletDataHandlerImpl extends BasePortletDataHandler {
 
 	private static final String _NAMESPACE = "document_library";
 
-	private static final boolean _PUBLISH_TO_LIVE_BY_DEFAULT = true;
-
-	private static PortletDataHandlerBoolean _comments =
-		new PortletDataHandlerBoolean(_NAMESPACE, "comments");
-
 	private static PortletDataHandlerBoolean _foldersAndDocuments =
 		new PortletDataHandlerBoolean(
 			_NAMESPACE, "folders-and-documents", true, true);
 
+	private static PortletDataHandlerBoolean _previewsAndThumbnails =
+		new PortletDataHandlerBoolean(_NAMESPACE, "previews-and-thumbnails");
+
 	private static PortletDataHandlerBoolean _ranks =
 		new PortletDataHandlerBoolean(_NAMESPACE, "ranks");
 
-	private static PortletDataHandlerBoolean _ratings =
-		new PortletDataHandlerBoolean(_NAMESPACE, "ratings");
-
 	private static PortletDataHandlerBoolean _shortcuts=
 		new PortletDataHandlerBoolean(_NAMESPACE, "shortcuts");
-
-	private static PortletDataHandlerBoolean _tags =
-		new PortletDataHandlerBoolean(_NAMESPACE, "tags");
 
 }

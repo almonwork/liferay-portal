@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -17,7 +17,6 @@ package com.liferay.portlet.documentlibrary.store;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.util.FileUtil;
-import com.liferay.portal.service.ServiceContext;
 import com.liferay.portlet.documentlibrary.model.DLFileEntryConstants;
 
 import java.io.File;
@@ -25,6 +24,7 @@ import java.io.InputStream;
 
 /**
  * @author Brian Wing Shun Chan
+ * @author Edward Han
  */
 public class SafeFileNameStoreWrapper implements Store {
 
@@ -49,51 +49,36 @@ public class SafeFileNameStoreWrapper implements Store {
 	}
 
 	public void addFile(
-			long companyId, String portletId, long groupId, long repositoryId,
-			String fileName, ServiceContext serviceContext, byte[] bytes)
+			long companyId, long repositoryId, String fileName, byte[] bytes)
 		throws PortalException, SystemException {
 
 		String safeFileName = FileUtil.encodeSafeFileName(fileName);
 
-		renameUnsafeFile(
-			companyId, portletId, groupId, repositoryId, fileName,
-			safeFileName);
+		renameUnsafeFile(companyId, repositoryId, fileName, safeFileName);
 
-		_store.addFile(
-			companyId, portletId, groupId, repositoryId, safeFileName,
-			serviceContext, bytes);
+		_store.addFile(companyId, repositoryId, safeFileName, bytes);
 	}
 
 	public void addFile(
-			long companyId, String portletId, long groupId, long repositoryId,
-			String fileName, ServiceContext serviceContext, File file)
+			long companyId, long repositoryId, String fileName, File file)
 		throws PortalException, SystemException {
 
 		String safeFileName = FileUtil.encodeSafeFileName(fileName);
 
-		renameUnsafeFile(
-			companyId, portletId, groupId, repositoryId, fileName,
-			safeFileName);
+		renameUnsafeFile(companyId, repositoryId, fileName, safeFileName);
 
-		_store.addFile(
-			companyId, portletId, groupId, repositoryId, safeFileName,
-			serviceContext, file);
+		_store.addFile(companyId, repositoryId, safeFileName, file);
 	}
 
 	public void addFile(
-			long companyId, String portletId, long groupId, long repositoryId,
-			String fileName, ServiceContext serviceContext, InputStream is)
+			long companyId, long repositoryId, String fileName, InputStream is)
 		throws PortalException, SystemException {
 
 		String safeFileName = FileUtil.encodeSafeFileName(fileName);
 
-		renameUnsafeFile(
-			companyId, portletId, groupId, repositoryId, fileName,
-			safeFileName);
+		renameUnsafeFile(companyId, repositoryId, fileName, safeFileName);
 
-		_store.addFile(
-			companyId, portletId, groupId, repositoryId, safeFileName,
-			serviceContext, is);
+		_store.addFile(companyId, repositoryId, safeFileName, is);
 	}
 
 	public void checkRoot(long companyId) throws SystemException {
@@ -101,37 +86,28 @@ public class SafeFileNameStoreWrapper implements Store {
 	}
 
 	public void copyFileVersion(
-			long companyId, String portletId, long groupId, long repositoryId,
-			String fileName, String fromVersionNumber, String toVersionNumber,
-			String sourceFileName, ServiceContext serviceContext)
+			long companyId, long repositoryId, String fileName,
+			String fromVersionLabel, String toVersionLabel)
 		throws PortalException, SystemException {
 
 		String safeFileName = FileUtil.encodeSafeFileName(fileName);
-		String safeSourceFileName = FileUtil.encodeSafeFileName(sourceFileName);
 
-		renameUnsafeFile(
-			companyId, portletId, groupId, repositoryId, fileName,
-			safeFileName);
-		renameUnsafeFile(
-			companyId, portletId, groupId, repositoryId, sourceFileName,
-			safeSourceFileName);
+		renameUnsafeFile(companyId, repositoryId, fileName, safeFileName);
 
 		_store.copyFileVersion(
-			companyId, portletId, groupId, repositoryId, safeFileName,
-			fromVersionNumber, toVersionNumber, safeSourceFileName,
-			serviceContext);
+			companyId, repositoryId, safeFileName, fromVersionLabel,
+			toVersionLabel);
 	}
 
 	public void deleteDirectory(
-			long companyId, String portletId, long repositoryId, String dirName)
+			long companyId, long repositoryId, String dirName)
 		throws PortalException, SystemException {
 
 		String safeDirName = FileUtil.encodeSafeFileName(dirName);
 
 		if (!safeDirName.equals(dirName)) {
 			try {
-				_store.deleteDirectory(
-					companyId, portletId, repositoryId, dirName);
+				_store.deleteDirectory(companyId, repositoryId, dirName);
 
 				return;
 			}
@@ -139,59 +115,50 @@ public class SafeFileNameStoreWrapper implements Store {
 			}
 		}
 
-		_store.deleteDirectory(companyId, portletId, repositoryId, safeDirName);
+		_store.deleteDirectory(companyId, repositoryId, safeDirName);
 	}
 
-	public void deleteFile(
-			long companyId, String portletId, long repositoryId,
-			String fileName)
+	public void deleteFile(long companyId, long repositoryId, String fileName)
 		throws PortalException, SystemException {
 
 		String safeFileName = FileUtil.encodeSafeFileName(fileName);
 
 		if (!safeFileName.equals(fileName) &&
-			_store.hasFile(
-				companyId, repositoryId, fileName,
-				DLFileEntryConstants.DEFAULT_VERSION)) {
+			_store.hasFile(companyId, repositoryId, fileName)) {
 
-			_store.deleteFile(companyId, portletId, repositoryId, fileName);
+			_store.deleteFile(companyId, repositoryId, fileName);
 
 			return;
 		}
 
-		_store.deleteFile(companyId, portletId, repositoryId, safeFileName);
+		_store.deleteFile(companyId, repositoryId, safeFileName);
 	}
 
 	public void deleteFile(
-			long companyId, String portletId, long repositoryId,
-			String fileName, String versionNumber)
+			long companyId, long repositoryId, String fileName,
+			String versionLabel)
 		throws PortalException, SystemException {
 
 		String safeFileName = FileUtil.encodeSafeFileName(fileName);
 
 		if (!safeFileName.equals(fileName) &&
-			_store.hasFile(
-				companyId, repositoryId, fileName, versionNumber)) {
+			_store.hasFile(companyId, repositoryId, fileName, versionLabel)) {
 
-			_store.deleteFile(
-				companyId, portletId, repositoryId, fileName, versionNumber);
+			_store.deleteFile(companyId, repositoryId, fileName, versionLabel);
 
 			return;
 		}
 
-		_store.deleteFile(
-			companyId, portletId, repositoryId, safeFileName, versionNumber);
+		_store.deleteFile(companyId, repositoryId, safeFileName, versionLabel);
 	}
 
-	public byte[] getFile(long companyId, long repositoryId, String fileName)
+	public File getFile(long companyId, long repositoryId, String fileName)
 		throws PortalException, SystemException {
 
 		String safeFileName = FileUtil.encodeSafeFileName(fileName);
 
 		if (!safeFileName.equals(fileName) &&
-			_store.hasFile(
-				companyId, repositoryId, fileName,
-				DLFileEntryConstants.DEFAULT_VERSION)) {
+			_store.hasFile(companyId, repositoryId, fileName)) {
 
 			return _store.getFile(companyId, repositoryId, fileName);
 		}
@@ -199,22 +166,55 @@ public class SafeFileNameStoreWrapper implements Store {
 		return _store.getFile(companyId, repositoryId, safeFileName);
 	}
 
-	public byte[] getFile(
+	public File getFile(
 			long companyId, long repositoryId, String fileName,
-			String versionNumber)
+			String versionLabel)
 		throws PortalException, SystemException {
 
 		String safeFileName = FileUtil.encodeSafeFileName(fileName);
 
 		if (!safeFileName.equals(fileName) &&
-			_store.hasFile(companyId, repositoryId, fileName, versionNumber)) {
+			_store.hasFile(companyId, repositoryId, fileName, versionLabel)) {
 
 			return _store.getFile(
-				companyId, repositoryId, fileName, versionNumber);
+				companyId, repositoryId, fileName, versionLabel);
 		}
 
 		return _store.getFile(
-			companyId, repositoryId, safeFileName, versionNumber);
+			companyId, repositoryId, safeFileName, versionLabel);
+	}
+
+	public byte[] getFileAsBytes(
+			long companyId, long repositoryId, String fileName)
+		throws PortalException, SystemException {
+
+		String safeFileName = FileUtil.encodeSafeFileName(fileName);
+
+		if (!safeFileName.equals(fileName) &&
+			_store.hasFile(companyId, repositoryId, fileName)) {
+
+			return _store.getFileAsBytes(companyId, repositoryId, fileName);
+		}
+
+		return _store.getFileAsBytes(companyId, repositoryId, safeFileName);
+	}
+
+	public byte[] getFileAsBytes(
+			long companyId, long repositoryId, String fileName,
+			String versionLabel)
+		throws PortalException, SystemException {
+
+		String safeFileName = FileUtil.encodeSafeFileName(fileName);
+
+		if (!safeFileName.equals(fileName) &&
+			_store.hasFile(companyId, repositoryId, fileName, versionLabel)) {
+
+			return _store.getFileAsBytes(
+				companyId, repositoryId, fileName, versionLabel);
+		}
+
+		return _store.getFileAsBytes(
+			companyId, repositoryId, safeFileName, versionLabel);
 	}
 
 	public InputStream getFileAsStream(
@@ -224,9 +224,7 @@ public class SafeFileNameStoreWrapper implements Store {
 		String safeFileName = FileUtil.encodeSafeFileName(fileName);
 
 		if (!safeFileName.equals(fileName) &&
-			_store.hasFile(
-				companyId, repositoryId, fileName,
-				DLFileEntryConstants.DEFAULT_VERSION)) {
+			_store.hasFile(companyId, repositoryId, fileName)) {
 
 			return _store.getFileAsStream(companyId, repositoryId, fileName);
 		}
@@ -236,28 +234,26 @@ public class SafeFileNameStoreWrapper implements Store {
 
 	public InputStream getFileAsStream(
 			long companyId, long repositoryId, String fileName,
-			String versionNumber)
+			String versionLabel)
 		throws PortalException, SystemException {
 
 		String safeFileName = FileUtil.encodeSafeFileName(fileName);
 
 		if (!safeFileName.equals(fileName) &&
-			_store.hasFile(
-				companyId, repositoryId, fileName, versionNumber)) {
+			_store.hasFile(companyId, repositoryId, fileName, versionLabel)) {
 
 			return _store.getFileAsStream(
-				companyId, repositoryId, fileName, versionNumber);
+				companyId, repositoryId, fileName, versionLabel);
 		}
 
 		return _store.getFileAsStream(
-			companyId, repositoryId, safeFileName, versionNumber);
+			companyId, repositoryId, safeFileName, versionLabel);
 	}
 
 	public String[] getFileNames(long companyId, long repositoryId)
 		throws SystemException {
 
-		String[] fileNames = _store.getFileNames(
-			companyId, repositoryId);
+		String[] fileNames = _store.getFileNames(companyId, repositoryId);
 
 		String[] decodedFileNames = new String[fileNames.length];
 
@@ -294,16 +290,13 @@ public class SafeFileNameStoreWrapper implements Store {
 		return decodedFileNames;
 	}
 
-	public long getFileSize(
-			long companyId, long repositoryId, String fileName)
+	public long getFileSize(long companyId, long repositoryId, String fileName)
 		throws PortalException, SystemException {
 
 		String safeFileName = FileUtil.encodeSafeFileName(fileName);
 
 		if (!safeFileName.equals(fileName) &&
-			_store.hasFile(
-				companyId, repositoryId, fileName,
-				DLFileEntryConstants.DEFAULT_VERSION)) {
+			_store.hasFile(companyId, repositoryId, fileName)) {
 
 			return _store.getFileSize(companyId, repositoryId, fileName);
 		}
@@ -311,21 +304,44 @@ public class SafeFileNameStoreWrapper implements Store {
 		return _store.getFileSize(companyId, repositoryId, safeFileName);
 	}
 
-	public boolean hasFile(
-			long companyId, long repositoryId, String fileName,
-			String versionNumber)
+	public boolean hasDirectory(
+			long companyId, long repositoryId, String dirName)
+		throws PortalException, SystemException {
+
+		String safeDirName = FileUtil.encodeSafeFileName(dirName);
+
+		return _store.hasDirectory(companyId, repositoryId, safeDirName);
+	}
+
+	public boolean hasFile(long companyId, long repositoryId, String fileName)
 		throws PortalException, SystemException {
 
 		String safeFileName = FileUtil.encodeSafeFileName(fileName);
 
 		if (!safeFileName.equals(fileName) &&
-			_store.hasFile(companyId, repositoryId, fileName, versionNumber)) {
+			_store.hasFile(companyId, repositoryId, fileName)) {
+
+			return true;
+		}
+
+		return _store.hasFile(companyId, repositoryId, safeFileName);
+	}
+
+	public boolean hasFile(
+			long companyId, long repositoryId, String fileName,
+			String versionLabel)
+		throws PortalException, SystemException {
+
+		String safeFileName = FileUtil.encodeSafeFileName(fileName);
+
+		if (!safeFileName.equals(fileName) &&
+			_store.hasFile(companyId, repositoryId, fileName, versionLabel)) {
 
 			return true;
 		}
 
 		return _store.hasFile(
-			companyId, repositoryId, safeFileName, versionNumber);
+			companyId, repositoryId, safeFileName, versionLabel);
 	}
 
 	public void move(String srcDir, String destDir) throws SystemException {
@@ -333,24 +349,21 @@ public class SafeFileNameStoreWrapper implements Store {
 	}
 
 	public void updateFile(
-			long companyId, String portletId, long groupId, long repositoryId,
-			long newRepositoryId, String fileName)
+			long companyId, long repositoryId, long newRepositoryId,
+			String fileName)
 		throws PortalException, SystemException {
 
 		String safeFileName = FileUtil.encodeSafeFileName(fileName);
 
-		renameUnsafeFile(
-			companyId, portletId, groupId, repositoryId, fileName,
-			safeFileName);
+		renameUnsafeFile(companyId, repositoryId, fileName, safeFileName);
 
 		_store.updateFile(
-			companyId, portletId, groupId, repositoryId, newRepositoryId,
-			safeFileName);
+			companyId, repositoryId, newRepositoryId, safeFileName);
 	}
 
 	public void updateFile(
-			long companyId, String portletId, long groupId, long repositoryId,
-			String fileName, String newFileName)
+			long companyId, long repositoryId, String fileName,
+			String newFileName)
 		throws PortalException, SystemException {
 
 		String safeFileName = FileUtil.encodeSafeFileName(fileName);
@@ -359,110 +372,81 @@ public class SafeFileNameStoreWrapper implements Store {
 		if (!safeFileName.equals(fileName)) {
 			if (_store.hasFile(
 					companyId, repositoryId, fileName,
-					DLFileEntryConstants.DEFAULT_VERSION)) {
+					DLFileEntryConstants.VERSION_DEFAULT)) {
 
 				safeFileName = fileName;
 			}
 		}
 
 		_store.updateFile(
-			companyId, portletId, groupId, repositoryId, safeFileName,
-			safeNewFileName);
+			companyId, repositoryId, safeFileName, safeNewFileName);
 	}
 
 	public void updateFile(
-			long companyId, String portletId, long groupId, long repositoryId,
-			String fileName, String versionNumber, String sourceFileName,
-			ServiceContext serviceContext, byte[] bytes)
+			long companyId, long repositoryId, String fileName,
+			String versionLabel, byte[] bytes)
 		throws PortalException, SystemException {
 
 		String safeFileName = FileUtil.encodeSafeFileName(fileName);
-		String safeSourceFileName = FileUtil.encodeSafeFileName(sourceFileName);
 
-		renameUnsafeFile(
-			companyId, portletId, groupId, repositoryId, fileName,
-			safeFileName);
-		renameUnsafeFile(
-			companyId, portletId, groupId, repositoryId, sourceFileName,
-			safeSourceFileName);
+		renameUnsafeFile(companyId, repositoryId, fileName, safeFileName);
 
 		_store.updateFile(
-			companyId, portletId, groupId, repositoryId, safeFileName,
-			versionNumber, safeSourceFileName, serviceContext, bytes);
+			companyId, repositoryId, safeFileName, versionLabel, bytes);
 	}
 
 	public void updateFile(
-			long companyId, String portletId, long groupId, long repositoryId,
-			String fileName, String versionNumber, String sourceFileName,
-			ServiceContext serviceContext, File file)
+			long companyId, long repositoryId, String fileName,
+			String versionLabel, File file)
 		throws PortalException, SystemException {
 
 		String safeFileName = FileUtil.encodeSafeFileName(fileName);
-		String safeSourceFileName = FileUtil.encodeSafeFileName(sourceFileName);
 
-		renameUnsafeFile(
-			companyId, portletId, groupId, repositoryId, fileName,
-			safeFileName);
-		renameUnsafeFile(
-			companyId, portletId, groupId, repositoryId, sourceFileName,
-			safeSourceFileName);
+		renameUnsafeFile(companyId, repositoryId, fileName, safeFileName);
 
 		_store.updateFile(
-			companyId, portletId, groupId, repositoryId, safeFileName,
-			versionNumber, safeSourceFileName, serviceContext, file);
+			companyId, repositoryId, safeFileName, versionLabel, file);
 	}
 
 	public void updateFile(
-			long companyId, String portletId, long groupId, long repositoryId,
-			String fileName, String versionNumber, String sourceFileName,
-			ServiceContext serviceContext, InputStream is)
+			long companyId, long repositoryId, String fileName,
+			String versionLabel, InputStream is)
 		throws PortalException, SystemException {
 
 		String safeFileName = FileUtil.encodeSafeFileName(fileName);
-		String safeSourceFileName = FileUtil.encodeSafeFileName(sourceFileName);
 
-		renameUnsafeFile(
-			companyId, portletId, groupId, repositoryId, fileName,
-			safeFileName);
-		renameUnsafeFile(
-			companyId, portletId, groupId, repositoryId, sourceFileName,
-			safeSourceFileName);
+		renameUnsafeFile(companyId, repositoryId, fileName, safeFileName);
 
 		_store.updateFile(
-			companyId, portletId, groupId, repositoryId, safeFileName,
-			versionNumber, safeSourceFileName, serviceContext, is);
+			companyId, repositoryId, safeFileName, versionLabel, is);
 	}
 
 	public void updateFileVersion(
-			long companyId, String portletId, long groupId, long repositoryId,
-			String fileName, String fromVersionNumber, String toVersionNumber,
-			String sourceFileName, ServiceContext serviceContext)
+			long companyId, long repositoryId, String fileName,
+			String fromVersionLabel, String toVersionLabel)
 		throws PortalException, SystemException {
 
 		String safeFileName = FileUtil.encodeSafeFileName(fileName);
 
-		renameUnsafeFile(
-			companyId, portletId, groupId, repositoryId, fileName,
-			safeFileName);
+		renameUnsafeFile(companyId, repositoryId, fileName, safeFileName);
 
 		_store.updateFileVersion(
-			companyId, portletId, groupId, repositoryId, safeFileName,
-			fromVersionNumber, toVersionNumber, sourceFileName, serviceContext);
+			companyId, repositoryId, safeFileName, fromVersionLabel,
+			toVersionLabel);
 	}
 
 	protected void renameUnsafeFile(
-			long companyId, String portletId, long groupId, long repositoryId,
-			String fileName, String safeFileName)
+			long companyId, long repositoryId, String fileName,
+			String safeFileName)
 		throws PortalException, SystemException {
 
 		if (!safeFileName.equals(fileName)) {
 			if (_store.hasFile(
 					companyId, repositoryId, fileName,
-					DLFileEntryConstants.DEFAULT_VERSION)) {
+					DLFileEntryConstants.VERSION_DEFAULT)) {
 
 				_store.updateFile(
-					companyId, portletId, groupId, repositoryId, fileName,
-					safeFileName);
+					companyId, repositoryId, fileName, safeFileName);
 			}
 		}
 	}

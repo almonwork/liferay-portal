@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -20,9 +20,19 @@ package com.liferay.portal.model;
 public class PortletConstants {
 
 	/**
-	 * War file separator.
+	 * Default preferences.
 	 */
-	public static final String WAR_SEPARATOR = "_WAR_";
+	public static final String DEFAULT_PREFERENCES = "<portlet-preferences />";
+
+	/**
+	 * Facebook integration method for FBML.
+	 */
+	public static final String FACEBOOK_INTEGRATION_FBML = "fbml";
+
+	/**
+	 * Facebook integration method for IFrame.
+	 */
+	public static final String FACEBOOK_INTEGRATION_IFRAME = "iframe";
 
 	/**
 	 * Instance separator.
@@ -33,11 +43,6 @@ public class PortletConstants {
 	 * Layout separator.
 	 */
 	public static final String LAYOUT_SEPARATOR = "_LAYOUT_";
-
-	/**
-	 * Default preferences.
-	 */
-	public static final String DEFAULT_PREFERENCES = "<portlet-preferences />";
 
 	/**
 	 * User principal strategy for screen name.
@@ -51,18 +56,31 @@ public class PortletConstants {
 	public static final String USER_PRINCIPAL_STRATEGY_USER_ID = "userId";
 
 	/**
-	 * Facebook integration method for FBML.
+	 * War file separator.
 	 */
-	public static final String FACEBOOK_INTEGRATION_FBML = "fbml";
+	public static final String WAR_SEPARATOR = "_WAR_";
 
 	/**
-	 * Facebook integration method for IFrame.
+	 * Returns the instance ID of the portlet.
+	 *
+	 * @param  portletId the portlet ID
+	 * @return the instance ID of the portlet
 	 */
-	public static final String FACEBOOK_INTEGRATION_IFRAME = "iframe";
+	public static String getInstanceId(String portletId) {
+		int pos = portletId.indexOf(INSTANCE_SEPARATOR);
+
+		if (pos == -1) {
+			return null;
+		}
+		else {
+			return portletId.substring(pos + INSTANCE_SEPARATOR.length());
+		}
+	}
 
 	/**
 	 * Returns the root portlet ID of the portlet.
 	 *
+	 * @param  portletId the portlet ID
 	 * @return the root portlet ID of the portlet
 	 */
 	public static String getRootPortletId(String portletId) {
@@ -77,20 +95,14 @@ public class PortletConstants {
 	}
 
 	/**
-	 * Returns the instance ID of the portlet.
+	 * Returns <code>true</code> if the portlet ID contains an instance ID.
 	 *
-	 * @return the instance ID of the portlet
+	 * @param  portletId theh portlet ID
+	 * @return <code>true</code> if the portlet ID contains an instance ID;
+	 *         <code>false</code> otherwise
 	 */
-	public static String getInstanceId(String portletId) {
-		int pos = portletId.indexOf(INSTANCE_SEPARATOR);
-
-		if (pos == -1) {
-			return null;
-		}
-		else {
-			return portletId.substring(
-				pos + INSTANCE_SEPARATOR.length(), portletId.length());
-		}
+	public static boolean hasInstanceId(String portletId) {
+		return portletId.contains(INSTANCE_SEPARATOR);
 	}
 
 }

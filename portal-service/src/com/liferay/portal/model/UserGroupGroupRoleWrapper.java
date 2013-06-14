@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,6 +14,9 @@
 
 package com.liferay.portal.model;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * <p>
  * This class is a wrapper for {@link UserGroupGroupRole}.
@@ -23,7 +26,8 @@ package com.liferay.portal.model;
  * @see       UserGroupGroupRole
  * @generated
  */
-public class UserGroupGroupRoleWrapper implements UserGroupGroupRole {
+public class UserGroupGroupRoleWrapper implements UserGroupGroupRole,
+	ModelWrapper<UserGroupGroupRole> {
 	public UserGroupGroupRoleWrapper(UserGroupGroupRole userGroupGroupRole) {
 		_userGroupGroupRole = userGroupGroupRole;
 	}
@@ -34,6 +38,36 @@ public class UserGroupGroupRoleWrapper implements UserGroupGroupRole {
 
 	public String getModelClassName() {
 		return UserGroupGroupRole.class.getName();
+	}
+
+	public Map<String, Object> getModelAttributes() {
+		Map<String, Object> attributes = new HashMap<String, Object>();
+
+		attributes.put("userGroupId", getUserGroupId());
+		attributes.put("groupId", getGroupId());
+		attributes.put("roleId", getRoleId());
+
+		return attributes;
+	}
+
+	public void setModelAttributes(Map<String, Object> attributes) {
+		Long userGroupId = (Long)attributes.get("userGroupId");
+
+		if (userGroupId != null) {
+			setUserGroupId(userGroupId);
+		}
+
+		Long groupId = (Long)attributes.get("groupId");
+
+		if (groupId != null) {
+			setGroupId(groupId);
+		}
+
+		Long roleId = (Long)attributes.get("roleId");
+
+		if (roleId != null) {
+			setRoleId(roleId);
+		}
 	}
 
 	/**
@@ -129,10 +163,6 @@ public class UserGroupGroupRoleWrapper implements UserGroupGroupRole {
 		return _userGroupGroupRole.isEscapedModel();
 	}
 
-	public void setEscapedModel(boolean escapedModel) {
-		_userGroupGroupRole.setEscapedModel(escapedModel);
-	}
-
 	public java.io.Serializable getPrimaryKeyObj() {
 		return _userGroupGroupRole.getPrimaryKeyObj();
 	}
@@ -187,7 +217,14 @@ public class UserGroupGroupRoleWrapper implements UserGroupGroupRole {
 		_userGroupGroupRole.persist();
 	}
 
+	/**
+	 * @deprecated Renamed to {@link #getWrappedModel}
+	 */
 	public UserGroupGroupRole getWrappedUserGroupGroupRole() {
+		return _userGroupGroupRole;
+	}
+
+	public UserGroupGroupRole getWrappedModel() {
 		return _userGroupGroupRole;
 	}
 

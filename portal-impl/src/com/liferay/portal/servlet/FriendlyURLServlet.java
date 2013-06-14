@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -57,8 +57,7 @@ public class FriendlyURLServlet extends HttpServlet {
 
 		_private = GetterUtil.getBoolean(
 			servletConfig.getInitParameter("private"));
-		_user = GetterUtil.getBoolean(
-			servletConfig.getInitParameter("user"));
+		_user = GetterUtil.getBoolean(servletConfig.getInitParameter("user"));
 
 		if (_private) {
 			if (_user) {
@@ -189,8 +188,7 @@ public class FriendlyURLServlet extends HttpServlet {
 					group = user.getGroup();
 				}
 				else if (_log.isWarnEnabled()) {
-					_log.warn(
-						"No user exists with friendly URL " + screenName);
+					_log.warn("No user exists with friendly URL " + screenName);
 				}
 			}
 			else {
@@ -229,7 +227,12 @@ public class FriendlyURLServlet extends HttpServlet {
 		friendlyURL = null;
 
 		if ((pos != -1) && ((pos + 1) != path.length())) {
-			friendlyURL = path.substring(pos, path.length());
+			friendlyURL = path.substring(pos);
+		}
+
+		if (Validator.isNull(friendlyURL)) {
+			request.setAttribute(
+				WebKeys.REDIRECT_TO_DEFAULT_LAYOUT, Boolean.TRUE);
 		}
 
 		Map<String, Object> requestContext = new HashMap<String, Object>();

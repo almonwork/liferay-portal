@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -36,7 +36,6 @@ import com.liferay.portal.util.WebKeys;
 
 import java.security.SecureRandom;
 
-import java.util.Iterator;
 import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.ConcurrentHashMap;
@@ -65,6 +64,8 @@ public class NtlmFilter extends BasePortalFilter {
 
 	@Override
 	public void init(FilterConfig filterConfig) {
+		super.init(filterConfig);
+
 		try {
 			NtlmHttpFilter ntlmFilter = new NtlmHttpFilter();
 
@@ -72,12 +73,7 @@ public class NtlmFilter extends BasePortalFilter {
 
 			Properties properties = PropsUtil.getProperties("jcifs.", false);
 
-			Iterator<Map.Entry<Object, Object>> itr =
-				properties.entrySet().iterator();
-
-			while (itr.hasNext()) {
-				Map.Entry<Object, Object> entry = itr.next();
-
+			for (Map.Entry<Object, Object> entry : properties.entrySet()) {
 				String key = (String)entry.getKey();
 				String value = (String)entry.getValue();
 
@@ -119,16 +115,16 @@ public class NtlmFilter extends BasePortalFilter {
 
 		String domain = PrefsPropsUtil.getString(
 			companyId, PropsKeys.NTLM_DOMAIN, PropsValues.NTLM_DOMAIN);
-		String domainController =  PrefsPropsUtil.getString(
+		String domainController = PrefsPropsUtil.getString(
 			companyId, PropsKeys.NTLM_DOMAIN_CONTROLLER,
 			PropsValues.NTLM_DOMAIN_CONTROLLER);
-		String domainControllerName =  PrefsPropsUtil.getString(
+		String domainControllerName = PrefsPropsUtil.getString(
 			companyId, PropsKeys.NTLM_DOMAIN_CONTROLLER_NAME,
 			PropsValues.NTLM_DOMAIN_CONTROLLER_NAME);
-		String serviceAccount =  PrefsPropsUtil.getString(
+		String serviceAccount = PrefsPropsUtil.getString(
 			companyId, PropsKeys.NTLM_SERVICE_ACCOUNT,
 			PropsValues.NTLM_SERVICE_ACCOUNT);
-		String servicePassword =  PrefsPropsUtil.getString(
+		String servicePassword = PrefsPropsUtil.getString(
 			companyId, PropsKeys.NTLM_SERVICE_PASSWORD,
 			PropsValues.NTLM_SERVICE_PASSWORD);
 
@@ -194,71 +190,69 @@ public class NtlmFilter extends BasePortalFilter {
 
 				authorization = Base64.encode(challengeMessage);
 
+				response.setContentLength(0);
 				response.setHeader(
 					HttpHeaders.WWW_AUTHENTICATE, "NTLM " + authorization);
 				response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-				response.setContentLength(0);
 
 				response.flushBuffer();
 
-				_serverChallenges.put(request.getRemoteAddr(), serverChallenge);
+				_portalCache.put(request.getRemoteAddr(), serverChallenge);
 
 				// Interrupt filter chain, send response. Browser will
 				// immediately post a new request.
 
 				return;
 			}
-			else {
-				byte[] serverChallenge = (byte[])_serverChallenges.get(
-					request.getRemoteAddr());
 
-				if (serverChallenge == null) {
-					response.setHeader(HttpHeaders.WWW_AUTHENTICATE, "NTLM");
-					response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-					response.setContentLength(0);
+			byte[] serverChallenge = (byte[])_portalCache.get(
+				request.getRemoteAddr());
 
-					response.flushBuffer();
+			if (serverChallenge == null) {
+				response.setContentLength(0);
+				response.setHeader(HttpHeaders.WWW_AUTHENTICATE, "NTLM");
+				response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
 
-					return;
+				response.flushBuffer();
+
+				return;
+			}
+
+			NtlmUserAccount ntlmUserAccount = null;
+
+			try {
+				ntlmUserAccount = ntlmManager.authenticate(
+					src, serverChallenge);
+			}
+			catch (Exception e) {
+				if (_log.isErrorEnabled()) {
+					_log.error("Unable to perform NTLM authentication", e);
 				}
+			}
+			finally {
+				_portalCache.remove(request.getRemoteAddr());
+			}
 
-				NtlmUserAccount ntlmUserAccount = null;
+			if (ntlmUserAccount == null) {
+				response.setContentLength(0);
+				response.setHeader(HttpHeaders.WWW_AUTHENTICATE, "NTLM");
+				response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
 
-				try {
-					ntlmUserAccount = ntlmManager.authenticate(
-						src, serverChallenge);
-				}
-				catch (Exception e) {
-					if (_log.isErrorEnabled()) {
-						_log.error("Unable to perform NTLM authentication", e);
-					}
-				}
-				finally {
-					_serverChallenges.remove(request.getRemoteAddr());
-				}
+				response.flushBuffer();
 
-				if (ntlmUserAccount == null) {
-					response.setHeader(HttpHeaders.WWW_AUTHENTICATE, "NTLM");
-					response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-					response.setContentLength(0);
+				return;
+			}
 
-					response.flushBuffer();
+			if (_log.isDebugEnabled()) {
+				_log.debug("NTLM remote user " + ntlmUserAccount.getUserName());
+			}
 
-					return;
-				}
+			request.setAttribute(
+				WebKeys.NTLM_REMOTE_USER, ntlmUserAccount.getUserName());
 
-				if (_log.isDebugEnabled()) {
-					_log.debug(
-						"NTLM remote user " + ntlmUserAccount.getUserName());
-				}
-
-				request.setAttribute(
-					WebKeys.NTLM_REMOTE_USER, ntlmUserAccount.getUserName());
-
-				if (session != null) {
-					session.setAttribute(
-						WebKeys.NTLM_USER_ACCOUNT, ntlmUserAccount);
-				}
+			if (session != null) {
+				session.setAttribute(
+					WebKeys.NTLM_USER_ACCOUNT, ntlmUserAccount);
 			}
 		}
 
@@ -273,9 +267,9 @@ public class NtlmFilter extends BasePortalFilter {
 			}
 
 			if (ntlmUserAccount == null) {
+				response.setContentLength(0);
 				response.setHeader(HttpHeaders.WWW_AUTHENTICATE, "NTLM");
 				response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-				response.setContentLength(0);
 
 				response.flushBuffer();
 
@@ -290,8 +284,8 @@ public class NtlmFilter extends BasePortalFilter {
 
 	private Map<Long, NtlmManager> _ntlmManagers =
 		new ConcurrentHashMap<Long, NtlmManager>();
-	private SecureRandom _secureRandom = new SecureRandom();
-	private PortalCache _serverChallenges = SingleVMPoolUtil.getCache(
+	private PortalCache _portalCache = SingleVMPoolUtil.getCache(
 		NtlmFilter.class.getName());
+	private SecureRandom _secureRandom = new SecureRandom();
 
 }

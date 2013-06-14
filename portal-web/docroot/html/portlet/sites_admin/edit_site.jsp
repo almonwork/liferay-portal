@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -17,7 +17,10 @@
 <%@ include file="/html/portlet/sites_admin/init.jsp" %>
 
 <%
-String redirect = ParamUtil.getString(request, "redirect", currentURL);
+String viewOrganizationsRedirect = ParamUtil.getString(request, "viewOrganizationsRedirect", themeDisplay.getURLControlPanel());
+String redirect = ParamUtil.getString(request, "redirect", viewOrganizationsRedirect);
+String closeRedirect = ParamUtil.getString(request, "closeRedirect");
+String backURL = ParamUtil.getString(request, "backURL", redirect);
 
 Group group = (Group)request.getAttribute(WebKeys.GROUP);
 
@@ -67,17 +70,21 @@ if (layoutSetPrototypeId > 0) {
 	layoutSetPrototype = LayoutSetPrototypeServiceUtil.getLayoutSetPrototype(layoutSetPrototypeId);
 }
 
+boolean showPrototypes = ParamUtil.getBoolean(request, "showPrototypes", true);
+
 String[] mainSections = PropsValues.SITES_FORM_ADD_MAIN;
 String[] seoSections = PropsValues.SITES_FORM_ADD_SEO;
 String[] advancedSections = PropsValues.SITES_FORM_ADD_ADVANCED;
+String[] miscellaneousSections = PropsValues.SITES_FORM_ADD_MISCELLANEOUS;
 
 if (group != null) {
 	mainSections = PropsValues.SITES_FORM_UPDATE_MAIN;
 	seoSections = PropsValues.SITES_FORM_UPDATE_SEO;
 	advancedSections = PropsValues.SITES_FORM_UPDATE_ADVANCED;
+	miscellaneousSections = PropsValues.SITES_FORM_UPDATE_MISCELLANEOUS;
 }
 
-String[][] categorySections = {mainSections, seoSections, advancedSections};
+String[][] categorySections = {mainSections, seoSections, advancedSections, miscellaneousSections};
 %>
 
 <c:if test="<%= portletName.equals(PortletKeys.SITES_ADMIN) %>">
@@ -92,7 +99,7 @@ String title = "new-site";
 
 if (group != null) {
 	localizeTitle= false;
-	title = group.getDescriptiveName();
+	title = group.getDescriptiveName(locale);
 }
 else if (layoutSetPrototype != null) {
 	localizeTitle= false;
@@ -101,7 +108,7 @@ else if (layoutSetPrototype != null) {
 %>
 
 <liferay-ui:header
-	backURL="<%= redirect %>"
+	backURL="<%= backURL %>"
 	localizeTitle="<%= localizeTitle %>"
 	title="<%= title %>"
 />
@@ -112,7 +119,9 @@ else if (layoutSetPrototype != null) {
 
 <aui:form action="<%= editSiteURL %>" method="post" name="fm" onSubmit='<%= "event.preventDefault(); " + renderResponse.getNamespace() + "saveGroup();" %>'>
 	<aui:input name="<%= Constants.CMD %>" type="hidden" />
-	<aui:input name="redirect" type="hidden" value="<%= redirect %>" />
+	<aui:input name="redirect" type="hidden" />
+	<aui:input name="closeRedirect" type="hidden" value="<%= closeRedirect %>" />
+	<aui:input name="backURL" type="hidden" value="<%= backURL %>" />
 	<aui:input name="groupId" type="hidden" value="<%= groupId %>" />
 	<aui:input name="liveGroupId" type="hidden" value="<%= liveGroupId %>" />
 	<aui:input name="stagingGroupId" type="hidden" value="<%= stagingGroupId %>" />
@@ -125,28 +134,27 @@ else if (layoutSetPrototype != null) {
 	request.setAttribute("site.stagingGroupId", new Long(stagingGroupId));
 	request.setAttribute("site.liveGroupTypeSettings", liveGroupTypeSettings);
 	request.setAttribute("site.layoutSetPrototype", layoutSetPrototype);
+	request.setAttribute("site.showPrototypes", String.valueOf(showPrototypes));
 	%>
 
-	<liferay-util:buffer var="htmlBottom">
-		<aui:button-row>
-			<aui:button type="submit" />
-
-			<aui:button href="<%= redirect %>" type="cancel" />
-		</aui:button-row>
-	</liferay-util:buffer>
-
 	<liferay-ui:form-navigator
+		backURL="<%= backURL %>"
 		categoryNames="<%= _CATEGORY_NAMES %>"
 		categorySections="<%= categorySections %>"
-		htmlBottom="<%= htmlBottom %>"
 		jspPath="/html/portlet/sites_admin/site/"
-		showButtons="<%= false %>"
+		showButtons="<%= true %>"
 	/>
 </aui:form>
 
 <aui:script>
 	function <portlet:namespace />saveGroup() {
 		document.<portlet:namespace />fm.<portlet:namespace /><%= Constants.CMD %>.value = "<%= (group == null) ? Constants.ADD : Constants.UPDATE %>";
+
+		var redirect = "<portlet:renderURL><portlet:param name="struts_action" value="/sites_admin/edit_site" /><portlet:param name="backURL" value="<%= backURL %>"></portlet:param></portlet:renderURL>";
+
+		redirect += Liferay.Util.getHistoryParam('<portlet:namespace />');
+
+		document.<portlet:namespace />fm.<portlet:namespace />redirect.value = redirect;
 
 		var ok = true;
 
@@ -173,13 +181,13 @@ else if (layoutSetPrototype != null) {
 				ok = false;
 
 				if (0 == currentValue) {
-					ok = confirm('<%= UnicodeLanguageUtil.format(pageContext, "are-you-sure-you-want-to-deactivate-staging-for-x", liveGroup.getDescriptiveName()) %>');
+					ok = confirm('<%= UnicodeLanguageUtil.format(pageContext, "are-you-sure-you-want-to-deactivate-staging-for-x", liveGroup.getDescriptiveName(locale)) %>');
 				}
 				else if (1 == currentValue) {
-					ok = confirm('<%= UnicodeLanguageUtil.format(pageContext, "are-you-sure-you-want-to-activate-local-staging-for-x", liveGroup.getDescriptiveName()) %>');
+					ok = confirm('<%= UnicodeLanguageUtil.format(pageContext, "are-you-sure-you-want-to-activate-local-staging-for-x", liveGroup.getDescriptiveName(locale)) %>');
 				}
 				else if (2 == currentValue) {
-					ok = confirm('<%= UnicodeLanguageUtil.format(pageContext, "are-you-sure-you-want-to-activate-remote-staging-for-x", liveGroup.getDescriptiveName()) %>');
+					ok = confirm('<%= UnicodeLanguageUtil.format(pageContext, "are-you-sure-you-want-to-activate-remote-staging-for-x", liveGroup.getDescriptiveName(locale)) %>');
 				}
 			}
 		</c:if>
@@ -227,7 +235,7 @@ else if (layoutSetPrototype != null) {
 
 <%
 if (group != null) {
-	PortalUtil.addPortletBreadcrumbEntry(request, HtmlUtil.escape(group.getDescriptiveName()), null);
+	PortalUtil.addPortletBreadcrumbEntry(request, group.getDescriptiveName(locale), null);
 	PortalUtil.addPortletBreadcrumbEntry(request, LanguageUtil.get(pageContext, "edit"), currentURL);
 }
 else {
@@ -236,5 +244,5 @@ else {
 %>
 
 <%!
-private static String[] _CATEGORY_NAMES = {"basic-information", "search-engine-optimization", "advanced"};
+private static String[] _CATEGORY_NAMES = {"basic-information", "search-engine-optimization", "advanced", "miscellaneous"};
 %>

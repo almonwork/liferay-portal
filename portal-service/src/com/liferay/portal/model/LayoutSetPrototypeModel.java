@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -21,6 +21,7 @@ import com.liferay.portlet.expando.model.ExpandoBridge;
 
 import java.io.Serializable;
 
+import java.util.Date;
 import java.util.Locale;
 import java.util.Map;
 
@@ -102,6 +103,34 @@ public interface LayoutSetPrototypeModel extends BaseModel<LayoutSetPrototype> {
 	public void setCompanyId(long companyId);
 
 	/**
+	 * Returns the create date of this layout set prototype.
+	 *
+	 * @return the create date of this layout set prototype
+	 */
+	public Date getCreateDate();
+
+	/**
+	 * Sets the create date of this layout set prototype.
+	 *
+	 * @param createDate the create date of this layout set prototype
+	 */
+	public void setCreateDate(Date createDate);
+
+	/**
+	 * Returns the modified date of this layout set prototype.
+	 *
+	 * @return the modified date of this layout set prototype
+	 */
+	public Date getModifiedDate();
+
+	/**
+	 * Sets the modified date of this layout set prototype.
+	 *
+	 * @param modifiedDate the modified date of this layout set prototype
+	 */
+	public void setModifiedDate(Date modifiedDate);
+
+	/**
 	 * Returns the name of this layout set prototype.
 	 *
 	 * @return the name of this layout set prototype
@@ -114,6 +143,7 @@ public interface LayoutSetPrototypeModel extends BaseModel<LayoutSetPrototype> {
 	 * @param locale the locale of the language
 	 * @return the localized name of this layout set prototype
 	 */
+	@AutoEscape
 	public String getName(Locale locale);
 
 	/**
@@ -123,6 +153,7 @@ public interface LayoutSetPrototypeModel extends BaseModel<LayoutSetPrototype> {
 	 * @param useDefault whether to use the default language if no localization exists for the requested language
 	 * @return the localized name of this layout set prototype. If <code>useDefault</code> is <code>false</code> and no localization exists for the requested language, an empty string will be returned.
 	 */
+	@AutoEscape
 	public String getName(Locale locale, boolean useDefault);
 
 	/**
@@ -131,6 +162,7 @@ public interface LayoutSetPrototypeModel extends BaseModel<LayoutSetPrototype> {
 	 * @param languageId the ID of the language
 	 * @return the localized name of this layout set prototype
 	 */
+	@AutoEscape
 	public String getName(String languageId);
 
 	/**
@@ -140,7 +172,14 @@ public interface LayoutSetPrototypeModel extends BaseModel<LayoutSetPrototype> {
 	 * @param useDefault whether to use the default language if no localization exists for the requested language
 	 * @return the localized name of this layout set prototype
 	 */
+	@AutoEscape
 	public String getName(String languageId, boolean useDefault);
+
+	@AutoEscape
+	public String getNameCurrentLanguageId();
+
+	@AutoEscape
+	public String getNameCurrentValue();
 
 	/**
 	 * Returns a map of the locales and localized names of this layout set prototype.
@@ -172,6 +211,8 @@ public interface LayoutSetPrototypeModel extends BaseModel<LayoutSetPrototype> {
 	 * @param defaultLocale the default locale
 	 */
 	public void setName(String name, Locale locale, Locale defaultLocale);
+
+	public void setNameCurrentLanguageId(String languageId);
 
 	/**
 	 * Sets the localized names of this layout set prototype from the map of locales and localized names.
@@ -248,8 +289,6 @@ public interface LayoutSetPrototypeModel extends BaseModel<LayoutSetPrototype> {
 	public void setCachedModel(boolean cachedModel);
 
 	public boolean isEscapedModel();
-
-	public void setEscapedModel(boolean escapedModel);
 
 	public Serializable getPrimaryKeyObj();
 

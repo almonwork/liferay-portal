@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,6 +14,9 @@
 
 package com.liferay.portal.model;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * <p>
  * This class is a wrapper for {@link UserNotificationEvent}.
@@ -23,7 +26,8 @@ package com.liferay.portal.model;
  * @see       UserNotificationEvent
  * @generated
  */
-public class UserNotificationEventWrapper implements UserNotificationEvent {
+public class UserNotificationEventWrapper implements UserNotificationEvent,
+	ModelWrapper<UserNotificationEvent> {
 	public UserNotificationEventWrapper(
 		UserNotificationEvent userNotificationEvent) {
 		_userNotificationEvent = userNotificationEvent;
@@ -35,6 +39,79 @@ public class UserNotificationEventWrapper implements UserNotificationEvent {
 
 	public String getModelClassName() {
 		return UserNotificationEvent.class.getName();
+	}
+
+	public Map<String, Object> getModelAttributes() {
+		Map<String, Object> attributes = new HashMap<String, Object>();
+
+		attributes.put("uuid", getUuid());
+		attributes.put("userNotificationEventId", getUserNotificationEventId());
+		attributes.put("companyId", getCompanyId());
+		attributes.put("userId", getUserId());
+		attributes.put("type", getType());
+		attributes.put("timestamp", getTimestamp());
+		attributes.put("deliverBy", getDeliverBy());
+		attributes.put("payload", getPayload());
+		attributes.put("archived", getArchived());
+
+		return attributes;
+	}
+
+	public void setModelAttributes(Map<String, Object> attributes) {
+		String uuid = (String)attributes.get("uuid");
+
+		if (uuid != null) {
+			setUuid(uuid);
+		}
+
+		Long userNotificationEventId = (Long)attributes.get(
+				"userNotificationEventId");
+
+		if (userNotificationEventId != null) {
+			setUserNotificationEventId(userNotificationEventId);
+		}
+
+		Long companyId = (Long)attributes.get("companyId");
+
+		if (companyId != null) {
+			setCompanyId(companyId);
+		}
+
+		Long userId = (Long)attributes.get("userId");
+
+		if (userId != null) {
+			setUserId(userId);
+		}
+
+		String type = (String)attributes.get("type");
+
+		if (type != null) {
+			setType(type);
+		}
+
+		Long timestamp = (Long)attributes.get("timestamp");
+
+		if (timestamp != null) {
+			setTimestamp(timestamp);
+		}
+
+		Long deliverBy = (Long)attributes.get("deliverBy");
+
+		if (deliverBy != null) {
+			setDeliverBy(deliverBy);
+		}
+
+		String payload = (String)attributes.get("payload");
+
+		if (payload != null) {
+			setPayload(payload);
+		}
+
+		Boolean archived = (Boolean)attributes.get("archived");
+
+		if (archived != null) {
+			setArchived(archived);
+		}
 	}
 
 	/**
@@ -219,6 +296,33 @@ public class UserNotificationEventWrapper implements UserNotificationEvent {
 		_userNotificationEvent.setPayload(payload);
 	}
 
+	/**
+	* Returns the archived of this user notification event.
+	*
+	* @return the archived of this user notification event
+	*/
+	public boolean getArchived() {
+		return _userNotificationEvent.getArchived();
+	}
+
+	/**
+	* Returns <code>true</code> if this user notification event is archived.
+	*
+	* @return <code>true</code> if this user notification event is archived; <code>false</code> otherwise
+	*/
+	public boolean isArchived() {
+		return _userNotificationEvent.isArchived();
+	}
+
+	/**
+	* Sets whether this user notification event is archived.
+	*
+	* @param archived the archived of this user notification event
+	*/
+	public void setArchived(boolean archived) {
+		_userNotificationEvent.setArchived(archived);
+	}
+
 	public boolean isNew() {
 		return _userNotificationEvent.isNew();
 	}
@@ -237,10 +341,6 @@ public class UserNotificationEventWrapper implements UserNotificationEvent {
 
 	public boolean isEscapedModel() {
 		return _userNotificationEvent.isEscapedModel();
-	}
-
-	public void setEscapedModel(boolean escapedModel) {
-		_userNotificationEvent.setEscapedModel(escapedModel);
 	}
 
 	public java.io.Serializable getPrimaryKeyObj() {
@@ -297,7 +397,14 @@ public class UserNotificationEventWrapper implements UserNotificationEvent {
 		_userNotificationEvent.persist();
 	}
 
+	/**
+	 * @deprecated Renamed to {@link #getWrappedModel}
+	 */
 	public UserNotificationEvent getWrappedUserNotificationEvent() {
+		return _userNotificationEvent;
+	}
+
+	public UserNotificationEvent getWrappedModel() {
 		return _userNotificationEvent;
 	}
 

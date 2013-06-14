@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -16,21 +16,52 @@ package com.liferay.portal.upgrade.v6_1_0;
 
 import com.liferay.portal.kernel.dao.jdbc.DataAccess;
 import com.liferay.portal.kernel.upgrade.UpgradeProcess;
+import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringUtil;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.Timestamp;
 
 /**
  * @author Shuyang Zhou
  */
 public class UpgradeMessageBoards extends UpgradeProcess {
 
+	protected void addThreadFlag(
+			long threadFlagId, long userId, long threadId,
+			Timestamp modifiedDate)
+		throws Exception {
+
+		Connection con = null;
+		PreparedStatement ps = null;
+		ResultSet rs = null;
+
+		try {
+			con = DataAccess.getUpgradeOptimizedConnection();
+
+			ps = con.prepareStatement(
+				"insert into MBThreadFlag (threadFlagId, userId, " +
+					"modifiedDate, threadId) values (?, ?, ?, ?)");
+
+			ps.setLong(1, threadFlagId);
+			ps.setLong(2, userId);
+			ps.setTimestamp(3, modifiedDate);
+			ps.setLong(4, threadId);
+
+			ps.executeUpdate();
+		}
+		finally {
+			DataAccess.cleanUp(con, ps, rs);
+		}
+	}
+
 	@Override
 	protected void doUpgrade() throws Exception {
 		updateMessage();
 		updateThread();
+		updateThreadFlag();
 	}
 
 	protected void updateMessage() throws Exception {
@@ -39,7 +70,7 @@ public class UpgradeMessageBoards extends UpgradeProcess {
 		ResultSet rs = null;
 
 		try {
-			con = DataAccess.getConnection();
+			con = DataAccess.getUpgradeOptimizedConnection();
 
 			ps = con.prepareStatement(
 				"select messageId, body from MBMessage where (body like " +
@@ -52,11 +83,36 @@ public class UpgradeMessageBoards extends UpgradeProcess {
 				String body = rs.getString("body");
 
 				body = StringUtil.replace(
-					body,
-					new String[] {"<3", ">_>", "<_<"},
+					body, new String[] {"<3", ">_>", "<_<"},
 					new String[] {":love:", ":glare:", ":dry:"});
 
-				updateMessage(messageId, body);
+				updateMessageBody(messageId, body);
+			}
+		}
+		finally {
+			DataAccess.cleanUp(con, ps, rs);
+		}
+
+		try {
+			con = DataAccess.getUpgradeOptimizedConnection();
+
+			StringBundler sb = new StringBundler(4);
+
+			sb.append("select messageFlag.messageId as messageId from ");
+			sb.append("MBMessageFlag messageFlag inner join MBMessage ");
+			sb.append("message on messageFlag.messageId = message.messageId ");
+			sb.append("where message.parentMessageId != 0 and flag = 3");
+
+			String sql = sb.toString();
+
+			ps = con.prepareStatement(sql);
+
+			rs = ps.executeQuery();
+
+			while (rs.next()) {
+				long messageId = rs.getLong("messageId");
+
+				updateMessageAnswer(messageId, true);
 			}
 		}
 		finally {
@@ -64,14 +120,36 @@ public class UpgradeMessageBoards extends UpgradeProcess {
 		}
 	}
 
-	protected void updateMessage(long messageId, String body)
+	protected void updateMessageAnswer(long messageId, boolean answer)
 		throws Exception {
 
 		Connection con = null;
 		PreparedStatement ps = null;
 
 		try {
-			con = DataAccess.getConnection();
+			con = DataAccess.getUpgradeOptimizedConnection();
+
+			ps = con.prepareStatement(
+				"update MBMessage set answer = ? where messageId = " +
+					messageId);
+
+			ps.setBoolean(1, answer);
+
+			ps.executeUpdate();
+		}
+		finally {
+			DataAccess.cleanUp(con, ps);
+		}
+	}
+
+	protected void updateMessageBody(long messageId, String body)
+		throws Exception {
+
+		Connection con = null;
+		PreparedStatement ps = null;
+
+		try {
+			con = DataAccess.getUpgradeOptimizedConnection();
 
 			ps = con.prepareStatement(
 				"update MBMessage set body = ? where messageId = " + messageId);
@@ -91,7 +169,7 @@ public class UpgradeMessageBoards extends UpgradeProcess {
 		ResultSet rs = null;
 
 		try {
-			con = DataAccess.getConnection();
+			con = DataAccess.getUpgradeOptimizedConnection();
 
 			ps = con.prepareStatement(
 				"select MBThread.threadId, MBMessage.companyId, " +
@@ -113,6 +191,98 @@ public class UpgradeMessageBoards extends UpgradeProcess {
 		}
 		finally {
 			DataAccess.cleanUp(con, ps, rs);
+		}
+
+		try {
+			con = DataAccess.getUpgradeOptimizedConnection();
+
+			ps = con.prepareStatement(
+				"select threadId from MBMessageFlag where flag = 2");
+
+			rs = ps.executeQuery();
+
+			while (rs.next()) {
+				long threadId = rs.getLong("threadId");
+
+				updateThreadQuestion(threadId, true);
+			}
+		}
+		finally {
+			DataAccess.cleanUp(con, ps, rs);
+		}
+
+		try {
+			con = DataAccess.getUpgradeOptimizedConnection();
+
+			StringBundler sb = new StringBundler(4);
+
+			sb.append("select messageFlag.threadId as threadId from ");
+			sb.append("MBMessageFlag messageFlag inner join MBMessage ");
+			sb.append("message on messageFlag.messageId = message.messageId ");
+			sb.append("where message.parentMessageId = 0 and flag = 3");
+
+			ps = con.prepareStatement(sb.toString());
+
+			rs = ps.executeQuery();
+
+			while (rs.next()) {
+				long threadId = rs.getLong("threadId");
+
+				updateThreadQuestion(threadId, true);
+			}
+		}
+		finally {
+			DataAccess.cleanUp(con, ps, rs);
+		}
+	}
+
+	protected void updateThreadFlag() throws Exception {
+		Connection con = null;
+		PreparedStatement ps = null;
+		ResultSet rs = null;
+
+		try {
+			con = DataAccess.getUpgradeOptimizedConnection();
+
+			ps = con.prepareStatement(
+				"select userId, threadId, modifiedDate from MBMessageFlag " +
+					"where flag = 1");
+
+			rs = ps.executeQuery();
+
+			while (rs.next()) {
+				long userId = rs.getLong("userId");
+				long threadId = rs.getLong("threadId");
+				Timestamp modifiedDate = rs.getTimestamp("modifiedDate");
+
+				addThreadFlag(increment(), userId, threadId, modifiedDate);
+			}
+		}
+		finally {
+			DataAccess.cleanUp(con, ps, rs);
+		}
+
+		runSQL("drop table MBMessageFlag");
+	}
+
+	protected void updateThreadQuestion(long threadId, boolean question)
+		throws Exception {
+
+		Connection con = null;
+		PreparedStatement ps = null;
+
+		try {
+			con = DataAccess.getUpgradeOptimizedConnection();
+
+			ps = con.prepareStatement(
+				"update MBThread set question = ? where threadId =" + threadId);
+
+			ps.setBoolean(1, question);
+
+			ps.executeUpdate();
+		}
+		finally {
+			DataAccess.cleanUp(con, ps);
 		}
 	}
 

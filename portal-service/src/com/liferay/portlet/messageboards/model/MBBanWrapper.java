@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,6 +14,12 @@
 
 package com.liferay.portlet.messageboards.model;
 
+import com.liferay.portal.model.ModelWrapper;
+
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * <p>
  * This class is a wrapper for {@link MBBan}.
@@ -23,7 +29,7 @@ package com.liferay.portlet.messageboards.model;
  * @see       MBBan
  * @generated
  */
-public class MBBanWrapper implements MBBan {
+public class MBBanWrapper implements MBBan, ModelWrapper<MBBan> {
 	public MBBanWrapper(MBBan mbBan) {
 		_mbBan = mbBan;
 	}
@@ -34,6 +40,71 @@ public class MBBanWrapper implements MBBan {
 
 	public String getModelClassName() {
 		return MBBan.class.getName();
+	}
+
+	public Map<String, Object> getModelAttributes() {
+		Map<String, Object> attributes = new HashMap<String, Object>();
+
+		attributes.put("banId", getBanId());
+		attributes.put("groupId", getGroupId());
+		attributes.put("companyId", getCompanyId());
+		attributes.put("userId", getUserId());
+		attributes.put("userName", getUserName());
+		attributes.put("createDate", getCreateDate());
+		attributes.put("modifiedDate", getModifiedDate());
+		attributes.put("banUserId", getBanUserId());
+
+		return attributes;
+	}
+
+	public void setModelAttributes(Map<String, Object> attributes) {
+		Long banId = (Long)attributes.get("banId");
+
+		if (banId != null) {
+			setBanId(banId);
+		}
+
+		Long groupId = (Long)attributes.get("groupId");
+
+		if (groupId != null) {
+			setGroupId(groupId);
+		}
+
+		Long companyId = (Long)attributes.get("companyId");
+
+		if (companyId != null) {
+			setCompanyId(companyId);
+		}
+
+		Long userId = (Long)attributes.get("userId");
+
+		if (userId != null) {
+			setUserId(userId);
+		}
+
+		String userName = (String)attributes.get("userName");
+
+		if (userName != null) {
+			setUserName(userName);
+		}
+
+		Date createDate = (Date)attributes.get("createDate");
+
+		if (createDate != null) {
+			setCreateDate(createDate);
+		}
+
+		Date modifiedDate = (Date)attributes.get("modifiedDate");
+
+		if (modifiedDate != null) {
+			setModifiedDate(modifiedDate);
+		}
+
+		Long banUserId = (Long)attributes.get("banUserId");
+
+		if (banUserId != null) {
+			setBanUserId(banUserId);
+		}
 	}
 
 	/**
@@ -258,10 +329,6 @@ public class MBBanWrapper implements MBBan {
 		return _mbBan.isEscapedModel();
 	}
 
-	public void setEscapedModel(boolean escapedModel) {
-		_mbBan.setEscapedModel(escapedModel);
-	}
-
 	public java.io.Serializable getPrimaryKeyObj() {
 		return _mbBan.getPrimaryKeyObj();
 	}
@@ -315,7 +382,14 @@ public class MBBanWrapper implements MBBan {
 		_mbBan.persist();
 	}
 
+	/**
+	 * @deprecated Renamed to {@link #getWrappedModel}
+	 */
 	public MBBan getWrappedMBBan() {
+		return _mbBan;
+	}
+
+	public MBBan getWrappedModel() {
 		return _mbBan;
 	}
 

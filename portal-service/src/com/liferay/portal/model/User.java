@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -50,15 +50,18 @@ public interface User extends UserModel, PersistedModel {
 
 	public java.lang.String getDisplayEmailAddress();
 
+	public java.lang.String getDisplayURL(java.lang.String portalURL,
+		java.lang.String mainPath)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException;
+
 	public java.lang.String getDisplayURL(
 		com.liferay.portal.theme.ThemeDisplay themeDisplay)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException;
 
-	public java.lang.String getDisplayURL(java.lang.String portalURL,
-		java.lang.String mainPath)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException;
+	public java.util.List<com.liferay.portal.model.EmailAddress> getEmailAddresses()
+		throws com.liferay.portal.kernel.exception.SystemException;
 
 	public boolean getFemale()
 		throws com.liferay.portal.kernel.exception.PortalException,
@@ -68,6 +71,10 @@ public interface User extends UserModel, PersistedModel {
 	public java.lang.String getFullName();
 
 	public com.liferay.portal.model.Group getGroup()
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException;
+
+	public long getGroupId()
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException;
 
@@ -93,7 +100,17 @@ public interface User extends UserModel, PersistedModel {
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException;
 
+	public java.util.List<com.liferay.portal.model.Group> getMySites(
+		boolean includeControlPanel, int max)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException;
+
 	public java.util.List<com.liferay.portal.model.Group> getMySites(int max)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException;
+
+	public java.util.List<com.liferay.portal.model.Group> getMySites(
+		java.lang.String[] classNames, boolean includeControlPanel, int max)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException;
 
@@ -106,7 +123,16 @@ public interface User extends UserModel, PersistedModel {
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException;
 
+	public long[] getOrganizationIds(boolean includeNonUser)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException;
+
 	public java.util.List<com.liferay.portal.model.Organization> getOrganizations()
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException;
+
+	public java.util.List<com.liferay.portal.model.Organization> getOrganizations(
+		boolean includeIndirectlyAssociated)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException;
 
@@ -144,23 +170,13 @@ public interface User extends UserModel, PersistedModel {
 	public java.util.List<com.liferay.portal.model.Role> getRoles()
 		throws com.liferay.portal.kernel.exception.SystemException;
 
-	public double getSocialContributionEquity();
-
-	public double getSocialContributionEquity(long groupId);
-
-	public double getSocialParticipationEquity();
-
-	public double getSocialParticipationEquity(long groupId);
-
-	public double getSocialPersonalEquity();
-
-	public double getSocialPersonalEquity(long groupId);
-
 	public long[] getTeamIds()
 		throws com.liferay.portal.kernel.exception.SystemException;
 
 	public java.util.List<com.liferay.portal.model.Team> getTeams()
 		throws com.liferay.portal.kernel.exception.SystemException;
+
+	public java.util.TimeZone getTimeZone();
 
 	public long[] getUserGroupIds()
 		throws com.liferay.portal.kernel.exception.SystemException;
@@ -168,7 +184,8 @@ public interface User extends UserModel, PersistedModel {
 	public java.util.List<com.liferay.portal.model.UserGroup> getUserGroups()
 		throws com.liferay.portal.kernel.exception.SystemException;
 
-	public java.util.TimeZone getTimeZone();
+	public java.util.List<com.liferay.portal.model.Website> getWebsites()
+		throws com.liferay.portal.kernel.exception.SystemException;
 
 	public boolean hasCompanyMx()
 		throws com.liferay.portal.kernel.exception.PortalException,
@@ -215,11 +232,4 @@ public interface User extends UserModel, PersistedModel {
 	public void setPasswordUnencrypted(java.lang.String passwordUnencrypted);
 
 	public void setTimeZoneId(java.lang.String timeZoneId);
-
-	public void updateSocialContributionEquity(long groupId, double value);
-
-	public void updateSocialParticipationEquity(long groupId, double value);
-
-	public java.util.List<com.liferay.portal.model.Website> getWebsites()
-		throws com.liferay.portal.kernel.exception.SystemException;
 }

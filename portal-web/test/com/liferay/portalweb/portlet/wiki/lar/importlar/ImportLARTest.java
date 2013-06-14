@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -28,14 +28,15 @@ public class ImportLARTest extends BaseTestCase {
 			switch (label) {
 			case 1:
 				selenium.open("/web/guest/home/");
+				loadRequiredJavaScriptModules();
 
 				for (int second = 0;; second++) {
-					if (second >= 60) {
+					if (second >= 90) {
 						fail("timeout");
 					}
 
 					try {
-						if (selenium.isElementPresent("link=Wiki Test Page")) {
+						if (selenium.isVisible("link=Wiki Test Page")) {
 							break;
 						}
 					}
@@ -45,20 +46,24 @@ public class ImportLARTest extends BaseTestCase {
 					Thread.sleep(1000);
 				}
 
-				selenium.saveScreenShotAndSource();
 				selenium.clickAt("link=Wiki Test Page",
-					RuntimeVariables.replace(""));
+					RuntimeVariables.replace("Wiki Test Page"));
 				selenium.waitForPageToLoad("30000");
-				selenium.saveScreenShotAndSource();
-				selenium.clickAt("//strong/a", RuntimeVariables.replace(""));
+				loadRequiredJavaScriptModules();
+				Thread.sleep(5000);
+				assertEquals(RuntimeVariables.replace("Options"),
+					selenium.getText("//span[@title='Options']/ul/li/strong/a"));
+				selenium.clickAt("//span[@title='Options']/ul/li/strong/a",
+					RuntimeVariables.replace("Options"));
 
 				for (int second = 0;; second++) {
-					if (second >= 60) {
+					if (second >= 90) {
 						fail("timeout");
 					}
 
 					try {
-						if (selenium.isElementPresent("link=Export / Import")) {
+						if (selenium.isVisible(
+									"//div[@class='lfr-component lfr-menu-list']/ul/li[3]/a")) {
 							break;
 						}
 					}
@@ -68,18 +73,38 @@ public class ImportLARTest extends BaseTestCase {
 					Thread.sleep(1000);
 				}
 
-				selenium.saveScreenShotAndSource();
-				selenium.clickAt("link=Export / Import",
-					RuntimeVariables.replace(""));
+				assertEquals(RuntimeVariables.replace("Export / Import"),
+					selenium.getText(
+						"//div[@class='lfr-component lfr-menu-list']/ul/li[3]/a"));
+				selenium.clickAt("//div[@class='lfr-component lfr-menu-list']/ul/li[3]/a",
+					RuntimeVariables.replace("Export / Import"));
 				selenium.waitForPageToLoad("30000");
-				selenium.saveScreenShotAndSource();
-				selenium.clickAt("link=Import", RuntimeVariables.replace(""));
+				loadRequiredJavaScriptModules();
+				selenium.clickAt("link=Import",
+					RuntimeVariables.replace("Import"));
 				selenium.waitForPageToLoad("30000");
-				selenium.saveScreenShotAndSource();
-				selenium.type("_86_importFileName",
+				loadRequiredJavaScriptModules();
+
+				for (int second = 0;; second++) {
+					if (second >= 90) {
+						fail("timeout");
+					}
+
+					try {
+						if (selenium.isVisible(
+									"//input[@id='_86_importFileName']")) {
+							break;
+						}
+					}
+					catch (Exception e) {
+					}
+
+					Thread.sleep(1000);
+				}
+
+				selenium.type("//input[@id='_86_importFileName']",
 					RuntimeVariables.replace(
 						"L:\\portal\\build\\portal-web\\test\\com\\liferay\\portalweb\\portlet\\wiki\\lar\\importlar\\dependencies\\Wiki-Selenium.portlet.lar"));
-				selenium.saveScreenShotAndSource();
 
 				boolean deleteBeforeChecked = selenium.isChecked(
 						"_86_DELETE_PORTLET_DATACheckbox");
@@ -110,11 +135,12 @@ public class ImportLARTest extends BaseTestCase {
 
 			case 3:
 				selenium.clickAt("//input[@value='Import']",
-					RuntimeVariables.replace(""));
+					RuntimeVariables.replace("Import"));
 				selenium.waitForPageToLoad("30000");
-				selenium.saveScreenShotAndSource();
-				assertTrue(selenium.isTextPresent(
-						"Your request completed successfully."));
+				loadRequiredJavaScriptModules();
+				assertEquals(RuntimeVariables.replace(
+						"Your request completed successfully."),
+					selenium.getText("//div[@class='portlet-msg-success']"));
 
 			case 100:
 				label = -1;

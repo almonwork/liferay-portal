@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,6 +14,11 @@
 
 package com.liferay.portlet.shopping.model;
 
+import com.liferay.portal.model.ModelWrapper;
+
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * <p>
  * This class is a wrapper for {@link ShoppingItemPrice}.
@@ -23,7 +28,8 @@ package com.liferay.portlet.shopping.model;
  * @see       ShoppingItemPrice
  * @generated
  */
-public class ShoppingItemPriceWrapper implements ShoppingItemPrice {
+public class ShoppingItemPriceWrapper implements ShoppingItemPrice,
+	ModelWrapper<ShoppingItemPrice> {
 	public ShoppingItemPriceWrapper(ShoppingItemPrice shoppingItemPrice) {
 		_shoppingItemPrice = shoppingItemPrice;
 	}
@@ -34,6 +40,86 @@ public class ShoppingItemPriceWrapper implements ShoppingItemPrice {
 
 	public String getModelClassName() {
 		return ShoppingItemPrice.class.getName();
+	}
+
+	public Map<String, Object> getModelAttributes() {
+		Map<String, Object> attributes = new HashMap<String, Object>();
+
+		attributes.put("itemPriceId", getItemPriceId());
+		attributes.put("itemId", getItemId());
+		attributes.put("minQuantity", getMinQuantity());
+		attributes.put("maxQuantity", getMaxQuantity());
+		attributes.put("price", getPrice());
+		attributes.put("discount", getDiscount());
+		attributes.put("taxable", getTaxable());
+		attributes.put("shipping", getShipping());
+		attributes.put("useShippingFormula", getUseShippingFormula());
+		attributes.put("status", getStatus());
+
+		return attributes;
+	}
+
+	public void setModelAttributes(Map<String, Object> attributes) {
+		Long itemPriceId = (Long)attributes.get("itemPriceId");
+
+		if (itemPriceId != null) {
+			setItemPriceId(itemPriceId);
+		}
+
+		Long itemId = (Long)attributes.get("itemId");
+
+		if (itemId != null) {
+			setItemId(itemId);
+		}
+
+		Integer minQuantity = (Integer)attributes.get("minQuantity");
+
+		if (minQuantity != null) {
+			setMinQuantity(minQuantity);
+		}
+
+		Integer maxQuantity = (Integer)attributes.get("maxQuantity");
+
+		if (maxQuantity != null) {
+			setMaxQuantity(maxQuantity);
+		}
+
+		Double price = (Double)attributes.get("price");
+
+		if (price != null) {
+			setPrice(price);
+		}
+
+		Double discount = (Double)attributes.get("discount");
+
+		if (discount != null) {
+			setDiscount(discount);
+		}
+
+		Boolean taxable = (Boolean)attributes.get("taxable");
+
+		if (taxable != null) {
+			setTaxable(taxable);
+		}
+
+		Double shipping = (Double)attributes.get("shipping");
+
+		if (shipping != null) {
+			setShipping(shipping);
+		}
+
+		Boolean useShippingFormula = (Boolean)attributes.get(
+				"useShippingFormula");
+
+		if (useShippingFormula != null) {
+			setUseShippingFormula(useShippingFormula);
+		}
+
+		Integer status = (Integer)attributes.get("status");
+
+		if (status != null) {
+			setStatus(status);
+		}
 	}
 
 	/**
@@ -272,10 +358,6 @@ public class ShoppingItemPriceWrapper implements ShoppingItemPrice {
 		return _shoppingItemPrice.isEscapedModel();
 	}
 
-	public void setEscapedModel(boolean escapedModel) {
-		_shoppingItemPrice.setEscapedModel(escapedModel);
-	}
-
 	public java.io.Serializable getPrimaryKeyObj() {
 		return _shoppingItemPrice.getPrimaryKeyObj();
 	}
@@ -330,7 +412,14 @@ public class ShoppingItemPriceWrapper implements ShoppingItemPrice {
 		_shoppingItemPrice.persist();
 	}
 
+	/**
+	 * @deprecated Renamed to {@link #getWrappedModel}
+	 */
 	public ShoppingItemPrice getWrappedShoppingItemPrice() {
+		return _shoppingItemPrice;
+	}
+
+	public ShoppingItemPrice getWrappedModel() {
 		return _shoppingItemPrice;
 	}
 

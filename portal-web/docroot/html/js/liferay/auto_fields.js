@@ -1,4 +1,4 @@
-AUI().add(
+AUI.add(
 	'liferay-auto-fields',
 	function(A) {
 		var Lang = A.Lang;
@@ -8,8 +8,6 @@ AUI().add(
 		var CSS_ICON_LOADING = 'loading-animation';
 
 		var TPL_INPUT_HIDDEN = '<input name="{name}" type="hidden" />';
-
-		var TPL_AUTOROW_CONTROLS = '<span class="row-controls ' + CSS_AUTOROW_CONTROLS + '"><a href="javascript:;" class="add-row">{0}</a><a href="javascript:;" class="delete-row modify-link">{1}</a></span>';
 
 		var TPL_ADD_BUTTON = '<button type="button" class="add-row aui-buttonitem-content aui-buttonitem aui-state-default aui-buttonitem-icon-only aui-toolbar-first aui-toolbar-item" title=""><span class="aui-buttonitem-icon aui-icon aui-icon-plus"></span></button>';
 
@@ -235,7 +233,7 @@ AUI().add(
 					serialize: function(filter) {
 						var instance = this;
 
-						var visibleRows = instance._contentBox.all('.lfr-form-row:visible');
+						var visibleRows = instance._contentBox.all('.lfr-form-row').each(instance._clearHiddenRows, instance);
 
 						var serializedData = [];
 
@@ -398,7 +396,7 @@ AUI().add(
 					_isHiddenRow: function(row) {
 						var instance = this;
 
-						return row.hasClass(row._hideClass);
+						return row.hasClass(row._hideClass || 'aui-helper-hidden');
 					},
 
 					_makeSortable: function(sortableHandle) {

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,12 +14,14 @@
 
 package com.liferay.portal.service.impl;
 
+import com.liferay.portal.RequiredLayoutSetPrototypeException;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.UnicodeProperties;
 import com.liferay.portal.model.Group;
+import com.liferay.portal.model.GroupConstants;
 import com.liferay.portal.model.LayoutConstants;
 import com.liferay.portal.model.LayoutSetPrototype;
 import com.liferay.portal.model.ResourceConstants;
@@ -27,6 +29,7 @@ import com.liferay.portal.security.permission.PermissionCacheUtil;
 import com.liferay.portal.service.ServiceContext;
 import com.liferay.portal.service.base.LayoutSetPrototypeLocalServiceBaseImpl;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -40,11 +43,13 @@ public class LayoutSetPrototypeLocalServiceImpl
 
 	public LayoutSetPrototype addLayoutSetPrototype(
 			long userId, long companyId, Map<Locale, String> nameMap,
-			String description, boolean active, boolean allowModifications,
-			boolean allowLayoutAddition, ServiceContext serviceContext)
+			String description, boolean active, boolean layoutsUpdateable,
+			ServiceContext serviceContext)
 		throws PortalException, SystemException {
 
 		// Layout set prototype
+
+		Date now = new Date();
 
 		long layoutSetPrototypeId = counterLocalService.increment();
 
@@ -53,6 +58,8 @@ public class LayoutSetPrototypeLocalServiceImpl
 
 		layoutSetPrototype.setUuid(serviceContext.getUuid());
 		layoutSetPrototype.setCompanyId(companyId);
+		layoutSetPrototype.setCreateDate(serviceContext.getCreateDate(now));
+		layoutSetPrototype.setModifiedDate(serviceContext.getModifiedDate(now));
 		layoutSetPrototype.setNameMap(nameMap);
 		layoutSetPrototype.setDescription(description);
 		layoutSetPrototype.setActive(active);
@@ -61,9 +68,7 @@ public class LayoutSetPrototypeLocalServiceImpl
 			layoutSetPrototype.getSettingsProperties();
 
 		settingsProperties.put(
-			"allowModifications", String.valueOf(allowModifications));
-		settingsProperties.put(
-			"allowLayoutAdditions", String.valueOf(allowLayoutAddition));
+			"layoutsUpdateable", String.valueOf(layoutsUpdateable));
 
 		layoutSetPrototype.setSettingsProperties(settingsProperties);
 
@@ -84,7 +89,8 @@ public class LayoutSetPrototypeLocalServiceImpl
 			"/template-" + layoutSetPrototype.getLayoutSetPrototypeId();
 
 		Group group = groupLocalService.addGroup(
-			userId, LayoutSetPrototype.class.getName(),
+			userId, GroupConstants.DEFAULT_PARENT_GROUP_ID,
+			LayoutSetPrototype.class.getName(),
 			layoutSetPrototype.getLayoutSetPrototypeId(),
 			layoutSetPrototype.getName(LocaleUtil.getDefault()), null, 0,
 			friendlyURL, false, true, serviceContext);
@@ -92,17 +98,23 @@ public class LayoutSetPrototypeLocalServiceImpl
 		layoutLocalService.addLayout(
 			userId, group.getGroupId(), true,
 			LayoutConstants.DEFAULT_PARENT_LAYOUT_ID, "home", null, null,
-			LayoutConstants.TYPE_PORTLET, false, "/home", false,
-			serviceContext);
+			LayoutConstants.TYPE_PORTLET, false, "/home", serviceContext);
 
 		return layoutSetPrototype;
 	}
 
 	@Override
-	public void deleteLayoutSetPrototype(LayoutSetPrototype layoutSetPrototype)
+	public LayoutSetPrototype deleteLayoutSetPrototype(
+			LayoutSetPrototype layoutSetPrototype)
 		throws PortalException, SystemException {
 
 		// Group
+
+		if (layoutSetPersistence.countByLayoutSetPrototypeUuid(
+				layoutSetPrototype.getUuid()) > 0) {
+
+			throw new RequiredLayoutSetPrototypeException();
+		}
 
 		Group group = layoutSetPrototype.getGroup();
 
@@ -123,23 +135,38 @@ public class LayoutSetPrototypeLocalServiceImpl
 		// Permission cache
 
 		PermissionCacheUtil.clearCache();
+
+		return layoutSetPrototype;
 	}
 
 	@Override
-	public void deleteLayoutSetPrototype(long layoutSetPrototypeId)
+	public LayoutSetPrototype deleteLayoutSetPrototype(
+			long layoutSetPrototypeId)
 		throws PortalException, SystemException {
 
 		LayoutSetPrototype layoutSetPrototype =
 			layoutSetPrototypePersistence.findByPrimaryKey(
 				layoutSetPrototypeId);
 
-		deleteLayoutSetPrototype(layoutSetPrototype);
+		return deleteLayoutSetPrototype(layoutSetPrototype);
 	}
 
+	/**
+	 * @deprecated {@link #getLayoutSetPrototypeByUuidAndCompanyId(String,
+	 *             long)}
+	 */
 	public LayoutSetPrototype getLayoutSetPrototypeByUuid(String uuid)
 		throws PortalException, SystemException {
 
 		return layoutSetPrototypePersistence.findByUuid_First(uuid, null);
+	}
+
+	public LayoutSetPrototype getLayoutSetPrototypeByUuidAndCompanyId(
+			String uuid, long companyId)
+		throws PortalException, SystemException {
+
+		return layoutSetPrototypePersistence.findByUuid_C_First(
+			uuid, companyId, null);
 	}
 
 	public List<LayoutSetPrototype> search(
@@ -170,8 +197,8 @@ public class LayoutSetPrototypeLocalServiceImpl
 
 	public LayoutSetPrototype updateLayoutSetPrototype(
 			long layoutSetPrototypeId, Map<Locale, String> nameMap,
-			String description, boolean active, boolean allowModifications,
-			boolean allowLayoutAddition, ServiceContext serviceContext)
+			String description, boolean active, boolean layoutsUpdateable,
+			ServiceContext serviceContext)
 		throws PortalException, SystemException {
 
 		// Layout set prototype
@@ -180,6 +207,8 @@ public class LayoutSetPrototypeLocalServiceImpl
 			layoutSetPrototypePersistence.findByPrimaryKey(
 				layoutSetPrototypeId);
 
+		layoutSetPrototype.setModifiedDate(
+			serviceContext.getModifiedDate(new Date()));
 		layoutSetPrototype.setNameMap(nameMap);
 		layoutSetPrototype.setDescription(description);
 		layoutSetPrototype.setActive(active);
@@ -188,9 +217,7 @@ public class LayoutSetPrototypeLocalServiceImpl
 			layoutSetPrototype.getSettingsProperties();
 
 		settingsProperties.put(
-			"allowModifications", String.valueOf(allowModifications));
-		settingsProperties.put(
-			"allowLayoutAdditions", String.valueOf(allowLayoutAddition));
+			"layoutsUpdateable", String.valueOf(layoutsUpdateable));
 
 		layoutSetPrototype.setSettingsProperties(settingsProperties);
 
@@ -218,6 +245,7 @@ public class LayoutSetPrototypeLocalServiceImpl
 			layoutSetPrototypePersistence.findByPrimaryKey(
 				layoutSetPrototypeId);
 
+		layoutSetPrototype.setModifiedDate(new Date());
 		layoutSetPrototype.setSettings(settings);
 
 		layoutSetPrototypePersistence.update(layoutSetPrototype, false);

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -32,12 +32,96 @@ import java.util.Set;
  */
 public class SetUtil {
 
+	public static Set<Boolean> fromArray(boolean[] array) {
+		if ((array == null) || (array.length == 0)) {
+			return new HashSet<Boolean>();
+		}
+
+		Set<Boolean> set = new HashSet<Boolean>(array.length);
+
+		for (int i = 0; i < array.length; i++) {
+			set.add(array[i]);
+		}
+
+		return set;
+	}
+
+	public static Set<Byte> fromArray(byte[] array) {
+		if ((array == null) || (array.length == 0)) {
+			return new HashSet<Byte>();
+		}
+
+		Set<Byte> set = new HashSet<Byte>(array.length);
+
+		for (int i = 0; i < array.length; i++) {
+			set.add(array[i]);
+		}
+
+		return set;
+	}
+
+	public static Set<Character> fromArray(char[] array) {
+		if ((array == null) || (array.length == 0)) {
+			return new HashSet<Character>();
+		}
+
+		Set<Character> set = new HashSet<Character>(array.length);
+
+		for (int i = 0; i < array.length; i++) {
+			set.add(array[i]);
+		}
+
+		return set;
+	}
+
+	public static Set<Double> fromArray(double[] array) {
+		if ((array == null) || (array.length == 0)) {
+			return new HashSet<Double>();
+		}
+
+		Set<Double> set = new HashSet<Double>(array.length);
+
+		for (int i = 0; i < array.length; i++) {
+			set.add(array[i]);
+		}
+
+		return set;
+	}
+
 	public static <E> Set<E> fromArray(E[] array) {
 		if ((array == null) || (array.length == 0)) {
 			return new HashSet<E>();
 		}
 
 		Set<E> set = new HashSet<E>(array.length);
+
+		for (int i = 0; i < array.length; i++) {
+			set.add(array[i]);
+		}
+
+		return set;
+	}
+
+	public static Set<Float> fromArray(float[] array) {
+		if ((array == null) || (array.length == 0)) {
+			return new HashSet<Float>();
+		}
+
+		Set<Float> set = new HashSet<Float>(array.length);
+
+		for (int i = 0; i < array.length; i++) {
+			set.add(array[i]);
+		}
+
+		return set;
+	}
+
+	public static Set<Integer> fromArray(int[] array) {
+		if ((array == null) || (array.length == 0)) {
+			return new HashSet<Integer>();
+		}
+
+		Set<Integer> set = new HashSet<Integer>(array.length);
 
 		for (int i = 0; i < array.length; i++) {
 			set.add(array[i]);
@@ -60,9 +144,23 @@ public class SetUtil {
 		return set;
 	}
 
+	public static Set<Short> fromArray(short[] array) {
+		if ((array == null) || (array.length == 0)) {
+			return new HashSet<Short>();
+		}
+
+		Set<Short> set = new HashSet<Short>(array.length);
+
+		for (int i = 0; i < array.length; i++) {
+			set.add(array[i]);
+		}
+
+		return set;
+	}
+
 	@SuppressWarnings("rawtypes")
 	public static <E> Set<E> fromCollection(Collection<E> c) {
-		if ((c != null) && (Set.class.isAssignableFrom(c.getClass()))) {
+		if ((c != null) && Set.class.isAssignableFrom(c.getClass())) {
 			return (Set)c;
 		}
 

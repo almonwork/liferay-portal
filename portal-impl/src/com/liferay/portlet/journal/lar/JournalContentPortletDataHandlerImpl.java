@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -30,6 +30,7 @@ import com.liferay.portal.kernel.xml.Element;
 import com.liferay.portal.kernel.xml.SAXReaderUtil;
 import com.liferay.portal.model.Layout;
 import com.liferay.portal.service.LayoutLocalServiceUtil;
+import com.liferay.portlet.documentlibrary.lar.DLPortletDataHandlerImpl;
 import com.liferay.portlet.journal.NoSuchArticleException;
 import com.liferay.portlet.journal.model.JournalArticle;
 import com.liferay.portlet.journal.model.JournalTemplate;
@@ -62,9 +63,9 @@ import javax.portlet.PortletPreferences;
  * @author Joel Kozikowski
  * @author Raymond Augé
  * @author Bruno Farache
- * @see    com.liferay.portal.kernel.lar.PortletDataHandler
- * @see    com.liferay.portlet.journal.lar.JournalCreationStrategy
- * @see    com.liferay.portlet.journal.lar.JournalPortletDataHandlerImpl
+ * @see	com.liferay.portal.kernel.lar.PortletDataHandler
+ * @see	com.liferay.portlet.journal.lar.JournalCreationStrategy
+ * @see	com.liferay.portlet.journal.lar.JournalPortletDataHandlerImpl
  */
 public class JournalContentPortletDataHandlerImpl
 	extends BasePortletDataHandler {
@@ -72,21 +73,56 @@ public class JournalContentPortletDataHandlerImpl
 	@Override
 	public PortletDataHandlerControl[] getExportControls() {
 		return new PortletDataHandlerControl[] {
-			_selectedArticles, _embeddedAssets, _images, _comments, _ratings,
-			_tags
+			_selectedArticles, _embeddedAssets
+		};
+	}
+
+	@Override
+	public PortletDataHandlerControl[] getExportMetadataControls() {
+		return new PortletDataHandlerControl[] {
+			 new PortletDataHandlerBoolean(
+				_NAMESPACE, "web-content", true,
+				JournalPortletDataHandlerImpl.getMetadataControls()),
+			new PortletDataHandlerBoolean(
+				_NAMESPACE, "folders-and-documents", true,
+				DLPortletDataHandlerImpl.getMetadataControls()
+			)
 		};
 	}
 
 	@Override
 	public PortletDataHandlerControl[] getImportControls() {
 		return new PortletDataHandlerControl[] {
-			_selectedArticles, _images, _comments, _ratings, _tags
+			_selectedArticles
 		};
 	}
 
 	@Override
+	public PortletDataHandlerControl[] getImportMetadataControls() {
+		return new PortletDataHandlerControl[] {
+			 new PortletDataHandlerBoolean(
+				_NAMESPACE, "web-content", true,
+				JournalPortletDataHandlerImpl.getMetadataControls()),
+			new PortletDataHandlerBoolean(
+				_NAMESPACE, "folders-and-documents", true,
+				DLPortletDataHandlerImpl.getMetadataControls()
+			)
+		};
+	}
+
+	@Override
+	public boolean isAlwaysExportable() {
+		return _ALWAYS_EXPORTABLE;
+	}
+
+	@Override
+	public boolean isAlwaysStaged() {
+		return _ALWAYS_STAGED;
+	}
+
+	@Override
 	public boolean isPublishToLiveByDefault() {
-		return 	_PUBLISH_TO_LIVE_BY_DEFAULT;
+		return _PUBLISH_TO_LIVE_BY_DEFAULT;
 	}
 
 	@Override
@@ -114,8 +150,8 @@ public class JournalContentPortletDataHandlerImpl
 		String articleId = portletPreferences.getValue("articleId", null);
 
 		if (articleId == null) {
-			if (_log.isWarnEnabled()) {
-				_log.warn(
+			if (_log.isDebugEnabled()) {
+				_log.debug(
 					"No article id found in preferences of portlet " +
 						portletId);
 			}
@@ -135,6 +171,12 @@ public class JournalContentPortletDataHandlerImpl
 			return StringPool.BLANK;
 		}
 
+		long previousScopeGroupId = portletDataContext.getScopeGroupId();
+
+		if (articleGroupId != portletDataContext.getScopeGroupId()) {
+			portletDataContext.setScopeGroupId(articleGroupId);
+		}
+
 		JournalArticle article = null;
 
 		try {
@@ -142,20 +184,27 @@ public class JournalContentPortletDataHandlerImpl
 				articleGroupId, articleId, WorkflowConstants.STATUS_APPROVED);
 		}
 		catch (NoSuchArticleException nsae) {
-			if (_log.isWarnEnabled()) {
-				_log.warn(
-					"No approved article found with group id " +
-						articleGroupId + " and article id " + articleId);
-			}
 		}
 
 		if (article == null) {
-			return StringPool.BLANK;
+			try {
+				article = JournalArticleLocalServiceUtil.getLatestArticle(
+					articleGroupId, articleId,
+					WorkflowConstants.STATUS_EXPIRED);
+			}
+			catch (NoSuchArticleException nsae) {
+			}
 		}
 
 		Document document = SAXReaderUtil.createDocument();
 
 		Element rootElement = document.addElement("journal-content-data");
+
+		if (article == null) {
+			portletDataContext.setScopeGroupId(previousScopeGroupId);
+
+			return document.formattedString();
+		}
 
 		String path = JournalPortletDataHandlerImpl.getArticlePath(
 			portletDataContext, article);
@@ -164,16 +213,26 @@ public class JournalContentPortletDataHandlerImpl
 
 		articleElement.addAttribute("path", path);
 
+		Element dlFileEntryTypesElement = rootElement.addElement(
+			"dl-file-entry-types");
 		Element dlFoldersElement = rootElement.addElement("dl-folders");
 		Element dlFilesElement = rootElement.addElement("dl-file-entries");
 		Element dlFileRanksElement = rootElement.addElement("dl-file-ranks");
-		Element igFoldersElement = rootElement.addElement("ig-folders");
-		Element igImagesElement = rootElement.addElement("ig-images");
+		Element dlRepositoriesElement = rootElement.addElement(
+			"dl-repositories");
+		Element dlRepositoryEntriesElement = rootElement.addElement(
+			"dl-repository-entries");
+
+		String preferenceTemplateId = portletPreferences.getValue(
+			"templateId", null);
 
 		JournalPortletDataHandlerImpl.exportArticle(
 			portletDataContext, rootElement, rootElement, rootElement,
-			dlFoldersElement, dlFilesElement, dlFileRanksElement,
-			igFoldersElement, igImagesElement, article, false);
+			dlFileEntryTypesElement, dlFoldersElement, dlFilesElement,
+			dlFileRanksElement, dlRepositoriesElement,
+			dlRepositoryEntriesElement, article, preferenceTemplateId, false);
+
+		portletDataContext.setScopeGroupId(previousScopeGroupId);
 
 		return document.formattedString();
 	}
@@ -191,6 +250,15 @@ public class JournalContentPortletDataHandlerImpl
 
 		if (Validator.isNull(data)) {
 			return null;
+		}
+
+		long previousScopeGroupId = portletDataContext.getScopeGroupId();
+
+		long importGroupId = GetterUtil.getLong(
+			portletPreferences.getValue("groupId", null));
+
+		if (importGroupId == portletDataContext.getSourceGroupId()) {
+			portletDataContext.setScopeGroupId(portletDataContext.getGroupId());
 		}
 
 		Document document = SAXReaderUtil.read(data);
@@ -223,7 +291,7 @@ public class JournalContentPortletDataHandlerImpl
 
 		String articleId = portletPreferences.getValue("articleId", null);
 
-		if (Validator.isNotNull(articleId)) {
+		if (Validator.isNotNull(articleId) && (articleElement != null)) {
 			String importedArticleGroupId = articleElement.attributeValue(
 				"imported-article-group-id");
 
@@ -249,6 +317,10 @@ public class JournalContentPortletDataHandlerImpl
 				portletDataContext.getScopeGroupId(), layout.isPrivateLayout(),
 				layout.getLayoutId(), portletId, articleId, true);
 		}
+		else {
+			portletPreferences.setValue("groupId", StringPool.BLANK);
+			portletPreferences.setValue("articleId", StringPool.BLANK);
+		}
 
 		String templateId = portletPreferences.getValue("templateId", null);
 
@@ -261,34 +333,31 @@ public class JournalContentPortletDataHandlerImpl
 
 			portletPreferences.setValue("templateId", templateId);
 		}
+		else {
+			portletPreferences.setValue("templateId", StringPool.BLANK);
+		}
+
+		portletDataContext.setScopeGroupId(previousScopeGroupId);
 
 		return portletPreferences;
 	}
+
+	private static final boolean _ALWAYS_EXPORTABLE = true;
+
+	private static final boolean _ALWAYS_STAGED = true;
 
 	private static final String _NAMESPACE = "journal";
 
 	private static final boolean _PUBLISH_TO_LIVE_BY_DEFAULT = true;
 
-	private static PortletDataHandlerBoolean _comments =
-		new PortletDataHandlerBoolean(_NAMESPACE, "comments");
+	private static Log _log = LogFactoryUtil.getLog(
+		JournalContentPortletDataHandlerImpl.class);
 
 	private static PortletDataHandlerBoolean _embeddedAssets =
 		new PortletDataHandlerBoolean(_NAMESPACE, "embedded-assets");
 
-	private static PortletDataHandlerBoolean _images =
-		new PortletDataHandlerBoolean(_NAMESPACE, "images");
-
-	private static Log _log = LogFactoryUtil.getLog(
-		JournalContentPortletDataHandlerImpl.class);
-
-	private static PortletDataHandlerBoolean _ratings =
-		new PortletDataHandlerBoolean(_NAMESPACE, "ratings");
-
 	private static PortletDataHandlerBoolean _selectedArticles =
 		new PortletDataHandlerBoolean(
 			_NAMESPACE, "selected-web-content", true, true);
-
-	private static PortletDataHandlerBoolean _tags =
-		new PortletDataHandlerBoolean(_NAMESPACE, "tags");
 
 }

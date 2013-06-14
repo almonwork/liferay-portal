@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -67,9 +67,19 @@ public class EditPublicRenderParametersAction extends EditConfigurationAction {
 		updatePreferences(actionRequest, portlet);
 
 		if (SessionErrors.isEmpty(actionRequest)) {
+			String portletResource = ParamUtil.getString(
+				actionRequest, "portletResource");
+
 			SessionMessages.add(
 				actionRequest,
-				portletConfig.getPortletName() + ".doConfigure");
+				portletConfig.getPortletName() +
+					SessionMessages.KEY_SUFFIX_REFRESH_PORTLET,
+				portletResource);
+
+			SessionMessages.add(
+				actionRequest,
+				portletConfig.getPortletName() +
+					SessionMessages.KEY_SUFFIX_UPDATED_CONFIGURATION);
 
 			String redirect = PortalUtil.escapeRedirect(
 				ParamUtil.getString(actionRequest, "redirect"));

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -29,6 +29,12 @@ public interface WebDAVProps extends WebDAVPropsModel, PersistedModel {
 	 *
 	 * Never modify this interface directly. Add methods to {@link com.liferay.portal.model.impl.WebDAVPropsImpl} and rerun ServiceBuilder to automatically copy the method declarations to this interface.
 	 */
+	public void addProp(java.lang.String name, java.lang.String prefix,
+		java.lang.String uri) throws java.lang.Exception;
+
+	public void addProp(java.lang.String name, java.lang.String prefix,
+		java.lang.String uri, java.lang.String text) throws java.lang.Exception;
+
 	public java.lang.String getProps();
 
 	public java.util.Set<com.liferay.portal.kernel.xml.QName> getPropsSet()
@@ -37,12 +43,6 @@ public interface WebDAVProps extends WebDAVPropsModel, PersistedModel {
 	public java.lang.String getText(java.lang.String name,
 		java.lang.String prefix, java.lang.String uri)
 		throws java.lang.Exception;
-
-	public void addProp(java.lang.String name, java.lang.String prefix,
-		java.lang.String uri) throws java.lang.Exception;
-
-	public void addProp(java.lang.String name, java.lang.String prefix,
-		java.lang.String uri, java.lang.String text) throws java.lang.Exception;
 
 	public void removeProp(java.lang.String name, java.lang.String prefix,
 		java.lang.String uri) throws java.lang.Exception;

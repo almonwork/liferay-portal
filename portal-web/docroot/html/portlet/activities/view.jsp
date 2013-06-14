@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -19,33 +19,31 @@
 <%
 Group group = GroupLocalServiceUtil.getGroup(scopeGroupId);
 
-int start = 0;
-int end = 10;
-
 List<SocialActivity> activities = null;
 
 if (group.isOrganization()) {
-	activities = SocialActivityLocalServiceUtil.getOrganizationActivities(group.getOrganizationId(), start, end);
+	activities = SocialActivityLocalServiceUtil.getOrganizationActivities(group.getOrganizationId(), 0, max);
 }
 else if (group.isRegularSite()) {
-	activities = SocialActivityLocalServiceUtil.getGroupActivities(group.getGroupId(), start, end);
+	activities = SocialActivityLocalServiceUtil.getGroupActivities(group.getGroupId(), 0, max);
 }
 else if (group.isUser()) {
-	activities = SocialActivityLocalServiceUtil.getUserActivities(group.getClassPK(), start, end);
+	activities = SocialActivityLocalServiceUtil.getUserActivities(group.getClassPK(), 0, max);
 }
 
-PortletURL rssURL = renderResponse.createRenderURL();
+ResourceURL rssURL = liferayPortletResponse.createResourceURL();
 
-rssURL.setParameter("rss", "1");
+rssURL.setCacheability(ResourceURL.FULL);
+rssURL.setParameter("struts_action", "/activities/rss");
 
-String taglibFeedTitle = LanguageUtil.format(pageContext, "subscribe-to-x's-activities", group.getDescriptiveName());
-String taglibFeedLinkMessage = LanguageUtil.format(pageContext, "subscribe-to-x's-activities", group.getDescriptiveName());
+String taglibFeedTitle = LanguageUtil.format(pageContext, "subscribe-to-x's-activities", group.getDescriptiveName(locale));
+String taglibFeedLinkMessage = LanguageUtil.format(pageContext, "subscribe-to-x's-activities", group.getDescriptiveName(locale));
 %>
 
 <liferay-ui:social-activities
 	activities="<%= activities %>"
 	feedEnabled="<%= true %>"
-	feedTitle="<%= HtmlUtil.escape(taglibFeedTitle) %>"
 	feedLink="<%= rssURL.toString() %>"
 	feedLinkMessage="<%= HtmlUtil.escape(taglibFeedLinkMessage) %>"
+	feedTitle="<%= HtmlUtil.escape(taglibFeedTitle) %>"
 />

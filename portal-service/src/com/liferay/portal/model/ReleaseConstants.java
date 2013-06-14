@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -22,6 +22,12 @@ public class ReleaseConstants {
 	public static final long DEFAULT_ID = 1;
 
 	public static final String DEFAULT_SERVLET_CONTEXT_NAME = "portal";
+
+	public static final int STATE_GOOD = 0;
+
+	public static final int STATE_UPGRADE_FAILURE = 1;
+
+	public static final int STATE_VERIFY_FAILURE = 2;
 
 	public static final String TEST_STRING =
 		"You take the blue pill, the story ends, you wake up in your bed and " +

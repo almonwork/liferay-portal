@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -20,6 +20,7 @@ import com.liferay.portal.kernel.repository.RepositoryException;
 import com.liferay.portal.kernel.util.UnicodeProperties;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.model.Repository;
+import com.liferay.portal.security.auth.PrincipalException;
 import com.liferay.portal.service.persistence.RepositoryUtil;
 
 import java.util.HashSet;
@@ -34,6 +35,8 @@ import org.apache.chemistry.opencmis.client.runtime.SessionFactoryImpl;
 import org.apache.chemistry.opencmis.commons.PropertyIds;
 import org.apache.chemistry.opencmis.commons.SessionParameter;
 import org.apache.chemistry.opencmis.commons.enums.IncludeRelationships;
+import org.apache.chemistry.opencmis.commons.exceptions.CmisPermissionDeniedException;
+import org.apache.chemistry.opencmis.commons.exceptions.CmisUnauthorizedException;
 
 /**
  * @author Alexander Chow
@@ -72,7 +75,7 @@ public class CMISRepositoryUtil {
 
 	public static com.liferay.portal.kernel.repository.cmis.Session
 			createSession(Map<String, String> parameters)
-		throws RepositoryException {
+		throws PrincipalException, RepositoryException {
 
 		try {
 			Session session = _sessionFactory.createSession(parameters);
@@ -80,6 +83,12 @@ public class CMISRepositoryUtil {
 			session.setDefaultContext(_operationContext);
 
 			return new SessionImpl(session);
+		}
+		catch (CmisPermissionDeniedException cpde) {
+			throw new PrincipalException(cpde);
+		}
+		catch (CmisUnauthorizedException cue) {
+			throw new PrincipalException();
 		}
 		catch (Exception e) {
 			throw new RepositoryException(e);
@@ -101,7 +110,8 @@ public class CMISRepositoryUtil {
 		String value = typeSettingsProperties.getProperty(typeSettingsKey);
 
 		if (Validator.isNull(value)) {
-			throw new InvalidRepositoryException();
+			throw new InvalidRepositoryException(
+				"Properties value cannot be null for key " + typeSettingsKey);
 		}
 
 		return value;

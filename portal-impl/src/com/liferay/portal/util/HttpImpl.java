@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -30,21 +30,28 @@ import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.SystemProperties;
 import com.liferay.portal.kernel.util.URLCodec;
 import com.liferay.portal.kernel.util.Validator;
+import com.liferay.portal.security.lang.PortalSecurityManagerThreadLocal;
 
 import java.io.IOException;
 import java.io.InputStream;
 
 import java.net.InetAddress;
+import java.net.InetSocketAddress;
+import java.net.Socket;
+import java.net.SocketAddress;
 import java.net.URL;
 import java.net.URLConnection;
+import java.net.UnknownHostException;
 
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.StringTokenizer;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import javax.net.SocketFactory;
 
 import javax.portlet.ActionRequest;
 import javax.portlet.RenderRequest;
@@ -53,6 +60,7 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
+import org.apache.commons.httpclient.ConnectTimeoutException;
 import org.apache.commons.httpclient.Credentials;
 import org.apache.commons.httpclient.Header;
 import org.apache.commons.httpclient.HostConfiguration;
@@ -78,18 +86,32 @@ import org.apache.commons.httpclient.methods.StringRequestEntity;
 import org.apache.commons.httpclient.methods.multipart.ByteArrayPartSource;
 import org.apache.commons.httpclient.methods.multipart.MultipartRequestEntity;
 import org.apache.commons.httpclient.methods.multipart.Part;
+import org.apache.commons.httpclient.methods.multipart.StringPart;
 import org.apache.commons.httpclient.params.HostParams;
 import org.apache.commons.httpclient.params.HttpClientParams;
 import org.apache.commons.httpclient.params.HttpConnectionManagerParams;
 import org.apache.commons.httpclient.params.HttpConnectionParams;
 import org.apache.commons.httpclient.params.HttpMethodParams;
+import org.apache.commons.httpclient.protocol.DefaultProtocolSocketFactory;
+import org.apache.commons.httpclient.protocol.Protocol;
 
 /**
  * @author Brian Wing Shun Chan
+ * @author Hugo Huijser
  */
 public class HttpImpl implements Http {
 
 	public HttpImpl() {
+
+		// Override the default protocol socket factory because it uses
+		// reflection for JDK 1.4 compatibility, which we do not need. It also
+		// attemps to create a new socket in a different thread so that we
+		// cannot track which class loader initiated the call.
+
+		Protocol protocol = new Protocol(
+			"http", new FastProtocolSocketFactory(), 80);
+
+		Protocol.registerProtocol("http", protocol);
 
 		// Mimic behavior found in
 		// http://java.sun.com/j2se/1.5.0/docs/guide/net/properties.html
@@ -97,12 +119,9 @@ public class HttpImpl implements Http {
 		if (Validator.isNotNull(_NON_PROXY_HOSTS)) {
 			String nonProxyHostsRegEx = _NON_PROXY_HOSTS;
 
-			nonProxyHostsRegEx = nonProxyHostsRegEx.replaceAll(
-				"\\.", "\\\\.");
-			nonProxyHostsRegEx = nonProxyHostsRegEx.replaceAll(
-				"\\*", ".*?");
-			nonProxyHostsRegEx = nonProxyHostsRegEx.replaceAll(
-				"\\|", ")|(");
+			nonProxyHostsRegEx = nonProxyHostsRegEx.replaceAll("\\.", "\\\\.");
+			nonProxyHostsRegEx = nonProxyHostsRegEx.replaceAll("\\*", ".*?");
+			nonProxyHostsRegEx = nonProxyHostsRegEx.replaceAll("\\|", ")|(");
 
 			nonProxyHostsRegEx = "(" + nonProxyHostsRegEx + ")";
 
@@ -192,7 +211,7 @@ public class HttpImpl implements Http {
 			sb.append(StringPool.QUESTION);
 		}
 		else if (!url.endsWith(StringPool.QUESTION) &&
-			!url.endsWith(StringPool.AMPERSAND)) {
+				 !url.endsWith(StringPool.AMPERSAND)) {
 
 			sb.append(StringPool.AMPERSAND);
 		}
@@ -206,9 +225,9 @@ public class HttpImpl implements Http {
 	}
 
 	public String decodePath(String path) {
-		path =  StringUtil.replace(path, StringPool.SLASH, _TEMP_SLASH);
+		path = StringUtil.replace(path, StringPool.SLASH, _TEMP_SLASH);
 		path = decodeURL(path, true);
-		path =  StringUtil.replace(path, _TEMP_SLASH, StringPool.SLASH);
+		path = StringUtil.replace(path, _TEMP_SLASH, StringPool.SLASH);
 
 		return path;
 	}
@@ -469,6 +488,28 @@ public class HttpImpl implements Http {
 		return parameterMapFromString(queryString);
 	}
 
+	public String getPath(String url) {
+		if (Validator.isNull(url)) {
+			return url;
+		}
+
+		if (url.startsWith(Http.HTTP)) {
+			int pos = url.indexOf(
+				StringPool.SLASH, Http.HTTPS_WITH_SLASH.length());
+
+			url = url.substring(pos);
+		}
+
+		int pos = url.indexOf(CharPool.QUESTION);
+
+		if (pos == -1) {
+			return url;
+		}
+		else {
+			return url.substring(0, pos);
+		}
+	}
+
 	public String getProtocol(ActionRequest actionRequest) {
 		return getProtocol(actionRequest.isSecure());
 	}
@@ -512,7 +553,7 @@ public class HttpImpl implements Http {
 			return StringPool.BLANK;
 		}
 		else {
-			return url.substring(pos + 1, url.length());
+			return url.substring(pos + 1);
 		}
 	}
 
@@ -545,14 +586,15 @@ public class HttpImpl implements Http {
 	}
 
 	public boolean isNonProxyHost(String host) {
-		if (_nonProxyHostsPattern == null ||
-			_nonProxyHostsPattern.matcher(host).matches()) {
+		if (_nonProxyHostsPattern != null) {
+			Matcher matcher = _nonProxyHostsPattern.matcher(host);
 
-			return true;
+			if (matcher.matches()) {
+				return true;
+			}
 		}
-		else {
-			return false;
-		}
+
+		return false;
 	}
 
 	public boolean isProxyHost(String host) {
@@ -575,14 +617,11 @@ public class HttpImpl implements Http {
 		Map<String, List<String>> tempParameterMap =
 			new LinkedHashMap<String, List<String>>();
 
-		StringTokenizer st = new StringTokenizer(
-			queryString, StringPool.AMPERSAND);
+		String[] parameters = StringUtil.split(queryString, CharPool.AMPERSAND);
 
-		while (st.hasMoreTokens()) {
-			String token = st.nextToken();
-
-			if (Validator.isNotNull(token)) {
-				String[] kvp = StringUtil.split(token, CharPool.EQUAL);
+		for (String parameter : parameters) {
+			if (parameter.length() > 0) {
+				String[] kvp = StringUtil.split(parameter, CharPool.EQUAL);
 
 				String key = kvp[0];
 
@@ -725,14 +764,12 @@ public class HttpImpl implements Http {
 
 		sb.append(url.substring(0, pos + 1));
 
-		StringTokenizer st = new StringTokenizer(
-			url.substring(pos + 1, url.length()), StringPool.AMPERSAND);
+		String[] parameters = StringUtil.split(
+			url.substring(pos + 1, url.length()), CharPool.AMPERSAND);
 
-		while (st.hasMoreTokens()) {
-			String token = st.nextToken();
-
-			if (Validator.isNotNull(token)) {
-				String[] kvp = StringUtil.split(token, CharPool.EQUAL);
+		for (String parameter : parameters) {
+			if (parameter.length() > 0) {
+				String[] kvp = StringUtil.split(parameter, CharPool.EQUAL);
 
 				String key = kvp[0];
 
@@ -768,10 +805,10 @@ public class HttpImpl implements Http {
 
 	public String removeProtocol(String url) {
 		if (url.startsWith(Http.HTTP_WITH_SLASH)) {
-			return url.substring(Http.HTTP_WITH_SLASH.length() , url.length());
+			return url.substring(Http.HTTP_WITH_SLASH.length());
 		}
 		else if (url.startsWith(Http.HTTPS_WITH_SLASH)) {
-			return url.substring(Http.HTTPS_WITH_SLASH.length() , url.length());
+			return url.substring(Http.HTTPS_WITH_SLASH.length());
 		}
 		else {
 			return url;
@@ -855,8 +892,10 @@ public class HttpImpl implements Http {
 	 * represent a file or some JNDI resource. In that case, the default Java
 	 * implementation is used.
 	 *
+	 * @param  url the URL
 	 * @return A string representation of the resource referenced by the URL
 	 *         object
+	 * @throws IOException if an IO exception occurred
 	 */
 	public String URLtoString(URL url) throws IOException {
 		String xml = null;
@@ -905,6 +944,49 @@ public class HttpImpl implements Http {
 		}
 		else {
 			return true;
+		}
+	}
+
+	protected void processPostMethod(
+		PostMethod postMethod, List<Http.FilePart> fileParts,
+		Map<String, String> parts) {
+
+		if ((fileParts == null) || fileParts.isEmpty()) {
+			if (parts != null) {
+				for (Map.Entry<String, String> entry : parts.entrySet()) {
+					String value = entry.getValue();
+
+					if (value != null) {
+						postMethod.addParameter(entry.getKey(), value);
+					}
+				}
+			}
+		}
+		else {
+			List<Part> partsList = new ArrayList<Part>();
+
+			if (parts != null) {
+				for (Map.Entry<String, String> entry : parts.entrySet()) {
+					String value = entry.getValue();
+
+					if (value != null) {
+						StringPart stringPart = new StringPart(
+							entry.getKey(), value);
+
+						partsList.add(stringPart);
+					}
+				}
+			}
+
+			for (Http.FilePart filePart : fileParts) {
+				partsList.add(toCommonsFilePart(filePart));
+			}
+
+			MultipartRequestEntity multipartRequestEntity =
+				new MultipartRequestEntity(
+					partsList.toArray(new Part[0]), postMethod.getParams());
+
+			postMethod.setRequestEntity(multipartRequestEntity);
 		}
 	}
 
@@ -1050,39 +1132,10 @@ public class HttpImpl implements Http {
 
 					entityEnclosingMethod.setRequestEntity(requestEntity);
 				}
-				else if (method.equals(Http.Method.POST) &&
-						 (((fileParts != null) && !fileParts.isEmpty()) ||
-						  ((parts != null) && !parts.isEmpty()))) {
-
+				else if (method.equals(Http.Method.POST)) {
 					PostMethod postMethod = (PostMethod)httpMethod;
 
-					List<Part> partsList = new ArrayList<Part>();
-
-					if (parts != null) {
-						for (Map.Entry<String, String> entry :
-								parts.entrySet()) {
-
-							String key = entry.getKey();
-							String value = entry.getValue();
-
-							if (value != null) {
-								postMethod.addParameter(key, value);
-							}
-						}
-					}
-
-					if (fileParts != null) {
-						for (Http.FilePart filePart : fileParts) {
-							partsList.add(toCommonsFilePart(filePart));
-						}
-					}
-
-					MultipartRequestEntity multipartRequestEntity =
-						new MultipartRequestEntity(
-							partsList.toArray(new Part[0]),
-							postMethod.getParams());
-
-					postMethod.setRequestEntity(multipartRequestEntity);
+					processPostMethod(postMethod, fileParts, parts);
 				}
 			}
 			else if (method.equals(Http.Method.DELETE)) {
@@ -1145,7 +1198,26 @@ public class HttpImpl implements Http {
 
 			proxifyState(httpState, hostConfiguration);
 
-			httpClient.executeMethod(hostConfiguration, httpMethod, httpState);
+			boolean checkReadFileDescriptor =
+				PortalSecurityManagerThreadLocal.isCheckReadFileDescriptor();
+			boolean checkWriteFileDescriptor =
+				PortalSecurityManagerThreadLocal.isCheckWriteFileDescriptor();
+
+			try {
+				PortalSecurityManagerThreadLocal.setCheckReadFileDescriptor(
+					false);
+				PortalSecurityManagerThreadLocal.setCheckWriteFileDescriptor(
+					false);
+
+				httpClient.executeMethod(
+					hostConfiguration, httpMethod, httpState);
+			}
+			finally {
+				PortalSecurityManagerThreadLocal.setCheckReadFileDescriptor(
+					checkReadFileDescriptor);
+				PortalSecurityManagerThreadLocal.setCheckWriteFileDescriptor(
+					checkWriteFileDescriptor);
+			}
 
 			Header locationHeader = httpMethod.getResponseHeader("location");
 
@@ -1181,8 +1253,6 @@ public class HttpImpl implements Http {
 				}
 
 				bytes = FileUtil.getBytes(inputStream);
-
-				inputStream.close();
 			}
 
 			for (Header header : httpMethod.getResponseHeaders()) {
@@ -1220,11 +1290,10 @@ public class HttpImpl implements Http {
 		2);
 
 	private static final int _MAX_TOTAL_CONNECTIONS = GetterUtil.getInteger(
-		PropsUtil.get(HttpImpl.class.getName() + ".max.total.connections"),
-		20);
+		PropsUtil.get(HttpImpl.class.getName() + ".max.total.connections"), 20);
 
-	private static final String _NON_PROXY_HOSTS =
-		SystemProperties.get("http.nonProxyHosts");
+	private static final String _NON_PROXY_HOSTS = SystemProperties.get(
+		"http.nonProxyHosts");
 
 	private static final String _PROXY_AUTH_TYPE = GetterUtil.getString(
 		PropsUtil.get(HttpImpl.class.getName() + ".proxy.auth.type"));
@@ -1260,5 +1329,40 @@ public class HttpImpl implements Http {
 	private Pattern _nonProxyHostsPattern;
 	private Credentials _proxyCredentials;
 	private HttpClient _proxyHttpClient = new HttpClient();
+
+	private class FastProtocolSocketFactory
+		extends DefaultProtocolSocketFactory {
+
+		@Override
+		public Socket createSocket(
+				final String host, final int port,
+				final InetAddress localInetAddress, final int localPort,
+				final HttpConnectionParams httpConnectionParams)
+			throws ConnectTimeoutException, IOException, UnknownHostException {
+
+			int connectionTimeout = httpConnectionParams.getConnectionTimeout();
+
+			if (connectionTimeout == 0) {
+				return createSocket(host, port, localInetAddress, localPort);
+			}
+
+			SocketFactory socketFactory = SocketFactory.getDefault();
+
+			Socket socket = socketFactory.createSocket();
+
+			SocketAddress localSocketAddress = new InetSocketAddress(
+				localInetAddress, localPort);
+
+			SocketAddress remoteSocketAddress = new InetSocketAddress(
+				host, port);
+
+			socket.bind(localSocketAddress);
+
+			socket.connect(remoteSocketAddress, connectionTimeout);
+
+			return socket;
+		}
+
+	}
 
 }

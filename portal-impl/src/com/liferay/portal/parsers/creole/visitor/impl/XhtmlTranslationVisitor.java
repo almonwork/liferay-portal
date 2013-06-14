@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -61,10 +61,7 @@ public class XhtmlTranslationVisitor implements ASTVisitor {
 	public void visit(BoldTextNode boldTextNode) {
 		append("<strong>");
 
-		if (boldTextNode.getContent() != null) {
-			append(HtmlUtil.escape(boldTextNode.getContent()));
-		}
-		else {
+		if (boldTextNode.hasContent()) {
 			traverse(boldTextNode.getChildASTNodes());
 		}
 
@@ -129,10 +126,7 @@ public class XhtmlTranslationVisitor implements ASTVisitor {
 	public void visit(ItalicTextNode italicTextNode) {
 		append("<em>");
 
-		if (italicTextNode.getContent() != null) {
-			append(HtmlUtil.escape(italicTextNode.getContent()));
-		}
-		else {
+		if (italicTextNode.hasContent()) {
 			traverse(italicTextNode.getChildASTNodes());
 		}
 

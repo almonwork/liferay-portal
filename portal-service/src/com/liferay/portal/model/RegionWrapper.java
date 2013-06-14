@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,6 +14,9 @@
 
 package com.liferay.portal.model;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * <p>
  * This class is a wrapper for {@link Region}.
@@ -23,7 +26,7 @@ package com.liferay.portal.model;
  * @see       Region
  * @generated
  */
-public class RegionWrapper implements Region {
+public class RegionWrapper implements Region, ModelWrapper<Region> {
 	public RegionWrapper(Region region) {
 		_region = region;
 	}
@@ -34,6 +37,50 @@ public class RegionWrapper implements Region {
 
 	public String getModelClassName() {
 		return Region.class.getName();
+	}
+
+	public Map<String, Object> getModelAttributes() {
+		Map<String, Object> attributes = new HashMap<String, Object>();
+
+		attributes.put("regionId", getRegionId());
+		attributes.put("countryId", getCountryId());
+		attributes.put("regionCode", getRegionCode());
+		attributes.put("name", getName());
+		attributes.put("active", getActive());
+
+		return attributes;
+	}
+
+	public void setModelAttributes(Map<String, Object> attributes) {
+		Long regionId = (Long)attributes.get("regionId");
+
+		if (regionId != null) {
+			setRegionId(regionId);
+		}
+
+		Long countryId = (Long)attributes.get("countryId");
+
+		if (countryId != null) {
+			setCountryId(countryId);
+		}
+
+		String regionCode = (String)attributes.get("regionCode");
+
+		if (regionCode != null) {
+			setRegionCode(regionCode);
+		}
+
+		String name = (String)attributes.get("name");
+
+		if (name != null) {
+			setName(name);
+		}
+
+		Boolean active = (Boolean)attributes.get("active");
+
+		if (active != null) {
+			setActive(active);
+		}
 	}
 
 	/**
@@ -173,10 +220,6 @@ public class RegionWrapper implements Region {
 		return _region.isEscapedModel();
 	}
 
-	public void setEscapedModel(boolean escapedModel) {
-		_region.setEscapedModel(escapedModel);
-	}
-
 	public java.io.Serializable getPrimaryKeyObj() {
 		return _region.getPrimaryKeyObj();
 	}
@@ -225,7 +268,14 @@ public class RegionWrapper implements Region {
 		return _region.toXmlString();
 	}
 
+	/**
+	 * @deprecated Renamed to {@link #getWrappedModel}
+	 */
 	public Region getWrappedRegion() {
+		return _region;
+	}
+
+	public Region getWrappedModel() {
 		return _region;
 	}
 

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -21,20 +21,22 @@ import com.liferay.portal.kernel.exception.PortalException;
  */
 public class RequiredGroupException extends PortalException {
 
-	public RequiredGroupException() {
-		super();
+	public static final int CURRENT_GROUP = 3;
+
+	public static final int PARENT_GROUP = 2;
+
+	public static final int SYSTEM_GROUP = 1;
+
+	public RequiredGroupException(String message, int type) {
+		super(message);
+
+		_type = type;
 	}
 
-	public RequiredGroupException(String msg) {
-		super(msg);
+	public int getType() {
+		return _type;
 	}
 
-	public RequiredGroupException(String msg, Throwable cause) {
-		super(msg, cause);
-	}
-
-	public RequiredGroupException(Throwable cause) {
-		super(cause);
-	}
+	private int _type;
 
 }

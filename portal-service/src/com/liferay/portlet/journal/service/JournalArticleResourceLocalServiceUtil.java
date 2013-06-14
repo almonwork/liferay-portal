@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -15,7 +15,6 @@
 package com.liferay.portlet.journal.service;
 
 import com.liferay.portal.kernel.bean.PortalBeanLocatorUtil;
-import com.liferay.portal.kernel.util.MethodCache;
 import com.liferay.portal.kernel.util.ReferenceRegistry;
 
 /**
@@ -66,25 +65,32 @@ public class JournalArticleResourceLocalServiceUtil {
 	* Deletes the journal article resource with the primary key from the database. Also notifies the appropriate model listeners.
 	*
 	* @param resourcePrimKey the primary key of the journal article resource
+	* @return the journal article resource that was removed
 	* @throws PortalException if a journal article resource with the primary key could not be found
 	* @throws SystemException if a system exception occurred
 	*/
-	public static void deleteJournalArticleResource(long resourcePrimKey)
+	public static com.liferay.portlet.journal.model.JournalArticleResource deleteJournalArticleResource(
+		long resourcePrimKey)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException {
-		getService().deleteJournalArticleResource(resourcePrimKey);
+		return getService().deleteJournalArticleResource(resourcePrimKey);
 	}
 
 	/**
 	* Deletes the journal article resource from the database. Also notifies the appropriate model listeners.
 	*
 	* @param journalArticleResource the journal article resource
+	* @return the journal article resource that was removed
 	* @throws SystemException if a system exception occurred
 	*/
-	public static void deleteJournalArticleResource(
+	public static com.liferay.portlet.journal.model.JournalArticleResource deleteJournalArticleResource(
 		com.liferay.portlet.journal.model.JournalArticleResource journalArticleResource)
 		throws com.liferay.portal.kernel.exception.SystemException {
-		getService().deleteJournalArticleResource(journalArticleResource);
+		return getService().deleteJournalArticleResource(journalArticleResource);
+	}
+
+	public static com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery() {
+		return getService().dynamicQuery();
 	}
 
 	/**
@@ -156,6 +162,12 @@ public class JournalArticleResourceLocalServiceUtil {
 		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery)
 		throws com.liferay.portal.kernel.exception.SystemException {
 		return getService().dynamicQueryCount(dynamicQuery);
+	}
+
+	public static com.liferay.portlet.journal.model.JournalArticleResource fetchJournalArticleResource(
+		long resourcePrimKey)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getService().fetchJournalArticleResource(resourcePrimKey);
 	}
 
 	/**
@@ -311,20 +323,15 @@ public class JournalArticleResourceLocalServiceUtil {
 
 			ReferenceRegistry.registerReference(JournalArticleResourceLocalServiceUtil.class,
 				"_service");
-			MethodCache.remove(JournalArticleResourceLocalService.class);
 		}
 
 		return _service;
 	}
 
+	/**
+	 * @deprecated
+	 */
 	public void setService(JournalArticleResourceLocalService service) {
-		MethodCache.remove(JournalArticleResourceLocalService.class);
-
-		_service = service;
-
-		ReferenceRegistry.registerReference(JournalArticleResourceLocalServiceUtil.class,
-			"_service");
-		MethodCache.remove(JournalArticleResourceLocalService.class);
 	}
 
 	private static JournalArticleResourceLocalService _service;

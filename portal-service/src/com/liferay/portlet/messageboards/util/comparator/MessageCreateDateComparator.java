@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -23,11 +23,11 @@ import com.liferay.portlet.messageboards.model.MBMessage;
  */
 public class MessageCreateDateComparator extends OrderByComparator {
 
-	public static String ORDER_BY_ASC = "createDate ASC";
+	public static final String ORDER_BY_ASC = "MBMessage.createDate ASC";
 
-	public static String ORDER_BY_DESC = "createDate DESC";
+	public static final String ORDER_BY_DESC = "MBMessage.createDate DESC";
 
-	public static String[] ORDER_BY_FIELDS = {"createDate"};
+	public static final String[] ORDER_BY_FIELDS = {"createDate"};
 
 	public MessageCreateDateComparator(boolean ascending) {
 		_ascending = ascending;

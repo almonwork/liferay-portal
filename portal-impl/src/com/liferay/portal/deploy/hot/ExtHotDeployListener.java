@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -37,7 +37,6 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.InputStream;
 
-import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
@@ -48,23 +47,29 @@ import javax.servlet.ServletContext;
  */
 public class ExtHotDeployListener extends BaseHotDeployListener {
 
-	public void invokeDeploy(HotDeployEvent event) throws HotDeployException {
+	public void invokeDeploy(HotDeployEvent hotDeployEvent)
+		throws HotDeployException {
+
 		try {
-			doInvokeDeploy(event);
+			doInvokeDeploy(hotDeployEvent);
 		}
 		catch (Throwable t) {
 			throwHotDeployException(
-				event, "Error registering extension environment for ", t);
+				hotDeployEvent, "Error registering extension environment for ",
+				t);
 		}
 	}
 
-	public void invokeUndeploy(HotDeployEvent event) throws HotDeployException {
+	public void invokeUndeploy(HotDeployEvent hotDeployEvent)
+		throws HotDeployException {
+
 		try {
-			doInvokeUndeploy(event);
+			doInvokeUndeploy(hotDeployEvent);
 		}
 		catch (Throwable t) {
 			throwHotDeployException(
-				event, "Error unregistering extension environment for ", t);
+				hotDeployEvent,
+				"Error unregistering extension environment for ", t);
 		}
 	}
 
@@ -88,38 +93,10 @@ public class ExtHotDeployListener extends BaseHotDeployListener {
 		StreamUtil.transfer(is, new FileOutputStream(new File(newJarFullName)));
 	}
 
-	protected void installExt(
-			ServletContext servletContext, ClassLoader portletClassLoader)
+	protected void doInvokeDeploy(HotDeployEvent hotDeployEvent)
 		throws Exception {
 
-		String servletContextName = servletContext.getServletContextName();
-
-		String globalLibDir = PortalUtil.getGlobalLibDir();
-		String portalWebDir = PortalUtil.getPortalWebDir();
-		String portalLibDir = PortalUtil.getPortalLibDir();
-		String pluginWebDir = WebDirDetector.getRootDir(portletClassLoader);
-
-		copyJar(servletContext, globalLibDir, "ext-service");
-		copyJar(servletContext, portalLibDir, "ext-impl");
-		copyJar(servletContext, portalLibDir, "ext-util-bridges");
-		copyJar(servletContext, portalLibDir, "ext-util-java");
-		copyJar(servletContext, portalLibDir, "ext-util-taglib");
-
-		mergeWebXml(portalWebDir, pluginWebDir);
-
-		CopyTask.copyDirectory(
-			pluginWebDir + "WEB-INF/ext-web/docroot", portalWebDir,
-			StringPool.BLANK, "**/WEB-INF/web.xml", true, false);
-
-		FileUtil.copyFile(
-			pluginWebDir + "WEB-INF/ext-" + servletContextName + ".xml",
-			portalWebDir + "WEB-INF/ext-" + servletContextName + ".xml");
-
-		ExtRegistry.registerExt(servletContext);
-	}
-
-	protected void doInvokeDeploy(HotDeployEvent event) throws Exception {
-		ServletContext servletContext = event.getServletContext();
+		ServletContext servletContext = hotDeployEvent.getServletContext();
 
 		String servletContextName = servletContext.getServletContextName();
 
@@ -160,12 +137,7 @@ public class ExtHotDeployListener extends BaseHotDeployListener {
 				"Extension environment for " + servletContextName +
 					" cannot be applied because of detected conflicts:");
 
-			Iterator<Map.Entry<String, Set<String>>> itr =
-				conflicts.entrySet().iterator();
-
-			while (itr.hasNext()) {
-				Map.Entry<String, Set<String>> entry = itr.next();
-
+			for (Map.Entry<String, Set<String>> entry : conflicts.entrySet()) {
 				String conflictServletContextName = entry.getKey();
 				Set<String> conflictFiles = entry.getValue();
 
@@ -184,7 +156,7 @@ public class ExtHotDeployListener extends BaseHotDeployListener {
 			return;
 		}
 
-		installExt(servletContext, event.getContextClassLoader());
+		installExt(servletContext, hotDeployEvent.getContextClassLoader());
 
 		FileAvailabilityUtil.reset();
 
@@ -196,8 +168,10 @@ public class ExtHotDeployListener extends BaseHotDeployListener {
 		}
 	}
 
-	protected void doInvokeUndeploy(HotDeployEvent event) throws Exception {
-		ServletContext servletContext = event.getServletContext();
+	protected void doInvokeUndeploy(HotDeployEvent hotDeployEvent)
+		throws Exception {
+
+		ServletContext servletContext = hotDeployEvent.getServletContext();
 
 		String servletContextName = servletContext.getServletContextName();
 
@@ -218,6 +192,36 @@ public class ExtHotDeployListener extends BaseHotDeployListener {
 				"Extension environment for " +
 					servletContextName + " will not be undeployed");
 		}
+	}
+
+	protected void installExt(
+			ServletContext servletContext, ClassLoader portletClassLoader)
+		throws Exception {
+
+		String servletContextName = servletContext.getServletContextName();
+
+		String globalLibDir = PortalUtil.getGlobalLibDir();
+		String portalWebDir = PortalUtil.getPortalWebDir();
+		String portalLibDir = PortalUtil.getPortalLibDir();
+		String pluginWebDir = WebDirDetector.getRootDir(portletClassLoader);
+
+		copyJar(servletContext, globalLibDir, "ext-service");
+		copyJar(servletContext, portalLibDir, "ext-impl");
+		copyJar(servletContext, portalLibDir, "ext-util-bridges");
+		copyJar(servletContext, portalLibDir, "ext-util-java");
+		copyJar(servletContext, portalLibDir, "ext-util-taglib");
+
+		mergeWebXml(portalWebDir, pluginWebDir);
+
+		CopyTask.copyDirectory(
+			pluginWebDir + "WEB-INF/ext-web/docroot", portalWebDir,
+			StringPool.BLANK, "**/WEB-INF/web.xml", true, false);
+
+		FileUtil.copyFile(
+			pluginWebDir + "WEB-INF/ext-" + servletContextName + ".xml",
+			portalWebDir + "WEB-INF/ext-" + servletContextName + ".xml");
+
+		ExtRegistry.registerExt(servletContext);
 	}
 
 	protected void mergeWebXml(String portalWebDir, String pluginWebDir) {

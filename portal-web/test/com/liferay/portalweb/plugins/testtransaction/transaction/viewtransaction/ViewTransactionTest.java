@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -23,9 +23,10 @@ import com.liferay.portalweb.portal.util.RuntimeVariables;
 public class ViewTransactionTest extends BaseTestCase {
 	public void testViewTransaction() throws Exception {
 		selenium.open("/web/guest/home/");
+		loadRequiredJavaScriptModules();
 
 		for (int second = 0;; second++) {
-			if (second >= 60) {
+			if (second >= 90) {
 				fail("timeout");
 			}
 
@@ -40,15 +41,21 @@ public class ViewTransactionTest extends BaseTestCase {
 			Thread.sleep(1000);
 		}
 
-		selenium.saveScreenShotAndSource();
 		selenium.clickAt("link=Test Transaction Page",
 			RuntimeVariables.replace("Test Transaction Page"));
 		selenium.waitForPageToLoad("30000");
-		selenium.saveScreenShotAndSource();
-		assertTrue(selenium.isTextPresent("BarLocalServiceUtil.addBar=PASSED"));
-		assertTrue(selenium.isTextPresent(
-				"BarLocalServiceUtil.addBarPortalRollback=PASSED"));
-		assertTrue(selenium.isTextPresent(
-				"BarLocalServiceUtil.addBarPortletRollback=PASSED"));
+		loadRequiredJavaScriptModules();
+		assertTrue(selenium.isPartialText("//p[1]",
+				"BarLocalServiceUtil.addBar_Success=PASSED"));
+		assertTrue(selenium.isPartialText("//p[1]",
+				"BarLocalServiceUtil.addBarAndClassName_PortalRollback=PASSED"));
+		assertTrue(selenium.isPartialText("//p[1]",
+				"BarLocalServiceUtil.addBarAndClassName_PortletRollback=PASSED"));
+		assertTrue(selenium.isPartialText("//p[2]",
+				"PortalServiceUtil.testAddClassNameAndTestTransactionPortletBar_Success=PASSED"));
+		assertTrue(selenium.isPartialText("//p[2]",
+				"PortalServiceUtil.testAddClassNameAndTestTransactionPortletBar_PortalRollback=PASSED"));
+		assertTrue(selenium.isPartialText("//p[2]",
+				"PortletServiceUtil.testAddClassNameAndTestTransactionPortletBar_PortletRollback=PASSED"));
 	}
 }

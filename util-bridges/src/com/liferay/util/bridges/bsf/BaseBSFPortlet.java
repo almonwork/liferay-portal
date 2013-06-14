@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -50,22 +50,6 @@ import org.apache.bsf.BSFManager;
 public abstract class BaseBSFPortlet extends GenericPortlet {
 
 	@Override
-	public void init() {
-		editFile = getInitParameter("edit-file");
-		helpFile = getInitParameter("help-file");
-		viewFile = getInitParameter("view-file");
-		actionFile = getInitParameter("action-file");
-		resourceFile = getInitParameter("resource-file");
-		globalFiles = StringUtil.split(getInitParameter("global-files"));
-
-		BSFManager.registerScriptingEngine(
-			getScriptingEngineLanguage(), getScriptingEngineClassName(),
-			new String[] {getScriptingEngineExtension()});
-
-		bsfManager = new BSFManager();
-	}
-
-	@Override
 	public void doDispatch(
 			RenderRequest renderRequest, RenderResponse renderResponse)
 		throws IOException, PortletException {
@@ -107,6 +91,22 @@ public abstract class BaseBSFPortlet extends GenericPortlet {
 		throws IOException {
 
 		include(viewFile, renderRequest, renderResponse);
+	}
+
+	@Override
+	public void init() {
+		editFile = getInitParameter("edit-file");
+		helpFile = getInitParameter("help-file");
+		viewFile = getInitParameter("view-file");
+		actionFile = getInitParameter("action-file");
+		resourceFile = getInitParameter("resource-file");
+		globalFiles = StringUtil.split(getInitParameter("global-files"));
+
+		BSFManager.registerScriptingEngine(
+			getScriptingEngineLanguage(), getScriptingEngineClassName(),
+			new String[] {getScriptingEngineExtension()});
+
+		bsfManager = new BSFManager();
 	}
 
 	@Override
@@ -185,6 +185,8 @@ public abstract class BaseBSFPortlet extends GenericPortlet {
 		bsfManager.exec(getScriptingEngineLanguage(), "(java)", 1, 1, script);
 	}
 
+	protected abstract String getFileParam();
+
 	protected String getGlobalScript() throws IOException {
 		if (globalFiles.length == 0) {
 			return StringPool.BLANK;
@@ -203,21 +205,14 @@ public abstract class BaseBSFPortlet extends GenericPortlet {
 				}
 			}
 
-			try {
-				if (is != null) {
-					sb.append(new String(FileUtil.getBytes(is)));
-					sb.append(StringPool.NEW_LINE);
-				}
-			}
-			finally {
-				is.close();
+			if (is != null) {
+				sb.append(new String(FileUtil.getBytes(is)));
+				sb.append(StringPool.NEW_LINE);
 			}
 		}
 
 		return sb.toString();
 	}
-
-	protected abstract String getFileParam();
 
 	protected abstract String getScriptingEngineClassName();
 
@@ -260,13 +255,13 @@ public abstract class BaseBSFPortlet extends GenericPortlet {
 		_log.error(message, t);
 	}
 
-	protected String editFile;
-	protected String helpFile;
-	protected String viewFile;
 	protected String actionFile;
-	protected String resourceFile;
-	protected String[] globalFiles;
 	protected BSFManager bsfManager;
+	protected String editFile;
+	protected String[] globalFiles;
+	protected String helpFile;
+	protected String resourceFile;
+	protected String viewFile;
 
 	private static Log _log = LogFactoryUtil.getLog(BaseBSFPortlet.class);
 

@@ -24,6 +24,11 @@
 	<td>Blogs Test Page2</td>
 </tr>
 <tr>
+	<td>waitForText</td>
+	<td>//span[@class='portlet-title-text']</td>
+	<td>Blogs (Blogs Test Page2)</td>
+</tr>
+<tr>
 	<td>assertText</td>
 	<td>//span[@class='portlet-title-text']</td>
 	<td>Blogs (Blogs Test Page2)</td>
@@ -39,9 +44,49 @@
 	<td>Blogs Entry4 Title</td>
 </tr>
 <tr>
-	<td>pause</td>
-	<td>5000</td>
-	<td></td>
+	<td>waitForElementPresent</td>
+	<td>//textarea[@id='_33_editor' and @style='display: none;']</td>
+	<td>Text Area</td>
+</tr>
+<tr>
+	<td>assertText</td>
+	<td>//span[.='Source']</td>
+	<td>Source</td>
+</tr>
+<tr>
+	<td>clickAt</td>
+	<td>//span[.='Source']</td>
+	<td>Source</td>
+</tr>
+<tr>
+	<td>waitForVisible</td>
+	<td>//a[@class='cke_button_source cke_on']</td>
+	<td>Source Button On</td>
+</tr>
+<tr>
+	<td>waitForVisible</td>
+	<td>//td[@id='cke_contents__33_editor']/textarea</td>
+	<td>CK Editor</td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>//td[@id='cke_contents__33_editor']/textarea</td>
+	<td>Blogs Entry4 Content</td>
+</tr>
+<tr>
+	<td>assertText</td>
+	<td>//span[.='Source']</td>
+	<td>Source</td>
+</tr>
+<tr>
+	<td>clickAt</td>
+	<td>//span[.='Source']</td>
+	<td>Source</td>
+</tr>
+<tr>
+	<td>waitForElementPresent</td>
+	<td>//textarea[@id='_33_editor' and @style='display: none;']</td>
+	<td>Text Area</td>
 </tr>
 <tr>
 	<td>waitForVisible</td>
@@ -54,7 +99,7 @@
 	<td>CK Editor</td>
 </tr>
 <tr>
-	<td>type</td>
+	<td>waitForText</td>
 	<td>//body</td>
 	<td>Blogs Entry4 Content</td>
 </tr>
@@ -71,11 +116,11 @@
 <tr>
 	<td>assertText</td>
 	<td>//div[@class='portlet-msg-success']</td>
-	<td>Your request processed successfully.</td>
+	<td>Your request completed successfully.</td>
 </tr>
 <tr>
 	<td>assertText</td>
-	<td>xPath=(//div[@class='entry-title'])[1]/a</td>
+	<td>xPath=(//div[@class='entry-title'])[1]/h2/a</td>
 	<td>Blogs Entry4 Title</td>
 </tr>
 <tr>
@@ -85,7 +130,7 @@
 </tr>
 <tr>
 	<td>assertText</td>
-	<td>xPath=(//div[@class='entry-title'])[2]/a</td>
+	<td>xPath=(//div[@class='entry-title'])[2]/h2/a</td>
 	<td>Blogs Entry3 Title</td>
 </tr>
 <tr>
@@ -95,7 +140,7 @@
 </tr>
 <tr>
 	<td>assertText</td>
-	<td>xPath=(//div[@class='entry-title'])[3]/a</td>
+	<td>xPath=(//div[@class='entry-title'])[3]/h2/a</td>
 	<td>Blogs Entry2 Title</td>
 </tr>
 <tr>
@@ -117,6 +162,16 @@
 	<td>clickAtAndWait</td>
 	<td>link=Blogs Test Page1</td>
 	<td>Blogs Test Page1</td>
+</tr>
+<tr>
+	<td>pause</td>
+	<td>5000</td>
+	<td></td>
+</tr>
+<tr>
+	<td>waitForText</td>
+	<td>//span[@class='portlet-title-text']</td>
+	<td>Blogs</td>
 </tr>
 <tr>
 	<td>assertText</td>
@@ -169,13 +224,18 @@
 	<td>Blogs Test Page2</td>
 </tr>
 <tr>
+	<td>waitForText</td>
+	<td>//span[@class='portlet-title-text']</td>
+	<td>Blogs (Blogs Test Page2)</td>
+</tr>
+<tr>
 	<td>assertText</td>
 	<td>//span[@class='portlet-title-text']</td>
 	<td>Blogs (Blogs Test Page2)</td>
 </tr>
 <tr>
 	<td>assertText</td>
-	<td>xPath=(//div[@class='entry-title'])[1]/a</td>
+	<td>xPath=(//div[@class='entry-title'])[1]/h2/a</td>
 	<td>Blogs Entry4 Title</td>
 </tr>
 <tr>
@@ -185,7 +245,7 @@
 </tr>
 <tr>
 	<td>assertText</td>
-	<td>xPath=(//div[@class='entry-title'])[2]/a</td>
+	<td>xPath=(//div[@class='entry-title'])[2]/h2/a</td>
 	<td>Blogs Entry3 Title</td>
 </tr>
 <tr>
@@ -195,7 +255,7 @@
 </tr>
 <tr>
 	<td>assertText</td>
-	<td>xPath=(//div[@class='entry-title'])[3]/a</td>
+	<td>xPath=(//div[@class='entry-title'])[3]/h2/a</td>
 	<td>Blogs Entry2 Title</td>
 </tr>
 <tr>
@@ -219,13 +279,18 @@
 	<td>Blogs Test Page3</td>
 </tr>
 <tr>
+	<td>waitForText</td>
+	<td>//span[@class='portlet-title-text']</td>
+	<td>Blogs (Blogs Test Page2)</td>
+</tr>
+<tr>
 	<td>assertText</td>
 	<td>//span[@class='portlet-title-text']</td>
 	<td>Blogs (Blogs Test Page2)</td>
 </tr>
 <tr>
 	<td>assertText</td>
-	<td>xPath=(//div[@class='entry-title'])[1]/a</td>
+	<td>xPath=(//div[@class='entry-title'])[1]/h2/a</td>
 	<td>Blogs Entry4 Title</td>
 </tr>
 <tr>
@@ -235,7 +300,7 @@
 </tr>
 <tr>
 	<td>assertText</td>
-	<td>xPath=(//div[@class='entry-title'])[2]/a</td>
+	<td>xPath=(//div[@class='entry-title'])[2]/h2/a</td>
 	<td>Blogs Entry3 Title</td>
 </tr>
 <tr>
@@ -245,7 +310,7 @@
 </tr>
 <tr>
 	<td>assertText</td>
-	<td>xPath=(//div[@class='entry-title'])[3]/a</td>
+	<td>xPath=(//div[@class='entry-title'])[3]/h2/a</td>
 	<td>Blogs Entry2 Title</td>
 </tr>
 <tr>
@@ -253,7 +318,6 @@
 	<td>xPath=(//div[@class='entry-body'])[3]/p</td>
 	<td>Blogs Entry2 Content</td>
 </tr>
-
 </tbody></table>
 </body>
 </html>

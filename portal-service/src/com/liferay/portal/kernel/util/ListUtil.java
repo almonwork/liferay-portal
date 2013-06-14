@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -96,7 +96,7 @@ public class ListUtil {
 
 	@SuppressWarnings("rawtypes")
 	public static <E> List<E> fromCollection(Collection<E> c) {
-		if ((c != null) && (List.class.isAssignableFrom(c.getClass()))) {
+		if ((c != null) && List.class.isAssignableFrom(c.getClass())) {
 			return (List)c;
 		}
 
@@ -180,6 +180,9 @@ public class ListUtil {
 		return fromArray(StringUtil.splitLines(s));
 	}
 
+	/**
+	 * @deprecated
+	 */
 	public static <E> boolean remove(List<E> list, E element) {
 		Iterator<E> itr = list.iterator();
 
@@ -322,41 +325,16 @@ public class ListUtil {
 		return list;
 	}
 
-	public static <T, V> String toString(
-		List<T> list, Accessor<T, V> accessor) {
-		return toString(list, accessor, StringPool.COMMA);
-	}
-
-	public static <T, V> String toString(
-		List<T> list, Accessor<T, V> accessor, String delimiter) {
-
-		if ((list == null) || list.isEmpty()) {
-			return StringPool.BLANK;
-		}
-
-		StringBundler sb = new StringBundler(2 * list.size() - 1);
-
-		for (int i = 0; i < list.size(); i++) {
-			T bean = list.get(i);
-
-			V value = accessor.get(bean);
-
-			if (value != null) {
-				sb.append(value);
-			}
-
-			if ((i + 1) != list.size()) {
-				sb.append(delimiter);
-			}
-		}
-
-		return sb.toString();
-	}
-
+	/**
+	 * @see ArrayUtil#toString(Object[], String)
+	 */
 	public static String toString(List<?> list, String param) {
 		return toString(list, param, StringPool.COMMA);
 	}
 
+	/**
+	 * @see ArrayUtil#toString(Object[], String, String)
+	 */
 	public static String toString(
 		List<?> list, String param, String delimiter) {
 
@@ -370,6 +348,44 @@ public class ListUtil {
 			Object bean = list.get(i);
 
 			Object value = BeanPropertiesUtil.getObject(bean, param);
+
+			if (value != null) {
+				sb.append(value);
+			}
+
+			if ((i + 1) != list.size()) {
+				sb.append(delimiter);
+			}
+		}
+
+		return sb.toString();
+	}
+
+	/**
+	 * @see ArrayUtil#toString(Object[], Accessor)
+	 */
+	public static <T, V> String toString(
+		List<T> list, Accessor<T, V> accessor) {
+
+		return toString(list, accessor, StringPool.COMMA);
+	}
+
+	/**
+	 * @see ArrayUtil#toString(Object[], Accessor, String)
+	 */
+	public static <T, V> String toString(
+		List<T> list, Accessor<T, V> accessor, String delimiter) {
+
+		if ((list == null) || list.isEmpty()) {
+			return StringPool.BLANK;
+		}
+
+		StringBundler sb = new StringBundler(2 * list.size() - 1);
+
+		for (int i = 0; i < list.size(); i++) {
+			T bean = list.get(i);
+
+			V value = accessor.get(bean);
 
 			if (value != null) {
 				sb.append(value);

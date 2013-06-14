@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,6 +14,11 @@
 
 package com.liferay.portlet.social.model;
 
+import com.liferay.portal.model.ModelWrapper;
+
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * <p>
  * This class is a wrapper for {@link SocialActivity}.
@@ -23,7 +28,8 @@ package com.liferay.portlet.social.model;
  * @see       SocialActivity
  * @generated
  */
-public class SocialActivityWrapper implements SocialActivity {
+public class SocialActivityWrapper implements SocialActivity,
+	ModelWrapper<SocialActivity> {
 	public SocialActivityWrapper(SocialActivity socialActivity) {
 		_socialActivity = socialActivity;
 	}
@@ -34,6 +40,92 @@ public class SocialActivityWrapper implements SocialActivity {
 
 	public String getModelClassName() {
 		return SocialActivity.class.getName();
+	}
+
+	public Map<String, Object> getModelAttributes() {
+		Map<String, Object> attributes = new HashMap<String, Object>();
+
+		attributes.put("activityId", getActivityId());
+		attributes.put("groupId", getGroupId());
+		attributes.put("companyId", getCompanyId());
+		attributes.put("userId", getUserId());
+		attributes.put("createDate", getCreateDate());
+		attributes.put("mirrorActivityId", getMirrorActivityId());
+		attributes.put("classNameId", getClassNameId());
+		attributes.put("classPK", getClassPK());
+		attributes.put("type", getType());
+		attributes.put("extraData", getExtraData());
+		attributes.put("receiverUserId", getReceiverUserId());
+
+		return attributes;
+	}
+
+	public void setModelAttributes(Map<String, Object> attributes) {
+		Long activityId = (Long)attributes.get("activityId");
+
+		if (activityId != null) {
+			setActivityId(activityId);
+		}
+
+		Long groupId = (Long)attributes.get("groupId");
+
+		if (groupId != null) {
+			setGroupId(groupId);
+		}
+
+		Long companyId = (Long)attributes.get("companyId");
+
+		if (companyId != null) {
+			setCompanyId(companyId);
+		}
+
+		Long userId = (Long)attributes.get("userId");
+
+		if (userId != null) {
+			setUserId(userId);
+		}
+
+		Long createDate = (Long)attributes.get("createDate");
+
+		if (createDate != null) {
+			setCreateDate(createDate);
+		}
+
+		Long mirrorActivityId = (Long)attributes.get("mirrorActivityId");
+
+		if (mirrorActivityId != null) {
+			setMirrorActivityId(mirrorActivityId);
+		}
+
+		Long classNameId = (Long)attributes.get("classNameId");
+
+		if (classNameId != null) {
+			setClassNameId(classNameId);
+		}
+
+		Long classPK = (Long)attributes.get("classPK");
+
+		if (classPK != null) {
+			setClassPK(classPK);
+		}
+
+		Integer type = (Integer)attributes.get("type");
+
+		if (type != null) {
+			setType(type);
+		}
+
+		String extraData = (String)attributes.get("extraData");
+
+		if (extraData != null) {
+			setExtraData(extraData);
+		}
+
+		Long receiverUserId = (Long)attributes.get("receiverUserId");
+
+		if (receiverUserId != null) {
+			setReceiverUserId(receiverUserId);
+		}
 	}
 
 	/**
@@ -191,6 +283,10 @@ public class SocialActivityWrapper implements SocialActivity {
 		return _socialActivity.getClassName();
 	}
 
+	public void setClassName(java.lang.String className) {
+		_socialActivity.setClassName(className);
+	}
+
 	/**
 	* Returns the class name ID of this social activity.
 	*
@@ -321,10 +417,6 @@ public class SocialActivityWrapper implements SocialActivity {
 		return _socialActivity.isEscapedModel();
 	}
 
-	public void setEscapedModel(boolean escapedModel) {
-		_socialActivity.setEscapedModel(escapedModel);
-	}
-
 	public java.io.Serializable getPrimaryKeyObj() {
 		return _socialActivity.getPrimaryKeyObj();
 	}
@@ -379,7 +471,24 @@ public class SocialActivityWrapper implements SocialActivity {
 		_socialActivity.persist();
 	}
 
+	public com.liferay.portlet.asset.model.AssetEntry getAssetEntry()
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return _socialActivity.getAssetEntry();
+	}
+
+	public void setAssetEntry(
+		com.liferay.portlet.asset.model.AssetEntry assetEntry) {
+		_socialActivity.setAssetEntry(assetEntry);
+	}
+
+	/**
+	 * @deprecated Renamed to {@link #getWrappedModel}
+	 */
 	public SocialActivity getWrappedSocialActivity() {
+		return _socialActivity;
+	}
+
+	public SocialActivity getWrappedModel() {
 		return _socialActivity;
 	}
 

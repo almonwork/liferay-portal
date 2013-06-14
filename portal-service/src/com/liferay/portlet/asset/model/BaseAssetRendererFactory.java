@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -25,7 +25,11 @@ import com.liferay.portal.security.permission.PermissionChecker;
 import com.liferay.portal.service.GroupLocalServiceUtil;
 import com.liferay.portal.service.LayoutLocalServiceUtil;
 import com.liferay.portal.theme.ThemeDisplay;
+import com.liferay.portal.util.PortalUtil;
 import com.liferay.portlet.asset.service.AssetEntryLocalServiceUtil;
+
+import java.util.Locale;
+import java.util.Map;
 
 import javax.portlet.PortletRequest;
 import javax.portlet.PortletURL;
@@ -64,7 +68,13 @@ public abstract class BaseAssetRendererFactory implements AssetRendererFactory {
 	}
 
 	public long getClassNameId() {
-		return _classNameId;
+		return PortalUtil.getClassNameId(_className);
+	}
+
+	public Map<Long, String> getClassTypes(long[] groupId, Locale locale)
+		throws Exception {
+
+		return null;
 	}
 
 	public String getIconPath(PortletRequest portletRequest) {
@@ -91,15 +101,23 @@ public abstract class BaseAssetRendererFactory implements AssetRendererFactory {
 			PermissionChecker permissionChecker, long classPK, String actionId)
 		throws Exception {
 
+		return _PERMISSION;
+	}
+
+	public boolean isCategorizable() {
 		return true;
+	}
+
+	public boolean isLinkable() {
+		return _LINKABLE;
 	}
 
 	public boolean isSelectable() {
-		return true;
+		return _SELECTABLE;
 	}
 
-	public void setClassNameId(long classNameId) {
-		_classNameId = classNameId;
+	public void setClassName(String className) {
+		_className = className;
 	}
 
 	public void setPortletId(String portletId) {
@@ -120,7 +138,13 @@ public abstract class BaseAssetRendererFactory implements AssetRendererFactory {
 		return themeDisplay.getPathThemeImages() + "/common/page.png";
 	}
 
-	private long _classNameId;
+	private static final boolean _LINKABLE = false;
+
+	private static final boolean _PERMISSION = true;
+
+	private static final boolean _SELECTABLE = true;
+
+	private String _className;
 	private String _portletId;
 
 }

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,6 +14,7 @@
 
 package com.liferay.portlet.dynamicdatamapping.util;
 
+import com.liferay.portal.kernel.security.pacl.permission.PortalRuntimePermission;
 import com.liferay.portal.kernel.xml.Document;
 import com.liferay.portal.kernel.xml.DocumentException;
 
@@ -25,9 +26,7 @@ import java.io.IOException;
  */
 public class DDMXMLUtil {
 
-	public static String formatXML(Document document)
-		throws IOException {
-
+	public static String formatXML(Document document) throws IOException {
 		return getDDMXML().formatXML(document);
 	}
 
@@ -38,10 +37,14 @@ public class DDMXMLUtil {
 	}
 
 	public static DDMXML getDDMXML() {
+		PortalRuntimePermission.checkGetBeanProperty(DDMXMLUtil.class);
+
 		return _ddmXML;
 	}
 
 	public void setDDMXML(DDMXML ddmXML) {
+		PortalRuntimePermission.checkSetBeanProperty(getClass());
+
 		_ddmXML = ddmXML;
 	}
 

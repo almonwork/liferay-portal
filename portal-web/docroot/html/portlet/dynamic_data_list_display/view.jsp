@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -40,7 +40,6 @@ try {
 				<liferay-util:param name="editable" value="<%= String.valueOf(editable) %>" />
 				<liferay-util:param name="spreadsheet" value="<%= String.valueOf(spreadsheet) %>" />
 			</liferay-util:include>
-
 		</c:when>
 		<c:otherwise>
 
@@ -68,56 +67,60 @@ catch (NoSuchRecordSetException nsrse) {
 <%
 }
 
-boolean showAddListIcon = PortletPermissionUtil.contains(permissionChecker, layout, portletDisplay.getId(), ActionKeys.CONFIGURATION) && DDLPermission.contains(permissionChecker, scopeGroupId, ActionKeys.ADD_RECORD_SET);
-boolean showAddTemplateIcon = (recordSet != null) && DDMPermission.contains(permissionChecker, scopeGroupId, ActionKeys.ADD_TEMPLATE);
+boolean hasConfigurationPermission = PortletPermissionUtil.contains(permissionChecker, layout, portletDisplay.getId(), ActionKeys.CONFIGURATION);
+
+boolean showAddListIcon = hasConfigurationPermission && DDLPermission.contains(permissionChecker, scopeGroupId, ActionKeys.ADD_RECORD_SET);
+boolean showAddTemplateIcon = (recordSet != null) && DDMPermission.contains(permissionChecker, scopeGroupId, ddmResource, ActionKeys.ADD_TEMPLATE);
 boolean showEditDetailTemplateIcon = (detailDDMTemplateId != 0) && DDMTemplatePermission.contains(permissionChecker, detailDDMTemplateId, ActionKeys.UPDATE);
 boolean showEditListTemplateIcon = (listDDMTemplateId != 0) && DDMTemplatePermission.contains(permissionChecker, listDDMTemplateId, ActionKeys.UPDATE);
-boolean showSelectListIcon = PortletPermissionUtil.contains(permissionChecker, layout, portletDisplay.getId(), ActionKeys.CONFIGURATION);
 %>
 
-<c:if test="<%= themeDisplay.isSignedIn() && (showAddListIcon || showAddTemplateIcon || showEditDetailTemplateIcon || showEditListTemplateIcon || showSelectListIcon ) %>">
+<c:if test="<%= themeDisplay.isSignedIn() && (showAddListIcon || showAddTemplateIcon || showEditDetailTemplateIcon || showEditListTemplateIcon || hasConfigurationPermission ) %>">
 	<div class="lfr-meta-actions icons-container">
 		<div class="icon-actions">
 			<c:if test="<%= showAddTemplateIcon %>">
-				<liferay-portlet:renderURL windowState="<%= WindowState.MAXIMIZED.toString() %>" var="addDetailTemplateURL" portletName="<%= PortletKeys.DYNAMIC_DATA_MAPPING %>">
+				<liferay-portlet:renderURL portletName="<%= PortletKeys.DYNAMIC_DATA_MAPPING %>" var="addDetailTemplateURL" windowState="<%= WindowState.MAXIMIZED.toString() %>">
 					<portlet:param name="struts_action" value="/dynamic_data_mapping/edit_template" />
 					<portlet:param name="redirect" value="<%= currentURL %>" />
 					<portlet:param name="portletResource" value="<%= portletDisplay.getId() %>" />
 					<portlet:param name="portletResourceNamespace" value="<%= renderResponse.getNamespace() %>" />
 					<portlet:param name="groupId" value="<%= String.valueOf(scopeGroupId) %>" />
-					<portlet:param name="structureId" value="<%= String.valueOf(recordSet.getDDMStructureId()) %>" />
+					<portlet:param name="classNameId" value="<%= String.valueOf(PortalUtil.getClassNameId(DDMStructure.class)) %>" />
+					<portlet:param name="classPK" value="<%= String.valueOf(recordSet.getDDMStructureId()) %>" />
 					<portlet:param name="structureAvailableFields" value='<%= renderResponse.getNamespace() + "structureAvailableFields" %>' />
+					<portlet:param name="ddmResource" value="<%= ddmResource %>" />
 				</liferay-portlet:renderURL>
 
 				<liferay-ui:icon
-					image="add_template"
+					image="add_template_detail"
 					message="add-detail-template"
 					url="<%= addDetailTemplateURL %>"
 				/>
 
-				<liferay-portlet:renderURL windowState="<%= WindowState.MAXIMIZED.toString() %>" var="addListTemplateURL" portletName="<%= PortletKeys.DYNAMIC_DATA_MAPPING %>">
+				<liferay-portlet:renderURL portletName="<%= PortletKeys.DYNAMIC_DATA_MAPPING %>" var="addListTemplateURL" windowState="<%= WindowState.MAXIMIZED.toString() %>">
 					<portlet:param name="struts_action" value="/dynamic_data_mapping/edit_template" />
 					<portlet:param name="redirect" value="<%= currentURL %>" />
 					<portlet:param name="portletResource" value="<%= portletDisplay.getId() %>" />
 					<portlet:param name="groupId" value="<%= String.valueOf(scopeGroupId) %>" />
-					<portlet:param name="structureId" value="<%= String.valueOf(recordSet.getDDMStructureId()) %>" />
+					<portlet:param name="classNameId" value="<%= String.valueOf(PortalUtil.getClassNameId(DDMStructure.class)) %>" />
+					<portlet:param name="classPK" value="<%= String.valueOf(recordSet.getDDMStructureId()) %>" />
 					<portlet:param name="type" value="<%= DDMTemplateConstants.TEMPLATE_TYPE_LIST %>" />
+					<portlet:param name="ddmResource" value="<%= ddmResource %>" />
 				</liferay-portlet:renderURL>
 
 				<liferay-ui:icon
-					image="add_template"
+					image="add_template_list"
 					message="add-list-template"
 					url="<%= addListTemplateURL %>"
 				/>
 			</c:if>
 
 			<c:if test="<%= showEditDetailTemplateIcon %>">
-				<liferay-portlet:renderURL windowState="<%= WindowState.MAXIMIZED.toString() %>" var="editDetailTemplateURL" portletName="<%= PortletKeys.DYNAMIC_DATA_MAPPING %>">
+				<liferay-portlet:renderURL portletName="<%= PortletKeys.DYNAMIC_DATA_MAPPING %>" var="editDetailTemplateURL" windowState="<%= WindowState.MAXIMIZED.toString() %>">
 					<portlet:param name="struts_action" value="/dynamic_data_mapping/edit_template" />
 					<portlet:param name="redirect" value="<%= currentURL %>" />
 					<portlet:param name="portletResourceNamespace" value="<%= renderResponse.getNamespace() %>" />
 					<portlet:param name="templateId" value="<%= String.valueOf(detailDDMTemplateId) %>" />
-					<portlet:param name="structureId" value="<%= String.valueOf(recordSet.getDDMStructureId()) %>" />
 					<portlet:param name="structureAvailableFields" value='<%= renderResponse.getNamespace() + "structureAvailableFields" %>' />
 				</liferay-portlet:renderURL>
 
@@ -129,11 +132,10 @@ boolean showSelectListIcon = PortletPermissionUtil.contains(permissionChecker, l
 			</c:if>
 
 			<c:if test="<%= showEditListTemplateIcon %>">
-				<liferay-portlet:renderURL windowState="<%= WindowState.MAXIMIZED.toString() %>" var="editListTemplateURL" portletName="<%= PortletKeys.DYNAMIC_DATA_MAPPING %>">
+				<liferay-portlet:renderURL portletName="<%= PortletKeys.DYNAMIC_DATA_MAPPING %>" var="editListTemplateURL" windowState="<%= WindowState.MAXIMIZED.toString() %>">
 					<portlet:param name="struts_action" value="/dynamic_data_mapping/edit_template" />
 					<portlet:param name="redirect" value="<%= currentURL %>" />
 					<portlet:param name="templateId" value="<%= String.valueOf(listDDMTemplateId) %>" />
-					<portlet:param name="structureId" value="<%= String.valueOf(recordSet.getDDMStructureId()) %>" />
 				</liferay-portlet:renderURL>
 
 				<liferay-ui:icon
@@ -143,18 +145,19 @@ boolean showSelectListIcon = PortletPermissionUtil.contains(permissionChecker, l
 				/>
 			</c:if>
 
-			<c:if test="<%= showSelectListIcon %>">
+			<c:if test="<%= hasConfigurationPermission %>">
 				<liferay-ui:icon
 					cssClass="portlet-configuration"
 					image="configuration"
 					message="select-list"
 					method="get"
+					onClick="<%= portletDisplay.getURLConfigurationJS() %>"
 					url="<%= portletDisplay.getURLConfiguration() %>"
 				/>
 			</c:if>
 
 			<c:if test="<%= showAddListIcon %>">
-				<liferay-portlet:renderURL windowState="<%= WindowState.MAXIMIZED.toString() %>" var="addListURL" portletName="<%= PortletKeys.DYNAMIC_DATA_LISTS %>">
+				<liferay-portlet:renderURL portletName="<%= PortletKeys.DYNAMIC_DATA_LISTS %>" var="addListURL" windowState="<%= WindowState.MAXIMIZED.toString() %>">
 					<portlet:param name="struts_action" value="/dynamic_data_lists/edit_record_set" />
 					<portlet:param name="redirect" value="<%= currentURL %>" />
 					<portlet:param name="portletResource" value="<%= portletDisplay.getId() %>" />

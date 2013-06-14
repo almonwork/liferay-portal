@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -136,7 +136,7 @@ public class SearchContext implements Serializable {
 
 	public String getSearchEngineId() {
 		if (Validator.isNull(_searchEngineId)) {
-			return SearchEngineUtil.SYSTEM_ENGINE_ID;
+			return SearchEngineUtil.getDefaultSearchEngineId();
 		}
 
 		return _searchEngineId;
@@ -254,16 +254,16 @@ public class SearchContext implements Serializable {
 		_nodeIds = nodeIds;
 	}
 
-	public void setQueryConfig(QueryConfig queryConfig) {
-		_queryConfig = queryConfig;
-	}
-
 	public void setOwnerUserId(long ownerUserId) {
 		_ownerUserId = ownerUserId;
 	}
 
 	public void setPortletIds(String[] portletIds) {
 		_portletIds = portletIds;
+	}
+
+	public void setQueryConfig(QueryConfig queryConfig) {
+		_queryConfig = queryConfig;
 	}
 
 	public void setScopeStrict(boolean scopeStrict) {

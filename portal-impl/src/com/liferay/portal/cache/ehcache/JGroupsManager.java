@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -33,11 +33,11 @@ import net.sf.ehcache.Element;
 import net.sf.ehcache.distribution.CacheManagerPeerProvider;
 import net.sf.ehcache.distribution.CachePeer;
 import net.sf.ehcache.distribution.jgroups.JGroupEventMessage;
-import net.sf.ehcache.distribution.jgroups.JGroupSerializable;
 
 import org.jgroups.Address;
 import org.jgroups.JChannel;
 import org.jgroups.Message;
+import org.jgroups.View;
 
 /**
  * <p>
@@ -85,7 +85,11 @@ public class JGroupsManager implements CacheManagerPeerProvider, CachePeer {
 	}
 
 	public List<Address> getBusMembership() {
-		return _jChannel.getView().getMembers();
+		BaseReceiver baseReceiver = (BaseReceiver)_jChannel.getReceiver();
+
+		View view = baseReceiver.getView();
+
+		return view.getMembers();
 	}
 
 	@SuppressWarnings("rawtypes")
@@ -127,15 +131,15 @@ public class JGroupsManager implements CacheManagerPeerProvider, CachePeer {
 	}
 
 	public void handleNotification(Serializable serializable) {
-		if (serializable instanceof JGroupSerializable) {
-			handleJGroupsNotification((JGroupSerializable)serializable);
+		if (serializable instanceof JGroupEventMessage) {
+			handleJGroupsNotification((JGroupEventMessage)serializable);
 		}
 		else if (serializable instanceof List<?>) {
 			List<?> valueList = (List<?>)serializable;
 
 			for (Object object : valueList) {
-				if (object instanceof JGroupSerializable) {
-					handleJGroupsNotification((JGroupSerializable)object);
+				if (object instanceof JGroupEventMessage) {
+					handleJGroupsNotification((JGroupEventMessage)object);
 				}
 			}
 		}
@@ -169,18 +173,15 @@ public class JGroupsManager implements CacheManagerPeerProvider, CachePeer {
 	public void send(Address address, List eventMessages)
 		throws RemoteException {
 
-		ArrayList<JGroupSerializable> jGroupSerializables =
-			new ArrayList<JGroupSerializable>();
+		ArrayList<JGroupEventMessage> jGroupEventMessages =
+			new ArrayList<JGroupEventMessage>();
 
 		for (Object eventMessage : eventMessages) {
 			if (eventMessage instanceof JGroupEventMessage) {
 				JGroupEventMessage jGroupEventMessage =
 					(JGroupEventMessage)eventMessage;
 
-				JGroupSerializable jGroupSerializable = toJGroupSerializable(
-					jGroupEventMessage);
-
-				jGroupSerializables.add(jGroupSerializable);
+				jGroupEventMessages.add(jGroupEventMessage);
 			}
 			else {
 				if (_log.isDebugEnabled()) {
@@ -191,7 +192,7 @@ public class JGroupsManager implements CacheManagerPeerProvider, CachePeer {
 		}
 
 		try {
-			_jChannel.send(address, null, jGroupSerializables);
+			_jChannel.send(address, jGroupEventMessages);
 		}
 		catch (Throwable t) {
 			throw new RemoteException(t.getMessage());
@@ -207,18 +208,16 @@ public class JGroupsManager implements CacheManagerPeerProvider, CachePeer {
 	}
 
 	protected void handleJGroupsNotification(
-		JGroupSerializable jGroupSerializable) {
+		JGroupEventMessage jGroupEventMessage) {
 
-		Cache cache = _cacheManager.getCache(
-			jGroupSerializable.getCacheName());
+		Cache cache = _cacheManager.getCache(jGroupEventMessage.getCacheName());
 
 		if (cache == null) {
 			return;
 		}
 
-		int event = jGroupSerializable.getEvent();
-		Serializable key = jGroupSerializable.getKey();
-		Serializable value = jGroupSerializable.getValue();
+		int event = jGroupEventMessage.getEvent();
+		Serializable key = jGroupEventMessage.getSerializableKey();
 
 		if ((event == JGroupEventMessage.REMOVE) &&
 			(cache.getQuiet(key) != null)) {
@@ -229,30 +228,15 @@ public class JGroupsManager implements CacheManagerPeerProvider, CachePeer {
 			cache.removeAll(true);
 		}
 		else if (event == JGroupEventMessage.PUT) {
-			cache.put(new Element(key, value), true);
+			Element element = jGroupEventMessage.getElement();
+
+			cache.put(new Element(key, element.getValue()), true);
 		}
 	}
-
-	protected JGroupSerializable toJGroupSerializable(
-		JGroupEventMessage jGroupEventMessage) {
-
-		Element element = jGroupEventMessage.getElement();
-
-		Serializable value = null;
-
-		if (element != null) {
-			value = element.getValue();
-		}
-
-		return new JGroupSerializable(
-			jGroupEventMessage.getEvent(),
-			jGroupEventMessage.getSerializableKey(), value,
-			jGroupEventMessage.getCacheName());
-	}
-
-	private static Log _log = LogFactoryUtil.getLog(JGroupsManager.class);
 
 	private static final String _SCHEME = "JGroups";
+
+	private static Log _log = LogFactoryUtil.getLog(JGroupsManager.class);
 
 	private CacheManager _cacheManager;
 	private JChannel _jChannel;

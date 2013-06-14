@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -28,11 +28,6 @@ public class FieldWeightSimilarity extends DefaultSimilarity {
 
 	@Override
 	public float idf(int docFreq, int numDocs) {
-		return 1;
-	}
-
-	@Override
-	public float lengthNorm(String fieldName, int numTerms) {
 		return 1;
 	}
 

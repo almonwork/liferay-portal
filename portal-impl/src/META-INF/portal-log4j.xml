@@ -30,26 +30,6 @@
 		<priority value="ERROR" />
 	</category>
 
-	<category name="com.liferay.documentlibrary">
-		<priority value="ERROR" />
-	</category>
-
-	<category name="com.liferay.documentlibrary.util">
-		<priority value="ERROR" />
-	</category>
-
-	<category name="com.liferay.documentlibrary.util.CMISHook">
-		<priority value="INFO" />
-	</category>
-
-	<category name="com.liferay.documentlibrary.util.DLIndexer">
-		<priority value="ERROR" />
-	</category>
-
-	<category name="com.liferay.documentlibrary.util.HookFactory">
-		<priority value="ERROR" />
-	</category>
-
 	<category name="com.liferay.jdbc">
 		<priority value="ERROR" />
 	</category>
@@ -114,6 +94,10 @@
 		<priority value="INFO" />
 	</category>
 
+	<category name="com.liferay.portal.configuration.ConfigurationImpl">
+		<priority value="WARN" />
+	</category>
+
 	<category name="com.liferay.portal.convert">
 		<priority value="DEBUG" />
 	</category>
@@ -131,6 +115,10 @@
 	</category>
 
 	<category name="com.liferay.portal.dao.jdbc.aop">
+		<priority value="ERROR" />
+	</category>
+
+	<category name="com.liferay.portal.dao.jdbc.pacl.PACLDataSource">
 		<priority value="ERROR" />
 	</category>
 
@@ -162,7 +150,19 @@
 		<priority value="INFO" />
 	</category>
 
+	<category name="com.liferay.portal.deploy.hot.HotDeployImpl">
+		<priority value="INFO" />
+	</category>
+
+	<category name="com.liferay.portal.deploy.hot.PACLHotDeployListener">
+		<priority value="ERROR" />
+	</category>
+
 	<category name="com.liferay.portal.deploy.hot.PluginPackageHotDeployListener">
+		<priority value="ERROR" />
+	</category>
+
+	<category name="com.liferay.portal.deploy.hot.PortletHotDeployListener">
 		<priority value="ERROR" />
 	</category>
 
@@ -263,19 +263,27 @@
 	</category>
 
 	<category name="com.liferay.portal.googleapps.GHelperUtil">
-		<priority value="ERROR" />
+		<priority value="INFO" />
 	</category>
 
 	<category name="com.liferay.portal.image.HookFactory">
 		<priority value="ERROR" />
 	</category>
 
-	<category name="com.liferay.portal.image.ImageProcessorImpl">
+	<category name="com.liferay.portal.image.ImageToolImpl">
 		<priority value="ERROR" />
 	</category>
 
 	<category name="com.liferay.portal.image.SpriteProcessorImpl">
 		<priority value="WARN" />
+	</category>
+
+	<category name="com.liferay.portal.jndi.pacl.PACLInitialContextFactory">
+		<priority value="ERROR" />
+	</category>
+
+	<category name="com.liferay.portal.jndi.pacl.PACLInitialContextFactoryBuilder">
+		<priority value="ERROR" />
 	</category>
 
 	<category name="com.liferay.portal.kernel.bean.PortalBeanLocatorUtil">
@@ -294,6 +302,14 @@
 		<priority value="INFO" />
 	</category>
 
+	<category name="com.liferay.portal.kernel.portlet.RestrictPortletServletRequest">
+		<priority value="ERROR" />
+	</category>
+
+	<category name="com.liferay.portal.kernel.messaging.config.AbstractMessagingConfigurator">
+		<priority value="INFO" />
+	</category>
+
 	<category name="com.liferay.portal.kernel.search.HitsOpenSearchImpl">
 		<priority value="WARN" />
 	</category>
@@ -302,8 +318,12 @@
 		<priority value="ERROR" />
 	</category>
 
-	<category name="com.liferay.portal.kernel.servlet.PortletContextListener">
-		<priority value="INFO" />
+	<category name="com.liferay.portal.kernel.servlet.PluginContextListener">
+		<priority value="WARN" />
+	</category>
+
+	<category name="com.liferay.portal.kernel.servlet.SecurePluginContextListener">
+		<priority value="ERROR" />
 	</category>
 
 	<category name="com.liferay.portal.kernel.servlet.ServletContextPool">
@@ -318,16 +338,40 @@
 		<priority value="INFO" />
 	</category>
 
-	<category name="com.liferay.portal.kernel.util.JavaProps">
+	<category name="com.liferay.portal.kernel.util.ClassUtil">
 		<priority value="ERROR" />
+	</category>
+
+	<category name="com.liferay.portal.kernel.util.JavaDetector">
+		<priority value="ERROR" />
+	</category>
+
+	<category name="com.liferay.portal.kernel.util.ReferenceRegistry">
+		<priority value="WARN" />
 	</category>
 
 	<category name="com.liferay.portal.kernel.util.ServerDetector">
 		<priority value="INFO" />
 	</category>
 
+	<category name="com.liferay.portal.language.LanguageResources">
+		<priority value="WARN" />
+	</category>
+
+	<category name="com.liferay.portal.kernel.servlet.ServletRequestUtil">
+		<priority value="INFO" />
+	</category>
+
+	<category name="com.liferay.portal.kernel.servlet.ServletResponseUtil">
+		<priority value="ERROR" />
+	</category>
+
 	<category name="com.liferay.portal.lar">
 		<priority value="ERROR" />
+	</category>
+
+	<category name="com.liferay.portal.license">
+		<priority value="INFO" />
 	</category>
 
 	<category name="com.liferay.portal.model.Image">
@@ -358,6 +402,10 @@
 		<priority value="ERROR" />
 	</category>
 
+	<category name="com.liferay.portal.search.IndexerRegistryImpl">
+		<priority value="WARN" />
+	</category>
+
 	<category name="com.liferay.portal.search.lucene">
 		<priority value="INFO" />
 	</category>
@@ -371,6 +419,14 @@
 	</category>
 
 	<category name="com.liferay.portal.search.lucene.LuceneIndexWriterImpl">
+		<priority value="ERROR" />
+	</category>
+
+	<category name="com.liferay.portal.security.auth.EmailAddressGeneratorFactory">
+		<priority value="ERROR" />
+	</category>
+
+	<category name="com.liferay.portal.security.auth.EmailAddressValidatorFactory">
 		<priority value="ERROR" />
 	</category>
 
@@ -402,11 +458,99 @@
 		<priority value="WARN" />
 	</category>
 
+	<category name="com.liferay.portal.security.lang.PortalSecurityManager">
+		<priority value="INFO" />
+	</category>
+
 	<category name="com.liferay.portal.security.ldap">
 		<priority value="ERROR" />
 	</category>
 
 	<category name="com.liferay.portal.security.ldap.PortalLDAPUtil">
+		<priority value="ERROR" />
+	</category>
+
+	<category name="com.liferay.portal.security.pacl.BasePACLPolicy">
+		<priority value="ERROR" />
+	</category>
+
+	<category name="com.liferay.portal.security.pacl.PACLAdvice">
+		<priority value="ERROR" />
+	</category>
+
+	<category name="com.liferay.portal.security.pacl.PACLBeanHandler">
+		<priority value="ERROR" />
+	</category>
+
+	<category name="com.liferay.portal.security.pacl.PACLClassUtil">
+		<priority value="ERROR" />
+	</category>
+
+	<category name="com.liferay.portal.security.pacl.PACLPolicyManager">
+		<priority value="INFO" />
+	</category>
+
+	<category name="com.liferay.portal.security.pacl.checker.BaseChecker">
+		<priority value="ERROR" />
+	</category>
+
+	<category name="com.liferay.portal.security.pacl.checker.BaseReflectChecker">
+		<priority value="ERROR" />
+	</category>
+
+	<category name="com.liferay.portal.security.pacl.checker.DefaultAcceptChecker">
+		<priority value="INFO" />
+	</category>
+
+	<category name="com.liferay.portal.security.pacl.checker.DefaultRejectChecker">
+		<priority value="INFO" />
+	</category>
+
+	<category name="com.liferay.portal.security.pacl.checker.FileChecker">
+		<priority value="WARN" />
+	</category>
+
+	<category name="com.liferay.portal.security.pacl.checker.MBeanChecker">
+		<priority value="ERROR" />
+	</category>
+
+	<category name="com.liferay.portal.security.pacl.checker.NetChecker">
+		<priority value="ERROR" />
+	</category>
+
+	<category name="com.liferay.portal.security.pacl.checker.PortalHookChecker">
+		<priority value="ERROR" />
+	</category>
+
+	<category name="com.liferay.portal.security.pacl.checker.PortalMessageBusChecker">
+		<priority value="ERROR" />
+	</category>
+
+	<category name="com.liferay.portal.security.pacl.checker.PortalRuntimeChecker">
+		<priority value="ERROR" />
+	</category>
+
+	<category name="com.liferay.portal.security.pacl.checker.PortalServiceChecker">
+		<priority value="ERROR" />
+	</category>
+
+	<category name="com.liferay.portal.security.pacl.checker.ReflectChecker">
+		<priority value="WARN" />
+	</category>
+
+	<category name="com.liferay.portal.security.pacl.checker.RuntimeChecker">
+		<priority value="WARN" />
+	</category>
+
+	<category name="com.liferay.portal.security.pacl.checker.SecurityChecker">
+		<priority value="ERROR" />
+	</category>
+
+	<category name="com.liferay.portal.security.pacl.checker.SocketChecker">
+		<priority value="ERROR" />
+	</category>
+
+	<category name="com.liferay.portal.security.pacl.checker.SQLChecker">
 		<priority value="ERROR" />
 	</category>
 
@@ -418,12 +562,16 @@
 		<priority value="INFO" />
 	</category>
 
-	<category name="com.liferay.portal.security.permission.ResourceActionsUtil">
+	<category name="com.liferay.portal.security.permission.ResourceActionsImpl">
 		<priority value="WARN" />
 	</category>
 
 	<category name="com.liferay.portal.security.pwd.RegExpToolkit">
 		<priority value="WARN" />
+	</category>
+
+	<category name="com.liferay.portal.server.capabilities.ServerCapabilitiesUtil">
+		<priority value="ERROR" />
 	</category>
 
 	<category name="com.liferay.portal.service.impl.LayoutLocalServiceImpl">
@@ -448,6 +596,10 @@
 
 	<category name="com.liferay.portal.service.impl.ReleaseLocalServiceImpl">
 		<priority value="INFO" />
+	</category>
+
+	<category name="com.liferay.portal.service.impl.RepositoryLocalServiceImpl">
+		<priority value="ERROR" />
 	</category>
 
 	<category name="com.liferay.portal.service.impl.ResourceLocalServiceImpl">
@@ -479,10 +631,6 @@
 	</category>
 
 	<category name="com.liferay.portal.servlet.FriendlyURLServlet">
-		<priority value="ERROR" />
-	</category>
-
-	<category name="com.liferay.portal.servlet.ImageServlet">
 		<priority value="ERROR" />
 	</category>
 
@@ -530,6 +678,18 @@
 		<priority value="ERROR" />
 	</category>
 
+	<category name="com.liferay.portal.servlet.filters.dynamiccss">
+		<priority value="ERROR" />
+	</category>
+
+	<category name="com.liferay.portal.servlet.filters.dynamiccss.DynamicCSSFilter">
+		<priority value="ERROR" />
+	</category>
+
+	<category name="com.liferay.portal.servlet.filters.dynamiccss.DynamicCSSUtil">
+		<priority value="ERROR" />
+	</category>
+
 	<category name="com.liferay.portal.servlet.filters.fragment">
 		<priority value="ERROR" />
 	</category>
@@ -563,6 +723,10 @@
 	</category>
 
 	<category name="com.liferay.portal.servlet.filters.virtualhost.VirtualHostFilter">
+		<priority value="ERROR" />
+	</category>
+
+	<category name="com.liferay.portal.sharepoint">
 		<priority value="ERROR" />
 	</category>
 
@@ -602,6 +766,10 @@
 		<priority value="ERROR" />
 	</category>
 
+	<category name="com.liferay.portal.struts.JSONAction">
+		<priority value="ERROR" />
+	</category>
+
 	<category name="com.liferay.portal.struts.MultiMessageResources">
 		<priority value="ERROR" />
 	</category>
@@ -626,19 +794,19 @@
 		<priority value="INFO" />
 	</category>
 
-	<category name="com.liferay.portal.tools.BaseDeployer">
-		<priority value="INFO" />
-	</category>
-
 	<category name="com.liferay.portal.tools.DBUpgrader">
 		<priority value="ERROR" />
 	</category>
 
-	<category name="com.liferay.portal.tools.PortletDeployer">
+	<category name="com.liferay.portal.tools.deploy.BaseDeployer">
 		<priority value="INFO" />
 	</category>
 
-	<category name="com.liferay.portal.tools.ThemeDeployer">
+	<category name="com.liferay.portal.tools.deploy.PortletDeployer">
+		<priority value="INFO" />
+	</category>
+
+	<category name="com.liferay.portal.tools.deploy.ThemeDeployer">
 		<priority value="INFO" />
 	</category>
 
@@ -674,6 +842,10 @@
 		<priority value="INFO" />
 	</category>
 
+	<category name="com.liferay.portal.util.JarUtil">
+		<priority value="INFO" />
+	</category>
+
 	<category name="com.liferay.portal.util.MaintenanceUtil">
 		<priority value="DEBUG" />
 	</category>
@@ -690,19 +862,15 @@
 		<priority value="INFO" />
 	</category>
 
+	<category name="com.liferay.portal.util.PropsUtil">
+		<priority value="INFO" />
+	</category>
+
 	<category name="com.liferay.portal.velocity">
 		<priority value="ERROR" />
 	</category>
 
-	<category name="com.liferay.portal.velocity.ClassLoaderVelocityResourceListener">
-		<priority value="ERROR" />
-	</category>
-
 	<category name="com.liferay.portal.velocity.LiferayResourceLoader">
-		<priority value="ERROR" />
-	</category>
-
-	<category name="com.liferay.portal.velocity.ServletVelocityResourceListener">
 		<priority value="ERROR" />
 	</category>
 
@@ -712,6 +880,10 @@
 
 	<category name="com.liferay.portal.verify.VerifyUser">
 		<priority value="INFO" />
+	</category>
+
+	<category name="com.liferay.portal.webserver.WebServerServlet">
+		<priority value="ERROR" />
 	</category>
 
 	<category name="com.liferay.portal.webdav">
@@ -766,8 +938,20 @@
 		<priority value="WARN" />
 	</category>
 
-	<category name="com.liferay.portlet.documentlibrary.util.DocumentConversionUtil">
+	<category name="com.liferay.portlet.documentlibrary.sharepoint">
 		<priority value="WARN" />
+	</category>
+
+	<category name="com.liferay.portlet.documentlibrary.store.StoreFactory">
+		<priority value="WARN" />
+	</category>
+
+	<category name="com.liferay.portlet.documentlibrary.util">
+		<priority value="WARN" />
+	</category>
+
+	<category name="com.liferay.portlet.documentlibrary.util.DLIndexer">
+		<priority value="ERROR" />
 	</category>
 
 	<category name="com.liferay.portlet.documentlibrary.webdav">
@@ -858,6 +1042,10 @@
 		<priority value="WARN" />
 	</category>
 
+	<category name="com.liferay.resourcesimporter">
+		<priority value="INFO" />
+	</category>
+
 	<category name="com.liferay.samplestruts">
 		<priority value="INFO" />
 	</category>
@@ -868,6 +1056,10 @@
 
 	<category name="com.liferay.testhook">
 		<priority value="INFO" />
+	</category>
+
+	<category name="com.liferay.util.Encryptor">
+		<priority value="WARN" />
 	</category>
 
 	<category name="com.liferay.util.JNDIUtil">
@@ -888,14 +1080,6 @@
 
 	<category name="com.liferay.util.portlet.PortletRequestUtil">
 		<priority value="INFO" />
-	</category>
-
-	<category name="com.liferay.util.servlet.ServletRequestUtil">
-		<priority value="INFO" />
-	</category>
-
-	<category name="com.liferay.util.servlet.ServletResponseUtil">
-		<priority value="ERROR" />
 	</category>
 
 	<category name="com.mchange">
@@ -1034,6 +1218,10 @@
 		<priority value="ERROR" />
 	</category>
 
+	<category name="org.jamwiki.Environment">
+		<priority value="ERROR" />
+	</category>
+
 	<category name="org.jgroups">
 		<priority value="ERROR" />
 	</category>
@@ -1056,6 +1244,10 @@
 
 	<category name="org.springframework">
 		<priority value="ERROR" />
+	</category>
+
+	<category name="org.springframework.aop.support.AopUtils">
+		<priority value="INFO" />
 	</category>
 
 	<category name="portal-web.docroot.errors.404.jsp">

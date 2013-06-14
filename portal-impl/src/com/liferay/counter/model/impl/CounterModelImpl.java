@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -19,6 +19,7 @@ import com.liferay.counter.model.CounterModel;
 
 import com.liferay.portal.kernel.bean.AutoEscapeBeanHandler;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.ProxyUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.model.CacheModel;
@@ -26,9 +27,10 @@ import com.liferay.portal.model.impl.BaseModelImpl;
 
 import java.io.Serializable;
 
-import java.lang.reflect.Proxy;
-
 import java.sql.Types;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * The base model implementation for the Counter service. Represents a row in the &quot;Counter&quot; database table, with each column mapped to a property of this class.
@@ -66,15 +68,7 @@ public class CounterModelImpl extends BaseModelImpl<Counter>
 	public static final boolean FINDER_CACHE_ENABLED = GetterUtil.getBoolean(com.liferay.portal.util.PropsUtil.get(
 				"value.object.finder.cache.enabled.com.liferay.counter.model.Counter"),
 			false);
-
-	public Class<?> getModelClass() {
-		return Counter.class;
-	}
-
-	public String getModelClassName() {
-		return Counter.class.getName();
-	}
-
+	public static final boolean COLUMN_BITMASK_ENABLED = false;
 	public static final long LOCK_EXPIRATION_TIME = GetterUtil.getLong(com.liferay.portal.util.PropsUtil.get(
 				"lock.expiration.time.com.liferay.counter.model.Counter"));
 
@@ -95,6 +89,39 @@ public class CounterModelImpl extends BaseModelImpl<Counter>
 
 	public void setPrimaryKeyObj(Serializable primaryKeyObj) {
 		setPrimaryKey((String)primaryKeyObj);
+	}
+
+	public Class<?> getModelClass() {
+		return Counter.class;
+	}
+
+	public String getModelClassName() {
+		return Counter.class.getName();
+	}
+
+	@Override
+	public Map<String, Object> getModelAttributes() {
+		Map<String, Object> attributes = new HashMap<String, Object>();
+
+		attributes.put("name", getName());
+		attributes.put("currentId", getCurrentId());
+
+		return attributes;
+	}
+
+	@Override
+	public void setModelAttributes(Map<String, Object> attributes) {
+		String name = (String)attributes.get("name");
+
+		if (name != null) {
+			setName(name);
+		}
+
+		Long currentId = (Long)attributes.get("currentId");
+
+		if (currentId != null) {
+			setCurrentId(currentId);
+		}
 	}
 
 	public String getName() {
@@ -120,18 +147,13 @@ public class CounterModelImpl extends BaseModelImpl<Counter>
 
 	@Override
 	public Counter toEscapedModel() {
-		if (isEscapedModel()) {
-			return (Counter)this;
+		if (_escapedModelProxy == null) {
+			_escapedModelProxy = (Counter)ProxyUtil.newProxyInstance(_classLoader,
+					_escapedModelProxyInterfaces,
+					new AutoEscapeBeanHandler(this));
 		}
-		else {
-			if (_escapedModelProxy == null) {
-				_escapedModelProxy = (Counter)Proxy.newProxyInstance(_classLoader,
-						_escapedModelProxyInterfaces,
-						new AutoEscapeBeanHandler(this));
-			}
 
-			return _escapedModelProxy;
-		}
+		return _escapedModelProxy;
 	}
 
 	@Override

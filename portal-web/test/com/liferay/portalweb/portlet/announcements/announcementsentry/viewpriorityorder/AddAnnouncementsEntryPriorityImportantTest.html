@@ -49,9 +49,64 @@
 	<td>http://www.liferay.com</td>
 </tr>
 <tr>
+	<td>waitForElementPresent</td>
+	<td>//textarea[@id='_84_editor' and @style='display: none;']</td>
+	<td>Text Area</td>
+</tr>
+<tr>
+	<td>assertText</td>
+	<td>//span[.='Source']</td>
+	<td>Source</td>
+</tr>
+<tr>
+	<td>clickAt</td>
+	<td>//span[.='Source']</td>
+	<td>Source</td>
+</tr>
+<tr>
+	<td>waitForVisible</td>
+	<td>//td[@id='cke_contents__84_editor']/textarea</td>
+	<td>CK Editor</td>
+</tr>
+<tr>
 	<td>type</td>
-	<td>//textarea[@id='_84_content']</td>
+	<td>//td[@id='cke_contents__84_editor']/textarea</td>
 	<td>Announcements Entry Content Priority Important</td>
+</tr>
+<tr>
+	<td>assertText</td>
+	<td>//span[.='Source']</td>
+	<td>Source</td>
+</tr>
+<tr>
+	<td>clickAt</td>
+	<td>//span[.='Source']</td>
+	<td>Source</td>
+</tr>
+<tr>
+	<td>waitForElementPresent</td>
+	<td>//textarea[@id='_84_editor' and @style='display: none;']</td>
+	<td>Text Area</td>
+</tr>
+<tr>
+	<td>waitForVisible</td>
+	<td>//td[@id='cke_contents__84_editor']/iframe</td>
+	<td>CK Editor</td>
+</tr>
+<tr>
+	<td>selectFrame</td>
+	<td>//td[@id='cke_contents__84_editor']/iframe</td>
+	<td>CK Editor</td>
+</tr>
+<tr>
+	<td>waitForText</td>
+	<td>//body</td>
+	<td>Announcements Entry Content Priority Important</td>
+</tr>
+<tr>
+	<td>selectFrame</td>
+	<td>relative=top</td>
+	<td>top</td>
 </tr>
 <tr>
 	<td>select</td>
@@ -59,9 +114,9 @@
 	<td>Important</td>
 </tr>
 <tr>
-	<td>keyPress</td>
-	<td>//select[@id='_84_expirationDateYear']</td>
-	<td>\34</td>
+	<td>assertSelectedLabel</td>
+	<td>//select[@id='_84_priority']</td>
+	<td>Important</td>
 </tr>
 <tr>
 	<td>clickAtAndWait</td>
@@ -84,17 +139,42 @@
 	<td>Announcements Entry Title Priority Important</td>
 </tr>
 <tr>
-	<td>assertVisible</td>
+	<td>assertValue</td>
 	<td>//input[@id='_84_title']</td>
 	<td>Announcements Entry Title Priority Important</td>
 </tr>
 <tr>
-	<td>assertVisible</td>
-	<td>//textarea[@id='_84_content']</td>
+	<td>waitForElementPresent</td>
+	<td>//textarea[@id='_84_editor' and @style='display: none;']</td>
+	<td>Text Area</td>
+</tr>
+<tr>
+	<td>waitForVisible</td>
+	<td>//td[@id='cke_contents__84_editor']/iframe</td>
+	<td>CK Editor</td>
+</tr>
+<tr>
+	<td>selectFrame</td>
+	<td>//td[@id='cke_contents__84_editor']/iframe</td>
+	<td>CK Editor</td>
+</tr>
+<tr>
+	<td>waitForText</td>
+	<td>//body</td>
 	<td>Announcements Entry Content Priority Important</td>
 </tr>
 <tr>
-	<td>assertVisible</td>
+	<td>assertText</td>
+	<td>//body</td>
+	<td>Announcements Entry Content Priority Important</td>
+</tr>
+<tr>
+	<td>selectFrame</td>
+	<td>relative=top</td>
+	<td>top</td>
+</tr>
+<tr>
+	<td>assertSelectedLabel</td>
 	<td>//select[@id='_84_priority']</td>
 	<td>Important</td>
 </tr>
@@ -120,10 +200,14 @@
 </tr>
 <tr>
 	<td>assertText</td>
-	<td>//p[@class=' entry-content entry-type-general']</td>
-	<td>General Announcements Entry Content Priority Important</td>
+	<td>//span[@class='entry-scope']</td>
+	<td>General</td>
 </tr>
-
+<tr>
+	<td>assertText</td>
+	<td>//div[@class=' entry-content entry-type-general']/p</td>
+	<td>Announcements Entry Content Priority Important</td>
+</tr>
 </tbody></table>
 </body>
 </html>

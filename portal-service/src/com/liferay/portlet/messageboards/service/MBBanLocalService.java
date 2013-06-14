@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -19,6 +19,7 @@ import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.transaction.Isolation;
 import com.liferay.portal.kernel.transaction.Propagation;
 import com.liferay.portal.kernel.transaction.Transactional;
+import com.liferay.portal.service.BaseLocalService;
 import com.liferay.portal.service.PersistedModelLocalService;
 
 /**
@@ -36,7 +37,8 @@ import com.liferay.portal.service.PersistedModelLocalService;
  */
 @Transactional(isolation = Isolation.PORTAL, rollbackFor =  {
 	PortalException.class, SystemException.class})
-public interface MBBanLocalService extends PersistedModelLocalService {
+public interface MBBanLocalService extends BaseLocalService,
+	PersistedModelLocalService {
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
@@ -66,10 +68,11 @@ public interface MBBanLocalService extends PersistedModelLocalService {
 	* Deletes the message boards ban with the primary key from the database. Also notifies the appropriate model listeners.
 	*
 	* @param banId the primary key of the message boards ban
+	* @return the message boards ban that was removed
 	* @throws PortalException if a message boards ban with the primary key could not be found
 	* @throws SystemException if a system exception occurred
 	*/
-	public void deleteMBBan(long banId)
+	public com.liferay.portlet.messageboards.model.MBBan deleteMBBan(long banId)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException;
 
@@ -77,10 +80,14 @@ public interface MBBanLocalService extends PersistedModelLocalService {
 	* Deletes the message boards ban from the database. Also notifies the appropriate model listeners.
 	*
 	* @param mbBan the message boards ban
+	* @return the message boards ban that was removed
 	* @throws SystemException if a system exception occurred
 	*/
-	public void deleteMBBan(com.liferay.portlet.messageboards.model.MBBan mbBan)
+	public com.liferay.portlet.messageboards.model.MBBan deleteMBBan(
+		com.liferay.portlet.messageboards.model.MBBan mbBan)
 		throws com.liferay.portal.kernel.exception.SystemException;
+
+	public com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery();
 
 	/**
 	* Performs a dynamic query on the database and returns the matching rows.
@@ -142,6 +149,10 @@ public interface MBBanLocalService extends PersistedModelLocalService {
 	*/
 	public long dynamicQueryCount(
 		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery)
+		throws com.liferay.portal.kernel.exception.SystemException;
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public com.liferay.portlet.messageboards.model.MBBan fetchMBBan(long banId)
 		throws com.liferay.portal.kernel.exception.SystemException;
 
 	/**

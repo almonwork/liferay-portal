@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -22,6 +22,7 @@ import java.sql.Connection;
 import java.sql.SQLException;
 
 import java.util.List;
+import java.util.Set;
 
 import javax.naming.NamingException;
 
@@ -35,6 +36,13 @@ public interface DB {
 	public static final int POPULATED = 0;
 
 	public static final int SHARDED = 2;
+
+	public static final String[] TYPE_ALL = {
+		DB.TYPE_DB2, DB.TYPE_DERBY, DB.TYPE_FIREBIRD, DB.TYPE_HYPERSONIC,
+		DB.TYPE_INFORMIX, DB.TYPE_INGRES, DB.TYPE_INTERBASE, DB.TYPE_JDATASTORE,
+		DB.TYPE_MYSQL, DB.TYPE_ORACLE, DB.TYPE_POSTGRESQL, DB.TYPE_SAP,
+		DB.TYPE_SQLSERVER, DB.TYPE_SYBASE
+	};
 
 	public static final String TYPE_DB2 = "db2";
 
@@ -64,11 +72,9 @@ public interface DB {
 
 	public static final String TYPE_SYBASE = "sybase";
 
-	public static final String[] TYPE_ALL = {
-		TYPE_DB2, TYPE_DERBY, TYPE_FIREBIRD, TYPE_HYPERSONIC, TYPE_INFORMIX,
-		TYPE_INGRES, TYPE_INTERBASE, TYPE_JDATASTORE, TYPE_MYSQL, TYPE_ORACLE,
-		TYPE_POSTGRESQL, TYPE_SAP, TYPE_SQLSERVER, TYPE_SYBASE
-	};
+	void addIndexes(
+			Connection con, String indexesSQL, Set<String> validIndexNames)
+		throws IOException;
 
 	public void buildCreateFile(String sqlDir, String databaseName)
 		throws IOException;
@@ -82,7 +88,7 @@ public interface DB {
 	public void buildSQLFile(String sqlDir, String fileName)
 		throws IOException;
 
-	public List<Index> getIndexes() throws SQLException;
+	public List<Index> getIndexes(Connection con) throws SQLException;
 
 	public String getTemplateFalse();
 
@@ -91,6 +97,8 @@ public interface DB {
 	public String getType();
 
 	public long increment() throws SystemException;
+
+	public long increment(String name) throws SystemException;
 
 	public boolean isSupportsAlterColumnName();
 
@@ -106,15 +114,15 @@ public interface DB {
 
 	public boolean isSupportsUpdateWithInnerJoin();
 
-	public void runSQL(String sql) throws IOException, SQLException;
-
 	public void runSQL(Connection con, String sql)
 		throws IOException, SQLException;
 
-	public void runSQL(String[] sqls) throws IOException, SQLException;
-
 	public void runSQL(Connection con, String[] sqls)
 		throws IOException, SQLException;
+
+	public void runSQL(String sql) throws IOException, SQLException;
+
+	public void runSQL(String[] sqls) throws IOException, SQLException;
 
 	public void runSQLTemplate(String path)
 		throws IOException, NamingException, SQLException;
@@ -130,8 +138,8 @@ public interface DB {
 		boolean supportsStringCaseSensitiveQuery);
 
 	public void updateIndexes(
-			String tablesSQL, String indexesSQL, String indexesProperties,
-			boolean dropStaleIndexes)
+			Connection con, String tablesSQL, String indexesSQL,
+			String indexesProperties, boolean dropStaleIndexes)
 		throws IOException, SQLException;
 
 }

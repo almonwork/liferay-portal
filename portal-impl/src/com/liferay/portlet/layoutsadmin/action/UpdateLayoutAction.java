@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -23,35 +23,24 @@ import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.PropsKeys;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
-import com.liferay.portal.kernel.util.UnicodeProperties;
 import com.liferay.portal.kernel.util.Validator;
-import com.liferay.portal.model.Group;
 import com.liferay.portal.model.Layout;
 import com.liferay.portal.model.LayoutConstants;
 import com.liferay.portal.model.LayoutPrototype;
-import com.liferay.portal.model.LayoutSet;
-import com.liferay.portal.model.LayoutSetPrototype;
 import com.liferay.portal.security.permission.ActionKeys;
 import com.liferay.portal.security.permission.PermissionChecker;
-import com.liferay.portal.service.GroupLocalServiceUtil;
 import com.liferay.portal.service.LayoutLocalServiceUtil;
 import com.liferay.portal.service.LayoutPrototypeServiceUtil;
 import com.liferay.portal.service.LayoutServiceUtil;
-import com.liferay.portal.service.LayoutSetLocalServiceUtil;
-import com.liferay.portal.service.LayoutSetPrototypeLocalServiceUtil;
 import com.liferay.portal.service.ServiceContext;
 import com.liferay.portal.service.ServiceContextFactory;
-import com.liferay.portal.service.permission.GroupPermissionUtil;
 import com.liferay.portal.service.permission.LayoutPermissionUtil;
 import com.liferay.portal.struts.JSONAction;
 import com.liferay.portal.theme.ThemeDisplay;
 import com.liferay.portal.util.LayoutSettings;
 import com.liferay.portal.util.PortalUtil;
 import com.liferay.portal.util.WebKeys;
-import com.liferay.portlet.sites.action.ActionUtil;
 import com.liferay.portlet.sites.util.SitesUtil;
-
-import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -98,19 +87,11 @@ public class UpdateLayoutAction extends JSONAction {
 				groupId, privateLayout, parentLayoutId);
 		}
 
-		if (layout != null) {
-			if (!LayoutPermissionUtil.contains(
-					permissionChecker, layout, ActionKeys.UPDATE)) {
+		if ((layout != null) &&
+			!LayoutPermissionUtil.contains(
+				permissionChecker, layout, ActionKeys.UPDATE)) {
 
-				return null;
-			}
-		}
-		else {
-			if (!GroupPermissionUtil.contains(
-					permissionChecker, groupId, ActionKeys.MANAGE_LAYOUTS)) {
-
-				return null;
-			}
+			return null;
 		}
 
 		String cmd = ParamUtil.getString(request, Constants.CMD);
@@ -120,7 +101,9 @@ public class UpdateLayoutAction extends JSONAction {
 		if (cmd.equals("add")) {
 			String[] array = addPage(themeDisplay, request, response);
 
+			jsonObj.put("deletable", Boolean.valueOf(array[2]));
 			jsonObj.put("layoutId", array[0]);
+			jsonObj.put("updateable", Boolean.valueOf(array[3]));
 			jsonObj.put("url", array[1]);
 		}
 		else if (cmd.equals("delete")) {
@@ -160,7 +143,6 @@ public class UpdateLayoutAction extends JSONAction {
 		String type = LayoutConstants.TYPE_PORTLET;
 		boolean hidden = false;
 		String friendlyURL = StringPool.BLANK;
-		boolean locked = ParamUtil.getBoolean(request, "locked");
 		long layoutPrototypeId = ParamUtil.getLong(
 			request, "layoutPrototypeId");
 
@@ -174,61 +156,19 @@ public class UpdateLayoutAction extends JSONAction {
 				LayoutPrototypeServiceUtil.getLayoutPrototype(
 					layoutPrototypeId);
 
-			Layout layoutPrototypeLayout = layoutPrototype.getLayout();
+			serviceContext.setAttribute("layoutPrototypeLinkEnabled", true);
+			serviceContext.setAttribute(
+				"layoutPrototypeUuid", layoutPrototype.getUuid());
 
 			layout = LayoutServiceUtil.addLayout(
 				groupId, privateLayout, parentLayoutId, name, title,
-				description, layoutPrototypeLayout.getType(),
-				false, friendlyURL, locked, serviceContext);
-
-			LayoutServiceUtil.updateLayout(
-				layout.getGroupId(), layout.isPrivateLayout(),
-				layout.getLayoutId(), layoutPrototypeLayout.getTypeSettings());
-
-			ActionUtil.copyPortletPermissions(
-				request, layout, layoutPrototypeLayout);
-
-			ActionUtil.copyPreferences(request, layout, layoutPrototypeLayout);
+				description, LayoutConstants.TYPE_PORTLET, false, friendlyURL,
+				serviceContext);
 		}
 		else {
 			layout = LayoutServiceUtil.addLayout(
 				groupId, privateLayout, parentLayoutId, name, title,
-				description, type, hidden, friendlyURL, false, serviceContext);
-
-			Group group = GroupLocalServiceUtil.getGroup(groupId);
-
-			if (group.isLayoutSetPrototype()) {
-				LayoutSetPrototype layoutSetPrototype =
-					LayoutSetPrototypeLocalServiceUtil.getLayoutSetPrototype(
-						group.getClassPK());
-
-				List<LayoutSet> layoutSets = LayoutSetLocalServiceUtil.
-					getLayoutSetsByLayoutSetPrototypeUuid(
-						layoutSetPrototype.getUuid());
-
-				serviceContext.setUuid(layout.getUuid());
-
-				for (LayoutSet layoutSet : layoutSets) {
-					Layout addedLayout = LayoutServiceUtil.addLayout(
-						layoutSet.getGroupId(), layoutSet.isPrivateLayout(),
-						parentLayoutId, name, title, description, type, hidden,
-						friendlyURL, locked, serviceContext);
-
-					addedLayout.setModifiedDate(layout.getModifiedDate());
-
-					UnicodeProperties typeSettingsProperties =
-						addedLayout.getTypeSettingsProperties();
-
-					typeSettingsProperties.put(
-						"layoutSetPrototypeLastCopyDate",
-						String.valueOf(layout.getModifiedDate().getTime()));
-
-					addedLayout.setTypeSettingsProperties(
-						typeSettingsProperties);
-
-					LayoutLocalServiceUtil.updateLayout(addedLayout);
-				}
-			}
+				description, type, hidden, friendlyURL, serviceContext);
 		}
 
 		LayoutSettings layoutSettings = LayoutSettings.getInstance(layout);
@@ -250,7 +190,16 @@ public class UpdateLayoutAction extends JSONAction {
 				themeDisplay.getDoAsUserLanguageId());
 		}
 
-		return new String[] {String.valueOf(layout.getLayoutId()), layoutURL};
+		boolean updateable = SitesUtil.isLayoutUpdateable(layout);
+		boolean deleteable =
+			updateable &&
+			LayoutPermissionUtil.contains(
+				themeDisplay.getPermissionChecker(), layout, ActionKeys.DELETE);
+
+		return new String[] {
+			String.valueOf(layout.getLayoutId()), layoutURL,
+			String.valueOf(deleteable), String.valueOf(updateable)
+		};
 	}
 
 	protected void updateDisplayOrder(HttpServletRequest request)

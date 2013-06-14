@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -78,7 +78,7 @@ public class TunnelUtil {
 			String ioeMessage = ioe.getMessage();
 
 			if ((ioeMessage != null) &&
-					(ioeMessage.indexOf("HTTP response code: 401") != -1)) {
+				(ioeMessage.indexOf("HTTP response code: 401") != -1)) {
 
 				throw new PrincipalException(ioeMessage);
 			}
@@ -128,7 +128,7 @@ public class TunnelUtil {
 			String ioeMessage = ioe.getMessage();
 
 			if ((ioeMessage != null) &&
-					(ioeMessage.indexOf("HTTP response code: 401") != -1)) {
+				(ioeMessage.indexOf("HTTP response code: 401") != -1)) {
 
 				throw new PrincipalException(ioeMessage);
 			}
@@ -147,7 +147,7 @@ public class TunnelUtil {
 	private static HttpURLConnection _getConnection(HttpPrincipal httpPrincipal)
 		throws IOException {
 
-		if (httpPrincipal == null || httpPrincipal.getUrl() == null) {
+		if ((httpPrincipal == null) || (httpPrincipal.getUrl() == null)) {
 			return null;
 		}
 
@@ -156,11 +156,10 @@ public class TunnelUtil {
 		if (Validator.isNull(httpPrincipal.getLogin()) ||
 			Validator.isNull(httpPrincipal.getPassword())) {
 
-			url = new URL(httpPrincipal.getUrl() + "/tunnel-web/liferay/do");
+			url = new URL(httpPrincipal.getUrl() + "/api/liferay/do");
 		}
 		else {
-			url = new URL(
-				httpPrincipal.getUrl() + "/tunnel-web/secure/liferay/do");
+			url = new URL(httpPrincipal.getUrl() + "/api/secure/liferay/do");
 		}
 
 		HttpURLConnection httpURLConnection =
@@ -209,8 +208,7 @@ public class TunnelUtil {
 		return httpURLConnection;
 	}
 
-	private static final boolean _VERIFY_SSL_HOSTNAME =
-		GetterUtil.getBoolean(
-			PropsUtil.get(TunnelUtil.class.getName() + ".verify.ssl.hostname"));
+	private static final boolean _VERIFY_SSL_HOSTNAME = GetterUtil.getBoolean(
+		PropsUtil.get(TunnelUtil.class.getName() + ".verify.ssl.hostname"));
 
 }

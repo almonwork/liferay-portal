@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -58,38 +58,24 @@ public class DBLoader {
 				if (line.endsWith(";")) {
 					String sql = sb.toString();
 
-					sql =
-						StringUtil.replace(
-							sql,
-							new String[] {
-								"\\\"",
-								"\\\\",
-								"\\n",
-								"\\r"
-							},
-							new String[] {
-								"\"",
-								"\\",
-								"\\u000a",
-								"\\u000a"
-							});
+					sql = StringUtil.replace(
+						sql, new String[] {"\\\"", "\\\\", "\\n", "\\r"},
+						new String[] {"\"", "\\", "\\u000a", "\\u000a"});
 
 					sb.setIndex(0);
 
-					PreparedStatement ps = null;
-
 					try {
-						ps = con.prepareStatement(sql);
+						PreparedStatement ps = con.prepareStatement(sql);
+
+						ps.executeUpdate();
+
+						ps.close();
 					}
 					catch (Exception e) {
 						System.out.println(sql);
 
 						throw e;
 					}
-
-					ps.executeUpdate();
-
-					ps.close();
 				}
 			}
 		}
@@ -162,9 +148,7 @@ public class DBLoader {
 		}
 	}
 
-	private void _loadDerby(Connection con, String fileName)
-		throws Exception {
-
+	private void _loadDerby(Connection con, String fileName) throws Exception {
 		StringBundler sb = new StringBundler();
 
 		UnsyncBufferedReader unsyncBufferedReader = new UnsyncBufferedReader(
@@ -179,23 +163,9 @@ public class DBLoader {
 				if (line.endsWith(";")) {
 					String sql = sb.toString();
 
-					sql =
-						StringUtil.replace(
-							sql,
-							new String[] {
-								"\\'",
-								"\\\"",
-								"\\\\",
-								"\\n",
-								"\\r"
-							},
-							new String[] {
-								"''",
-								"\"",
-								"\\",
-								"\n",
-								"\r"
-							});
+					sql = StringUtil.replace(
+						sql, new String[] {"\\'", "\\\"", "\\\\", "\\n", "\\r"},
+						new String[] {"''", "\"", "\\", "\n", "\r"});
 
 					sql = sql.substring(0, sql.length() - 1);
 

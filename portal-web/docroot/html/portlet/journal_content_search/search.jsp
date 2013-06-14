@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -33,6 +33,9 @@
 
 		<portlet:renderURL var="searchURL">
 			<portlet:param name="struts_action" value="/journal_content_search/search" />
+			<portlet:param name="showListed" value="<%= String.valueOf(showListed) %>" />
+			<portlet:param name="targetPortletId" value="<%= targetPortletId %>" />
+			<portlet:param name="type" value="<%= type %>" />
 		</portlet:renderURL>
 
 		<aui:form action="<%= searchURL %>" method="post" name="fm">
@@ -48,7 +51,6 @@
 			headerNames.add("#");
 			headerNames.add("name");
 			headerNames.add("content");
-			headerNames.add("score");
 
 			SearchContainer searchContainer = new SearchContainer(renderRequest, null, null, SearchContainer.DEFAULT_CUR_PARAM, SearchContainer.DEFAULT_DELTA, portletURL, headerNames, LanguageUtil.format(pageContext, "no-pages-were-found-that-matched-the-keywords-x", "<strong>" + HtmlUtil.escape(keywords) + "</strong>"));
 
@@ -80,7 +82,7 @@
 				for (int i = 0; i < results.getDocs().length; i++) {
 					Document doc = results.doc(i);
 
-					String snippet = doc.get(Field.CONTENT);
+					String snippet = doc.get(locale, Field.CONTENT);
 
 					ResultRow row = new ResultRow(new Object[] {queryTerms, doc, snippet}, i, i);
 
@@ -90,7 +92,7 @@
 
 					// Title
 
-					String title = doc.get(Field.TITLE);
+					String title = HtmlUtil.escape(doc.get(locale, Field.TITLE));
 
 					title = StringUtil.highlight(title, queryTerms);
 
@@ -99,10 +101,6 @@
 					// Content
 
 					row.addJSP("/html/portlet/journal_content_search/article_content.jsp");
-
-					// Score
-
-					row.addScore(results.score(i));
 
 					// Add result row
 
@@ -115,12 +113,12 @@
 			String taglibOnFocus = "if (this.value == '" + unicodeDefaultKeywords + "') { this.value = ''; }";
 			%>
 
-			<aui:input cssClass="lfr-search-keywords" inlineField="<%= true %>" label="" name="keywords" size="30" onBlur="<%= taglibOnBlur %>" onFocus="<%= taglibOnFocus %>" title="search-web-content" type="text" value="<%= HtmlUtil.escape(keywords) %>" />
+			<aui:input cssClass="lfr-search-keywords" inlineField="<%= true %>" label="" name="keywords" onBlur="<%= taglibOnBlur %>" onFocus="<%= taglibOnFocus %>" size="30" title="search-web-content" type="text" value="<%= HtmlUtil.escape(keywords) %>" />
 
 			<aui:input align="absmiddle" alt='<%= LanguageUtil.get(pageContext, "search") %>' border="0" cssClass="lfr-search-button" inlineField="<%= true %>" label="" name="search" src='<%= themeDisplay.getPathThemeImages() + "/common/search.png" %>' title="search" type="image" />
 
 			<div class="search-results">
-				<liferay-ui:search-speed searchContainer="<%= searchContainer %>" hits="<%= results %>" />
+				<liferay-ui:search-speed hits="<%= results %>" searchContainer="<%= searchContainer %>" />
 
 				<liferay-ui:search-iterator searchContainer="<%= searchContainer %>" />
 			</div>

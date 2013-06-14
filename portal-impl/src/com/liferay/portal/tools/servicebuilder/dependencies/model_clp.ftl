@@ -20,6 +20,7 @@ import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
+import com.liferay.portal.model.BaseModel;
 import com.liferay.portal.model.impl.BaseModelImpl;
 import com.liferay.portal.util.PortalUtil;
 
@@ -30,6 +31,7 @@ import java.lang.reflect.Proxy;
 import java.sql.Blob;
 
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 
@@ -122,6 +124,42 @@ public class ${entity.name}Clp extends BaseModelImpl<${entity.name}> implements 
 		);
 	}
 
+	@Override
+	public Map<String, Object> getModelAttributes() {
+		Map<String, Object> attributes = new HashMap<String, Object>();
+
+		<#list entity.regularColList as column>
+			attributes.put("${column.name}", get${column.methodName}());
+		</#list>
+
+		return attributes;
+	}
+
+	@Override
+	public void setModelAttributes(Map<String, Object> attributes) {
+		<#list entity.regularColList as column>
+			<#if column.isPrimitiveType()>
+				${serviceBuilder.getPrimitiveObj(column.type)}
+			<#else>
+				${column.type}
+			</#if>
+
+			${column.name} =
+
+			<#if column.isPrimitiveType()>
+				(${serviceBuilder.getPrimitiveObj(column.type)})
+			<#else>
+				(${column.type})
+			</#if>
+
+			attributes.get("${column.name}");
+
+			if (${column.name} != null) {
+				set${column.methodName}(${column.name});
+			}
+		</#list>
+	}
+
 	<#list entity.regularColList as column>
 		<#if column.name == "classNameId">
 			public String getClassName() {
@@ -130,6 +168,16 @@ public class ${entity.name}Clp extends BaseModelImpl<${entity.name}> implements 
 				}
 
 				return PortalUtil.getClassName(getClassNameId());
+			}
+
+			public void setClassName(String className) {
+				long classNameId = 0;
+
+				if (Validator.isNotNull(className)) {
+					classNameId = PortalUtil.getClassNameId(className);
+				}
+
+				setClassNameId(classNameId);
 			}
 		</#if>
 
@@ -151,25 +199,21 @@ public class ${entity.name}Clp extends BaseModelImpl<${entity.name}> implements 
 			}
 
 			public String get${column.methodName}(String languageId) {
-				String value = LocalizationUtil.getLocalization(get${column.methodName}(), languageId);
-
-				if (isEscapedModel()) {
-					return HtmlUtil.escape(value);
-				}
-				else {
-					return value;
-				}
+				return LocalizationUtil.getLocalization(get${column.methodName}(), languageId);
 			}
 
 			public String get${column.methodName}(String languageId, boolean useDefault) {
-				String value = LocalizationUtil.getLocalization(get${column.methodName}(), languageId, useDefault);
+				return LocalizationUtil.getLocalization(get${column.methodName}(), languageId, useDefault);
+			}
 
-				if (isEscapedModel()) {
-					return HtmlUtil.escape(value);
-				}
-				else {
-					return value;
-				}
+			public String get${column.methodName}CurrentLanguageId() {
+				return _${column.name}CurrentLanguageId;
+			}
+
+			public String get${column.methodName}CurrentValue() {
+				Locale locale = getLocale(_${column.name}CurrentLanguageId);
+
+				return get${column.methodName}(locale);
 			}
 
 			public Map<Locale, String> get${column.methodName}Map() {
@@ -204,6 +248,10 @@ public class ${entity.name}Clp extends BaseModelImpl<${entity.name}> implements 
 				}
 			}
 
+			public void set${column.methodName}CurrentLanguageId(String languageId) {
+				_${column.name}CurrentLanguageId = languageId;
+			}
+
 			public void set${column.methodName}Map(Map<Locale, String> ${column.name}Map) {
 				set${column.methodName}Map(${column.name}Map, LocaleUtil.getDefault());
 			}
@@ -224,13 +272,7 @@ public class ${entity.name}Clp extends BaseModelImpl<${entity.name}> implements 
 						currentThread.setContextClassLoader(portalClassLoader);
 					}
 
-					Locale[] locales = LanguageUtil.getAvailableLocales();
-
-					for (Locale locale : locales) {
-						String ${column.name} = ${column.name}Map.get(locale);
-
-						set${column.methodName}(${column.name}, locale, defaultLocale);
-					}
+					set${column.methodName}(LocalizationUtil.updateLocalization(${column.name}Map, get${column.methodName}(), "${column.methodName}", LocaleUtil.toLanguageId(defaultLocale)));
 				}
 				finally {
 					if (contextClassLoader != portalClassLoader) {
@@ -330,6 +372,15 @@ public class ${entity.name}Clp extends BaseModelImpl<${entity.name}> implements 
 			}
 		}
 
+		public boolean isInTrash() {
+			if (getStatus() == WorkflowConstants.STATUS_IN_TRASH) {
+				return true;
+			}
+			else {
+				return false;
+			}
+		}
+
 		public boolean isPending() {
 			if (getStatus() == WorkflowConstants.STATUS_PENDING) {
 				return true;
@@ -340,20 +391,28 @@ public class ${entity.name}Clp extends BaseModelImpl<${entity.name}> implements 
 		}
 	</#if>
 
+	public BaseModel<?> get${entity.name}RemoteModel() {
+		return _${entity.varName}RemoteModel;
+	}
+
+	public void set${entity.name}RemoteModel(BaseModel<?> ${entity.varName}RemoteModel) {
+		_${entity.varName}RemoteModel = ${entity.varName}RemoteModel;
+	}
+
 	<#if entity.hasLocalService() && entity.hasColumns()>
 		public void persist() throws SystemException {
-			${entity.name}LocalServiceUtil.update${entity.name}(this);
+			if (this.isNew()) {
+				${entity.name}LocalServiceUtil.add${entity.name}(this);
+			}
+			else {
+				${entity.name}LocalServiceUtil.update${entity.name}(this);
+			}
 		}
 	</#if>
 
 	@Override
 	public ${entity.name} toEscapedModel() {
-		if (isEscapedModel()) {
-			return this;
-		}
-		else {
-			return (${entity.name})Proxy.newProxyInstance(${entity.name}.class.getClassLoader(), new Class[] {${entity.name}.class}, new AutoEscapeBeanHandler(this));
-		}
+		return (${entity.name})Proxy.newProxyInstance(${entity.name}.class.getClassLoader(), new Class[] {${entity.name}.class}, new AutoEscapeBeanHandler(this));
 	}
 
 	@Override
@@ -524,6 +583,10 @@ public class ${entity.name}Clp extends BaseModelImpl<${entity.name}> implements 
 	<#list entity.regularColList as column>
 		private ${column.type} _${column.name};
 
+		<#if column.localized>
+			private String _${column.name}CurrentLanguageId;
+		</#if>
+
 		<#if (column.name == "resourcePrimKey") && entity.isResourcedModel()>
 			private boolean _resourceMain;
 		</#if>
@@ -532,5 +595,7 @@ public class ${entity.name}Clp extends BaseModelImpl<${entity.name}> implements 
 			private String _${column.userUuidName};
 		</#if>
 	</#list>
+
+	private BaseModel<?> _${entity.varName}RemoteModel;
 
 }

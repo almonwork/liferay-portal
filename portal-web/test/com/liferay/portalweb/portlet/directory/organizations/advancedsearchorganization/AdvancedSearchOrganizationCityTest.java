@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -28,9 +28,10 @@ public class AdvancedSearchOrganizationCityTest extends BaseTestCase {
 			switch (label) {
 			case 1:
 				selenium.open("/web/guest/home/");
+				loadRequiredJavaScriptModules();
 
 				for (int second = 0;; second++) {
-					if (second >= 60) {
+					if (second >= 90) {
 						fail("timeout");
 					}
 
@@ -45,15 +46,14 @@ public class AdvancedSearchOrganizationCityTest extends BaseTestCase {
 					Thread.sleep(1000);
 				}
 
-				selenium.saveScreenShotAndSource();
 				selenium.clickAt("link=Directory Test Page",
-					RuntimeVariables.replace(""));
+					RuntimeVariables.replace("Directory Test Page"));
 				selenium.waitForPageToLoad("30000");
-				selenium.saveScreenShotAndSource();
+				loadRequiredJavaScriptModules();
 				selenium.clickAt("link=Organizations",
-					RuntimeVariables.replace(""));
+					RuntimeVariables.replace("Organizations"));
 				selenium.waitForPageToLoad("30000");
-				selenium.saveScreenShotAndSource();
+				loadRequiredJavaScriptModules();
 
 				boolean advancedVisible = selenium.isVisible(
 						"link=Advanced \u00bb");
@@ -65,17 +65,18 @@ public class AdvancedSearchOrganizationCityTest extends BaseTestCase {
 				}
 
 				selenium.clickAt("link=Advanced \u00bb",
-					RuntimeVariables.replace(""));
+					RuntimeVariables.replace("Advanced \u00bb"));
 
 			case 2:
 
 				for (int second = 0;; second++) {
-					if (second >= 60) {
+					if (second >= 90) {
 						fail("timeout");
 					}
 
 					try {
-						if (selenium.isVisible("_11_andOperator")) {
+						if (selenium.isVisible(
+									"//select[@id='_11_andOperator']")) {
 							break;
 						}
 					}
@@ -85,32 +86,29 @@ public class AdvancedSearchOrganizationCityTest extends BaseTestCase {
 					Thread.sleep(1000);
 				}
 
-				selenium.saveScreenShotAndSource();
-				selenium.select("_11_andOperator",
-					RuntimeVariables.replace("label=Any"));
-				selenium.type("_11_city",
+				selenium.select("//select[@id='_11_andOperator']",
+					RuntimeVariables.replace("Any"));
+				selenium.type("//input[@id='_11_city']",
 					RuntimeVariables.replace("Diamond Bar"));
-				selenium.saveScreenShotAndSource();
-				selenium.clickAt("//div[2]/span[2]/span/input",
+				selenium.clickAt("//input[@value='Search']",
 					RuntimeVariables.replace("Search"));
 				selenium.waitForPageToLoad("30000");
-				selenium.saveScreenShotAndSource();
-				selenium.type("_11_city", RuntimeVariables.replace(""));
-				selenium.saveScreenShotAndSource();
-				assertTrue(selenium.isElementPresent("link=Test Organization"));
-				selenium.type("_11_city",
-					RuntimeVariables.replace("Diamond1 Bar1"));
-				selenium.saveScreenShotAndSource();
-				selenium.clickAt("//div[2]/span[2]/span/input",
-					RuntimeVariables.replace("Search"));
-				selenium.waitForPageToLoad("30000");
-				selenium.saveScreenShotAndSource();
-				selenium.type("_11_city", RuntimeVariables.replace(""));
-				selenium.saveScreenShotAndSource();
-				selenium.select("_11_andOperator",
-					RuntimeVariables.replace("label=All"));
-				selenium.clickAt("link=\u00ab Basic",
+				loadRequiredJavaScriptModules();
+				selenium.type("//input[@id='_11_city']",
 					RuntimeVariables.replace(""));
+				assertTrue(selenium.isVisible("link=Test Organization"));
+				selenium.type("//input[@id='_11_city']",
+					RuntimeVariables.replace("Diamond1 Bar1"));
+				selenium.clickAt("//input[@value='Search']",
+					RuntimeVariables.replace("Search"));
+				selenium.waitForPageToLoad("30000");
+				loadRequiredJavaScriptModules();
+				selenium.type("//input[@id='_11_city']",
+					RuntimeVariables.replace(""));
+				selenium.select("//select[@id='_11_andOperator']",
+					RuntimeVariables.replace("All"));
+				selenium.clickAt("link=\u00ab Basic",
+					RuntimeVariables.replace("\u00ab Basic"));
 				assertFalse(selenium.isTextPresent("Test Organization"));
 
 			case 100:

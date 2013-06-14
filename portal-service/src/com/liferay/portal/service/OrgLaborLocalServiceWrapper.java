@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -23,7 +23,8 @@ package com.liferay.portal.service;
  * @see       OrgLaborLocalService
  * @generated
  */
-public class OrgLaborLocalServiceWrapper implements OrgLaborLocalService {
+public class OrgLaborLocalServiceWrapper implements OrgLaborLocalService,
+	ServiceWrapper<OrgLaborLocalService> {
 	public OrgLaborLocalServiceWrapper(
 		OrgLaborLocalService orgLaborLocalService) {
 		_orgLaborLocalService = orgLaborLocalService;
@@ -56,24 +57,31 @@ public class OrgLaborLocalServiceWrapper implements OrgLaborLocalService {
 	* Deletes the org labor with the primary key from the database. Also notifies the appropriate model listeners.
 	*
 	* @param orgLaborId the primary key of the org labor
+	* @return the org labor that was removed
 	* @throws PortalException if a org labor with the primary key could not be found
 	* @throws SystemException if a system exception occurred
 	*/
-	public void deleteOrgLabor(long orgLaborId)
+	public com.liferay.portal.model.OrgLabor deleteOrgLabor(long orgLaborId)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException {
-		_orgLaborLocalService.deleteOrgLabor(orgLaborId);
+		return _orgLaborLocalService.deleteOrgLabor(orgLaborId);
 	}
 
 	/**
 	* Deletes the org labor from the database. Also notifies the appropriate model listeners.
 	*
 	* @param orgLabor the org labor
+	* @return the org labor that was removed
 	* @throws SystemException if a system exception occurred
 	*/
-	public void deleteOrgLabor(com.liferay.portal.model.OrgLabor orgLabor)
+	public com.liferay.portal.model.OrgLabor deleteOrgLabor(
+		com.liferay.portal.model.OrgLabor orgLabor)
 		throws com.liferay.portal.kernel.exception.SystemException {
-		_orgLaborLocalService.deleteOrgLabor(orgLabor);
+		return _orgLaborLocalService.deleteOrgLabor(orgLabor);
+	}
+
+	public com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery() {
+		return _orgLaborLocalService.dynamicQuery();
 	}
 
 	/**
@@ -145,6 +153,11 @@ public class OrgLaborLocalServiceWrapper implements OrgLaborLocalService {
 		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery)
 		throws com.liferay.portal.kernel.exception.SystemException {
 		return _orgLaborLocalService.dynamicQueryCount(dynamicQuery);
+	}
+
+	public com.liferay.portal.model.OrgLabor fetchOrgLabor(long orgLaborId)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return _orgLaborLocalService.fetchOrgLabor(orgLaborId);
 	}
 
 	/**
@@ -270,12 +283,26 @@ public class OrgLaborLocalServiceWrapper implements OrgLaborLocalService {
 			wedClose, thuOpen, thuClose, friOpen, friClose, satOpen, satClose);
 	}
 
+	/**
+	 * @deprecated Renamed to {@link #getWrappedService}
+	 */
 	public OrgLaborLocalService getWrappedOrgLaborLocalService() {
 		return _orgLaborLocalService;
 	}
 
+	/**
+	 * @deprecated Renamed to {@link #setWrappedService}
+	 */
 	public void setWrappedOrgLaborLocalService(
 		OrgLaborLocalService orgLaborLocalService) {
+		_orgLaborLocalService = orgLaborLocalService;
+	}
+
+	public OrgLaborLocalService getWrappedService() {
+		return _orgLaborLocalService;
+	}
+
+	public void setWrappedService(OrgLaborLocalService orgLaborLocalService) {
 		_orgLaborLocalService = orgLaborLocalService;
 	}
 

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -16,13 +16,13 @@ package com.liferay.portlet.documentlibrary.store;
 
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
-import com.liferay.portal.service.ServiceContext;
 
 import java.io.File;
 import java.io.InputStream;
 
 /**
  * @author Brian Wing Shun Chan
+ * @author Edward Han
  */
 public class StoreWrapper implements Store {
 
@@ -37,86 +37,89 @@ public class StoreWrapper implements Store {
 	}
 
 	public void addFile(
-			long companyId, String portletId, long groupId, long repositoryId,
-			String fileName, ServiceContext serviceContext, byte[] bytes)
+			long companyId, long repositoryId, String fileName, byte[] bytes)
 		throws PortalException, SystemException {
 
-		_store.addFile(
-			companyId, portletId, groupId, repositoryId, fileName,
-			serviceContext, bytes);
+		_store.addFile(companyId, repositoryId, fileName, bytes);
 	}
 
 	public void addFile(
-			long companyId, String portletId, long groupId, long repositoryId,
-			String fileName, ServiceContext serviceContext, File file)
+			long companyId, long repositoryId, String fileName, File file)
 		throws PortalException, SystemException {
 
-		_store.addFile(
-			companyId, portletId, groupId, repositoryId, fileName,
-			serviceContext, file);
+		_store.addFile(companyId, repositoryId, fileName, file);
 	}
 
 	public void addFile(
-			long companyId, String portletId, long groupId, long repositoryId,
-			String fileName, ServiceContext serviceContext, InputStream is)
+			long companyId, long repositoryId, String fileName, InputStream is)
 		throws PortalException, SystemException {
 
-		_store.addFile(
-			companyId, portletId, groupId, repositoryId, fileName,
-			serviceContext, is);
+		_store.addFile(companyId, repositoryId, fileName, is);
 	}
 
 	public void checkRoot(long companyId) throws SystemException {
 		_store.checkRoot(companyId);
 	}
 
-	public void deleteDirectory(
-			long companyId, String portletId, long repositoryId, String dirName)
-		throws PortalException, SystemException {
-
-		_store.deleteDirectory(companyId, portletId, repositoryId, dirName);
-	}
-
 	public void copyFileVersion(
-			long companyId, String portletId, long groupId, long repositoryId,
-			String fileName, String fromVersionNumber, String toVersionNumber,
-			String sourceFileName, ServiceContext serviceContext)
+			long companyId, long repositoryId, String fileName,
+			String fromVersionLabel, String toVersionLabel)
 		throws PortalException, SystemException {
 
 		_store.copyFileVersion(
-			companyId, portletId, groupId, repositoryId, fileName,
-			fromVersionNumber, toVersionNumber, sourceFileName, serviceContext);
+			companyId, repositoryId, fileName, fromVersionLabel,
+			toVersionLabel);
+	}
+
+	public void deleteDirectory(
+			long companyId, long repositoryId, String dirName)
+		throws PortalException, SystemException {
+
+		_store.deleteDirectory(companyId, repositoryId, dirName);
+	}
+
+	public void deleteFile(long companyId, long repositoryId, String fileName)
+		throws PortalException, SystemException {
+
+		_store.deleteFile(companyId, repositoryId, fileName);
 	}
 
 	public void deleteFile(
-			long companyId, String portletId, long repositoryId,
-			String fileName)
+			long companyId, long repositoryId, String fileName,
+			String versionLabel)
 		throws PortalException, SystemException {
 
-		_store.deleteFile(companyId, portletId, repositoryId, fileName);
+		_store.deleteFile(companyId, repositoryId, fileName, versionLabel);
 	}
 
-	public void deleteFile(
-			long companyId, String portletId, long repositoryId,
-			String fileName, String versionNumber)
-		throws PortalException, SystemException {
-
-		_store.deleteFile(
-			companyId, portletId, repositoryId, fileName, versionNumber);
-	}
-
-	public byte[] getFile(long companyId, long repositoryId, String fileName)
+	public File getFile(long companyId, long repositoryId, String fileName)
 		throws PortalException, SystemException {
 
 		return _store.getFile(companyId, repositoryId, fileName);
 	}
 
-	public byte[] getFile(
+	public File getFile(
 			long companyId, long repositoryId, String fileName,
-			String versionNumber)
+			String versionLabel)
 		throws PortalException, SystemException {
 
-		return _store.getFile(companyId, repositoryId, fileName, versionNumber);
+		return _store.getFile(companyId, repositoryId, fileName, versionLabel);
+	}
+
+	public byte[] getFileAsBytes(
+			long companyId, long repositoryId, String fileName)
+		throws PortalException, SystemException {
+
+		return _store.getFileAsBytes(companyId, repositoryId, fileName);
+	}
+
+	public byte[] getFileAsBytes(
+			long companyId, long repositoryId, String fileName,
+			String versionLabel)
+		throws PortalException, SystemException {
+
+		return _store.getFileAsBytes(
+			companyId, repositoryId, fileName, versionLabel);
 	}
 
 	public InputStream getFileAsStream(
@@ -128,11 +131,11 @@ public class StoreWrapper implements Store {
 
 	public InputStream getFileAsStream(
 			long companyId, long repositoryId, String fileName,
-			String versionNumber)
+			String versionLabel)
 		throws PortalException, SystemException {
 
 		return _store.getFileAsStream(
-			companyId, repositoryId, fileName, versionNumber);
+			companyId, repositoryId, fileName, versionLabel);
 	}
 
 	public String[] getFileNames(long companyId, long repositoryId)
@@ -148,19 +151,31 @@ public class StoreWrapper implements Store {
 		return _store.getFileNames(companyId, repositoryId, dirName);
 	}
 
-	public long getFileSize(
-			long companyId, long repositoryId, String fileName)
+	public long getFileSize(long companyId, long repositoryId, String fileName)
 		throws PortalException, SystemException {
 
 		return _store.getFileSize(companyId, repositoryId, fileName);
 	}
 
-	public boolean hasFile(
-			long companyId, long repositoryId, String fileName,
-			String versionNumber)
+	public boolean hasDirectory(
+			long companyId, long repositoryId, String dirName)
 		throws PortalException, SystemException {
 
-		return _store.hasFile(companyId, repositoryId, fileName, versionNumber);
+		return _store.hasDirectory(companyId, repositoryId, dirName);
+	}
+
+	public boolean hasFile(long companyId, long repositoryId, String fileName)
+		throws PortalException, SystemException {
+
+		return _store.hasFile(companyId, repositoryId, fileName);
+	}
+
+	public boolean hasFile(
+			long companyId, long repositoryId, String fileName,
+			String versionLabel)
+		throws PortalException, SystemException {
+
+		return _store.hasFile(companyId, repositoryId, fileName, versionLabel);
 	}
 
 	public void move(String srcDir, String destDir) throws SystemException {
@@ -168,67 +183,55 @@ public class StoreWrapper implements Store {
 	}
 
 	public void updateFile(
-			long companyId, String portletId, long groupId, long repositoryId,
-			long newRepositoryId, String fileName)
+			long companyId, long repositoryId, long newRepositoryId,
+			String fileName)
 		throws PortalException, SystemException {
 
-		_store.updateFile(
-			companyId, portletId, groupId, repositoryId, newRepositoryId,
-			fileName);
+		_store.updateFile(companyId, repositoryId, newRepositoryId, fileName);
 	}
 
 	public void updateFile(
-			long companyId, String portletId, long groupId, long repositoryId,
-			String fileName, String newFileName)
+			long companyId, long repositoryId, String fileName,
+			String newFileName)
 		throws PortalException, SystemException {
 
-		_store.updateFile(
-			companyId, portletId, groupId, repositoryId, fileName,
-			newFileName);
+		_store.updateFile(companyId, repositoryId, fileName, newFileName);
 	}
 
 	public void updateFile(
-			long companyId, String portletId, long groupId, long repositoryId,
-			String fileName, String versionNumber, String sourceFileName,
-			ServiceContext serviceContext, byte[] bytes)
+			long companyId, long repositoryId, String fileName,
+			String versionLabel, byte[] bytes)
 		throws PortalException, SystemException {
 
 		_store.updateFile(
-			companyId, portletId, groupId, repositoryId, fileName,
-			versionNumber, sourceFileName, serviceContext, bytes);
+			companyId, repositoryId, fileName, versionLabel, bytes);
 	}
 
 	public void updateFile(
-			long companyId, String portletId, long groupId, long repositoryId,
-			String fileName, String versionNumber, String sourceFileName,
-			ServiceContext serviceContext, File file)
+			long companyId, long repositoryId, String fileName,
+			String versionLabel, File file)
 		throws PortalException, SystemException {
 
 		_store.updateFile(
-			companyId, portletId, groupId, repositoryId, fileName,
-			versionNumber, sourceFileName, serviceContext, file);
+			companyId, repositoryId, fileName, versionLabel, file);
 	}
 
 	public void updateFile(
-			long companyId, String portletId, long groupId, long repositoryId,
-			String fileName, String versionNumber, String sourceFileName,
-			ServiceContext serviceContext, InputStream is)
+			long companyId, long repositoryId, String fileName,
+			String versionLabel, InputStream is)
 		throws PortalException, SystemException {
 
-		_store.updateFile(
-			companyId, portletId, groupId, repositoryId, fileName,
-			versionNumber, sourceFileName, serviceContext, is);
+		_store.updateFile(companyId, repositoryId, fileName, versionLabel, is);
 	}
 
 	public void updateFileVersion(
-			long companyId, String portletId, long groupId, long repositoryId,
-			String fileName, String fromVersionNumber, String toVersionNumber,
-			String sourceFileName, ServiceContext serviceContext)
+			long companyId, long repositoryId, String fileName,
+			String fromVersionLabel, String toVersionLabel)
 		throws PortalException, SystemException {
 
 		_store.updateFileVersion(
-			companyId, portletId, groupId, repositoryId, fileName,
-			fromVersionNumber, toVersionNumber, sourceFileName, serviceContext);
+			companyId, repositoryId, fileName, fromVersionLabel,
+			toVersionLabel);
 	}
 
 	private Store _store;

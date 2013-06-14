@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -23,10 +23,11 @@ public class VerifyProcessSuite extends VerifyProcess {
 	protected void doVerify() throws Exception {
 		verify(new VerifyProperties());
 
+		verify(new VerifyDB2());
 		verify(new VerifyMySQL());
+		verify(new VerifyOracle());
 		verify(new VerifySQLServer());
 
-		verify(new VerifyCounter());
 		verify(new VerifyUUID());
 
 		verify(new VerifyPermission());
@@ -38,7 +39,6 @@ public class VerifyProcessSuite extends VerifyProcess {
 		verify(new VerifyCalendar());
 		verify(new VerifyDocumentLibrary());
 		verify(new VerifyGroup());
-		verify(new VerifyImageGallery());
 		verify(new VerifyJournal());
 		verify(new VerifyLayout());
 		verify(new VerifyMessageBoards());
@@ -52,12 +52,6 @@ public class VerifyProcessSuite extends VerifyProcess {
 		// trackback and verifies that the source URL is a valid URL.
 
 		//verify(new VerifyBlogsTrackbacks());
-
-		// VerifyImage is very powerful because it removes all images that it
-		// believes is stale. Do not run this unless you are also not managing
-		// images in Liferay's Image service for your custom models.
-
-		//verify(new VerifyImage());
 	}
 
 }

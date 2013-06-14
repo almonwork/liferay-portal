@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -92,14 +92,6 @@ public class MBDiscussionUtil {
 		return getPersistence()
 				   .findWithDynamicQuery(dynamicQuery, start, end,
 			orderByComparator);
-	}
-
-	/**
-	 * @see com.liferay.portal.service.persistence.BasePersistence#remove(com.liferay.portal.model.BaseModel)
-	 */
-	public static MBDiscussion remove(MBDiscussion mbDiscussion)
-		throws SystemException {
-		return getPersistence().remove(mbDiscussion);
 	}
 
 	/**
@@ -473,12 +465,14 @@ public class MBDiscussionUtil {
 	* Removes the message boards discussion where threadId = &#63; from the database.
 	*
 	* @param threadId the thread ID
+	* @return the message boards discussion that was removed
 	* @throws SystemException if a system exception occurred
 	*/
-	public static void removeByThreadId(long threadId)
+	public static com.liferay.portlet.messageboards.model.MBDiscussion removeByThreadId(
+		long threadId)
 		throws com.liferay.portal.kernel.exception.SystemException,
 			com.liferay.portlet.messageboards.NoSuchDiscussionException {
-		getPersistence().removeByThreadId(threadId);
+		return getPersistence().removeByThreadId(threadId);
 	}
 
 	/**
@@ -486,12 +480,14 @@ public class MBDiscussionUtil {
 	*
 	* @param classNameId the class name ID
 	* @param classPK the class p k
+	* @return the message boards discussion that was removed
 	* @throws SystemException if a system exception occurred
 	*/
-	public static void removeByC_C(long classNameId, long classPK)
+	public static com.liferay.portlet.messageboards.model.MBDiscussion removeByC_C(
+		long classNameId, long classPK)
 		throws com.liferay.portal.kernel.exception.SystemException,
 			com.liferay.portlet.messageboards.NoSuchDiscussionException {
-		getPersistence().removeByC_C(classNameId, classPK);
+		return getPersistence().removeByC_C(classNameId, classPK);
 	}
 
 	/**
@@ -563,11 +559,10 @@ public class MBDiscussionUtil {
 		return _persistence;
 	}
 
+	/**
+	 * @deprecated
+	 */
 	public void setPersistence(MBDiscussionPersistence persistence) {
-		_persistence = persistence;
-
-		ReferenceRegistry.registerReference(MBDiscussionUtil.class,
-			"_persistence");
 	}
 
 	private static MBDiscussionPersistence _persistence;

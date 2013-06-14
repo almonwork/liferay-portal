@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,7 +14,6 @@
 
 package com.liferay.portlet.dynamicdatalists.service.persistence;
 
-import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.service.persistence.BasePersistence;
 
 import com.liferay.portlet.dynamicdatalists.model.DDLRecordVersion;
@@ -417,9 +416,11 @@ public interface DDLRecordVersionPersistence extends BasePersistence<DDLRecordVe
 	*
 	* @param recordId the record ID
 	* @param version the version
+	* @return the d d l record version that was removed
 	* @throws SystemException if a system exception occurred
 	*/
-	public void removeByR_V(long recordId, java.lang.String version)
+	public com.liferay.portlet.dynamicdatalists.model.DDLRecordVersion removeByR_V(
+		long recordId, java.lang.String version)
 		throws com.liferay.portal.kernel.exception.SystemException,
 			com.liferay.portlet.dynamicdatalists.NoSuchRecordVersionException;
 
@@ -481,7 +482,4 @@ public interface DDLRecordVersionPersistence extends BasePersistence<DDLRecordVe
 	*/
 	public int countAll()
 		throws com.liferay.portal.kernel.exception.SystemException;
-
-	public DDLRecordVersion remove(DDLRecordVersion ddlRecordVersion)
-		throws SystemException;
 }

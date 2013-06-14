@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -15,6 +15,7 @@
 package com.liferay.portal.dao.orm.hibernate;
 
 import com.liferay.portal.kernel.dao.orm.CacheMode;
+import com.liferay.portal.kernel.dao.orm.LockMode;
 import com.liferay.portal.kernel.dao.orm.ORMException;
 import com.liferay.portal.kernel.dao.orm.Query;
 import com.liferay.portal.kernel.dao.orm.SQLQuery;
@@ -39,6 +40,7 @@ public class SQLQueryImpl implements SQLQuery {
 
 	public SQLQueryImpl(org.hibernate.SQLQuery sqlQuery, boolean strictName) {
 		_sqlQuery = sqlQuery;
+		_strictName = strictName;
 
 		if (!_strictName) {
 			_names = sqlQuery.getNamedParameters();
@@ -83,22 +85,38 @@ public class SQLQueryImpl implements SQLQuery {
 		}
 	}
 
-	@SuppressWarnings("rawtypes")
-	public List list() throws ORMException {
-		return list(true);
+	public Object iterateNext() throws ORMException {
+		Iterator<?> iterator = iterate(false);
+
+		if (iterator.hasNext()) {
+			return iterator.next();
+		}
+
+		return null;
 	}
 
-	@SuppressWarnings("rawtypes")
-	public List list(boolean unmodifiable) throws ORMException {
+	public List<?> list() throws ORMException {
+		return list(false, false);
+	}
+
+	public List<?> list(boolean unmodifiable) throws ORMException {
+		return list(true, unmodifiable);
+	}
+
+	public List<?> list(boolean copy, boolean unmodifiable)
+		throws ORMException {
+
 		try {
-			List list = _sqlQuery.list();
+			List<?> list = _sqlQuery.list();
 
 			if (unmodifiable) {
-				return new UnmodifiableList(list);
+				list = new UnmodifiableList<Object>(list);
 			}
-			else {
-				return ListUtil.copy(list);
+			else if (copy) {
+				list = ListUtil.copy(list);
 			}
+
+			return list;
 		}
 		catch (Exception e) {
 			throw ExceptionTranslator.translate(e);
@@ -198,6 +216,12 @@ public class SQLQueryImpl implements SQLQuery {
 		}
 
 		_sqlQuery.setInteger(name, value);
+
+		return this;
+	}
+
+	public Query setLockMode(String alias, LockMode lockMode) {
+		_sqlQuery.setLockMode(alias, LockModeTranslator.translate(lockMode));
 
 		return this;
 	}

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,6 +14,11 @@
 
 package com.liferay.portlet.asset.model;
 
+import com.liferay.portal.model.ModelWrapper;
+
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * <p>
  * This class is a wrapper for {@link AssetTagStats}.
@@ -23,7 +28,8 @@ package com.liferay.portlet.asset.model;
  * @see       AssetTagStats
  * @generated
  */
-public class AssetTagStatsWrapper implements AssetTagStats {
+public class AssetTagStatsWrapper implements AssetTagStats,
+	ModelWrapper<AssetTagStats> {
 	public AssetTagStatsWrapper(AssetTagStats assetTagStats) {
 		_assetTagStats = assetTagStats;
 	}
@@ -34,6 +40,43 @@ public class AssetTagStatsWrapper implements AssetTagStats {
 
 	public String getModelClassName() {
 		return AssetTagStats.class.getName();
+	}
+
+	public Map<String, Object> getModelAttributes() {
+		Map<String, Object> attributes = new HashMap<String, Object>();
+
+		attributes.put("tagStatsId", getTagStatsId());
+		attributes.put("tagId", getTagId());
+		attributes.put("classNameId", getClassNameId());
+		attributes.put("assetCount", getAssetCount());
+
+		return attributes;
+	}
+
+	public void setModelAttributes(Map<String, Object> attributes) {
+		Long tagStatsId = (Long)attributes.get("tagStatsId");
+
+		if (tagStatsId != null) {
+			setTagStatsId(tagStatsId);
+		}
+
+		Long tagId = (Long)attributes.get("tagId");
+
+		if (tagId != null) {
+			setTagId(tagId);
+		}
+
+		Long classNameId = (Long)attributes.get("classNameId");
+
+		if (classNameId != null) {
+			setClassNameId(classNameId);
+		}
+
+		Integer assetCount = (Integer)attributes.get("assetCount");
+
+		if (assetCount != null) {
+			setAssetCount(assetCount);
+		}
 	}
 
 	/**
@@ -99,6 +142,10 @@ public class AssetTagStatsWrapper implements AssetTagStats {
 		return _assetTagStats.getClassName();
 	}
 
+	public void setClassName(java.lang.String className) {
+		_assetTagStats.setClassName(className);
+	}
+
 	/**
 	* Returns the class name ID of this asset tag stats.
 	*
@@ -155,10 +202,6 @@ public class AssetTagStatsWrapper implements AssetTagStats {
 		return _assetTagStats.isEscapedModel();
 	}
 
-	public void setEscapedModel(boolean escapedModel) {
-		_assetTagStats.setEscapedModel(escapedModel);
-	}
-
 	public java.io.Serializable getPrimaryKeyObj() {
 		return _assetTagStats.getPrimaryKeyObj();
 	}
@@ -213,7 +256,14 @@ public class AssetTagStatsWrapper implements AssetTagStats {
 		_assetTagStats.persist();
 	}
 
+	/**
+	 * @deprecated Renamed to {@link #getWrappedModel}
+	 */
 	public AssetTagStats getWrappedAssetTagStats() {
+		return _assetTagStats;
+	}
+
+	public AssetTagStats getWrappedModel() {
 		return _assetTagStats;
 	}
 

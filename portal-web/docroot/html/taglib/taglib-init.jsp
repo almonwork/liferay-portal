@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -16,19 +16,17 @@
 @generated
 --%>
 
-<%@ page import="com.liferay.portal.kernel.json.JSONFactoryUtil" %>
-<%@ page import="com.liferay.portal.kernel.servlet.taglib.CustomAttributes" %>
-<%@ page import="com.liferay.portal.kernel.util.GetterUtil" %>
-<%@ page import="com.liferay.portal.kernel.util.StringPool" %>
-<%@ page import="com.liferay.portal.kernel.util.StringUtil" %>
-<%@ page import="com.liferay.portal.kernel.util.Validator" %>
+<%@ page import="com.liferay.portal.kernel.json.JSONFactoryUtil" %><%@
+page import="com.liferay.portal.kernel.util.GetterUtil" %><%@
+page import="com.liferay.portal.kernel.util.StringPool" %><%@
+page import="com.liferay.portal.kernel.util.StringUtil" %><%@
+page import="com.liferay.portal.kernel.util.Validator" %>
 
-<%@ page import="java.util.ArrayList" %>
-<%@ page import="java.util.HashMap" %>
-<%@ page import="java.util.Map" %>
-<%@ page import="java.util.Set" %>
+<%@ page import="java.util.ArrayList" %><%@
+page import="java.util.HashMap" %><%@
+page import="java.util.Map" %>
 
-<%@ include file="taglib-init-ext.jspf" %>
+<%@ include file="/html/taglib/taglib-init-ext.jspf" %>
 
 <%!
 private static Object _deserialize(Object obj) {

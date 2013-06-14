@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -109,7 +109,7 @@ public class ContentTransformerListener extends BaseTransformerListener {
 				String type = GetterUtil.getString(
 					element.attributeValue("type"));
 
-				if ((!name.startsWith("reserved-")) &&
+				if (!name.startsWith("reserved-") &&
 					(type.equals("text") || type.equals("text_area") ||
 					 type.equals("text_box"))) {
 
@@ -143,7 +143,7 @@ public class ContentTransformerListener extends BaseTransformerListener {
 
 				// [@articleId;elementName@]
 
-				if (Validator.isNotNull(text) && text.length() >= 7 &&
+				if (Validator.isNotNull(text) && (text.length() >= 7) &&
 					text.startsWith("[@") && text.endsWith("@]")) {
 
 					text = text.substring(2, text.length() - 2);
@@ -152,8 +152,7 @@ public class ContentTransformerListener extends BaseTransformerListener {
 
 					if (pos != -1) {
 						String articleId = text.substring(0, pos);
-						String elementName =
-							text.substring(pos + 1, text.length());
+						String elementName = text.substring(pos + 1);
 
 						JournalArticle article =
 							JournalArticleLocalServiceUtil.getArticle(
@@ -169,7 +168,7 @@ public class ContentTransformerListener extends BaseTransformerListener {
 				// Make sure to point images to the full path
 
 				else if ((text != null) &&
-						 (text.startsWith("/image/journal/article?img_id"))) {
+						 text.startsWith("/image/journal/article?img_id")) {
 
 					dynamicContent.setText("@cdn_host@@root_path@" + text);
 				}

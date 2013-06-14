@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -20,10 +20,10 @@ import com.liferay.portal.kernel.captcha.CaptchaUtil;
 import com.liferay.portal.kernel.servlet.SessionErrors;
 import com.liferay.portal.kernel.upload.UploadPortletRequest;
 import com.liferay.portal.kernel.util.Constants;
-import com.liferay.portal.kernel.util.FileUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.ObjectValuePair;
 import com.liferay.portal.kernel.util.ParamUtil;
+import com.liferay.portal.kernel.util.StreamUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
@@ -50,12 +50,12 @@ import com.liferay.portlet.messageboards.NoSuchMessageException;
 import com.liferay.portlet.messageboards.RequiredMessageException;
 import com.liferay.portlet.messageboards.model.MBMessage;
 import com.liferay.portlet.messageboards.model.MBMessageConstants;
-import com.liferay.portlet.messageboards.service.MBMessageFlagLocalServiceUtil;
 import com.liferay.portlet.messageboards.service.MBMessageServiceUtil;
+import com.liferay.portlet.messageboards.service.MBThreadLocalServiceUtil;
 import com.liferay.portlet.messageboards.service.MBThreadServiceUtil;
 import com.liferay.portlet.messageboards.service.permission.MBMessagePermission;
 
-import java.io.File;
+import java.io.InputStream;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -75,6 +75,7 @@ import org.apache.struts.action.ActionMapping;
 /**
  * @author Brian Wing Shun Chan
  * @author Daniel Sanz
+ * @author Shuyang Zhou
  */
 public class EditMessageAction extends PortletAction {
 
@@ -120,7 +121,7 @@ public class EditMessageAction extends PortletAction {
 				e instanceof PrincipalException ||
 				e instanceof RequiredMessageException) {
 
-				SessionErrors.add(actionRequest, e.getClass().getName());
+				SessionErrors.add(actionRequest, e.getClass());
 
 				setForward(actionRequest, "portlet.message_boards.error");
 			}
@@ -133,12 +134,12 @@ public class EditMessageAction extends PortletAction {
 					 e instanceof MessageBodyException ||
 					 e instanceof MessageSubjectException) {
 
-				SessionErrors.add(actionRequest, e.getClass().getName());
+				SessionErrors.add(actionRequest, e.getClass());
 			}
 			else if (e instanceof AssetCategoryException ||
 					 e instanceof AssetTagException) {
 
-				SessionErrors.add(actionRequest, e.getClass().getName(), e);
+				SessionErrors.add(actionRequest, e.getClass(), e);
 			}
 			else {
 				throw e;
@@ -159,7 +160,7 @@ public class EditMessageAction extends PortletAction {
 			if (e instanceof NoSuchMessageException ||
 				e instanceof PrincipalException) {
 
-				SessionErrors.add(renderRequest, e.getClass().getName());
+				SessionErrors.add(renderRequest, e.getClass());
 
 				return mapping.findForward("portlet.message_boards.error");
 			}
@@ -194,6 +195,9 @@ public class EditMessageAction extends PortletAction {
 		if (workflowAction == WorkflowConstants.ACTION_SAVE_DRAFT) {
 			return getSaveAndContinueRedirect(
 				actionRequest, actionResponse, message);
+		}
+		else if (message == null) {
+			return ParamUtil.getString(actionRequest, "redirect");
 		}
 
 		ActionResponseImpl actionResponseImpl =
@@ -304,113 +308,129 @@ public class EditMessageAction extends PortletAction {
 		boolean attachments = ParamUtil.getBoolean(
 			actionRequest, "attachments");
 
-		List<ObjectValuePair<String, byte[]>> files =
-			new ArrayList<ObjectValuePair<String, byte[]>>();
+		List<ObjectValuePair<String, InputStream>> inputStreamOVPs =
+			new ArrayList<ObjectValuePair<String, InputStream>>(5);
 
-		if (attachments) {
-			UploadPortletRequest uploadRequest =
-				PortalUtil.getUploadPortletRequest(actionRequest);
+		try {
+			if (attachments) {
+				UploadPortletRequest uploadPortletRequest =
+					PortalUtil.getUploadPortletRequest(actionRequest);
 
-			for (int i = 1; i <= 5; i++) {
-				File file = uploadRequest.getFile("msgFile" + i);
-				String fileName = uploadRequest.getFileName("msgFile" + i);
-				byte[] bytes = FileUtil.getBytes(file);
+				for (int i = 1; i <= 5; i++) {
+					String fileName = uploadPortletRequest.getFileName(
+						"msgFile" + i);
+					InputStream inputStream =
+						uploadPortletRequest.getFileAsStream("msgFile" + i);
 
-				if ((bytes != null) && (bytes.length > 0)) {
-					ObjectValuePair<String, byte[]> ovp =
-						new ObjectValuePair<String, byte[]>(fileName, bytes);
+					if (inputStream == null) {
+						continue;
+					}
 
-					files.add(ovp);
+					ObjectValuePair<String, InputStream> inputStreamOVP =
+						new ObjectValuePair<String, InputStream>(
+							fileName, inputStream);
+
+					inputStreamOVPs.add(inputStreamOVP);
 				}
 			}
-		}
 
-		boolean question = ParamUtil.getBoolean(actionRequest, "question");
-		boolean anonymous = ParamUtil.getBoolean(actionRequest, "anonymous");
-		double priority = ParamUtil.getDouble(actionRequest, "priority");
-		boolean allowPingbacks = ParamUtil.getBoolean(
-			actionRequest, "allowPingbacks");
+			boolean question = ParamUtil.getBoolean(actionRequest, "question");
+			boolean anonymous = ParamUtil.getBoolean(
+				actionRequest, "anonymous");
+			double priority = ParamUtil.getDouble(actionRequest, "priority");
+			boolean allowPingbacks = ParamUtil.getBoolean(
+				actionRequest, "allowPingbacks");
 
-		ServiceContext serviceContext = ServiceContextFactory.getInstance(
-			MBMessage.class.getName(), actionRequest);
+			ServiceContext serviceContext = ServiceContextFactory.getInstance(
+				MBMessage.class.getName(), actionRequest);
 
-		boolean preview = ParamUtil.getBoolean(actionRequest, "preview");
+			boolean preview = ParamUtil.getBoolean(actionRequest, "preview");
 
-		serviceContext.setAttribute("preview", preview);
+			serviceContext.setAttribute("preview", preview);
 
-		MBMessage message = null;
+			MBMessage message = null;
 
-		if (messageId <= 0) {
-			if (PropsValues.CAPTCHA_CHECK_PORTLET_MESSAGE_BOARDS_EDIT_MESSAGE) {
-				CaptchaUtil.check(actionRequest);
-			}
+			if (messageId <= 0) {
+				if (PropsValues.
+						CAPTCHA_CHECK_PORTLET_MESSAGE_BOARDS_EDIT_MESSAGE) {
 
-			if (threadId <= 0) {
+					CaptchaUtil.check(actionRequest);
+				}
 
-				// Post new thread
+				if (threadId <= 0) {
 
-				message = MBMessageServiceUtil.addMessage(
-					groupId, categoryId, subject, body, format, files,
-					anonymous, priority, allowPingbacks, serviceContext);
+					// Post new thread
 
-				if (question) {
-					MBMessageFlagLocalServiceUtil.addQuestionFlag(
-						message.getMessageId());
+					message = MBMessageServiceUtil.addMessage(
+						groupId, categoryId, subject, body, format,
+						inputStreamOVPs, anonymous, priority, allowPingbacks,
+						serviceContext);
+
+					if (question) {
+						MBThreadLocalServiceUtil.updateQuestion(
+							message.getThreadId(), true);
+					}
+				}
+				else {
+
+					// Post reply
+
+					message = MBMessageServiceUtil.addMessage(
+						groupId, categoryId, threadId, parentMessageId, subject,
+						body, format, inputStreamOVPs, anonymous, priority,
+						allowPingbacks, serviceContext);
 				}
 			}
 			else {
+				List<String> existingFiles = new ArrayList<String>();
 
-				// Post reply
+				for (int i = 1; i <= 5; i++) {
+					String path = ParamUtil.getString(
+						actionRequest, "existingPath" + i);
 
-				message = MBMessageServiceUtil.addMessage(
-					groupId, categoryId, threadId, parentMessageId, subject,
-					body, format, files, anonymous, priority, allowPingbacks,
-					serviceContext);
-			}
-		}
-		else {
-			List<String> existingFiles = new ArrayList<String>();
+					if (Validator.isNotNull(path)) {
+						existingFiles.add(path);
+					}
+				}
 
-			for (int i = 1; i <= 5; i++) {
-				String path = ParamUtil.getString(
-					actionRequest, "existingPath" + i);
+				// Update message
 
-				if (Validator.isNotNull(path)) {
-					existingFiles.add(path);
+				message = MBMessageServiceUtil.updateMessage(
+					messageId, subject, body, inputStreamOVPs, existingFiles,
+					priority, allowPingbacks, serviceContext);
+
+				if (message.isRoot()) {
+					MBThreadLocalServiceUtil.updateQuestion(
+						message.getThreadId(), question);
 				}
 			}
 
-			// Update message
+			PermissionChecker permissionChecker =
+				themeDisplay.getPermissionChecker();
 
-			message = MBMessageServiceUtil.updateMessage(
-				messageId, subject, body, files, existingFiles, priority,
-				allowPingbacks, serviceContext);
+			boolean subscribe = ParamUtil.getBoolean(
+				actionRequest, "subscribe");
 
-			if (message.isRoot()) {
-				if (question) {
-					MBMessageFlagLocalServiceUtil.addQuestionFlag(messageId);
-				}
-				else {
-					MBMessageFlagLocalServiceUtil.deleteQuestionAndAnswerFlags(
-						message.getThreadId());
+			if (subscribe &&
+				MBMessagePermission.contains(
+					permissionChecker, message, ActionKeys.SUBSCRIBE)) {
+
+				MBMessageServiceUtil.subscribeMessage(message.getMessageId());
+			}
+
+			return message;
+		}
+		finally {
+			if (attachments) {
+				for (ObjectValuePair<String, InputStream> inputStreamOVP :
+						inputStreamOVPs) {
+
+					InputStream inputStream = inputStreamOVP.getValue();
+
+					StreamUtil.cleanUp(inputStream);
 				}
 			}
 		}
-
-		PermissionChecker permissionChecker =
-			themeDisplay.getPermissionChecker();
-
-		boolean subscribe = ParamUtil.getBoolean(
-			actionRequest, "subscribe");
-
-		if (subscribe &&
-			MBMessagePermission.contains(
-				permissionChecker, message,	ActionKeys.SUBSCRIBE)) {
-
-			MBMessageServiceUtil.subscribeMessage(message.getMessageId());
-		}
-
-		return message;
 	}
 
 }

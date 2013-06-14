@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -46,7 +46,7 @@ public class CyrusHook implements Hook {
 				File file = new File(home + "/" + userId + ".procmail.forward");
 
 				if ((filters.size() > 0) || (emailAddresses.size() > 0) ||
-					(leaveCopy)) {
+					leaveCopy) {
 
 					StringBundler sb = new StringBundler();
 
@@ -104,8 +104,8 @@ public class CyrusHook implements Hook {
 
 			// Expect
 
-			String addUserCmd =
-				PropsUtil.get(PropsKeys.MAIL_HOOK_CYRUS_ADD_USER);
+			String addUserCmd = PropsUtil.get(
+				PropsKeys.MAIL_HOOK_CYRUS_ADD_USER);
 
 			addUserCmd = StringUtil.replace(
 				addUserCmd, "%1%", String.valueOf(userId));
@@ -163,8 +163,8 @@ public class CyrusHook implements Hook {
 
 			// Expect
 
-			String deleteUserCmd =
-				PropsUtil.get(PropsKeys.MAIL_HOOK_CYRUS_DELETE_USER);
+			String deleteUserCmd = PropsUtil.get(
+				PropsKeys.MAIL_HOOK_CYRUS_DELETE_USER);
 
 			deleteUserCmd = StringUtil.replace(
 				deleteUserCmd, "%1%", String.valueOf(userId));

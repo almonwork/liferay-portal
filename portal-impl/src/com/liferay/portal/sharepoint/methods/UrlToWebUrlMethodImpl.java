@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,6 +14,8 @@
 
 package com.liferay.portal.sharepoint.methods;
 
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.sharepoint.Property;
@@ -40,6 +42,10 @@ public class UrlToWebUrlMethodImpl extends BaseMethodImpl {
 
 		String url = sharepointRequest.getParameterValue("url");
 
+		if (_log.isInfoEnabled()) {
+			_log.info("URL is " + url);
+		}
+
 		if (Validator.isNotNull(url)) {
 			elements.add(new Property("webUrl", "/sharepoint"));
 
@@ -52,5 +58,8 @@ public class UrlToWebUrlMethodImpl extends BaseMethodImpl {
 	}
 
 	private static final String _METHOD_NAME = "url to web url";
+
+	private static Log _log = LogFactoryUtil.getLog(
+		UrlToWebUrlMethodImpl.class);
 
 }

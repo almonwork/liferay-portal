@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,7 +14,7 @@
 
 package com.liferay.taglib.aui;
 
-import com.liferay.taglib.util.IncludeTag;
+import com.liferay.taglib.aui.base.BaseModelContextTag;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -22,35 +22,23 @@ import javax.servlet.http.HttpServletRequest;
  * @author Jorge Ferrer
  * @author Brian Wing Shun Chan
  */
-public class ModelContextTag extends IncludeTag {
-
-	public void setBean(Object bean) {
-		_bean = bean;
-	}
-
-	public void setModel(Class<?> model) {
-		_model = model;
-	}
-
-	@Override
-	protected void cleanUp() {
-		_bean = null;
-		_model = null;
-	}
+public class ModelContextTag extends BaseModelContextTag {
 
 	@Override
 	protected void setAttributes(HttpServletRequest request) {
-		if (_model != null) {
-			pageContext.setAttribute("aui:model-context:bean", _bean);
-			pageContext.setAttribute("aui:model-context:model", _model);
+		Class<?> model = getModel();
+
+		if (model != null) {
+			pageContext.setAttribute("aui:model-context:bean", getBean());
+			pageContext.setAttribute(
+				"aui:model-context:defaultLanguageId", getDefaultLanguageId());
+			pageContext.setAttribute("aui:model-context:model", model);
 		}
 		else {
 			pageContext.removeAttribute("aui:model-context:bean");
-			pageContext.removeAttribute("aui:model-context::model");
+			pageContext.removeAttribute("aui:model-context:defaultLanguageId");
+			pageContext.removeAttribute("aui:model-context:model");
 		}
 	}
-
-	private Object _bean;
-	private Class<?> _model;
 
 }

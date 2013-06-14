@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,8 +14,10 @@
 
 package com.liferay.portlet.polls.service.impl;
 
+import com.liferay.portal.NoSuchUserException;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
+import com.liferay.portal.model.User;
 import com.liferay.portal.service.ServiceContext;
 import com.liferay.portlet.polls.DuplicateVoteException;
 import com.liferay.portlet.polls.NoSuchQuestionException;
@@ -30,6 +32,7 @@ import java.util.List;
 
 /**
  * @author Brian Wing Shun Chan
+ * @author Mate Thurzo
  */
 public class PollsVoteLocalServiceImpl extends PollsVoteLocalServiceBaseImpl {
 
@@ -69,11 +72,26 @@ public class PollsVoteLocalServiceImpl extends PollsVoteLocalServiceBaseImpl {
 			throw new DuplicateVoteException();
 		}
 		else {
+			String userName = null;
+
+			try {
+				User user = userPersistence.findByPrimaryKey(userId);
+
+				userName = user.getFullName();
+			}
+			catch (NoSuchUserException nsue) {
+				userName = serviceContext.translate("anonymous");
+			}
+
 			long voteId = counterLocalService.increment();
 
 			vote = pollsVotePersistence.create(voteId);
 
+			vote.setCompanyId(serviceContext.getCompanyId());
 			vote.setUserId(userId);
+			vote.setUserName(userName);
+			vote.setCreateDate(serviceContext.getCreateDate(now));
+			vote.setModifiedDate(serviceContext.getModifiedDate(now));
 			vote.setQuestionId(questionId);
 			vote.setChoiceId(choiceId);
 			vote.setVoteDate(serviceContext.getCreateDate(now));
@@ -87,7 +105,7 @@ public class PollsVoteLocalServiceImpl extends PollsVoteLocalServiceBaseImpl {
 	public List<PollsVote> getChoiceVotes(long choiceId, int start, int end)
 		throws SystemException {
 
-		return pollsVotePersistence.findByChoiceId(choiceId,  start, end);
+		return pollsVotePersistence.findByChoiceId(choiceId, start, end);
 	}
 
 	public int getChoiceVotesCount(long choiceId) throws SystemException {

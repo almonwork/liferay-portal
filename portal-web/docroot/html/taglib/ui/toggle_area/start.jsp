@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -18,12 +18,12 @@
 
 <div style="float: <%= align %>">
 	<liferay-ui:toggle
+		defaultShowContent="<%= defaultShowContent %>"
+		hideImage="<%= hideImage %>"
+		hideMessage="<%= hideMessage %>"
 		id="<%= id %>"
 		showImage="<%= showImage %>"
-		hideImage="<%= hideImage %>"
 		showMessage="<%= showMessage %>"
-		hideMessage="<%= hideMessage %>"
-		defaultShowContent="<%= defaultShowContent %>"
 		stateVar="<%= stateVar %>"
 	/>
 </div>

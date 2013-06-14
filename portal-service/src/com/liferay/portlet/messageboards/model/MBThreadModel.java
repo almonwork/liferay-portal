@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -246,6 +246,27 @@ public interface MBThreadModel extends BaseModel<MBThread>, WorkflowedModel {
 	public void setPriority(double priority);
 
 	/**
+	 * Returns the question of this message boards thread.
+	 *
+	 * @return the question of this message boards thread
+	 */
+	public boolean getQuestion();
+
+	/**
+	 * Returns <code>true</code> if this message boards thread is question.
+	 *
+	 * @return <code>true</code> if this message boards thread is question; <code>false</code> otherwise
+	 */
+	public boolean isQuestion();
+
+	/**
+	 * Sets whether this message boards thread is question.
+	 *
+	 * @param question the question of this message boards thread
+	 */
+	public void setQuestion(boolean question);
+
+	/**
 	 * Returns the status of this message boards thread.
 	 *
 	 * @return the status of this message boards thread
@@ -344,6 +365,13 @@ public interface MBThreadModel extends BaseModel<MBThread>, WorkflowedModel {
 	public boolean isExpired();
 
 	/**
+	 * Returns <code>true</code> if this message boards thread is in the Recycle Bin.
+	 *
+	 * @return <code>true</code> if this message boards thread is in the Recycle Bin; <code>false</code> otherwise
+	 */
+	public boolean isInTrash();
+
+	/**
 	 * Returns <code>true</code> if this message boards thread is pending.
 	 *
 	 * @return <code>true</code> if this message boards thread is pending; <code>false</code> otherwise
@@ -359,8 +387,6 @@ public interface MBThreadModel extends BaseModel<MBThread>, WorkflowedModel {
 	public void setCachedModel(boolean cachedModel);
 
 	public boolean isEscapedModel();
-
-	public void setEscapedModel(boolean escapedModel);
 
 	public Serializable getPrimaryKeyObj();
 

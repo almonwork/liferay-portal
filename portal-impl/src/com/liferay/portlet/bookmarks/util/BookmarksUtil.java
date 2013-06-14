@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -67,21 +67,6 @@ public class BookmarksUtil {
 	}
 
 	public static void addPortletBreadcrumbEntries(
-			long folderId, HttpServletRequest request,
-			RenderResponse renderResponse)
-		throws Exception {
-
-		if (folderId == BookmarksFolderConstants.DEFAULT_PARENT_FOLDER_ID) {
-			return;
-		}
-
-		BookmarksFolder folder = BookmarksFolderLocalServiceUtil.getFolder(
-			folderId);
-
-		addPortletBreadcrumbEntries(folder, request, renderResponse);
-	}
-
-	public static void addPortletBreadcrumbEntries(
 			BookmarksFolder folder, HttpServletRequest request,
 			RenderResponse renderResponse)
 		throws Exception {
@@ -91,7 +76,7 @@ public class BookmarksUtil {
 		PortletURL portletURL = renderResponse.createRenderURL();
 
 		if (strutsAction.equals("/bookmarks/select_folder")) {
-			ThemeDisplay themeDisplay =	(ThemeDisplay)request.getAttribute(
+			ThemeDisplay themeDisplay = (ThemeDisplay)request.getAttribute(
 				WebKeys.THEME_DISPLAY);
 
 			portletURL.setWindowState(LiferayWindowState.POP_UP);
@@ -100,8 +85,7 @@ public class BookmarksUtil {
 				"struts_action", "/bookmarks/select_folder");
 
 			PortalUtil.addPortletBreadcrumbEntry(
-				request, themeDisplay.translate("bookmarks-home"),
-				portletURL.toString());
+				request, themeDisplay.translate("home"), portletURL.toString());
 		}
 		else {
 			portletURL.setParameter("struts_action", "/bookmarks/view");
@@ -130,7 +114,22 @@ public class BookmarksUtil {
 		}
 	}
 
-	public static OrderByComparator getEntriesOrderByComparator(
+	public static void addPortletBreadcrumbEntries(
+			long folderId, HttpServletRequest request,
+			RenderResponse renderResponse)
+		throws Exception {
+
+		if (folderId == BookmarksFolderConstants.DEFAULT_PARENT_FOLDER_ID) {
+			return;
+		}
+
+		BookmarksFolder folder = BookmarksFolderLocalServiceUtil.getFolder(
+			folderId);
+
+		addPortletBreadcrumbEntries(folder, request, renderResponse);
+	}
+
+	public static OrderByComparator getEntryOrderByComparator(
 		String orderByCol, String orderByType) {
 
 		boolean orderByAsc = false;

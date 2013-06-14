@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -17,8 +17,6 @@
 <%@ include file="/html/portlet/users_admin/init.jsp" %>
 
 <%
-themeDisplay.setIncludeServiceJs(true);
-
 String redirect = ParamUtil.getString(request, "redirect");
 String backURL = ParamUtil.getString(request, "backURL", redirect);
 
@@ -79,7 +77,7 @@ String[][] categorySections = {mainSections, identificationSections, miscellaneo
 
 			<div class="organization-info">
 				<div class="float-container">
-					<img alt="<%= HtmlUtil.escape(organization.getName()) %>" class="organization-logo" src="<%= themeDisplay.getPathImage() %>/organization_logo?img_id=<%= logoId %>&t=<%= ImageServletTokenUtil.getToken(logoId) %>" />
+					<img alt="<%= HtmlUtil.escape(organization.getName()) %>" class="organization-logo" src="<%= themeDisplay.getPathImage() %>/organization_logo?img_id=<%= logoId %>&t=<%= WebServerServletTokenUtil.getToken(logoId) %>" />
 
 					<span class="organization-name"><%= HtmlUtil.escape(organization.getName()) %></span>
 				</div>
@@ -88,6 +86,7 @@ String[][] categorySections = {mainSections, identificationSections, miscellaneo
 	</liferay-util:buffer>
 
 	<liferay-ui:form-navigator
+		backURL="<%= backURL %>"
 		categoryNames="<%= _CATEGORY_NAMES %>"
 		categorySections="<%= categorySections %>"
 		htmlTop="<%= htmlTop %>"

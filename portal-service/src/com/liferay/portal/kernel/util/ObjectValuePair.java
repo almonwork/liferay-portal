@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -29,22 +29,6 @@ public class ObjectValuePair<K, V> implements Serializable {
 		_value = value;
 	}
 
-	public K getKey() {
-		return _key;
-	}
-
-	public void setKey(K key) {
-		_key = key;
-	}
-
-	public V getValue() {
-		return _value;
-	}
-
-	public void setValue(V value) {
-		_value = value;
-	}
-
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj) {
@@ -64,6 +48,14 @@ public class ObjectValuePair<K, V> implements Serializable {
 		return false;
 	}
 
+	public K getKey() {
+		return _key;
+	}
+
+	public V getValue() {
+		return _value;
+	}
+
 	@Override
 	public int hashCode() {
 		if (_key != null) {
@@ -72,6 +64,14 @@ public class ObjectValuePair<K, V> implements Serializable {
 		else {
 			return 0;
 		}
+	}
+
+	public void setKey(K key) {
+		_key = key;
+	}
+
+	public void setValue(V value) {
+		_value = value;
 	}
 
 	private static final long serialVersionUID = 6341296770402285296L;

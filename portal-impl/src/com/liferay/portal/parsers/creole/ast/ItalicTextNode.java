@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -25,13 +25,18 @@ public class ItalicTextNode extends FormattedTextNode {
 		super(astNode);
 	}
 
-	public ItalicTextNode(String content) {
-		super(content);
-	}
-
 	@Override
 	public void accept(ASTVisitor astVisitor) {
 		astVisitor.visit(this);
+	}
+
+	@Override
+	public boolean hasContent() {
+		if ((getChildASTNodes() == null) && (getContent() == null)) {
+			return false;
+		}
+
+		return true;
 	}
 
 }

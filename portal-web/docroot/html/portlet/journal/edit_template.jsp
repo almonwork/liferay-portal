@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -39,15 +39,21 @@ String newTemplateId = ParamUtil.getString(request, "newTemplateId");
 
 String structureId = BeanParamUtil.getString(template, request, "structureId");
 
+long structureGroupId = 0;
 String structureName = StringPool.BLANK;
 
 if (Validator.isNotNull(structureId)) {
-	try {
-		JournalStructure structure = JournalStructureLocalServiceUtil.getStructure(groupId, structureId);
+	JournalStructure structure = null;
 
-		structureName = structure.getName();
+	try {
+		structure = JournalStructureLocalServiceUtil.getStructure(groupId, structureId, true);
 	}
 	catch (NoSuchStructureException nsse) {
+	}
+
+	if (structure != null) {
+		structureGroupId = structure.getGroupId();
+		structureName = structure.getName(locale);
 	}
 }
 
@@ -63,6 +69,12 @@ else {
 }
 
 String langType = BeanParamUtil.getString(template, request, "langType", JournalTemplateConstants.LANG_TYPE_VM);
+
+String editorContent = xsl;
+
+if (Validator.isNull(editorContent)) {
+	editorContent = ContentUtil.get(PropsUtil.get(PropsKeys.JOURNAL_TEMPLATE_LANGUAGE_CONTENT, new Filter(langType)));
+}
 
 boolean cacheable = BeanParamUtil.getBoolean(template, request, "cacheable");
 
@@ -88,12 +100,13 @@ if (template == null) {
 	<aui:input name="groupId" type="hidden" value="<%= groupId %>" />
 	<aui:input name="templateId" type="hidden" value="<%= templateId %>" />
 	<aui:input name="xslContent" type="hidden" value="<%= JS.encodeURIComponent(xsl) %>" />
+	<aui:input disabled="<%= true %>" name="editorContentInput" type="hidden" value="<%= JS.encodeURIComponent(editorContent) %>" />
 	<aui:input name="saveAndContinue" type="hidden" />
 
 	<liferay-ui:header
 		backURL="<%= redirect %>"
 		localizeTitle="<%= (template == null) %>"
-		title='<%= (template == null) ? "new-template" : template.getName() %>'
+		title='<%= (template == null) ? "new-template" : template.getName(locale) %>'
 	/>
 
 	<liferay-ui:error exception="<%= DuplicateTemplateIdException.class %>" message="please-enter-a-unique-id" />
@@ -131,7 +144,7 @@ if (template == null) {
 						<aui:input name="autoTemplateId" type="hidden" value="<%= true %>" />
 					</c:when>
 					<c:otherwise>
-						<aui:input cssClass="lfr-input-text-container" label="id" name="newTemplateId" field="templateId" fieldParam="newTemplateId" value="<%= newTemplateId %>" />
+						<aui:input cssClass="lfr-input-text-container" field="templateId" fieldParam="newTemplateId" label="id" name="newTemplateId" value="<%= newTemplateId %>" />
 
 						<aui:input label="autogenerate-id" name="autoTemplateId" type="checkbox" />
 					</c:otherwise>
@@ -148,7 +161,7 @@ if (template == null) {
 
 		<aui:input cssClass="lfr-textarea-container" name="description" />
 
-		<aui:input helpMessage="journal-template-cacheable-help" inlineLabel="right" name="cacheable" value="<%= new Boolean(cacheable) %>" />
+		<aui:input helpMessage="journal-template-cacheable-help" name="cacheable" value="<%= new Boolean(cacheable) %>" />
 
 		<c:if test="<%= template != null %>">
 			<aui:field-wrapper label="url">
@@ -157,7 +170,7 @@ if (template == null) {
 
 			<c:if test="<%= portletDisplay.isWebDAVEnabled() %>">
 				<aui:field-wrapper label="webdav-url">
-					<liferay-ui:input-resource url='<%= themeDisplay.getPortalURL() + "/tunnel-web/secure/webdav" + group.getFriendlyURL() + "/journal/Templates/" + templateId %>' />
+					<liferay-ui:input-resource url='<%= themeDisplay.getPortalURL() + themeDisplay.getPathContext() + "/api/secure/webdav" + group.getFriendlyURL() + "/journal/Templates/" + templateId %>' />
 				</aui:field-wrapper>
 			</c:if>
 		</c:if>
@@ -170,11 +183,11 @@ if (template == null) {
 					<portlet:renderURL var="editStructureURL">
 						<portlet:param name="struts_action" value="/journal/edit_structure" />
 						<portlet:param name="redirect" value="<%= currentURL %>" />
-						<portlet:param name="groupId" value="<%= String.valueOf(groupId) %>" />
+						<portlet:param name="groupId" value="<%= String.valueOf(structureGroupId) %>" />
 						<portlet:param name="structureId" value="<%= structureId %>" />
 					</portlet:renderURL>
 
-					<aui:a href="<%= editStructureURL %>" label="<%= structureName %>" id="structureName" />
+					<aui:a href="<%= editStructureURL %>" id="structureName" label="<%= HtmlUtil.escape(structureName) %>" />
 				</c:when>
 				<c:otherwise>
 					<aui:a href="" id="structureName" />
@@ -212,7 +225,7 @@ if (template == null) {
 			</c:if>
 		</aui:field-wrapper>
 
-		<aui:input inlineLabel="right" label="format-script" name="formatXsl" type="checkbox" />
+		<aui:input label="format-script" name="formatXsl" type="checkbox" />
 
 		<aui:input cssClass="lfr-input-text-container" label="small-image-url" name="smallImageURL" />
 
@@ -220,7 +233,7 @@ if (template == null) {
 
 		<aui:input cssClass="lfr-input-text-container" label="small-image" name="smallFile" type="file" />
 
-		<aui:input inlineLabel="right" name="smallImage" />
+		<aui:input name="smallImage" />
 
 		<c:if test="<%= template == null %>">
 			<aui:field-wrapper label="permissions">
@@ -232,9 +245,23 @@ if (template == null) {
 	</aui:fieldset>
 
 	<aui:button-row>
-		<aui:button type="submit" />
 
-		<aui:button onClick='<%= renderResponse.getNamespace() + "saveAndContinueTemplate();" %>' value="save-and-continue" />
+		<%
+		boolean hasSavePermission = false;
+
+		if (template != null) {
+			hasSavePermission = JournalTemplatePermission.contains(permissionChecker, template, ActionKeys.UPDATE);
+		}
+		else {
+			hasSavePermission = JournalPermission.contains(permissionChecker, scopeGroupId, ActionKeys.ADD_TEMPLATE);
+		}
+		%>
+
+		<c:if test="<%= hasSavePermission %>">
+			<aui:button type="submit" />
+
+			<aui:button onClick='<%= renderResponse.getNamespace() + "saveAndContinueTemplate();" %>' value="save-and-continue" />
+		</c:if>
 
 		<aui:button href="<%= redirect %>" type="cancel" />
 	</aui:button-row>
@@ -254,10 +281,10 @@ if (template == null) {
 		Liferay.Util.openWindow(
 			{
 				dialog: {
-					stack: false,
 					width: 680
 				},
-				title: '<liferay-ui:message key="structure" />',
+				id: '<portlet:namespace />structureSelector',
+				title: '<%= UnicodeLanguageUtil.get(pageContext, "structure") %>',
 				uri: '<portlet:renderURL windowState="<%= LiferayWindowState.POP_UP.toString() %>"><portlet:param name="struts_action" value="/journal/select_structure" /><portlet:param name="groupId" value="<%= String.valueOf(groupId) %>" /></portlet:renderURL>'
 			}
 		);
@@ -309,10 +336,10 @@ if (template == null) {
 	Liferay.Util.inlineEditor(
 		{
 			button: '#<portlet:namespace />editorButton',
-			id: '<portlet:namespace />xslContent',
+			id: '<portlet:namespace />xslContentIFrame',
 			textarea: '<portlet:namespace />xslContent',
-			title: '<liferay-ui:message key="editor" />',
-			uri: '<portlet:renderURL windowState="<%= LiferayWindowState.POP_UP.toString() %>"><portlet:param name="struts_action" value="/journal/edit_template_xsl" /></portlet:renderURL>&<portlet:namespace />langType=' + document.<portlet:namespace />fm1.<portlet:namespace />langType.value
+			title: '<%= UnicodeLanguageUtil.get(pageContext, "editor") %>',
+			uri: '<portlet:renderURL windowState="<%= LiferayWindowState.POP_UP.toString() %>"><portlet:param name="struts_action" value="/journal/edit_template_xsl" /><portlet:param name="langType" value="<%= langType %>" /><portlet:param name="editorContentInputElement" value='<%= \"#\" + renderResponse.getNamespace() + \"editorContentInput\" %>' /><portlet:param name="editorContentOutputElement" value='<%= \"#\" + renderResponse.getNamespace() + \"xslContent\" %>' /></portlet:renderURL>'
 		}
 	);
 

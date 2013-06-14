@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<!DOCTYPE service-builder PUBLIC "-//Liferay//DTD Service Builder 6.0.0//EN" "http://www.liferay.com/dtd/liferay-service-builder_6_0_0.dtd">
+<!DOCTYPE service-builder PUBLIC "-//Liferay//DTD Service Builder 6.1.0//EN" "http://www.liferay.com/dtd/liferay-service-builder_6_1_0.dtd">
 
 <service-builder package-path="com.liferay.portlet.documentlibrary">
 	<namespace>DL</namespace>
@@ -20,8 +20,10 @@
 		<!-- References -->
 
 		<reference package-path="com.liferay.portal" entity="Group" />
+		<reference package-path="com.liferay.portal" entity="Image" />
 		<reference package-path="com.liferay.portal" entity="Lock" />
 		<reference package-path="com.liferay.portal" entity="Layout" />
+		<reference package-path="com.liferay.portal" entity="Subscription" />
 		<reference package-path="com.liferay.portal" entity="WebDAVProps" />
 		<reference package-path="com.liferay.portal" entity="WorkflowInstanceLink" />
 		<reference package-path="com.liferay.portlet.asset" entity="AssetCategory" />
@@ -34,6 +36,8 @@
 		<reference package-path="com.liferay.portlet.ratings" entity="RatingsEntry" />
 		<reference package-path="com.liferay.portlet.ratings" entity="RatingsStats" />
 		<reference package-path="com.liferay.portlet.social" entity="SocialActivity" />
+		<reference package-path="com.liferay.portlet.social" entity="SocialActivityCounter" />
+		<reference package-path="com.liferay.portlet.trash" entity="TrashEntry" />
 	</entity>
 	<entity name="DLContent" human-name="document library content" local-service="true" remote-service="false">
 
@@ -51,24 +55,36 @@
 
 		<!-- Other fields -->
 
-		<column name="portletId" type="String" />
 		<column name="repositoryId" type="long" />
 		<column name="path" type="String" />
 		<column name="version" type="String" />
 		<column name="data" type="Blob" />
 		<column name="size" type="long" />
 
+		<!-- Order -->
+
+		<order by="desc">
+			<order-column name="version" />
+		</order>
+
 		<!-- Finder methods -->
 
-		<finder name="C_P_R_P" return-type="Collection">
+		<finder name="C_R" return-type="Collection">
 			<finder-column name="companyId" />
-			<finder-column name="portletId" />
+			<finder-column name="repositoryId" />
+		</finder>
+		<finder name="C_R_P" return-type="Collection">
+			<finder-column name="companyId" />
 			<finder-column name="repositoryId" />
 			<finder-column name="path" />
 		</finder>
-		<finder name="C_P_R_P_V" return-type="DLContent" unique="true">
+		<finder name="C_R_LikeP" return-type="Collection">
 			<finder-column name="companyId" />
-			<finder-column name="portletId" />
+			<finder-column name="repositoryId" />
+			<finder-column name="path" comparator="LIKE" />
+		</finder>
+		<finder name="C_R_P_V" return-type="DLContent" unique="true">
+			<finder-column name="companyId" />
 			<finder-column name="repositoryId" />
 			<finder-column name="path" />
 			<finder-column name="version" />
@@ -108,6 +124,10 @@
 		<column name="version" type="String" />
 		<column name="size" type="long" />
 		<column name="readCount" type="int" />
+		<column name="smallImageId" type="long" />
+		<column name="largeImageId" type="long" />
+		<column name="custom1ImageId" type="long" />
+		<column name="custom2ImageId" type="long" />
 
 		<!-- Order -->
 
@@ -123,6 +143,9 @@
 		</finder>
 		<finder name="CompanyId" return-type="Collection">
 			<finder-column name="companyId" />
+		</finder>
+		<finder name="MimeType" return-type="Collection" db-index="false" >
+			<finder-column name="mimeType" />
 		</finder>
 		<finder name="G_U" return-type="Collection">
 			<finder-column name="groupId" />
@@ -155,6 +178,7 @@
 
 		<!-- References -->
 
+		<reference package-path="com.liferay.portal" entity="Image" />
 		<reference package-path="com.liferay.portal" entity="Lock" />
 		<reference package-path="com.liferay.portal" entity="WebDAVProps" />
 		<reference package-path="com.liferay.portal" entity="WorkflowInstanceLink" />
@@ -198,7 +222,7 @@
 			<finder-column name="DDMStructureId" />
 			<finder-column name="fileVersionId" />
 		</finder>
-        <finder name="F_V" return-type="DLFileEntryMetadata">
+		<finder name="F_V" return-type="DLFileEntryMetadata">
 			<finder-column name="fileEntryId" />
 			<finder-column name="fileVersionId" />
 		</finder>
@@ -207,7 +231,7 @@
 
 		<reference package-path="com.liferay.portlet.dynamicdatamapping" entity="DDMStructureLink" />
 	</entity>
-	<entity name="DLFileEntryType" human-name="document library file entry type" local-service="true" remote-service="true">
+	<entity name="DLFileEntryType" human-name="document library file entry type" uuid="true" local-service="true" remote-service="true">
 
 		<!-- PK fields -->
 
@@ -238,12 +262,11 @@
 		<!-- Finder methods -->
 
 		<finder name="GroupId" return-type="Collection">
-			<finder-column name="groupId" />
+			<finder-column name="groupId" arrayable-operator="OR" />
 		</finder>
-		<finder name="G_N_D" return-type="Collection" db-index="false">
+		<finder name="G_N" return-type="DLFileEntryType" unique="true">
 			<finder-column name="groupId" />
 			<finder-column name="name" />
-			<finder-column name="description" />
 		</finder>
 
 		<!-- References -->
@@ -271,6 +294,7 @@
 		<!-- Other fields -->
 
 		<column name="fileEntryId" type="long" />
+		<column name="active" type="boolean" />
 
 		<!-- Order -->
 
@@ -289,6 +313,11 @@
 		<finder name="G_U" return-type="Collection">
 			<finder-column name="groupId" />
 			<finder-column name="userId" />
+		</finder>
+		<finder name="G_U_A" return-type="Collection">
+			<finder-column name="groupId" />
+			<finder-column name="userId" />
+			<finder-column name="active" />
 		</finder>
 		<finder name="C_U_F" return-type="DLFileRank" unique="true">
 			<finder-column name="companyId" />
@@ -323,6 +352,7 @@
 		<column name="repositoryId" type="long" />
 		<column name="folderId" type="long" />
 		<column name="toFileEntryId" type="long" />
+		<column name="active" type="boolean" />
 		<column name="status" type="int" />
 		<column name="statusByUserId" type="long" />
 		<column name="statusByUserName" type="String" />
@@ -333,13 +363,15 @@
 		<finder name="ToFileEntryId" return-type="Collection">
 			<finder-column name="toFileEntryId" />
 		</finder>
-		<finder name="G_F" return-type="Collection">
+		<finder name="G_F_A" return-type="Collection">
 			<finder-column name="groupId" />
 			<finder-column name="folderId" />
+			<finder-column name="active" />
 		</finder>
-		<finder name="G_F_S" return-type="Collection">
+		<finder name="G_F_A_S" return-type="Collection">
 			<finder-column name="groupId" />
 			<finder-column name="folderId" />
+			<finder-column name="active" />
 			<finder-column name="status" />
 		</finder>
 
@@ -347,8 +379,9 @@
 
 		<reference package-path="com.liferay.portlet.asset" entity="AssetEntry" />
 		<reference package-path="com.liferay.portlet.asset" entity="AssetTag" />
+		<reference package-path="com.liferay.portlet.trash" entity="TrashEntry" />
 	</entity>
-	<entity name="DLFileVersion" human-name="document library file version" local-service="true" remote-service="true">
+	<entity name="DLFileVersion" human-name="document library file version" uuid="true" local-service="true" remote-service="true">
 
 		<!-- PK fields -->
 
@@ -364,10 +397,12 @@
 		<column name="userId" type="long" />
 		<column name="userName" type="String" />
 		<column name="createDate" type="Date" />
+		<column name="modifiedDate" type="Date" />
 
 		<!-- Other fields -->
 
 		<column name="repositoryId" type="long" />
+		<column name="folderId" type="long" />
 		<column name="fileEntryId" type="long" />
 		<column name="extension" type="String" />
 		<column name="mimeType" type="String" />
@@ -403,6 +438,11 @@
 			<finder-column name="fileEntryId" />
 			<finder-column name="status" />
 		</finder>
+		<finder name="G_F_S" return-type="Collection">
+			<finder-column name="groupId" />
+			<finder-column name="folderId" />
+			<finder-column name="status" />
+		</finder>
 	</entity>
 	<entity name="DLFolder" human-name="document library folder" uuid="true" local-service="true" remote-service="true">
 
@@ -432,6 +472,10 @@
 		<column name="lastPostDate" type="Date" />
 		<column name="defaultFileEntryTypeId" type="long" />
 		<column name="overrideFileEntryTypes" type="boolean" />
+		<column name="status" type="int" />
+		<column name="statusByUserId" type="long" />
+		<column name="statusByUserName" type="String" />
+		<column name="statusDate" type="Date" />
 
 		<!-- Relationships -->
 
@@ -463,15 +507,26 @@
 			<finder-column name="parentFolderId" />
 			<finder-column name="name" />
 		</finder>
-		<finder name="G_P_M" return-type="Collection">
+		<finder name="G_M_P" return-type="Collection">
 			<finder-column name="groupId" />
-			<finder-column name="parentFolderId" />
 			<finder-column name="mountPoint" />
+			<finder-column name="parentFolderId" />
 		</finder>
 		<finder name="G_P_N" return-type="DLFolder" unique="true">
 			<finder-column name="groupId" />
 			<finder-column name="parentFolderId" />
 			<finder-column name="name" />
+		</finder>
+		<finder name="G_P_S" return-type="Collection">
+			<finder-column name="groupId" />
+			<finder-column name="parentFolderId" />
+			<finder-column name="status" />
+		</finder>
+		<finder name="G_M_P_S" return-type="Collection">
+			<finder-column name="groupId" />
+			<finder-column name="mountPoint" />
+			<finder-column name="parentFolderId" />
+			<finder-column name="status" />
 		</finder>
 
 		<!-- References -->
@@ -497,18 +552,22 @@
 
 		<!-- Other fields -->
 
-		<column name="fileId" type="String" />
+		<column name="fileId" type="long" />
+		<column name="fileUuid" type="String" />
 		<column name="repositoryId" type="long" />
+		<column name="parentFolderId" type="long" />
+		<column name="name" type="String" />
+		<column name="description" type="String" />
 		<column name="event" type="String" />
 		<column name="type" type="String" />
+		<column name="version" type="String" />
 
 		<!-- Order -->
 
-		<order by="desc">
+		<order by="asc">
 			<order-column name="companyId" />
 			<order-column name="repositoryId" />
 			<order-column name="modifiedDate" />
-			<order-column name="type" case-sensitive="false" />
 		</order>
 
 		<!-- Finder methods -->
@@ -521,22 +580,34 @@
 			<finder-column name="modifiedDate" comparator="&gt;=" />
 			<finder-column name="repositoryId" />
 		</finder>
+
+		<!-- References -->
+
+		<reference package-path="com.liferay.portal" entity="Repository" />
+
+		<!-- Transactions -->
+
 		<tx-required>getFileDeltaAsStream</tx-required>
 	</entity>
 	<exceptions>
 		<exception>DirectoryName</exception>
 		<exception>DuplicateDirectory</exception>
 		<exception>DuplicateFile</exception>
+		<exception>DuplicateFileEntryType</exception>
 		<exception>DuplicateFolderName</exception>
 		<exception>DuplicateRepositoryName</exception>
 		<exception>FileExtension</exception>
+		<exception>FileMimeType</exception>
 		<exception>FileName</exception>
 		<exception>FileShortcutPermission</exception>
 		<exception>FileSize</exception>
 		<exception>FolderName</exception>
+		<exception>ImageSize</exception>
 		<exception>InvalidFileEntryType</exception>
+		<exception>InvalidFileVersion</exception>
 		<exception>NoSuchDirectory</exception>
 		<exception>NoSuchFile</exception>
+		<exception>NoSuchMetadataSet</exception>
 		<exception>RepositoryName</exception>
 		<exception>SourceFileName</exception>
 	</exceptions>

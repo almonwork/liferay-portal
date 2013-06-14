@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -34,15 +34,11 @@ import java.util.Locale;
  */
 public class BaseResourceImpl implements Resource {
 
-	public BaseResourceImpl(
-		String parentPath, long name, long displayName) {
-
+	public BaseResourceImpl(String parentPath, long name, long displayName) {
 		this(parentPath, String.valueOf(name), String.valueOf(displayName));
 	}
 
-	public BaseResourceImpl(
-		String parentPath, long name, String displayName) {
-
+	public BaseResourceImpl(String parentPath, long name, String displayName) {
 		this(parentPath, String.valueOf(name), displayName);
 	}
 
@@ -90,16 +86,49 @@ public class BaseResourceImpl implements Resource {
 		_size = size;
 	}
 
- 	public String getHREF() {
-		return _href;
+	public String getClassName() {
+		return _className;
+	}
+
+	@SuppressWarnings("unused")
+	public InputStream getContentAsStream() throws WebDAVException {
+		return null;
+	}
+
+	public String getContentType() {
+		return ContentTypes.HTTPD_UNIX_DIRECTORY;
+	}
+
+	public String getCreateDate() {
+		return _createDateFormatter.format(_createDate);
 	}
 
 	public String getDisplayName() {
 		return _displayName;
 	}
 
+	public String getHREF() {
+		return _href;
+	}
+
 	public Lock getLock() {
 		return null;
+	}
+
+	public Object getModel() {
+		return _model;
+	}
+
+	public String getModifiedDate() {
+		return _modifiedDateFormatter.format(_modifiedDate);
+	}
+
+	public long getPrimaryKey() {
+		return _primaryKey;
+	}
+
+	public long getSize() {
+		return _size;
 	}
 
 	public boolean isCollection() {
@@ -110,49 +139,16 @@ public class BaseResourceImpl implements Resource {
 		return false;
 	}
 
-	public String getCreateDate() {
-		return _createDateFormatter.format(_createDate);
-	}
-
- 	public String getModifiedDate() {
-		return _modifiedDateFormatter.format(_modifiedDate);
-	}
-
-	public long getSize() {
-		return _size;
-	}
-
-	public Object getModel() {
-		return _model;
+	public void setClassName(String className) {
+		_className = className;
 	}
 
 	public void setModel(Object model) {
 		_model = model;
 	}
 
- 	public String getClassName() {
- 		return _className;
- 	}
-
- 	public void setClassName(String className) {
- 		_className = className;
- 	}
-
- 	public long getPrimaryKey() {
- 		return _primaryKey;
- 	}
-
- 	public void setPrimaryKey(long primaryKey) {
- 		_primaryKey = primaryKey;
- 	}
-
-	public String getContentType() {
-		return ContentTypes.HTTPD_UNIX_DIRECTORY;
-	}
-
-	@SuppressWarnings("unused")
-	public InputStream getContentAsStream() throws WebDAVException {
-		return null;
+	public void setPrimaryKey(long primaryKey) {
+		_primaryKey = primaryKey;
 	}
 
 	private static Format _createDateFormatter =
@@ -163,13 +159,13 @@ public class BaseResourceImpl implements Resource {
 		FastDateFormatFactoryUtil.getSimpleDateFormat(
 			"EEE, dd MMM yyyy HH:mm:ss zzz", Locale.US);
 
-	private String _href;
-	private String _displayName;
-	private Date _createDate;
-	private Date _modifiedDate;
-	private long _size;
-	private Object _model;
 	private String _className;
+	private Date _createDate;
+	private String _displayName;
+	private String _href;
+	private Object _model;
+	private Date _modifiedDate;
 	private long _primaryKey = -1;
+	private long _size;
 
 }

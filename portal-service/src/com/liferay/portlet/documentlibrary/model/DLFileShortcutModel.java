@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -235,6 +235,27 @@ public interface DLFileShortcutModel extends BaseModel<DLFileShortcut>,
 	public void setToFileEntryId(long toFileEntryId);
 
 	/**
+	 * Returns the active of this document library file shortcut.
+	 *
+	 * @return the active of this document library file shortcut
+	 */
+	public boolean getActive();
+
+	/**
+	 * Returns <code>true</code> if this document library file shortcut is active.
+	 *
+	 * @return <code>true</code> if this document library file shortcut is active; <code>false</code> otherwise
+	 */
+	public boolean isActive();
+
+	/**
+	 * Sets whether this document library file shortcut is active.
+	 *
+	 * @param active the active of this document library file shortcut
+	 */
+	public void setActive(boolean active);
+
+	/**
 	 * Returns the status of this document library file shortcut.
 	 *
 	 * @return the status of this document library file shortcut
@@ -333,6 +354,13 @@ public interface DLFileShortcutModel extends BaseModel<DLFileShortcut>,
 	public boolean isExpired();
 
 	/**
+	 * Returns <code>true</code> if this document library file shortcut is in the Recycle Bin.
+	 *
+	 * @return <code>true</code> if this document library file shortcut is in the Recycle Bin; <code>false</code> otherwise
+	 */
+	public boolean isInTrash();
+
+	/**
 	 * Returns <code>true</code> if this document library file shortcut is pending.
 	 *
 	 * @return <code>true</code> if this document library file shortcut is pending; <code>false</code> otherwise
@@ -348,8 +376,6 @@ public interface DLFileShortcutModel extends BaseModel<DLFileShortcut>,
 	public void setCachedModel(boolean cachedModel);
 
 	public boolean isEscapedModel();
-
-	public void setEscapedModel(boolean escapedModel);
 
 	public Serializable getPrimaryKeyObj();
 

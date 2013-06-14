@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -33,6 +33,8 @@ long categoryId = ParamUtil.getLong(request, "categoryId", ShoppingCategoryConst
 	<liferay-util:include page="/html/portlet/shopping/tabs1.jsp">
 		<liferay-util:param name="tabs1" value="categories" />
 	</liferay-util:include>
+
+	<liferay-ui:error exception="<%= AmazonException.class %>" />
 
 	<div class="breadcrumbs">
 		<%= ShoppingUtil.getBreadcrumbs(categoryId, pageContext, renderRequest, renderResponse) %>

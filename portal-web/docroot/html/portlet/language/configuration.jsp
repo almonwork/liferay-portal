@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -30,7 +30,7 @@ String redirect = ParamUtil.getString(request, "redirect");
 		<aui:input name="preferences--languageIds--" type="hidden" />
 
 		<%
-		Set availableLanguageIdsSet = SetUtil.fromArray(availableLanguageIds);
+		Set<String> availableLanguageIdsSet = SetUtil.fromArray(availableLanguageIds);
 
 		// Left list
 
@@ -48,11 +48,7 @@ String redirect = ParamUtil.getString(request, "redirect");
 
 		Arrays.sort(languageIds);
 
-		Iterator itr = availableLanguageIdsSet.iterator();
-
-		while (itr.hasNext()) {
-			String languageId = (String)itr.next();
-
+		for (String languageId : availableLanguageIdsSet) {
 			if (Arrays.binarySearch(languageIds, languageId) < 0) {
 				rightList.add(new KeyValuePair(languageId, LocaleUtil.fromLanguageId(languageId).getDisplayName(locale)));
 			}
@@ -62,13 +58,13 @@ String redirect = ParamUtil.getString(request, "redirect");
 		%>
 
 		<liferay-ui:input-move-boxes
-			leftTitle="current"
-			rightTitle="available"
 			leftBoxName="currentLanguageIds"
-			rightBoxName="availableLanguageIds"
-			leftReorder="true"
 			leftList="<%= leftList %>"
+			leftReorder="true"
+			leftTitle="current"
+			rightBoxName="availableLanguageIds"
 			rightList="<%= rightList %>"
+			rightTitle="available"
 		/>
 	</aui:fieldset>
 

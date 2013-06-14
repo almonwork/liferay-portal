@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -34,6 +34,7 @@ import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.SystemProperties;
 import com.liferay.portal.kernel.util.Time;
 import com.liferay.portal.kernel.util.Validator;
+import com.liferay.portal.security.pacl.PACLClassLoaderUtil;
 import com.liferay.util.PwdGenerator;
 import com.liferay.util.ant.ExpandTask;
 
@@ -55,6 +56,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Properties;
+import java.util.concurrent.Future;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.tika.Tika;
@@ -73,11 +75,9 @@ public class FileImpl implements com.liferay.portal.kernel.util.File {
 		return _instance;
 	}
 
-	public void copyDirectory(String sourceDirName, String destinationDirName) {
-		copyDirectory(new File(sourceDirName), new File(destinationDirName));
-	}
+	public void copyDirectory(File source, File destination)
+		throws IOException {
 
-	public void copyDirectory(File source, File destination) {
 		if (source.exists() && source.isDirectory()) {
 			if (!destination.exists()) {
 				destination.mkdirs();
@@ -102,19 +102,19 @@ public class FileImpl implements com.liferay.portal.kernel.util.File {
 		}
 	}
 
-	public void copyFile(String source, String destination) {
+	public void copyDirectory(String sourceDirName, String destinationDirName)
+		throws IOException {
+
+		copyDirectory(new File(sourceDirName), new File(destinationDirName));
+	}
+
+	public void copyFile(File source, File destination) throws IOException {
 		copyFile(source, destination, false);
 	}
 
-	public void copyFile(String source, String destination, boolean lazy) {
-		copyFile(new File(source), new File(destination), lazy);
-	}
+	public void copyFile(File source, File destination, boolean lazy)
+		throws IOException {
 
-	public void copyFile(File source, File destination) {
-		copyFile(source, destination, false);
-	}
-
-	public void copyFile(File source, File destination, boolean lazy) {
 		if (!source.exists()) {
 			return;
 		}
@@ -142,25 +142,41 @@ public class FileImpl implements com.liferay.portal.kernel.util.File {
 			}
 		}
 		else {
-			if ((destination.getParentFile() != null) &&
-				(!destination.getParentFile().exists())) {
+			mkdirsParentFile(destination);
 
-				destination.getParentFile().mkdirs();
-			}
-
-			try {
-				StreamUtil.transfer(
-					new FileInputStream(source),
-					new FileOutputStream(destination));
-			}
-			catch (IOException ioe) {
-				_log.error(ioe.getMessage());
-			}
+			StreamUtil.transfer(
+				new FileInputStream(source), new FileOutputStream(destination));
 		}
 	}
 
+	public void copyFile(String source, String destination) throws IOException {
+		copyFile(source, destination, false);
+	}
+
+	public void copyFile(String source, String destination, boolean lazy)
+		throws IOException {
+
+		copyFile(new File(source), new File(destination), lazy);
+	}
+
 	public File createTempFile() {
-		return createTempFile(null);
+		return createTempFile(StringPool.BLANK);
+	}
+
+	public File createTempFile(byte[] bytes) throws IOException {
+		File file = createTempFile(StringPool.BLANK);
+
+		write(file, bytes);
+
+		return file;
+	}
+
+	public File createTempFile(InputStream is) throws IOException {
+		File file = createTempFile(StringPool.BLANK);
+
+		write(file, is);
+
+		return file;
 	}
 
 	public File createTempFile(String extension) {
@@ -192,21 +208,30 @@ public class FileImpl implements com.liferay.portal.kernel.util.File {
 			fileName, _SAFE_FILE_NAME_2, _SAFE_FILE_NAME_1);
 	}
 
+	public boolean delete(File file) {
+		if (file != null) {
+			boolean exists = true;
+
+			try {
+				exists = file.exists();
+			}
+			catch (SecurityException se) {
+
+				// We may have the permission to delete a specific file without
+				// having the permission to check if the file exists
+
+			}
+
+			if (exists) {
+				return file.delete();
+			}
+		}
+
+		return false;
+	}
+
 	public boolean delete(String file) {
 		return delete(new File(file));
-	}
-
-	public boolean delete(File file) {
-		if ((file != null) && file.exists()) {
-			return file.delete();
-		}
-		else {
-			return false;
-		}
-	}
-
-	public void deltree(String directory) {
-		deltree(new File(directory));
 	}
 
 	public void deltree(File directory) {
@@ -226,6 +251,10 @@ public class FileImpl implements com.liferay.portal.kernel.util.File {
 		}
 	}
 
+	public void deltree(String directory) {
+		deltree(new File(directory));
+	}
+
 	public String encodeSafeFileName(String fileName) {
 		if (fileName == null) {
 			return StringPool.BLANK;
@@ -235,18 +264,28 @@ public class FileImpl implements com.liferay.portal.kernel.util.File {
 			fileName, _SAFE_FILE_NAME_1, _SAFE_FILE_NAME_2);
 	}
 
-	public boolean exists(String fileName) {
-		return exists(new File(fileName));
-	}
-
 	public boolean exists(File file) {
 		return file.exists();
+	}
+
+	public boolean exists(String fileName) {
+		return exists(new File(fileName));
 	}
 
 	public String extractText(InputStream is, String fileName) {
 		String text = null;
 
+		ClassLoader portalClassLoader =
+			PACLClassLoaderUtil.getPortalClassLoader();
+
+		ClassLoader contextClassLoader =
+			PACLClassLoaderUtil.getContextClassLoader();
+
 		try {
+			if (contextClassLoader != portalClassLoader) {
+				PACLClassLoaderUtil.setContextClassLoader(portalClassLoader);
+			}
+
 			Tika tika = new Tika();
 
 			boolean forkProcess = false;
@@ -263,9 +302,11 @@ public class FileImpl implements com.liferay.portal.kernel.util.File {
 			}
 
 			if (forkProcess) {
-				text = ProcessExecutor.execute(
-					new ExtractTextProcessCallable(getBytes(is)),
-					ClassPathUtil.getPortalClassPath());
+				Future<String> future = ProcessExecutor.execute(
+					ClassPathUtil.getPortalClassPath(),
+					new ExtractTextProcessCallable(getBytes(is)));
+
+				text = future.get();
 			}
 			else {
 				text = tika.parseToString(is);
@@ -273,6 +314,11 @@ public class FileImpl implements com.liferay.portal.kernel.util.File {
 		}
 		catch (Exception e) {
 			_log.error(e, e);
+		}
+		finally {
+			if (contextClassLoader != portalClassLoader) {
+				PACLClassLoaderUtil.setContextClassLoader(contextClassLoader);
+			}
 		}
 
 		if (_log.isInfoEnabled()) {
@@ -315,9 +361,8 @@ public class FileImpl implements com.liferay.portal.kernel.util.File {
 		String[] includedFiles = directoryScanner.getIncludedFiles();
 
 		for (int i = 0; i < includedFiles.length; i++) {
-			includedFiles[i] =
-				directory.concat(StringPool.SLASH).concat(
-					replaceSeparator(includedFiles[i]));
+			includedFiles[i] = directory.concat(
+				StringPool.SLASH).concat(replaceSeparator(includedFiles[i]));
 		}
 
 		return includedFiles;
@@ -351,11 +396,23 @@ public class FileImpl implements com.liferay.portal.kernel.util.File {
 	public byte[] getBytes(InputStream inputStream, int bufferSize)
 		throws IOException {
 
+		return getBytes(inputStream, bufferSize, true);
+	}
+
+	public byte[] getBytes(
+			InputStream inputStream, int bufferSize, boolean cleanUpStream)
+		throws IOException {
+
+		if (inputStream == null) {
+			return null;
+		}
+
 		UnsyncByteArrayOutputStream unsyncByteArrayOutputStream =
 			new UnsyncByteArrayOutputStream();
 
 		StreamUtil.transfer(
-			inputStream, unsyncByteArrayOutputStream, bufferSize);
+			inputStream, unsyncByteArrayOutputStream, bufferSize,
+			cleanUpStream);
 
 		return unsyncByteArrayOutputStream.toByteArray();
 	}
@@ -376,30 +433,23 @@ public class FileImpl implements com.liferay.portal.kernel.util.File {
 	}
 
 	public String getPath(String fullFileName) {
-		int pos = fullFileName.lastIndexOf(CharPool.SLASH);
+		int x = fullFileName.lastIndexOf(CharPool.SLASH);
+		int y = fullFileName.lastIndexOf(CharPool.BACK_SLASH);
 
-		if (pos == -1) {
-			pos = fullFileName.lastIndexOf(CharPool.BACK_SLASH);
-		}
-
-		String shortFileName = fullFileName.substring(0, pos);
-
-		if (Validator.isNull(shortFileName)) {
+		if ((x == -1) && (y == -1)) {
 			return StringPool.SLASH;
 		}
+
+		String shortFileName = fullFileName.substring(0, Math.max(x, y));
 
 		return shortFileName;
 	}
 
 	public String getShortFileName(String fullFileName) {
-		int pos = fullFileName.lastIndexOf(CharPool.SLASH);
+		int x = fullFileName.lastIndexOf(CharPool.SLASH);
+		int y = fullFileName.lastIndexOf(CharPool.BACK_SLASH);
 
-		if (pos == -1) {
-			pos = fullFileName.lastIndexOf(CharPool.BACK_SLASH);
-		}
-
-		String shortFileName =
-			fullFileName.substring(pos + 1, fullFileName.length());
+		String shortFileName = fullFileName.substring(Math.max(x, y) + 1);
 
 		return shortFileName;
 	}
@@ -490,10 +540,6 @@ public class FileImpl implements com.liferay.portal.kernel.util.File {
 		return isSameContent(file, byteBuffer.array(), byteBuffer.limit());
 	}
 
-	public String[] listDirs(String fileName) {
-		return listDirs(new File(fileName));
-	}
-
 	public String[] listDirs(File file) {
 		List<String> dirs = new ArrayList<String>();
 
@@ -508,12 +554,8 @@ public class FileImpl implements com.liferay.portal.kernel.util.File {
 		return dirs.toArray(new String[dirs.size()]);
 	}
 
-	public String[] listFiles(String fileName) {
-		if (Validator.isNull(fileName)) {
-			return new String[0];
-		}
-
-		return listFiles(new File(fileName));
+	public String[] listDirs(String fileName) {
+		return listDirs(new File(fileName));
 	}
 
 	public String[] listFiles(File file) {
@@ -530,14 +572,18 @@ public class FileImpl implements com.liferay.portal.kernel.util.File {
 		return files.toArray(new String[files.size()]);
 	}
 
+	public String[] listFiles(String fileName) {
+		if (Validator.isNull(fileName)) {
+			return new String[0];
+		}
+
+		return listFiles(new File(fileName));
+	}
+
 	public void mkdirs(String pathName) {
 		File file = new File(pathName);
 
 		file.mkdirs();
-	}
-
-	public boolean move(String sourceFileName, String destinationFileName) {
-		return move(new File(sourceFileName), new File(destinationFileName));
 	}
 
 	public boolean move(File source, File destination) {
@@ -550,8 +596,8 @@ public class FileImpl implements com.liferay.portal.kernel.util.File {
 		return source.renameTo(destination);
 	}
 
-	public String read(String fileName) throws IOException {
-		return read(new File(fileName));
+	public boolean move(String sourceFileName, String destinationFileName) {
+		return move(new File(sourceFileName), new File(destinationFileName));
 	}
 
 	public String read(File file) throws IOException {
@@ -574,6 +620,10 @@ public class FileImpl implements com.liferay.portal.kernel.util.File {
 			return StringUtil.replace(
 				s, StringPool.RETURN_NEW_LINE, StringPool.NEW_LINE);
 		}
+	}
+
+	public String read(String fileName) throws IOException {
+		return read(new File(fileName));
 	}
 
 	public String replaceSeparator(String fileName) {
@@ -683,6 +733,69 @@ public class FileImpl implements com.liferay.portal.kernel.util.File {
 		ExpandTask.expand(source, destination);
 	}
 
+	public void write(File file, byte[] bytes) throws IOException {
+		write(file, bytes, 0, bytes.length);
+	}
+
+	public void write(File file, byte[] bytes, int offset, int length)
+		throws IOException {
+
+		mkdirsParentFile(file);
+
+		FileOutputStream fileOutputStream = new FileOutputStream(file);
+
+		fileOutputStream.write(bytes, offset, length);
+
+		fileOutputStream.close();
+	}
+
+	public void write(File file, InputStream is) throws IOException {
+		mkdirsParentFile(file);
+
+		StreamUtil.transfer(is, new FileOutputStream(file));
+	}
+
+	public void write(File file, String s) throws IOException {
+		write(file, s, false);
+	}
+
+	public void write(File file, String s, boolean lazy) throws IOException {
+		write(file, s, lazy, false);
+	}
+
+	public void write(File file, String s, boolean lazy, boolean append)
+		throws IOException {
+
+		if (s == null) {
+			return;
+		}
+
+		mkdirsParentFile(file);
+
+		if (lazy && file.exists()) {
+			String content = read(file);
+
+			if (content.equals(s)) {
+				return;
+			}
+		}
+
+		Writer writer = new OutputStreamWriter(
+			new FileOutputStream(file, append), StringPool.UTF8);
+
+		writer.write(s);
+
+		writer.close();
+	}
+
+	public void write(String fileName, byte[] bytes) throws IOException {
+		write(new File(fileName), bytes);
+	}
+
+	public void write(String fileName, InputStream is) throws IOException {
+		write(new File(fileName), is);
+	}
+
 	public void write(String fileName, String s) throws IOException {
 		write(new File(fileName), s);
 	}
@@ -719,71 +832,24 @@ public class FileImpl implements com.liferay.portal.kernel.util.File {
 		write(new File(pathName, fileName), s, lazy, append);
 	}
 
-	public void write(File file, String s) throws IOException {
-		write(file, s, false);
-	}
+	protected void mkdirsParentFile(File file) {
+		File parentFile = file.getParentFile();
 
-	public void write(File file, String s, boolean lazy)
-		throws IOException {
-
-		write(file, s, lazy, false);
-	}
-
-	public void write(File file, String s, boolean lazy, boolean append)
-		throws IOException {
-
-		if (file.getParent() != null) {
-			mkdirs(file.getParent());
+		if (parentFile == null) {
+			return;
 		}
 
-		if (lazy && file.exists()) {
-			String content = read(file);
-
-			if (content.equals(s)) {
-				return;
+		try {
+			if (!parentFile.exists()) {
+				parentFile.mkdirs();
 			}
 		}
+		catch (SecurityException se) {
 
-		Writer writer = new OutputStreamWriter(
-			new FileOutputStream(file, append), StringPool.UTF8);
+			// We may have the permission to write a specific file without
+			// having the permission to check if the parent file exists
 
-		writer.write(s);
-
-		writer.close();
-	}
-
-	public void write(String fileName, byte[] bytes) throws IOException {
-		write(new File(fileName), bytes);
-	}
-
-	public void write(File file, byte[] bytes) throws IOException {
-		write(file, bytes, 0, bytes.length);
-	}
-
-	public void write(File file, byte[] bytes, int offset, int length)
-		throws IOException {
-
-		if (file.getParent() != null) {
-			mkdirs(file.getParent());
 		}
-
-		FileOutputStream fos = new FileOutputStream(file);
-
-		fos.write(bytes, offset, length);
-
-		fos.close();
-	}
-
-	public void write(String fileName, InputStream is) throws IOException {
-		write(new File(fileName), is);
-	}
-
-	public void write(File file, InputStream is) throws IOException {
-		if (file.getParent() != null) {
-			mkdirs(file.getParent());
-		}
-
-		StreamUtil.transfer(is, new FileOutputStream(file));
 	}
 
 	private static final String[] _SAFE_FILE_NAME_1 = {

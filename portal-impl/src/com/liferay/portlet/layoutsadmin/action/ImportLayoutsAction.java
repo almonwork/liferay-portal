@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -17,6 +17,7 @@ package com.liferay.portlet.layoutsadmin.action;
 import com.liferay.portal.LARFileException;
 import com.liferay.portal.LARTypeException;
 import com.liferay.portal.LayoutImportException;
+import com.liferay.portal.LayoutPrototypeException;
 import com.liferay.portal.NoSuchGroupException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
@@ -54,13 +55,13 @@ public class ImportLayoutsAction extends PortletAction {
 		throws Exception {
 
 		try {
-			UploadPortletRequest uploadRequest =
+			UploadPortletRequest uploadPortletRequest =
 				PortalUtil.getUploadPortletRequest(actionRequest);
 
-			long groupId = ParamUtil.getLong(uploadRequest, "groupId");
+			long groupId = ParamUtil.getLong(uploadPortletRequest, "groupId");
 			boolean privateLayout = ParamUtil.getBoolean(
-				uploadRequest, "privateLayout");
-			File file = uploadRequest.getFile("importFileName");
+				uploadPortletRequest, "privateLayout");
+			File file = uploadPortletRequest.getFile("importFileName");
 
 			if (!file.exists()) {
 				throw new LARFileException("Import file does not exist");
@@ -70,12 +71,21 @@ public class ImportLayoutsAction extends PortletAction {
 				groupId, privateLayout, actionRequest.getParameterMap(), file);
 
 			addSuccessMessage(actionRequest, actionResponse);
+
+			String redirect = ParamUtil.getString(actionRequest, "redirect");
+
+			sendRedirect(actionRequest, actionResponse, redirect);
 		}
 		catch (Exception e) {
 			if ((e instanceof LARFileException) ||
 				(e instanceof LARTypeException)) {
 
-				SessionErrors.add(actionRequest, e.getClass().getName());
+				SessionErrors.add(actionRequest, e.getClass());
+			}
+			else if (e instanceof LayoutPrototypeException) {
+				LayoutPrototypeException lpe = (LayoutPrototypeException)e;
+
+				SessionErrors.add(actionRequest, e.getClass(), lpe);
 			}
 			else {
 				_log.error(e, e);
@@ -84,8 +94,6 @@ public class ImportLayoutsAction extends PortletAction {
 					actionRequest, LayoutImportException.class.getName());
 			}
 		}
-
-		setForward(actionRequest, "portlet.layouts_admin.edit_layouts");
 	}
 
 	@Override
@@ -101,7 +109,7 @@ public class ImportLayoutsAction extends PortletAction {
 			if (e instanceof NoSuchGroupException ||
 				e instanceof PrincipalException) {
 
-				SessionErrors.add(renderRequest, e.getClass().getName());
+				SessionErrors.add(renderRequest, e.getClass());
 
 				return mapping.findForward("portlet.layouts_admin.error");
 			}

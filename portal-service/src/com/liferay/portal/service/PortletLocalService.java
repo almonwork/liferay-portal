@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -35,7 +35,8 @@ import com.liferay.portal.kernel.transaction.Transactional;
  */
 @Transactional(isolation = Isolation.PORTAL, rollbackFor =  {
 	PortalException.class, SystemException.class})
-public interface PortletLocalService extends PersistedModelLocalService {
+public interface PortletLocalService extends BaseLocalService,
+	PersistedModelLocalService {
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
@@ -65,10 +66,11 @@ public interface PortletLocalService extends PersistedModelLocalService {
 	* Deletes the portlet with the primary key from the database. Also notifies the appropriate model listeners.
 	*
 	* @param id the primary key of the portlet
+	* @return the portlet that was removed
 	* @throws PortalException if a portlet with the primary key could not be found
 	* @throws SystemException if a system exception occurred
 	*/
-	public void deletePortlet(long id)
+	public com.liferay.portal.model.Portlet deletePortlet(long id)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException;
 
@@ -76,10 +78,14 @@ public interface PortletLocalService extends PersistedModelLocalService {
 	* Deletes the portlet from the database. Also notifies the appropriate model listeners.
 	*
 	* @param portlet the portlet
+	* @return the portlet that was removed
 	* @throws SystemException if a system exception occurred
 	*/
-	public void deletePortlet(com.liferay.portal.model.Portlet portlet)
+	public com.liferay.portal.model.Portlet deletePortlet(
+		com.liferay.portal.model.Portlet portlet)
 		throws com.liferay.portal.kernel.exception.SystemException;
+
+	public com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery();
 
 	/**
 	* Performs a dynamic query on the database and returns the matching rows.
@@ -141,6 +147,10 @@ public interface PortletLocalService extends PersistedModelLocalService {
 	*/
 	public long dynamicQueryCount(
 		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery)
+		throws com.liferay.portal.kernel.exception.SystemException;
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public com.liferay.portal.model.Portlet fetchPortlet(long id)
 		throws com.liferay.portal.kernel.exception.SystemException;
 
 	/**
@@ -238,6 +248,8 @@ public interface PortletLocalService extends PersistedModelLocalService {
 
 	public void clearCache();
 
+	public void clearCompanyPortletsPool();
+
 	/**
 	* @deprecated {@link #clonePortlet(String)}
 	*/
@@ -308,6 +320,9 @@ public interface PortletLocalService extends PersistedModelLocalService {
 		throws com.liferay.portal.kernel.exception.SystemException;
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public java.util.List<com.liferay.portal.model.Portlet> getScopablePortlets();
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public com.liferay.portal.model.PortletCategory getWARDisplay(
 		java.lang.String servletContextName, java.lang.String xml)
 		throws com.liferay.portal.kernel.exception.SystemException;
@@ -324,6 +339,13 @@ public interface PortletLocalService extends PersistedModelLocalService {
 		java.lang.String servletContextName,
 		javax.servlet.ServletContext servletContext, java.lang.String[] xmls,
 		com.liferay.portal.kernel.plugin.PluginPackage pluginPackage);
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public java.util.Map<java.lang.String, com.liferay.portal.model.Portlet> loadGetPortletsPool(
+		long companyId)
+		throws com.liferay.portal.kernel.exception.SystemException;
+
+	public void removeCompanyPortletsPool(long companyId);
 
 	public com.liferay.portal.model.Portlet updatePortlet(long companyId,
 		java.lang.String portletId, java.lang.String roles, boolean active)

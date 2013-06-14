@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -32,8 +32,7 @@ import java.util.List;
  */
 public class TeamServiceImpl extends TeamServiceBaseImpl {
 
-	public Team addTeam(
-			long groupId, String name, String description)
+	public Team addTeam(long groupId, String name, String description)
 		throws PortalException, SystemException {
 
 		GroupPermissionUtil.check(
@@ -62,9 +61,7 @@ public class TeamServiceImpl extends TeamServiceBaseImpl {
 
 	}
 
-	public Team getTeam(long teamId)
-		throws PortalException, SystemException {
-
+	public Team getTeam(long teamId) throws PortalException, SystemException {
 		TeamPermissionUtil.check(
 			getPermissionChecker(), teamId, ActionKeys.VIEW);
 
@@ -76,8 +73,7 @@ public class TeamServiceImpl extends TeamServiceBaseImpl {
 
 		Team team = teamLocalService.getTeam(groupId, name);
 
-		TeamPermissionUtil.check(
-			getPermissionChecker(), team, ActionKeys.VIEW);
+		TeamPermissionUtil.check(getPermissionChecker(), team, ActionKeys.VIEW);
 
 		return team;
 	}

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -81,6 +81,8 @@ public interface PropsKeys {
 
 	public static final String ANNOUNCEMENTS_ENTRY_CHECK_INTERVAL = "announcements.entry.check.interval";
 
+	public static final String ANNOUNCEMENTS_ENTRY_PAGE_DELTA_VALUES = "announcements.entry.page.delta.values";
+
 	public static final String ANNOUNCEMENTS_ENTRY_TYPES = "announcements.entry.types";
 
 	public static final String APPLICATION_SHUTDOWN_EVENTS = "application.shutdown.events";
@@ -98,6 +100,8 @@ public interface PropsKeys {
 	public static final String ASSET_FILTER_SEARCH_LIMIT = "asset.filter.search.limit";
 
 	public static final String ASSET_PUBLISHER_DISPLAY_STYLES = "asset.publisher.display.styles";
+
+	public static final String ASSET_PUBLISHER_DISPLAY_STYLES_TEMPLATE_CONTENT = "asset.publisher.display.styles.template.content";
 
 	public static final String ASSET_RENDERER_ENABLED = "asset.renderer.enabled.";
 
@@ -122,6 +126,8 @@ public interface PropsKeys {
 	public static final String AUTH_LOGIN_DISABLED_PATH = "auth.login.disabled.path";
 
 	public static final String AUTH_LOGIN_PORTLET_NAME = "auth.login.portlet.name";
+
+	public static final String AUTH_LOGIN_PROMPT_ENABLED = "auth.login.prompt.enabled";
 
 	public static final String AUTH_LOGIN_SITE_URL = "auth.login.site.url";
 
@@ -185,6 +191,8 @@ public interface PropsKeys {
 
 	public static final String AUTO_DEPLOY_UNPACK_WAR = "auto.deploy.unpack.war";
 
+	public static final String AUTO_DEPLOY_WEBSPHERE_WSADMIN_APP_MANAGER_QUERY = "auto.deploy.websphere.wsadmin.app.manager.query";
+
 	public static final String AUTO_LOGIN_HOOKS = "auto.login.hooks";
 
 	public static final String AUTO_LOGIN_IGNORE_HOSTS = "auto.login.ignore.hosts";
@@ -211,7 +219,11 @@ public interface PropsKeys {
 
 	public static final String BLOGS_ENTRY_COMMENTS_ENABLED = "blogs.entry.comments.enabled";
 
+	public static final String BLOGS_ENTRY_PAGE_DELTA_VALUES = "blogs.entry.page.delta.values";
+
 	public static final String BLOGS_ENTRY_PREVIOUS_AND_NEXT_NAVIGATION_ENABLED = "blogs.entry.previous.and.next.navigation.enabled";
+
+	public static final String BLOGS_ENTRY_URL_TITLE_REGEXP = "blogs.entry.url.title.regexp";
 
 	public static final String BLOGS_IMAGE_EXTENSIONS = "blogs.image.extensions";
 
@@ -238,6 +250,8 @@ public interface PropsKeys {
 	public static final String BREADCRUMB_SHOW_GUEST_GROUP = "breadcrumb.show.guest.group";
 
 	public static final String BREADCRUMB_SHOW_PARENT_GROUPS = "breadcrumb.show.parent.groups";
+
+	public static final String BROWSER_CACHE_DISABLED = "browser.cache.disabled";
 
 	public static final String BROWSER_CACHE_SIGNED_IN_DISABLED = "browser.cache.signed.in.disabled";
 
@@ -321,13 +335,13 @@ public interface PropsKeys {
 
 	public static final String CAS_SERVICE_URL = "cas.service.url";
 
+	public static final String CDN_DYNAMIC_RESOURCES_ENABLED = "cdn.dynamic.resources.enabled";
+
 	public static final String CDN_HOST_HTTP = "cdn.host.http";
 
 	public static final String CDN_HOST_HTTPS = "cdn.host.https";
 
 	public static final String CLUSTER_EXECUTOR_DEBUG_ENABLED = "cluster.executor.debug.enabled";
-
-	public static final String CLUSTER_EXECUTOR_HEARTBEAT_INTERVAL = "cluster.executor.heartbeat.interval";
 
 	public static final String CLUSTER_LINK_AUTODETECT_ADDRESS = "cluster.link.autodetect.address";
 
@@ -339,6 +353,8 @@ public interface PropsKeys {
 
 	public static final String CLUSTER_LINK_ENABLED = "cluster.link.enabled";
 
+	public static final String COMBO_ALLOWED_FILE_EXTENSIONS = "combo.allowed.file.extensions";
+
 	public static final String COMBO_CHECK_TIMESTAMP = "combo.check.timestamp";
 
 	public static final String COMBO_CHECK_TIMESTAMP_INTERVAL = "combo.check.timestamp.interval";
@@ -346,6 +362,12 @@ public interface PropsKeys {
 	public static final String COMMUNITIES_CONTROL_PANEL_MEMBERS_VISIBLE = "communities.control.panel.members.visible";
 
 	public static final String COMPANY_DEFAULT_HOME_URL = "company.default.home.url";
+
+	public static final String COMPANY_DEFAULT_LOCALE = "company.default.locale";
+
+	public static final String COMPANY_DEFAULT_NAME = "company.default.name";
+
+	public static final String COMPANY_DEFAULT_TIME_ZONE = "company.default.time.zone";
 
 	public static final String COMPANY_DEFAULT_WEB_ID = "company.default.web.id";
 
@@ -377,6 +399,8 @@ public interface PropsKeys {
 
 	public static final String COMPANY_SECURITY_STRANGERS_WITH_MX = "company.security.strangers.with.mx";
 
+	public static final String COMPANY_SETTINGS_FORM_AUTHENTICATION = "company.settings.form.authentication";
+
 	public static final String COMPANY_SETTINGS_FORM_CONFIGURATION = "company.settings.form.configuration";
 
 	public static final String COMPANY_SETTINGS_FORM_IDENTIFICATION = "company.settings.form.identification";
@@ -404,6 +428,8 @@ public interface PropsKeys {
 	public static final String CUSTOM_SQL_FUNCTION_ISNOTNULL = "custom.sql.function.isnotnull";
 
 	public static final String CUSTOM_SQL_FUNCTION_ISNULL = "custom.sql.function.isnull";
+
+	public static final String DATABASE_INDEXES_UPDATE_ON_STARTUP = "database.indexes.update.on.startup";
 
 	public static final String DATABASE_MYSQL_ENGINE = "database.mysql.engine";
 
@@ -493,6 +519,8 @@ public interface PropsKeys {
 
 	public static final String DIRECT_SERVLET_CONTEXT_RELOAD = "direct.servlet.context.reload";
 
+	public static final String DISCUSSION_COMMENTS_ALWAYS_EDITABLE_BY_OWNER = "discussion.comments.always.editable.by.owner";
+
 	public static final String DISCUSSION_EMAIL_BODY = "discussion.email.body";
 
 	public static final String DISCUSSION_EMAIL_COMMENTS_ADDED_ENABLED = "discussion.email.comments.added.enabled";
@@ -505,39 +533,75 @@ public interface PropsKeys {
 
 	public static final String DL_COMPARABLE_FILE_EXTENSIONS = "dl.comparable.file.extensions";
 
+	public static final String DL_DEFAULT_DISPLAY_VIEW = "dl.default.display.view";
+
 	public static final String DL_DISPLAY_VIEWS = "dl.display.views";
 
 	public static final String DL_FILE_ENTRY_COMMENTS_ENABLED = "dl.file.entry.comments.enabled";
 
 	public static final String DL_FILE_ENTRY_DRAFTS_ENABLED = "dl.file.entry.drafts.enabled";
 
+	public static final String DL_FILE_ENTRY_PREVIEW_AUDIO = "dl.file.entry.preview.audio.";
+
+	public static final String DL_FILE_ENTRY_PREVIEW_AUDIO_BIT_RATE = "dl.file.entry.preview.audio.bit.rate";
+
+	public static final String DL_FILE_ENTRY_PREVIEW_AUDIO_CONTAINERS = "dl.file.entry.preview.audio.containers";
+
+	public static final String DL_FILE_ENTRY_PREVIEW_AUDIO_MIME_TYPES = "dl.file.entry.preview.audio.mime.types";
+
+	public static final String DL_FILE_ENTRY_PREVIEW_AUDIO_SAMPLE_RATE = "dl.file.entry.preview.audio.sample.rate";
+
 	public static final String DL_FILE_ENTRY_PREVIEW_DOCUMENT_DEPTH = "dl.file.entry.preview.document.depth";
 
 	public static final String DL_FILE_ENTRY_PREVIEW_DOCUMENT_DPI = "dl.file.entry.preview.document.dpi";
 
-	public static final String DL_FILE_ENTRY_PREVIEW_DOCUMENT_HEIGHT = "dl.file.entry.preview.document.height";
+	public static final String DL_FILE_ENTRY_PREVIEW_DOCUMENT_MAX_HEIGHT = "dl.file.entry.preview.document.max.height";
 
-	public static final String DL_FILE_ENTRY_PREVIEW_DOCUMENT_WIDTH = "dl.file.entry.preview.document.width";
+	public static final String DL_FILE_ENTRY_PREVIEW_DOCUMENT_MAX_WIDTH = "dl.file.entry.preview.document.max.width";
 
 	public static final String DL_FILE_ENTRY_PREVIEW_ENABLED = "dl.file.entry.preview.enabled";
 
+	public static final String DL_FILE_ENTRY_PREVIEW_FORK_PROCESS_ENABLED = "dl.file.entry.preview.fork.process.enabled";
+
+	public static final String DL_FILE_ENTRY_PREVIEW_IMAGE_MIME_TYPES = "dl.file.entry.preview.image.mime.types";
+
+	public static final String DL_FILE_ENTRY_PREVIEW_VIDEO = "dl.file.entry.preview.video.";
+
+	public static final String DL_FILE_ENTRY_PREVIEW_VIDEO_BIT_RATE = "dl.file.entry.preview.video.bit.rate";
+
+	public static final String DL_FILE_ENTRY_PREVIEW_VIDEO_CONTAINERS = "dl.file.entry.preview.video.containers";
+
+	public static final String DL_FILE_ENTRY_PREVIEW_VIDEO_FRAME_RATE_DENOMINATOR = "dl.file.entry.preview.video.frame.rate.denominator";
+
+	public static final String DL_FILE_ENTRY_PREVIEW_VIDEO_FRAME_RATE_NUMERATOR = "dl.file.entry.preview.video.frame.rate.numerator";
+
 	public static final String DL_FILE_ENTRY_PREVIEW_VIDEO_HEIGHT = "dl.file.entry.preview.video.height";
+
+	public static final String DL_FILE_ENTRY_PREVIEW_VIDEO_MIME_TYPES = "dl.file.entry.preview.video.mime.types";
 
 	public static final String DL_FILE_ENTRY_PREVIEW_VIDEO_WIDTH = "dl.file.entry.preview.video.width";
 
 	public static final String DL_FILE_ENTRY_PROCESSORS = "dl.file.entry.processors";
 
+	public static final String DL_FILE_ENTRY_PROCESSORS_TRIGGER_SYNCHRONOUSLY = "dl.file.entry.processors.trigger.synchronously";
+
 	public static final String DL_FILE_ENTRY_READ_COUNT_ENABLED = "dl.file.entry.read.count.enabled";
 
-	public static final String DL_FILE_ENTRY_THUMBNAIL_DEPTH = "dl.file.entry.thumbnail.depth";
+	public static final String DL_FILE_ENTRY_THUMBNAIL_CUSTOM_1_MAX_HEIGHT = "dl.file.entry.thumbnail.custom1.max.height";
 
-	public static final String DL_FILE_ENTRY_THUMBNAIL_DPI = "dl.file.entry.thumbnail.dpi";
+	public static final String DL_FILE_ENTRY_THUMBNAIL_CUSTOM_1_MAX_WIDTH = "dl.file.entry.thumbnail.custom1.max.width";
+
+	public static final String DL_FILE_ENTRY_THUMBNAIL_CUSTOM_2_MAX_HEIGHT = "dl.file.entry.thumbnail.custom2.max.height";
+
+	public static final String DL_FILE_ENTRY_THUMBNAIL_CUSTOM_2_MAX_WIDTH = "dl.file.entry.thumbnail.custom2.max.width";
 
 	public static final String DL_FILE_ENTRY_THUMBNAIL_ENABLED = "dl.file.entry.thumbnail.enabled";
 
-	public static final String DL_FILE_ENTRY_THUMBNAIL_HEIGHT = "dl.file.entry.thumbnail.height";
+	public static final String DL_FILE_ENTRY_THUMBNAIL_MAX_HEIGHT = "dl.file.entry.thumbnail.max.height";
 
-	public static final String DL_FILE_ENTRY_THUMBNAIL_WIDTH = "dl.file.entry.thumbnail.width";
+	public static final String DL_FILE_ENTRY_THUMBNAIL_MAX_WIDTH = "dl.file.entry.thumbnail.max.width";
+
+	public static final String DL_FILE_ENTRY_THUMBNAIL_VIDEO_FRAME_PERCENTAGE = "dl.file.entry.thumbnail.video.frame.percentage";
 
 	public static final String DL_FILE_EXTENSIONS = "dl.file.extensions";
 
@@ -564,6 +628,12 @@ public interface PropsKeys {
 	public static final String DL_REPOSITORY_CMIS_DELETE_DEPTH = "dl.repository.cmis.delete.depth";
 
 	public static final String DL_REPOSITORY_IMPL = "dl.repository.impl";
+
+	public static final String DL_SHOW_LIFERAY_SYNC_MESSAGE = "dl.show.liferay.sync.message";
+
+	public static final String DL_STORE_ANTIVIRUS_ENABLED = "dl.store.antivirus.enabled";
+
+	public static final String DL_STORE_ANTIVIRUS_IMPL = "dl.store.antivirus.impl";
 
 	public static final String DL_STORE_CMIS_CREDENTIALS_PASSWORD = "dl.store.cmis.credentials.password";
 
@@ -609,6 +679,8 @@ public interface PropsKeys {
 
 	public static final String DYNAMIC_DATA_MAPPING_TEMPLATE_LANGUAGE_TYPES = "dynamic.data.mapping.template.language.types";
 
+	public static final String DYNAMIC_RESOURCE_SERVLET_ALLOWED_PATHS = "dynamic.resource.servlet.allowed.paths";
+
 	public static final String EDITOR_WYSIWYG_DEFAULT = "editor.wysiwyg.default";
 
 	public static final String EHCACHE_BLOCKING_CACHE_ALLOWED = "ehcache.blocking.cache.allowed";
@@ -643,6 +715,8 @@ public interface PropsKeys {
 
 	public static final String FACEBOOK_CONNECT_OAUTH_TOKEN_URL = "facebook.connect.oauth.token.url";
 
+	public static final String FACEBOOK_CONNECT_VERIFIED_ACCOUNT_REQUIRED = "facebook.connect.verified.account.required";
+
 	public static final String FIELD_EDITABLE_COM_LIFERAY_PORTAL_MODEL_USER_EMAILADDRESS = "field.editable.com.liferay.portal.model.User.emailAddress";
 
 	public static final String FIELD_EDITABLE_COM_LIFERAY_PORTAL_MODEL_USER_SCREENNAME = "field.editable.com.liferay.portal.model.User.screenName";
@@ -669,17 +743,19 @@ public interface PropsKeys {
 
 	public static final String FREEMARKER_ENGINE_CACHE_ENABLED = "freemarker.engine.cache.enabled";
 
-	public static final String FREEMARKER_ENGINE_CACHE_STORAGE = "freemarker.engine.cache.storage";
-
 	public static final String FREEMARKER_ENGINE_LOCALIZED_LOOKUP = "freemarker.engine.localized.lookup";
 
 	public static final String FREEMARKER_ENGINE_MACRO_LIBRARY = "freemarker.engine.macro.library";
 
-	public static final String FREEMARKER_ENGINE_MODIFICATION_CHECK_INTERVAL = "freemarker.engine.modification.check.interval";
+	public static final String FREEMARKER_ENGINE_RESOURCE_MODIFICATION_CHECK_INTERVAL = "freemarker.engine.resource.modification.check.interval";
+
+	public static final String FREEMARKER_ENGINE_RESTRICTED_CLASSES = "freemarker.engine.restricted.classes";
+
+	public static final String FREEMARKER_ENGINE_RESTRICTED_PACKAGES = "freemarker.engine.restricted.packages";
 
 	public static final String FREEMARKER_ENGINE_TEMPLATE_EXCEPTION_HANDLER = "freemarker.engine.template.exception.handler";
 
-	public static final String FREEMARKER_ENGINE_TEMPLATE_LOADERS = "freemarker.engine.template.loaders";
+	public static final String FREEMARKER_ENGINE_TEMPLATE_PARSERS = "freemarker.engine.template.parsers";
 
 	public static final String GLOBAL_SHUTDOWN_EVENTS = "global.shutdown.events";
 
@@ -723,18 +799,6 @@ public interface PropsKeys {
 
 	public static final String IFRAME_PASSWORD_PASSWORD_TOKEN_ROLE = "iframe.password.token.role";
 
-	public static final String IG_IMAGE_CUSTOM_1_MAX_DIMENSION = "ig.image.custom1.max.dimension";
-
-	public static final String IG_IMAGE_CUSTOM_2_MAX_DIMENSION = "ig.image.custom2.max.dimension";
-
-	public static final String IG_IMAGE_EXTENSIONS = "ig.image.extensions";
-
-	public static final String IG_IMAGE_MAX_SIZE = "ig.image.max.size";
-
-	public static final String IG_IMAGE_THUMBNAIL_MAX_DIMENSION = "ig.image.thumbnail.max.dimension";
-
-	public static final String IG_PUBLISH_TO_LIVE_BY_DEFAULT = "ig.publish.to.live.by.default";
-
 	public static final String IMAGE_AUTO_SCALE = "image.auto.scale";
 
 	public static final String IMAGE_DEFAULT_COMPANY_LOGO = "image.default.company.logo";
@@ -755,11 +819,15 @@ public interface PropsKeys {
 
 	public static final String IMAGEMAGICK_GLOBAL_SEARCH_PATH = "imagemagick.global.search.path";
 
+	public static final String IMAGEMAGICK_RESOURCE_LIMIT = "imagemagick.resource.limit.";
+
 	public static final String INDEX_DATE_FORMAT_PATTERN = "index.date.format.pattern";
 
 	public static final String INDEX_DUMP_COMPRESSION_ENABLED = "index.dump.compression.enabled";
 
 	public static final String INDEX_FILTER_SEARCH_LIMIT = "index.filter.search.limit";
+
+	public static final String INDEX_FORCE_GC_BEFORE_DELETE = "index.force.gc.before.delete";
 
 	public static final String INDEX_ON_STARTUP = "index.on.startup";
 
@@ -768,6 +836,8 @@ public interface PropsKeys {
 	public static final String INDEX_ON_UPGRADE = "index.on.upgrade";
 
 	public static final String INDEX_READ_ONLY = "index.read.only";
+
+	public static final String INDEX_SEARCH_ENGINE_ID = "index.search.engine.id";
 
 	public static final String INDEX_SEARCH_HIGHLIGHT_ENABLED = "index.search.highlight.enabled";
 
@@ -779,6 +849,10 @@ public interface PropsKeys {
 
 	public static final String INDEX_SEARCH_SCORING_ENABLED = "index.search.scoring.enabled";
 
+	public static final String INDEX_SORTABLE_TEXT_FIELDS = "index.sortable.text.fields";
+
+	public static final String INDEX_SORTABLE_TEXT_FIELDS_TRUNCATED_LENGTH = "index.sortable.text.fields.truncated.length";
+
 	public static final String INDEX_WITH_THREAD = "index.with.thread";
 
 	public static final String INVITATION_EMAIL_MAX_RECIPIENTS = "invitation.email.max.recipients";
@@ -788,6 +862,8 @@ public interface PropsKeys {
 	public static final String INVITATION_EMAIL_MESSAGE_SUBJECT = "invitation.email.message.subject";
 
 	public static final String INVOKER_FILTER_CHAIN_SIZE = "invoker.filter.chain.cache.size";
+
+	public static final String JAVADOC_MANAGER_ENABLED = "javadoc.manager.enabled";
 
 	public static final String JAVASCRIPT_BAREBONE_ENABLED = "javascript.barebone.enabled";
 
@@ -821,7 +897,21 @@ public interface PropsKeys {
 
 	public static final String JCR_WORKSPACE_NAME = "jcr.workspace.name";
 
+	public static final String JCR_WRAP_SESSION = "jcr.wrap.session";
+
+	public static final String JDBC_DEFAULT_DRIVER_CLASS_NAME = "jdbc.default.driverClassName";
+
+	public static final String JDBC_DEFAULT_JNDI_NAME = "jdbc.default.jndi.name";
+
 	public static final String JDBC_DEFAULT_LIFERAY_POOL_PROVIDER = "jdbc.default.liferay.pool.provider";
+
+	public static final String JDBC_DEFAULT_PASSWORD = "jdbc.default.password";
+
+	public static final String JDBC_DEFAULT_URL = "jdbc.default.url";
+
+	public static final String JDBC_DEFAULT_USERNAME = "jdbc.default.username";
+
+	public static final String JNDI_ENVIRONMENT = "jndi.environment.";
 
 	public static final String JOURNAL_ARTICLE_CHECK_INTERVAL = "journal.article.check.interval";
 
@@ -830,6 +920,8 @@ public interface PropsKeys {
 	public static final String JOURNAL_ARTICLE_CUSTOM_TOKEN_VALUE = "journal.article.custom.token.value";
 
 	public static final String JOURNAL_ARTICLE_CUSTOM_TOKENS = "journal.article.custom.tokens";
+
+	public static final String JOURNAL_ARTICLE_EXPIRE_ALL_VERSIONS = "journal.article.expire.all.versions";
 
 	public static final String JOURNAL_ARTICLE_FORCE_AUTOGENERATE_ID = "journal.article.force.autogenerate.id";
 
@@ -842,6 +934,8 @@ public interface PropsKeys {
 	public static final String JOURNAL_ARTICLE_TOKEN_PAGE_BREAK = "journal.article.token.page.break";
 
 	public static final String JOURNAL_ARTICLE_TYPES = "journal.article.types";
+
+	public static final String JOURNAL_ARTICLE_URL_TITLE_REGEXP = "journal.article.url.title.regexp";
 
 	public static final String JOURNAL_ARTICLE_VIEW_PERMISSION_CHECK_ENABLED = "journal.article.view.permission.check.enabled";
 
@@ -937,9 +1031,27 @@ public interface PropsKeys {
 
 	public static final String JPA_PROVIDER_PROPERTY_PREFIX = "jpa.provider.property.";
 
+	public static final String JSON_DESERIALIZER_STRICT_MODE = "json.deserializer.strict.mode";
+
+	public static final String JSON_SERVICE_AUTH_TOKEN_ENABLED = "json.service.auth.token.enabled";
+
+	public static final String JSON_SERVICE_AUTH_TOKEN_HOSTS_ALLOWED = "json.service.auth.token.hosts.allowed";
+
 	public static final String JSON_SERVICE_INVALID_CLASS_NAMES = "json.service.invalid.class.names";
 
+	public static final String JSON_SERVICE_PUBLIC_METHODS = "json.service.public.methods";
+
+	public static final String JSON_WEB_SERVICE_ENABLED = "json.web.service.enabled";
+
+	public static final String JSONWS_WEB_SERVICE_INVALID_HTTP_METHODS = "jsonws.web.service.invalid.http.methods";
+
+	public static final String JSONWS_WEB_SERVICE_PUBLIC_METHODS = "jsonws.web.service.public.methods";
+
+	public static final String JSONWS_WEB_SERVICE_STRICT_HTTP_METHOD = "jsonws.web.service.strict.http.method";
+
 	public static final String JSP_WRITER_BUFFER_SIZE = "jsp.writer.buffer.size";
+
+	public static final String LAYOUT_AJAX_RENDER_ENABLE = "layout.ajax.render.enable";
 
 	public static final String LAYOUT_CLONE_IMPL = "layout.clone.impl";
 
@@ -979,11 +1091,31 @@ public interface PropsKeys {
 
 	public static final String LAYOUT_PARALLEL_RENDER_ENABLE = "layout.parallel.render.enable";
 
+	public static final String LAYOUT_PARALLEL_RENDER_THREAD_POOL_ALLOW_CORE_THREAD_TIMEOUT = "layout.parallel.render.thread.pool.allow.core.thread.timeout";
+
+	public static final String LAYOUT_PARALLEL_RENDER_THREAD_POOL_CORE_THREAD_COUNT = "layout.parallel.render.thread.pool.core.thread.count";
+
+	public static final String LAYOUT_PARALLEL_RENDER_THREAD_POOL_KEEP_ALIVE_TIME = "layout.parallel.render.thread.pool.keep.alive.time";
+
+	public static final String LAYOUT_PARALLEL_RENDER_THREAD_POOL_MAX_QUEUE_SIZE = "layout.parallel.render.thread.pool.max.queue.size";
+
+	public static final String LAYOUT_PARALLEL_RENDER_THREAD_POOL_MAX_THREAD_COUNT = "layout.parallel.render.thread.pool.max.thread.count";
+
+	public static final String LAYOUT_PARALLEL_RENDER_TIMEOUT = "layout.parallel.render.timeout";
+
 	public static final String LAYOUT_PARENTABLE = "layout.parentable";
+
+	public static final String LAYOUT_PROTOTYPE_MERGE_FAIL_THRESHOLD = "layout.prototype.merge.fail.threshold";
+
+	public static final String LAYOUT_PROTOTYPE_MERGE_LOCK_MAX_TIME = "layout.prototype.merge.lock.max.time";
 
 	public static final String LAYOUT_REMEMBER_MAXIMIZED_WINDOW_STATE = "layout.remember.maximized.window.state";
 
 	public static final String LAYOUT_SET_FORM_UPDATE = "layout.set.form.update";
+
+	public static final String LAYOUT_SET_PROTOTYPE_MERGE_FAIL_THRESHOLD = "layout.set.prototype.merge.fail.threshold";
+
+	public static final String LAYOUT_SET_PROTOTYPE_MERGE_LOCK_MAX_TIME = "layout.set.prototype.merge.lock.max.time";
 
 	public static final String LAYOUT_SHOW_HTTP_STATUS = "layout.show.http.status";
 
@@ -1011,15 +1143,11 @@ public interface PropsKeys {
 
 	public static final String LAYOUT_USER_PRIVATE_LAYOUTS_ENABLED = "layout.user.private.layouts.enabled";
 
-	public static final String LAYOUT_USER_PRIVATE_LAYOUTS_MODIFIABLE = "layout.user.private.layouts.modifiable";
-
 	public static final String LAYOUT_USER_PRIVATE_LAYOUTS_POWER_USER_REQUIRED = "layout.user.private.layouts.power.user.required";
 
 	public static final String LAYOUT_USER_PUBLIC_LAYOUTS_AUTO_CREATE = "layout.user.public.layouts.auto.create";
 
 	public static final String LAYOUT_USER_PUBLIC_LAYOUTS_ENABLED = "layout.user.public.layouts.enabled";
-
-	public static final String LAYOUT_USER_PUBLIC_LAYOUTS_MODIFIABLE = "layout.user.public.layouts.modifiable";
 
 	public static final String LAYOUT_USER_PUBLIC_LAYOUTS_POWER_USER_REQUIRED = "layout.user.public.layouts.power.user.required";
 
@@ -1040,6 +1168,8 @@ public interface PropsKeys {
 	public static final String LDAP_BASE_DN = "ldap.base.dn";
 
 	public static final String LDAP_BASE_PROVIDER_URL = "ldap.base.provider.url";
+
+	public static final String LDAP_CONNECTION_PROPERTY_PREFIX = "ldap.connection.";
 
 	public static final String LDAP_CONTACT_CUSTOM_MAPPINGS = "ldap.contact.custom.mappings";
 
@@ -1083,6 +1213,8 @@ public interface PropsKeys {
 
 	public static final String LDAP_IMPORT_INTERVAL = "ldap.import.interval";
 
+	public static final String LDAP_IMPORT_LOCK_EXPIRATION_TIME = "ldap.import.lock.expiration.time";
+
 	public static final String LDAP_IMPORT_METHOD = "ldap.import.method";
 
 	public static final String LDAP_IMPORT_ON_STARTUP = "ldap.import.on.startup";
@@ -1125,6 +1257,14 @@ public interface PropsKeys {
 
 	public static final String LIFERAY_HOME = "liferay.home";
 
+	public static final String LIFERAY_LIB_GLOBAL_DIR = "liferay.lib.global.dir";
+
+	public static final String LIFERAY_LIB_GLOBAL_SHARED_DIR = "liferay.lib.global.shared.dir";
+
+	public static final String LIFERAY_LIB_PORTAL_DIR = "liferay.lib.portal.dir";
+
+	public static final String LIFERAY_WEB_PORTAL_DIR = "liferay.web.portal.dir";
+
 	public static final String LIVE_USERS_ENABLED = "live.users.enabled";
 
 	public static final String LOCALE_DEFAULT_REQUEST = "locale.default.request";
@@ -1145,13 +1285,21 @@ public interface PropsKeys {
 
 	public static final String LOGIN_EVENTS_PRE = "login.events.pre";
 
+	public static final String LOGIN_FORM_NAVIGATION_POST = "login.form.navigation.post";
+
+	public static final String LOGIN_FORM_NAVIGATION_PRE = "login.form.navigation.pre";
+
 	public static final String LOGOUT_EVENTS_POST = "logout.events.post";
 
 	public static final String LOGOUT_EVENTS_PRE = "logout.events.pre";
 
 	public static final String LOOK_AND_FEEL_MODIFIABLE = "look.and.feel.modifiable";
 
+	public static final String LUCENE_ANALYZER_MAX_TOKENS = "lucene.analyzer.max.tokens";
+
 	public static final String LUCENE_BUFFER_SIZE = "lucene.buffer.size";
+
+	public static final String LUCENE_CLUSTER_INDEX_LOADING_SYNC_TIMEOUT = "lucene.cluster.index.loading.sync.timeout";
 
 	public static final String LUCENE_COMMIT_BATCH_SIZE = "lucene.commit.batch.size";
 
@@ -1165,19 +1313,17 @@ public interface PropsKeys {
 
 	public static final String LUCENE_MERGE_FACTOR = "lucene.merge.factor";
 
-	public static final String LUCENE_OPTIMIZE_INTERVAL = "lucene.optimize.interval";
+	public static final String LUCENE_MERGE_POLICY = "lucene.merge.policy";
 
 	public static final String LUCENE_REPLICATE_WRITE = "lucene.replicate.write";
 
-	public static final String LUCENE_STORE_JDBC_AUTO_CLEAN_UP_ENABLED = "lucene.store.jdbc.auto.clean.up.enabled";
-
-	public static final String LUCENE_STORE_JDBC_AUTO_CLEAN_UP_INTERVAL = "lucene.store.jdbc.auto.clean.up.interval";
-
-	public static final String LUCENE_STORE_JDBC_DIALECT = "lucene.store.jdbc.dialect.";
-
 	public static final String LUCENE_STORE_TYPE = "lucene.store.type";
 
+	public static final String LUCENE_STORE_TYPE_FILE_FORCE_MMAP = "lucene.store.type.file.force.mmap";
+
 	public static final String MAIL_AUDIT_TRAIL = "mail.audit.trail";
+
+	public static final String MAIL_BATCH_SIZE = "mail.batch.size";
 
 	public static final String MAIL_HOOK_CYRUS_ADD_USER = "mail.hook.cyrus.add.user";
 
@@ -1247,6 +1393,8 @@ public interface PropsKeys {
 
 	public static final String MESSAGE_BOARDS_CATEGORY_DISPLAY_STYLES_DEFAULT = "message.boards.category.display.styles.default";
 
+	public static final String MESSAGE_BOARDS_EMAIL_BULK = "message.boards.email.bulk";
+
 	public static final String MESSAGE_BOARDS_EMAIL_FROM_ADDRESS = "message.boards.email.from.address";
 
 	public static final String MESSAGE_BOARDS_EMAIL_FROM_NAME = "message.boards.email.from.name";
@@ -1291,7 +1439,13 @@ public interface PropsKeys {
 
 	public static final String MESSAGE_BOARDS_THREAD_VIEWS_DEFAULT = "message.boards.thread.views.default";
 
+	public static final String MICROSOFT_TRANSLATOR_CLIENT_ID = "microsoft.translator.client.id";
+
+	public static final String MICROSOFT_TRANSLATOR_CLIENT_SECRET = "microsoft.translator.client.secret";
+
 	public static final String MIME_TYPES_CONTENT_DISPOSITION_INLINE = "mime.types.content.disposition.inline";
+
+	public static final String MINIFIER_FILES_LIMIT = "minifier.files.limit";
 
 	public static final String MINIFIER_INLINE_CONTENT_CACHE_SIZE = "minifier.inline.content.cache.size";
 
@@ -1299,7 +1453,25 @@ public interface PropsKeys {
 
 	public static final String MINIFIER_INLINE_CONTENT_CACHE_SKIP_JAVASCRIPT = "minifier.inline.content.cache.skip.javascript";
 
+	public static final String MOBILE_DEVICE_RULES_RULE_GROUP_COPY_POSTFIX = "mobile.device.rules.rule.group.copy.postfix";
+
 	public static final String MODEL_HINTS_CONFIGS = "model.hints.configs";
+
+	public static final String MODULE_FRAMEWORK_BEGINNING_START_LEVEL = "module.framework.beginning.start.level";
+
+	public static final String MODULE_FRAMEWORK_ENABLED = "module.framework.enabled";
+
+	public static final String MODULE_FRAMEWORK_LIB_DIR = "module.framework.lib.dir";
+
+	public static final String MODULE_FRAMEWORK_REGISTER_LIFERAY_SERVICES = "module.framework.register.liferay.services";
+
+	public static final String MODULE_FRAMEWORK_RUNTIME_START_LEVEL = "module.framework.runtime.start.level";
+
+	public static final String MODULE_FRAMEWORK_STATE_DIR = "module.framework.state.dir";
+
+	public static final String MODULE_FRAMEWORK_SYSTEM_BUNDLE_EXPORT_PACKAGES = "module.framework.system.bundle.export.packages";
+
+	public static final String MODULE_FRAMEWORK_SYSTEM_PACKAGES_EXTRA = "module.framework.system.packages.extra";
 
 	public static final String MONITORING_DATA_SAMPLE_THREAD_LOCAL = "monitoring.data.sample.thread.local";
 
@@ -1347,6 +1519,8 @@ public interface PropsKeys {
 
 	public static final String NTLM_AUTH_ENABLED = "ntlm.auth.enabled";
 
+	public static final String NTLM_AUTH_NEGOTIATE_FLAGS = "ntlm.auth.negotiate.flags";
+
 	public static final String NTLM_DOMAIN = "ntlm.auth.domain";
 
 	public static final String NTLM_DOMAIN_CONTROLLER = "ntlm.auth.domain.controller";
@@ -1393,8 +1567,6 @@ public interface PropsKeys {
 
 	public static final String OPENOFFICE_SERVER_PORT = "openoffice.server.port";
 
-	public static final String ORGANIZATIONS_ASSIGNMENT_AUTO = "organizations.assignment.auto";
-
 	public static final String ORGANIZATIONS_ASSIGNMENT_STRICT = "organizations.assignment.strict";
 
 	public static final String ORGANIZATIONS_CHILDREN_TYPES = "organizations.children.types";
@@ -1415,6 +1587,8 @@ public interface PropsKeys {
 
 	public static final String ORGANIZATIONS_FORM_UPDATE_MISCELLANEOUS = "organizations.form.update.miscellaneous";
 
+	public static final String ORGANIZATIONS_INDEXER_ENABLED = "organizations.indexer.enabled";
+
 	public static final String ORGANIZATIONS_MEMBERSHIP_STRICT = "organizations.membership.strict";
 
 	public static final String ORGANIZATIONS_ROOTABLE = "organizations.rootable";
@@ -1423,9 +1597,51 @@ public interface PropsKeys {
 
 	public static final String ORGANIZATIONS_TYPES = "organizations.types";
 
-	public static final String ORGANIZATIONS_USER_GROUP_MEMBERSHIP_ENABLED = "organizations.user.group.membership.enabled";
+	public static final String PASSWORDS_DEFAULT_POLICY_ALLOW_DICTIONARY_WORDS = "passwords.default.policy.allow.dictionary.words";
+
+	public static final String PASSWORDS_DEFAULT_POLICY_CHANGE_REQUIRED = "passwords.default.policy.change.required";
+
+	public static final String PASSWORDS_DEFAULT_POLICY_CHANGEABLE = "passwords.default.policy.changeable";
+
+	public static final String PASSWORDS_DEFAULT_POLICY_CHECK_SYNTAX = "passwords.default.policy.check.syntax";
+
+	public static final String PASSWORDS_DEFAULT_POLICY_EXPIREABLE = "passwords.default.policy.expireable";
+
+	public static final String PASSWORDS_DEFAULT_POLICY_GRACE_LIMIT = "passwords.default.policy.grace.limit";
+
+	public static final String PASSWORDS_DEFAULT_POLICY_HISTORY = "passwords.default.policy.history";
+
+	public static final String PASSWORDS_DEFAULT_POLICY_HISTORY_COUNT = "passwords.default.policy.history.count";
+
+	public static final String PASSWORDS_DEFAULT_POLICY_LOCKOUT = "passwords.default.policy.lockout";
+
+	public static final String PASSWORDS_DEFAULT_POLICY_LOCKOUT_DURATION = "passwords.default.policy.lockout.duration";
+
+	public static final String PASSWORDS_DEFAULT_POLICY_MAX_AGE = "passwords.default.policy.max.age";
+
+	public static final String PASSWORDS_DEFAULT_POLICY_MAX_FAILURE = "passwords.default.policy.max.failure";
+
+	public static final String PASSWORDS_DEFAULT_POLICY_MIN_AGE = "passwords.default.policy.min.age";
+
+	public static final String PASSWORDS_DEFAULT_POLICY_MIN_ALPHANUMERIC = "passwords.default.policy.alphanumeric";
+
+	public static final String PASSWORDS_DEFAULT_POLICY_MIN_LENGTH = "passwords.default.policy.min.length";
+
+	public static final String PASSWORDS_DEFAULT_POLICY_MIN_LOWERCASE = "passwords.default.policy.min.lowercase";
+
+	public static final String PASSWORDS_DEFAULT_POLICY_MIN_NUMBERS = "passwords.default.policy.min.numbers";
+
+	public static final String PASSWORDS_DEFAULT_POLICY_MIN_SYMBOLS = "passwords.default.policy.min.symbols";
+
+	public static final String PASSWORDS_DEFAULT_POLICY_MIN_UPPERCASE = "passwords.default.policy.min.uppercase";
 
 	public static final String PASSWORDS_DEFAULT_POLICY_NAME = "passwords.default.policy.name";
+
+	public static final String PASSWORDS_DEFAULT_POLICY_RESET_FAILURE_COUNT = "passwords.default.policy.reset.failure.count";
+
+	public static final String PASSWORDS_DEFAULT_POLICY_RESET_TICKET_MAX_AGE = "passwords.default.policy.reset.ticket.max.age";
+
+	public static final String PASSWORDS_DEFAULT_POLICY_WARNING_TIME = "passwords.default.policy.warning.time";
 
 	public static final String PASSWORDS_DIGEST_ENCODING = "passwords.digest.encoding";
 
@@ -1451,13 +1667,25 @@ public interface PropsKeys {
 
 	public static final String PASSWORDS_TOOLKIT = "passwords.toolkit";
 
+	public static final String PERMISSIONS_CHECK_GUEST_ENABLED = "permissions.check.guest.enabled";
+
 	public static final String PERMISSIONS_CHECKER = "permissions.checker";
 
+	public static final String PERMISSIONS_CUSTOM_ATTRIBUTE_READ_CHECK_BY_DEFAULT = "permissions.custom.attribute.read.check.by.default";
+
+	public static final String PERMISSIONS_CUSTOM_ATTRIBUTE_WRITE_CHECK_BY_DEFAULT = "permissions.custom.attribute.write.check.by.default";
+
 	public static final String PERMISSIONS_INLINE_SQL_CHECK_ENABLED = "permissions.inline.sql.check.enabled";
+
+	public static final String PERMISSIONS_INLINE_SQL_RESOURCE_BLOCK_QUERY_THRESHHOLD = "permissions.inline.sql.resource.block.query.threshhold";
 
 	public static final String PERMISSIONS_LIST_FILTER = "permissions.list.filter";
 
 	public static final String PERMISSIONS_OBJECT_BLOCKING_CACHE = "permissions.object.blocking.cache";
+
+	public static final String PERMISSIONS_PROPAGATION_ENABLED = "permissions.propagation.enabled";
+
+	public static final String PERMISSIONS_ROLE_RESOURCE_PERMISSION_QUERY_THRESHOLD = "permissions.role.resource.permission.query.threshold";
 
 	public static final String PERMISSIONS_THREAD_LOCAL_CACHE_MAX_SIZE = "permissions.thread.local.cache.max.size";
 
@@ -1466,6 +1694,12 @@ public interface PropsKeys {
 	public static final String PERMISSIONS_VIEW_DYNAMIC_INHERITANCE = "permissions.view.dynamic.inheritance";
 
 	public static final String PERSISTENCE_PROVIDER = "persistence.provider";
+
+	public static final String PHONE_NUMBER_FORMAT_IMPL = "phone.number.format.impl";
+
+	public static final String PHONE_NUMBER_FORMAT_INTERNATIONAL_REGEXP = "phone.number.format.international.regexp";
+
+	public static final String PHONE_NUMBER_FORMAT_USA_REGEXP = "phone.number.format.usa.regexp";
 
 	public static final String PLUGIN_NOTIFICATIONS_ENABLED = "plugin.notifications.enabled";
 
@@ -1503,13 +1737,17 @@ public interface PropsKeys {
 
 	public static final String PORTAL_PROXY_PATH = "portal.proxy.path";
 
-	public static final String PORTAL_SECURITY_MANAGER_ENABLE = "portal.security.manager.enable";
+	public static final String PORTAL_SECURITY_MANAGER_FILE_CHECKER_DEFAULT_READ_PATHS = "portal.security.manager.file.checker.default.read.paths";
+
+	public static final String PORTAL_SECURITY_MANAGER_STRATEGY = "portal.security.manager.strategy";
 
 	public static final String PORTLET_ADD_DEFAULT_RESOURCE_CHECK_ENABLED = "portlet.add.default.resource.check.enabled";
 
 	public static final String PORTLET_ADD_DEFAULT_RESOURCE_CHECK_WHITELIST = "portlet.add.default.resource.check.whitelist";
 
 	public static final String PORTLET_ADD_DEFAULT_RESOURCE_CHECK_WHITELIST_ACTIONS = "portlet.add.default.resource.check.whitelist.actions";
+
+	public static final String PORTLET_CONTAINER_RESTRICT = "portlet.container.restrict";
 
 	public static final String PORTLET_CSS_ENABLED = "portlet.css.enabled";
 
@@ -1524,6 +1762,8 @@ public interface PropsKeys {
 	public static final String PORTLET_URL_APPEND_PARAMETERS = "portlet.url.append.parameters";
 
 	public static final String PORTLET_URL_ESCAPE_XML = "portlet.url.escape.xml";
+
+	public static final String PORTLET_URL_REFRESH_URL_RESERVED_PARAMETERS = "portlet.url.refresh.url.reserved.parameters";
 
 	public static final String PORTLET_VIRTUAL_PATH = "portlet.virtual.path";
 
@@ -1545,6 +1785,8 @@ public interface PropsKeys {
 
 	public static final String REQUEST_HEADER_AUTH_IMPORT_FROM_LDAP = "request.header.auth.import.from.ldap";
 
+	public static final String REQUEST_HEADER_IGNORE_INIT_PARAMS = "request.header.ignore.init.params";
+
 	public static final String REQUEST_SHARED_ATTRIBUTES = "request.shared.attributes";
 
 	public static final String RESOURCE_ACTIONS_CONFIGS = "resource.actions.configs";
@@ -1553,7 +1795,7 @@ public interface PropsKeys {
 
 	public static final String RESOURCE_REPOSITORIES_ROOT = "resource.repositories.root";
 
-	public static final String REST_PROXY_DOMAINS_ALLOWED = "rest.proxy.domains.allowed";
+	public static final String REST_PROXY_URL_PREFIXES_ALLOWED = "rest.proxy.url.prefixes.allowed";
 
 	public static final String ROBOTS_TXT_WITH_SITEMAP = "robots.txt.with.sitemap";
 
@@ -1607,6 +1849,8 @@ public interface PropsKeys {
 
 	public static final String SCRIPTING_JRUBY_COMPILE_THRESHOLD = "scripting.jruby.compile.threshold";
 
+	public static final String SCRIPTING_JRUBY_LOAD_PATHS = "scripting.jruby.load.paths";
+
 	public static final String SEARCH_CONTAINER_PAGE_DEFAULT_DELTA = "search.container.page.default.delta";
 
 	public static final String SEARCH_CONTAINER_PAGE_DELTA_VALUES = "search.container.page.delta.values";
@@ -1629,6 +1873,10 @@ public interface PropsKeys {
 
 	public static final String SERVLET_SESSION_DESTROY_EVENTS = "servlet.session.destroy.events";
 
+	public static final String SESSION_CLICKS_MAX_ALLOWED_VALUES = "session.clicks.max.allowed.values";
+
+	public static final String SESSION_CLICKS_MAX_SIZE_TERMS = "session.clicks.max.size.terms";
+
 	public static final String SESSION_COOKIE_DOMAIN = "session.cookie.domain";
 
 	public static final String SESSION_DISABLED = "session.disabled";
@@ -1640,6 +1888,8 @@ public interface PropsKeys {
 	public static final String SESSION_ENABLE_URL_WITH_SESSION_ID = "session.enable.url.with.session.id";
 
 	public static final String SESSION_ID_DELIMITER = "session.id.delimiter";
+
+	public static final String SESSION_MAX_ALLOWED = "session.max.allowed";
 
 	public static final String SESSION_PHISHING_PROTECTED_ATTRIBUTES = "session.phishing.protected.attributes";
 
@@ -1668,6 +1918,18 @@ public interface PropsKeys {
 	public static final String SESSION_TRACKER_PERSISTENCE_ENABLED = "session.tracker.persistence.enabled";
 
 	public static final String SESSION_VERIFY_SERIALIZABLE_ATTRIBUTE = "session.verify.serializable.attribute";
+
+	public static final String SETUP_DATABASE_DRIVER_CLASS_NAME = "setup.database.driverClassName";
+
+	public static final String SETUP_DATABASE_JAR_NAME = "setup.database.jar.name";
+
+	public static final String SETUP_DATABASE_JAR_URL = "setup.database.jar.url";
+
+	public static final String SETUP_DATABASE_TYPES = "setup.database.types";
+
+	public static final String SETUP_DATABASE_URL = "setup.database.url";
+
+	public static final String SETUP_WIZARD_ENABLED = "setup.wizard.enabled";
 
 	public static final String SHARD_DEFAULT_NAME = "shard.default.name";
 
@@ -1737,23 +1999,41 @@ public interface PropsKeys {
 
 	public static final String SITES_FORM_ADD_MAIN = "sites.form.add.main";
 
+	public static final String SITES_FORM_ADD_MISCELLANEOUS = "sites.form.add.miscellaneous";
+
 	public static final String SITES_FORM_ADD_SEO = "sites.form.add.seo";
 
 	public static final String SITES_FORM_UPDATE_ADVANCED = "sites.form.update.advanced";
 
 	public static final String SITES_FORM_UPDATE_MAIN = "sites.form.update.main";
 
+	public static final String SITES_FORM_UPDATE_MISCELLANEOUS = "sites.form.update.miscellaneous";
+
 	public static final String SITES_FORM_UPDATE_SEO = "sites.form.update.seo";
+
+	public static final String SITES_SITEMAP_DEFAULT_CHANGE_FREQUENCY = "sites.sitemap.default.change.frequency";
+
+	public static final String SITES_SITEMAP_DEFAULT_PRIORITY = "sites.sitemap.default.priority";
+
+	public static final String SOCIAL_ACTIVITY_CONTRIBUTION_INCREMENTS = "social.activity.contribution.increments";
+
+	public static final String SOCIAL_ACTIVITY_CONTRIBUTION_LIMIT_VALUES = "social.activity.contribution.limit.values";
+
+	public static final String SOCIAL_ACTIVITY_COUNTER_LOCK_RETRY_DELAY = "social.activity.counter.lock.retry.delay";
+
+	public static final String SOCIAL_ACTIVITY_COUNTER_LOCK_TIMEOUT = "social.activity.counter.lock.timeout";
+
+	public static final String SOCIAL_ACTIVITY_COUNTER_PERIOD_LENGTH = "social.activity.counter.period.length";
+
+	public static final String SOCIAL_ACTIVITY_PARTICIPATION_INCREMENTS = "social.activity.participation.increments";
+
+	public static final String SOCIAL_ACTIVITY_PARTICIPATION_LIMIT_VALUES = "social.activity.participation.limit.values";
 
 	public static final String SOCIAL_BOOKMARK_JSP = "social.bookmark.jsp";
 
 	public static final String SOCIAL_BOOKMARK_POST_URL = "social.bookmark.post.url";
 
 	public static final String SOCIAL_BOOKMARK_TYPES = "social.bookmark.types";
-
-	public static final String SOCIAL_EQUITY_EQUITY_LOG_CHECK_INTERVAL = "social.equity.equity.log.check.interval";
-
-	public static final String SOCIAL_EQUITY_EQUITY_LOG_ENABLED = "social.equity.equity.log.enabled";
 
 	public static final String SOURCE_FORGE_MIRRORS = "source.forge.mirrors";
 
@@ -1769,6 +2049,8 @@ public interface PropsKeys {
 
 	public static final String SPRITE_PROPERTIES_FILE_NAME = "sprite.properties.file.name";
 
+	public static final String SPRITE_ROOT_DIR = "sprite.root.dir";
+
 	public static final String SQL_DATA_COM_LIFERAY_PORTAL_MODEL_COUNTRY_COUNTRY_ID = "sql.data.com.liferay.portal.model.Country.country.id";
 
 	public static final String SQL_DATA_COM_LIFERAY_PORTAL_MODEL_LISTTYPE_ACCOUNT_ADDRESS = "sql.data.com.liferay.portal.model.ListType.account.address";
@@ -1782,6 +2064,10 @@ public interface PropsKeys {
 	public static final String SQL_DATA_COM_LIFERAY_PORTAL_MODEL_REGION_REGION_ID = "sql.data.com.liferay.portal.model.Region.region.id";
 
 	public static final String SQL_DATA_MAX_PARAMETERS = "sql.data.max.parameters";
+
+	public static final String STAGING_LOCK_ENABLED = "staging.lock.enabled";
+
+	public static final String STRIP_CSS_SASS_ENABLED = "strip.css.sass.enabled";
 
 	public static final String STRIP_IGNORE_PATHS = "strip.ignore.paths";
 
@@ -1845,11 +2131,17 @@ public interface PropsKeys {
 
 	public static final String TRANSLATOR_DEFAULT_LANGUAGES = "translator.default.languages";
 
+	public static final String TRANSLATOR_LANGUAGES = "translator.languages";
+
+	public static final String TRASH_SEARCH_LIMIT = "trash.search.limit";
+
 	public static final String UPGRADE_PROCESSES = "upgrade.processes";
 
 	public static final String UPLOAD_SERVLET_REQUEST_IMPL_MAX_SIZE = "com.liferay.portal.upload.UploadServletRequestImpl.max.size";
 
 	public static final String UPLOAD_SERVLET_REQUEST_IMPL_TEMP_DIR = "com.liferay.portal.upload.UploadServletRequestImpl.temp.dir";
+
+	public static final String USER_GROUPS_COPY_LAYOUTS_TO_USER_PERSONAL_SITE = "user.groups.copy.layouts.to.user.personal.site";
 
 	public static final String USER_GROUPS_NAME_ALLOW_NUMERIC = "user.groups.name.allow.numeric";
 
@@ -1862,6 +2154,8 @@ public interface PropsKeys {
 	public static final String USERS_EMAIL_ADDRESS_GENERATOR = "users.email.address.generator";
 
 	public static final String USERS_EMAIL_ADDRESS_REQUIRED = "users.email.address.required";
+
+	public static final String USERS_EMAIL_ADDRESS_VALIDATOR = "users.email.address.validator";
 
 	public static final String USERS_EXPORT_CSV_FIELDS = "users.export.csv.fields";
 
@@ -1893,11 +2187,11 @@ public interface PropsKeys {
 
 	public static final String USERS_IMAGE_MAX_WIDTH = "users.image.max.width";
 
+	public static final String USERS_INDEXER_ENABLED = "users.indexer.enabled";
+
 	public static final String USERS_LAST_NAME_REQUIRED = "users.last.name.required";
 
 	public static final String USERS_LIST_VIEWS = "users.list.views";
-
-	public static final String USERS_LIST_VIEWS_DEFAULT = "users.list.views.default";
 
 	public static final String USERS_REMINDER_QUERIES_CUSTOM_QUESTION_ENABLED = "users.reminder.queries.custom.question.enabled";
 
@@ -1939,15 +2233,17 @@ public interface PropsKeys {
 
 	public static final String VELOCITY_ENGINE_LOGGER_CATEGORY = "velocity.engine.logger.category";
 
-	public static final String VELOCITY_ENGINE_RESOURCE_LISTENERS = "velocity.engine.resource.listeners";
-
 	public static final String VELOCITY_ENGINE_RESOURCE_MANAGER = "velocity.engine.resource.manager";
-
-	public static final String VELOCITY_ENGINE_RESOURCE_MANAGER_CACHE = "velocity.engine.resource.manager.cache";
 
 	public static final String VELOCITY_ENGINE_RESOURCE_MANAGER_CACHE_ENABLED = "velocity.engine.resource.manager.cache.enabled";
 
-	public static final String VELOCITY_ENGINE_RESOURCE_MANAGER_MODIFICATION_CHECK_INTERVAL = "velocity.engine.resource.manager.modification.check.interval";
+	public static final String VELOCITY_ENGINE_RESOURCE_MODIFICATION_CHECK_INTERVAL = "velocity.engine.resource.modification.check.interval";
+
+	public static final String VELOCITY_ENGINE_RESOURCE_PARSERS = "velocity.engine.resource.parsers";
+
+	public static final String VELOCITY_ENGINE_RESTRICTED_CLASSES = "velocity.engine.restricted.classes";
+
+	public static final String VELOCITY_ENGINE_RESTRICTED_PACKAGES = "velocity.engine.restricted.packages";
 
 	public static final String VELOCITY_ENGINE_VELOCIMACRO_LIBRARY = "velocity.engine.velocimacro.library";
 
@@ -1975,7 +2271,19 @@ public interface PropsKeys {
 
 	public static final String WEB_SERVER_PROXY_LEGACY_MODE = "web.server.proxy.legacy.mode";
 
+	public static final String WEB_SERVER_SERVLET_ACCEPT_RANGES_MIME_TYPES = "web.server.servlet.accept.ranges.mime.types";
+
+	public static final String WEB_SERVER_SERVLET_DIRECTORY_INDEXING_ENABLED = "web.server.servlet.directory.indexing.enabled";
+
+	public static final String WEB_SERVER_SERVLET_HTTP_STATUS_CODE_STRICT = "web.server.servlet.http.status.code.strict";
+
+	public static final String WEB_SERVER_SERVLET_MAX_RANGE_FIELDS = "web.server.servlet.max.range.fields";
+
+	public static final String WEB_SERVER_SERVLET_VERSION_VERBOSITY = "web.server.servlet.version.verbosity";
+
 	public static final String WEBDAV_IGNORE = "webdav.ignore";
+
+	public static final String WEBDAV_NONCE_EXPIRATION = "webdav.nonce.expiration";
 
 	public static final String WIDGET_SERVLET_MAPPING = "widget.servlet.mapping";
 
@@ -2038,6 +2346,16 @@ public interface PropsKeys {
 	public static final String XML_VALIDATION_ENABLED = "xml.validation.enabled";
 
 	public static final String XUGGLER_ENABLED = "xuggler.enabled";
+
+	public static final String XUGGLER_FFPRESET = "xuggler.ffpreset.";
+
+	public static final String XUGGLER_JAR_FILE = "xuggler.jar.file";
+
+	public static final String XUGGLER_JAR_NAME = "xuggler.jar.name";
+
+	public static final String XUGGLER_JAR_OPTIONS = "xuggler.jar.options";
+
+	public static final String XUGGLER_JAR_URL = "xuggler.jar.url";
 
 	public static final String YM_LOGIN = "ym.login";
 

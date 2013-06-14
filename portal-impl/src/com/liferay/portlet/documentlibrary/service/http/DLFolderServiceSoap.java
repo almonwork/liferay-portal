@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -50,8 +50,8 @@ import java.rmi.RemoteException;
  *
  * <p>
  * You can see a list of services at
- * http://localhost:8080/tunnel-web/secure/axis. Set the property
- * <b>tunnel.servlet.hosts.allowed</b> in portal.properties to configure
+ * http://localhost:8080/api/secure/axis. Set the property
+ * <b>axis.servlet.hosts.allowed</b> in portal.properties to configure
  * security.
  * </p>
  *
@@ -124,6 +124,22 @@ public class DLFolderServiceSoap {
 		}
 	}
 
+	public static int getFileEntriesAndFileShortcutsCount(long groupId,
+		long folderId, int status, java.lang.String[] mimeTypes)
+		throws RemoteException {
+		try {
+			int returnValue = DLFolderServiceUtil.getFileEntriesAndFileShortcutsCount(groupId,
+					folderId, status, mimeTypes);
+
+			return returnValue;
+		}
+		catch (Exception e) {
+			_log.error(e, e);
+
+			throw new RemoteException(e.getMessage());
+		}
+	}
+
 	public static com.liferay.portlet.documentlibrary.model.DLFolderSoap getFolder(
 		long folderId) throws RemoteException {
 		try {
@@ -170,12 +186,13 @@ public class DLFolderServiceSoap {
 	}
 
 	public static com.liferay.portlet.documentlibrary.model.DLFolderSoap[] getFolders(
-		long groupId, long parentFolderId, boolean includeMountfolders,
-		int start, int end, com.liferay.portal.kernel.util.OrderByComparator obc)
+		long groupId, long parentFolderId, int status,
+		boolean includeMountfolders, int start, int end,
+		com.liferay.portal.kernel.util.OrderByComparator obc)
 		throws RemoteException {
 		try {
 			java.util.List<com.liferay.portlet.documentlibrary.model.DLFolder> returnValue =
-				DLFolderServiceUtil.getFolders(groupId, parentFolderId,
+				DLFolderServiceUtil.getFolders(groupId, parentFolderId, status,
 					includeMountfolders, start, end, obc);
 
 			return com.liferay.portlet.documentlibrary.model.DLFolderSoap.toSoapModels(returnValue);
@@ -205,12 +222,44 @@ public class DLFolderServiceSoap {
 		}
 	}
 
+	public static int getFoldersAndFileEntriesAndFileShortcuts(long groupId,
+		long folderId, int status, java.lang.String[] mimeTypes,
+		boolean includeMountFolders) throws RemoteException {
+		try {
+			int returnValue = DLFolderServiceUtil.getFoldersAndFileEntriesAndFileShortcuts(groupId,
+					folderId, status, mimeTypes, includeMountFolders);
+
+			return returnValue;
+		}
+		catch (Exception e) {
+			_log.error(e, e);
+
+			throw new RemoteException(e.getMessage());
+		}
+	}
+
 	public static int getFoldersAndFileEntriesAndFileShortcutsCount(
 		long groupId, long folderId, int status, boolean includeMountFolders)
 		throws RemoteException {
 		try {
 			int returnValue = DLFolderServiceUtil.getFoldersAndFileEntriesAndFileShortcutsCount(groupId,
 					folderId, status, includeMountFolders);
+
+			return returnValue;
+		}
+		catch (Exception e) {
+			_log.error(e, e);
+
+			throw new RemoteException(e.getMessage());
+		}
+	}
+
+	public static int getFoldersAndFileEntriesAndFileShortcutsCount(
+		long groupId, long folderId, int status, java.lang.String[] mimeTypes,
+		boolean includeMountFolders) throws RemoteException {
+		try {
+			int returnValue = DLFolderServiceUtil.getFoldersAndFileEntriesAndFileShortcutsCount(groupId,
+					folderId, status, mimeTypes, includeMountFolders);
 
 			return returnValue;
 		}
@@ -237,10 +286,10 @@ public class DLFolderServiceSoap {
 	}
 
 	public static int getFoldersCount(long groupId, long parentFolderId,
-		boolean includeMountfolders) throws RemoteException {
+		int status, boolean includeMountfolders) throws RemoteException {
 		try {
 			int returnValue = DLFolderServiceUtil.getFoldersCount(groupId,
-					parentFolderId, includeMountfolders);
+					parentFolderId, status, includeMountfolders);
 
 			return returnValue;
 		}
@@ -276,6 +325,19 @@ public class DLFolderServiceSoap {
 					parentFolderId);
 
 			return returnValue;
+		}
+		catch (Exception e) {
+			_log.error(e, e);
+
+			throw new RemoteException(e.getMessage());
+		}
+	}
+
+	public static void getSubfolderIds(Long[] folderIds, long groupId,
+		long folderId) throws RemoteException {
+		try {
+			DLFolderServiceUtil.getSubfolderIds(ListUtil.toList(folderIds),
+				groupId, folderId);
 		}
 		catch (Exception e) {
 			_log.error(e, e);

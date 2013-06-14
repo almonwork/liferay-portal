@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,6 +14,8 @@
 
 package com.liferay.counter.service;
 
+import com.liferay.portal.service.ServiceWrapper;
+
 /**
  * <p>
  * This class is a wrapper for {@link CounterLocalService}.
@@ -23,7 +25,8 @@ package com.liferay.counter.service;
  * @see       CounterLocalService
  * @generated
  */
-public class CounterLocalServiceWrapper implements CounterLocalService {
+public class CounterLocalServiceWrapper implements CounterLocalService,
+	ServiceWrapper<CounterLocalService> {
 	public CounterLocalServiceWrapper(CounterLocalService counterLocalService) {
 		_counterLocalService = counterLocalService;
 	}
@@ -56,24 +59,32 @@ public class CounterLocalServiceWrapper implements CounterLocalService {
 	* Deletes the counter with the primary key from the database. Also notifies the appropriate model listeners.
 	*
 	* @param name the primary key of the counter
+	* @return the counter that was removed
 	* @throws PortalException if a counter with the primary key could not be found
 	* @throws SystemException if a system exception occurred
 	*/
-	public void deleteCounter(java.lang.String name)
+	public com.liferay.counter.model.Counter deleteCounter(
+		java.lang.String name)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException {
-		_counterLocalService.deleteCounter(name);
+		return _counterLocalService.deleteCounter(name);
 	}
 
 	/**
 	* Deletes the counter from the database. Also notifies the appropriate model listeners.
 	*
 	* @param counter the counter
+	* @return the counter that was removed
 	* @throws SystemException if a system exception occurred
 	*/
-	public void deleteCounter(com.liferay.counter.model.Counter counter)
+	public com.liferay.counter.model.Counter deleteCounter(
+		com.liferay.counter.model.Counter counter)
 		throws com.liferay.portal.kernel.exception.SystemException {
-		_counterLocalService.deleteCounter(counter);
+		return _counterLocalService.deleteCounter(counter);
+	}
+
+	public com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery() {
+		return _counterLocalService.dynamicQuery();
 	}
 
 	/**
@@ -145,6 +156,11 @@ public class CounterLocalServiceWrapper implements CounterLocalService {
 		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery)
 		throws com.liferay.portal.kernel.exception.SystemException {
 		return _counterLocalService.dynamicQueryCount(dynamicQuery);
+	}
+
+	public com.liferay.counter.model.Counter fetchCounter(java.lang.String name)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return _counterLocalService.fetchCounter(name);
 	}
 
 	/**
@@ -277,12 +293,26 @@ public class CounterLocalServiceWrapper implements CounterLocalService {
 		_counterLocalService.reset(name, size);
 	}
 
+	/**
+	 * @deprecated Renamed to {@link #getWrappedService}
+	 */
 	public CounterLocalService getWrappedCounterLocalService() {
 		return _counterLocalService;
 	}
 
+	/**
+	 * @deprecated Renamed to {@link #setWrappedService}
+	 */
 	public void setWrappedCounterLocalService(
 		CounterLocalService counterLocalService) {
+		_counterLocalService = counterLocalService;
+	}
+
+	public CounterLocalService getWrappedService() {
+		return _counterLocalService;
+	}
+
+	public void setWrappedService(CounterLocalService counterLocalService) {
 		_counterLocalService = counterLocalService;
 	}
 

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -23,14 +23,15 @@ import com.liferay.portalweb.portal.util.RuntimeVariables;
 public class ViewUserNameAndImageTest extends BaseTestCase {
 	public void testViewUserNameAndImage() throws Exception {
 		selenium.open("/web/guest/home/");
+		loadRequiredJavaScriptModules();
 
 		for (int second = 0;; second++) {
-			if (second >= 60) {
+			if (second >= 90) {
 				fail("timeout");
 			}
 
 			try {
-				if (selenium.isElementPresent("link=Recent Bloggers Test Page")) {
+				if (selenium.isVisible("link=Recent Bloggers Test Page")) {
 					break;
 				}
 			}
@@ -40,17 +41,19 @@ public class ViewUserNameAndImageTest extends BaseTestCase {
 			Thread.sleep(1000);
 		}
 
-		selenium.saveScreenShotAndSource();
 		selenium.clickAt("link=Recent Bloggers Test Page",
-			RuntimeVariables.replace(""));
+			RuntimeVariables.replace("Recent Bloggers Test Page"));
 		selenium.waitForPageToLoad("30000");
-		selenium.saveScreenShotAndSource();
-		assertTrue(selenium.isElementPresent(
-				"//div[@class='user-profile-image']/a/img[@alt='Joe Bloggs']"));
-		assertTrue(selenium.isElementPresent("//a[@class='user-name']"));
-		assertTrue(selenium.isTextPresent("Posts:"));
-		assertTrue(selenium.isTextPresent("Stars:"));
-		assertTrue(selenium.isTextPresent("Date:"));
+		loadRequiredJavaScriptModules();
+		assertTrue(selenium.isVisible("//img[@class='avatar']"));
+		assertEquals(RuntimeVariables.replace("Joe Bloggs"),
+			selenium.getText("//span[@class='user-name']"));
+		assertEquals(RuntimeVariables.replace("Posts: 1"),
+			selenium.getText("//div[@class='blogger-post-count']"));
+		assertEquals(RuntimeVariables.replace("Stars: 0"),
+			selenium.getText("//div[@class='blogger-stars']"));
+		assertTrue(selenium.isPartialText("//div[@class='blogger-date']",
+				"Date:"));
 		assertFalse(selenium.isElementPresent("//th[1]"));
 		assertFalse(selenium.isElementPresent("//th[2]"));
 		assertFalse(selenium.isElementPresent("//th[3]"));

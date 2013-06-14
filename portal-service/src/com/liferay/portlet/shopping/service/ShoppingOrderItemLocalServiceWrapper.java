@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,6 +14,8 @@
 
 package com.liferay.portlet.shopping.service;
 
+import com.liferay.portal.service.ServiceWrapper;
+
 /**
  * <p>
  * This class is a wrapper for {@link ShoppingOrderItemLocalService}.
@@ -24,7 +26,8 @@ package com.liferay.portlet.shopping.service;
  * @generated
  */
 public class ShoppingOrderItemLocalServiceWrapper
-	implements ShoppingOrderItemLocalService {
+	implements ShoppingOrderItemLocalService,
+		ServiceWrapper<ShoppingOrderItemLocalService> {
 	public ShoppingOrderItemLocalServiceWrapper(
 		ShoppingOrderItemLocalService shoppingOrderItemLocalService) {
 		_shoppingOrderItemLocalService = shoppingOrderItemLocalService;
@@ -58,25 +61,32 @@ public class ShoppingOrderItemLocalServiceWrapper
 	* Deletes the shopping order item with the primary key from the database. Also notifies the appropriate model listeners.
 	*
 	* @param orderItemId the primary key of the shopping order item
+	* @return the shopping order item that was removed
 	* @throws PortalException if a shopping order item with the primary key could not be found
 	* @throws SystemException if a system exception occurred
 	*/
-	public void deleteShoppingOrderItem(long orderItemId)
+	public com.liferay.portlet.shopping.model.ShoppingOrderItem deleteShoppingOrderItem(
+		long orderItemId)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException {
-		_shoppingOrderItemLocalService.deleteShoppingOrderItem(orderItemId);
+		return _shoppingOrderItemLocalService.deleteShoppingOrderItem(orderItemId);
 	}
 
 	/**
 	* Deletes the shopping order item from the database. Also notifies the appropriate model listeners.
 	*
 	* @param shoppingOrderItem the shopping order item
+	* @return the shopping order item that was removed
 	* @throws SystemException if a system exception occurred
 	*/
-	public void deleteShoppingOrderItem(
+	public com.liferay.portlet.shopping.model.ShoppingOrderItem deleteShoppingOrderItem(
 		com.liferay.portlet.shopping.model.ShoppingOrderItem shoppingOrderItem)
 		throws com.liferay.portal.kernel.exception.SystemException {
-		_shoppingOrderItemLocalService.deleteShoppingOrderItem(shoppingOrderItem);
+		return _shoppingOrderItemLocalService.deleteShoppingOrderItem(shoppingOrderItem);
+	}
+
+	public com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery() {
+		return _shoppingOrderItemLocalService.dynamicQuery();
 	}
 
 	/**
@@ -149,6 +159,12 @@ public class ShoppingOrderItemLocalServiceWrapper
 		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery)
 		throws com.liferay.portal.kernel.exception.SystemException {
 		return _shoppingOrderItemLocalService.dynamicQueryCount(dynamicQuery);
+	}
+
+	public com.liferay.portlet.shopping.model.ShoppingOrderItem fetchShoppingOrderItem(
+		long orderItemId)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return _shoppingOrderItemLocalService.fetchShoppingOrderItem(orderItemId);
 	}
 
 	/**
@@ -255,11 +271,26 @@ public class ShoppingOrderItemLocalServiceWrapper
 		return _shoppingOrderItemLocalService.getOrderItems(orderId);
 	}
 
+	/**
+	 * @deprecated Renamed to {@link #getWrappedService}
+	 */
 	public ShoppingOrderItemLocalService getWrappedShoppingOrderItemLocalService() {
 		return _shoppingOrderItemLocalService;
 	}
 
+	/**
+	 * @deprecated Renamed to {@link #setWrappedService}
+	 */
 	public void setWrappedShoppingOrderItemLocalService(
+		ShoppingOrderItemLocalService shoppingOrderItemLocalService) {
+		_shoppingOrderItemLocalService = shoppingOrderItemLocalService;
+	}
+
+	public ShoppingOrderItemLocalService getWrappedService() {
+		return _shoppingOrderItemLocalService;
+	}
+
+	public void setWrappedService(
 		ShoppingOrderItemLocalService shoppingOrderItemLocalService) {
 		_shoppingOrderItemLocalService = shoppingOrderItemLocalService;
 	}

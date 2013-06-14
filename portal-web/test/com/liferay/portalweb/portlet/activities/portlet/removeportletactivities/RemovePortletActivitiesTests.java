@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,7 +14,10 @@
 
 package com.liferay.portalweb.portlet.activities.portlet.removeportletactivities;
 
-import com.liferay.portalweb.portal.BaseTests;
+import com.liferay.portalweb.portal.BaseTestSuite;
+import com.liferay.portalweb.portlet.activities.portlet.addportletactivities.AddPageActivitiesTest;
+import com.liferay.portalweb.portlet.activities.portlet.addportletactivities.AddPortletActivitiesTest;
+import com.liferay.portalweb.portlet.activities.portlet.addportletactivities.TearDownMyCommunityPrivatePageTest;
 
 import junit.framework.Test;
 import junit.framework.TestSuite;
@@ -22,11 +25,9 @@ import junit.framework.TestSuite;
 /**
  * @author Brian Wing Shun Chan
  */
-public class RemovePortletActivitiesTests extends BaseTests {
-
+public class RemovePortletActivitiesTests extends BaseTestSuite {
 	public static Test suite() {
 		TestSuite testSuite = new TestSuite();
-
 		testSuite.addTestSuite(AddPageActivitiesTest.class);
 		testSuite.addTestSuite(AddPortletActivitiesTest.class);
 		testSuite.addTestSuite(RemovePortletActivitiesTest.class);
@@ -34,5 +35,4 @@ public class RemovePortletActivitiesTests extends BaseTests {
 
 		return testSuite;
 	}
-
 }

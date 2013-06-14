@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -25,8 +25,7 @@ import java.util.Set;
 /**
  * @author Brian Wing Shun Chan
  */
-public class SocialRequestInterpreterImpl
-	implements SocialRequestInterpreter {
+public class SocialRequestInterpreterImpl implements SocialRequestInterpreter {
 
 	public SocialRequestInterpreterImpl(
 		String portletId, SocialRequestInterpreter requestInterpreter) {
@@ -61,15 +60,13 @@ public class SocialRequestInterpreterImpl
 	public SocialRequestFeedEntry interpret(
 		SocialRequest request, ThemeDisplay themeDisplay) {
 
-		return _requestInterpreter.interpret(
-			request, themeDisplay);
+		return _requestInterpreter.interpret(request, themeDisplay);
 	}
 
 	public boolean processConfirmation(
 		SocialRequest request, ThemeDisplay themeDisplay) {
 
-		return _requestInterpreter.processConfirmation(
-			request, themeDisplay);
+		return _requestInterpreter.processConfirmation(request, themeDisplay);
 	}
 
 	public boolean processRejection(
@@ -78,8 +75,8 @@ public class SocialRequestInterpreterImpl
 		return _requestInterpreter.processRejection(request, themeDisplay);
 	}
 
+	private Set<String> _classNames = new HashSet<String>();
 	private String _portletId;
 	private SocialRequestInterpreter _requestInterpreter;
-	private Set<String> _classNames = new HashSet<String>();
 
 }

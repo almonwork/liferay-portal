@@ -76,13 +76,6 @@ public class ${entity.name}Util {
 	}
 
 	/**
-	 * @see com.liferay.portal.service.persistence.BasePersistence#remove(com.liferay.portal.model.BaseModel)
-	 */
-	public static ${entity.name} remove(${entity.name} ${entity.varName}) throws SystemException {
-		return getPersistence().remove(${entity.varName});
-	}
-
-	/**
 	 * @see com.liferay.portal.service.persistence.BasePersistence#update(com.liferay.portal.model.BaseModel, boolean)
 	 */
 	public static ${entity.name} update(${entity.name} ${entity.varName}, boolean merge) throws SystemException {
@@ -157,10 +150,10 @@ public class ${entity.name}Util {
 		return _persistence;
 	}
 
+	/**
+	 * @deprecated
+	 */
 	public void setPersistence(${entity.name}Persistence persistence) {
-		_persistence = persistence;
-
-		ReferenceRegistry.registerReference(${entity.name}Util.class, "_persistence");
 	}
 
 	private static ${entity.name}Persistence _persistence;

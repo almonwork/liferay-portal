@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,6 +14,12 @@
 
 package com.liferay.portlet.softwarecatalog.model;
 
+import com.liferay.portal.model.ModelWrapper;
+
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * <p>
  * This class is a wrapper for {@link SCProductEntry}.
@@ -23,7 +29,8 @@ package com.liferay.portlet.softwarecatalog.model;
  * @see       SCProductEntry
  * @generated
  */
-public class SCProductEntryWrapper implements SCProductEntry {
+public class SCProductEntryWrapper implements SCProductEntry,
+	ModelWrapper<SCProductEntry> {
 	public SCProductEntryWrapper(SCProductEntry scProductEntry) {
 		_scProductEntry = scProductEntry;
 	}
@@ -34,6 +41,127 @@ public class SCProductEntryWrapper implements SCProductEntry {
 
 	public String getModelClassName() {
 		return SCProductEntry.class.getName();
+	}
+
+	public Map<String, Object> getModelAttributes() {
+		Map<String, Object> attributes = new HashMap<String, Object>();
+
+		attributes.put("productEntryId", getProductEntryId());
+		attributes.put("groupId", getGroupId());
+		attributes.put("companyId", getCompanyId());
+		attributes.put("userId", getUserId());
+		attributes.put("userName", getUserName());
+		attributes.put("createDate", getCreateDate());
+		attributes.put("modifiedDate", getModifiedDate());
+		attributes.put("name", getName());
+		attributes.put("type", getType());
+		attributes.put("tags", getTags());
+		attributes.put("shortDescription", getShortDescription());
+		attributes.put("longDescription", getLongDescription());
+		attributes.put("pageURL", getPageURL());
+		attributes.put("author", getAuthor());
+		attributes.put("repoGroupId", getRepoGroupId());
+		attributes.put("repoArtifactId", getRepoArtifactId());
+
+		return attributes;
+	}
+
+	public void setModelAttributes(Map<String, Object> attributes) {
+		Long productEntryId = (Long)attributes.get("productEntryId");
+
+		if (productEntryId != null) {
+			setProductEntryId(productEntryId);
+		}
+
+		Long groupId = (Long)attributes.get("groupId");
+
+		if (groupId != null) {
+			setGroupId(groupId);
+		}
+
+		Long companyId = (Long)attributes.get("companyId");
+
+		if (companyId != null) {
+			setCompanyId(companyId);
+		}
+
+		Long userId = (Long)attributes.get("userId");
+
+		if (userId != null) {
+			setUserId(userId);
+		}
+
+		String userName = (String)attributes.get("userName");
+
+		if (userName != null) {
+			setUserName(userName);
+		}
+
+		Date createDate = (Date)attributes.get("createDate");
+
+		if (createDate != null) {
+			setCreateDate(createDate);
+		}
+
+		Date modifiedDate = (Date)attributes.get("modifiedDate");
+
+		if (modifiedDate != null) {
+			setModifiedDate(modifiedDate);
+		}
+
+		String name = (String)attributes.get("name");
+
+		if (name != null) {
+			setName(name);
+		}
+
+		String type = (String)attributes.get("type");
+
+		if (type != null) {
+			setType(type);
+		}
+
+		String tags = (String)attributes.get("tags");
+
+		if (tags != null) {
+			setTags(tags);
+		}
+
+		String shortDescription = (String)attributes.get("shortDescription");
+
+		if (shortDescription != null) {
+			setShortDescription(shortDescription);
+		}
+
+		String longDescription = (String)attributes.get("longDescription");
+
+		if (longDescription != null) {
+			setLongDescription(longDescription);
+		}
+
+		String pageURL = (String)attributes.get("pageURL");
+
+		if (pageURL != null) {
+			setPageURL(pageURL);
+		}
+
+		String author = (String)attributes.get("author");
+
+		if (author != null) {
+			setAuthor(author);
+		}
+
+		String repoGroupId = (String)attributes.get("repoGroupId");
+
+		if (repoGroupId != null) {
+			setRepoGroupId(repoGroupId);
+		}
+
+		String repoArtifactId = (String)attributes.get("repoArtifactId");
+
+		if (repoArtifactId != null) {
+			setRepoArtifactId(repoArtifactId);
+		}
 	}
 
 	/**
@@ -382,10 +510,6 @@ public class SCProductEntryWrapper implements SCProductEntry {
 		return _scProductEntry.isEscapedModel();
 	}
 
-	public void setEscapedModel(boolean escapedModel) {
-		_scProductEntry.setEscapedModel(escapedModel);
-	}
-
 	public java.io.Serializable getPrimaryKeyObj() {
 		return _scProductEntry.getPrimaryKeyObj();
 	}
@@ -455,7 +579,14 @@ public class SCProductEntryWrapper implements SCProductEntry {
 		return _scProductEntry.getScreenshots();
 	}
 
+	/**
+	 * @deprecated Renamed to {@link #getWrappedModel}
+	 */
 	public SCProductEntry getWrappedSCProductEntry() {
+		return _scProductEntry;
+	}
+
+	public SCProductEntry getWrappedModel() {
 		return _scProductEntry;
 	}
 

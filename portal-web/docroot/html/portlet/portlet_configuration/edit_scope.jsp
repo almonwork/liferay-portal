@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -22,7 +22,7 @@ String returnToFullPageURL = ParamUtil.getString(request, "returnToFullPageURL")
 
 PortletPreferences preferences = PortletPreferencesFactoryUtil.getLayoutPortletSetup(layout, portletResource);
 
-String scopeType = GetterUtil.getString(preferences.getValue("lfr-scope-type", null));
+String scopeType = GetterUtil.getString(preferences.getValue("lfrScopeType", null));
 String scopeLayoutUuid = GetterUtil.getString(preferences.getValue("lfrScopeLayoutUuid", null));
 
 Group group = layout.getGroup();
@@ -58,7 +58,6 @@ Group group = layout.getGroup();
 					if (curLayout.getPlid() == layout.getPlid()) {
 						continue;
 					}
-
 				%>
 
 					<aui:option label="<%= HtmlUtil.escape(curLayout.getName(locale)) %>" selected="<%= scopeLayoutUuid.equals(curLayout.getUuid()) %>" value="<%= curLayout.getUuid() %>" />

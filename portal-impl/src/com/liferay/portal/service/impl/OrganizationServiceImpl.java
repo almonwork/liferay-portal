@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -16,6 +16,8 @@ package com.liferay.portal.service.impl;
 
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
+import com.liferay.portal.kernel.search.Indexer;
+import com.liferay.portal.kernel.search.IndexerRegistryUtil;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.model.Address;
 import com.liferay.portal.model.EmailAddress;
@@ -34,6 +36,7 @@ import com.liferay.portal.service.permission.GroupPermissionUtil;
 import com.liferay.portal.service.permission.OrganizationPermissionUtil;
 import com.liferay.portal.service.permission.PasswordPolicyPermissionUtil;
 import com.liferay.portal.service.permission.PortalPermissionUtil;
+import com.liferay.portal.service.permission.UserPermissionUtil;
 import com.liferay.portlet.usersadmin.util.UsersAdminUtil;
 
 import java.util.Iterator;
@@ -95,8 +98,8 @@ public class OrganizationServiceImpl extends OrganizationServiceBaseImpl {
 	 * @param  phones the organization's phone numbers
 	 * @param  websites the organization's websites
 	 * @param  serviceContext the organization's service context (optionally
-	 *         <code>null</code>). Can specify the organization's asset category
-	 *         IDs, asset tag names, and expando bridge attributes.
+	 *         <code>null</code>). Can set asset category IDs, asset tag names,
+	 *         and expando bridge attributes for the organization.
 	 * @return the organization
 	 * @throws PortalException if a parent organization with the primary key
 	 *         could not be found, if the organization's information was
@@ -113,30 +116,46 @@ public class OrganizationServiceImpl extends OrganizationServiceBaseImpl {
 			ServiceContext serviceContext)
 		throws PortalException, SystemException {
 
-		Organization organization = addOrganization(
-			parentOrganizationId, name, type, recursable, regionId, countryId,
-			statusId, comments, site, serviceContext);
+		boolean indexingEnabled = serviceContext.isIndexingEnabled();
 
-		UsersAdminUtil.updateAddresses(
-			Organization.class.getName(), organization.getOrganizationId(),
-			addresses);
+		serviceContext.setIndexingEnabled(false);
 
-		UsersAdminUtil.updateEmailAddresses(
-			Organization.class.getName(), organization.getOrganizationId(),
-			emailAddresses);
+		try {
+			Organization organization = addOrganization(
+				parentOrganizationId, name, type, recursable, regionId,
+				countryId, statusId, comments, site, serviceContext);
 
-		UsersAdminUtil.updateOrgLabors(organization.getOrganizationId(),
-			orgLabors);
+			UsersAdminUtil.updateAddresses(
+				Organization.class.getName(), organization.getOrganizationId(),
+				addresses);
 
-		UsersAdminUtil.updatePhones(
-			Organization.class.getName(), organization.getOrganizationId(),
-			phones);
+			UsersAdminUtil.updateEmailAddresses(
+				Organization.class.getName(), organization.getOrganizationId(),
+				emailAddresses);
 
-		UsersAdminUtil.updateWebsites(
-			Organization.class.getName(), organization.getOrganizationId(),
-			websites);
+			UsersAdminUtil.updateOrgLabors(
+				organization.getOrganizationId(), orgLabors);
 
-		return organization;
+			UsersAdminUtil.updatePhones(
+				Organization.class.getName(), organization.getOrganizationId(),
+				phones);
+
+			UsersAdminUtil.updateWebsites(
+				Organization.class.getName(), organization.getOrganizationId(),
+				websites);
+
+			if (indexingEnabled) {
+				Indexer indexer = IndexerRegistryUtil.nullSafeGetIndexer(
+					Organization.class);
+
+				indexer.reindex(organization);
+			}
+
+			return organization;
+		}
+		finally {
+			serviceContext.setIndexingEnabled(indexingEnabled);
+		}
 	}
 
 	/**
@@ -160,8 +179,8 @@ public class OrganizationServiceImpl extends OrganizationServiceBaseImpl {
 	 * @param  site whether the organization is to be associated with a main
 	 *         site
 	 * @param  serviceContext the organization's service context (optionally
-	 *         <code>null</code>). Can specify the organization's asset category
-	 *         IDs, asset tag names, and expando bridge attributes.
+	 *         <code>null</code>). Can set asset category IDs, asset tag names,
+	 *         and expando bridge attributes for the organization.
 	 * @return the organization
 	 * @throws PortalException if the parent organization with the primary key
 	 *         could not be found, if the organization information was invalid,
@@ -279,10 +298,7 @@ public class OrganizationServiceImpl extends OrganizationServiceBaseImpl {
 			organizationLocalService.getUserOrganizations(
 				permissionChecker.getUserId());
 
-		Long[][] leftAndRightOrganizationIds =
-			UsersAdminUtil.getLeftAndRightOrganizationIds(userOrganizations);
-
-		params.put("organizationsTree", leftAndRightOrganizationIds);
+		params.put("organizationsTree", userOrganizations);
 
 		List<Organization> manageableOrganizations =
 			organizationLocalService.search(
@@ -336,9 +352,15 @@ public class OrganizationServiceImpl extends OrganizationServiceBaseImpl {
 	 * @throws SystemException if a system exception occurred
 	 */
 	public long getOrganizationId(long companyId, String name)
-		throws SystemException {
+		throws PortalException, SystemException {
 
-		return organizationLocalService.getOrganizationId(companyId, name);
+		long organizationId = organizationLocalService.getOrganizationId(
+			companyId, name);
+
+		OrganizationPermissionUtil.check(
+			getPermissionChecker(), organizationId, ActionKeys.VIEW);
+
+		return organizationId;
 	}
 
 	/**
@@ -398,8 +420,7 @@ public class OrganizationServiceImpl extends OrganizationServiceBaseImpl {
 	 * @return the number of organizations belonging to the parent organization
 	 * @throws SystemException if a system exception occurred
 	 */
-	public int getOrganizationsCount(
-			long companyId, long parentOrganizationId)
+	public int getOrganizationsCount(long companyId, long parentOrganizationId)
 		throws SystemException {
 
 		return organizationPersistence.filterCountByC_P(
@@ -417,27 +438,10 @@ public class OrganizationServiceImpl extends OrganizationServiceBaseImpl {
 	public List<Organization> getUserOrganizations(long userId)
 		throws PortalException, SystemException {
 
+		UserPermissionUtil.check(
+			getPermissionChecker(), userId, ActionKeys.VIEW);
+
 		return organizationLocalService.getUserOrganizations(userId);
-	}
-
-	/**
-	 * Returns all the organizations associated with the user, optionally
-	 * including the organizations associated with the user groups to which the
-	 * user belongs.
-	 *
-	 * @param  userId the primary key of the user
-	 * @param  inheritUserGroups whether to include organizations associated
-	 *         with the user groups to which the user belongs
-	 * @return the organizations associated with the user
-	 * @throws PortalException if a user with the primary key could not be found
-	 * @throws SystemException if a system exception occurred
-	 */
-	public List<Organization> getUserOrganizations(
-			long userId, boolean inheritUserGroups)
-		throws PortalException, SystemException {
-
-		return organizationLocalService.getUserOrganizations(
-			userId, inheritUserGroups);
 	}
 
 	/**
@@ -488,7 +492,7 @@ public class OrganizationServiceImpl extends OrganizationServiceBaseImpl {
 	 * @param  organizationIds the primary keys of the organizations
 	 * @throws PortalException if a password policy or organization with the
 	 *         primary key could not be found, or if the user did not have
-	 *         permission to update the password policy.
+	 *         permission to update the password policy
 	 * @throws SystemException if a system exception occurred
 	 */
 	public void unsetPasswordPolicyOrganizations(
@@ -524,9 +528,9 @@ public class OrganizationServiceImpl extends OrganizationServiceBaseImpl {
 	 * @param  phones the organization's phone numbers
 	 * @param  websites the organization's websites
 	 * @param  serviceContext the organization's service context (optionally
-	 *         <code>null</code>). Can specify the organization's replacement
-	 *         asset category IDs, replacement asset tag names, and new expando
-	 *         bridge attributes.
+	 *         <code>null</code>). Can set asset category IDs and asset tag
+	 *         names for the organization, and merge expando bridge attributes
+	 *         for the organization.
 	 * @return the organization
 	 * @throws PortalException if an organization or parent organization with
 	 *         the primary key could not be found, if the user did not have
@@ -543,25 +547,39 @@ public class OrganizationServiceImpl extends OrganizationServiceBaseImpl {
 			List<Website> websites, ServiceContext serviceContext)
 		throws PortalException, SystemException {
 
-		UsersAdminUtil.updateAddresses(
-			Organization.class.getName(), organizationId, addresses);
+		OrganizationPermissionUtil.check(
+			getPermissionChecker(), organizationId, ActionKeys.UPDATE);
 
-		UsersAdminUtil.updateEmailAddresses(
-			Organization.class.getName(), organizationId, emailAddresses);
+		if (addresses != null) {
+			UsersAdminUtil.updateAddresses(
+				Organization.class.getName(), organizationId, addresses);
+		}
 
-		UsersAdminUtil.updateOrgLabors(organizationId, orgLabors);
+		if (emailAddresses != null) {
+			UsersAdminUtil.updateEmailAddresses(
+				Organization.class.getName(), organizationId, emailAddresses);
+		}
 
-		UsersAdminUtil.updatePhones(
-			Organization.class.getName(), organizationId, phones);
+		if (orgLabors != null) {
+			UsersAdminUtil.updateOrgLabors(organizationId, orgLabors);
+		}
 
-		UsersAdminUtil.updateWebsites(
-			Organization.class.getName(), organizationId, websites);
+		if (phones != null) {
+			UsersAdminUtil.updatePhones(
+				Organization.class.getName(), organizationId, phones);
+		}
 
-		Organization organization = updateOrganization(
-			organizationId, parentOrganizationId, name, type, recursable,
-			regionId, countryId, statusId, comments, site, serviceContext);
+		if (websites != null) {
+			UsersAdminUtil.updateWebsites(
+				Organization.class.getName(), organizationId, websites);
+		}
 
-		return organization;
+		User user = getUser();
+
+		return organizationLocalService.updateOrganization(
+			user.getCompanyId(), organizationId, parentOrganizationId, name,
+			type, recursable, regionId, countryId, statusId, comments, site,
+			serviceContext);
 	}
 
 	/**
@@ -581,9 +599,9 @@ public class OrganizationServiceImpl extends OrganizationServiceBaseImpl {
 	 * @param  site whether the organization is to be associated with a main
 	 *         site
 	 * @param  serviceContext the organization's service context (optionally
-	 *         <code>null</code>). Can specify the organization's replacement
-	 *         asset category IDs, replacement asset tag names, and new expando
-	 *         bridge attributes.
+	 *         <code>null</code>). Can set asset category IDs and asset tag
+	 *         names for the organization, and merge expando bridge attributes
+	 *         for the organization.
 	 * @return the organization
 	 * @throws PortalException if an organization or parent organization with
 	 *         the primary key could not be found, if the user did not have
@@ -598,15 +616,10 @@ public class OrganizationServiceImpl extends OrganizationServiceBaseImpl {
 			ServiceContext serviceContext)
 		throws PortalException, SystemException {
 
-		OrganizationPermissionUtil.check(
-			getPermissionChecker(), organizationId, ActionKeys.UPDATE);
-
-		User user = getUser();
-
-		return organizationLocalService.updateOrganization(
-			user.getCompanyId(), organizationId, parentOrganizationId,
-			name, type, recursable, regionId, countryId, statusId, comments,
-			site, serviceContext);
+		return updateOrganization(
+			organizationId, parentOrganizationId, name, type, recursable,
+			regionId, countryId, statusId, comments, site, null, null, null,
+			null, null, serviceContext);
 	}
 
 }

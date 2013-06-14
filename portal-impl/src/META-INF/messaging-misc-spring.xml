@@ -38,8 +38,8 @@
 	<bean id="destination.document_library_audio_processor" class="com.liferay.portal.kernel.messaging.SerialDestination">
 		<property name="name" value="liferay/document_library_audio_processor" />
 	</bean>
-	<bean id="destination.document_library_folder_last_post_date" class="com.liferay.portal.kernel.messaging.SerialDestination">
-		<property name="name" value="liferay/document_library_folder_last_post_date" />
+	<bean id="destination.document_library_image_processor" class="com.liferay.portal.kernel.messaging.SerialDestination">
+		<property name="name" value="liferay/document_library_image_processor" />
 	</bean>
 	<bean id="destination.document_library_pdf_processor" class="com.liferay.portal.kernel.messaging.SerialDestination">
 		<property name="name" value="liferay/document_library_pdf_processor" />
@@ -78,14 +78,15 @@
 	<bean id="messageListener.buffered_increment" class="com.liferay.portal.increment.BufferedIncrementMessageListener" />
 	<bean id="messageListener.convert_process" class="com.liferay.portal.convert.messaging.ConvertProcessMessageListener" />
 	<bean id="messageListener.document_library_audio_processor" class="com.liferay.portlet.documentlibrary.messaging.AudioProcessorMessageListener" />
-	<bean id="messageListener.document_library_folder_last_post_date" class="com.liferay.portlet.documentlibrary.messaging.FolderLastPostDateMessageListener" />
+	<bean id="messageListener.document_library_image_processor" class="com.liferay.portlet.documentlibrary.messaging.ImageProcessorMessageListener" />
 	<bean id="messageListener.document_library_pdf_processor" class="com.liferay.portlet.documentlibrary.messaging.PDFProcessorMessageListener" />
 	<bean id="messageListener.document_library_raw_metadata_processor" class="com.liferay.portlet.documentlibrary.messaging.RawMetadataProcessorMessageListener" />
 	<bean id="messageListener.document_library_video_processor" class="com.liferay.portlet.documentlibrary.messaging.VideoProcessorMessageListener" />
 	<bean id="messageListener.flags" class="com.liferay.portlet.flags.messaging.FlagsRequestMessageListener" />
 	<bean id="messageListener.hot_deploy" class="com.liferay.portal.deploy.hot.messaging.HotDeployMessageListener" />
 	<bean id="messageListener.layouts_local_publisher" class="com.liferay.portal.kernel.scheduler.messaging.SchedulerEventMessageListenerWrapper">
-		<property name="className" value="com.liferay.portal.messaging.LayoutsLocalPublisherMessageListener" />
+		<property name="groupName" value="com.liferay.portal.messaging.LayoutsLocalPublisherMessageListener" />
+		<property name="jobName" value="com.liferay.portal.messaging.LayoutsLocalPublisherMessageListener" />
 		<property name="messageListener">
 			<bean class="com.liferay.portal.messaging.LayoutsLocalPublisherMessageListener">
 				<property name="responseSender" ref="com.liferay.portal.kernel.messaging.sender.MessageSender" />
@@ -94,7 +95,8 @@
 		</property>
 	</bean>
 	<bean id="messageListener.layouts_remote_publisher" class="com.liferay.portal.kernel.scheduler.messaging.SchedulerEventMessageListenerWrapper">
-		<property name="className" value="com.liferay.portal.messaging.LayoutsRemotePublisherMessageListener" />
+		<property name="groupName" value="com.liferay.portal.messaging.LayoutsRemotePublisherMessageListener" />
+		<property name="jobName" value="com.liferay.portal.messaging.LayoutsRemotePublisherMessageListener" />
 		<property name="messageListener">
 			<bean class="com.liferay.portal.messaging.LayoutsRemotePublisherMessageListener">
 				<property name="responseSender" ref="com.liferay.portal.kernel.messaging.sender.MessageSender" />
@@ -109,7 +111,8 @@
 		</property>
 	</bean>
 	<bean id="messageListener.message_boards_mailing_list" class="com.liferay.portal.kernel.scheduler.messaging.SchedulerEventMessageListenerWrapper">
-		<property name="className" value="com.liferay.portlet.messageboards.messaging.MailingListMessageListener" />
+		<property name="groupName" value="com.liferay.portlet.messageboards.messaging.MailingListMessageListener" />
+		<property name="jobName" value="com.liferay.portlet.messageboards.messaging.MailingListMessageListener" />
 		<property name="messageListener">
 			<bean class="com.liferay.portlet.messageboards.messaging.MailingListMessageListener" />
 		</property>
@@ -126,7 +129,7 @@
 				<ref bean="destination.buffered_increment_serial" />
 				<ref bean="destination.convert_process" />
 				<ref bean="destination.document_library_audio_processor" />
-				<ref bean="destination.document_library_folder_last_post_date" />
+				<ref bean="destination.document_library_image_processor" />
 				<ref bean="destination.document_library_pdf_processor" />
 				<ref bean="destination.document_library_raw_metadata_processor" />
 				<ref bean="destination.document_library_video_processor" />
@@ -169,9 +172,9 @@
 						<ref bean="messageListener.document_library_audio_processor" />
 					</list>
 				</entry>
-				<entry key="liferay/document_library_folder_last_post_date">
+				<entry key="liferay/document_library_image_processor">
 					<list value-type="com.liferay.portal.kernel.messaging.MessageListener">
-						<ref bean="messageListener.document_library_folder_last_post_date" />
+						<ref bean="messageListener.document_library_image_processor" />
 					</list>
 				</entry>
 				<entry key="liferay/document_library_pdf_processor">

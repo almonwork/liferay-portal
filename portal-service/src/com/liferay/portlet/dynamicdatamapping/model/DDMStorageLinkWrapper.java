@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,6 +14,11 @@
 
 package com.liferay.portlet.dynamicdatamapping.model;
 
+import com.liferay.portal.model.ModelWrapper;
+
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * <p>
  * This class is a wrapper for {@link DDMStorageLink}.
@@ -23,7 +28,8 @@ package com.liferay.portlet.dynamicdatamapping.model;
  * @see       DDMStorageLink
  * @generated
  */
-public class DDMStorageLinkWrapper implements DDMStorageLink {
+public class DDMStorageLinkWrapper implements DDMStorageLink,
+	ModelWrapper<DDMStorageLink> {
 	public DDMStorageLinkWrapper(DDMStorageLink ddmStorageLink) {
 		_ddmStorageLink = ddmStorageLink;
 	}
@@ -34,6 +40,50 @@ public class DDMStorageLinkWrapper implements DDMStorageLink {
 
 	public String getModelClassName() {
 		return DDMStorageLink.class.getName();
+	}
+
+	public Map<String, Object> getModelAttributes() {
+		Map<String, Object> attributes = new HashMap<String, Object>();
+
+		attributes.put("uuid", getUuid());
+		attributes.put("storageLinkId", getStorageLinkId());
+		attributes.put("classNameId", getClassNameId());
+		attributes.put("classPK", getClassPK());
+		attributes.put("structureId", getStructureId());
+
+		return attributes;
+	}
+
+	public void setModelAttributes(Map<String, Object> attributes) {
+		String uuid = (String)attributes.get("uuid");
+
+		if (uuid != null) {
+			setUuid(uuid);
+		}
+
+		Long storageLinkId = (Long)attributes.get("storageLinkId");
+
+		if (storageLinkId != null) {
+			setStorageLinkId(storageLinkId);
+		}
+
+		Long classNameId = (Long)attributes.get("classNameId");
+
+		if (classNameId != null) {
+			setClassNameId(classNameId);
+		}
+
+		Long classPK = (Long)attributes.get("classPK");
+
+		if (classPK != null) {
+			setClassPK(classPK);
+		}
+
+		Long structureId = (Long)attributes.get("structureId");
+
+		if (structureId != null) {
+			setStructureId(structureId);
+		}
 	}
 
 	/**
@@ -97,6 +147,10 @@ public class DDMStorageLinkWrapper implements DDMStorageLink {
 	*/
 	public java.lang.String getClassName() {
 		return _ddmStorageLink.getClassName();
+	}
+
+	public void setClassName(java.lang.String className) {
+		_ddmStorageLink.setClassName(className);
 	}
 
 	/**
@@ -173,10 +227,6 @@ public class DDMStorageLinkWrapper implements DDMStorageLink {
 		return _ddmStorageLink.isEscapedModel();
 	}
 
-	public void setEscapedModel(boolean escapedModel) {
-		_ddmStorageLink.setEscapedModel(escapedModel);
-	}
-
 	public java.io.Serializable getPrimaryKeyObj() {
 		return _ddmStorageLink.getPrimaryKeyObj();
 	}
@@ -243,7 +293,14 @@ public class DDMStorageLinkWrapper implements DDMStorageLink {
 		return _ddmStorageLink.getStructure();
 	}
 
+	/**
+	 * @deprecated Renamed to {@link #getWrappedModel}
+	 */
 	public DDMStorageLink getWrappedDDMStorageLink() {
+		return _ddmStorageLink;
+	}
+
+	public DDMStorageLink getWrappedModel() {
 		return _ddmStorageLink;
 	}
 

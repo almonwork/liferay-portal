@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -16,6 +16,7 @@ package com.liferay.portal.model.impl;
 
 import com.liferay.portal.kernel.bean.AutoEscapeBeanHandler;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.ProxyUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.model.CacheModel;
@@ -28,9 +29,10 @@ import com.liferay.portlet.expando.util.ExpandoBridgeFactoryUtil;
 
 import java.io.Serializable;
 
-import java.lang.reflect.Proxy;
-
 import java.sql.Types;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * The base model implementation for the ClusterGroup service. Represents a row in the &quot;ClusterGroup&quot; database table, with each column mapped to a property of this class.
@@ -70,15 +72,7 @@ public class ClusterGroupModelImpl extends BaseModelImpl<ClusterGroup>
 	public static final boolean FINDER_CACHE_ENABLED = GetterUtil.getBoolean(com.liferay.portal.util.PropsUtil.get(
 				"value.object.finder.cache.enabled.com.liferay.portal.model.ClusterGroup"),
 			true);
-
-	public Class<?> getModelClass() {
-		return ClusterGroup.class;
-	}
-
-	public String getModelClassName() {
-		return ClusterGroup.class.getName();
-	}
-
+	public static final boolean COLUMN_BITMASK_ENABLED = false;
 	public static final long LOCK_EXPIRATION_TIME = GetterUtil.getLong(com.liferay.portal.util.PropsUtil.get(
 				"lock.expiration.time.com.liferay.portal.model.ClusterGroup"));
 
@@ -99,6 +93,53 @@ public class ClusterGroupModelImpl extends BaseModelImpl<ClusterGroup>
 
 	public void setPrimaryKeyObj(Serializable primaryKeyObj) {
 		setPrimaryKey(((Long)primaryKeyObj).longValue());
+	}
+
+	public Class<?> getModelClass() {
+		return ClusterGroup.class;
+	}
+
+	public String getModelClassName() {
+		return ClusterGroup.class.getName();
+	}
+
+	@Override
+	public Map<String, Object> getModelAttributes() {
+		Map<String, Object> attributes = new HashMap<String, Object>();
+
+		attributes.put("clusterGroupId", getClusterGroupId());
+		attributes.put("name", getName());
+		attributes.put("clusterNodeIds", getClusterNodeIds());
+		attributes.put("wholeCluster", getWholeCluster());
+
+		return attributes;
+	}
+
+	@Override
+	public void setModelAttributes(Map<String, Object> attributes) {
+		Long clusterGroupId = (Long)attributes.get("clusterGroupId");
+
+		if (clusterGroupId != null) {
+			setClusterGroupId(clusterGroupId);
+		}
+
+		String name = (String)attributes.get("name");
+
+		if (name != null) {
+			setName(name);
+		}
+
+		String clusterNodeIds = (String)attributes.get("clusterNodeIds");
+
+		if (clusterNodeIds != null) {
+			setClusterNodeIds(clusterNodeIds);
+		}
+
+		Boolean wholeCluster = (Boolean)attributes.get("wholeCluster");
+
+		if (wholeCluster != null) {
+			setWholeCluster(wholeCluster);
+		}
 	}
 
 	public long getClusterGroupId() {
@@ -149,33 +190,26 @@ public class ClusterGroupModelImpl extends BaseModelImpl<ClusterGroup>
 
 	@Override
 	public ClusterGroup toEscapedModel() {
-		if (isEscapedModel()) {
-			return (ClusterGroup)this;
+		if (_escapedModelProxy == null) {
+			_escapedModelProxy = (ClusterGroup)ProxyUtil.newProxyInstance(_classLoader,
+					_escapedModelProxyInterfaces,
+					new AutoEscapeBeanHandler(this));
 		}
-		else {
-			if (_escapedModelProxy == null) {
-				_escapedModelProxy = (ClusterGroup)Proxy.newProxyInstance(_classLoader,
-						_escapedModelProxyInterfaces,
-						new AutoEscapeBeanHandler(this));
-			}
 
-			return _escapedModelProxy;
-		}
+		return _escapedModelProxy;
 	}
 
 	@Override
 	public ExpandoBridge getExpandoBridge() {
-		if (_expandoBridge == null) {
-			_expandoBridge = ExpandoBridgeFactoryUtil.getExpandoBridge(0,
-					ClusterGroup.class.getName(), getPrimaryKey());
-		}
-
-		return _expandoBridge;
+		return ExpandoBridgeFactoryUtil.getExpandoBridge(0,
+			ClusterGroup.class.getName(), getPrimaryKey());
 	}
 
 	@Override
 	public void setExpandoBridgeAttributes(ServiceContext serviceContext) {
-		getExpandoBridge().setAttributes(serviceContext);
+		ExpandoBridge expandoBridge = getExpandoBridge();
+
+		expandoBridge.setAttributes(serviceContext);
 	}
 
 	@Override
@@ -321,6 +355,5 @@ public class ClusterGroupModelImpl extends BaseModelImpl<ClusterGroup>
 	private String _name;
 	private String _clusterNodeIds;
 	private boolean _wholeCluster;
-	private transient ExpandoBridge _expandoBridge;
 	private ClusterGroup _escapedModelProxy;
 }

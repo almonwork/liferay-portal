@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -27,8 +27,8 @@ import com.liferay.portal.kernel.io.unsync.UnsyncBufferedOutputStream;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.mail.MailMessage;
-import com.liferay.portal.kernel.search.Indexer;
-import com.liferay.portal.kernel.search.IndexerRegistryUtil;
+import com.liferay.portal.kernel.search.Indexable;
+import com.liferay.portal.kernel.search.IndexableType;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.CalendarFactoryUtil;
 import com.liferay.portal.kernel.util.CalendarUtil;
@@ -36,6 +36,7 @@ import com.liferay.portal.kernel.util.CharPool;
 import com.liferay.portal.kernel.util.ContentTypes;
 import com.liferay.portal.kernel.util.FastDateFormatFactoryUtil;
 import com.liferay.portal.kernel.util.FileUtil;
+import com.liferay.portal.kernel.util.HtmlUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.ReleaseInfo;
 import com.liferay.portal.kernel.util.StreamUtil;
@@ -46,6 +47,7 @@ import com.liferay.portal.kernel.util.TimeZoneUtil;
 import com.liferay.portal.kernel.util.UnmodifiableList;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.uuid.PortalUUIDUtil;
+import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.portal.model.Company;
 import com.liferay.portal.model.Contact;
 import com.liferay.portal.model.ModelHintsUtil;
@@ -70,8 +72,8 @@ import com.liferay.util.TimeZoneSensitive;
 
 import java.io.File;
 import java.io.FileOutputStream;
-import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 
 import java.text.Format;
@@ -125,6 +127,7 @@ import net.fortuna.ical4j.model.property.Version;
  */
 public class CalEventLocalServiceImpl extends CalEventLocalServiceBaseImpl {
 
+	@Indexable(type = IndexableType.REINDEX)
 	public CalEvent addEvent(
 			long userId, String title, String description, String location,
 			int startDateMonth, int startDateDay, int startDateYear,
@@ -219,12 +222,12 @@ public class CalEventLocalServiceImpl extends CalEventLocalServiceBaseImpl {
 
 		// Resources
 
-		if (serviceContext.getAddGroupPermissions() ||
-			serviceContext.getAddGuestPermissions()) {
+		if (serviceContext.isAddGroupPermissions() ||
+			serviceContext.isAddGuestPermissions()) {
 
 			addEventResources(
-				event, serviceContext.getAddGroupPermissions(),
-				serviceContext.getAddGuestPermissions());
+				event, serviceContext.isAddGroupPermissions(),
+				serviceContext.isAddGuestPermissions());
 		}
 		else {
 			addEventResources(
@@ -239,17 +242,19 @@ public class CalEventLocalServiceImpl extends CalEventLocalServiceBaseImpl {
 			serviceContext.getAssetTagNames(),
 			serviceContext.getAssetLinkEntryIds());
 
+		// Message boards
+
+		if (PropsValues.CALENDAR_EVENT_COMMENTS_ENABLED) {
+			mbMessageLocalService.addDiscussionMessage(
+				userId, event.getUserName(), groupId, CalEvent.class.getName(),
+				event.getEventId(), WorkflowConstants.ACTION_PUBLISH);
+		}
+
 		// Social
 
 		socialActivityLocalService.addActivity(
 			userId, groupId, CalEvent.class.getName(), eventId,
 			CalendarActivityKeys.ADD_EVENT, StringPool.BLANK, 0);
-
-		// Indexer
-
-		Indexer indexer = IndexerRegistryUtil.getIndexer(CalEvent.class);
-
-		indexer.reindex(event);
 
 		// Pool
 
@@ -287,8 +292,7 @@ public class CalEventLocalServiceImpl extends CalEventLocalServiceBaseImpl {
 
 		CalEvent event = calEventPersistence.findByPrimaryKey(eventId);
 
-		addEventResources(
-			event, addGroupPermissions, addGuestPermissions);
+		addEventResources(event, addGroupPermissions, addGuestPermissions);
 	}
 
 	public void addEventResources(
@@ -307,7 +311,7 @@ public class CalEventLocalServiceImpl extends CalEventLocalServiceBaseImpl {
 			User user = userPersistence.fetchByPrimaryKey(event.getUserId());
 
 			if (user == null) {
-				deleteEvent(event);
+				calEventLocalService.deleteEvent(event);
 
 				continue;
 			}
@@ -369,7 +373,8 @@ public class CalEventLocalServiceImpl extends CalEventLocalServiceBaseImpl {
 		}
 	}
 
-	public void deleteEvent(CalEvent event)
+	@Indexable(type = IndexableType.DELETE)
+	public CalEvent deleteEvent(CalEvent event)
 		throws PortalException, SystemException {
 
 		// Event
@@ -382,6 +387,11 @@ public class CalEventLocalServiceImpl extends CalEventLocalServiceBaseImpl {
 			event.getCompanyId(), CalEvent.class.getName(),
 			ResourceConstants.SCOPE_INDIVIDUAL, event.getEventId());
 
+		// Subscriptions
+
+		subscriptionLocalService.deleteSubscriptions(
+			event.getCompanyId(), CalEvent.class.getName(), event.getEventId());
+
 		// Asset
 
 		assetEntryLocalService.deleteEntry(
@@ -392,40 +402,31 @@ public class CalEventLocalServiceImpl extends CalEventLocalServiceBaseImpl {
 		expandoValueLocalService.deleteValues(
 			CalEvent.class.getName(), event.getEventId());
 
-		// Social
-
-		socialActivityLocalService.deleteActivities(
-			CalEvent.class.getName(), event.getEventId());
-
-		// Indexer
-
-		Indexer indexer = IndexerRegistryUtil.getIndexer(CalEvent.class);
-
-		indexer.delete(event);
-
 		// Pool
 
 		CalEventLocalUtil.clearEventsPool(event.getGroupId());
+
+		return event;
 	}
 
-	public void deleteEvent(long eventId)
+	@Indexable(type = IndexableType.DELETE)
+	public CalEvent deleteEvent(long eventId)
 		throws PortalException, SystemException {
 
 		CalEvent event = calEventPersistence.findByPrimaryKey(eventId);
 
 		deleteEvent(event);
+
+		return event;
 	}
 
 	public void deleteEvents(long groupId)
 		throws PortalException, SystemException {
 
-		Iterator<CalEvent> itr = calEventPersistence.findByGroupId(
-			groupId).iterator();
+		List<CalEvent> events = calEventPersistence.findByGroupId(groupId);
 
-		while (itr.hasNext()) {
-			CalEvent event = itr.next();
-
-			deleteEvent(event);
+		for (CalEvent event : events) {
+			calEventLocalService.deleteEvent(event);
 		}
 	}
 
@@ -620,13 +621,9 @@ public class CalEventLocalServiceImpl extends CalEventLocalServiceBaseImpl {
 				cal.get(Calendar.YEAR), cal.get(Calendar.MONTH),
 				cal.get(Calendar.DATE));
 
-			Iterator<CalEvent> itr = events.iterator();
-
 			List<CalEvent> repeatingEvents = new ArrayList<CalEvent>();
 
-			while (itr.hasNext()) {
-				CalEvent event = itr.next();
-
+			for (CalEvent event : events) {
 				TZSRecurrence recurrence = event.getRecurrenceObj();
 
 				try {
@@ -688,25 +685,19 @@ public class CalEventLocalServiceImpl extends CalEventLocalServiceBaseImpl {
 		}
 	}
 
-	public void importICal4j(long userId, long groupId, File file)
+	public void importICal4j(long userId, long groupId, InputStream inputStream)
 		throws PortalException, SystemException {
 
-		FileReader fileReader = null;
-
 		try {
-			fileReader = new FileReader(file);
 
 			CalendarBuilder builder = new CalendarBuilder();
 
 			net.fortuna.ical4j.model.Calendar calendar = builder.build(
-				fileReader);
+				inputStream);
 
-			Iterator<VEvent> itr = calendar.getComponents(
-				Component.VEVENT).iterator();
+			List<VEvent> vEvents = calendar.getComponents(Component.VEVENT);
 
-			while (itr.hasNext()) {
-				VEvent vEvent = itr.next();
-
+			for (VEvent vEvent : vEvents) {
 				importICal4j(userId, groupId, vEvent);
 			}
 		}
@@ -715,16 +706,6 @@ public class CalEventLocalServiceImpl extends CalEventLocalServiceBaseImpl {
 		}
 		catch (ParserException pe) {
 			throw new SystemException(pe.getMessage(), pe);
-		}
-		finally {
-			try {
-				if (fileReader != null) {
-					fileReader.close();
-				}
-			}
-			catch (IOException ioe) {
-				_log.error(ioe, ioe);
-			}
 		}
 	}
 
@@ -735,8 +716,8 @@ public class CalEventLocalServiceImpl extends CalEventLocalServiceBaseImpl {
 
 		AssetEntry assetEntry = assetEntryLocalService.updateEntry(
 			userId, event.getGroupId(), CalEvent.class.getName(),
-			event.getEventId(), event.getUuid(), assetCategoryIds,
-			assetTagNames, true, null, null, null, null, ContentTypes.TEXT_HTML,
+			event.getEventId(), event.getUuid(), 0, assetCategoryIds,
+			assetTagNames, true, null, null, null, ContentTypes.TEXT_HTML,
 			event.getTitle(), event.getDescription(), null, null, null, 0, 0,
 			null, false);
 
@@ -745,6 +726,7 @@ public class CalEventLocalServiceImpl extends CalEventLocalServiceBaseImpl {
 			AssetLinkConstants.TYPE_RELATED);
 	}
 
+	@Indexable(type = IndexableType.REINDEX)
 	public CalEvent updateEvent(
 			long userId, long eventId, String title, String description,
 			String location, int startDateMonth, int startDateDay,
@@ -840,12 +822,6 @@ public class CalEventLocalServiceImpl extends CalEventLocalServiceBaseImpl {
 			userId, event.getGroupId(), CalEvent.class.getName(), eventId,
 			CalendarActivityKeys.UPDATE_EVENT, StringPool.BLANK, 0);
 
-		// Indexer
-
-		Indexer indexer = IndexerRegistryUtil.getIndexer(CalEvent.class);
-
-		indexer.reindex(event);
-
 		// Pool
 
 		CalEventLocalUtil.clearEventsPool(event.getGroupId());
@@ -912,8 +888,7 @@ public class CalEventLocalServiceImpl extends CalEventLocalServiceBaseImpl {
 		Calendar recurrenceCal = (Calendar)tzICal.clone();
 		recurrenceCal.set(
 			Calendar.HOUR_OF_DAY, eventCal.get(Calendar.HOUR_OF_DAY));
-		recurrenceCal.set(
-			Calendar.MINUTE, eventCal.get(Calendar.MINUTE));
+		recurrenceCal.set(Calendar.MINUTE, eventCal.get(Calendar.MINUTE));
 		recurrenceCal.set(Calendar.SECOND, 0);
 		recurrenceCal.set(Calendar.MILLISECOND, 0);
 
@@ -945,8 +920,7 @@ public class CalEventLocalServiceImpl extends CalEventLocalServiceBaseImpl {
 		return recurrenceCal;
 	}
 
-	protected void importICal4j(
-			long userId, long groupId, VEvent event)
+	protected void importICal4j(long userId, long groupId, VEvent event)
 		throws PortalException, SystemException {
 
 		User user = userPersistence.findByPrimaryKey(userId);
@@ -1120,16 +1094,67 @@ public class CalEventLocalServiceImpl extends CalEventLocalServiceBaseImpl {
 		serviceContext.setAddGuestPermissions(true);
 		serviceContext.setScopeGroupId(groupId);
 
-		addEvent(
-			userId, title, description, location, startDate.get(Calendar.MONTH),
-			startDate.get(Calendar.DAY_OF_MONTH), startDate.get(Calendar.YEAR),
-			startDate.get(Calendar.HOUR_OF_DAY),
-			startDate.get(Calendar.MINUTE), endDate.get(Calendar.MONTH),
-			endDate.get(Calendar.DAY_OF_MONTH), endDate.get(Calendar.YEAR),
-			(int)durationHours, (int)durationMins, allDay,
-			timeZoneSensitive, type, repeating, recurrence, remindBy,
-			firstReminder, secondReminder, serviceContext);
+		// Merge event
 
+		String uuid = null;
+
+		CalEvent existingEvent = null;
+
+		if (event.getUid() != null) {
+			Uid uid = event.getUid();
+
+			if (existingEvent == null) {
+
+				// VEvent exported by Liferay portal
+
+				uuid = uid.getValue();
+
+				existingEvent = calEventPersistence.fetchByUUID_G(
+					uuid, groupId);
+			}
+
+			if (existingEvent == null) {
+
+				// VEvent exported by external application
+
+				uuid = PortalUUIDUtil.generate(uid.getValue().getBytes());
+
+				existingEvent = calEventPersistence.fetchByUUID_G(
+					uuid, groupId);
+			}
+		}
+
+		int startDateMonth = startDate.get(Calendar.MONTH);
+		int startDateDay = startDate.get(Calendar.DAY_OF_MONTH);
+		int startDateYear = startDate.get(Calendar.YEAR);
+		int startDateHour = startDate.get(Calendar.HOUR_OF_DAY);
+		int startDateMinute = startDate.get(Calendar.MINUTE);
+		int endDateMonth = endDate.get(Calendar.MONTH);
+		int endDateDay = endDate.get(Calendar.DAY_OF_MONTH);
+		int endDateYear = endDate.get(Calendar.YEAR);
+		int durationHour = (int)durationHours;
+		int durationMinute = (int)durationMins;
+
+		if (existingEvent == null) {
+			serviceContext.setUuid(uuid);
+
+			calEventLocalService.addEvent(
+				userId, title, description, location, startDateMonth,
+				startDateDay, startDateYear, startDateHour, startDateMinute,
+				endDateMonth, endDateDay, endDateYear, durationHour,
+				durationMinute, allDay, timeZoneSensitive, type, repeating,
+				recurrence, remindBy, firstReminder, secondReminder,
+				serviceContext);
+		}
+		else {
+			calEventLocalService.updateEvent(
+				userId, existingEvent.getEventId(), title, description,
+				location, startDateMonth, startDateDay, startDateYear,
+				startDateHour, startDateMinute, endDateMonth, endDateDay,
+				endDateYear, durationHour, durationMinute, allDay,
+				timeZoneSensitive, type, repeating, recurrence, remindBy,
+				firstReminder, secondReminder, serviceContext);
+		}
 	}
 
 	protected boolean isICal4jDateOnly(DateProperty dateProperty) {
@@ -1161,6 +1186,10 @@ public class CalEventLocalServiceImpl extends CalEventLocalServiceBaseImpl {
 				portletPreferencesLocalService.getPreferences(
 					event.getCompanyId(), ownerId, ownerType, plid, portletId);
 
+			if (!CalUtil.getEmailEventReminderEnabled(preferences)) {
+				return;
+			}
+
 			Company company = companyPersistence.findByPrimaryKey(
 				user.getCompanyId());
 
@@ -1169,8 +1198,10 @@ public class CalEventLocalServiceImpl extends CalEventLocalServiceBaseImpl {
 			String portletName = PortalUtil.getPortletTitle(
 				PortletKeys.CALENDAR, user);
 
-			String fromName = CalUtil.getEmailFromName(preferences);
-			String fromAddress = CalUtil.getEmailFromAddress(preferences);
+			String fromName = CalUtil.getEmailFromName(
+				preferences, event.getCompanyId());
+			String fromAddress = CalUtil.getEmailFromAddress(
+				preferences, event.getCompanyId());
 
 			String toName = user.getFullName();
 			String toAddress = user.getEmailAddress();
@@ -1188,51 +1219,33 @@ public class CalEventLocalServiceImpl extends CalEventLocalServiceBaseImpl {
 			subject = StringUtil.replace(
 				subject,
 				new String[] {
-					"[$EVENT_LOCATION$]",
-					"[$EVENT_START_DATE$]",
-					"[$EVENT_TITLE$]",
-					"[$FROM_ADDRESS$]",
-					"[$FROM_NAME$]",
-					"[$PORTAL_URL$]",
-					"[$PORTLET_NAME$]",
-					"[$TO_ADDRESS$]",
+					"[$EVENT_LOCATION$]", "[$EVENT_START_DATE$]",
+					"[$EVENT_TITLE$]", "[$FROM_ADDRESS$]", "[$FROM_NAME$]",
+					"[$PORTAL_URL$]", "[$PORTLET_NAME$]", "[$TO_ADDRESS$]",
 					"[$TO_NAME$]"
 				},
 				new String[] {
 					event.getLocation(),
 					dateFormatDateTime.format(startDate.getTime()),
-					event.getTitle(),
-					fromAddress,
-					fromName,
-					company.getVirtualHostname(),
-					portletName,
-					toAddress,
-					toName,
+					event.getTitle(), fromAddress, fromName,
+					company.getPortalURL(event.getGroupId()), portletName,
+					HtmlUtil.escape(toAddress), HtmlUtil.escape(toName),
 				});
 
 			body = StringUtil.replace(
 				body,
 				new String[] {
-					"[$EVENT_LOCATION$]",
-					"[$EVENT_START_DATE$]",
-					"[$EVENT_TITLE$]",
-					"[$FROM_ADDRESS$]",
-					"[$FROM_NAME$]",
-					"[$PORTAL_URL$]",
-					"[$PORTLET_NAME$]",
-					"[$TO_ADDRESS$]",
+					"[$EVENT_LOCATION$]", "[$EVENT_START_DATE$]",
+					"[$EVENT_TITLE$]", "[$FROM_ADDRESS$]", "[$FROM_NAME$]",
+					"[$PORTAL_URL$]", "[$PORTLET_NAME$]", "[$TO_ADDRESS$]",
 					"[$TO_NAME$]"
 				},
 				new String[] {
 					event.getLocation(),
 					dateFormatDateTime.format(startDate.getTime()),
-					event.getTitle(),
-					fromAddress,
-					fromName,
-					company.getVirtualHostname(),
-					portletName,
-					toAddress,
-					toName,
+					event.getTitle(), fromAddress, fromName,
+					company.getPortalURL(event.getGroupId()), portletName,
+					HtmlUtil.escape(toAddress), HtmlUtil.escape(toName),
 				});
 
 			if ((remindBy == CalEventConstants.REMIND_BY_EMAIL) ||
@@ -1249,22 +1262,22 @@ public class CalEventLocalServiceImpl extends CalEventLocalServiceBaseImpl {
 				mailService.sendEmail(message);
 			}
 			else if ((remindBy == CalEventConstants.REMIND_BY_AIM) &&
-					 (Validator.isNotNull(contact.getAimSn()))) {
+					 Validator.isNotNull(contact.getAimSn())) {
 
 				AIMConnector.send(contact.getAimSn(), body);
 			}
 			else if ((remindBy == CalEventConstants.REMIND_BY_ICQ) &&
-					 (Validator.isNotNull(contact.getIcqSn()))) {
+					 Validator.isNotNull(contact.getIcqSn())) {
 
 				ICQConnector.send(contact.getIcqSn(), body);
 			}
 			else if ((remindBy == CalEventConstants.REMIND_BY_MSN) &&
-					 (Validator.isNotNull(contact.getMsnSn()))) {
+					 Validator.isNotNull(contact.getMsnSn())) {
 
 				MSNConnector.send(contact.getMsnSn(), body);
 			}
 			else if ((remindBy == CalEventConstants.REMIND_BY_YM) &&
-					 (Validator.isNotNull(contact.getYmSn()))) {
+					 Validator.isNotNull(contact.getYmSn())) {
 
 				YMConnector.send(contact.getYmSn(), body);
 			}
@@ -1275,18 +1288,29 @@ public class CalEventLocalServiceImpl extends CalEventLocalServiceBaseImpl {
 	}
 
 	protected void remindUser(
-		CalEvent event, User user, Calendar startDate, Calendar now) {
+		CalEvent event, User user, Calendar startCalendar,
+		Calendar nowCalendar) {
 
-		long diff =
-			(startDate.getTime().getTime() - now.getTime().getTime()) /
-				_CALENDAR_EVENT_CHECK_INTERVAL;
+		Date startDate = startCalendar.getTime();
+
+		long startTime = startDate.getTime();
+
+		Date nowDate = nowCalendar.getTime();
+
+		long nowTime = nowDate.getTime();
+
+		if (startTime < nowTime) {
+			return;
+		}
+
+		long diff = (startTime - nowTime) / _CALENDAR_EVENT_CHECK_INTERVAL;
 
 		if ((diff ==
 				(event.getFirstReminder() / _CALENDAR_EVENT_CHECK_INTERVAL)) ||
 			(diff ==
 				(event.getSecondReminder() / _CALENDAR_EVENT_CHECK_INTERVAL))) {
 
-			remindUser(event, user, startDate);
+			remindUser(event, user, startCalendar);
 		}
 	}
 
@@ -1363,11 +1387,7 @@ public class CalEventLocalServiceImpl extends CalEventLocalServiceBaseImpl {
 
 		List<VEvent> components = iCal.getComponents();
 
-		Iterator<CalEvent> itr = events.iterator();
-
-		while (itr.hasNext()) {
-			CalEvent event = itr.next();
-
+		for (CalEvent event : events) {
 			components.add(toICalVEvent(event, timeZone));
 		}
 
@@ -1462,7 +1482,7 @@ public class CalEventLocalServiceImpl extends CalEventLocalServiceBaseImpl {
 
 		// UID
 
-		Uid uid = new Uid(PortalUUIDUtil.generate());
+		Uid uid = new Uid(event.getUuid());
 
 		eventProps.add(uid);
 
@@ -1624,11 +1644,9 @@ public class CalEventLocalServiceImpl extends CalEventLocalServiceBaseImpl {
 
 			List<DayAndPosition> dayPosList = new ArrayList<DayAndPosition>();
 
-			Iterator<WeekDay> itr = recur.getDayList().iterator();
+			List<WeekDay> weekDays = recur.getDayList();
 
-			while (itr.hasNext()) {
-				WeekDay weekDay = itr.next();
-
+			for (WeekDay weekDay : weekDays) {
 				dayPosList.add(
 					new DayAndPosition(toCalendarWeekDay(weekDay), 0));
 			}
@@ -1643,11 +1661,9 @@ public class CalEventLocalServiceImpl extends CalEventLocalServiceBaseImpl {
 
 			List<DayAndPosition> dayPosList = new ArrayList<DayAndPosition>();
 
-			Iterator<WeekDay> itr = recur.getDayList().iterator();
+			List<WeekDay> weekDays = recur.getDayList();
 
-			while (itr.hasNext()) {
-				WeekDay weekDay = itr.next();
-
+			for (WeekDay weekDay : weekDays) {
 				dayPosList.add(
 					new DayAndPosition(toCalendarWeekDay(weekDay), 0));
 			}
@@ -1708,7 +1724,7 @@ public class CalEventLocalServiceImpl extends CalEventLocalServiceBaseImpl {
 			throw new EventEndDateException();
 		}
 
-		if (!allDay && durationHour <= 0 && durationMinute <= 0) {
+		if (!allDay && (durationHour <= 0) && (durationMinute <= 0)) {
 			throw new EventDurationException();
 		}
 
@@ -1724,7 +1740,7 @@ public class CalEventLocalServiceImpl extends CalEventLocalServiceBaseImpl {
 		}
 	}
 
-	private long _CALENDAR_EVENT_CHECK_INTERVAL =
+	private static final long _CALENDAR_EVENT_CHECK_INTERVAL =
 		PropsValues.CALENDAR_EVENT_CHECK_INTERVAL * Time.MINUTE;
 
 	private static Log _log = LogFactoryUtil.getLog(

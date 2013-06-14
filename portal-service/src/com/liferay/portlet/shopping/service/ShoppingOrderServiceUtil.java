@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -15,7 +15,6 @@
 package com.liferay.portlet.shopping.service;
 
 import com.liferay.portal.kernel.bean.PortalBeanLocatorUtil;
-import com.liferay.portal.kernel.util.MethodCache;
 import com.liferay.portal.kernel.util.ReferenceRegistry;
 
 /**
@@ -37,15 +36,35 @@ public class ShoppingOrderServiceUtil {
 	 *
 	 * Never modify this class directly. Add custom service methods to {@link com.liferay.portlet.shopping.service.impl.ShoppingOrderServiceImpl} and rerun ServiceBuilder to regenerate this class.
 	 */
+
+	/**
+	* Returns the Spring bean ID for this bean.
+	*
+	* @return the Spring bean ID for this bean
+	*/
+	public static java.lang.String getBeanIdentifier() {
+		return getService().getBeanIdentifier();
+	}
+
+	/**
+	* Sets the Spring bean ID for this bean.
+	*
+	* @param beanIdentifier the Spring bean ID for this bean
+	*/
+	public static void setBeanIdentifier(java.lang.String beanIdentifier) {
+		getService().setBeanIdentifier(beanIdentifier);
+	}
+
 	public static void completeOrder(long groupId, java.lang.String number,
 		java.lang.String ppTxnId, java.lang.String ppPaymentStatus,
 		double ppPaymentGross, java.lang.String ppReceiverEmail,
-		java.lang.String ppPayerEmail)
+		java.lang.String ppPayerEmail,
+		com.liferay.portal.service.ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException {
 		getService()
 			.completeOrder(groupId, number, ppTxnId, ppPaymentStatus,
-			ppPaymentGross, ppReceiverEmail, ppPayerEmail);
+			ppPaymentGross, ppReceiverEmail, ppPayerEmail, serviceContext);
 	}
 
 	public static void deleteOrder(long groupId, long orderId)
@@ -62,10 +81,11 @@ public class ShoppingOrderServiceUtil {
 	}
 
 	public static void sendEmail(long groupId, long orderId,
-		java.lang.String emailType)
+		java.lang.String emailType,
+		com.liferay.portal.service.ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException {
-		getService().sendEmail(groupId, orderId, emailType);
+		getService().sendEmail(groupId, orderId, emailType, serviceContext);
 	}
 
 	public static com.liferay.portlet.shopping.model.ShoppingOrder updateOrder(
@@ -113,20 +133,15 @@ public class ShoppingOrderServiceUtil {
 
 			ReferenceRegistry.registerReference(ShoppingOrderServiceUtil.class,
 				"_service");
-			MethodCache.remove(ShoppingOrderService.class);
 		}
 
 		return _service;
 	}
 
+	/**
+	 * @deprecated
+	 */
 	public void setService(ShoppingOrderService service) {
-		MethodCache.remove(ShoppingOrderService.class);
-
-		_service = service;
-
-		ReferenceRegistry.registerReference(ShoppingOrderServiceUtil.class,
-			"_service");
-		MethodCache.remove(ShoppingOrderService.class);
 	}
 
 	private static ShoppingOrderService _service;

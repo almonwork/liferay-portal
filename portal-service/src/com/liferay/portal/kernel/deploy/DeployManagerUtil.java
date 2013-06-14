@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,20 +14,24 @@
 
 package com.liferay.portal.kernel.deploy;
 
-import java.io.File;
+import com.liferay.portal.kernel.deploy.auto.context.AutoDeploymentContext;
+import com.liferay.portal.kernel.plugin.PluginPackage;
+import com.liferay.portal.kernel.security.pacl.permission.PortalRuntimePermission;
+
+import java.util.List;
+import java.util.Properties;
 
 /**
  * @author Jonathan Potter
  * @author Brian Wing Shun Chan
+ * @author Ryan Park
  */
 public class DeployManagerUtil {
 
-	public static void deploy(File source) throws Exception {
-		getDeployManager().deploy(source);
-	}
+	public static void deploy(AutoDeploymentContext autoDeploymentContext)
+		throws Exception {
 
-	public static void deploy(File source, String context) throws Exception {
-		getDeployManager().deploy(source, context);
+		getDeployManager().deploy(autoDeploymentContext);
 	}
 
 	public static String getDeployDir() throws Exception {
@@ -35,7 +39,38 @@ public class DeployManagerUtil {
 	}
 
 	public static DeployManager getDeployManager() {
+		PortalRuntimePermission.checkGetBeanProperty(DeployManagerUtil.class);
+
 		return _deployManager;
+	}
+
+	public static String getInstalledDir() throws Exception {
+		return getDeployManager().getInstalledDir();
+	}
+
+	public static PluginPackage getInstalledPluginPackage(String context) {
+		return getDeployManager().getInstalledPluginPackage(context);
+	}
+
+	public static List<PluginPackage> getInstalledPluginPackages() {
+		return getDeployManager().getInstalledPluginPackages();
+	}
+
+	public static boolean isDeployed(String context) {
+		return getDeployManager().isDeployed(context);
+	}
+
+	public static PluginPackage readPluginPackageProperties(
+		String displayName, Properties properties) {
+
+		return getDeployManager().readPluginPackageProperties(
+			displayName, properties);
+	}
+
+	public static PluginPackage readPluginPackageXml(String xml)
+		throws Exception {
+
+		return getDeployManager().readPluginPackageXml(xml);
 	}
 
 	public static void redeploy(String context) throws Exception {
@@ -47,6 +82,8 @@ public class DeployManagerUtil {
 	}
 
 	public void setDeployManager(DeployManager deployManager) {
+		PortalRuntimePermission.checkSetBeanProperty(getClass());
+
 		_deployManager = deployManager;
 	}
 

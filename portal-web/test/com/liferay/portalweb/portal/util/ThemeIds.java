@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -17,7 +17,6 @@ package com.liferay.portalweb.portal.util;
 import com.liferay.portal.model.Theme;
 import com.liferay.portal.security.auth.HttpPrincipal;
 import com.liferay.portal.service.http.ThemeServiceHttp;
-import com.liferay.portalweb.portal.util.TestPropsValues;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -51,7 +50,7 @@ public class ThemeIds {
 				List<String> themeIds = new ArrayList<String>();
 
 				List<Theme> themes = ThemeServiceHttp.getThemes(
-					httpPrincipal, TestPropsValues.COMPANY_ID);
+					httpPrincipal, TestPropsValues.getCompanyId());
 
 				for (Theme theme : themes) {
 					if (!theme.isWapTheme()) {
@@ -81,7 +80,7 @@ public class ThemeIds {
 
 	private static ThemeIds _instance = new ThemeIds();
 
-	private String[] _themeIds = new String[0];
 	private int _pos;
+	private String[] _themeIds = new String[0];
 
 }

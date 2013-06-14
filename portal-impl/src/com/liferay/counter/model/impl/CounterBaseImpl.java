@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -39,6 +39,11 @@ public abstract class CounterBaseImpl extends CounterModelImpl
 	 * Never modify or reference this class directly. All methods that expect a counter model instance should use the {@link Counter} interface instead.
 	 */
 	public void persist() throws SystemException {
-		CounterLocalServiceUtil.updateCounter(this);
+		if (this.isNew()) {
+			CounterLocalServiceUtil.addCounter(this);
+		}
+		else {
+			CounterLocalServiceUtil.updateCounter(this);
+		}
 	}
 }

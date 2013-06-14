@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -20,6 +20,7 @@ import com.liferay.portal.kernel.dao.search.SearchEntry;
 import com.liferay.portal.kernel.dao.search.TextSearchEntry;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.util.ServerDetector;
+import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.Validator;
 
 import java.util.List;
@@ -45,11 +46,12 @@ public class SearchContainerColumnTextTag<R>
 				(SearchContainerRowTag<R>)findAncestorWithClass(
 					this, SearchContainerRowTag.class);
 
-			ResultRow row = searchContainerRowTag.getRow();
+			ResultRow resultRow = searchContainerRowTag.getRow();
 
 			if (Validator.isNotNull(_property)) {
 				_value = String.valueOf(
-					BeanPropertiesUtil.getObject(row.getObject(), _property));
+					BeanPropertiesUtil.getObject(
+						resultRow.getObject(), _property));
 			}
 			else if (Validator.isNotNull(_buffer)) {
 				_value = _sb.toString();
@@ -60,6 +62,12 @@ public class SearchContainerColumnTextTag<R>
 				if (bodyContent != null) {
 					_value = bodyContent.getString();
 				}
+				else {
+					Object object = BeanPropertiesUtil.getObject(
+						resultRow.getObject(), getName());
+
+					_value = String.valueOf(object);
+				}
 			}
 
 			if (_translate) {
@@ -67,10 +75,12 @@ public class SearchContainerColumnTextTag<R>
 			}
 
 			if (index <= -1) {
-				index = row.getEntries().size();
+				List<SearchEntry> searchEntries = resultRow.getEntries();
+
+				index = searchEntries.size();
 			}
 
-			if (row.isRestricted()) {
+			if (resultRow.isRestricted()) {
 				_href = null;
 			}
 
@@ -85,7 +95,7 @@ public class SearchContainerColumnTextTag<R>
 			textSearchEntry.setTitle(getTitle());
 			textSearchEntry.setValign(getValign());
 
-			row.addSearchEntry(index, textSearchEntry);
+			resultRow.addSearchEntry(index, textSearchEntry);
 
 			return EVAL_PAGE;
 		}
@@ -139,7 +149,7 @@ public class SearchContainerColumnTextTag<R>
 			headerNames.add(name);
 
 			if (_orderable) {
-				Map<String,String> orderableHeaders =
+				Map<String, String> orderableHeaders =
 					searchContainerRowTag.getOrderableHeaders();
 
 				if (Validator.isNotNull(_orderableProperty)) {
@@ -158,7 +168,7 @@ public class SearchContainerColumnTextTag<R>
 			return SKIP_BODY;
 		}
 		else if (Validator.isNotNull(_buffer)) {
-			_sb = new StringBuilder();
+			_sb = new StringBundler();
 
 			pageContext.setAttribute(_buffer, _sb);
 
@@ -249,7 +259,7 @@ public class SearchContainerColumnTextTag<R>
 	private boolean _orderable;
 	private String _orderableProperty;
 	private String _property;
-	private StringBuilder _sb;
+	private StringBundler _sb;
 	private String _target;
 	private String _title;
 	private boolean _translate;

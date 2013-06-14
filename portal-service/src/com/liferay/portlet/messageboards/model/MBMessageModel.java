@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -199,6 +199,8 @@ public interface MBMessageModel extends AttachedModel, BaseModel<MBMessage>,
 	 * @return the fully qualified class name of this message-boards message
 	 */
 	public String getClassName();
+
+	public void setClassName(String className);
 
 	/**
 	 * Returns the class name ID of this message-boards message.
@@ -407,6 +409,27 @@ public interface MBMessageModel extends AttachedModel, BaseModel<MBMessage>,
 	public void setAllowPingbacks(boolean allowPingbacks);
 
 	/**
+	 * Returns the answer of this message-boards message.
+	 *
+	 * @return the answer of this message-boards message
+	 */
+	public boolean getAnswer();
+
+	/**
+	 * Returns <code>true</code> if this message-boards message is answer.
+	 *
+	 * @return <code>true</code> if this message-boards message is answer; <code>false</code> otherwise
+	 */
+	public boolean isAnswer();
+
+	/**
+	 * Sets whether this message-boards message is answer.
+	 *
+	 * @param answer the answer of this message-boards message
+	 */
+	public void setAnswer(boolean answer);
+
+	/**
 	 * Returns the status of this message-boards message.
 	 *
 	 * @return the status of this message-boards message
@@ -505,6 +528,13 @@ public interface MBMessageModel extends AttachedModel, BaseModel<MBMessage>,
 	public boolean isExpired();
 
 	/**
+	 * Returns <code>true</code> if this message-boards message is in the Recycle Bin.
+	 *
+	 * @return <code>true</code> if this message-boards message is in the Recycle Bin; <code>false</code> otherwise
+	 */
+	public boolean isInTrash();
+
+	/**
 	 * Returns <code>true</code> if this message-boards message is pending.
 	 *
 	 * @return <code>true</code> if this message-boards message is pending; <code>false</code> otherwise
@@ -520,8 +550,6 @@ public interface MBMessageModel extends AttachedModel, BaseModel<MBMessage>,
 	public void setCachedModel(boolean cachedModel);
 
 	public boolean isEscapedModel();
-
-	public void setEscapedModel(boolean escapedModel);
 
 	public Serializable getPrimaryKeyObj();
 

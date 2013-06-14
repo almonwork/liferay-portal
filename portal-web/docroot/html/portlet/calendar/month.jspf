@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -111,9 +111,9 @@ Format timeFormat = FastDateFormatFactoryUtil.getSimpleDateFormat("h:mma", local
 			int daysIndex = (selCal.getFirstDayOfWeek() + i - 1) % 7;
 		%>
 
-			<td align="center" height="25" width="<%= (i == 0 || i == 6) ? "15" : "14" %>%">
+			<th align="center" height="25" width="<%= (i == 0 || i == 6) ? "15" : "14" %>%">
 				<%= LanguageUtil.get(pageContext, days[daysIndex]) %>
-			</td>
+			</th>
 
 		<%
 		}
@@ -125,7 +125,7 @@ Format timeFormat = FastDateFormatFactoryUtil.getSimpleDateFormat("h:mma", local
 	<tr>
 
 		<%
-		if (((selCal.getFirstDayOfWeek()) == Calendar.MONDAY)) {
+		if (selCal.getFirstDayOfWeek() == Calendar.MONDAY) {
 			if (dayOfWeek == 1) {
 				dayOfWeek += 6;
 			}
@@ -193,7 +193,7 @@ Format timeFormat = FastDateFormatFactoryUtil.getSimpleDateFormat("h:mma", local
 							<td align="right">
 								<c:if test="<%= CalendarPermission.contains(permissionChecker, scopeGroupId, ActionKeys.ADD_EVENT) %>">
 									<a href="<portlet:renderURL><portlet:param name="struts_action" value="/calendar/edit_event" /><portlet:param name="redirect" value="<%= currentURL %>" /><portlet:param name="backURL" value="<%= currentURL %>" /><portlet:param name="month" value="<%= String.valueOf(tempCal.get(Calendar.MONTH)) %>" /><portlet:param name="day" value="<%= String.valueOf(tempCal.get(Calendar.DATE)) %>" /><portlet:param name="year" value="<%= String.valueOf(tempCal.get(Calendar.YEAR)) %>" /></portlet:renderURL>">
-									<img border="0" src="<%= themeDisplay.getPathThemeImages() %>/arrows/01_plus.png" title="<liferay-ui:message key="add" />" />
+									<img alt="<%= LanguageUtil.get(pageContext, "new-event") %>" border="0" src="<%= themeDisplay.getPathThemeImages() %>/arrows/01_plus.png" title="<liferay-ui:message key="new-event" />" />
 									</a>
 								</c:if>
 							</td>
@@ -252,6 +252,7 @@ Format timeFormat = FastDateFormatFactoryUtil.getSimpleDateFormat("h:mma", local
 
 		for (int i = 7; i >= dayOfWeek; i--) {
 		%>
+
 			<td height="100"></td>
 
 		<%

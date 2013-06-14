@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,8 +14,6 @@
  */
 --%>
 
-<%@ page import="java.text.Format" %>
-
 <%
 if (!useNamespace) {
 	namespace = StringPool.BLANK;
@@ -24,8 +22,6 @@ if (!useNamespace) {
 String baseType = GetterUtil.getString((String)request.getAttribute("aui:input:baseType"));
 String forLabel = namespace + GetterUtil.getString((String)request.getAttribute("aui:input:forLabel"));
 boolean required = GetterUtil.getBoolean((String)request.getAttribute("aui:input:required"));
-
-id = namespace + id;
 
 if (Validator.isNull(label) && changesContext) {
 	StringBundler sb = new StringBundler(5);
@@ -47,15 +43,19 @@ boolean choiceField = checkboxField || baseType.equals("radio");
 
 boolean showForLabel = true;
 
-if ((baseType.equals("assetCategories")) || (baseType.equals("assetTags")) || baseType.equals(Date.class.getName())) {
+if (type.equals("assetCategories") || baseType.equals(Date.class.getName())) {
 	showForLabel = false;
+}
+
+if (type.equals("assetTags")) {
+	forLabel += "assetTagNames";
 }
 
 if (checkboxField) {
 	forLabel += "Checkbox";
 }
 
-if (choiceField) {
+if (choiceField && Validator.isNull(inlineLabel)) {
 	inlineLabel = "right";
 }
 
@@ -63,5 +63,5 @@ String baseTypeCss = TextFormatter.format(baseType.toLowerCase(), TextFormatter.
 
 String fieldCss = AUIUtil.buildCss(AUIUtil.FIELD_PREFIX, baseTypeCss, inlineField, disabled, choiceField, first, last, cssClass);
 String inputCss = AUIUtil.buildCss(AUIUtil.INPUT_PREFIX, baseTypeCss, false, false, choiceField, false, false, inputCssClass);
-String labelTag = AUIUtil.buildLabel(inlineLabel, showForLabel, forLabel);
+String labelTag = AUIUtil.buildLabel(inlineLabel, showForLabel, forLabel, choiceField);
 %>

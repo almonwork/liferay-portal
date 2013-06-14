@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -23,19 +23,25 @@ String toolbarItem = ParamUtil.getString(request, "toolbarItem", "view");
 <div class="lfr-portlet-toolbar">
 	<portlet:renderURL var="viewUsersURL">
 		<portlet:param name="struts_action" value="/users_admin/view" />
+		<portlet:param name="usersListView" value="<%= UserConstants.LIST_VIEW_TREE %>" />
+		<portlet:param name="saveUsersListView" value="<%= Boolean.TRUE.toString() %>" />
 	</portlet:renderURL>
 
-	<liferay-ui:icon-menu align="left" direction="down" extended="<%= false %>" icon='<%= themeDisplay.getPathThemeImages() + "/common/view_users.png" %>' message="view">
-		<%@ include file="/html/portlet/users_admin/user/list_views.jspf" %>
-	</liferay-ui:icon-menu>
+	<span class="lfr-toolbar-button view-button <%= toolbarItem.equals("view-all") ? "current" : StringPool.BLANK %>">
+		<a href="<%= viewUsersURL %>"><liferay-ui:message key="view-all" /></a>
+	</span>
 
-	<c:if test="<%= PortalPermissionUtil.contains(permissionChecker, ActionKeys.ADD_ORGANIZATION) || PortalPermissionUtil.contains(permissionChecker, ActionKeys.ADD_USER) || PortalPermissionUtil.contains(permissionChecker, ActionKeys.ADD_USER_GROUP) %>">
-		<liferay-ui:icon-menu align="left" direction="down" extended="<%= false %>" icon='<%= themeDisplay.getPathThemeImages() + "/common/add.png" %>' message="add">
+	<%
+	boolean hasAddOrganizationPermission = PortalPermissionUtil.contains(permissionChecker, ActionKeys.ADD_ORGANIZATION);
+	boolean hasAddUserPermission = PortalPermissionUtil.contains(permissionChecker, ActionKeys.ADD_USER);
+	%>
 
-			<c:if test="<%= PortalPermissionUtil.contains(permissionChecker, ActionKeys.ADD_USER) %>">
+	<c:if test="<%= hasAddOrganizationPermission || hasAddUserPermission %>">
+		<liferay-ui:icon-menu align="left" cssClass='<%= "lfr-toolbar-button add-button " + (toolbarItem.equals("add") ? "current" : StringPool.BLANK) %>' direction="down" extended="<%= false %>" icon='<%= themeDisplay.getPathThemeImages() + "/common/add.png" %>' message="add" showWhenSingleIcon="<%= true %>">
+			<c:if test="<%= hasAddUserPermission %>">
 				<portlet:renderURL var="addUserURL">
 					<portlet:param name="struts_action" value="/users_admin/edit_user" />
-					<portlet:param name="redirect" value="<%= currentURL %>" />
+					<portlet:param name="redirect" value="<%= viewUsersURL %>" />
 				</portlet:renderURL>
 
 				<liferay-ui:icon
@@ -45,7 +51,7 @@ String toolbarItem = ParamUtil.getString(request, "toolbarItem", "view");
 				/>
 			</c:if>
 
-			<c:if test="<%= PortalPermissionUtil.contains(permissionChecker, ActionKeys.ADD_ORGANIZATION) %>">
+			<c:if test="<%= hasAddOrganizationPermission %>">
 
 				<%
 				for (String organizationType : PropsValues.ORGANIZATIONS_TYPES) {
@@ -53,7 +59,7 @@ String toolbarItem = ParamUtil.getString(request, "toolbarItem", "view");
 
 					<portlet:renderURL var="addOrganizationURL">
 						<portlet:param name="struts_action" value="/users_admin/edit_organization" />
-						<portlet:param name="redirect" value="<%= currentURL %>" />
+						<portlet:param name="redirect" value="<%= viewUsersURL %>" />
 						<portlet:param name="type" value="<%= organizationType %>" />
 					</portlet:renderURL>
 
@@ -68,35 +74,17 @@ String toolbarItem = ParamUtil.getString(request, "toolbarItem", "view");
 				%>
 
 			</c:if>
-
-			<c:if test="<%= PortalPermissionUtil.contains(permissionChecker, ActionKeys.ADD_USER_GROUP) %>">
-				<portlet:renderURL var="addUsergroupURL">
-					<portlet:param name="struts_action" value="/users_admin/edit_user_group" />
-					<portlet:param name="redirect" value="<%= currentURL %>" />
-				</portlet:renderURL>
-
-				<liferay-ui:icon
-					image="assign_user_group_roles"
-					message="user-group"
-					url="<%= addUsergroupURL %>"
-				/>
-			</c:if>
 		</liferay-ui:icon-menu>
 	</c:if>
 
 	<c:if test="<%= PortalPermissionUtil.contains(permissionChecker, ActionKeys.EXPORT_USER) %>">
-		<portlet:renderURL var="addUserURL">
-			<portlet:param name="struts_action" value="/users_admin/edit_user" />
-			<portlet:param name="redirect" value="<%= currentURL %>" />
-		</portlet:renderURL>
-
-		<span class="lfr-toolbar-button export-button"><a href="javascript:<portlet:namespace />exportUsers();"><liferay-ui:message key="export-users" /></a></span>
+		<span class="lfr-toolbar-button export-button"><a href="javascript:<portlet:namespace />exportUsers();"><liferay-ui:message key="export-all-users" /></a></span>
 	</c:if>
 </div>
 
 <aui:script>
 	function <portlet:namespace />exportUsers() {
 		document.<portlet:namespace />fm.method = "post";
-		submitForm(document.<portlet:namespace />fm, "<portlet:actionURL><portlet:param name="struts_action" value="/users_admin/export_users" /></portlet:actionURL>&etag=0&strip=0&compress=0", false);
+		submitForm(document.<portlet:namespace />fm, "<portlet:actionURL><portlet:param name="struts_action" value="/users_admin/export_users" /></portlet:actionURL>&compress=0&etag=0&strip=0", false);
 	}
 </aui:script>

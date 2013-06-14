@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -28,7 +28,7 @@ String snippet = (String)objArray[2];
 String content = snippet;
 
 if (Validator.isNull(snippet)) {
-	content = StringUtil.shorten(doc.get(Field.CONTENT), 200);
+	content = StringUtil.shorten(doc.get(locale, Field.CONTENT), 200);
 }
 
 content = StringUtil.highlight(content, queryTerms);

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -28,6 +28,7 @@ import java.util.List;
  * @author Shuyang Zhou
  * @author Brian Wing Shun Chan
  * @author Marcellus Tavares
+ * @author Eduardo Lundgren
  */
 public class WorkflowDefinitionManagerProxyBean
 	extends BaseProxyBean implements WorkflowDefinitionManager {
@@ -35,6 +36,14 @@ public class WorkflowDefinitionManagerProxyBean
 	public WorkflowDefinition deployWorkflowDefinition(
 		long companyId, long userId, String title, InputStream inputStream) {
 
+		throw new UnsupportedOperationException();
+	}
+
+	public int getActiveWorkflowDefinitionCount(long companyId) {
+		throw new UnsupportedOperationException();
+	}
+
+	public int getActiveWorkflowDefinitionCount(long companyId, String name) {
 		throw new UnsupportedOperationException();
 	}
 
@@ -52,11 +61,9 @@ public class WorkflowDefinitionManagerProxyBean
 		throw new UnsupportedOperationException();
 	}
 
-	public int getActiveWorkflowDefinitionCount(long companyId) {
-		throw new UnsupportedOperationException();
-	}
+	public WorkflowDefinition getLatestKaleoDefinition(
+		long companyId, String name) {
 
-	public int getActiveWorkflowDefinitionCount(long companyId, String name) {
 		throw new UnsupportedOperationException();
 	}
 
@@ -103,6 +110,10 @@ public class WorkflowDefinitionManagerProxyBean
 	public WorkflowDefinition updateTitle(
 		long companyId, long userId, String name, int version, String title) {
 
+		throw new UnsupportedOperationException();
+	}
+
+	public void validateWorkflowDefinition(InputStream inputStream) {
 		throw new UnsupportedOperationException();
 	}
 

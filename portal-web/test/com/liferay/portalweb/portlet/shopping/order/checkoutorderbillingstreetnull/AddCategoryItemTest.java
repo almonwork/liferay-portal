@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -23,64 +23,57 @@ import com.liferay.portalweb.portal.util.RuntimeVariables;
 public class AddCategoryItemTest extends BaseTestCase {
 	public void testAddCategoryItem() throws Exception {
 		selenium.open("/web/guest/home/");
-
-		for (int second = 0;; second++) {
-			if (second >= 60) {
-				fail("timeout");
-			}
-
-			try {
-				if (selenium.isElementPresent("link=Shopping Test Page")) {
-					break;
-				}
-			}
-			catch (Exception e) {
-			}
-
-			Thread.sleep(1000);
-		}
-
-		selenium.saveScreenShotAndSource();
-		selenium.clickAt("link=Shopping Test Page", RuntimeVariables.replace(""));
+		loadRequiredJavaScriptModules();
+		selenium.clickAt("link=Shopping Test Page",
+			RuntimeVariables.replace("Shopping Test Page"));
 		selenium.waitForPageToLoad("30000");
-		selenium.saveScreenShotAndSource();
-		selenium.clickAt("link=Categories", RuntimeVariables.replace(""));
+		loadRequiredJavaScriptModules();
+		selenium.clickAt("link=Categories",
+			RuntimeVariables.replace("Categories"));
 		selenium.waitForPageToLoad("30000");
-		selenium.saveScreenShotAndSource();
-		selenium.clickAt("//td[1]/a", RuntimeVariables.replace(""));
+		loadRequiredJavaScriptModules();
+		assertEquals(RuntimeVariables.replace(
+				"Shopping Category Name\nShopping Category Description"),
+			selenium.getText("//td[1]/a"));
+		selenium.clickAt("//td[1]/a",
+			RuntimeVariables.replace(
+				"Shopping Category Name\nShopping Category Description"));
 		selenium.waitForPageToLoad("30000");
-		selenium.saveScreenShotAndSource();
+		loadRequiredJavaScriptModules();
 		selenium.clickAt("//input[@value='Add Item']",
-			RuntimeVariables.replace(""));
+			RuntimeVariables.replace("Add Item"));
 		selenium.waitForPageToLoad("30000");
-		selenium.saveScreenShotAndSource();
-		selenium.type("_34_sku", RuntimeVariables.replace("1111"));
-		selenium.saveScreenShotAndSource();
-		selenium.type("_34_name", RuntimeVariables.replace("Item Test"));
-		selenium.saveScreenShotAndSource();
-		selenium.type("_34_description",
-			RuntimeVariables.replace("This is an item test."));
-		selenium.saveScreenShotAndSource();
-		selenium.type("_34_stockQuantity", RuntimeVariables.replace("50"));
-		selenium.saveScreenShotAndSource();
-		selenium.type("_34_properties",
-			RuntimeVariables.replace("Limited Time Only"));
-		selenium.saveScreenShotAndSource();
-		assertTrue(selenium.isElementPresent("_34_requiresShippingCheckbox"));
-		selenium.clickAt("_34_requiresShippingCheckbox",
-			RuntimeVariables.replace(""));
-		assertTrue(selenium.isChecked("_34_requiresShippingCheckbox"));
-		selenium.saveScreenShotAndSource();
-		selenium.type("_34_price0", RuntimeVariables.replace("$9.99"));
-		selenium.saveScreenShotAndSource();
-		selenium.type("_34_minQuantity0", RuntimeVariables.replace("1"));
-		selenium.saveScreenShotAndSource();
-		selenium.clickAt("//input[@value='Save']", RuntimeVariables.replace(""));
+		loadRequiredJavaScriptModules();
+		selenium.type("//input[@id='_34_sku']", RuntimeVariables.replace("1111"));
+		selenium.type("//input[@id='_34_name']",
+			RuntimeVariables.replace("Shopping Category Item Name"));
+		selenium.type("//textarea[@id='_34_description']",
+			RuntimeVariables.replace("Shopping Category Item Description"));
+		selenium.type("//textarea[@id='_34_properties']",
+			RuntimeVariables.replace("Shopping Category Item Properties"));
+		assertFalse(selenium.isChecked(
+				"//input[@id='_34_requiresShippingCheckbox']"));
+		selenium.clickAt("//input[@id='_34_requiresShippingCheckbox']",
+			RuntimeVariables.replace("Requires Shipping"));
+		assertTrue(selenium.isChecked(
+				"//input[@id='_34_requiresShippingCheckbox']"));
+		selenium.type("//input[@id='_34_stockQuantity']",
+			RuntimeVariables.replace("50"));
+		selenium.type("//input[@id='_34_minQuantity0']",
+			RuntimeVariables.replace("1"));
+		selenium.type("//input[@id='_34_maxQuantity0']",
+			RuntimeVariables.replace("1"));
+		selenium.type("//input[@id='_34_price0']",
+			RuntimeVariables.replace("$9.99"));
+		selenium.clickAt("//input[@value='Save']",
+			RuntimeVariables.replace("Save"));
 		selenium.waitForPageToLoad("30000");
-		selenium.saveScreenShotAndSource();
-		assertTrue(selenium.isTextPresent(
-				"Your request completed successfully."));
-		assertTrue(selenium.isTextPresent(
-				"Item Test\nThis is an item test.\nLimited: Time Only"));
+		loadRequiredJavaScriptModules();
+		assertEquals(RuntimeVariables.replace(
+				"Your request completed successfully."),
+			selenium.getText("//div[@class='portlet-msg-success']"));
+		assertEquals(RuntimeVariables.replace(
+				"Shopping Category Item Name\nShopping Category Item Description\nShopping: Category Item Properties"),
+			selenium.getText("//td[2]/a"));
 	}
 }

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -67,6 +67,10 @@ public class TestPropsUtil {
 		}
 	}
 
+	private String _get(String key) {
+		return _props.getProperty(key);
+	}
+
 	private void _printProperties(boolean update) {
 		List<String> keys = Collections.list(
 			(Enumeration<String>)_props.propertyNames());
@@ -85,10 +89,6 @@ public class TestPropsUtil {
 		}
 
 		System.out.println("");
-	}
-
-	private String _get(String key) {
-		return _props.getProperty(key);
 	}
 
 	private void _set(String key, String value) {

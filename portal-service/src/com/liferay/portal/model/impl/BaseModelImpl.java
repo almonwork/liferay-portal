@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,10 +14,16 @@
 
 package com.liferay.portal.model.impl;
 
+import com.liferay.portal.kernel.util.LocaleThreadLocal;
+import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.model.BaseModel;
 import com.liferay.portal.model.CacheModel;
 import com.liferay.portal.service.ServiceContext;
 import com.liferay.portlet.expando.model.ExpandoBridge;
+
+import java.util.Collections;
+import java.util.Locale;
+import java.util.Map;
 
 /**
  * The base implementation for all model classes. This class should never need
@@ -30,42 +36,45 @@ public abstract class BaseModelImpl<T> implements BaseModel<T> {
 	public BaseModelImpl() {
 	}
 
-	public boolean isNew() {
-		return _new;
+	@Override
+	public abstract Object clone();
+
+	public ExpandoBridge getExpandoBridge() {
+		throw new UnsupportedOperationException();
 	}
 
-	public void setNew(boolean n) {
-		_new = n;
+	public Map<String, Object> getModelAttributes() {
+		return Collections.emptyMap();
 	}
 
 	public boolean isCachedModel() {
 		return _cachedModel;
 	}
 
+	public boolean isEscapedModel() {
+		return _ESCAPED_MODEL;
+	}
+
+	public boolean isNew() {
+		return _new;
+	}
+
+	public void resetOriginalValues() {
+	}
+
 	public void setCachedModel(boolean cachedModel) {
 		_cachedModel = cachedModel;
-	}
-
-	public boolean isEscapedModel() {
-		return _escapedModel;
-	}
-
-	public void setEscapedModel(boolean escapedModel) {
-		_escapedModel = escapedModel;
-	}
-
-	public ExpandoBridge getExpandoBridge() {
-		throw new UnsupportedOperationException();
 	}
 
 	public void setExpandoBridgeAttributes(ServiceContext serviceContext) {
 		throw new UnsupportedOperationException();
 	}
 
-	@Override
-	public abstract Object clone();
+	public void setModelAttributes(Map<String, Object> attributes) {
+	}
 
-	public void resetOriginalValues() {
+	public void setNew(boolean n) {
+		_new = n;
 	}
 
 	public CacheModel<T> toCacheModel() {
@@ -76,8 +85,27 @@ public abstract class BaseModelImpl<T> implements BaseModel<T> {
 		throw new UnsupportedOperationException();
 	}
 
-	private boolean _new;
+	protected Locale getLocale(String languageId) {
+		Locale locale = null;
+
+		if (languageId != null) {
+			locale = LocaleUtil.fromLanguageId(languageId);
+		}
+
+		if (locale == null) {
+			locale = LocaleThreadLocal.getThemeDisplayLocale();
+		}
+
+		if (locale == null) {
+			locale = LocaleUtil.getDefault();
+		}
+
+		return locale;
+	}
+
+	private static final boolean _ESCAPED_MODEL = false;
+
 	private boolean _cachedModel;
-	private boolean _escapedModel;
+	private boolean _new;
 
 }

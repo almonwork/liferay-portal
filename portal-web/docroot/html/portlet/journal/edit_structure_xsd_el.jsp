@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -32,7 +32,9 @@ if (metaDataEl != null) {
 	elMetadataXML = metaDataEl.asXML();
 }
 
-String parentElType = java.net.URLDecoder.decode(el.getParent().attributeValue("type", StringPool.BLANK));
+Element parentEl = el.getParent();
+
+String parentElType = URLDecoder.decode(parentEl.attributeValue("type", StringPool.BLANK));
 
 IntegerWrapper count = (IntegerWrapper)request.getAttribute(WebKeys.JOURNAL_STRUCTURE_EL_COUNT);
 Integer depth = (Integer)request.getAttribute(WebKeys.JOURNAL_STRUCTURE_EL_DEPTH);
@@ -58,12 +60,12 @@ if (MathUtil.isEven(count.getValue())) {
 			</c:if>
 
 			<td>
-				<input id="<portlet:namespace />structure_el<%= count.getValue() %>_name" tabindex="<%= tabIndex.getValue() %>" type="text" size="20" value="<%= elName %>" />
+				<input id="<portlet:namespace />structure_el<%= count.getValue() %>_name" size="20" tabindex="<%= tabIndex.getValue() %>" type="text" value="<%= elName %>" />
 			</td>
 			<td>
 				<c:choose>
 					<c:when test='<%= parentElType.equals("list") || parentElType.equals("multi-list") %>'>
-						<input id="<portlet:namespace />structure_el<%= count.getValue() %>_type" tabindex="<%= tabIndex.getValue() %>" type="text" size="20" value="<%= elType %>" />
+						<input id="<portlet:namespace />structure_el<%= count.getValue() %>_type" size="20" tabindex="<%= tabIndex.getValue() %>" type="text" value="<%= elType %>" />
 					</c:when>
 					<c:otherwise>
 						<aui:column>
@@ -73,12 +75,12 @@ if (MathUtil.isEven(count.getValue())) {
 								<option <%= elType.equals("text_box") ? "selected" : "" %> value="text_box"><liferay-ui:message key="text-box" /></option>
 								<option <%= elType.equals("text_area") ? "selected" : "" %> value="text_area"><liferay-ui:message key="text-area" /></option>
 								<option <%= elType.equals("image") ? "selected" : "" %> value="image"><liferay-ui:message key="image" /></option>
-								<option <%= elType.equals("image_gallery") ? "selected" : "" %> value="image_gallery"><%= PortalUtil.getPortletTitle(PortletKeys.IMAGE_GALLERY, user) %></option>
 								<option <%= elType.equals("document_library") ? "selected" : "" %> value="document_library"><%= PortalUtil.getPortletTitle(PortletKeys.DOCUMENT_LIBRARY, user) %></option>
 								<option <%= elType.equals("boolean") ? "selected" : "" %> value="boolean"><liferay-ui:message key="boolean-flag" /></option>
 								<option <%= elType.equals("list") ? "selected" : "" %> value="list"><liferay-ui:message key="selection-list" /></option>
 								<option <%= elType.equals("multi-list") ? "selected" : "" %> value="multi-list"><liferay-ui:message key="multi-selection-list" /></option>
 								<option <%= elType.equals("link_to_layout") ? "selected" : "" %> value="link_to_layout"><liferay-ui:message key="link-to-layout" /></option>
+								<option <%= elType.equals("selection_break") ? "selected" : "" %> value="selection_break"><liferay-ui:message key="selection-break" /></option>
 							</select>
 						</aui:column>
 

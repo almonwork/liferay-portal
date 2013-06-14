@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,6 +14,11 @@
 
 package com.liferay.portlet.documentlibrary.model;
 
+import com.liferay.portal.model.ModelWrapper;
+
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * <p>
  * This class is a wrapper for {@link DLFileEntryMetadata}.
@@ -23,7 +28,8 @@ package com.liferay.portlet.documentlibrary.model;
  * @see       DLFileEntryMetadata
  * @generated
  */
-public class DLFileEntryMetadataWrapper implements DLFileEntryMetadata {
+public class DLFileEntryMetadataWrapper implements DLFileEntryMetadata,
+	ModelWrapper<DLFileEntryMetadata> {
 	public DLFileEntryMetadataWrapper(DLFileEntryMetadata dlFileEntryMetadata) {
 		_dlFileEntryMetadata = dlFileEntryMetadata;
 	}
@@ -34,6 +40,64 @@ public class DLFileEntryMetadataWrapper implements DLFileEntryMetadata {
 
 	public String getModelClassName() {
 		return DLFileEntryMetadata.class.getName();
+	}
+
+	public Map<String, Object> getModelAttributes() {
+		Map<String, Object> attributes = new HashMap<String, Object>();
+
+		attributes.put("uuid", getUuid());
+		attributes.put("fileEntryMetadataId", getFileEntryMetadataId());
+		attributes.put("DDMStorageId", getDDMStorageId());
+		attributes.put("DDMStructureId", getDDMStructureId());
+		attributes.put("fileEntryTypeId", getFileEntryTypeId());
+		attributes.put("fileEntryId", getFileEntryId());
+		attributes.put("fileVersionId", getFileVersionId());
+
+		return attributes;
+	}
+
+	public void setModelAttributes(Map<String, Object> attributes) {
+		String uuid = (String)attributes.get("uuid");
+
+		if (uuid != null) {
+			setUuid(uuid);
+		}
+
+		Long fileEntryMetadataId = (Long)attributes.get("fileEntryMetadataId");
+
+		if (fileEntryMetadataId != null) {
+			setFileEntryMetadataId(fileEntryMetadataId);
+		}
+
+		Long DDMStorageId = (Long)attributes.get("DDMStorageId");
+
+		if (DDMStorageId != null) {
+			setDDMStorageId(DDMStorageId);
+		}
+
+		Long DDMStructureId = (Long)attributes.get("DDMStructureId");
+
+		if (DDMStructureId != null) {
+			setDDMStructureId(DDMStructureId);
+		}
+
+		Long fileEntryTypeId = (Long)attributes.get("fileEntryTypeId");
+
+		if (fileEntryTypeId != null) {
+			setFileEntryTypeId(fileEntryTypeId);
+		}
+
+		Long fileEntryId = (Long)attributes.get("fileEntryId");
+
+		if (fileEntryId != null) {
+			setFileEntryId(fileEntryId);
+		}
+
+		Long fileVersionId = (Long)attributes.get("fileVersionId");
+
+		if (fileVersionId != null) {
+			setFileVersionId(fileVersionId);
+		}
 	}
 
 	/**
@@ -200,10 +264,6 @@ public class DLFileEntryMetadataWrapper implements DLFileEntryMetadata {
 		return _dlFileEntryMetadata.isEscapedModel();
 	}
 
-	public void setEscapedModel(boolean escapedModel) {
-		_dlFileEntryMetadata.setEscapedModel(escapedModel);
-	}
-
 	public java.io.Serializable getPrimaryKeyObj() {
 		return _dlFileEntryMetadata.getPrimaryKeyObj();
 	}
@@ -276,7 +336,14 @@ public class DLFileEntryMetadataWrapper implements DLFileEntryMetadata {
 		return _dlFileEntryMetadata.getFileVersion();
 	}
 
+	/**
+	 * @deprecated Renamed to {@link #getWrappedModel}
+	 */
 	public DLFileEntryMetadata getWrappedDLFileEntryMetadata() {
+		return _dlFileEntryMetadata;
+	}
+
+	public DLFileEntryMetadata getWrappedModel() {
 		return _dlFileEntryMetadata;
 	}
 

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -17,6 +17,7 @@ package com.liferay.portlet.messageboards.model.impl;
 import com.liferay.portal.kernel.bean.AutoEscapeBeanHandler;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.ProxyUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.model.CacheModel;
 import com.liferay.portal.model.impl.BaseModelImpl;
@@ -30,11 +31,11 @@ import com.liferay.portlet.messageboards.model.MBStatsUserModel;
 
 import java.io.Serializable;
 
-import java.lang.reflect.Proxy;
-
 import java.sql.Types;
 
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * The base model implementation for the MBStatsUser service. Represents a row in the &quot;MBStatsUser&quot; database table, with each column mapped to a property of this class.
@@ -77,15 +78,12 @@ public class MBStatsUserModelImpl extends BaseModelImpl<MBStatsUser>
 	public static final boolean FINDER_CACHE_ENABLED = GetterUtil.getBoolean(com.liferay.portal.util.PropsUtil.get(
 				"value.object.finder.cache.enabled.com.liferay.portlet.messageboards.model.MBStatsUser"),
 			true);
-
-	public Class<?> getModelClass() {
-		return MBStatsUser.class;
-	}
-
-	public String getModelClassName() {
-		return MBStatsUser.class.getName();
-	}
-
+	public static final boolean COLUMN_BITMASK_ENABLED = GetterUtil.getBoolean(com.liferay.portal.util.PropsUtil.get(
+				"value.object.column.bitmask.enabled.com.liferay.portlet.messageboards.model.MBStatsUser"),
+			true);
+	public static long GROUPID_COLUMN_BITMASK = 1L;
+	public static long MESSAGECOUNT_COLUMN_BITMASK = 2L;
+	public static long USERID_COLUMN_BITMASK = 4L;
 	public static final long LOCK_EXPIRATION_TIME = GetterUtil.getLong(com.liferay.portal.util.PropsUtil.get(
 				"lock.expiration.time.com.liferay.portlet.messageboards.model.MBStatsUser"));
 
@@ -106,6 +104,60 @@ public class MBStatsUserModelImpl extends BaseModelImpl<MBStatsUser>
 
 	public void setPrimaryKeyObj(Serializable primaryKeyObj) {
 		setPrimaryKey(((Long)primaryKeyObj).longValue());
+	}
+
+	public Class<?> getModelClass() {
+		return MBStatsUser.class;
+	}
+
+	public String getModelClassName() {
+		return MBStatsUser.class.getName();
+	}
+
+	@Override
+	public Map<String, Object> getModelAttributes() {
+		Map<String, Object> attributes = new HashMap<String, Object>();
+
+		attributes.put("statsUserId", getStatsUserId());
+		attributes.put("groupId", getGroupId());
+		attributes.put("userId", getUserId());
+		attributes.put("messageCount", getMessageCount());
+		attributes.put("lastPostDate", getLastPostDate());
+
+		return attributes;
+	}
+
+	@Override
+	public void setModelAttributes(Map<String, Object> attributes) {
+		Long statsUserId = (Long)attributes.get("statsUserId");
+
+		if (statsUserId != null) {
+			setStatsUserId(statsUserId);
+		}
+
+		Long groupId = (Long)attributes.get("groupId");
+
+		if (groupId != null) {
+			setGroupId(groupId);
+		}
+
+		Long userId = (Long)attributes.get("userId");
+
+		if (userId != null) {
+			setUserId(userId);
+		}
+
+		Integer messageCount = (Integer)attributes.get("messageCount");
+
+		if (messageCount != null) {
+			setMessageCount(messageCount);
+		}
+
+		Date lastPostDate = (Date)attributes.get("lastPostDate");
+
+		if (lastPostDate != null) {
+			setLastPostDate(lastPostDate);
+		}
 	}
 
 	public long getStatsUserId() {
@@ -129,6 +181,8 @@ public class MBStatsUserModelImpl extends BaseModelImpl<MBStatsUser>
 	}
 
 	public void setGroupId(long groupId) {
+		_columnBitmask |= GROUPID_COLUMN_BITMASK;
+
 		if (!_setOriginalGroupId) {
 			_setOriginalGroupId = true;
 
@@ -147,6 +201,8 @@ public class MBStatsUserModelImpl extends BaseModelImpl<MBStatsUser>
 	}
 
 	public void setUserId(long userId) {
+		_columnBitmask |= USERID_COLUMN_BITMASK;
+
 		if (!_setOriginalUserId) {
 			_setOriginalUserId = true;
 
@@ -173,7 +229,19 @@ public class MBStatsUserModelImpl extends BaseModelImpl<MBStatsUser>
 	}
 
 	public void setMessageCount(int messageCount) {
+		_columnBitmask = -1L;
+
+		if (!_setOriginalMessageCount) {
+			_setOriginalMessageCount = true;
+
+			_originalMessageCount = _messageCount;
+		}
+
 		_messageCount = messageCount;
+	}
+
+	public int getOriginalMessageCount() {
+		return _originalMessageCount;
 	}
 
 	public Date getLastPostDate() {
@@ -184,35 +252,32 @@ public class MBStatsUserModelImpl extends BaseModelImpl<MBStatsUser>
 		_lastPostDate = lastPostDate;
 	}
 
+	public long getColumnBitmask() {
+		return _columnBitmask;
+	}
+
 	@Override
 	public MBStatsUser toEscapedModel() {
-		if (isEscapedModel()) {
-			return (MBStatsUser)this;
+		if (_escapedModelProxy == null) {
+			_escapedModelProxy = (MBStatsUser)ProxyUtil.newProxyInstance(_classLoader,
+					_escapedModelProxyInterfaces,
+					new AutoEscapeBeanHandler(this));
 		}
-		else {
-			if (_escapedModelProxy == null) {
-				_escapedModelProxy = (MBStatsUser)Proxy.newProxyInstance(_classLoader,
-						_escapedModelProxyInterfaces,
-						new AutoEscapeBeanHandler(this));
-			}
 
-			return _escapedModelProxy;
-		}
+		return _escapedModelProxy;
 	}
 
 	@Override
 	public ExpandoBridge getExpandoBridge() {
-		if (_expandoBridge == null) {
-			_expandoBridge = ExpandoBridgeFactoryUtil.getExpandoBridge(0,
-					MBStatsUser.class.getName(), getPrimaryKey());
-		}
-
-		return _expandoBridge;
+		return ExpandoBridgeFactoryUtil.getExpandoBridge(0,
+			MBStatsUser.class.getName(), getPrimaryKey());
 	}
 
 	@Override
 	public void setExpandoBridgeAttributes(ServiceContext serviceContext) {
-		getExpandoBridge().setAttributes(serviceContext);
+		ExpandoBridge expandoBridge = getExpandoBridge();
+
+		expandoBridge.setAttributes(serviceContext);
 	}
 
 	@Override
@@ -293,6 +358,12 @@ public class MBStatsUserModelImpl extends BaseModelImpl<MBStatsUser>
 		mbStatsUserModelImpl._originalUserId = mbStatsUserModelImpl._userId;
 
 		mbStatsUserModelImpl._setOriginalUserId = false;
+
+		mbStatsUserModelImpl._originalMessageCount = mbStatsUserModelImpl._messageCount;
+
+		mbStatsUserModelImpl._setOriginalMessageCount = false;
+
+		mbStatsUserModelImpl._columnBitmask = 0;
 	}
 
 	@Override
@@ -385,7 +456,9 @@ public class MBStatsUserModelImpl extends BaseModelImpl<MBStatsUser>
 	private long _originalUserId;
 	private boolean _setOriginalUserId;
 	private int _messageCount;
+	private int _originalMessageCount;
+	private boolean _setOriginalMessageCount;
 	private Date _lastPostDate;
-	private transient ExpandoBridge _expandoBridge;
+	private long _columnBitmask;
 	private MBStatsUser _escapedModelProxy;
 }

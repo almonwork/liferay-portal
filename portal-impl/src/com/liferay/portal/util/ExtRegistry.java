@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -20,7 +20,6 @@ import com.liferay.portal.kernel.xml.SAXReaderUtil;
 
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -42,14 +41,9 @@ public class ExtRegistry {
 		Set<String> files = _readExtFiles(
 			servletContext, "/WEB-INF/ext-" + servletContextName + ".xml");
 
-		Iterator<Map.Entry<String, Set<String>>> itr =
-			_extMap.entrySet().iterator();
-
 		Map<String, Set<String>> conflicts = new HashMap<String, Set<String>>();
 
-		while (itr.hasNext()) {
-			Map.Entry<String, Set<String>> entry = itr.next();
-
+		for (Map.Entry<String, Set<String>> entry : _extMap.entrySet()) {
 			String curServletContextName = entry.getKey();
 			Set<String> curFiles = entry.getValue();
 
@@ -101,8 +95,7 @@ public class ExtRegistry {
 	public static void registerPortal(ServletContext servletContext)
 		throws Exception {
 
-		Set<String> resourcePaths = servletContext.getResourcePaths(
-			"/WEB-INF");
+		Set<String> resourcePaths = servletContext.getResourcePaths("/WEB-INF");
 
 		for (String resourcePath : resourcePaths) {
 			if (resourcePath.startsWith("/WEB-INF/ext-") &&
@@ -111,8 +104,7 @@ public class ExtRegistry {
 				String servletContextName = resourcePath.substring(
 					13, resourcePath.length() - 4);
 
-				Set<String> files = _readExtFiles(
-					servletContext, resourcePath);
+				Set<String> files = _readExtFiles(servletContext, resourcePath);
 
 				_extMap.put(servletContextName, files);
 			}

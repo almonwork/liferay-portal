@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -92,14 +92,6 @@ public class JournalStructureUtil {
 		return getPersistence()
 				   .findWithDynamicQuery(dynamicQuery, start, end,
 			orderByComparator);
-	}
-
-	/**
-	 * @see com.liferay.portal.service.persistence.BasePersistence#remove(com.liferay.portal.model.BaseModel)
-	 */
-	public static JournalStructure remove(JournalStructure journalStructure)
-		throws SystemException {
-		return getPersistence().remove(journalStructure);
 	}
 
 	/**
@@ -359,6 +351,134 @@ public class JournalStructureUtil {
 		java.lang.String uuid, long groupId, boolean retrieveFromCache)
 		throws com.liferay.portal.kernel.exception.SystemException {
 		return getPersistence().fetchByUUID_G(uuid, groupId, retrieveFromCache);
+	}
+
+	/**
+	* Returns all the journal structures where uuid = &#63; and companyId = &#63;.
+	*
+	* @param uuid the uuid
+	* @param companyId the company ID
+	* @return the matching journal structures
+	* @throws SystemException if a system exception occurred
+	*/
+	public static java.util.List<com.liferay.portlet.journal.model.JournalStructure> findByUuid_C(
+		java.lang.String uuid, long companyId)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getPersistence().findByUuid_C(uuid, companyId);
+	}
+
+	/**
+	* Returns a range of all the journal structures where uuid = &#63; and companyId = &#63;.
+	*
+	* <p>
+	* Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set.
+	* </p>
+	*
+	* @param uuid the uuid
+	* @param companyId the company ID
+	* @param start the lower bound of the range of journal structures
+	* @param end the upper bound of the range of journal structures (not inclusive)
+	* @return the range of matching journal structures
+	* @throws SystemException if a system exception occurred
+	*/
+	public static java.util.List<com.liferay.portlet.journal.model.JournalStructure> findByUuid_C(
+		java.lang.String uuid, long companyId, int start, int end)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getPersistence().findByUuid_C(uuid, companyId, start, end);
+	}
+
+	/**
+	* Returns an ordered range of all the journal structures where uuid = &#63; and companyId = &#63;.
+	*
+	* <p>
+	* Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set.
+	* </p>
+	*
+	* @param uuid the uuid
+	* @param companyId the company ID
+	* @param start the lower bound of the range of journal structures
+	* @param end the upper bound of the range of journal structures (not inclusive)
+	* @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
+	* @return the ordered range of matching journal structures
+	* @throws SystemException if a system exception occurred
+	*/
+	public static java.util.List<com.liferay.portlet.journal.model.JournalStructure> findByUuid_C(
+		java.lang.String uuid, long companyId, int start, int end,
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getPersistence()
+				   .findByUuid_C(uuid, companyId, start, end, orderByComparator);
+	}
+
+	/**
+	* Returns the first journal structure in the ordered set where uuid = &#63; and companyId = &#63;.
+	*
+	* <p>
+	* Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set.
+	* </p>
+	*
+	* @param uuid the uuid
+	* @param companyId the company ID
+	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	* @return the first matching journal structure
+	* @throws com.liferay.portlet.journal.NoSuchStructureException if a matching journal structure could not be found
+	* @throws SystemException if a system exception occurred
+	*/
+	public static com.liferay.portlet.journal.model.JournalStructure findByUuid_C_First(
+		java.lang.String uuid, long companyId,
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
+		throws com.liferay.portal.kernel.exception.SystemException,
+			com.liferay.portlet.journal.NoSuchStructureException {
+		return getPersistence()
+				   .findByUuid_C_First(uuid, companyId, orderByComparator);
+	}
+
+	/**
+	* Returns the last journal structure in the ordered set where uuid = &#63; and companyId = &#63;.
+	*
+	* <p>
+	* Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set.
+	* </p>
+	*
+	* @param uuid the uuid
+	* @param companyId the company ID
+	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	* @return the last matching journal structure
+	* @throws com.liferay.portlet.journal.NoSuchStructureException if a matching journal structure could not be found
+	* @throws SystemException if a system exception occurred
+	*/
+	public static com.liferay.portlet.journal.model.JournalStructure findByUuid_C_Last(
+		java.lang.String uuid, long companyId,
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
+		throws com.liferay.portal.kernel.exception.SystemException,
+			com.liferay.portlet.journal.NoSuchStructureException {
+		return getPersistence()
+				   .findByUuid_C_Last(uuid, companyId, orderByComparator);
+	}
+
+	/**
+	* Returns the journal structures before and after the current journal structure in the ordered set where uuid = &#63; and companyId = &#63;.
+	*
+	* <p>
+	* Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set.
+	* </p>
+	*
+	* @param id the primary key of the current journal structure
+	* @param uuid the uuid
+	* @param companyId the company ID
+	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	* @return the previous, current, and next journal structure
+	* @throws com.liferay.portlet.journal.NoSuchStructureException if a journal structure with the primary key could not be found
+	* @throws SystemException if a system exception occurred
+	*/
+	public static com.liferay.portlet.journal.model.JournalStructure[] findByUuid_C_PrevAndNext(
+		long id, java.lang.String uuid, long companyId,
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
+		throws com.liferay.portal.kernel.exception.SystemException,
+			com.liferay.portlet.journal.NoSuchStructureException {
+		return getPersistence()
+				   .findByUuid_C_PrevAndNext(id, uuid, companyId,
+			orderByComparator);
 	}
 
 	/**
@@ -673,6 +793,132 @@ public class JournalStructureUtil {
 			com.liferay.portlet.journal.NoSuchStructureException {
 		return getPersistence()
 				   .findByStructureId_PrevAndNext(id, structureId,
+			orderByComparator);
+	}
+
+	/**
+	* Returns all the journal structures where parentStructureId = &#63;.
+	*
+	* @param parentStructureId the parent structure ID
+	* @return the matching journal structures
+	* @throws SystemException if a system exception occurred
+	*/
+	public static java.util.List<com.liferay.portlet.journal.model.JournalStructure> findByParentStructureId(
+		java.lang.String parentStructureId)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getPersistence().findByParentStructureId(parentStructureId);
+	}
+
+	/**
+	* Returns a range of all the journal structures where parentStructureId = &#63;.
+	*
+	* <p>
+	* Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set.
+	* </p>
+	*
+	* @param parentStructureId the parent structure ID
+	* @param start the lower bound of the range of journal structures
+	* @param end the upper bound of the range of journal structures (not inclusive)
+	* @return the range of matching journal structures
+	* @throws SystemException if a system exception occurred
+	*/
+	public static java.util.List<com.liferay.portlet.journal.model.JournalStructure> findByParentStructureId(
+		java.lang.String parentStructureId, int start, int end)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getPersistence()
+				   .findByParentStructureId(parentStructureId, start, end);
+	}
+
+	/**
+	* Returns an ordered range of all the journal structures where parentStructureId = &#63;.
+	*
+	* <p>
+	* Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set.
+	* </p>
+	*
+	* @param parentStructureId the parent structure ID
+	* @param start the lower bound of the range of journal structures
+	* @param end the upper bound of the range of journal structures (not inclusive)
+	* @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
+	* @return the ordered range of matching journal structures
+	* @throws SystemException if a system exception occurred
+	*/
+	public static java.util.List<com.liferay.portlet.journal.model.JournalStructure> findByParentStructureId(
+		java.lang.String parentStructureId, int start, int end,
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getPersistence()
+				   .findByParentStructureId(parentStructureId, start, end,
+			orderByComparator);
+	}
+
+	/**
+	* Returns the first journal structure in the ordered set where parentStructureId = &#63;.
+	*
+	* <p>
+	* Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set.
+	* </p>
+	*
+	* @param parentStructureId the parent structure ID
+	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	* @return the first matching journal structure
+	* @throws com.liferay.portlet.journal.NoSuchStructureException if a matching journal structure could not be found
+	* @throws SystemException if a system exception occurred
+	*/
+	public static com.liferay.portlet.journal.model.JournalStructure findByParentStructureId_First(
+		java.lang.String parentStructureId,
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
+		throws com.liferay.portal.kernel.exception.SystemException,
+			com.liferay.portlet.journal.NoSuchStructureException {
+		return getPersistence()
+				   .findByParentStructureId_First(parentStructureId,
+			orderByComparator);
+	}
+
+	/**
+	* Returns the last journal structure in the ordered set where parentStructureId = &#63;.
+	*
+	* <p>
+	* Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set.
+	* </p>
+	*
+	* @param parentStructureId the parent structure ID
+	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	* @return the last matching journal structure
+	* @throws com.liferay.portlet.journal.NoSuchStructureException if a matching journal structure could not be found
+	* @throws SystemException if a system exception occurred
+	*/
+	public static com.liferay.portlet.journal.model.JournalStructure findByParentStructureId_Last(
+		java.lang.String parentStructureId,
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
+		throws com.liferay.portal.kernel.exception.SystemException,
+			com.liferay.portlet.journal.NoSuchStructureException {
+		return getPersistence()
+				   .findByParentStructureId_Last(parentStructureId,
+			orderByComparator);
+	}
+
+	/**
+	* Returns the journal structures before and after the current journal structure in the ordered set where parentStructureId = &#63;.
+	*
+	* <p>
+	* Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set.
+	* </p>
+	*
+	* @param id the primary key of the current journal structure
+	* @param parentStructureId the parent structure ID
+	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	* @return the previous, current, and next journal structure
+	* @throws com.liferay.portlet.journal.NoSuchStructureException if a journal structure with the primary key could not be found
+	* @throws SystemException if a system exception occurred
+	*/
+	public static com.liferay.portlet.journal.model.JournalStructure[] findByParentStructureId_PrevAndNext(
+		long id, java.lang.String parentStructureId,
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
+		throws com.liferay.portal.kernel.exception.SystemException,
+			com.liferay.portlet.journal.NoSuchStructureException {
+		return getPersistence()
+				   .findByParentStructureId_PrevAndNext(id, parentStructureId,
 			orderByComparator);
 	}
 
@@ -997,12 +1243,26 @@ public class JournalStructureUtil {
 	*
 	* @param uuid the uuid
 	* @param groupId the group ID
+	* @return the journal structure that was removed
 	* @throws SystemException if a system exception occurred
 	*/
-	public static void removeByUUID_G(java.lang.String uuid, long groupId)
+	public static com.liferay.portlet.journal.model.JournalStructure removeByUUID_G(
+		java.lang.String uuid, long groupId)
 		throws com.liferay.portal.kernel.exception.SystemException,
 			com.liferay.portlet.journal.NoSuchStructureException {
-		getPersistence().removeByUUID_G(uuid, groupId);
+		return getPersistence().removeByUUID_G(uuid, groupId);
+	}
+
+	/**
+	* Removes all the journal structures where uuid = &#63; and companyId = &#63; from the database.
+	*
+	* @param uuid the uuid
+	* @param companyId the company ID
+	* @throws SystemException if a system exception occurred
+	*/
+	public static void removeByUuid_C(java.lang.String uuid, long companyId)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		getPersistence().removeByUuid_C(uuid, companyId);
 	}
 
 	/**
@@ -1028,16 +1288,30 @@ public class JournalStructureUtil {
 	}
 
 	/**
+	* Removes all the journal structures where parentStructureId = &#63; from the database.
+	*
+	* @param parentStructureId the parent structure ID
+	* @throws SystemException if a system exception occurred
+	*/
+	public static void removeByParentStructureId(
+		java.lang.String parentStructureId)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		getPersistence().removeByParentStructureId(parentStructureId);
+	}
+
+	/**
 	* Removes the journal structure where groupId = &#63; and structureId = &#63; from the database.
 	*
 	* @param groupId the group ID
 	* @param structureId the structure ID
+	* @return the journal structure that was removed
 	* @throws SystemException if a system exception occurred
 	*/
-	public static void removeByG_S(long groupId, java.lang.String structureId)
+	public static com.liferay.portlet.journal.model.JournalStructure removeByG_S(
+		long groupId, java.lang.String structureId)
 		throws com.liferay.portal.kernel.exception.SystemException,
 			com.liferay.portlet.journal.NoSuchStructureException {
-		getPersistence().removeByG_S(groupId, structureId);
+		return getPersistence().removeByG_S(groupId, structureId);
 	}
 
 	/**
@@ -1089,6 +1363,19 @@ public class JournalStructureUtil {
 	}
 
 	/**
+	* Returns the number of journal structures where uuid = &#63; and companyId = &#63;.
+	*
+	* @param uuid the uuid
+	* @param companyId the company ID
+	* @return the number of matching journal structures
+	* @throws SystemException if a system exception occurred
+	*/
+	public static int countByUuid_C(java.lang.String uuid, long companyId)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getPersistence().countByUuid_C(uuid, companyId);
+	}
+
+	/**
 	* Returns the number of journal structures where groupId = &#63;.
 	*
 	* @param groupId the group ID
@@ -1122,6 +1409,19 @@ public class JournalStructureUtil {
 	public static int countByStructureId(java.lang.String structureId)
 		throws com.liferay.portal.kernel.exception.SystemException {
 		return getPersistence().countByStructureId(structureId);
+	}
+
+	/**
+	* Returns the number of journal structures where parentStructureId = &#63;.
+	*
+	* @param parentStructureId the parent structure ID
+	* @return the number of matching journal structures
+	* @throws SystemException if a system exception occurred
+	*/
+	public static int countByParentStructureId(
+		java.lang.String parentStructureId)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getPersistence().countByParentStructureId(parentStructureId);
 	}
 
 	/**
@@ -1187,11 +1487,10 @@ public class JournalStructureUtil {
 		return _persistence;
 	}
 
+	/**
+	 * @deprecated
+	 */
 	public void setPersistence(JournalStructurePersistence persistence) {
-		_persistence = persistence;
-
-		ReferenceRegistry.registerReference(JournalStructureUtil.class,
-			"_persistence");
 	}
 
 	private static JournalStructurePersistence _persistence;

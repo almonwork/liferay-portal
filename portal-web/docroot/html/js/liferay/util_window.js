@@ -1,6 +1,7 @@
-AUI().add(
+AUI.add(
 	'liferay-util-window',
 	function(A) {
+		var Lang = A.Lang;
 		var Util = Liferay.Util;
 		var Window = Util.Window;
 
@@ -18,7 +19,7 @@ AUI().add(
 
 		var CONFIG_DEFAULTS_DIALOG = {
 			draggable: true,
-			stack: true,
+			stack: false,
 			width: 720,
 			xy: Window.XY,
 			after: {
@@ -31,30 +32,78 @@ AUI().add(
 			}
 		};
 
-		Util._openWindow = function(config) {
+		Util._openWindow = function(config, callback) {
 			var openingWindow = config.openingWindow;
 
+			var refreshWindow = config.refreshWindow;
 			var title = config.title;
 			var uri = config.uri;
 
 			var id = config.id || A.guid();
 
 			if (config.cache === false) {
-				uri = Liferay.Util.addParams(A.guid() + '=' + (+new Date), uri);
+				uri = Liferay.Util.addParams(A.guid() + '=' + Lang.now(), uri);
 			}
 
 			var dialog = Window._map[id];
+
+			var defaultDialogConfig = null;
 
 			if (!dialog) {
 				var dialogConfig = config.dialog || {};
 
 				var dialogIframeConfig = config.dialogIframe || {};
 
-				A.mix(dialogConfig, CONFIG_DEFAULTS_DIALOG);
+				var openingUtil = A.Object.getValue(openingWindow, 'Liferay.Util'.split('.'));
+
+				if (openingUtil) {
+					var openingWindowName = openingUtil.getWindowName();
+
+					var openingDialog = Window._map[openingWindowName];
+
+					if (openingDialog) {
+						defaultDialogConfig = {
+							draggable: openingDialog.get('draggable'),
+							stack: openingDialog.get('stack')
+						};
+					}
+				}
+
+				dialogConfig = A.merge(CONFIG_DEFAULTS_DIALOG, defaultDialogConfig, dialogConfig);
 
 				A.mix(
 					dialogIframeConfig,
 					{
+						bindLoadHandler: function() {
+							var instance = this;
+
+							var popupReady = false;
+
+							Liferay.on(
+								'popupReady',
+								function(event) {
+									instance.fire('load', event);
+
+									popupReady = true;
+								}
+							);
+
+							instance.node.on(
+								'load',
+								function(event) {
+									if (!popupReady) {
+										Liferay.fire(
+											'popupReady',
+											{
+												windowName: id
+											}
+										);
+									}
+
+									popupReady = false;
+								}
+							);
+						},
 						id: id,
 						iframeId: id,
 						uri: uri
@@ -70,6 +119,7 @@ AUI().add(
 				Window._map[id] = dialog;
 
 				dialog._opener = openingWindow;
+				dialog._refreshWindow = refreshWindow;
 
 				dialog.after(
 					'destroy',
@@ -80,29 +130,40 @@ AUI().add(
 					}
 				);
 
-				dialog.iframe.after(
-					'load',
+				Liferay.after(
+					'popupReady',
 					function(event) {
-						var dialogIframeNode = event.currentTarget.node;
+						if (event.windowName == id) {
+							event.dialog = dialog;
+							event.details[0].dialog = dialog;
 
-						Util.afterIframeLoaded(event);
+							if (event.doc) {
+								Util.afterIframeLoaded(event);
 
-						var dialogUtil = dialogIframeNode.get('contentWindow.Liferay.Util');
+								var dialogUtil = event.win.Liferay.Util;
 
-						dialogUtil.Window._opener = openingWindow;
+								dialogUtil.Window._opener = openingWindow;
 
-						dialogUtil.Window._name = id;
+								dialogUtil.Window._name = id;
+							}
+
+							dialog.iframe.node.focus();
+						}
 					}
 				);
 
 				dialog.render();
 			}
 			else {
-				dialog.show();
+				if (!dialog.get('visible')) {
+					dialog.show();
+
+					dialog.iframe.node.focus();
+
+					dialog.iframe.set('uri', uri);
+				}
 
 				dialog._syncUIPosAlign();
-
-				dialog.iframe.set('uri', uri);
 			}
 
 			if (dialog.get('stack')) {
@@ -110,6 +171,10 @@ AUI().add(
 			}
 
 			dialog.set('title', title);
+
+			if (Lang.isFunction(callback)) {
+				callback(dialog);
+			}
 
 			return dialog;
 		};

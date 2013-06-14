@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -15,7 +15,6 @@
 package com.liferay.portlet.calendar.service;
 
 import com.liferay.portal.kernel.bean.PortalBeanLocatorUtil;
-import com.liferay.portal.kernel.util.MethodCache;
 import com.liferay.portal.kernel.util.ReferenceRegistry;
 
 /**
@@ -37,6 +36,25 @@ public class CalEventServiceUtil {
 	 *
 	 * Never modify this class directly. Add custom service methods to {@link com.liferay.portlet.calendar.service.impl.CalEventServiceImpl} and rerun ServiceBuilder to regenerate this class.
 	 */
+
+	/**
+	* Returns the Spring bean ID for this bean.
+	*
+	* @return the Spring bean ID for this bean
+	*/
+	public static java.lang.String getBeanIdentifier() {
+		return getService().getBeanIdentifier();
+	}
+
+	/**
+	* Sets the Spring bean ID for this bean.
+	*
+	* @param beanIdentifier the Spring bean ID for this bean
+	*/
+	public static void setBeanIdentifier(java.lang.String beanIdentifier) {
+		getService().setBeanIdentifier(beanIdentifier);
+	}
+
 	public static com.liferay.portlet.calendar.model.CalEvent addEvent(
 		java.lang.String title, java.lang.String description,
 		java.lang.String location, int startDateMonth, int startDateDay,
@@ -139,10 +157,11 @@ public class CalEventServiceUtil {
 		return getService().hasEvents(groupId, cal, types);
 	}
 
-	public static void importICal4j(long groupId, java.io.File file)
+	public static void importICal4j(long groupId,
+		java.io.InputStream inputStream)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException {
-		getService().importICal4j(groupId, file);
+		getService().importICal4j(groupId, inputStream);
 	}
 
 	public static com.liferay.portlet.calendar.model.CalEvent updateEvent(
@@ -172,20 +191,15 @@ public class CalEventServiceUtil {
 
 			ReferenceRegistry.registerReference(CalEventServiceUtil.class,
 				"_service");
-			MethodCache.remove(CalEventService.class);
 		}
 
 		return _service;
 	}
 
+	/**
+	 * @deprecated
+	 */
 	public void setService(CalEventService service) {
-		MethodCache.remove(CalEventService.class);
-
-		_service = service;
-
-		ReferenceRegistry.registerReference(CalEventServiceUtil.class,
-			"_service");
-		MethodCache.remove(CalEventService.class);
 	}
 
 	private static CalEventService _service;

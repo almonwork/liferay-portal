@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -29,27 +29,28 @@ boolean showThumbnail = false;
 if (fileEntry.getVersion().equals(fileVersion.getVersion())) {
 	showThumbnail = true;
 }
-
-String src = null;
-
-if (showThumbnail) {
-	src = themeDisplay.getPortalURL() + themeDisplay.getPathContext() + "/documents/" + themeDisplay.getScopeGroupId() + StringPool.SLASH + fileEntry.getFolderId() + StringPool.SLASH + HttpUtil.encodeURL(HtmlUtil.unescape(fileEntry.getTitle())) + "?version=" + fileVersion.getVersion();
-}
 %>
 
 <c:if test="<%= fileVersion.isApproved() %>">
 	<div class="asset-resource-info">
 		<c:choose>
-			<c:when test="<%= showThumbnail && PDFProcessor.hasImages(fileEntry, fileVersion.getVersion()) %>">
+			<c:when test="<%= showThumbnail && ImageProcessorUtil.hasImages(fileVersion) %>">
 				<div>
-					<img src="<%= src %>&documentThumbnail=1" />
+					<img src="<%= DLUtil.getPreviewURL(fileEntry, fileVersion, themeDisplay, "&imageThumbnail=1") %>" />
 
 					<%= fileVersion.getTitle() %>
 				</div>
 			</c:when>
-			<c:when test="<%= showThumbnail && VideoProcessor.hasVideo(fileEntry, fileVersion.getVersion()) %>">
+			<c:when test="<%= showThumbnail && PDFProcessorUtil.hasImages(fileVersion) %>">
 				<div>
-					<img src="<%= src %>&videoThumbnail=1" />
+					<img src="<%= DLUtil.getPreviewURL(fileEntry, fileVersion, themeDisplay, "&documentThumbnail=1") %>" />
+
+					<%= fileVersion.getTitle() %>
+				</div>
+			</c:when>
+			<c:when test="<%= showThumbnail && VideoProcessorUtil.hasVideo(fileVersion) %>">
+				<div>
+					<img src="<%= DLUtil.getPreviewURL(fileEntry, fileVersion, themeDisplay, "&videoThumbnail=1") %>" />
 
 					<%= fileVersion.getTitle() %>
 				</div>
@@ -59,7 +60,7 @@ if (showThumbnail) {
 					image='<%= "../file_system/small/" + fileVersion.getIcon() %>'
 					label="<%= true %>"
 					message="<%= HtmlUtil.escape(fileVersion.getTitle()) %>"
-					url='<%= themeDisplay.getPortalURL() + themeDisplay.getPathContext() + "/documents/" + fileVersion.getRepositoryId() + StringPool.SLASH + fileEntry.getFolderId() + StringPool.SLASH + HttpUtil.encodeURL(HtmlUtil.unescape(fileEntry.getTitle())) + "?version=" + fileVersion.getVersion() %>'
+					url="<%= assetRenderer.getURLDownload(themeDisplay) %>"
 				/>
 			</c:otherwise>
 		</c:choose>

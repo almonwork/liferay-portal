@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,7 +14,6 @@
 
 package com.liferay.portlet.announcements.service.persistence;
 
-import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.service.persistence.BasePersistence;
 
 import com.liferay.portlet.announcements.model.AnnouncementsFlag;
@@ -309,9 +308,11 @@ public interface AnnouncementsFlagPersistence extends BasePersistence<Announceme
 	* @param userId the user ID
 	* @param entryId the entry ID
 	* @param value the value
+	* @return the announcements flag that was removed
 	* @throws SystemException if a system exception occurred
 	*/
-	public void removeByU_E_V(long userId, long entryId, int value)
+	public com.liferay.portlet.announcements.model.AnnouncementsFlag removeByU_E_V(
+		long userId, long entryId, int value)
 		throws com.liferay.portal.kernel.exception.SystemException,
 			com.liferay.portlet.announcements.NoSuchFlagException;
 
@@ -353,7 +354,4 @@ public interface AnnouncementsFlagPersistence extends BasePersistence<Announceme
 	*/
 	public int countAll()
 		throws com.liferay.portal.kernel.exception.SystemException;
-
-	public AnnouncementsFlag remove(AnnouncementsFlag announcementsFlag)
-		throws SystemException;
 }

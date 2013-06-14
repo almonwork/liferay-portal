@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -28,6 +28,7 @@ import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.model.User;
+import com.liferay.portal.security.auth.PrincipalException;
 import com.liferay.portal.service.ServiceContext;
 import com.liferay.portal.service.UserLocalServiceUtil;
 import com.liferay.portal.struts.PortletAction;
@@ -36,7 +37,6 @@ import com.liferay.portal.util.OpenIdUtil;
 import com.liferay.portal.util.PortalUtil;
 import com.liferay.portal.util.WebKeys;
 import com.liferay.portlet.ActionResponseImpl;
-import com.liferay.portlet.login.util.LoginUtil;
 import com.liferay.util.PwdGenerator;
 
 import java.util.Calendar;
@@ -89,6 +89,10 @@ public class OpenIdAction extends PortletAction {
 		ThemeDisplay themeDisplay = (ThemeDisplay)actionRequest.getAttribute(
 			WebKeys.THEME_DISPLAY);
 
+		if (!OpenIdUtil.isEnabled(themeDisplay.getCompanyId())) {
+			throw new PrincipalException();
+		}
+
 		if (actionRequest.getRemoteUser() != null) {
 			actionResponse.sendRedirect(themeDisplay.getPathMain());
 
@@ -116,7 +120,7 @@ public class OpenIdAction extends PortletAction {
 		}
 		catch (Exception e) {
 			if (e instanceof DuplicateUserEmailAddressException) {
-				SessionErrors.add(actionRequest, e.getClass().getName());
+				SessionErrors.add(actionRequest, e.getClass());
 			}
 			else if (e instanceof OpenIDException) {
 				if (_log.isInfoEnabled()) {
@@ -125,7 +129,7 @@ public class OpenIdAction extends PortletAction {
 							e.getMessage());
 				}
 
-				SessionErrors.add(actionRequest, e.getClass().getName());
+				SessionErrors.add(actionRequest, e.getClass());
 			}
 			else {
 				_log.error("Error processing the OpenID login", e);
@@ -143,6 +147,10 @@ public class OpenIdAction extends PortletAction {
 
 		ThemeDisplay themeDisplay = (ThemeDisplay)renderRequest.getAttribute(
 			WebKeys.THEME_DISPLAY);
+
+		if (!OpenIdUtil.isEnabled(themeDisplay.getCompanyId())) {
+			return mapping.findForward("portlet.login.login");
+		}
 
 		renderResponse.setTitle(themeDisplay.translate("open-id"));
 
@@ -266,7 +274,7 @@ public class OpenIdAction extends PortletAction {
 							"attributes to create an account");
 				}
 
-				String createAccountURL = LoginUtil.getCreateAccountHREF(
+				String createAccountURL = PortalUtil.getCreateAccountURL(
 					request, themeDisplay);
 
 				createAccountURL = HttpUtil.setParameter(
@@ -321,10 +329,6 @@ public class OpenIdAction extends PortletAction {
 			ThemeDisplay themeDisplay, ActionRequest actionRequest,
 			ActionResponse actionResponse)
 		throws Exception {
-
-		if (!OpenIdUtil.isEnabled(themeDisplay.getCompanyId())) {
-			return;
-		}
 
 		HttpServletRequest request = PortalUtil.getHttpServletRequest(
 			actionRequest);

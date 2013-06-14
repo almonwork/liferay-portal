@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,6 +14,7 @@
 
 package com.liferay.portlet;
 
+import com.liferay.portal.kernel.security.pacl.permission.PortalRuntimePermission;
 import com.liferay.portal.kernel.xml.Element;
 import com.liferay.portal.kernel.xml.QName;
 
@@ -31,6 +32,8 @@ public class PortletQNameUtil {
 	}
 
 	public static PortletQName getPortletQName() {
+		PortalRuntimePermission.checkGetBeanProperty(PortletQNameUtil.class);
+
 		return _portletQName;
 	}
 
@@ -45,14 +48,14 @@ public class PortletQNameUtil {
 		return getPortletQName().getPublicRenderParameterName(qName);
 	}
 
-	public static QName getQName(String publicRenderParameterName) {
-		return getPortletQName().getQName(publicRenderParameterName);
-	}
-
 	public static QName getQName(
 		Element qNameEl, Element nameEl, String defaultNamespace) {
 
 		return getPortletQName().getQName(qNameEl, nameEl, defaultNamespace);
+	}
+
+	public static QName getQName(String publicRenderParameterName) {
+		return getPortletQName().getQName(publicRenderParameterName);
 	}
 
 	public static String getRemovePublicRenderParameterName(QName qName) {
@@ -67,6 +70,8 @@ public class PortletQNameUtil {
 	}
 
 	public void setPortletQName(PortletQName portletQName) {
+		PortalRuntimePermission.checkSetBeanProperty(getClass());
+
 		_portletQName = portletQName;
 	}
 

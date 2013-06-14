@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -48,7 +48,7 @@ String[] attachments = new String[0];
 
 boolean preview = ParamUtil.getBoolean(request, "preview");
 
-boolean newPage = false;
+boolean newPage = ParamUtil.getBoolean(request, "newPage");
 
 if (wikiPage == null) {
 	newPage = true;
@@ -170,6 +170,7 @@ if (Validator.isNull(redirect)) {
 	<aui:input name="redirect" type="hidden" value="<%= redirect %>" />
 	<aui:input name="originalRedirect" type="hidden" value="<%= originalRedirect %>" />
 	<aui:input name="nodeId" type="hidden" value="<%= nodeId %>" />
+	<aui:input name="newPage" type="hidden" value="<%= newPage %>" />
 
 	<aui:model-context bean="<%= !newPage ? wikiPage : templatePage %>" model="<%= WikiPage.class %>" />
 
@@ -299,7 +300,7 @@ if (Validator.isNull(redirect)) {
 								<portlet:param name="fileName" value="<%= fileName %>" />
 							</portlet:actionURL>
 
-							<aui:a href="<%= getPageAttachmentURL %>"><%= fileName %></aui:a> (<%= TextFormatter.formatKB(fileSize, locale) %>k)<%= (i < (attachments.length - 1)) ? ", " : "" %>
+							<aui:a href="<%= getPageAttachmentURL %>"><%= fileName %></aui:a> (<%=TextFormatter.formatStorageSize(fileSize, locale) %>)<%= (i < (attachments.length - 1)) ? ", " : "" %>
 
 						<%
 						}
@@ -318,15 +319,15 @@ if (Validator.isNull(redirect)) {
 					resourcePrimKey = templatePage.getResourcePrimKey();
 				}
 
+				long assetEntryId = 0;
 				long classPK = resourcePrimKey;
 
-				if (!newPage && !wikiPage.isApproved() && (wikiPage.getVersion() != WikiPageConstants.DEFAULT_VERSION)) {
-					try {
-						AssetEntryLocalServiceUtil.getEntry(WikiPage.class.getName(), wikiPage.getPrimaryKey());
+				if (!newPage && !wikiPage.isApproved() && (wikiPage.getVersion() != WikiPageConstants.VERSION_DEFAULT)) {
+					AssetEntry assetEntry = AssetEntryLocalServiceUtil.fetchEntry(WikiPage.class.getName(), wikiPage.getPrimaryKey());
 
+					if (assetEntry != null) {
+						assetEntryId = assetEntry.getEntryId();
 						classPK = wikiPage.getPrimaryKey();
-					}
-					catch (NoSuchEntryException nsee) {
 					}
 				}
 				%>
@@ -338,7 +339,7 @@ if (Validator.isNull(redirect)) {
 				<aui:input label="description-of-the-changes" name="summary" />
 
 				<c:if test="<%= !newPage %>">
-					<aui:input inlineLabel="true" label="this-is-a-minor-edit" name="minorEdit" />
+					<aui:input label="this-is-a-minor-edit" name="minorEdit" />
 				</c:if>
 
 				<c:if test="<%= newPage %>">
@@ -360,6 +361,7 @@ if (Validator.isNull(redirect)) {
 				<liferay-ui:panel defaultState="closed" extended="<%= false %>" id="wikiPageAssetLinksPanel" persistState="<%= true %>" title="related-assets">
 					<aui:fieldset>
 						<liferay-ui:input-asset-links
+							assetEntryId="<%= assetEntryId %>"
 							className="<%= WikiPage.class.getName() %>"
 							classPK="<%= classPK %>"
 						/>
@@ -439,7 +441,7 @@ if (Validator.isNull(redirect)) {
 
 		var newFormat = formatSelect.options[formatSelect.selectedIndex].text;
 
-		var confirmMessage = '<liferay-ui:message key="you-may-lose-formatting-when-switching-from-x-to-x" />';
+		var confirmMessage = '<%= UnicodeLanguageUtil.get(pageContext, "you-may-lose-formatting-when-switching-from-x-to-x") %>';
 
 		confirmMessage = AUI().Lang.sub(confirmMessage, [currentFormat, newFormat]);
 

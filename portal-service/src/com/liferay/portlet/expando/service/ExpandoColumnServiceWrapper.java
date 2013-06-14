@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,6 +14,8 @@
 
 package com.liferay.portlet.expando.service;
 
+import com.liferay.portal.service.ServiceWrapper;
+
 /**
  * <p>
  * This class is a wrapper for {@link ExpandoColumnService}.
@@ -23,10 +25,29 @@ package com.liferay.portlet.expando.service;
  * @see       ExpandoColumnService
  * @generated
  */
-public class ExpandoColumnServiceWrapper implements ExpandoColumnService {
+public class ExpandoColumnServiceWrapper implements ExpandoColumnService,
+	ServiceWrapper<ExpandoColumnService> {
 	public ExpandoColumnServiceWrapper(
 		ExpandoColumnService expandoColumnService) {
 		_expandoColumnService = expandoColumnService;
+	}
+
+	/**
+	* Returns the Spring bean ID for this bean.
+	*
+	* @return the Spring bean ID for this bean
+	*/
+	public java.lang.String getBeanIdentifier() {
+		return _expandoColumnService.getBeanIdentifier();
+	}
+
+	/**
+	* Sets the Spring bean ID for this bean.
+	*
+	* @param beanIdentifier the Spring bean ID for this bean
+	*/
+	public void setBeanIdentifier(java.lang.String beanIdentifier) {
+		_expandoColumnService.setBeanIdentifier(beanIdentifier);
 	}
 
 	public com.liferay.portlet.expando.model.ExpandoColumn addColumn(
@@ -73,12 +94,26 @@ public class ExpandoColumnServiceWrapper implements ExpandoColumnService {
 		return _expandoColumnService.updateTypeSettings(columnId, typeSettings);
 	}
 
+	/**
+	 * @deprecated Renamed to {@link #getWrappedService}
+	 */
 	public ExpandoColumnService getWrappedExpandoColumnService() {
 		return _expandoColumnService;
 	}
 
+	/**
+	 * @deprecated Renamed to {@link #setWrappedService}
+	 */
 	public void setWrappedExpandoColumnService(
 		ExpandoColumnService expandoColumnService) {
+		_expandoColumnService = expandoColumnService;
+	}
+
+	public ExpandoColumnService getWrappedService() {
+		return _expandoColumnService;
+	}
+
+	public void setWrappedService(ExpandoColumnService expandoColumnService) {
 		_expandoColumnService = expandoColumnService;
 	}
 

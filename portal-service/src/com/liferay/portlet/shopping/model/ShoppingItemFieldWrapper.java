@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,6 +14,11 @@
 
 package com.liferay.portlet.shopping.model;
 
+import com.liferay.portal.model.ModelWrapper;
+
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * <p>
  * This class is a wrapper for {@link ShoppingItemField}.
@@ -23,7 +28,8 @@ package com.liferay.portlet.shopping.model;
  * @see       ShoppingItemField
  * @generated
  */
-public class ShoppingItemFieldWrapper implements ShoppingItemField {
+public class ShoppingItemFieldWrapper implements ShoppingItemField,
+	ModelWrapper<ShoppingItemField> {
 	public ShoppingItemFieldWrapper(ShoppingItemField shoppingItemField) {
 		_shoppingItemField = shoppingItemField;
 	}
@@ -34,6 +40,50 @@ public class ShoppingItemFieldWrapper implements ShoppingItemField {
 
 	public String getModelClassName() {
 		return ShoppingItemField.class.getName();
+	}
+
+	public Map<String, Object> getModelAttributes() {
+		Map<String, Object> attributes = new HashMap<String, Object>();
+
+		attributes.put("itemFieldId", getItemFieldId());
+		attributes.put("itemId", getItemId());
+		attributes.put("name", getName());
+		attributes.put("values", getValues());
+		attributes.put("description", getDescription());
+
+		return attributes;
+	}
+
+	public void setModelAttributes(Map<String, Object> attributes) {
+		Long itemFieldId = (Long)attributes.get("itemFieldId");
+
+		if (itemFieldId != null) {
+			setItemFieldId(itemFieldId);
+		}
+
+		Long itemId = (Long)attributes.get("itemId");
+
+		if (itemId != null) {
+			setItemId(itemId);
+		}
+
+		String name = (String)attributes.get("name");
+
+		if (name != null) {
+			setName(name);
+		}
+
+		String values = (String)attributes.get("values");
+
+		if (values != null) {
+			setValues(values);
+		}
+
+		String description = (String)attributes.get("description");
+
+		if (description != null) {
+			setDescription(description);
+		}
 	}
 
 	/**
@@ -164,10 +214,6 @@ public class ShoppingItemFieldWrapper implements ShoppingItemField {
 		return _shoppingItemField.isEscapedModel();
 	}
 
-	public void setEscapedModel(boolean escapedModel) {
-		_shoppingItemField.setEscapedModel(escapedModel);
-	}
-
 	public java.io.Serializable getPrimaryKeyObj() {
 		return _shoppingItemField.getPrimaryKeyObj();
 	}
@@ -230,7 +276,14 @@ public class ShoppingItemFieldWrapper implements ShoppingItemField {
 		_shoppingItemField.setValuesArray(valuesArray);
 	}
 
+	/**
+	 * @deprecated Renamed to {@link #getWrappedModel}
+	 */
 	public ShoppingItemField getWrappedShoppingItemField() {
+		return _shoppingItemField;
+	}
+
+	public ShoppingItemField getWrappedModel() {
 		return _shoppingItemField;
 	}
 

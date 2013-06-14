@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -25,6 +25,7 @@ import com.liferay.portlet.blogs.service.BlogsEntryLocalServiceUtil;
 import com.liferay.portlet.blogs.service.permission.BlogsEntryPermission;
 import com.liferay.portlet.social.model.BaseSocialActivityInterpreter;
 import com.liferay.portlet.social.model.SocialActivity;
+import com.liferay.portlet.social.model.SocialActivityConstants;
 import com.liferay.portlet.social.model.SocialActivityFeedEntry;
 
 /**
@@ -77,19 +78,26 @@ public class BlogsActivityInterpreter extends BaseSocialActivityInterpreter {
 
 		String titlePattern = null;
 
-		if (activityType == BlogsActivityKeys.ADD_COMMENT) {
-			titlePattern = "activity-blogs-add-comment";
+		if ((activityType == BlogsActivityKeys.ADD_COMMENT) ||
+			(activityType == SocialActivityConstants.TYPE_ADD_COMMENT)) {
+
+			if (Validator.isNull(groupName)) {
+				titlePattern = "activity-blogs-add-comment";
+			}
+			else {
+				titlePattern = "activity-blogs-add-comment-in";
+			}
 		}
 		else if (activityType == BlogsActivityKeys.ADD_ENTRY) {
-			titlePattern = "activity-blogs-add-entry";
+			if (Validator.isNull(groupName)) {
+				titlePattern = "activity-blogs-add-entry";
+			}
+			else {
+				titlePattern = "activity-blogs-add-entry-in";
+			}
 		}
 
-		if (Validator.isNotNull(groupName)) {
-			titlePattern += "-in";
-		}
-
-		String entryTitle = wrapLink(
-			link, HtmlUtil.escape(cleanContent(entry.getTitle())));
+		String entryTitle = wrapLink(link, HtmlUtil.escape(entry.getTitle()));
 
 		Object[] titleArguments = new Object[] {
 			groupName, creatorUserName, receiverUserName, entryTitle

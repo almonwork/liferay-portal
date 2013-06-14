@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -26,22 +26,51 @@ public class DLFileEntryFinderUtil {
 		return getFinder().countByExtraSettings();
 	}
 
-	public static int countByG_F_S(long groupId,
-		java.util.List<java.lang.Long> folderIds, int status)
+	public static int countByG_F(long groupId,
+		java.util.List<java.lang.Long> folderIds,
+		com.liferay.portal.kernel.dao.orm.QueryDefinition queryDefinition)
 		throws com.liferay.portal.kernel.exception.SystemException {
-		return getFinder().countByG_F_S(groupId, folderIds, status);
+		return getFinder().countByG_F(groupId, folderIds, queryDefinition);
 	}
 
-	public static int filterCountByG_F_S(long groupId,
-		java.util.List<java.lang.Long> folderIds, int status)
+	public static int countByG_U_F_M(long groupId, long userId,
+		java.util.List<java.lang.Long> folderIds, java.lang.String[] mimeTypes,
+		com.liferay.portal.kernel.dao.orm.QueryDefinition queryDefinition)
 		throws com.liferay.portal.kernel.exception.SystemException {
-		return getFinder().filterCountByG_F_S(groupId, folderIds, status);
+		return getFinder()
+				   .countByG_U_F_M(groupId, userId, folderIds, mimeTypes,
+			queryDefinition);
+	}
+
+	public static com.liferay.portlet.documentlibrary.model.DLFileEntry fetchByAnyImageId(
+		long imageId)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getFinder().fetchByAnyImageId(imageId);
+	}
+
+	public static int filterCountByG_F(long groupId,
+		java.util.List<java.lang.Long> folderIds,
+		com.liferay.portal.kernel.dao.orm.QueryDefinition queryDefinition)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getFinder().filterCountByG_F(groupId, folderIds, queryDefinition);
+	}
+
+	public static com.liferay.portlet.documentlibrary.model.DLFileEntry findByAnyImageId(
+		long imageId)
+		throws com.liferay.portal.kernel.exception.SystemException,
+			com.liferay.portlet.documentlibrary.NoSuchFileEntryException {
+		return getFinder().findByAnyImageId(imageId);
 	}
 
 	public static java.util.List<com.liferay.portlet.documentlibrary.model.DLFileEntry> findByExtraSettings(
 		int start, int end)
 		throws com.liferay.portal.kernel.exception.SystemException {
 		return getFinder().findByExtraSettings(start, end);
+	}
+
+	public static java.util.List<com.liferay.portlet.documentlibrary.model.DLFileEntry> findByMisversioned()
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getFinder().findByMisversioned();
 	}
 
 	public static java.util.List<com.liferay.portlet.documentlibrary.model.DLFileEntry> findByNoAssets()
@@ -52,6 +81,16 @@ public class DLFileEntryFinderUtil {
 	public static java.util.List<com.liferay.portlet.documentlibrary.model.DLFileEntry> findByOrphanedFileEntries()
 		throws com.liferay.portal.kernel.exception.SystemException {
 		return getFinder().findByOrphanedFileEntries();
+	}
+
+	public static java.util.List<com.liferay.portlet.documentlibrary.model.DLFileEntry> findByG_U_F_M(
+		long groupId, long userId, java.util.List<java.lang.Long> folderIds,
+		java.lang.String[] mimeTypes,
+		com.liferay.portal.kernel.dao.orm.QueryDefinition queryDefinition)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getFinder()
+				   .findByG_U_F_M(groupId, userId, folderIds, mimeTypes,
+			queryDefinition);
 	}
 
 	public static DLFileEntryFinder getFinder() {

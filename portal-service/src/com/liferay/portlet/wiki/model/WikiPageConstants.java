@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -22,21 +22,21 @@ import com.liferay.portal.kernel.util.PropsUtil;
  */
 public class WikiPageConstants {
 
-	public static final String DEFAULT_FORMAT =
-		PropsUtil.get(PropsKeys.WIKI_FORMATS_DEFAULT);
+	public static final String DEFAULT_FORMAT = PropsUtil.get(
+		PropsKeys.WIKI_FORMATS_DEFAULT);
 
-	public static final double DEFAULT_VERSION = 1.0;
+	public static final String[] FORMATS = PropsUtil.getArray(
+		PropsKeys.WIKI_FORMATS);
 
-	public static final String[] FORMATS =
-		PropsUtil.getArray(PropsKeys.WIKI_FORMATS);
-
-	public static final String FRONT_PAGE =
-		PropsUtil.get(PropsKeys.WIKI_FRONT_PAGE_NAME);
+	public static final String FRONT_PAGE = PropsUtil.get(
+		PropsKeys.WIKI_FRONT_PAGE_NAME);
 
 	public static final String MOVED = "Moved";
 
 	public static final String NEW = "New";
 
 	public static final String REVERTED = "Reverted";
+
+	public static final double VERSION_DEFAULT = 1.0;
 
 }

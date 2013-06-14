@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -28,6 +28,10 @@ import java.util.Enumeration;
  */
 public class InetAddressUtil {
 
+	public static String getLocalHostName() throws Exception {
+		return LocalHostNameHolder._localHostName;
+	}
+
 	public static InetAddress getLocalInetAddress() throws Exception {
 		Enumeration<NetworkInterface> enu1 =
 			NetworkInterface.getNetworkInterfaces();
@@ -35,8 +39,7 @@ public class InetAddressUtil {
 		while (enu1.hasMoreElements()) {
 			NetworkInterface networkInterface = enu1.nextElement();
 
-			Enumeration<InetAddress> enu2 =
-				networkInterface.getInetAddresses();
+			Enumeration<InetAddress> enu2 = networkInterface.getInetAddresses();
 
 			while (enu2.hasMoreElements()) {
 				InetAddress inetAddress = enu2.nextElement();
@@ -50,6 +53,23 @@ public class InetAddressUtil {
 		}
 
 		throw new SystemException("No local internet address");
+	}
+
+	private static class LocalHostNameHolder {
+
+		private static final String _localHostName;
+
+		static {
+			try {
+				InetAddress inetAddress = getLocalInetAddress();
+
+				_localHostName = inetAddress.getHostName();
+			}
+			catch (Exception e) {
+				throw new ExceptionInInitializerError(e);
+			}
+		}
+
 	}
 
 }

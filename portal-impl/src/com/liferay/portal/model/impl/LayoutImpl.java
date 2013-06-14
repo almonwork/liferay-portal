@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -24,7 +24,6 @@ import com.liferay.portal.kernel.util.CharPool;
 import com.liferay.portal.kernel.util.HttpUtil;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
-import com.liferay.portal.kernel.util.PropsKeys;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.UnicodeProperties;
@@ -50,7 +49,6 @@ import com.liferay.portal.util.CookieKeys;
 import com.liferay.portal.util.LayoutClone;
 import com.liferay.portal.util.LayoutCloneFactory;
 import com.liferay.portal.util.PortalUtil;
-import com.liferay.portal.util.PropsUtil;
 import com.liferay.portal.util.PropsValues;
 import com.liferay.portal.util.WebKeys;
 import com.liferay.portlet.PortletURLImpl;
@@ -79,6 +77,10 @@ public class LayoutImpl extends LayoutBaseImpl {
 			return LayoutFriendlyURLException.TOO_SHORT;
 		}
 
+		if (friendlyURL.length() > LayoutConstants.FRIENDLY_URL_MAX_LENGTH) {
+			return LayoutFriendlyURLException.TOO_LONG;
+		}
+
 		if (!friendlyURL.startsWith(StringPool.SLASH)) {
 			return LayoutFriendlyURLException.DOES_NOT_START_WITH_SLASH;
 		}
@@ -92,9 +94,9 @@ public class LayoutImpl extends LayoutBaseImpl {
 		}
 
 		for (char c : friendlyURL.toCharArray()) {
-			if ((!Validator.isChar(c)) && (!Validator.isDigit(c)) &&
+			if (!Validator.isChar(c) && !Validator.isDigit(c) &&
 				(c != CharPool.DASH) && (c != CharPool.PERCENT) &&
-				(c != CharPool.PERIOD)  && (c != CharPool.PLUS) &&
+				(c != CharPool.PERIOD) && (c != CharPool.PLUS) &&
 				(c != CharPool.SLASH) && (c != CharPool.STAR) &&
 				(c != CharPool.UNDERLINE)) {
 
@@ -108,13 +110,11 @@ public class LayoutImpl extends LayoutBaseImpl {
 	public static void validateFriendlyURLKeyword(String friendlyURL)
 		throws LayoutFriendlyURLException {
 
-		String[] keywords = PropsUtil.getArray(
-			PropsKeys.LAYOUT_FRIENDLY_URL_KEYWORDS);
-
-		for (String keyword : keywords) {
-			if ((friendlyURL.indexOf(
-					StringPool.SLASH + keyword + StringPool.SLASH) != -1) ||
-				(friendlyURL.endsWith(StringPool.SLASH + keyword))) {
+		for (String keyword : PropsValues.LAYOUT_FRIENDLY_URL_KEYWORDS) {
+			if (StringUtil.endsWith(
+					friendlyURL, StringUtil.quote(keyword, StringPool.SLASH)) ||
+				StringUtil.endsWith(
+					friendlyURL, StringPool.SLASH + keyword)) {
 
 				LayoutFriendlyURLException lfurle =
 					new LayoutFriendlyURLException(
@@ -133,13 +133,9 @@ public class LayoutImpl extends LayoutBaseImpl {
 	public List<Layout> getAllChildren() throws SystemException {
 		List<Layout> layouts = new ArrayList<Layout>();
 
-		Iterator<Layout> itr = getChildren().iterator();
-
-		while (itr.hasNext()) {
-			Layout layout = itr.next();
-
+		for (Layout layout : getChildren()) {
 			layouts.add(layout);
-			layouts.addAll(layout.getChildren());
+			layouts.addAll(layout.getAllChildren());
 		}
 
 		return layouts;
@@ -396,6 +392,12 @@ public class LayoutImpl extends LayoutBaseImpl {
 		return typeSettingsProperties.getProperty(key);
 	}
 
+	public String getTypeSettingsProperty(String key, String defaultValue) {
+		UnicodeProperties typeSettingsProperties = getTypeSettingsProperties();
+
+		return typeSettingsProperties.getProperty(key, defaultValue);
+	}
+
 	public ColorScheme getWapColorScheme()
 		throws PortalException, SystemException {
 
@@ -528,6 +530,16 @@ public class LayoutImpl extends LayoutBaseImpl {
 		}
 	}
 
+	public boolean isLayoutPrototypeLinkActive() {
+		if (isLayoutPrototypeLinkEnabled() &&
+			Validator.isNotNull(getLayoutPrototypeUuid())) {
+
+			return true;
+		}
+
+		return false;
+	}
+
 	public boolean isPublicLayout() {
 		return !isPrivateLayout();
 	}
@@ -619,6 +631,24 @@ public class LayoutImpl extends LayoutBaseImpl {
 	}
 
 	@Override
+	public void setGroupId(long groupId) {
+		super.setGroupId(groupId);
+
+		_layoutSet = null;
+	}
+
+	public void setLayoutSet(LayoutSet layoutSet) {
+		_layoutSet = layoutSet;
+	}
+
+	@Override
+	public void setPrivateLayout(boolean privateLayout) {
+		super.setPrivateLayout(privateLayout);
+
+		_layoutSet = null;
+	}
+
+	@Override
 	public void setTypeSettings(String typeSettings) {
 		_typeSettingsProperties = null;
 
@@ -699,8 +729,8 @@ public class LayoutImpl extends LayoutBaseImpl {
 			}
 
 			if (layoutTypePortlet.hasStateMax()) {
-				String portletId =
-					StringUtil.split(layoutTypePortlet.getStateMax())[0];
+				String portletId = StringUtil.split(
+					layoutTypePortlet.getStateMax())[0];
 
 				PortletURLImpl portletURLImpl = new PortletURLImpl(
 					request, portletId, getPlid(), PortletRequest.ACTION_PHASE);
@@ -730,9 +760,13 @@ public class LayoutImpl extends LayoutBaseImpl {
 			}
 		}
 
+		String portalURL = PortalUtil.getPortalURL(request);
+
 		String url = PortalUtil.getLayoutURL(this, themeDisplay);
 
-		if (!CookieKeys.hasSessionId(request)) {
+		if (!CookieKeys.hasSessionId(request) &&
+			(url.startsWith(portalURL) || url.startsWith(StringPool.SLASH))) {
+
 			url = PortalUtil.getURLWithSessionId(
 				url, request.getSession().getId());
 		}

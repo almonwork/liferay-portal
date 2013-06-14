@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -19,6 +19,14 @@
 <%
 SearchContainer searchContainer = (SearchContainer)request.getAttribute("liferay-ui:search:searchContainer");
 
+String id = (String)request.getAttribute("liferay-ui:search:id");
+
+if (Validator.isNull(id) && (searchContainer != null)) {
+	id = searchContainer.getId(request);
+
+	id = id.concat("PageIterator");
+}
+
 String type = (String)request.getAttribute("liferay-ui:search:type");
 
 PortletURL iteratorURL = searchContainer.getIteratorURL();
@@ -26,6 +34,8 @@ PortletURL iteratorURL = searchContainer.getIteratorURL();
 String url = StringPool.BLANK;
 
 if (iteratorURL != null) {
+	iteratorURL.setParameter("resetCur", Boolean.FALSE.toString());
+
 	url = HttpUtil.removeParameter(iteratorURL.toString(), namespace + searchContainer.getCurParam());
 }
 %>
@@ -36,6 +46,7 @@ if (iteratorURL != null) {
 	delta="<%= searchContainer.getDelta() %>"
 	deltaConfigurable="<%= searchContainer.isDeltaConfigurable() %>"
 	deltaParam="<%= searchContainer.getDeltaParam() %>"
+	id="<%= id %>"
 	maxPages="<%= PropsValues.SEARCH_CONTAINER_PAGE_ITERATOR_MAX_PAGES %>"
 	total="<%= searchContainer.getTotal() %>"
 	type="<%= type %>"

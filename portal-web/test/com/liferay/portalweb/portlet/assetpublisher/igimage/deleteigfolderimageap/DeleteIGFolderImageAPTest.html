@@ -29,9 +29,19 @@
 	<td>IG Folder Image Name</td>
 </tr>
 <tr>
+	<td>pause</td>
+	<td>5000</td>
+	<td></td>
+</tr>
+<tr>
 	<td>assertElementPresent</td>
-	<td>//img[@class='asset-small-image']</td>
+	<td>//div[@class='asset-resource-info']/div</td>
 	<td>IG Folder Image Name</td>
+</tr>
+<tr>
+	<td>assertText</td>
+	<td>//strong/a</td>
+	<td>Options</td>
 </tr>
 <tr>
 	<td>clickAt</td>
@@ -61,16 +71,16 @@
 <tr>
 	<td>waitForVisible</td>
 	<td>//td[1]/a</td>
-	<td>Image Gallery Image</td>
+	<td>Documents and Media Document</td>
 </tr>
 <tr>
 	<td>assertText</td>
 	<td>//td[1]/a</td>
-	<td>Image Gallery Image</td>
+	<td>Documents and Media Document</td>
 </tr>
 <tr>
-	<td>assertElementPresent</td>
-	<td>//img[@alt='IG Folder Image Name']</td>
+	<td>assertText</td>
+	<td>//td[2]/a</td>
 	<td>IG Folder Image Name</td>
 </tr>
 <tr>
@@ -115,7 +125,7 @@
 </tr>
 <tr>
 	<td>assertElementNotPresent</td>
-	<td>//img[@class='asset-small-image']</td>
+	<td>//div[@class='asset-resource-info']/div</td>
 	<td>IG Folder Image Name</td>
 </tr>
 <tr>

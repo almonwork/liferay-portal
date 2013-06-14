@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -90,13 +90,6 @@ public class TicketUtil {
 		return getPersistence()
 				   .findWithDynamicQuery(dynamicQuery, start, end,
 			orderByComparator);
-	}
-
-	/**
-	 * @see com.liferay.portal.service.persistence.BasePersistence#remove(com.liferay.portal.model.BaseModel)
-	 */
-	public static Ticket remove(Ticket ticket) throws SystemException {
-		return getPersistence().remove(ticket);
 	}
 
 	/**
@@ -287,12 +280,14 @@ public class TicketUtil {
 	* Removes the ticket where key = &#63; from the database.
 	*
 	* @param key the key
+	* @return the ticket that was removed
 	* @throws SystemException if a system exception occurred
 	*/
-	public static void removeByKey(java.lang.String key)
+	public static com.liferay.portal.model.Ticket removeByKey(
+		java.lang.String key)
 		throws com.liferay.portal.NoSuchTicketException,
 			com.liferay.portal.kernel.exception.SystemException {
-		getPersistence().removeByKey(key);
+		return getPersistence().removeByKey(key);
 	}
 
 	/**
@@ -338,10 +333,10 @@ public class TicketUtil {
 		return _persistence;
 	}
 
+	/**
+	 * @deprecated
+	 */
 	public void setPersistence(TicketPersistence persistence) {
-		_persistence = persistence;
-
-		ReferenceRegistry.registerReference(TicketUtil.class, "_persistence");
 	}
 
 	private static TicketPersistence _persistence;

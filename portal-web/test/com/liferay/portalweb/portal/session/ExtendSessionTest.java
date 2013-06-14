@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -22,7 +22,7 @@ import com.liferay.portalweb.portal.BaseTestCase;
 public class ExtendSessionTest extends BaseTestCase {
 	public void testExtendSession() throws Exception {
 		for (int second = 0;; second++) {
-			if (second >= 60) {
+			if (second >= 90) {
 				fail("timeout");
 			}
 
@@ -38,17 +38,16 @@ public class ExtendSessionTest extends BaseTestCase {
 			Thread.sleep(1000);
 		}
 
-		selenium.saveScreenShotAndSource();
 		Thread.sleep(30000);
 		Thread.sleep(15000);
 
 		for (int second = 0;; second++) {
-			if (second >= 60) {
+			if (second >= 90) {
 				fail("timeout");
 			}
 
 			try {
-				if (selenium.isElementPresent("//input[@value='Extend']")) {
+				if (selenium.isVisible("//input[@value='Extend']")) {
 					break;
 				}
 			}
@@ -58,16 +57,15 @@ public class ExtendSessionTest extends BaseTestCase {
 			Thread.sleep(1000);
 		}
 
-		selenium.saveScreenShotAndSource();
 		selenium.click("//input[@value='Extend']");
 
 		for (int second = 0;; second++) {
-			if (second >= 60) {
+			if (second >= 90) {
 				fail("timeout");
 			}
 
 			try {
-				if (!selenium.isElementPresent("//input[@value='Extend']")) {
+				if (!selenium.isVisible("//input[@value='Extend']")) {
 					break;
 				}
 			}
@@ -76,7 +74,5 @@ public class ExtendSessionTest extends BaseTestCase {
 
 			Thread.sleep(1000);
 		}
-
-		selenium.saveScreenShotAndSource();
 	}
 }

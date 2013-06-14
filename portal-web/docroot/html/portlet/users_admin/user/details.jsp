@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -19,12 +19,6 @@
 <%
 User selUser = (User)request.getAttribute("user.selUser");
 Contact selContact = (Contact)request.getAttribute("user.selContact");
-
-String displayEmailAddress = StringPool.BLANK;
-
-if (selUser != null) {
-	displayEmailAddress = selUser.getDisplayEmailAddress();
-}
 
 Calendar birthday = CalendarFactoryUtil.getCalendar();
 
@@ -46,7 +40,7 @@ boolean deletePortrait = ParamUtil.getBoolean(request, "deletePortrait");
 <h3><liferay-ui:message key="details" /></h3>
 
 <aui:fieldset column="<%= true %>" cssClass="aui-w50">
-	<aui:select bean="<%= selContact %>" label="title[person]" model="<%= Contact.class %>" name="prefixId" listType="<%= ListTypeConstants.CONTACT_PREFIX %>" listTypeFieldName="prefixId" showEmptyOption="<%= true %>" />
+	<aui:select bean="<%= selContact %>" label="title[person]" listType="<%= ListTypeConstants.CONTACT_PREFIX %>" listTypeFieldName="prefixId" model="<%= Contact.class %>" name="prefixId" showEmptyOption="<%= true %>" />
 
 	<liferay-ui:success key="verificationEmailSent" message="your-email-verification-code-has-been-sent-and-the-new-email-address-will-be-applied-to-your-account-once-it-has-been-verified" />
 
@@ -88,13 +82,28 @@ boolean deletePortrait = ParamUtil.getBoolean(request, "deletePortrait");
 	<c:choose>
 		<c:when test="<%= (selUser != null) && !UsersAdminUtil.hasUpdateEmailAddress(permissionChecker, selUser) %>">
 			<aui:field-wrapper name="emailAddress">
-				<%= displayEmailAddress %>
+				<%= selUser.getDisplayEmailAddress() %>
 
 				<aui:input name="emailAddress" type="hidden" value="<%= selUser.getEmailAddress() %>" />
 			</aui:field-wrapper>
 		</c:when>
 		<c:otherwise>
-			<aui:input name="emailAddress" />
+
+			<%
+			User displayEmailAddressUser = null;
+
+			if (selUser != null) {
+				displayEmailAddressUser = (User)selUser.clone();
+
+				displayEmailAddressUser.setEmailAddress(displayEmailAddressUser.getDisplayEmailAddress());
+			}
+			%>
+
+			<aui:input bean="<%= displayEmailAddressUser %>" model="<%= User.class %>" name="emailAddress">
+				<c:if test="<%= PrefsPropsUtil.getBoolean(company.getCompanyId(), PropsKeys.USERS_EMAIL_ADDRESS_REQUIRED) %>">
+					<aui:validator name="required" />
+				</c:if>
+			</aui:input>
 		</c:otherwise>
 	</c:choose>
 
@@ -113,13 +122,13 @@ boolean deletePortrait = ParamUtil.getBoolean(request, "deletePortrait");
 		</c:if>
 	</aui:input>
 
-	<aui:select bean="<%= selContact %>" label="suffix" model="<%= Contact.class %>" name="suffixId" listType="<%= ListTypeConstants.CONTACT_SUFFIX %>" listTypeFieldName="suffixId" showEmptyOption="<%= true %>" />
+	<aui:select bean="<%= selContact %>" label="suffix" listType="<%= ListTypeConstants.CONTACT_SUFFIX %>" listTypeFieldName="suffixId" model="<%= Contact.class %>" name="suffixId" showEmptyOption="<%= true %>" />
 </aui:fieldset>
 
 <aui:fieldset column="<%= true %>" cssClass="aui-w50">
 	<div>
 		<c:if test="<%= selUser != null %>">
-			<portlet:renderURL windowState="<%= LiferayWindowState.POP_UP.toString() %>" var="editUserPortraitURL">
+			<portlet:renderURL var="editUserPortraitURL" windowState="<%= LiferayWindowState.POP_UP.toString() %>">
 				<portlet:param name="struts_action" value="/users_admin/edit_user_portrait" />
 				<portlet:param name="redirect" value="<%= currentURL %>" />
 				<portlet:param name="p_u_i_d" value="<%= String.valueOf(selUser.getUserId()) %>" />

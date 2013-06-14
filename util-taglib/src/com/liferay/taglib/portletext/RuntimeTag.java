@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -16,23 +16,22 @@ package com.liferay.taglib.portletext;
 
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.portlet.PortletContainerUtil;
+import com.liferay.portal.kernel.portlet.RestrictPortletServletRequest;
+import com.liferay.portal.kernel.servlet.DynamicServletRequest;
 import com.liferay.portal.kernel.servlet.PipingServletResponse;
-import com.liferay.portal.kernel.util.JavaConstants;
+import com.liferay.portal.kernel.servlet.taglib.portletext.RuntimePortletIDs;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.model.Layout;
+import com.liferay.portal.model.Portlet;
+import com.liferay.portal.service.PortletLocalServiceUtil;
+import com.liferay.portal.theme.ThemeDisplay;
 import com.liferay.portlet.PortletPreferencesFactoryUtil;
-import com.liferay.portlet.layoutconfiguration.util.RuntimePortletUtil;
 
-import java.util.HashSet;
 import java.util.Set;
 
-import javax.portlet.PortletRequest;
-import javax.portlet.PortletResponse;
-import javax.portlet.RenderRequest;
-import javax.portlet.RenderResponse;
-
-import javax.servlet.ServletContext;
+import javax.servlet.ServletRequest;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.jsp.JspException;
@@ -46,29 +45,24 @@ public class RuntimeTag extends TagSupport {
 
 	public static void doTag(
 			String portletName, PageContext pageContext,
-			ServletContext servletContext, HttpServletRequest request,
-			HttpServletResponse response)
+			HttpServletRequest request, HttpServletResponse response)
 		throws Exception {
 
-		doTag(
-			portletName, null, pageContext, servletContext, request, response);
+		doTag(portletName, null, pageContext, request, response);
 	}
 
 	public static void doTag(
 			String portletName, String queryString, PageContext pageContext,
-			ServletContext servletContext, HttpServletRequest request,
-			HttpServletResponse response)
+			HttpServletRequest request, HttpServletResponse response)
 		throws Exception {
 
-		doTag(
-			portletName, queryString, null, pageContext, servletContext,
-			request, response);
+		doTag(portletName, queryString, null, pageContext, request, response);
 	}
 
 	public static void doTag(
 			String portletName, String queryString, String defaultPreferences,
-			PageContext pageContext, ServletContext servletContext,
-			HttpServletRequest request, HttpServletResponse response)
+			PageContext pageContext, HttpServletRequest request,
+			HttpServletResponse response)
 		throws Exception {
 
 		if (pageContext != null) {
@@ -76,29 +70,13 @@ public class RuntimeTag extends TagSupport {
 				response, pageContext.getOut());
 		}
 
-		PortletRequest portletRequest = (PortletRequest)request.getAttribute(
-			JavaConstants.JAVAX_PORTLET_REQUEST);
-
-		RenderRequest renderRequest = null;
-
-		if ((portletRequest != null) &&
-			(portletRequest instanceof RenderRequest)) {
-
-			renderRequest = (RenderRequest)portletRequest;
-		}
-
-		PortletResponse portletResponse = (PortletResponse)request.getAttribute(
-			JavaConstants.JAVAX_PORTLET_RESPONSE);
-
-		RenderResponse renderResponse = null;
-
-		if ((portletResponse != null) &&
-			(portletResponse instanceof RenderResponse)) {
-
-			renderResponse = (RenderResponse)portletResponse;
-		}
-
 		String portletId = portletName;
+
+		RestrictPortletServletRequest restrictPortletServletRequest =
+			new RestrictPortletServletRequest(request);
+
+		request = DynamicServletRequest.addQueryString(
+			restrictPortletServletRequest, queryString);
 
 		try {
 			request.setAttribute(WebKeys.RENDER_PORTLET_RESOURCE, Boolean.TRUE);
@@ -108,25 +86,44 @@ public class RuntimeTag extends TagSupport {
 					request, portletId, defaultPreferences);
 			}
 
-			RuntimePortletUtil.processPortlet(
-				servletContext, request, response, renderRequest,
-				renderResponse, portletId, queryString, true);
+			ThemeDisplay themeDisplay = (ThemeDisplay)request.getAttribute(
+				WebKeys.THEME_DISPLAY);
 
-			Set<String> runtimePortletIds = (Set<String>)request.getAttribute(
-				WebKeys.RUNTIME_PORTLET_IDS);
+			Portlet portlet = PortletLocalServiceUtil.getPortletById(
+				themeDisplay.getCompanyId(), portletId);
 
-			if (runtimePortletIds == null) {
-				runtimePortletIds = new HashSet<String>();
+			PortletContainerUtil.render(request, response, portlet);
+
+			RuntimePortletIDs runtimePortletIDs =
+				(RuntimePortletIDs)request.getAttribute(
+					WebKeys.RUNTIME_PORTLET_IDS);
+
+			if (runtimePortletIDs == null) {
+				runtimePortletIDs = new RuntimePortletIDs();
+
+				request.setAttribute(
+					WebKeys.RUNTIME_PORTLET_IDS, runtimePortletIDs);
 			}
 
-			runtimePortletIds.add(portletName);
-
-			request.setAttribute(
-				WebKeys.RUNTIME_PORTLET_IDS, runtimePortletIds);
+			runtimePortletIDs.addRuntimePortletID(portletName);
 		}
 		finally {
-			request.removeAttribute(WebKeys.RENDER_PORTLET_RESOURCE);
+			restrictPortletServletRequest.mergeSharedAttributes();
 		}
+	}
+
+	public static Set<String> getRuntimePortletIDs(
+		ServletRequest servletRequest) {
+
+		RuntimePortletIDs runtimePortletIDs =
+			(RuntimePortletIDs)servletRequest.getAttribute(
+				WebKeys.RUNTIME_PORTLET_IDS);
+
+		if (runtimePortletIDs == null) {
+			return null;
+		}
+
+		return runtimePortletIDs.getRuntimePortletIDs();
 	}
 
 	@Override
@@ -141,15 +138,12 @@ public class RuntimeTag extends TagSupport {
 				return EVAL_PAGE;
 			}
 
-			ServletContext servletContext =
-				(ServletContext)request.getAttribute(WebKeys.CTX);
-
 			HttpServletResponse response =
 				(HttpServletResponse)pageContext.getResponse();
 
 			doTag(
 				_portletName, _queryString, _defaultPreferences, pageContext,
-				servletContext, request, response);
+				request, response);
 
 			return EVAL_PAGE;
 		}
@@ -160,6 +154,10 @@ public class RuntimeTag extends TagSupport {
 		}
 	}
 
+	public void setDefaultPreferences(String defaultPreferences) {
+		_defaultPreferences = defaultPreferences;
+	}
+
 	public void setPortletName(String portletName) {
 		_portletName = portletName;
 	}
@@ -168,14 +166,10 @@ public class RuntimeTag extends TagSupport {
 		_queryString = queryString;
 	}
 
-	public void setDefaultPreferences(String defaultPreferences) {
-		_defaultPreferences = defaultPreferences;
-	}
-
 	private static Log _log = LogFactoryUtil.getLog(RuntimeTag.class);
 
+	private String _defaultPreferences;
 	private String _portletName;
 	private String _queryString;
-	private String _defaultPreferences;
 
 }

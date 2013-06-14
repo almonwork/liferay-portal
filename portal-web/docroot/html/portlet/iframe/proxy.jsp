@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -43,7 +43,7 @@ for (String hiddenVariable : hiddenVariablesList) {
 
 	if (pos != -1) {
 		hiddenKey = hiddenVariable.substring(0, pos);
-		hiddenValue = hiddenVariable.substring(pos + 1, hiddenVariable.length());
+		hiddenValue = hiddenVariable.substring(pos + 1);
 	}
 %>
 

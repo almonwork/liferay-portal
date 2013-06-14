@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -35,7 +35,8 @@ import com.liferay.portal.kernel.transaction.Transactional;
  */
 @Transactional(isolation = Isolation.PORTAL, rollbackFor =  {
 	PortalException.class, SystemException.class})
-public interface LayoutRevisionLocalService extends PersistedModelLocalService {
+public interface LayoutRevisionLocalService extends BaseLocalService,
+	PersistedModelLocalService {
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
@@ -66,10 +67,12 @@ public interface LayoutRevisionLocalService extends PersistedModelLocalService {
 	* Deletes the layout revision with the primary key from the database. Also notifies the appropriate model listeners.
 	*
 	* @param layoutRevisionId the primary key of the layout revision
+	* @return the layout revision that was removed
 	* @throws PortalException if a layout revision with the primary key could not be found
 	* @throws SystemException if a system exception occurred
 	*/
-	public void deleteLayoutRevision(long layoutRevisionId)
+	public com.liferay.portal.model.LayoutRevision deleteLayoutRevision(
+		long layoutRevisionId)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException;
 
@@ -77,13 +80,16 @@ public interface LayoutRevisionLocalService extends PersistedModelLocalService {
 	* Deletes the layout revision from the database. Also notifies the appropriate model listeners.
 	*
 	* @param layoutRevision the layout revision
+	* @return the layout revision that was removed
 	* @throws PortalException
 	* @throws SystemException if a system exception occurred
 	*/
-	public void deleteLayoutRevision(
+	public com.liferay.portal.model.LayoutRevision deleteLayoutRevision(
 		com.liferay.portal.model.LayoutRevision layoutRevision)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException;
+
+	public com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery();
 
 	/**
 	* Performs a dynamic query on the database and returns the matching rows.
@@ -145,6 +151,11 @@ public interface LayoutRevisionLocalService extends PersistedModelLocalService {
 	*/
 	public long dynamicQueryCount(
 		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery)
+		throws com.liferay.portal.kernel.exception.SystemException;
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public com.liferay.portal.model.LayoutRevision fetchLayoutRevision(
+		long layoutRevisionId)
 		throws com.liferay.portal.kernel.exception.SystemException;
 
 	/**
@@ -234,7 +245,8 @@ public interface LayoutRevisionLocalService extends PersistedModelLocalService {
 	public com.liferay.portal.model.LayoutRevision addLayoutRevision(
 		long userId, long layoutSetBranchId, long layoutBranchId,
 		long parentLayoutRevisionId, boolean head, long plid,
-		boolean privateLayout, java.lang.String name, java.lang.String title,
+		long portletPreferencesPlid, boolean privateLayout,
+		java.lang.String name, java.lang.String title,
 		java.lang.String description, java.lang.String keywords,
 		java.lang.String robots, java.lang.String typeSettings,
 		boolean iconImage, long iconImageId, java.lang.String themeId,
@@ -260,6 +272,11 @@ public interface LayoutRevisionLocalService extends PersistedModelLocalService {
 	public void deleteLayoutSetBranchLayoutRevisions(long layoutSetBranchId)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException;
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public com.liferay.portal.model.LayoutRevision fetchLastLayoutRevision(
+		long plid, boolean head)
+		throws com.liferay.portal.kernel.exception.SystemException;
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public java.util.List<com.liferay.portal.model.LayoutRevision> getChildLayoutRevisions(

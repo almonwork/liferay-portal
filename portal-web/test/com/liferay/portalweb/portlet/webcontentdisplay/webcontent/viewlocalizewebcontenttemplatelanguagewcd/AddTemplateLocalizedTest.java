@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -28,9 +28,10 @@ public class AddTemplateLocalizedTest extends BaseTestCase {
 			switch (label) {
 			case 1:
 				selenium.open("/web/guest/home/");
+				loadRequiredJavaScriptModules();
 
 				for (int second = 0;; second++) {
-					if (second >= 60) {
+					if (second >= 90) {
 						fail("timeout");
 					}
 
@@ -45,38 +46,47 @@ public class AddTemplateLocalizedTest extends BaseTestCase {
 					Thread.sleep(1000);
 				}
 
-				selenium.saveScreenShotAndSource();
 				selenium.clickAt("link=Control Panel",
-					RuntimeVariables.replace(""));
+					RuntimeVariables.replace("Control Panel"));
 				selenium.waitForPageToLoad("30000");
-				selenium.saveScreenShotAndSource();
-				assertEquals(RuntimeVariables.replace("Web Content"),
-					selenium.getText("//div[2]/div[2]/div[2]/ul/li[3]/a"));
-				selenium.clickAt("//div[2]/div[2]/div[2]/ul/li[3]/a",
+				loadRequiredJavaScriptModules();
+				selenium.clickAt("link=Web Content",
 					RuntimeVariables.replace("Web Content"));
 				selenium.waitForPageToLoad("30000");
-				selenium.saveScreenShotAndSource();
-				selenium.clickAt("link=Templates", RuntimeVariables.replace(""));
+				loadRequiredJavaScriptModules();
+				selenium.clickAt("link=Templates",
+					RuntimeVariables.replace("Templates"));
 				selenium.waitForPageToLoad("30000");
-				selenium.saveScreenShotAndSource();
+				loadRequiredJavaScriptModules();
 				selenium.clickAt("//input[@value='Add Template']",
-					RuntimeVariables.replace(""));
+					RuntimeVariables.replace("Add Template"));
 				selenium.waitForPageToLoad("30000");
-				selenium.saveScreenShotAndSource();
-				selenium.type("_15_name",
-					RuntimeVariables.replace("Test Localized Template"));
-				selenium.saveScreenShotAndSource();
-				selenium.type("_15_description",
+				loadRequiredJavaScriptModules();
+				selenium.type("//input[@id='_15_name_en_US']",
 					RuntimeVariables.replace(
-						"This is a test localized template."));
-				selenium.saveScreenShotAndSource();
+						"Web Content Localized Template Name"));
+				selenium.type("//textarea[@id='_15_description_en_US']",
+					RuntimeVariables.replace(
+						"Web Content Localized Template Description"));
 				selenium.clickAt("//input[@value='Select']",
-					RuntimeVariables.replace(""));
-				selenium.waitForPopUp("structure",
-					RuntimeVariables.replace("30000"));
-				selenium.selectWindow("structure");
-				selenium.saveScreenShotAndSource();
-				Thread.sleep(5000);
+					RuntimeVariables.replace("Select"));
+
+				for (int second = 0;; second++) {
+					if (second >= 90) {
+						fail("timeout");
+					}
+
+					try {
+						if (selenium.isVisible(
+									"//input[@value='Add Structure']")) {
+							break;
+						}
+					}
+					catch (Exception e) {
+					}
+
+					Thread.sleep(1000);
+				}
 
 				boolean localizedPresentA = selenium.isElementPresent(
 						"//td[1]/a");
@@ -89,7 +99,6 @@ public class AddTemplateLocalizedTest extends BaseTestCase {
 
 				selenium.close();
 				selenium.selectWindow("null");
-				selenium.saveScreenShotAndSource();
 
 			case 2:
 
@@ -104,24 +113,28 @@ public class AddTemplateLocalizedTest extends BaseTestCase {
 
 				selenium.click("//td[1]/a");
 				selenium.selectWindow("null");
-				selenium.saveScreenShotAndSource();
 
 			case 3:
 				Thread.sleep(5000);
-				assertTrue(selenium.isElementPresent(
-						"link=Test Localized Structure"));
-				selenium.type("_15_xsl",
+				assertEquals(RuntimeVariables.replace(
+						"Web Content Localized Structure Name"),
+					selenium.getText("//a[@id='_15_structureName']"));
+				selenium.type("//input[@id='_15_xsl']",
 					RuntimeVariables.replace(
 						"L:\\portal\\build\\portal-web\\test\\com\\liferay\\portalweb\\portlet\\webcontentdisplay\\dependencies\\LocalizedTemplate.html"));
-				selenium.saveScreenShotAndSource();
-				Thread.sleep(5000);
 				selenium.clickAt("//input[@value='Save']",
-					RuntimeVariables.replace(""));
+					RuntimeVariables.replace("Save"));
 				selenium.waitForPageToLoad("30000");
-				selenium.saveScreenShotAndSource();
-				assertTrue(selenium.isTextPresent(
-						"Your request completed successfully."));
-				assertTrue(selenium.isTextPresent("Test Localized Template"));
+				loadRequiredJavaScriptModules();
+				assertEquals(RuntimeVariables.replace(
+						"Your request completed successfully."),
+					selenium.getText("//div[@class='portlet-msg-success']"));
+				assertEquals(RuntimeVariables.replace(
+						"Web Content Localized Template Name"),
+					selenium.getText("//td[3]/a"));
+				assertEquals(RuntimeVariables.replace(
+						"Web Content Localized Template Description"),
+					selenium.getText("//td[4]/a"));
 
 			case 100:
 				label = -1;

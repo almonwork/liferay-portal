@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -23,9 +23,10 @@ import com.liferay.portalweb.portal.util.RuntimeVariables;
 public class AddWikiNodeNameSymbolTest extends BaseTestCase {
 	public void testAddWikiNodeNameSymbol() throws Exception {
 		selenium.open("/web/guest/home/");
+		loadRequiredJavaScriptModules();
 
 		for (int second = 0;; second++) {
-			if (second >= 60) {
+			if (second >= 90) {
 				fail("timeout");
 			}
 
@@ -40,46 +41,133 @@ public class AddWikiNodeNameSymbolTest extends BaseTestCase {
 			Thread.sleep(1000);
 		}
 
-		selenium.saveScreenShotAndSource();
-		selenium.clickAt("link=Control Panel", RuntimeVariables.replace(""));
+		selenium.clickAt("link=Control Panel",
+			RuntimeVariables.replace("Control Panel"));
 		selenium.waitForPageToLoad("30000");
-		selenium.saveScreenShotAndSource();
-		selenium.clickAt("link=Wiki", RuntimeVariables.replace(""));
+		loadRequiredJavaScriptModules();
+		assertEquals(RuntimeVariables.replace("Wiki"),
+			selenium.getText("//ul[@class='category-portlets']/li[11]/a"));
+		selenium.clickAt("//ul[@class='category-portlets']/li[11]/a",
+			RuntimeVariables.replace("Wiki"));
 		selenium.waitForPageToLoad("30000");
-		selenium.saveScreenShotAndSource();
+		loadRequiredJavaScriptModules();
 		selenium.clickAt("//input[@value='Add Wiki']",
-			RuntimeVariables.replace(""));
+			RuntimeVariables.replace("Add Wiki"));
 		selenium.waitForPageToLoad("30000");
-		selenium.saveScreenShotAndSource();
-		selenium.type("_154_name", RuntimeVariables.replace("Test/"));
-		selenium.saveScreenShotAndSource();
-		selenium.type("_154_description",
-			RuntimeVariables.replace("This is a wiki node test."));
-		selenium.saveScreenShotAndSource();
-		selenium.clickAt("//input[@value='Save']", RuntimeVariables.replace(""));
+		loadRequiredJavaScriptModules();
+		selenium.type("//input[@id='_154_name']",
+			RuntimeVariables.replace("Wiki/ Node/ Name/"));
+		selenium.type("//textarea[@id='_154_description']",
+			RuntimeVariables.replace("Wiki/ Node/ Description/"));
+		selenium.clickAt("//input[@value='Save']",
+			RuntimeVariables.replace("Save"));
 		selenium.waitForPageToLoad("30000");
-		selenium.saveScreenShotAndSource();
-		assertTrue(selenium.isTextPresent("Your request failed to complete."));
-		assertTrue(selenium.isTextPresent("Please enter a valid name."));
-		selenium.type("_154_name", RuntimeVariables.replace("Test!"));
-		selenium.saveScreenShotAndSource();
-		selenium.type("_154_description",
-			RuntimeVariables.replace("This is a wiki node test."));
-		selenium.saveScreenShotAndSource();
-		selenium.clickAt("//input[@value='Save']", RuntimeVariables.replace(""));
+		loadRequiredJavaScriptModules();
+		assertEquals(RuntimeVariables.replace(
+				"Your request completed successfully."),
+			selenium.getText("//div[@class='portlet-msg-success']"));
+		assertEquals(RuntimeVariables.replace("Wiki/ Node/ Name/"),
+			selenium.getText("//tr[contains(.,'Wiki/ Node/ Name/')]/td/a"));
+		selenium.open("/web/guest/home/");
+		loadRequiredJavaScriptModules();
+
+		for (int second = 0;; second++) {
+			if (second >= 90) {
+				fail("timeout");
+			}
+
+			try {
+				if (selenium.isElementPresent("link=Control Panel")) {
+					break;
+				}
+			}
+			catch (Exception e) {
+			}
+
+			Thread.sleep(1000);
+		}
+
+		selenium.clickAt("link=Control Panel",
+			RuntimeVariables.replace("Control Panel"));
 		selenium.waitForPageToLoad("30000");
-		selenium.saveScreenShotAndSource();
-		assertTrue(selenium.isTextPresent("Your request failed to complete."));
-		assertTrue(selenium.isTextPresent("Please enter a valid name."));
-		selenium.type("_154_name", RuntimeVariables.replace("Test?"));
-		selenium.saveScreenShotAndSource();
-		selenium.type("_154_description",
-			RuntimeVariables.replace("This is a wiki node test."));
-		selenium.saveScreenShotAndSource();
-		selenium.clickAt("//input[@value='Save']", RuntimeVariables.replace(""));
+		loadRequiredJavaScriptModules();
+		assertEquals(RuntimeVariables.replace("Wiki"),
+			selenium.getText("//ul[@class='category-portlets']/li[11]/a"));
+		selenium.clickAt("//ul[@class='category-portlets']/li[11]/a",
+			RuntimeVariables.replace("Wiki"));
 		selenium.waitForPageToLoad("30000");
-		selenium.saveScreenShotAndSource();
-		assertTrue(selenium.isTextPresent("Your request failed to complete."));
-		assertTrue(selenium.isTextPresent("Please enter a valid name."));
+		loadRequiredJavaScriptModules();
+		selenium.clickAt("//input[@value='Add Wiki']",
+			RuntimeVariables.replace("Add Wiki"));
+		selenium.waitForPageToLoad("30000");
+		loadRequiredJavaScriptModules();
+		selenium.type("//input[@id='_154_name']",
+			RuntimeVariables.replace("Wiki! Node! Name!"));
+		selenium.type("//textarea[@id='_154_description']",
+			RuntimeVariables.replace("Wiki! Node! Description!"));
+		selenium.clickAt("//input[@value='Save']",
+			RuntimeVariables.replace("Save"));
+		selenium.waitForPageToLoad("30000");
+		loadRequiredJavaScriptModules();
+		assertEquals(RuntimeVariables.replace(
+				"Your request completed successfully."),
+			selenium.getText("//div[@class='portlet-msg-success']"));
+		assertEquals(RuntimeVariables.replace("Wiki! Node! Name!"),
+			selenium.getText("//tr[contains(.,'Wiki! Node! Name!')]/td/a"));
+		assertEquals(RuntimeVariables.replace("Wiki/ Node/ Name/"),
+			selenium.getText("//tr[contains(.,'Wiki/ Node/ Name/')]/td/a"));
+		selenium.open("/web/guest/home/");
+		loadRequiredJavaScriptModules();
+
+		for (int second = 0;; second++) {
+			if (second >= 90) {
+				fail("timeout");
+			}
+
+			try {
+				if (selenium.isElementPresent("link=Control Panel")) {
+					break;
+				}
+			}
+			catch (Exception e) {
+			}
+
+			Thread.sleep(1000);
+		}
+
+		selenium.clickAt("link=Control Panel",
+			RuntimeVariables.replace("Control Panel"));
+		selenium.waitForPageToLoad("30000");
+		loadRequiredJavaScriptModules();
+		assertEquals(RuntimeVariables.replace("Wiki"),
+			selenium.getText("//ul[@class='category-portlets']/li[11]/a"));
+		selenium.clickAt("//ul[@class='category-portlets']/li[11]/a",
+			RuntimeVariables.replace("Wiki"));
+		selenium.waitForPageToLoad("30000");
+		loadRequiredJavaScriptModules();
+		selenium.clickAt("//input[@value='Add Wiki']",
+			RuntimeVariables.replace("Add Wiki"));
+		selenium.waitForPageToLoad("30000");
+		loadRequiredJavaScriptModules();
+		selenium.type("//input[@id='_154_name']",
+			RuntimeVariables.replace("Wiki? Node? Name?"));
+		selenium.type("//textarea[@id='_154_description']",
+			RuntimeVariables.replace("Wiki? Node? Description?"));
+		selenium.clickAt("//input[@value='Save']",
+			RuntimeVariables.replace("Save"));
+		selenium.waitForPageToLoad("30000");
+		loadRequiredJavaScriptModules();
+		assertEquals(RuntimeVariables.replace(
+				"Your request completed successfully."),
+			selenium.getText("//div[@class='portlet-msg-success']"));
+		assertEquals(RuntimeVariables.replace(
+				"Your request completed successfully."),
+			selenium.getText("//div[@class='portlet-msg-success']"));
+		assertEquals(RuntimeVariables.replace("Wiki? Node? Name?"),
+			selenium.getText("//tr[contains(.,'Wiki? Node? Name?')]/td/a"));
+		assertEquals(RuntimeVariables.replace("Wiki! Node! Name!"),
+			selenium.getText("//tr[contains(.,'Wiki! Node! Name!')]/td/a"));
+		assertEquals(RuntimeVariables.replace("Wiki/ Node/ Name/"),
+			selenium.getText("//tr[contains(.,'Wiki/ Node/ Name/')]/td/a"));
 	}
 }

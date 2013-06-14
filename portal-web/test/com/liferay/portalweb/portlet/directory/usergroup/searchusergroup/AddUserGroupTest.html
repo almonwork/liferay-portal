@@ -16,37 +16,37 @@
 <tr>
 	<td>waitForElementPresent</td>
 	<td>link=Control Panel</td>
-	<td></td>
+	<td>Control Panel</td>
 </tr>
 <tr>
 	<td>clickAtAndWait</td>
 	<td>link=Control Panel</td>
-	<td></td>
+	<td>Control Panel</td>
 </tr>
 <tr>
 	<td>clickAtAndWait</td>
 	<td>link=User Groups</td>
-	<td></td>
+	<td>User Groups</td>
 </tr>
 <tr>
 	<td>clickAtAndWait</td>
 	<td>link=Add</td>
-	<td></td>
+	<td>Add</td>
 </tr>
 <tr>
 	<td>type</td>
-	<td>_127_name</td>
-	<td>Test User Group</td>
+	<td>//input[@id='_127_name']</td>
+	<td>User Group Name</td>
 </tr>
 <tr>
 	<td>type</td>
-	<td>_127_description</td>
-	<td>This is a test user group!</td>
+	<td>//textarea[@id='_127_description']</td>
+	<td>User Group Description</td>
 </tr>
 <tr>
 	<td>clickAtAndWait</td>
 	<td>//input[@value='Save']</td>
-	<td></td>
+	<td>Save</td>
 </tr>
 <tr>
 	<td>assertText</td>
@@ -56,12 +56,12 @@
 <tr>
 	<td>assertText</td>
 	<td>//td[2]/a</td>
-	<td>Test User Group</td>
+	<td>User Group Name</td>
 </tr>
 <tr>
 	<td>assertText</td>
 	<td>//td[3]/a</td>
-	<td>This is a test user group!</td>
+	<td>User Group Description</td>
 </tr>
 
 </tbody></table>

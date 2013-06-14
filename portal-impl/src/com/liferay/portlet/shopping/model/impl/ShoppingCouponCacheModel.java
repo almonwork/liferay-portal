@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -20,6 +20,8 @@ import com.liferay.portal.model.CacheModel;
 
 import com.liferay.portlet.shopping.model.ShoppingCoupon;
 
+import java.io.Serializable;
+
 import java.util.Date;
 
 /**
@@ -29,7 +31,8 @@ import java.util.Date;
  * @see ShoppingCoupon
  * @generated
  */
-public class ShoppingCouponCacheModel implements CacheModel<ShoppingCoupon> {
+public class ShoppingCouponCacheModel implements CacheModel<ShoppingCoupon>,
+	Serializable {
 	@Override
 	public String toString() {
 		StringBundler sb = new StringBundler(37);

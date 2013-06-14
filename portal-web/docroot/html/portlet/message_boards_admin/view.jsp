@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -71,7 +71,7 @@ request.setAttribute("view.jsp-viewCategory", Boolean.TRUE.toString());
 		<%
 		boolean showAddCategoryButton = MBCategoryPermission.contains(permissionChecker, scopeGroupId, categoryId, ActionKeys.ADD_CATEGORY);
 		boolean showAddMessageButton = MBCategoryPermission.contains(permissionChecker, scopeGroupId, categoryId, ActionKeys.ADD_MESSAGE);
-		boolean showPermissionsButton = GroupPermissionUtil.contains(permissionChecker, scopeGroupId, ActionKeys.PERMISSIONS);
+		boolean showPermissionsButton = MBCategoryPermission.contains(permissionChecker, scopeGroupId, categoryId, ActionKeys.PERMISSIONS);
 
 		if (showAddMessageButton && !themeDisplay.isSignedIn()) {
 			if (!allowAnonymousPosting) {
@@ -246,9 +246,7 @@ request.setAttribute("view.jsp-viewCategory", Boolean.TRUE.toString());
 
 							message = message.toEscapedModel();
 
-							boolean readThread = MBMessageFlagLocalServiceUtil.hasReadFlag(themeDisplay.getUserId(), thread);
-
-							row.setBold(!readThread);
+							row.setBold(!MBThreadFlagLocalServiceUtil.hasThreadFlag(themeDisplay.getUserId(), thread));
 							row.setObject(new Object[] {message});
 							row.setRestricted(!MBMessagePermission.contains(permissionChecker, message, ActionKeys.VIEW));
 							%>
@@ -299,10 +297,10 @@ request.setAttribute("view.jsp-viewCategory", Boolean.TRUE.toString());
 							>
 
 								<%
-								if (MBMessageFlagLocalServiceUtil.hasAnswerFlag(message.getMessageId())) {
+								if (MBThreadLocalServiceUtil.hasAnswerMessage(thread.getThreadId())) {
 									buffer.append(LanguageUtil.get(pageContext, "resolved"));
 								}
-								else if (MBMessageFlagLocalServiceUtil.hasQuestionFlag(message.getMessageId())) {
+								else if (thread.isQuestion()) {
 									buffer.append(LanguageUtil.get(pageContext, "waiting-for-an-answer"));
 								}
 								%>
@@ -409,16 +407,22 @@ request.setAttribute("view.jsp-viewCategory", Boolean.TRUE.toString());
 			<aui:input name="threadIds" type="hidden" />
 
 			<liferay-ui:search-container
+				emptyResultsMessage="there-are-no-recent-posts"
 				headerNames="thread,started-by,posts,views,last-post"
 				iteratorURL="<%= portletURL %>"
-				emptyResultsMessage="there-are-no-recent-posts"
 				rowChecker="<%= new RowChecker(renderResponse) %>"
 			>
 				<liferay-ui:search-container-results>
 
 					<%
-					results = MBThreadServiceUtil.getGroupThreads(scopeGroupId, groupThreadsUserId, WorkflowConstants.STATUS_APPROVED, false, false, searchContainer.getStart(), searchContainer.getEnd());
-					total = MBThreadServiceUtil.getGroupThreadsCount(scopeGroupId, groupThreadsUserId, WorkflowConstants.STATUS_APPROVED, false, false);
+					Calendar calendar = Calendar.getInstance();
+
+					int offset = GetterUtil.getInteger(recentPostsDateOffset);
+
+					calendar.add(Calendar.DATE, -offset);
+
+					results = MBThreadServiceUtil.getGroupThreads(scopeGroupId, groupThreadsUserId, calendar.getTime(), WorkflowConstants.STATUS_APPROVED, searchContainer.getStart(), searchContainer.getEnd());
+					total = MBThreadServiceUtil.getGroupThreadsCount(scopeGroupId, groupThreadsUserId, calendar.getTime(), WorkflowConstants.STATUS_APPROVED);
 
 					pageContext.setAttribute("results", results);
 					pageContext.setAttribute("total", total);
@@ -446,9 +450,7 @@ request.setAttribute("view.jsp-viewCategory", Boolean.TRUE.toString());
 
 					message = message.toEscapedModel();
 
-					boolean readThread = MBMessageFlagLocalServiceUtil.hasReadFlag(themeDisplay.getUserId(), thread);
-
-					row.setBold(!readThread);
+					row.setBold(!MBThreadFlagLocalServiceUtil.hasThreadFlag(themeDisplay.getUserId(), thread));
 					row.setObject(new Object[] {message});
 					row.setRestricted(!MBMessagePermission.contains(permissionChecker, message, ActionKeys.VIEW));
 					%>
@@ -669,7 +671,7 @@ request.setAttribute("view.jsp-viewCategory", Boolean.TRUE.toString());
 	Liferay.provide(
 		window,
 		'<portlet:namespace />deleteCategories',
-		function(cmd) {
+		function() {
 			var deleteCategories = true;
 
 			var deleteCategoryIds = Liferay.Util.listCheckedExcept(document.<portlet:namespace />fm, "<portlet:namespace />allRowIds");
@@ -681,7 +683,7 @@ request.setAttribute("view.jsp-viewCategory", Boolean.TRUE.toString());
 			if (deleteCategories) {
 				if (confirm('<%= UnicodeLanguageUtil.get(pageContext, "are-you-sure-you-want-to-delete-this") %>')) {
 					document.<portlet:namespace />fm.method = "post";
-					document.<portlet:namespace />fm.<portlet:namespace /><%= Constants.CMD %>.value = cmd;
+					document.<portlet:namespace />fm.<portlet:namespace /><%= Constants.CMD %>.value = "<%= Constants.DELETE %>";
 					document.<portlet:namespace />fm.<portlet:namespace />deleteCategoryIds.value = deleteCategoryIds;
 					submitForm(document.<portlet:namespace />fm, "<portlet:actionURL><portlet:param name="struts_action" value="/message_boards_admin/edit_category" /></portlet:actionURL>");
 				}

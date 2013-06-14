@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -19,6 +19,8 @@ import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.model.CacheModel;
 import com.liferay.portal.model.Contact;
 
+import java.io.Serializable;
+
 import java.util.Date;
 
 /**
@@ -28,10 +30,10 @@ import java.util.Date;
  * @see Contact
  * @generated
  */
-public class ContactCacheModel implements CacheModel<Contact> {
+public class ContactCacheModel implements CacheModel<Contact>, Serializable {
 	@Override
 	public String toString() {
-		StringBundler sb = new StringBundler(61);
+		StringBundler sb = new StringBundler(67);
 
 		sb.append("{contactId=");
 		sb.append(contactId);
@@ -45,10 +47,16 @@ public class ContactCacheModel implements CacheModel<Contact> {
 		sb.append(createDate);
 		sb.append(", modifiedDate=");
 		sb.append(modifiedDate);
+		sb.append(", classNameId=");
+		sb.append(classNameId);
+		sb.append(", classPK=");
+		sb.append(classPK);
 		sb.append(", accountId=");
 		sb.append(accountId);
 		sb.append(", parentContactId=");
 		sb.append(parentContactId);
+		sb.append(", emailAddress=");
+		sb.append(emailAddress);
 		sb.append(", firstName=");
 		sb.append(firstName);
 		sb.append(", middleName=");
@@ -126,8 +134,17 @@ public class ContactCacheModel implements CacheModel<Contact> {
 			contactImpl.setModifiedDate(new Date(modifiedDate));
 		}
 
+		contactImpl.setClassNameId(classNameId);
+		contactImpl.setClassPK(classPK);
 		contactImpl.setAccountId(accountId);
 		contactImpl.setParentContactId(parentContactId);
+
+		if (emailAddress == null) {
+			contactImpl.setEmailAddress(StringPool.BLANK);
+		}
+		else {
+			contactImpl.setEmailAddress(emailAddress);
+		}
 
 		if (firstName == null) {
 			contactImpl.setFirstName(StringPool.BLANK);
@@ -277,8 +294,11 @@ public class ContactCacheModel implements CacheModel<Contact> {
 	public String userName;
 	public long createDate;
 	public long modifiedDate;
+	public long classNameId;
+	public long classPK;
 	public long accountId;
 	public long parentContactId;
+	public String emailAddress;
 	public String firstName;
 	public String middleName;
 	public String lastName;

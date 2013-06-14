@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,6 +14,11 @@
 
 package com.liferay.portlet.polls.model;
 
+import com.liferay.portal.model.ModelWrapper;
+
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * <p>
  * This class is a wrapper for {@link PollsChoice}.
@@ -23,7 +28,8 @@ package com.liferay.portlet.polls.model;
  * @see       PollsChoice
  * @generated
  */
-public class PollsChoiceWrapper implements PollsChoice {
+public class PollsChoiceWrapper implements PollsChoice,
+	ModelWrapper<PollsChoice> {
 	public PollsChoiceWrapper(PollsChoice pollsChoice) {
 		_pollsChoice = pollsChoice;
 	}
@@ -34,6 +40,50 @@ public class PollsChoiceWrapper implements PollsChoice {
 
 	public String getModelClassName() {
 		return PollsChoice.class.getName();
+	}
+
+	public Map<String, Object> getModelAttributes() {
+		Map<String, Object> attributes = new HashMap<String, Object>();
+
+		attributes.put("uuid", getUuid());
+		attributes.put("choiceId", getChoiceId());
+		attributes.put("questionId", getQuestionId());
+		attributes.put("name", getName());
+		attributes.put("description", getDescription());
+
+		return attributes;
+	}
+
+	public void setModelAttributes(Map<String, Object> attributes) {
+		String uuid = (String)attributes.get("uuid");
+
+		if (uuid != null) {
+			setUuid(uuid);
+		}
+
+		Long choiceId = (Long)attributes.get("choiceId");
+
+		if (choiceId != null) {
+			setChoiceId(choiceId);
+		}
+
+		Long questionId = (Long)attributes.get("questionId");
+
+		if (questionId != null) {
+			setQuestionId(questionId);
+		}
+
+		String name = (String)attributes.get("name");
+
+		if (name != null) {
+			setName(name);
+		}
+
+		String description = (String)attributes.get("description");
+
+		if (description != null) {
+			setDescription(description);
+		}
 	}
 
 	/**
@@ -179,6 +229,14 @@ public class PollsChoiceWrapper implements PollsChoice {
 		return _pollsChoice.getDescription(languageId, useDefault);
 	}
 
+	public java.lang.String getDescriptionCurrentLanguageId() {
+		return _pollsChoice.getDescriptionCurrentLanguageId();
+	}
+
+	public java.lang.String getDescriptionCurrentValue() {
+		return _pollsChoice.getDescriptionCurrentValue();
+	}
+
 	/**
 	* Returns a map of the locales and localized descriptions of this polls choice.
 	*
@@ -218,6 +276,10 @@ public class PollsChoiceWrapper implements PollsChoice {
 	public void setDescription(java.lang.String description,
 		java.util.Locale locale, java.util.Locale defaultLocale) {
 		_pollsChoice.setDescription(description, locale, defaultLocale);
+	}
+
+	public void setDescriptionCurrentLanguageId(java.lang.String languageId) {
+		_pollsChoice.setDescriptionCurrentLanguageId(languageId);
 	}
 
 	/**
@@ -260,10 +322,6 @@ public class PollsChoiceWrapper implements PollsChoice {
 
 	public boolean isEscapedModel() {
 		return _pollsChoice.isEscapedModel();
-	}
-
-	public void setEscapedModel(boolean escapedModel) {
-		_pollsChoice.setEscapedModel(escapedModel);
 	}
 
 	public java.io.Serializable getPrimaryKeyObj() {
@@ -325,7 +383,14 @@ public class PollsChoiceWrapper implements PollsChoice {
 		return _pollsChoice.getVotesCount();
 	}
 
+	/**
+	 * @deprecated Renamed to {@link #getWrappedModel}
+	 */
 	public PollsChoice getWrappedPollsChoice() {
+		return _pollsChoice;
+	}
+
+	public PollsChoice getWrappedModel() {
 		return _pollsChoice;
 	}
 

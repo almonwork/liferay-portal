@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -43,7 +43,7 @@ public class PortletBeanFactoryCleaner implements BeanFactoryAware {
 	public static void readBeans() {
 		if (_beanFactory == null) {
 			if (_log.isWarnEnabled()) {
-				_log.warn("BeanFactory is null");
+				_log.warn("Bean factory is null");
 			}
 
 			return;

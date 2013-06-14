@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -22,11 +22,13 @@ import com.liferay.portal.model.Layout;
  */
 public class LayoutComparator extends OrderByComparator {
 
-	public static String ORDER_BY_ASC = "groupId ASC, layoutId ASC";
+	public static final String ORDER_BY_ASC =
+		"Layout.groupId ASC, Layout.layoutId ASC";
 
-	public static String ORDER_BY_DESC = "groupId DESC, layoutId DESC";
+	public static final String ORDER_BY_DESC =
+		"Layout.groupId DESC, Layout.layoutId DESC";
 
-	public static String[] ORDER_BY_FIELDS = {"groupId", "layoutId"};
+	public static final String[] ORDER_BY_FIELDS = {"groupId", "layoutId"};
 
 	public LayoutComparator() {
 		this(false);

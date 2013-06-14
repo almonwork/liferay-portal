@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,13 +14,16 @@
 
 package com.liferay.portlet.assetpublisher.util;
 
+import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.templateparser.Transformer;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.CharPool;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
+import com.liferay.portal.kernel.util.PrimitiveLongList;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
@@ -30,17 +33,27 @@ import com.liferay.portal.kernel.xml.SAXReaderUtil;
 import com.liferay.portal.model.Group;
 import com.liferay.portal.model.GroupConstants;
 import com.liferay.portal.model.Layout;
+import com.liferay.portal.model.User;
+import com.liferay.portal.service.GroupLocalServiceUtil;
 import com.liferay.portal.service.LayoutLocalServiceUtil;
 import com.liferay.portal.theme.ThemeDisplay;
 import com.liferay.portal.util.PortalUtil;
 import com.liferay.portal.util.WebKeys;
 import com.liferay.portlet.PortletPreferencesFactoryUtil;
+import com.liferay.portlet.asset.model.AssetCategory;
 import com.liferay.portlet.asset.model.AssetEntry;
+import com.liferay.portlet.asset.model.AssetRendererFactory;
+import com.liferay.portlet.asset.service.AssetCategoryLocalServiceUtil;
 import com.liferay.portlet.asset.service.AssetEntryLocalServiceUtil;
 import com.liferay.portlet.asset.service.AssetTagLocalServiceUtil;
 import com.liferay.portlet.asset.service.persistence.AssetEntryQuery;
+import com.liferay.portlet.dynamicdatalists.util.DDLTransformer;
+import com.liferay.portlet.dynamicdatamapping.model.DDMTemplate;
+import com.liferay.portlet.dynamicdatamapping.service.DDMTemplateLocalServiceUtil;
+import com.liferay.portlet.expando.model.ExpandoBridge;
 
 import java.io.IOException;
+import java.io.Serializable;
 
 import java.util.HashMap;
 import java.util.Iterator;
@@ -49,6 +62,8 @@ import java.util.Map;
 
 import javax.portlet.PortletPreferences;
 import javax.portlet.PortletRequest;
+import javax.portlet.RenderRequest;
+import javax.portlet.RenderResponse;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
@@ -82,7 +97,7 @@ public class AssetPublisherUtil {
 				referringPortletResource, null);
 
 		String selectionStyle = portletPreferences.getValue(
-			"selection-style", "dynamic");
+			"selectionStyle", "dynamic");
 
 		if (selectionStyle.equals("dynamic")) {
 			return;
@@ -133,14 +148,61 @@ public class AssetPublisherUtil {
 		String assetEntryXml = _getAssetEntryXml(
 			assetEntryType, assetEntry.getClassUuid());
 
-		if (assetEntryOrder > -1) {
-			assetEntryXmls[assetEntryOrder] = assetEntryXml;
+		if (!ArrayUtil.contains(assetEntryXmls, assetEntryXml)) {
+			if (assetEntryOrder > -1) {
+				assetEntryXmls[assetEntryOrder] = assetEntryXml;
+			}
+			else {
+				assetEntryXmls = ArrayUtil.append(
+					assetEntryXmls, assetEntryXml);
+			}
+
+			portletPreferences.setValues("assetEntryXml", assetEntryXmls);
 		}
-		else {
-			assetEntryXmls = ArrayUtil.append(assetEntryXmls, assetEntryXml);
+	}
+
+	public static void addUserAttributes(
+			User user, String[] customUserAttributeNames,
+			AssetEntryQuery assetEntryQuery)
+		throws Exception {
+
+		if ((user == null) || (customUserAttributeNames.length == 0)) {
+			return;
 		}
 
-		portletPreferences.setValues("assetEntryXml", assetEntryXmls);
+		Group companyGroup = GroupLocalServiceUtil.getCompanyGroup(
+			user.getCompanyId());
+
+		long[] allCategoryIds = assetEntryQuery.getAllCategoryIds();
+
+		PrimitiveLongList allCategoryIdsList = new PrimitiveLongList(
+			allCategoryIds.length + customUserAttributeNames.length);
+
+		allCategoryIdsList.addAll(allCategoryIds);
+
+		for (String customUserAttributeName : customUserAttributeNames) {
+			ExpandoBridge userCustomAttributes = user.getExpandoBridge();
+
+			Serializable userCustomFieldValue =
+				userCustomAttributes.getAttribute(customUserAttributeName);
+
+			if (userCustomFieldValue == null) {
+				continue;
+			}
+
+			String userCustomFieldValueString = userCustomFieldValue.toString();
+
+			List<AssetCategory> assetCategories =
+				AssetCategoryLocalServiceUtil.search(
+					companyGroup.getGroupId(), userCustomFieldValueString,
+					new String[0], QueryUtil.ALL_POS, QueryUtil.ALL_POS);
+
+			for (AssetCategory assetCategory : assetCategories) {
+				 allCategoryIdsList.add(assetCategory.getCategoryId());
+			}
+		}
+
+		assetEntryQuery.setAllCategoryIds(allCategoryIdsList.getArray());
 	}
 
 	public static AssetEntryQuery getAssetEntryQuery(
@@ -210,22 +272,36 @@ public class AssetPublisherUtil {
 			}
 		}
 
-		long[] allAssetTagIds = AssetTagLocalServiceUtil.getTagIds(
-			scopeGroupIds, allAssetTagNames);
+		assetEntryQuery.setAllCategoryIds(allAssetCategoryIds);
+
+		for (String assetTagName : allAssetTagNames) {
+			long[] allAssetTagIds = AssetTagLocalServiceUtil.getTagIds(
+				scopeGroupIds, assetTagName);
+
+			assetEntryQuery.addAllTagIdsArray(allAssetTagIds);
+		}
+
+		assetEntryQuery.setAnyCategoryIds(anyAssetCategoryIds);
+
 		long[] anyAssetTagIds = AssetTagLocalServiceUtil.getTagIds(
 			scopeGroupIds, anyAssetTagNames);
-		long[] notAllAssetTagIds = AssetTagLocalServiceUtil.getTagIds(
-			scopeGroupIds, notAllAssetTagNames);
+
+		assetEntryQuery.setAnyTagIds(anyAssetTagIds);
+
+		assetEntryQuery.setNotAllCategoryIds(notAllAssetCategoryIds);
+
+		for (String assetTagName : notAllAssetTagNames) {
+			long[] notAllAssetTagIds = AssetTagLocalServiceUtil.getTagIds(
+				scopeGroupIds, assetTagName);
+
+			assetEntryQuery.addNotAllTagIdsArray(notAllAssetTagIds);
+		}
+
+		assetEntryQuery.setNotAnyCategoryIds(notAnyAssetCategoryIds);
+
 		long[] notAnyAssetTagIds = AssetTagLocalServiceUtil.getTagIds(
 			scopeGroupIds, notAnyAssetTagNames);
 
-		assetEntryQuery.setAllCategoryIds(allAssetCategoryIds);
-		assetEntryQuery.setAllTagIds(allAssetTagIds);
-		assetEntryQuery.setAnyCategoryIds(anyAssetCategoryIds);
-		assetEntryQuery.setAnyTagIds(anyAssetTagIds);
-		assetEntryQuery.setNotAllCategoryIds(notAllAssetCategoryIds);
-		assetEntryQuery.setNotAllTagIds(notAllAssetTagIds);
-		assetEntryQuery.setNotAnyCategoryIds(notAnyAssetCategoryIds);
 		assetEntryQuery.setNotAnyTagIds(notAnyAssetTagIds);
 
 		return assetEntryQuery;
@@ -265,6 +341,18 @@ public class AssetPublisherUtil {
 		return allAssetTagNames;
 	}
 
+	public static String getClassName(
+		AssetRendererFactory assetRendererFactory) {
+
+		Class<?> clazz = assetRendererFactory.getClass();
+
+		String className = clazz.getName();
+
+		int pos = className.lastIndexOf(StringPool.PERIOD);
+
+		return className.substring(pos + 1);
+	}
+
 	public static long[] getClassNameIds(
 		PortletPreferences portletPreferences, long[] availableClassNameIds) {
 
@@ -272,76 +360,102 @@ public class AssetPublisherUtil {
 			portletPreferences.getValue(
 				"anyAssetType", Boolean.TRUE.toString()));
 
-		long[] classNameIds = null;
+		if (anyAssetType) {
+			return availableClassNameIds;
+		}
 
-		if (!anyAssetType &&
-			(portletPreferences.getValues("classNameIds", null) != null)) {
+		long defaultClassNameId = GetterUtil.getLong(
+			portletPreferences.getValue("anyAssetType", null));
 
-			classNameIds = GetterUtil.getLongValues(
-				portletPreferences.getValues("classNameIds", null));
+		if (defaultClassNameId > 0) {
+			return new long[] {defaultClassNameId};
+		}
+
+		long[] classNameIds = GetterUtil.getLongValues(
+			portletPreferences.getValues("classNameIds", null));
+
+		if (classNameIds != null) {
+			return classNameIds;
 		}
 		else {
-			classNameIds = availableClassNameIds;
+			return availableClassNameIds;
+		}
+	}
+
+	public static Long[] getClassTypeIds(
+		PortletPreferences portletPreferences, String className,
+		Long[] availableClassTypeIds) {
+
+		boolean anyAssetType = GetterUtil.getBoolean(
+			portletPreferences.getValue(
+				"anyClassType" + className, Boolean.TRUE.toString()));
+
+		if (anyAssetType) {
+			return availableClassTypeIds;
 		}
 
-		return classNameIds;
+		long defaultClassTypeId = GetterUtil.getLong(
+			portletPreferences.getValue("anyClassType" + className, null));
+
+		if (defaultClassTypeId > 0) {
+			return new Long[] {defaultClassTypeId};
+		}
+
+		Long[] classTypeIds = ArrayUtil.toArray(
+			StringUtil.split(
+				portletPreferences.getValue(
+					"classTypeIds" + className, null), 0L));
+
+		if (classTypeIds != null) {
+			return classTypeIds;
+		}
+		else {
+			return availableClassTypeIds;
+		}
 	}
 
 	public static long[] getGroupIds(
 		PortletPreferences portletPreferences, long scopeGroupId,
 		Layout layout) {
 
-		long[] groupIds = new long[] {scopeGroupId};
+		String defaultScopeId = GetterUtil.getString(
+			portletPreferences.getValue("defaultScope", null));
 
-		boolean defaultScope = GetterUtil.getBoolean(
-			portletPreferences.getValue("defaultScope", null), true);
+		if (Validator.isNull(defaultScopeId) ||
+			defaultScopeId.equals(StringPool.FALSE)) {
 
-		if (!defaultScope) {
 			String[] scopeIds = portletPreferences.getValues(
 				"scopeIds",
 				new String[] {"group" + StringPool.UNDERLINE + scopeGroupId});
 
-			groupIds = new long[scopeIds.length];
+			long[] groupIds = new long[scopeIds.length];
 
 			for (int i = 0; i < scopeIds.length; i++) {
 				try {
-					String[] scopeIdFragments = StringUtil.split(
-						scopeIds[i], CharPool.UNDERLINE);
-
-					if (scopeIdFragments[0].equals("Layout")) {
-						long scopeIdLayoutId = GetterUtil.getLong(
-							scopeIdFragments[1]);
-
-						Layout scopeIdLayout =
-							LayoutLocalServiceUtil.getLayout(
-								scopeGroupId, layout.isPrivateLayout(),
-								scopeIdLayoutId);
-
-						Group scopeIdGroup = scopeIdLayout.getScopeGroup();
-
-						groupIds[i] = scopeIdGroup.getGroupId();
-					}
-					else {
-						if (scopeIdFragments[1].equals(
-								GroupConstants.DEFAULT)) {
-
-							groupIds[i] = scopeGroupId;
-						}
-						else {
-							long scopeIdGroupId = GetterUtil.getLong(
-								scopeIdFragments[1]);
-
-							groupIds[i] = scopeIdGroupId;
-						}
-					}
+					groupIds[i] = _getGroupId(
+						scopeIds[i], scopeGroupId, layout.isPrivateLayout());
 				}
 				catch (Exception e) {
 					continue;
 				}
 			}
+
+			return groupIds;
 		}
 
-		return groupIds;
+		if (defaultScopeId.equals(StringPool.TRUE)) {
+			return new long[] {scopeGroupId};
+		}
+
+		try {
+			long groupId = _getGroupId(
+				defaultScopeId, scopeGroupId, layout.isPrivateLayout());
+
+			return new long[] {groupId};
+		}
+		catch (Exception e) {
+			return new long[0];
+		}
 	}
 
 	public static long getRecentFolderId(
@@ -358,8 +472,7 @@ public class AssetPublisherUtil {
 	}
 
 	public static void removeAndStoreSelection(
-			List<String> assetEntryUuids,
-			PortletPreferences portletPreferences)
+			List<String> assetEntryUuids, PortletPreferences portletPreferences)
 		throws Exception {
 
 		if (assetEntryUuids.size() == 0) {
@@ -402,6 +515,44 @@ public class AssetPublisherUtil {
 		}
 	}
 
+	public static String renderDDMTemplate(
+			RenderRequest renderRequest, RenderResponse renderResponse,
+			long ddmTemplateId, List<AssetEntry> assetEntries)
+		throws Exception {
+
+		ThemeDisplay themeDisplay = (ThemeDisplay)renderRequest.getAttribute(
+			WebKeys.THEME_DISPLAY);
+
+		DDMTemplate ddmTemplate = DDMTemplateLocalServiceUtil.getTemplate(
+			ddmTemplateId);
+
+		Map<String, Object> contextObjects = new HashMap<String, Object>();
+
+		contextObjects.put(AssetPublisherConstants.ASSET_ENTRIES, assetEntries);
+
+		if (assetEntries.size() == 1) {
+			contextObjects.put(
+				AssetPublisherConstants.ASSET_ENTRY, assetEntries.get(0));
+		}
+
+		contextObjects.put(
+			AssetPublisherConstants.ASSET_PUBLISHER_HELPER,
+			AssetPublisherHelperUtil.getAssetPublisherHelper());
+		contextObjects.put(
+			AssetPublisherConstants.DDM_TEMPLATE_ID, ddmTemplateId);
+		contextObjects.put(
+			AssetPublisherConstants.LOCALE, renderRequest.getLocale());
+		contextObjects.put(
+			AssetPublisherConstants.RENDER_REQUEST, renderRequest);
+		contextObjects.put(
+			AssetPublisherConstants.RENDER_RESPONSE, renderResponse);
+		contextObjects.put(AssetPublisherConstants.THEME_DISPLAY, themeDisplay);
+
+		return _transformer.transform(
+			themeDisplay, contextObjects, ddmTemplate.getScript(),
+			ddmTemplate.getLanguage());
+	}
+
 	private static String _getAssetEntryXml(
 		String assetEntryType, String assetEntryUuid) {
 
@@ -433,6 +584,30 @@ public class AssetPublisherUtil {
 		return xml;
 	}
 
+	private static long _getGroupId(
+			String scopeId, long scopeGroupId, boolean privateLayout)
+		throws Exception {
+
+		String[] scopeIdParts = StringUtil.split(scopeId, CharPool.UNDERLINE);
+
+		if (scopeIdParts[0].equals("Layout")) {
+			long scopeIdLayoutId = GetterUtil.getLong(scopeIdParts[1]);
+
+			Layout scopeIdLayout = LayoutLocalServiceUtil.getLayout(
+				scopeGroupId, privateLayout, scopeIdLayoutId);
+
+			Group scopeIdGroup = scopeIdLayout.getScopeGroup();
+
+			return scopeIdGroup.getGroupId();
+		}
+
+		if (scopeIdParts[1].equals(GroupConstants.DEFAULT)) {
+			return scopeGroupId;
+		}
+
+		return GetterUtil.getLong(scopeIdParts[1]);
+	}
+
 	private static Map<String, Long> _getRecentFolderIds(
 		PortletRequest portletRequest) {
 
@@ -460,5 +635,7 @@ public class AssetPublisherUtil {
 	}
 
 	private static Log _log = LogFactoryUtil.getLog(AssetPublisherUtil.class);
+
+	private static Transformer _transformer = new DDLTransformer();
 
 }

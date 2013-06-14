@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -23,9 +23,10 @@ import com.liferay.portalweb.portal.util.RuntimeVariables;
 public class AddMailAccountTest extends BaseTestCase {
 	public void testAddMailAccount() throws Exception {
 		selenium.open("/web/guest/home");
+		loadRequiredJavaScriptModules();
 
 		for (int second = 0;; second++) {
-			if (second >= 60) {
+			if (second >= 90) {
 				fail("timeout");
 			}
 
@@ -40,21 +41,21 @@ public class AddMailAccountTest extends BaseTestCase {
 			Thread.sleep(1000);
 		}
 
-		selenium.saveScreenShotAndSource();
 		selenium.clickAt("link=Mail Test Page",
 			RuntimeVariables.replace("Mail Test Page"));
 		selenium.waitForPageToLoad("30000");
-		selenium.saveScreenShotAndSource();
+		loadRequiredJavaScriptModules();
 		selenium.clickAt("//input[@value='Add Mail Account']",
 			RuntimeVariables.replace("Add Mail Account"));
 
 		for (int second = 0;; second++) {
-			if (second >= 60) {
+			if (second >= 90) {
 				fail("timeout");
 			}
 
 			try {
-				if (selenium.isVisible("_1_WAR_mailportlet_address")) {
+				if (selenium.isVisible(
+							"//input[@id='_1_WAR_mailportlet_address']")) {
 					break;
 				}
 			}
@@ -64,26 +65,26 @@ public class AddMailAccountTest extends BaseTestCase {
 			Thread.sleep(1000);
 		}
 
-		selenium.saveScreenShotAndSource();
-		selenium.type("_1_WAR_mailportlet_address",
-			RuntimeVariables.replace("liferay.qa.mail.portlet.60x@gmail.com"));
-		selenium.saveScreenShotAndSource();
-		selenium.type("_1_WAR_mailportlet_password",
+		selenium.type("//input[@id='_1_WAR_mailportlet_address']",
+			RuntimeVariables.replace("liferay.qa.testing.trunk@gmail.com"));
+		selenium.type("//input[@id='_1_WAR_mailportlet_password']",
 			RuntimeVariables.replace("loveispatient"));
-		selenium.saveScreenShotAndSource();
-		selenium.check("_1_WAR_mailportlet_savePasswordCheckbox");
+		assertFalse(selenium.isChecked(
+				"//input[@id='_1_WAR_mailportlet_savePasswordCheckbox']"));
+		selenium.check("//input[@id='_1_WAR_mailportlet_savePasswordCheckbox']");
+		assertTrue(selenium.isChecked(
+				"//input[@id='_1_WAR_mailportlet_savePasswordCheckbox']"));
 		selenium.clickAt("//input[@value='Add Account']",
 			RuntimeVariables.replace("Add Account"));
 
 		for (int second = 0;; second++) {
-			if (second >= 60) {
+			if (second >= 90) {
 				fail("timeout");
 			}
 
 			try {
-				if (RuntimeVariables.replace("Account has been created.")
-										.equals(selenium.getText(
-								"//span[@class='message portlet-msg-success']"))) {
+				if (selenium.isVisible(
+							"//span[@class='message portlet-msg-success']")) {
 					break;
 				}
 			}
@@ -93,7 +94,6 @@ public class AddMailAccountTest extends BaseTestCase {
 			Thread.sleep(1000);
 		}
 
-		selenium.saveScreenShotAndSource();
 		assertEquals(RuntimeVariables.replace("Account has been created."),
 			selenium.getText("//span[@class='message portlet-msg-success']"));
 	}

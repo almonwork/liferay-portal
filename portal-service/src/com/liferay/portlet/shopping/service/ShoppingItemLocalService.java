@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -19,6 +19,7 @@ import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.transaction.Isolation;
 import com.liferay.portal.kernel.transaction.Propagation;
 import com.liferay.portal.kernel.transaction.Transactional;
+import com.liferay.portal.service.BaseLocalService;
 import com.liferay.portal.service.PersistedModelLocalService;
 
 /**
@@ -36,7 +37,8 @@ import com.liferay.portal.service.PersistedModelLocalService;
  */
 @Transactional(isolation = Isolation.PORTAL, rollbackFor =  {
 	PortalException.class, SystemException.class})
-public interface ShoppingItemLocalService extends PersistedModelLocalService {
+public interface ShoppingItemLocalService extends BaseLocalService,
+	PersistedModelLocalService {
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
@@ -67,10 +69,12 @@ public interface ShoppingItemLocalService extends PersistedModelLocalService {
 	* Deletes the shopping item with the primary key from the database. Also notifies the appropriate model listeners.
 	*
 	* @param itemId the primary key of the shopping item
+	* @return the shopping item that was removed
 	* @throws PortalException if a shopping item with the primary key could not be found
 	* @throws SystemException if a system exception occurred
 	*/
-	public void deleteShoppingItem(long itemId)
+	public com.liferay.portlet.shopping.model.ShoppingItem deleteShoppingItem(
+		long itemId)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException;
 
@@ -78,11 +82,14 @@ public interface ShoppingItemLocalService extends PersistedModelLocalService {
 	* Deletes the shopping item from the database. Also notifies the appropriate model listeners.
 	*
 	* @param shoppingItem the shopping item
+	* @return the shopping item that was removed
 	* @throws SystemException if a system exception occurred
 	*/
-	public void deleteShoppingItem(
+	public com.liferay.portlet.shopping.model.ShoppingItem deleteShoppingItem(
 		com.liferay.portlet.shopping.model.ShoppingItem shoppingItem)
 		throws com.liferay.portal.kernel.exception.SystemException;
+
+	public com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery();
 
 	/**
 	* Performs a dynamic query on the database and returns the matching rows.
@@ -145,6 +152,10 @@ public interface ShoppingItemLocalService extends PersistedModelLocalService {
 	public long dynamicQueryCount(
 		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery)
 		throws com.liferay.portal.kernel.exception.SystemException;
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public com.liferay.portlet.shopping.model.ShoppingItem fetchShoppingItem(
+		long itemId) throws com.liferay.portal.kernel.exception.SystemException;
 
 	/**
 	* Returns the shopping item with the primary key.
@@ -242,10 +253,10 @@ public interface ShoppingItemLocalService extends PersistedModelLocalService {
 		java.lang.String properties, java.lang.String fieldsQuantities,
 		boolean requiresShipping, int stockQuantity, boolean featured,
 		java.lang.Boolean sale, boolean smallImage,
-		java.lang.String smallImageURL, java.io.File smallFile,
+		java.lang.String smallImageURL, java.io.File smallImageFile,
 		boolean mediumImage, java.lang.String mediumImageURL,
-		java.io.File mediumFile, boolean largeImage,
-		java.lang.String largeImageURL, java.io.File largeFile,
+		java.io.File mediumImageFile, boolean largeImage,
+		java.lang.String largeImageURL, java.io.File largeImageFile,
 		java.util.List<com.liferay.portlet.shopping.model.ShoppingItemField> itemFields,
 		java.util.List<com.liferay.portlet.shopping.model.ShoppingItemPrice> itemPrices,
 		com.liferay.portal.service.ServiceContext serviceContext)
@@ -368,10 +379,10 @@ public interface ShoppingItemLocalService extends PersistedModelLocalService {
 		java.lang.String fieldsQuantities, boolean requiresShipping,
 		int stockQuantity, boolean featured, java.lang.Boolean sale,
 		boolean smallImage, java.lang.String smallImageURL,
-		java.io.File smallFile, boolean mediumImage,
-		java.lang.String mediumImageURL, java.io.File mediumFile,
+		java.io.File smallImageFile, boolean mediumImage,
+		java.lang.String mediumImageURL, java.io.File mediumImageFile,
 		boolean largeImage, java.lang.String largeImageURL,
-		java.io.File largeFile,
+		java.io.File largeImageFile,
 		java.util.List<com.liferay.portlet.shopping.model.ShoppingItemField> itemFields,
 		java.util.List<com.liferay.portlet.shopping.model.ShoppingItemPrice> itemPrices,
 		com.liferay.portal.service.ServiceContext serviceContext)

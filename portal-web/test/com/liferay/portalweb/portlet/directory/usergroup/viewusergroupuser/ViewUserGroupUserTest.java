@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -23,9 +23,10 @@ import com.liferay.portalweb.portal.util.RuntimeVariables;
 public class ViewUserGroupUserTest extends BaseTestCase {
 	public void testViewUserGroupUser() throws Exception {
 		selenium.open("/web/guest/home/");
+		loadRequiredJavaScriptModules();
 
 		for (int second = 0;; second++) {
-			if (second >= 60) {
+			if (second >= 90) {
 				fail("timeout");
 			}
 
@@ -40,42 +41,43 @@ public class ViewUserGroupUserTest extends BaseTestCase {
 			Thread.sleep(1000);
 		}
 
-		selenium.saveScreenShotAndSource();
 		selenium.clickAt("link=Directory Test Page",
-			RuntimeVariables.replace(""));
+			RuntimeVariables.replace("Directory Test Page"));
 		selenium.waitForPageToLoad("30000");
-		selenium.saveScreenShotAndSource();
-		selenium.clickAt("link=User Groups", RuntimeVariables.replace(""));
+		loadRequiredJavaScriptModules();
+		selenium.clickAt("link=User Groups",
+			RuntimeVariables.replace("User Groups"));
 		selenium.waitForPageToLoad("30000");
-		selenium.saveScreenShotAndSource();
-		assertEquals(RuntimeVariables.replace("Test User Group"),
+		loadRequiredJavaScriptModules();
+		assertEquals(RuntimeVariables.replace("User Group Name"),
 			selenium.getText("//tr[3]/td[1]"));
-		assertEquals(RuntimeVariables.replace("This is a test user group!"),
+		assertEquals(RuntimeVariables.replace("User Group Description"),
 			selenium.getText("//tr[3]/td[2]"));
+		assertEquals(RuntimeVariables.replace("View Users"),
+			selenium.getText("//span/a/span"));
 		selenium.clickAt("//span/a/span", RuntimeVariables.replace("View Users"));
 		selenium.waitForPageToLoad("30000");
-		selenium.saveScreenShotAndSource();
-		assertEquals(RuntimeVariables.replace("TestFirst1"),
+		loadRequiredJavaScriptModules();
+		assertEquals(RuntimeVariables.replace("userfn"),
 			selenium.getText("//td[1]/a"));
-		assertEquals(RuntimeVariables.replace("TestLast1"),
+		assertEquals(RuntimeVariables.replace("userln"),
 			selenium.getText("//td[2]/a"));
-		assertEquals(RuntimeVariables.replace("testsn1"),
+		assertEquals(RuntimeVariables.replace("usersn"),
 			selenium.getText("//td[3]/a"));
 		assertEquals(RuntimeVariables.replace(""), selenium.getText("//td[4]/a"));
 		assertEquals(RuntimeVariables.replace(""), selenium.getText("//td[5]/a"));
-		selenium.clickAt("//td[1]/a", RuntimeVariables.replace("TestFirst1"));
+		selenium.clickAt("//td[1]/a", RuntimeVariables.replace("userfn"));
 		selenium.waitForPageToLoad("30000");
-		selenium.saveScreenShotAndSource();
-		assertEquals(RuntimeVariables.replace(
-				"TestFirst1 TestMiddle1 TestLast1"),
+		loadRequiredJavaScriptModules();
+		assertEquals(RuntimeVariables.replace("userfn usermn userln"),
 			selenium.getText("//div[@class='user-information']/div[1]/h2"));
 		assertEquals(RuntimeVariables.replace("Email Address"),
 			selenium.getText("//dl[@class='property-list']/dt[1]"));
-		assertEquals(RuntimeVariables.replace("testemail1@liferay.com"),
+		assertEquals(RuntimeVariables.replace("userea@liferay.com"),
 			selenium.getText("//dl[@class='property-list']/dd[1]"));
 		assertEquals(RuntimeVariables.replace("Birthday"),
 			selenium.getText("//dl[@class='property-list']/dt[2]"));
-		assertEquals(RuntimeVariables.replace("1/1/70"),
+		assertEquals(RuntimeVariables.replace("4/10/86"),
 			selenium.getText("//dl[@class='property-list']/dd[2]"));
 		assertEquals(RuntimeVariables.replace("Gender"),
 			selenium.getText("//dl[@class='property-list']/dt[3]"));

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -23,11 +23,11 @@ import com.liferay.portal.model.User;
  */
 public class UserLoginDateComparator extends OrderByComparator {
 
-	public static String ORDER_BY_ASC = "User_.loginDate ASC";
+	public static final String ORDER_BY_ASC = "loginDate ASC";
 
-	public static String ORDER_BY_DESC = "User_.loginDate DESC";
+	public static final String ORDER_BY_DESC = "loginDate DESC";
 
-	public static String[] ORDER_BY_FIELDS = {"loginDate"};
+	public static final String[] ORDER_BY_FIELDS = {"loginDate"};
 
 	public UserLoginDateComparator() {
 		this(false);

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -15,7 +15,6 @@
 package com.liferay.portlet.documentlibrary.service;
 
 import com.liferay.portal.kernel.bean.PortalBeanLocatorUtil;
-import com.liferay.portal.kernel.util.MethodCache;
 import com.liferay.portal.kernel.util.ReferenceRegistry;
 
 /**
@@ -66,25 +65,32 @@ public class DLFileShortcutLocalServiceUtil {
 	* Deletes the document library file shortcut with the primary key from the database. Also notifies the appropriate model listeners.
 	*
 	* @param fileShortcutId the primary key of the document library file shortcut
+	* @return the document library file shortcut that was removed
 	* @throws PortalException if a document library file shortcut with the primary key could not be found
 	* @throws SystemException if a system exception occurred
 	*/
-	public static void deleteDLFileShortcut(long fileShortcutId)
+	public static com.liferay.portlet.documentlibrary.model.DLFileShortcut deleteDLFileShortcut(
+		long fileShortcutId)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException {
-		getService().deleteDLFileShortcut(fileShortcutId);
+		return getService().deleteDLFileShortcut(fileShortcutId);
 	}
 
 	/**
 	* Deletes the document library file shortcut from the database. Also notifies the appropriate model listeners.
 	*
 	* @param dlFileShortcut the document library file shortcut
+	* @return the document library file shortcut that was removed
 	* @throws SystemException if a system exception occurred
 	*/
-	public static void deleteDLFileShortcut(
+	public static com.liferay.portlet.documentlibrary.model.DLFileShortcut deleteDLFileShortcut(
 		com.liferay.portlet.documentlibrary.model.DLFileShortcut dlFileShortcut)
 		throws com.liferay.portal.kernel.exception.SystemException {
-		getService().deleteDLFileShortcut(dlFileShortcut);
+		return getService().deleteDLFileShortcut(dlFileShortcut);
+	}
+
+	public static com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery() {
+		return getService().dynamicQuery();
 	}
 
 	/**
@@ -156,6 +162,12 @@ public class DLFileShortcutLocalServiceUtil {
 		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery)
 		throws com.liferay.portal.kernel.exception.SystemException {
 		return getService().dynamicQueryCount(dynamicQuery);
+	}
+
+	public static com.liferay.portlet.documentlibrary.model.DLFileShortcut fetchDLFileShortcut(
+		long fileShortcutId)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getService().fetchDLFileShortcut(fileShortcutId);
 	}
 
 	/**
@@ -338,6 +350,16 @@ public class DLFileShortcutLocalServiceUtil {
 		getService().deleteFileShortcuts(toFileEntryId);
 	}
 
+	public static void disableFileShortcuts(long toFileEntryId)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		getService().disableFileShortcuts(toFileEntryId);
+	}
+
+	public static void enableFileShortcuts(long toFileEntryId)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		getService().enableFileShortcuts(toFileEntryId);
+	}
+
 	public static com.liferay.portlet.documentlibrary.model.DLFileShortcut getFileShortcut(
 		long fileShortcutId)
 		throws com.liferay.portal.kernel.exception.PortalException,
@@ -370,26 +392,28 @@ public class DLFileShortcutLocalServiceUtil {
 		getService().updateFileShortcuts(oldToFileEntryId, newToFileEntryId);
 	}
 
+	public static void updateStatus(long userId, long fileShortcutId,
+		int status, com.liferay.portal.service.ServiceContext serviceContext)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException {
+		getService().updateStatus(userId, fileShortcutId, status, serviceContext);
+	}
+
 	public static DLFileShortcutLocalService getService() {
 		if (_service == null) {
 			_service = (DLFileShortcutLocalService)PortalBeanLocatorUtil.locate(DLFileShortcutLocalService.class.getName());
 
 			ReferenceRegistry.registerReference(DLFileShortcutLocalServiceUtil.class,
 				"_service");
-			MethodCache.remove(DLFileShortcutLocalService.class);
 		}
 
 		return _service;
 	}
 
+	/**
+	 * @deprecated
+	 */
 	public void setService(DLFileShortcutLocalService service) {
-		MethodCache.remove(DLFileShortcutLocalService.class);
-
-		_service = service;
-
-		ReferenceRegistry.registerReference(DLFileShortcutLocalServiceUtil.class,
-			"_service");
-		MethodCache.remove(DLFileShortcutLocalService.class);
 	}
 
 	private static DLFileShortcutLocalService _service;

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -24,6 +24,7 @@ import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
+import com.liferay.portal.security.permission.InlineSQLHelperUtil;
 import com.liferay.portal.service.persistence.impl.BasePersistenceImpl;
 import com.liferay.portlet.dynamicdatamapping.model.DDMTemplate;
 import com.liferay.portlet.dynamicdatamapping.model.impl.DDMTemplateImpl;
@@ -35,66 +36,492 @@ import java.util.List;
 /**
  * @author Eduardo Lundgren
  * @author Connor McKay
+ * @author Marcellus Tavares
  */
 public class DDMTemplateFinderImpl
 	extends BasePersistenceImpl<DDMTemplate> implements DDMTemplateFinder {
 
-	public static String COUNT_BY_C_G_S_N_D_T_L =
-		DDMTemplateFinder.class.getName() + ".countByC_G_S_N_D_T_L";
+	public static final String COUNT_BY_C_G_C_C_N_D_T_M_L =
+		DDMTemplateFinder.class.getName() + ".countByC_G_C_C_N_D_T_M_L";
 
-	public static String FIND_BY_C_G_S_N_D_T_L =
-		DDMTemplateFinder.class.getName() + ".findByC_G_S_N_D_T_L";
+	public static final String FIND_BY_C_G_C_C_N_D_T_M_L =
+		DDMTemplateFinder.class.getName() + ".findByC_G_C_C_N_D_T_M_L";
 
 	public int countByKeywords(
-			long companyId, long groupId, long structureId, String keywords)
+			long companyId, long groupId, long classNameId, long classPK,
+			String keywords, String type, String mode)
 		throws SystemException {
 
 		String[] names = null;
 		String[] descriptions = null;
-		String[] types = null;
+		String[] types = CustomSQLUtil.keywords(type, false);
+		String[] modes = CustomSQLUtil.keywords(mode, false);
 		String[] languages = null;
 		boolean andOperator = false;
 
 		if (Validator.isNotNull(keywords)) {
 			names = CustomSQLUtil.keywords(keywords);
 			descriptions = CustomSQLUtil.keywords(keywords, false);
-			types = CustomSQLUtil.keywords(keywords, false);
 			languages = CustomSQLUtil.keywords(keywords, false);
 		}
 		else {
 			andOperator = true;
 		}
 
-		return countByC_G_S_N_D_T_L(
-			companyId, groupId, structureId, names, descriptions, types,
-			languages, andOperator);
+		return countByC_G_C_C_N_D_T_M_L(
+			companyId, groupId, classNameId, classPK, names, descriptions,
+			types, modes, languages, andOperator);
 	}
 
-	public int countByC_G_S_N_D_T_L(
-			long companyId, long groupId, long structureId, String name,
-			String description, String type, String language,
-			boolean andOperator)
+	public int countByKeywords(
+			long companyId, long groupId, long[] classNameIds, long classPK,
+			String keywords, String type, String mode)
+		throws SystemException {
+
+		String[] names = null;
+		String[] descriptions = null;
+		String[] types = CustomSQLUtil.keywords(type, false);
+		String[] modes = CustomSQLUtil.keywords(mode, false);
+		String[] languages = null;
+		boolean andOperator = false;
+
+		if (Validator.isNotNull(keywords)) {
+			names = CustomSQLUtil.keywords(keywords);
+			descriptions = CustomSQLUtil.keywords(keywords, false);
+			languages = CustomSQLUtil.keywords(keywords, false);
+		}
+		else {
+			andOperator = true;
+		}
+
+		return countByC_G_C_C_N_D_T_M_L(
+			companyId, groupId, classNameIds, classPK, names, descriptions,
+			types, modes, languages, andOperator);
+	}
+
+	public int countByC_G_C_C_N_D_T_M_L(
+			long companyId, long groupId, long classNameId, long classPK,
+			String name, String description, String type, String mode,
+			String language, boolean andOperator)
 		throws SystemException {
 
 		String[] names = CustomSQLUtil.keywords(name);
 		String[] descriptions = CustomSQLUtil.keywords(description, false);
 		String[] types = CustomSQLUtil.keywords(type, false);
+		String[] modes = CustomSQLUtil.keywords(mode, false);
 		String[] languages = CustomSQLUtil.keywords(language, false);
 
-		return countByC_G_S_N_D_T_L(
-			companyId, groupId, structureId, names,	descriptions, types,
-			languages, andOperator);
+		return countByC_G_C_C_N_D_T_M_L(
+			companyId, groupId, classNameId, classPK, names, descriptions,
+			types, modes, languages, andOperator);
 	}
 
-	public int countByC_G_S_N_D_T_L(
-			long companyId, long groupId, long structureId, String[] names,
-			String[] descriptions, String[] types, String[] languages,
-			boolean andOperator)
+	public int countByC_G_C_C_N_D_T_M_L(
+			long companyId, long groupId, long classNameId, long classPK,
+			String[] names, String[] descriptions, String[] types,
+			String[] modes, String[] languages, boolean andOperator)
+		throws SystemException {
+
+		long[] classNameIds = new long[] {classNameId};
+
+		return doCountByC_G_C_C_N_D_T_M_L(
+			companyId, groupId, classNameIds, classPK, names, descriptions,
+			types, modes, languages, andOperator, false);
+	}
+
+	public int countByC_G_C_C_N_D_T_M_L(
+			long companyId, long groupId, long[] classNameIds, long classPK,
+			String name, String description, String type, String mode,
+			String language, boolean andOperator)
+		throws SystemException {
+
+		String[] names = CustomSQLUtil.keywords(name);
+		String[] descriptions = CustomSQLUtil.keywords(description, false);
+		String[] types = CustomSQLUtil.keywords(type, false);
+		String[] modes = CustomSQLUtil.keywords(mode, false);
+		String[] languages = CustomSQLUtil.keywords(language, false);
+
+		return countByC_G_C_C_N_D_T_M_L(
+			companyId, groupId, classNameIds, classPK, names, descriptions,
+			types, modes, languages, andOperator);
+	}
+
+	public int countByC_G_C_C_N_D_T_M_L(
+			long companyId, long groupId, long[] classNameIds, long classPK,
+			String[] names, String[] descriptions, String[] types,
+			String[] modes, String[] languages, boolean andOperator)
+		throws SystemException {
+
+		return doCountByC_G_C_C_N_D_T_M_L(
+			companyId, groupId, classNameIds, classPK, names, descriptions,
+			types, modes, languages, andOperator, false) ;
+	}
+
+	public int filterCountByKeywords(
+			long companyId, long groupId, long classNameId, long classPK,
+			String keywords, String type, String mode)
+		throws SystemException {
+
+		String[] names = null;
+		String[] descriptions = null;
+		String[] types = CustomSQLUtil.keywords(type, false);
+		String[] modes = CustomSQLUtil.keywords(mode, false);
+		String[] languages = null;
+		boolean andOperator = false;
+
+		if (Validator.isNotNull(keywords)) {
+			names = CustomSQLUtil.keywords(keywords);
+			descriptions = CustomSQLUtil.keywords(keywords, false);
+			languages = CustomSQLUtil.keywords(keywords, false);
+		}
+		else {
+			andOperator = true;
+		}
+
+		return filterCountByC_G_C_C_N_D_T_M_L(
+			companyId, groupId, classNameId, classPK, names, descriptions,
+			types, modes, languages, andOperator);
+	}
+
+	public int filterCountByKeywords(
+			long companyId, long groupId, long[] classNameIds, long classPK,
+			String keywords, String type, String mode)
+		throws SystemException {
+
+		String[] names = null;
+		String[] descriptions = null;
+		String[] types = CustomSQLUtil.keywords(type, false);
+		String[] modes = CustomSQLUtil.keywords(mode, false);
+		String[] languages = null;
+		boolean andOperator = false;
+
+		if (Validator.isNotNull(keywords)) {
+			names = CustomSQLUtil.keywords(keywords);
+			descriptions = CustomSQLUtil.keywords(keywords, false);
+			languages = CustomSQLUtil.keywords(keywords, false);
+		}
+		else {
+			andOperator = true;
+		}
+
+		return filterCountByC_G_C_C_N_D_T_M_L(
+			companyId, groupId, classNameIds, classPK, names, descriptions,
+			types, modes, languages, andOperator);
+	}
+
+	public int filterCountByC_G_C_C_N_D_T_M_L(
+			long companyId, long groupId, long classNameId, long classPK,
+			String name, String description, String type, String mode,
+			String language, boolean andOperator)
+		throws SystemException {
+
+		String[] names = CustomSQLUtil.keywords(name);
+		String[] descriptions = CustomSQLUtil.keywords(description, false);
+		String[] types = CustomSQLUtil.keywords(type, false);
+		String[] modes = CustomSQLUtil.keywords(mode, false);
+		String[] languages = CustomSQLUtil.keywords(language, false);
+
+		return filterCountByC_G_C_C_N_D_T_M_L(
+			companyId, groupId, classNameId, classPK, names, descriptions,
+			types, modes, languages, andOperator);
+	}
+
+	public int filterCountByC_G_C_C_N_D_T_M_L(
+			long companyId, long groupId, long classNameId, long classPK,
+			String[] names, String[] descriptions, String[] types,
+			String[] modes, String[] languages, boolean andOperator)
+		throws SystemException {
+
+		long[] classNameIds = new long[] {classNameId};
+
+		return filterCountByC_G_C_C_N_D_T_M_L(
+			companyId, groupId, classNameIds, classPK, names, descriptions,
+			types, modes, languages, andOperator);
+	}
+
+	public int filterCountByC_G_C_C_N_D_T_M_L(
+			long companyId, long groupId, long[] classNameIds, long classPK,
+			String name, String description, String type, String mode,
+			String language, boolean andOperator)
+		throws SystemException {
+
+		String[] names = CustomSQLUtil.keywords(name);
+		String[] descriptions = CustomSQLUtil.keywords(description, false);
+		String[] types = CustomSQLUtil.keywords(type, false);
+		String[] modes = CustomSQLUtil.keywords(mode, false);
+		String[] languages = CustomSQLUtil.keywords(language, false);
+
+		return filterCountByC_G_C_C_N_D_T_M_L(
+			companyId, groupId, classNameIds, classPK, names, descriptions,
+			types, modes, languages, andOperator);
+	}
+
+	public int filterCountByC_G_C_C_N_D_T_M_L(
+			long companyId, long groupId, long[] classNameIds, long classPK,
+			String[] names, String[] descriptions, String[] types,
+			String[] modes, String[] languages, boolean andOperator)
+		throws SystemException {
+
+		return doCountByC_G_C_C_N_D_T_M_L(
+			companyId, groupId, classNameIds, classPK, names, descriptions,
+			types, modes, languages, andOperator, true);
+	}
+
+	public List<DDMTemplate> filterFindByKeywords(
+			long companyId, long groupId, long classNameId, long classPK,
+			String keywords, String type, String mode, int start, int end,
+			OrderByComparator orderByComparator)
+		throws SystemException {
+
+		String[] names = null;
+		String[] descriptions = null;
+		String[] types = CustomSQLUtil.keywords(type, false);
+		String[] modes = CustomSQLUtil.keywords(mode, false);
+		String[] languages = null;
+		boolean andOperator = false;
+
+		if (Validator.isNotNull(keywords)) {
+			names = CustomSQLUtil.keywords(keywords);
+			descriptions = CustomSQLUtil.keywords(keywords, false);
+			languages = CustomSQLUtil.keywords(keywords, false);
+		}
+		else {
+			andOperator = true;
+		}
+
+		return filterFindByC_G_C_C_N_D_T_M_L(
+			companyId, groupId, classNameId, classPK, names, descriptions,
+			types, modes, languages, andOperator, start, end,
+			orderByComparator);
+	}
+
+	public List<DDMTemplate> filterFindByKeywords(
+			long companyId, long groupId, long[] classNameIds, long classPK,
+			String keywords, String type, String mode, int start, int end,
+			OrderByComparator orderByComparator)
+		throws SystemException {
+
+		String[] names = null;
+		String[] descriptions = null;
+		String[] types = CustomSQLUtil.keywords(type, false);
+		String[] modes = CustomSQLUtil.keywords(mode, false);
+		String[] languages = null;
+		boolean andOperator = false;
+
+		if (Validator.isNotNull(keywords)) {
+			names = CustomSQLUtil.keywords(keywords);
+			descriptions = CustomSQLUtil.keywords(keywords, false);
+			languages = CustomSQLUtil.keywords(languages, false);
+		}
+		else {
+			andOperator = true;
+		}
+
+		return filterFindByC_G_C_C_N_D_T_M_L(
+			companyId, groupId, classNameIds, classPK, names, descriptions,
+			types, modes, languages, andOperator, start, end,
+			orderByComparator);
+	}
+
+	public List<DDMTemplate> filterFindByC_G_C_C_N_D_T_M_L(
+			long companyId, long groupId, long classNameId, long classPK,
+			String name, String description, String type, String mode,
+			String language, boolean andOperator, int start, int end,
+			OrderByComparator orderByComparator)
+		throws SystemException {
+
+		String[] names = CustomSQLUtil.keywords(name);
+		String[] descriptions = CustomSQLUtil.keywords(description, false);
+		String[] types = CustomSQLUtil.keywords(type, false);
+		String[] modes = CustomSQLUtil.keywords(mode, false);
+		String[] languages = CustomSQLUtil.keywords(language, false);
+
+		return filterFindByC_G_C_C_N_D_T_M_L(
+			companyId, groupId, classNameId, classPK, names, descriptions,
+			types, modes, languages, andOperator, start, end,
+			orderByComparator);
+	}
+
+	public List<DDMTemplate> filterFindByC_G_C_C_N_D_T_M_L(
+			long companyId, long groupId, long classNameId, long classPK,
+			String[] names, String[] descriptions, String[] types,
+			String[] modes, String[] languages, boolean andOperator, int start,
+			int end, OrderByComparator orderByComparator)
+		throws SystemException {
+
+		long[] classNameIds = new long[] {classNameId};
+
+		return filterFindByC_G_C_C_N_D_T_M_L(
+			companyId, groupId, classNameIds, classPK, names, descriptions,
+			types, modes, languages, andOperator, start, end,
+			orderByComparator);
+	}
+
+	public List<DDMTemplate> filterFindByC_G_C_C_N_D_T_M_L(
+			long companyId, long groupId, long[] classNameIds, long classPK,
+			String name, String description, String type, String mode,
+			String language, boolean andOperator, int start, int end,
+			OrderByComparator orderByComparator)
+		throws SystemException {
+
+		String[] names = CustomSQLUtil.keywords(name);
+		String[] descriptions = CustomSQLUtil.keywords(description, false);
+		String[] types = CustomSQLUtil.keywords(type, false);
+		String[] modes = CustomSQLUtil.keywords(mode, false);
+		String[] languages = CustomSQLUtil.keywords(language, false);
+
+		return filterFindByC_G_C_C_N_D_T_M_L(
+			companyId, groupId, classNameIds, classPK, names, descriptions,
+			types, modes, languages, andOperator, start, end,
+			orderByComparator);
+	}
+
+	public List<DDMTemplate> filterFindByC_G_C_C_N_D_T_M_L(
+			long companyId, long groupId, long[] classNameIds, long classPK,
+			String[] names, String[] descriptions, String[] types,
+			String[] modes, String[] languages, boolean andOperator, int start,
+			int end, OrderByComparator orderByComparator)
+		throws SystemException {
+
+		return doFindByC_G_C_C_N_D_T_M_L(
+			companyId, groupId, classNameIds, classPK, names, descriptions,
+			types, modes, languages, andOperator, start, end, orderByComparator,
+			true);
+	}
+
+	public List<DDMTemplate> findByKeywords(
+			long companyId, long groupId, long classNameId, long classPK,
+			String keywords, String type, String mode, int start, int end,
+			OrderByComparator orderByComparator)
+		throws SystemException {
+
+		String[] names = null;
+		String[] descriptions = null;
+		String[] types = CustomSQLUtil.keywords(type, false);
+		String[] modes = CustomSQLUtil.keywords(mode, false);
+		String[] languages = null;
+		boolean andOperator = false;
+
+		if (Validator.isNotNull(keywords)) {
+			names = CustomSQLUtil.keywords(keywords);
+			descriptions = CustomSQLUtil.keywords(keywords, false);
+			languages = CustomSQLUtil.keywords(keywords, false);
+		}
+		else {
+			andOperator = true;
+		}
+
+		return findByC_G_C_C_N_D_T_M_L(
+			companyId, groupId, classNameId, classPK, names, descriptions,
+			types, modes, languages, andOperator, start, end,
+			orderByComparator);
+	}
+
+	public List<DDMTemplate> findByKeywords(
+			long companyId, long groupId, long[] classNameIds, long classPK,
+			String keywords, String type, String mode, int start, int end,
+			OrderByComparator orderByComparator)
+		throws SystemException {
+
+		String[] names = null;
+		String[] descriptions = null;
+		String[] types = CustomSQLUtil.keywords(type, false);
+		String[] modes = CustomSQLUtil.keywords(mode, false);
+		String[] languages = null;
+		boolean andOperator = false;
+
+		if (Validator.isNotNull(keywords)) {
+			names = CustomSQLUtil.keywords(keywords);
+			descriptions = CustomSQLUtil.keywords(keywords, false);
+			languages = CustomSQLUtil.keywords(languages, false);
+		}
+		else {
+			andOperator = true;
+		}
+
+		return findByC_G_C_C_N_D_T_M_L(
+			companyId, groupId, classNameIds, classPK, names, descriptions,
+			types, modes, languages, andOperator, start, end,
+			orderByComparator);
+	}
+
+	public List<DDMTemplate> findByC_G_C_C_N_D_T_M_L(
+			long companyId, long groupId, long classNameId, long classPK,
+			String name, String description, String type, String mode,
+			String language, boolean andOperator, int start, int end,
+			OrderByComparator orderByComparator)
+		throws SystemException {
+
+		String[] names = CustomSQLUtil.keywords(name);
+		String[] descriptions = CustomSQLUtil.keywords(description, false);
+		String[] types = CustomSQLUtil.keywords(type, false);
+		String[] modes = CustomSQLUtil.keywords(mode, false);
+		String[] languages = CustomSQLUtil.keywords(language, false);
+
+		return findByC_G_C_C_N_D_T_M_L(
+			companyId, groupId, classNameId, classPK, names, descriptions,
+			types, modes, languages, andOperator, start, end,
+			orderByComparator);
+	}
+
+	public List<DDMTemplate> findByC_G_C_C_N_D_T_M_L(
+			long companyId, long groupId, long classNameId, long classPK,
+			String[] names, String[] descriptions, String[] types,
+			String[] modes, String[] languages, boolean andOperator, int start,
+			int end, OrderByComparator orderByComparator)
+		throws SystemException {
+
+		long[] classNameIds = new long[] {classNameId};
+
+		return doFindByC_G_C_C_N_D_T_M_L(
+			companyId, groupId, classNameIds, classPK, names, descriptions,
+			types, modes, languages, andOperator, start, end, orderByComparator,
+			false);
+	}
+
+	public List<DDMTemplate> findByC_G_C_C_N_D_T_M_L(
+			long companyId, long groupId, long[] classNameIds, long classPK,
+			String name, String description, String type, String mode,
+			String language, boolean andOperator, int start, int end,
+			OrderByComparator orderByComparator)
+		throws SystemException {
+
+		String[] names = CustomSQLUtil.keywords(name);
+		String[] descriptions = CustomSQLUtil.keywords(description, false);
+		String[] types = CustomSQLUtil.keywords(type, false);
+		String[] modes = CustomSQLUtil.keywords(mode, false);
+		String[] languages = CustomSQLUtil.keywords(language, false);
+
+		return findByC_G_C_C_N_D_T_M_L(
+			companyId, groupId, classNameIds, classPK, names, descriptions,
+			types, modes, languages, andOperator, start, end,
+			orderByComparator);
+	}
+
+	public List<DDMTemplate> findByC_G_C_C_N_D_T_M_L(
+			long companyId, long groupId, long[] classNameIds, long classPK,
+			String[] names, String[] descriptions, String[] types,
+			String[] modes, String[] languages, boolean andOperator, int start,
+			int end, OrderByComparator orderByComparator)
+		throws SystemException {
+
+		return doFindByC_G_C_C_N_D_T_M_L(
+			companyId, groupId, classNameIds, classPK, names, descriptions,
+			types, modes, languages, andOperator, start, end, orderByComparator,
+			false);
+	}
+
+	protected int doCountByC_G_C_C_N_D_T_M_L(
+			long companyId, long groupId, long[] classNameIds, long classPK,
+			String[] names, String[] descriptions, String[] types,
+			String[] modes, String[] languages, boolean andOperator,
+			boolean inlineSQLHelper)
 		throws SystemException {
 
 		names = CustomSQLUtil.keywords(names);
 		descriptions = CustomSQLUtil.keywords(descriptions, false);
 		types = CustomSQLUtil.keywords(types, false);
+		modes = CustomSQLUtil.keywords(modes, false);
 		languages = CustomSQLUtil.keywords(languages, false);
 
 		Session session = null;
@@ -102,14 +529,30 @@ public class DDMTemplateFinderImpl
 		try {
 			session = openSession();
 
-			String sql = CustomSQLUtil.get(COUNT_BY_C_G_S_N_D_T_L);
+			String sql = CustomSQLUtil.get(COUNT_BY_C_G_C_C_N_D_T_M_L);
 
-			if (groupId <= 0) {
-				sql = StringUtil.replace(sql, "(groupId = ?) AND", "");
+			if (inlineSQLHelper) {
+				sql = InlineSQLHelperUtil.replacePermissionCheck(
+					sql, DDMTemplate.class.getName(), "DDMTemplate.templateId",
+					groupId);
 			}
 
-			if (structureId <= 0) {
-				sql = StringUtil.replace(sql, "(structureId = ?) AND", "");
+			if (groupId <= 0) {
+				sql = StringUtil.replace(
+					sql, "(groupId = ?) AND", StringPool.BLANK);
+			}
+
+			if (classNameIds.length == 0) {
+				sql = StringUtil.replace(
+					sql, "(classNameId IN ([$CLASSNAME_ID$])) AND", "");
+			}
+			else {
+				sql = StringUtil.replace(
+					sql, "[$CLASSNAME_ID$]", StringUtil.merge(classNameIds));
+			}
+
+			if (classPK < 0) {
+				sql = StringUtil.replace(sql, "(classPK = ?) AND", "");
 			}
 
 			sql = CustomSQLUtil.replaceKeywords(
@@ -119,7 +562,9 @@ public class DDMTemplateFinderImpl
 			sql = CustomSQLUtil.replaceKeywords(
 				sql, "type", StringPool.LIKE, false, types);
 			sql = CustomSQLUtil.replaceKeywords(
-				sql, "language", StringPool.LIKE, false, languages);
+				sql, "mode", StringPool.LIKE, false, modes);
+			sql = CustomSQLUtil.replaceKeywords(
+				sql, "language", StringPool.LIKE, true, languages);
 			sql = CustomSQLUtil.replaceAndOperator(sql, andOperator);
 
 			SQLQuery q = session.createSQLQuery(sql);
@@ -134,16 +579,17 @@ public class DDMTemplateFinderImpl
 				qPos.add(groupId);
 			}
 
-			if (structureId > 0) {
-				qPos.add(structureId);
+			if (classPK >= 0) {
+				qPos.add(classPK);
 			}
 
 			qPos.add(names, 2);
 			qPos.add(descriptions, 2);
 			qPos.add(types, 2);
+			qPos.add(modes, 2);
 			qPos.add(languages, 2);
 
-			Iterator<Long> itr = q.list().iterator();
+			Iterator<Long> itr = q.iterate();
 
 			if (itr.hasNext()) {
 				Long count = itr.next();
@@ -163,59 +609,18 @@ public class DDMTemplateFinderImpl
 		}
 	}
 
-	public List<DDMTemplate> findByKeywords(
-			long companyId, long groupId, long structureId, String keywords,
-			int start, int end, OrderByComparator orderByComparator)
-		throws SystemException {
-
-		String[] names = null;
-		String[] descriptions = null;
-		String[] types = null;
-		String[] languages = null;
-		boolean andOperator = false;
-
-		if (Validator.isNotNull(keywords)) {
-			names = CustomSQLUtil.keywords(keywords);
-			descriptions = CustomSQLUtil.keywords(keywords, false);
-			types = CustomSQLUtil.keywords(types, false);
-			languages = CustomSQLUtil.keywords(languages, false);
-		}
-		else {
-			andOperator = true;
-		}
-
-		return findByC_G_S_N_D_T_L(
-			companyId, groupId, structureId, names, descriptions, types,
-			languages, andOperator, start, end, orderByComparator);
-	}
-
-	public List<DDMTemplate> findByC_G_S_N_D_T_L(
-			long companyId, long groupId, long structureId, String name,
-			String description, String type, String language,
-			boolean andOperator, int start, int end,
-			OrderByComparator orderByComparator)
-		throws SystemException {
-
-		String[] names = CustomSQLUtil.keywords(name);
-		String[] descriptions = CustomSQLUtil.keywords(description, false);
-		String[] types = CustomSQLUtil.keywords(type, false);
-		String[] languages = CustomSQLUtil.keywords(language, false);
-
-		return findByC_G_S_N_D_T_L(
-			companyId, groupId, structureId, names,	descriptions, types,
-			languages, andOperator, start, end, orderByComparator);
-	}
-
-	public List<DDMTemplate> findByC_G_S_N_D_T_L(
-			long companyId, long groupId, long structureId, String[] names,
-			String[] descriptions, String[] types, String[] languages,
-			boolean andOperator, int start, int end,
-			OrderByComparator orderByComparator)
+	protected List<DDMTemplate> doFindByC_G_C_C_N_D_T_M_L(
+			long companyId, long groupId, long[] classNameIds, long classPK,
+			String[] names, String[] descriptions, String[] types,
+			String[] modes, String[] languages, boolean andOperator, int start,
+			int end, OrderByComparator orderByComparator,
+			boolean inlineSQLHelper)
 		throws SystemException {
 
 		names = CustomSQLUtil.keywords(names);
 		descriptions = CustomSQLUtil.keywords(descriptions, false);
 		types = CustomSQLUtil.keywords(types, false);
+		modes = CustomSQLUtil.keywords(modes, false);
 		languages = CustomSQLUtil.keywords(languages, false);
 
 		Session session = null;
@@ -223,14 +628,30 @@ public class DDMTemplateFinderImpl
 		try {
 			session = openSession();
 
-			String sql = CustomSQLUtil.get(FIND_BY_C_G_S_N_D_T_L);
+			String sql = CustomSQLUtil.get(FIND_BY_C_G_C_C_N_D_T_M_L);
 
-			if (groupId <= 0) {
-				sql = StringUtil.replace(sql, "(groupId = ?) AND", "");
+			if (inlineSQLHelper) {
+				sql = InlineSQLHelperUtil.replacePermissionCheck(
+					sql, DDMTemplate.class.getName(), "DDMTemplate.templateId",
+					groupId);
 			}
 
-			if (structureId <= 0) {
-				sql = StringUtil.replace(sql, "(structureId = ?) AND", "");
+			if (groupId <= 0) {
+				sql = StringUtil.replace(
+					sql, "(groupId = ?) AND", StringPool.BLANK);
+			}
+
+			if (classNameIds.length == 0) {
+				sql = StringUtil.replace(
+					sql, "(classNameId IN ([$CLASSNAME_ID$])) AND", "");
+			}
+			else {
+				sql = StringUtil.replace(
+					sql, "[$CLASSNAME_ID$]", StringUtil.merge(classNameIds));
+			}
+
+			if (classPK < 0) {
+				sql = StringUtil.replace(sql, "(classPK = ?) AND", "");
 			}
 
 			sql = CustomSQLUtil.replaceKeywords(
@@ -240,15 +661,13 @@ public class DDMTemplateFinderImpl
 			sql = CustomSQLUtil.replaceKeywords(
 				sql, "type", StringPool.LIKE, false, types);
 			sql = CustomSQLUtil.replaceKeywords(
-				sql, "language", StringPool.LIKE, false, languages);
+				sql, "mode", StringPool.LIKE, false, modes);
+			sql = CustomSQLUtil.replaceKeywords(
+				sql, "language", StringPool.LIKE, true, languages);
 			sql = CustomSQLUtil.replaceAndOperator(sql, andOperator);
 
 			if (orderByComparator != null) {
-				String orderByFields = StringUtil.merge(
-					orderByComparator.getOrderByFields(), StringPool.COMMA);
-
-				sql = StringUtil.replace(
-					sql, "templateId DESC", orderByFields.concat(" DESC"));
+				sql = CustomSQLUtil.replaceOrderBy(sql, orderByComparator);
 			}
 
 			SQLQuery q = session.createSQLQuery(sql);
@@ -263,13 +682,14 @@ public class DDMTemplateFinderImpl
 				qPos.add(groupId);
 			}
 
-			if (structureId > 0) {
-				qPos.add(structureId);
+			if (classPK >= 0) {
+				qPos.add(classPK);
 			}
 
 			qPos.add(names, 2);
 			qPos.add(descriptions, 2);
 			qPos.add(types, 2);
+			qPos.add(modes, 2);
 			qPos.add(languages, 2);
 
 			return (List<DDMTemplate>)QueryUtil.list(

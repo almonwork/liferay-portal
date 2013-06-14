@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -44,7 +44,7 @@
 
 		<c:if test='<%= !displayStyle.endsWith("-without-title") %>'>
 			<div class="entry-info">
-				<span class="entry-title"><a href="<%= viewEntryURL %>"><%= entry.getTitle() %></a></span>
+				<span class="entry-title"><a href="<%= viewEntryURL %>"><%= HtmlUtil.escape(entry.getTitle()) %></a></span>
 
 				<span class="entry-author"><liferay-ui:message key="written-by" /> <a href="<%= viewAllEntriesURL %>"><%= HtmlUtil.escape(PortalUtil.getUserName(entry.getUserId(), entry.getUserName())) %></a>,</span>
 
@@ -76,14 +76,33 @@
 			</c:if>
 			<c:choose>
 				<c:when test='<%= displayStyle.startsWith("abstract") %>'>
-					<%= StringUtil.shorten(HtmlUtil.stripHtml(entry.getContent()), 200, StringPool.BLANK) %>
+					<%= StringUtil.shorten(HtmlUtil.stripHtml(entry.getDescription()), 200, StringPool.BLANK) %>
+
+					<c:if test="<%= entry.isSmallImage() %>">
+
+						<%
+						String src = StringPool.BLANK;
+
+						if (Validator.isNotNull(entry.getSmallImageURL())) {
+							src = entry.getSmallImageURL();
+						}
+						else {
+							src = themeDisplay.getPathImage() + "/blogs/article?img_id=" + entry.getSmallImageId() + "&t=" + WebServerServletTokenUtil.getToken(entry.getSmallImageId());
+						}
+						%>
+
+						<div class="asset-small-image">
+							<img alt="" class="asset-small-image" src="<%= HtmlUtil.escape(src) %>" width="150" />
+						</div>
+					</c:if>
+
 				</c:when>
 				<c:when test='<%= displayStyle.startsWith("quote") %>'>
 					<span class="quote">
 						<a href="<%= viewAllEntriesURL %>">
 							&quot;<%= StringUtil.shorten(StringUtil.trim(HtmlUtil.stripHtml(entry.getContent())), 100, StringPool.BLANK) %> ...&quot;
 
-							<span class="nobreak"><liferay-ui:message arguments='<%= new Object[] {"aui-helper-hidden-accessible", entry.getTitle()} %>' key="read-more-x-about-x" /> &raquo;</span>
+							<span class="nobreak"><liferay-ui:message arguments='<%= new Object[] {"aui-helper-hidden-accessible", HtmlUtil.escape(entry.getTitle())} %>' key="read-more-x-about-x" /> &raquo;</span>
 						</a>
 					</span>
 				</c:when>
@@ -96,7 +115,7 @@
 		<div class="comments">
 			<c:choose>
 				<c:when test='<%= displayStyle.startsWith("abstract") %>'>
-					<a href="<%= viewEntryURL %>"><liferay-ui:message arguments='<%= new Object[] {"aui-helper-hidden-accessible", entry.getTitle()} %>' key="read-more-x-about-x" /> &raquo;</a>
+					<a href="<%= viewEntryURL %>"><liferay-ui:message arguments='<%= new Object[] {"aui-helper-hidden-accessible", HtmlUtil.escape(entry.getTitle())} %>' key="read-more-x-about-x" /> &raquo;</a>
 				</c:when>
 				<c:when test='<%= !displayStyle.startsWith("quote") %>'>
 
@@ -106,7 +125,7 @@
 					int messagesCount = MBMessageLocalServiceUtil.getDiscussionMessagesCount(classNameId, entry.getEntryId(), WorkflowConstants.STATUS_APPROVED);
 					%>
 
-					<a href="<%= viewEntryURL %>#<portlet:namespace />messageScroll0"><%= messagesCount %> <liferay-ui:message key="comments" /></a>
+					<a href="<%= PropsValues.PORTLET_URL_ANCHOR_ENABLE ? viewEntryURL : viewEntryURL + "#blogsCommentsPanelContainer" %>"><%= messagesCount %> <liferay-ui:message key='<%= (messagesCount == 1) ? "comment" : "comments" %>' /></a>
 				</c:when>
 			</c:choose>
 		</div>

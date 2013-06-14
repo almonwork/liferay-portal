@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -69,7 +69,7 @@ long groupId = ParamUtil.getLong(request, "groupId");
 		sb.append("selectStructure('");
 		sb.append(structure.getStructureId());
 		sb.append("', '");
-		sb.append(structure.getName());
+		sb.append(structure.getName(locale));
 		sb.append("', Liferay.Util.getWindow());");
 
 		String rowHREF = sb.toString();
@@ -78,13 +78,17 @@ long groupId = ParamUtil.getLong(request, "groupId");
 
 		row.addText(structure.getStructureId(), rowHREF);
 
-		// Name and description
+		// Name
 
-		if (Validator.isNotNull(structure.getDescription())) {
-			row.addText(structure.getName().concat("<br />").concat(structure.getDescription()), rowHREF);
+		row.addText(HtmlUtil.escape(structure.getName(locale)), rowHREF);
+
+		// Description
+
+		if (Validator.isNotNull(structure.getDescription(locale))) {
+			row.addText(HtmlUtil.escape(structure.getDescription(locale)), rowHREF);
 		}
 		else {
-			row.addText(structure.getName(), rowHREF);
+			row.addText(StringPool.BLANK);
 		}
 
 		// Add result row

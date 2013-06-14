@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -52,6 +52,11 @@ public class UnsyncBufferedOutputStream extends UnsyncFilterOutputStream {
 	}
 
 	@Override
+	public void write(byte[] bytes) throws IOException {
+		write(bytes, 0, bytes.length);
+	}
+
+	@Override
 	public void write(byte[] bytes, int offset, int length) throws IOException {
 		if (length >= buffer.length) {
 			if (count > 0) {
@@ -65,7 +70,7 @@ public class UnsyncBufferedOutputStream extends UnsyncFilterOutputStream {
 			return;
 		}
 
-		if (count > 0 && length > buffer.length - count) {
+		if ((count > 0) && (length > (buffer.length - count))) {
 			outputStream.write(buffer, 0, count);
 
 			count = 0;
@@ -74,11 +79,6 @@ public class UnsyncBufferedOutputStream extends UnsyncFilterOutputStream {
 		System.arraycopy(bytes, offset, buffer, count, length);
 
 		count += length;
-	}
-
-	@Override
-	public void write(byte[] bytes) throws IOException {
-		write(bytes, 0, bytes.length);
 	}
 
 	@Override
@@ -95,6 +95,6 @@ public class UnsyncBufferedOutputStream extends UnsyncFilterOutputStream {
 	protected byte[] buffer;
 	protected int count;
 
-	private static int _DEFAULT_BUFFER_SIZE = 8192;
+	private static final int _DEFAULT_BUFFER_SIZE = 8192;
 
 }

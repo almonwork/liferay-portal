@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -23,9 +23,28 @@ package com.liferay.portal.service;
  * @see       ImageService
  * @generated
  */
-public class ImageServiceWrapper implements ImageService {
+public class ImageServiceWrapper implements ImageService,
+	ServiceWrapper<ImageService> {
 	public ImageServiceWrapper(ImageService imageService) {
 		_imageService = imageService;
+	}
+
+	/**
+	* Returns the Spring bean ID for this bean.
+	*
+	* @return the Spring bean ID for this bean
+	*/
+	public java.lang.String getBeanIdentifier() {
+		return _imageService.getBeanIdentifier();
+	}
+
+	/**
+	* Sets the Spring bean ID for this bean.
+	*
+	* @param beanIdentifier the Spring bean ID for this bean
+	*/
+	public void setBeanIdentifier(java.lang.String beanIdentifier) {
+		_imageService.setBeanIdentifier(beanIdentifier);
 	}
 
 	public com.liferay.portal.model.Image getImage(long imageId)
@@ -34,11 +53,25 @@ public class ImageServiceWrapper implements ImageService {
 		return _imageService.getImage(imageId);
 	}
 
+	/**
+	 * @deprecated Renamed to {@link #getWrappedService}
+	 */
 	public ImageService getWrappedImageService() {
 		return _imageService;
 	}
 
+	/**
+	 * @deprecated Renamed to {@link #setWrappedService}
+	 */
 	public void setWrappedImageService(ImageService imageService) {
+		_imageService = imageService;
+	}
+
+	public ImageService getWrappedService() {
+		return _imageService;
+	}
+
+	public void setWrappedService(ImageService imageService) {
 		_imageService = imageService;
 	}
 

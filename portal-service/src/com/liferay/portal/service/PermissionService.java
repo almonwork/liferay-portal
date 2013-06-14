@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -18,7 +18,6 @@ import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.jsonwebservice.JSONWebService;
 import com.liferay.portal.kernel.transaction.Isolation;
-import com.liferay.portal.kernel.transaction.Propagation;
 import com.liferay.portal.kernel.transaction.Transactional;
 
 /**
@@ -37,93 +36,56 @@ import com.liferay.portal.kernel.transaction.Transactional;
 @JSONWebService
 @Transactional(isolation = Isolation.PORTAL, rollbackFor =  {
 	PortalException.class, SystemException.class})
-public interface PermissionService {
+public interface PermissionService extends BaseService {
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this interface directly. Always use {@link PermissionServiceUtil} to access the permission remote service. Add custom service methods to {@link com.liferay.portal.service.impl.PermissionServiceImpl} and rerun ServiceBuilder to automatically copy the method declarations to this interface.
 	 */
-	public void checkPermission(long groupId, long resourceId)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException;
 
+	/**
+	* Returns the Spring bean ID for this bean.
+	*
+	* @return the Spring bean ID for this bean
+	*/
+	public java.lang.String getBeanIdentifier();
+
+	/**
+	* Sets the Spring bean ID for this bean.
+	*
+	* @param beanIdentifier the Spring bean ID for this bean
+	*/
+	public void setBeanIdentifier(java.lang.String beanIdentifier);
+
+	/**
+	* Checks to see if the group has permission to the service.
+	*
+	* @param groupId the primary key of the group
+	* @param name the service name
+	* @param primKey the primary key of the service
+	* @throws PortalException if the group did not have permission to the
+	service, if a group with the primary key could not be found or if
+	the permission information was invalid
+	* @throws SystemException if a system exception occurred
+	*/
 	public void checkPermission(long groupId, java.lang.String name,
 		long primKey)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException;
 
+	/**
+	* Checks to see if the group has permission to the service.
+	*
+	* @param groupId the primary key of the group
+	* @param name the service name
+	* @param primKey the primary key of the service
+	* @throws PortalException if the group did not have permission to the
+	service, if a group with the primary key could not be found or if
+	the permission information was invalid
+	* @throws SystemException if a system exception occurred
+	*/
 	public void checkPermission(long groupId, java.lang.String name,
 		java.lang.String primKey)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException;
-
-	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public boolean hasGroupPermission(long groupId, java.lang.String actionId,
-		long resourceId)
-		throws com.liferay.portal.kernel.exception.SystemException;
-
-	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public boolean hasUserPermission(long userId, java.lang.String actionId,
-		long resourceId)
-		throws com.liferay.portal.kernel.exception.SystemException;
-
-	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public boolean hasUserPermissions(long userId, long groupId,
-		java.util.List<com.liferay.portal.model.Resource> resources,
-		java.lang.String actionId,
-		com.liferay.portal.security.permission.PermissionCheckerBag permissionCheckerBag)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException;
-
-	public void setGroupPermissions(long groupId, java.lang.String[] actionIds,
-		long resourceId)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException;
-
-	public void setGroupPermissions(java.lang.String className,
-		java.lang.String classPK, long groupId, java.lang.String[] actionIds,
-		long resourceId)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException;
-
-	public void setOrgGroupPermissions(long organizationId, long groupId,
-		java.lang.String[] actionIds, long resourceId)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException;
-
-	public void setRolePermission(long roleId, long groupId,
-		java.lang.String name, int scope, java.lang.String primKey,
-		java.lang.String actionId)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException;
-
-	public void setRolePermissions(long roleId, long groupId,
-		java.lang.String[] actionIds, long resourceId)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException;
-
-	public void setUserPermissions(long userId, long groupId,
-		java.lang.String[] actionIds, long resourceId)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException;
-
-	public void unsetRolePermission(long roleId, long groupId, long permissionId)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException;
-
-	public void unsetRolePermission(long roleId, long groupId,
-		java.lang.String name, int scope, java.lang.String primKey,
-		java.lang.String actionId)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException;
-
-	public void unsetRolePermissions(long roleId, long groupId,
-		java.lang.String name, int scope, java.lang.String actionId)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException;
-
-	public void unsetUserPermissions(long userId, long groupId,
-		java.lang.String[] actionIds, long resourceId)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException;
 }

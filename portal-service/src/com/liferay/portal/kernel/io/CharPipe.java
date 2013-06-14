@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -83,6 +83,11 @@ public class CharPipe {
 	protected Condition notFull = bufferLock.newCondition();
 	protected int readIndex;
 	protected int writeIndex;
+
+	private static final int _DEFAULT_BUFFER_SIZE = 1024 * 8;
+
+	private PipeReader _pipeReader = new PipeReader();
+	private PipeWriter _pipeWriter = new PipeWriter();
 
 	private class PipeReader extends Reader {
 
@@ -488,7 +493,7 @@ public class CharPipe {
 
 					int write = remaining;
 
-					if (remaining > buffer.length - count) {
+					if (remaining > (buffer.length - count)) {
 						write = buffer.length - count;
 					}
 
@@ -554,10 +559,5 @@ public class CharPipe {
 		private volatile boolean _closed;
 
 	}
-
-	private static final int _DEFAULT_BUFFER_SIZE = 1024 * 8;
-
-	private PipeReader _pipeReader = new PipeReader();
-	private PipeWriter _pipeWriter = new PipeWriter();
 
 }

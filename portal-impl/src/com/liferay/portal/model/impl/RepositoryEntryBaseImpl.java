@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,7 +14,9 @@
 
 package com.liferay.portal.model.impl;
 
+import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.model.RepositoryEntry;
+import com.liferay.portal.service.RepositoryEntryLocalServiceUtil;
 
 /**
  * The extended model base implementation for the RepositoryEntry service. Represents a row in the &quot;RepositoryEntry&quot; database table, with each column mapped to a property of this class.
@@ -35,4 +37,12 @@ public abstract class RepositoryEntryBaseImpl extends RepositoryEntryModelImpl
 	 *
 	 * Never modify or reference this class directly. All methods that expect a repository entry model instance should use the {@link RepositoryEntry} interface instead.
 	 */
+	public void persist() throws SystemException {
+		if (this.isNew()) {
+			RepositoryEntryLocalServiceUtil.addRepositoryEntry(this);
+		}
+		else {
+			RepositoryEntryLocalServiceUtil.updateRepositoryEntry(this);
+		}
+	}
 }

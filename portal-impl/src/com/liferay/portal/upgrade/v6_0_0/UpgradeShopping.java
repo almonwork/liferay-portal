@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -15,10 +15,10 @@
 package com.liferay.portal.upgrade.v6_0_0;
 
 import com.liferay.portal.kernel.upgrade.UpgradeProcess;
-import com.liferay.portal.kernel.upgrade.util.UpgradeTable;
-import com.liferay.portal.kernel.upgrade.util.UpgradeTableFactoryUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.upgrade.v6_0_0.util.ShoppingItemTable;
+
+import java.sql.SQLException;
 
 /**
  * @author Alexander Chow
@@ -40,14 +40,11 @@ public class UpgradeShopping extends UpgradeProcess {
 			runSQL("alter_column_type ShoppingItem mediumImageURL STRING null");
 			runSQL("alter_column_type ShoppingItem largeImageURL STRING null");
 		}
-		catch (Exception e) {
-			UpgradeTable upgradeTable = UpgradeTableFactoryUtil.getUpgradeTable(
-				ShoppingItemTable.TABLE_NAME, ShoppingItemTable.TABLE_COLUMNS);
-
-			upgradeTable.setCreateSQL(ShoppingItemTable.TABLE_SQL_CREATE);
-			upgradeTable.setIndexesSQL(ShoppingItemTable.TABLE_SQL_ADD_INDEXES);
-
-			upgradeTable.updateTable();
+		catch (SQLException sqle) {
+			upgradeTable(
+				ShoppingItemTable.TABLE_NAME, ShoppingItemTable.TABLE_COLUMNS,
+				ShoppingItemTable.TABLE_SQL_CREATE,
+				ShoppingItemTable.TABLE_SQL_ADD_INDEXES);
 		}
 	}
 

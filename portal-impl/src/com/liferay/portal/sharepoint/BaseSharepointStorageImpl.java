@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -48,25 +48,25 @@ public abstract class BaseSharepointStorageImpl implements SharepointStorage {
 		return null;
 	}
 
-	public Tree getDocumentTree(SharepointRequest sharepointRequest)
-		throws Exception {
-
-		return new Tree();
-	}
-
 	public Tree getDocumentsTree(SharepointRequest sharepointRequest)
 		throws Exception {
 
 		return new Tree();
 	}
 
-	public Tree getFolderTree(SharepointRequest sharepointRequest)
+	public Tree getDocumentTree(SharepointRequest sharepointRequest)
 		throws Exception {
 
 		return new Tree();
 	}
 
 	public Tree getFoldersTree(SharepointRequest sharepointRequest)
+		throws Exception {
+
+		return new Tree();
+	}
+
+	public Tree getFolderTree(SharepointRequest sharepointRequest)
 		throws Exception {
 
 		return new Tree();

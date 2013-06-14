@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -103,6 +103,7 @@ if (Validator.isNull(redirect)) {
 		message.setThreadId(temp.getThreadId());
 		message.setSubject(subject);
 		message.setBody(body);
+		message.setFormat(messageFormat);
 		message.setAttachments(temp.isAttachments());
 		message.setAnonymous(temp.isAnonymous());
 	}
@@ -118,6 +119,7 @@ if (Validator.isNull(redirect)) {
 		message.setThreadId(threadId);
 		message.setSubject(subject);
 		message.setBody(body);
+		message.setFormat(messageFormat);
 		message.setAttachments(attachments);
 		message.setAnonymous(BeanParamUtil.getBoolean(message, request, "anonymous"));
 	}
@@ -149,7 +151,7 @@ if (Validator.isNull(redirect)) {
 	<portlet:param name="struts_action" value="/message_boards/edit_message" />
 </portlet:actionURL>
 
-<aui:form action="<%= editMessageURL %>" enctype="multipart/form-data" method="post" name="fm" onSubmit='<%= "event.preventDefault(); " + renderResponse.getNamespace() + "saveMessage(false);" %>'>
+<aui:form action="<%= editMessageURL %>" enctype='<%= attachments ? "multipart/form-data" : "" %>' method="post" name="fm" onSubmit='<%= "event.preventDefault(); " + renderResponse.getNamespace() + "saveMessage(false);" %>'>
 	<aui:input name="<%= Constants.CMD %>" type="hidden" />
 	<aui:input name="redirect" type="hidden" value="<%= redirect %>" />
 	<aui:input name="messageId" type="hidden" value="<%= messageId %>" />
@@ -175,7 +177,13 @@ if (Validator.isNull(redirect)) {
 	<liferay-ui:error exception="<%= FileSizeException.class %>">
 
 		<%
-		long fileMaxSize = PrefsPropsUtil.getLong(PropsKeys.DL_FILE_MAX_SIZE) / 1024;
+		long fileMaxSize = PrefsPropsUtil.getLong(PropsKeys.DL_FILE_MAX_SIZE);
+
+		if (fileMaxSize == 0) {
+			fileMaxSize = PrefsPropsUtil.getLong(PropsKeys.UPLOAD_SERVLET_REQUEST_IMPL_MAX_SIZE);
+		}
+
+		fileMaxSize /= 1024;
 		%>
 
 		<liferay-ui:message arguments="<%= fileMaxSize %>" key="please-enter-a-file-with-a-valid-file-size-no-larger-than-x" />
@@ -223,7 +231,7 @@ if (Validator.isNull(redirect)) {
 				for (int i = 0; i < existingAttachments.length; i++) {
 					String existingPath = existingAttachments[i];
 
-					String existingName = StringUtil.extractLast(existingPath, StringPool.SLASH);
+					String existingName = StringUtil.extractLast(existingPath, CharPool.SLASH);
 				%>
 
 					<tr>
@@ -267,27 +275,35 @@ if (Validator.isNull(redirect)) {
 		<c:if test="<%= curParentMessage == null %>">
 
 			<%
+			boolean disabled = false;
 			boolean question = threadAsQuestionByDefault;
 
 			if (message != null) {
-				boolean questionFlag = MBMessageFlagLocalServiceUtil.hasQuestionFlag(messageId);
-				boolean answerFlag = MBMessageFlagLocalServiceUtil.hasAnswerFlag(messageId);
+				thread = MBThreadLocalServiceUtil.getThread(threadId);
 
-				if (questionFlag || answerFlag) {
+				if (thread.isQuestion() || message.isAnswer()) {
+					question = true;
+				}
+			}
+			else {
+				MBCategory category = MBCategoryLocalServiceUtil.getCategory(categoryId);
+
+				if ((category != null) && category.getDisplayStyle().equals("question")) {
+					disabled = true;
 					question = true;
 				}
 			}
 			%>
 
-			<aui:input helpMessage="message-boards-message-question-help" inlineLabel="left" label="mark-as-a-question" name="question" type="checkbox" value="<%= question %>" />
+			<aui:input disabled="<%= disabled %>" helpMessage="message-boards-message-question-help" label="mark-as-a-question" name="question" type="checkbox" value="<%= question %>" />
 		</c:if>
 
 		<c:if test="<%= (message == null) && themeDisplay.isSignedIn() && allowAnonymousPosting %>">
-			<aui:input helpMessage="message-boards-message-anonymous-help" inlineLabel="left" name="anonymous" type="checkbox" />
+			<aui:input helpMessage="message-boards-message-anonymous-help" name="anonymous" type="checkbox" />
 		</c:if>
 
-		<c:if test="<%= (message == null) && themeDisplay.isSignedIn() && !SubscriptionLocalServiceUtil.isSubscribed(themeDisplay.getCompanyId(), user.getUserId(),	MBThread.class.getName(), threadId) && !SubscriptionLocalServiceUtil.isSubscribed(themeDisplay.getCompanyId(), user.getUserId(), MBCategory.class.getName(), categoryId) %>">
-			<aui:input helpMessage="message-boards-message-subscribe-me-help" inlineLabel="left" label="subscribe-me" name="subscribe" type="checkbox" value="<%= subscribeByDefault %>" />
+		<c:if test="<%= (message == null) && themeDisplay.isSignedIn() && !SubscriptionLocalServiceUtil.isSubscribed(themeDisplay.getCompanyId(), user.getUserId(), MBThread.class.getName(), threadId) && !SubscriptionLocalServiceUtil.isSubscribed(themeDisplay.getCompanyId(), user.getUserId(), MBCategory.class.getName(), categoryId) %>">
+			<aui:input helpMessage="message-boards-message-subscribe-me-help" label="subscribe-me" name="subscribe" type="checkbox" value="<%= subscribeByDefault %>" />
 		</c:if>
 
 		<c:if test="<%= (priorities.length > 0) && MBCategoryPermission.contains(permissionChecker, scopeGroupId, categoryId, ActionKeys.UPDATE_THREAD_PRIORITY) %>">
@@ -325,7 +341,7 @@ if (Validator.isNull(redirect)) {
 		</c:if>
 
 		<c:if test="<%= PropsValues.MESSAGE_BOARDS_PINGBACK_ENABLED %>">
-			<aui:input helpMessage="to-allow-pingbacks,-please-also-ensure-the-entry's-guest-view-permission-is-enabled" inlineLabel="left" label="allow-pingbacks" name="allowPingbacks" value="<%= allowPingbacks %>" />
+			<aui:input helpMessage="to-allow-pingbacks,-please-also-ensure-the-entry's-guest-view-permission-is-enabled" label="allow-pingbacks" name="allowPingbacks" value="<%= allowPingbacks %>" />
 		</c:if>
 
 		<c:if test="<%= message == null %>">
@@ -353,9 +369,9 @@ if (Validator.isNull(redirect)) {
 	</aui:fieldset>
 
 	<c:if test="<%= (message == null) && PropsValues.CAPTCHA_CHECK_PORTLET_MESSAGE_BOARDS_EDIT_MESSAGE %>">
-		<portlet:actionURL windowState="<%= LiferayWindowState.EXCLUSIVE.toString() %>" var="captchaURL">
+		<portlet:resourceURL var="captchaURL">
 			<portlet:param name="struts_action" value="/message_boards/captcha" />
-		</portlet:actionURL>
+		</portlet:resourceURL>
 
 		<liferay-ui:captcha url="<%= captchaURL %>" />
 	</c:if>
@@ -487,6 +503,7 @@ if (Validator.isNull(redirect)) {
 	<%
 	for (int i = 1; i <= existingAttachments.length; i++) {
 	%>
+
 		var removeExisting = A.one("#<portlet:namespace />removeExisting" + <%= i %>);
 
 		if (removeExisting) {
@@ -511,6 +528,7 @@ if (Validator.isNull(redirect)) {
 				}
 			);
 		}
+
 	<%
 	}
 	%>

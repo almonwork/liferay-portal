@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,6 +14,12 @@
 
 package com.liferay.portlet.dynamicdatalists.model;
 
+import com.liferay.portal.model.ModelWrapper;
+
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * <p>
  * This class is a wrapper for {@link DDLRecordSet}.
@@ -23,7 +29,8 @@ package com.liferay.portlet.dynamicdatalists.model;
  * @see       DDLRecordSet
  * @generated
  */
-public class DDLRecordSetWrapper implements DDLRecordSet {
+public class DDLRecordSetWrapper implements DDLRecordSet,
+	ModelWrapper<DDLRecordSet> {
 	public DDLRecordSetWrapper(DDLRecordSet ddlRecordSet) {
 		_ddlRecordSet = ddlRecordSet;
 	}
@@ -34,6 +41,113 @@ public class DDLRecordSetWrapper implements DDLRecordSet {
 
 	public String getModelClassName() {
 		return DDLRecordSet.class.getName();
+	}
+
+	public Map<String, Object> getModelAttributes() {
+		Map<String, Object> attributes = new HashMap<String, Object>();
+
+		attributes.put("uuid", getUuid());
+		attributes.put("recordSetId", getRecordSetId());
+		attributes.put("groupId", getGroupId());
+		attributes.put("companyId", getCompanyId());
+		attributes.put("userId", getUserId());
+		attributes.put("userName", getUserName());
+		attributes.put("createDate", getCreateDate());
+		attributes.put("modifiedDate", getModifiedDate());
+		attributes.put("DDMStructureId", getDDMStructureId());
+		attributes.put("recordSetKey", getRecordSetKey());
+		attributes.put("name", getName());
+		attributes.put("description", getDescription());
+		attributes.put("minDisplayRows", getMinDisplayRows());
+		attributes.put("scope", getScope());
+
+		return attributes;
+	}
+
+	public void setModelAttributes(Map<String, Object> attributes) {
+		String uuid = (String)attributes.get("uuid");
+
+		if (uuid != null) {
+			setUuid(uuid);
+		}
+
+		Long recordSetId = (Long)attributes.get("recordSetId");
+
+		if (recordSetId != null) {
+			setRecordSetId(recordSetId);
+		}
+
+		Long groupId = (Long)attributes.get("groupId");
+
+		if (groupId != null) {
+			setGroupId(groupId);
+		}
+
+		Long companyId = (Long)attributes.get("companyId");
+
+		if (companyId != null) {
+			setCompanyId(companyId);
+		}
+
+		Long userId = (Long)attributes.get("userId");
+
+		if (userId != null) {
+			setUserId(userId);
+		}
+
+		String userName = (String)attributes.get("userName");
+
+		if (userName != null) {
+			setUserName(userName);
+		}
+
+		Date createDate = (Date)attributes.get("createDate");
+
+		if (createDate != null) {
+			setCreateDate(createDate);
+		}
+
+		Date modifiedDate = (Date)attributes.get("modifiedDate");
+
+		if (modifiedDate != null) {
+			setModifiedDate(modifiedDate);
+		}
+
+		Long DDMStructureId = (Long)attributes.get("DDMStructureId");
+
+		if (DDMStructureId != null) {
+			setDDMStructureId(DDMStructureId);
+		}
+
+		String recordSetKey = (String)attributes.get("recordSetKey");
+
+		if (recordSetKey != null) {
+			setRecordSetKey(recordSetKey);
+		}
+
+		String name = (String)attributes.get("name");
+
+		if (name != null) {
+			setName(name);
+		}
+
+		String description = (String)attributes.get("description");
+
+		if (description != null) {
+			setDescription(description);
+		}
+
+		Integer minDisplayRows = (Integer)attributes.get("minDisplayRows");
+
+		if (minDisplayRows != null) {
+			setMinDisplayRows(minDisplayRows);
+		}
+
+		Integer scope = (Integer)attributes.get("scope");
+
+		if (scope != null) {
+			setScope(scope);
+		}
 	}
 
 	/**
@@ -306,6 +420,14 @@ public class DDLRecordSetWrapper implements DDLRecordSet {
 		return _ddlRecordSet.getName(languageId, useDefault);
 	}
 
+	public java.lang.String getNameCurrentLanguageId() {
+		return _ddlRecordSet.getNameCurrentLanguageId();
+	}
+
+	public java.lang.String getNameCurrentValue() {
+		return _ddlRecordSet.getNameCurrentValue();
+	}
+
 	/**
 	* Returns a map of the locales and localized names of this d d l record set.
 	*
@@ -344,6 +466,10 @@ public class DDLRecordSetWrapper implements DDLRecordSet {
 	public void setName(java.lang.String name, java.util.Locale locale,
 		java.util.Locale defaultLocale) {
 		_ddlRecordSet.setName(name, locale, defaultLocale);
+	}
+
+	public void setNameCurrentLanguageId(java.lang.String languageId) {
+		_ddlRecordSet.setNameCurrentLanguageId(languageId);
 	}
 
 	/**
@@ -421,6 +547,14 @@ public class DDLRecordSetWrapper implements DDLRecordSet {
 		return _ddlRecordSet.getDescription(languageId, useDefault);
 	}
 
+	public java.lang.String getDescriptionCurrentLanguageId() {
+		return _ddlRecordSet.getDescriptionCurrentLanguageId();
+	}
+
+	public java.lang.String getDescriptionCurrentValue() {
+		return _ddlRecordSet.getDescriptionCurrentValue();
+	}
+
 	/**
 	* Returns a map of the locales and localized descriptions of this d d l record set.
 	*
@@ -460,6 +594,10 @@ public class DDLRecordSetWrapper implements DDLRecordSet {
 	public void setDescription(java.lang.String description,
 		java.util.Locale locale, java.util.Locale defaultLocale) {
 		_ddlRecordSet.setDescription(description, locale, defaultLocale);
+	}
+
+	public void setDescriptionCurrentLanguageId(java.lang.String languageId) {
+		_ddlRecordSet.setDescriptionCurrentLanguageId(languageId);
 	}
 
 	/**
@@ -502,6 +640,24 @@ public class DDLRecordSetWrapper implements DDLRecordSet {
 		_ddlRecordSet.setMinDisplayRows(minDisplayRows);
 	}
 
+	/**
+	* Returns the scope of this d d l record set.
+	*
+	* @return the scope of this d d l record set
+	*/
+	public int getScope() {
+		return _ddlRecordSet.getScope();
+	}
+
+	/**
+	* Sets the scope of this d d l record set.
+	*
+	* @param scope the scope of this d d l record set
+	*/
+	public void setScope(int scope) {
+		_ddlRecordSet.setScope(scope);
+	}
+
 	public boolean isNew() {
 		return _ddlRecordSet.isNew();
 	}
@@ -520,10 +676,6 @@ public class DDLRecordSetWrapper implements DDLRecordSet {
 
 	public boolean isEscapedModel() {
 		return _ddlRecordSet.isEscapedModel();
-	}
-
-	public void setEscapedModel(boolean escapedModel) {
-		_ddlRecordSet.setEscapedModel(escapedModel);
 	}
 
 	public java.io.Serializable getPrimaryKeyObj() {
@@ -604,7 +756,14 @@ public class DDLRecordSetWrapper implements DDLRecordSet {
 		return _ddlRecordSet.getRecordsFieldsList();
 	}
 
+	/**
+	 * @deprecated Renamed to {@link #getWrappedModel}
+	 */
 	public DDLRecordSet getWrappedDDLRecordSet() {
+		return _ddlRecordSet;
+	}
+
+	public DDLRecordSet getWrappedModel() {
 		return _ddlRecordSet;
 	}
 

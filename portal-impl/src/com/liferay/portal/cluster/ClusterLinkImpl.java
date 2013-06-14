@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -30,13 +30,14 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Properties;
 
-import org.jgroups.ChannelException;
 import org.jgroups.JChannel;
 
 /**
  * @author Shuyang Zhou
  */
 public class ClusterLinkImpl extends ClusterBase implements ClusterLink {
+
+	public static final int MAX_CHANNEL_COUNT = Priority.values().length;
 
 	@Override
 	public void destroy() {
@@ -82,10 +83,10 @@ public class ClusterLinkImpl extends ClusterBase implements ClusterLink {
 		JChannel jChannel = getChannel(priority);
 
 		try {
-			jChannel.send(null, null, message);
+			jChannel.send(null, message);
 		}
-		catch (ChannelException ce) {
-			_log.error("Unable to send multicast message " + message, ce);
+		catch (Exception e) {
+			_log.error("Unable to send multicast message " + message, e);
 		}
 	}
 
@@ -102,10 +103,10 @@ public class ClusterLinkImpl extends ClusterBase implements ClusterLink {
 		JChannel jChannel = getChannel(priority);
 
 		try {
-			jChannel.send(jGroupsAddress, null, message);
+			jChannel.send(jGroupsAddress, message);
 		}
-		catch (ChannelException ce) {
-			_log.error("Unable to send unicast message:" + message, ce);
+		catch (Exception e) {
+			_log.error("Unable to send unicast message " + message, e);
 		}
 	}
 
@@ -117,7 +118,7 @@ public class ClusterLinkImpl extends ClusterBase implements ClusterLink {
 
 	protected JChannel getChannel(Priority priority) {
 		int channelIndex =
-			priority.ordinal() * _channelCount / _MAX_CHANNEL_COUNT;
+			priority.ordinal() * _channelCount / MAX_CHANNEL_COUNT;
 
 		if (_log.isDebugEnabled()) {
 			_log.debug(
@@ -129,15 +130,15 @@ public class ClusterLinkImpl extends ClusterBase implements ClusterLink {
 	}
 
 	@Override
-	protected void initChannels() throws ChannelException {
+	protected void initChannels() throws Exception {
 		Properties transportProperties = PropsUtil.getProperties(
 			PropsKeys.CLUSTER_LINK_CHANNEL_PROPERTIES_TRANSPORT, true);
 
 		_channelCount = transportProperties.size();
 
-		if ((_channelCount <= 0) || (_channelCount > _MAX_CHANNEL_COUNT)) {
+		if ((_channelCount <= 0) || (_channelCount > MAX_CHANNEL_COUNT)) {
 			throw new IllegalArgumentException(
-				"Channel count must be between 1 and " + _MAX_CHANNEL_COUNT);
+				"Channel count must be between 1 and " + MAX_CHANNEL_COUNT);
 		}
 
 		_localTransportAddresses = new ArrayList<org.jgroups.Address>(
@@ -163,15 +164,13 @@ public class ClusterLinkImpl extends ClusterBase implements ClusterLink {
 					_localTransportAddresses, _clusterForwardMessageListener),
 					_LIFERAY_TRANSPORT_CHANNEL + i);
 
-			_localTransportAddresses.add(jChannel.getLocalAddress());
+			_localTransportAddresses.add(jChannel.getAddress());
 			_transportChannels.add(jChannel);
 		}
 	}
 
 	private static final String _LIFERAY_TRANSPORT_CHANNEL =
 		"LIFERAY-TRANSPORT-CHANNEL-";
-
-	private static final int _MAX_CHANNEL_COUNT = Priority.values().length;
 
 	private static Log _log = LogFactoryUtil.getLog(ClusterLinkImpl.class);
 

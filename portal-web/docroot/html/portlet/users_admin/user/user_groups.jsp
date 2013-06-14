@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -31,7 +31,6 @@ List<UserGroup> userGroups = (List<UserGroup>)request.getAttribute("user.userGro
 <h3><liferay-ui:message key="user-groups" /></h3>
 
 <liferay-ui:search-container
-	id='<%= renderResponse.getNamespace() + "userGroupsSearchContainer" %>'
 	headerNames="name,null"
 >
 	<liferay-ui:search-container-results
@@ -74,7 +73,7 @@ List<UserGroup> userGroups = (List<UserGroup>)request.getAttribute("user.userGro
 
 <aui:script>
 	function <portlet:namespace />openUserGroupSelector() {
-		var userGroupWindow = window.open('<portlet:renderURL windowState="<%= LiferayWindowState.POP_UP.toString() %>"><portlet:param name="struts_action" value="/users_admin/select_user_group" /></portlet:renderURL>', 'usergroup', 'directories=no,height=640,location=no,menubar=no,resizable=yes,scrollbars=yes,status=no,toolbar=no,width=680');
+		var userGroupWindow = window.open('<portlet:renderURL windowState="<%= LiferayWindowState.POP_UP.toString() %>"><portlet:param name="struts_action" value="/user_groups_admin/select_user_group" /></portlet:renderURL>', 'usergroup', 'directories=no,height=640,location=no,menubar=no,resizable=yes,scrollbars=yes,status=no,toolbar=no,width=680');
 
 		userGroupWindow.focus();
 	}

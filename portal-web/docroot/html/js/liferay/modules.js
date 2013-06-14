@@ -23,7 +23,6 @@
 		var name = config.name;
 
 		delete config.group;
-		delete config.name;
 
 		var module = GROUPS[group].modules[trigger];
 
@@ -45,40 +44,51 @@
 
 		var moduleList = {
 			'asset-categories-selector': ['aui-tree', 'liferay-asset-tags-selector'],
-			'asset-tags-selector': ['array-extras', 'async-queue', 'aui-autocomplete', 'aui-dialog', 'aui-io-request', 'aui-live-search', 'aui-textboxlist', 'aui-form-textfield', 'datasource-cache', 'liferay-service-datasource', 'substitute'],
-			'auto-fields': ['aui-base', 'aui-data-set', 'aui-io-request', 'aui-parse-content', 'aui-sortable', 'base', 'liferay-undo-manager'],
-			'dockbar': ['aui-button-item', 'aui-dialog', 'aui-io-plugin', 'aui-io-request', 'aui-overlay-context', 'aui-overlay-manager', 'event-touch', 'node-focusmanager'],
+			'asset-tags-selector': ['array-extras', 'async-queue', 'aui-autocomplete', 'aui-dialog', 'aui-form-textfield', 'aui-io-request', 'aui-live-search', 'aui-template', 'aui-textboxlist', 'datasource-cache', 'liferay-service-datasource'],
+			'auto-fields': ['aui-base', 'aui-data-set', 'aui-io-request', 'aui-parse-content', 'sortable', 'base', 'liferay-undo-manager'],
+			'dockbar': ['aui-node', 'event-touch'],
+			'dockbar-underlay': ['aui-button-item', 'aui-io-plugin', 'aui-overlay-manager'],
 			'dynamic-select': ['aui-base'],
 			'form': ['aui-base', 'aui-form-validator'],
 			'form-navigator': ['aui-base'],
+			'form-placeholders': ['liferay-form', 'plugin'],
 			'history': getHistoryRequirements(),
-			'history-html5': ['history-html5', 'querystring-stringify-simple'],
+			'history-html5': ['liferay-history', 'history-html5', 'querystring-stringify-simple'],
 			'history-manager': ['liferay-history'],
 			'hudcrumbs': ['aui-base', 'plugin'],
 			'icon': ['aui-base'],
 			'input-move-boxes': ['aui-base', 'aui-toolbar'],
-			'layout': ['aui-io-request', 'aui-portal-layout', 'aui-resize', 'dd'],
+			'layout': [],
+			'layout-column': ['aui-portal-layout', 'dd'],
 			'layout-configuration': ['aui-live-search', 'dd', 'liferay-layout'],
+			'layout-freeform': ['aui-resize', 'liferay-layout-column'],
 			'list-view': ['aui-base', 'transition'],
 			'logo-selector': ['aui-base'],
 			'look-and-feel': ['aui-color-picker', 'aui-dialog', 'aui-io-request', 'aui-tabs-base'],
-			'menu': ['aui-live-search','aui-overlay', 'node-focusmanager', 'selector-css3'],
-			'navigation': ['aui-form-combobox', 'aui-io-request', 'dd-constrain', 'event-touch', 'json-parse', 'node-event-simulate', 'overlay', 'selector-css3', 'sortable', 'substitute'],
-			'navigation-touch': ['liferay-navigation'],
-			'navigation-interaction': ['node-focusmanager'],
+			'menu': ['aui-debounce', 'aui-node'],
+			'message': ['aui-base', 'liferay-store'],
+			'navigation': [],
+			'navigation-interaction': ['node-focusmanager', 'plugin'],
+			'navigation-touch': ['event-touch', 'liferay-navigation'],
 			'notice': ['aui-base'],
-			'panel': ['aui-base', 'aui-io-request'],
-			'panel-floating': ['aui-paginator', 'liferay-panel', 'selector-css3'],
+			'panel': ['aui-base', 'liferay-store'],
+			'panel-floating': ['aui-paginator', 'liferay-panel'],
 			'poller': ['aui-base', 'io', 'json'],
+			'portlet-base': ['aui-base'],
 			'portlet-url': ['aui-base', 'aui-io-request', 'querystring-stringify-simple'],
-			'ratings': ['aui-io-request', 'aui-rating', 'substitute'],
-			'search-container': ['aui-base', 'selector-css3'],
-			'session': ['aui-io', 'collection', 'cookie', 'liferay-notice', 'substitute'],
+			'progress': ['aui-progressbar'],
+			'ratings': ['aui-io-request', 'aui-rating'],
+			'search-container': ['aui-base', 'event-mouseenter'],
 			'service-datasource': ['aui-base', 'datasource-local'],
-			'staging': ['aui-button-item', 'aui-dialog', 'aui-io-plugin', 'liferay-portlet-url'],
-			'translation-manager': ['aui-base', 'selector-css3'],
-			'undo-manager': ['aui-data-set', 'base', 'substitute'],
-			'upload': ['aui-base', 'aui-swf', 'collection', 'substitute', 'swfupload'],
+			'session': ['aui-io-request', 'aui-task-manager', 'cookie', 'liferay-notice'],
+			'staging': ['aui-dialog', 'aui-io-plugin'],
+			'staging-branch': ['liferay-staging'],
+			'staging-version': ['aui-button-item', 'liferay-staging'],
+			'store': ['aui-io-request'],
+			'token-list': ['aui-base', 'aui-template'],
+			'translation-manager': ['aui-base'],
+			'undo-manager': ['aui-data-set', 'base'],
+			'upload': ['aui-io-request', 'aui-swf', 'collection', 'swfupload'],
 			'util-list-fields': ['aui-base'],
 			'util-window': ['aui-dialog', 'aui-dialog-iframe']
 		};
@@ -161,6 +171,16 @@
 
 	addPlugin(
 		{
+			name: 'liferay-form-placeholders',
+			test: function(A) {
+				return !A.Object.owns(document.createElement('input'), 'placeholder');
+			},
+			trigger: 'liferay-form'
+		}
+	);
+
+	addPlugin(
+		{
 			name: 'liferay-navigation-touch',
 			test: function(A) {
 				return A.UA.touch;
@@ -179,4 +199,10 @@
 			trigger: 'aui-calendar'
 		}
 	);
+
+	var loader = A.Env._loader;
+
+	loader.addGroup(GROUPS.liferay, 'liferay');
+	loader.addGroup(GROUPS.misc, 'misc');
+	loader.addGroup(GROUPS.portal, 'portal');
 })(AUI(), Liferay);

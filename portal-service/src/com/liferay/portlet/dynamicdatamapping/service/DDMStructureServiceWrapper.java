@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,6 +14,8 @@
 
 package com.liferay.portlet.dynamicdatamapping.service;
 
+import com.liferay.portal.service.ServiceWrapper;
+
 /**
  * <p>
  * This class is a wrapper for {@link DDMStructureService}.
@@ -23,22 +25,52 @@ package com.liferay.portlet.dynamicdatamapping.service;
  * @see       DDMStructureService
  * @generated
  */
-public class DDMStructureServiceWrapper implements DDMStructureService {
+public class DDMStructureServiceWrapper implements DDMStructureService,
+	ServiceWrapper<DDMStructureService> {
 	public DDMStructureServiceWrapper(DDMStructureService ddmStructureService) {
 		_ddmStructureService = ddmStructureService;
+	}
+
+	/**
+	* Returns the Spring bean ID for this bean.
+	*
+	* @return the Spring bean ID for this bean
+	*/
+	public java.lang.String getBeanIdentifier() {
+		return _ddmStructureService.getBeanIdentifier();
+	}
+
+	/**
+	* Sets the Spring bean ID for this bean.
+	*
+	* @param beanIdentifier the Spring bean ID for this bean
+	*/
+	public void setBeanIdentifier(java.lang.String beanIdentifier) {
+		_ddmStructureService.setBeanIdentifier(beanIdentifier);
 	}
 
 	public com.liferay.portlet.dynamicdatamapping.model.DDMStructure addStructure(
 		long groupId, long classNameId, java.lang.String structureKey,
 		java.util.Map<java.util.Locale, java.lang.String> nameMap,
 		java.util.Map<java.util.Locale, java.lang.String> descriptionMap,
-		java.lang.String xsd, java.lang.String storageType,
+		java.lang.String xsd, java.lang.String storageType, int type,
 		com.liferay.portal.service.ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException {
 		return _ddmStructureService.addStructure(groupId, classNameId,
-			structureKey, nameMap, descriptionMap, xsd, storageType,
+			structureKey, nameMap, descriptionMap, xsd, storageType, type,
 			serviceContext);
+	}
+
+	public com.liferay.portlet.dynamicdatamapping.model.DDMStructure copyStructure(
+		long structureId,
+		java.util.Map<java.util.Locale, java.lang.String> nameMap,
+		java.util.Map<java.util.Locale, java.lang.String> descriptionMap,
+		com.liferay.portal.service.ServiceContext serviceContext)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException {
+		return _ddmStructureService.copyStructure(structureId, nameMap,
+			descriptionMap, serviceContext);
 	}
 
 	public void deleteStructure(long structureId)
@@ -47,11 +79,55 @@ public class DDMStructureServiceWrapper implements DDMStructureService {
 		_ddmStructureService.deleteStructure(structureId);
 	}
 
+	public com.liferay.portlet.dynamicdatamapping.model.DDMStructure fetchStructure(
+		long groupId, java.lang.String structureKey)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException {
+		return _ddmStructureService.fetchStructure(groupId, structureKey);
+	}
+
 	public com.liferay.portlet.dynamicdatamapping.model.DDMStructure getStructure(
 		long structureId)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException {
 		return _ddmStructureService.getStructure(structureId);
+	}
+
+	public java.util.List<com.liferay.portlet.dynamicdatamapping.model.DDMStructure> search(
+		long companyId, long[] groupIds, long[] classNameIds,
+		java.lang.String keywords, int start, int end,
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return _ddmStructureService.search(companyId, groupIds, classNameIds,
+			keywords, start, end, orderByComparator);
+	}
+
+	public java.util.List<com.liferay.portlet.dynamicdatamapping.model.DDMStructure> search(
+		long companyId, long[] groupIds, long[] classNameIds,
+		java.lang.String name, java.lang.String description,
+		java.lang.String storageType, int type, boolean andOperator, int start,
+		int end,
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return _ddmStructureService.search(companyId, groupIds, classNameIds,
+			name, description, storageType, type, andOperator, start, end,
+			orderByComparator);
+	}
+
+	public int searchCount(long companyId, long[] groupIds,
+		long[] classNameIds, java.lang.String keywords)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return _ddmStructureService.searchCount(companyId, groupIds,
+			classNameIds, keywords);
+	}
+
+	public int searchCount(long companyId, long[] groupIds,
+		long[] classNameIds, java.lang.String name,
+		java.lang.String description, java.lang.String storageType, int type,
+		boolean andOperator)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return _ddmStructureService.searchCount(companyId, groupIds,
+			classNameIds, name, description, storageType, type, andOperator);
 	}
 
 	public com.liferay.portlet.dynamicdatamapping.model.DDMStructure updateStructure(
@@ -78,12 +154,26 @@ public class DDMStructureServiceWrapper implements DDMStructureService {
 			nameMap, descriptionMap, xsd, serviceContext);
 	}
 
+	/**
+	 * @deprecated Renamed to {@link #getWrappedService}
+	 */
 	public DDMStructureService getWrappedDDMStructureService() {
 		return _ddmStructureService;
 	}
 
+	/**
+	 * @deprecated Renamed to {@link #setWrappedService}
+	 */
 	public void setWrappedDDMStructureService(
 		DDMStructureService ddmStructureService) {
+		_ddmStructureService = ddmStructureService;
+	}
+
+	public DDMStructureService getWrappedService() {
+		return _ddmStructureService;
+	}
+
+	public void setWrappedService(DDMStructureService ddmStructureService) {
 		_ddmStructureService = ddmStructureService;
 	}
 

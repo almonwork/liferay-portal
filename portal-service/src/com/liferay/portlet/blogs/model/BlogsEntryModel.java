@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -472,6 +472,13 @@ public interface BlogsEntryModel extends BaseModel<BlogsEntry>, GroupedModel,
 	public boolean isExpired();
 
 	/**
+	 * Returns <code>true</code> if this blogs entry is in the Recycle Bin.
+	 *
+	 * @return <code>true</code> if this blogs entry is in the Recycle Bin; <code>false</code> otherwise
+	 */
+	public boolean isInTrash();
+
+	/**
 	 * Returns <code>true</code> if this blogs entry is pending.
 	 *
 	 * @return <code>true</code> if this blogs entry is pending; <code>false</code> otherwise
@@ -487,8 +494,6 @@ public interface BlogsEntryModel extends BaseModel<BlogsEntry>, GroupedModel,
 	public void setCachedModel(boolean cachedModel);
 
 	public boolean isEscapedModel();
-
-	public void setEscapedModel(boolean escapedModel);
 
 	public Serializable getPrimaryKeyObj();
 

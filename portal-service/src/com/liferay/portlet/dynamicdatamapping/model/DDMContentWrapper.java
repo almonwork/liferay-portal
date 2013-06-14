@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,6 +14,12 @@
 
 package com.liferay.portlet.dynamicdatamapping.model;
 
+import com.liferay.portal.model.ModelWrapper;
+
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * <p>
  * This class is a wrapper for {@link DDMContent}.
@@ -23,7 +29,7 @@ package com.liferay.portlet.dynamicdatamapping.model;
  * @see       DDMContent
  * @generated
  */
-public class DDMContentWrapper implements DDMContent {
+public class DDMContentWrapper implements DDMContent, ModelWrapper<DDMContent> {
 	public DDMContentWrapper(DDMContent ddmContent) {
 		_ddmContent = ddmContent;
 	}
@@ -34,6 +40,92 @@ public class DDMContentWrapper implements DDMContent {
 
 	public String getModelClassName() {
 		return DDMContent.class.getName();
+	}
+
+	public Map<String, Object> getModelAttributes() {
+		Map<String, Object> attributes = new HashMap<String, Object>();
+
+		attributes.put("uuid", getUuid());
+		attributes.put("contentId", getContentId());
+		attributes.put("groupId", getGroupId());
+		attributes.put("companyId", getCompanyId());
+		attributes.put("userId", getUserId());
+		attributes.put("userName", getUserName());
+		attributes.put("createDate", getCreateDate());
+		attributes.put("modifiedDate", getModifiedDate());
+		attributes.put("name", getName());
+		attributes.put("description", getDescription());
+		attributes.put("xml", getXml());
+
+		return attributes;
+	}
+
+	public void setModelAttributes(Map<String, Object> attributes) {
+		String uuid = (String)attributes.get("uuid");
+
+		if (uuid != null) {
+			setUuid(uuid);
+		}
+
+		Long contentId = (Long)attributes.get("contentId");
+
+		if (contentId != null) {
+			setContentId(contentId);
+		}
+
+		Long groupId = (Long)attributes.get("groupId");
+
+		if (groupId != null) {
+			setGroupId(groupId);
+		}
+
+		Long companyId = (Long)attributes.get("companyId");
+
+		if (companyId != null) {
+			setCompanyId(companyId);
+		}
+
+		Long userId = (Long)attributes.get("userId");
+
+		if (userId != null) {
+			setUserId(userId);
+		}
+
+		String userName = (String)attributes.get("userName");
+
+		if (userName != null) {
+			setUserName(userName);
+		}
+
+		Date createDate = (Date)attributes.get("createDate");
+
+		if (createDate != null) {
+			setCreateDate(createDate);
+		}
+
+		Date modifiedDate = (Date)attributes.get("modifiedDate");
+
+		if (modifiedDate != null) {
+			setModifiedDate(modifiedDate);
+		}
+
+		String name = (String)attributes.get("name");
+
+		if (name != null) {
+			setName(name);
+		}
+
+		String description = (String)attributes.get("description");
+
+		if (description != null) {
+			setDescription(description);
+		}
+
+		String xml = (String)attributes.get("xml");
+
+		if (xml != null) {
+			setXml(xml);
+		}
 	}
 
 	/**
@@ -270,6 +362,14 @@ public class DDMContentWrapper implements DDMContent {
 		return _ddmContent.getName(languageId, useDefault);
 	}
 
+	public java.lang.String getNameCurrentLanguageId() {
+		return _ddmContent.getNameCurrentLanguageId();
+	}
+
+	public java.lang.String getNameCurrentValue() {
+		return _ddmContent.getNameCurrentValue();
+	}
+
 	/**
 	* Returns a map of the locales and localized names of this d d m content.
 	*
@@ -308,6 +408,10 @@ public class DDMContentWrapper implements DDMContent {
 	public void setName(java.lang.String name, java.util.Locale locale,
 		java.util.Locale defaultLocale) {
 		_ddmContent.setName(name, locale, defaultLocale);
+	}
+
+	public void setNameCurrentLanguageId(java.lang.String languageId) {
+		_ddmContent.setNameCurrentLanguageId(languageId);
 	}
 
 	/**
@@ -388,10 +492,6 @@ public class DDMContentWrapper implements DDMContent {
 		return _ddmContent.isEscapedModel();
 	}
 
-	public void setEscapedModel(boolean escapedModel) {
-		_ddmContent.setEscapedModel(escapedModel);
-	}
-
 	public java.io.Serializable getPrimaryKeyObj() {
 		return _ddmContent.getPrimaryKeyObj();
 	}
@@ -446,7 +546,14 @@ public class DDMContentWrapper implements DDMContent {
 		_ddmContent.persist();
 	}
 
+	/**
+	 * @deprecated Renamed to {@link #getWrappedModel}
+	 */
 	public DDMContent getWrappedDDMContent() {
+		return _ddmContent;
+	}
+
+	public DDMContent getWrappedModel() {
 		return _ddmContent;
 	}
 

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -23,7 +23,8 @@ package com.liferay.portal.service;
  * @see       LockLocalService
  * @generated
  */
-public class LockLocalServiceWrapper implements LockLocalService {
+public class LockLocalServiceWrapper implements LockLocalService,
+	ServiceWrapper<LockLocalService> {
 	public LockLocalServiceWrapper(LockLocalService lockLocalService) {
 		_lockLocalService = lockLocalService;
 	}
@@ -55,24 +56,31 @@ public class LockLocalServiceWrapper implements LockLocalService {
 	* Deletes the lock with the primary key from the database. Also notifies the appropriate model listeners.
 	*
 	* @param lockId the primary key of the lock
+	* @return the lock that was removed
 	* @throws PortalException if a lock with the primary key could not be found
 	* @throws SystemException if a system exception occurred
 	*/
-	public void deleteLock(long lockId)
+	public com.liferay.portal.model.Lock deleteLock(long lockId)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException {
-		_lockLocalService.deleteLock(lockId);
+		return _lockLocalService.deleteLock(lockId);
 	}
 
 	/**
 	* Deletes the lock from the database. Also notifies the appropriate model listeners.
 	*
 	* @param lock the lock
+	* @return the lock that was removed
 	* @throws SystemException if a system exception occurred
 	*/
-	public void deleteLock(com.liferay.portal.model.Lock lock)
+	public com.liferay.portal.model.Lock deleteLock(
+		com.liferay.portal.model.Lock lock)
 		throws com.liferay.portal.kernel.exception.SystemException {
-		_lockLocalService.deleteLock(lock);
+		return _lockLocalService.deleteLock(lock);
+	}
+
+	public com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery() {
+		return _lockLocalService.dynamicQuery();
 	}
 
 	/**
@@ -144,6 +152,11 @@ public class LockLocalServiceWrapper implements LockLocalService {
 		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery)
 		throws com.liferay.portal.kernel.exception.SystemException {
 		return _lockLocalService.dynamicQueryCount(dynamicQuery);
+	}
+
+	public com.liferay.portal.model.Lock fetchLock(long lockId)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return _lockLocalService.fetchLock(lockId);
 	}
 
 	/**
@@ -259,34 +272,31 @@ public class LockLocalServiceWrapper implements LockLocalService {
 		return _lockLocalService.getLock(className, key);
 	}
 
-	public com.liferay.portal.model.Lock getLockByUuid(java.lang.String uuid)
+	public com.liferay.portal.model.Lock getLockByUuidAndCompanyId(
+		java.lang.String uuid, long companyId)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException {
-		return _lockLocalService.getLockByUuid(uuid);
+		return _lockLocalService.getLockByUuidAndCompanyId(uuid, companyId);
 	}
 
 	public boolean hasLock(long userId, java.lang.String className, long key)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.SystemException {
 		return _lockLocalService.hasLock(userId, className, key);
 	}
 
 	public boolean hasLock(long userId, java.lang.String className,
 		java.lang.String key)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.SystemException {
 		return _lockLocalService.hasLock(userId, className, key);
 	}
 
 	public boolean isLocked(java.lang.String className, long key)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.SystemException {
 		return _lockLocalService.isLocked(className, key);
 	}
 
 	public boolean isLocked(java.lang.String className, java.lang.String key)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.SystemException {
 		return _lockLocalService.isLocked(className, key);
 	}
 
@@ -323,10 +333,10 @@ public class LockLocalServiceWrapper implements LockLocalService {
 	}
 
 	public com.liferay.portal.model.Lock refresh(java.lang.String uuid,
-		long expirationTime)
+		long companyId, long expirationTime)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException {
-		return _lockLocalService.refresh(uuid, expirationTime);
+		return _lockLocalService.refresh(uuid, companyId, expirationTime);
 	}
 
 	public void unlock(java.lang.String className, long key)
@@ -345,11 +355,25 @@ public class LockLocalServiceWrapper implements LockLocalService {
 		_lockLocalService.unlock(className, key, owner, retrieveFromCache);
 	}
 
+	/**
+	 * @deprecated Renamed to {@link #getWrappedService}
+	 */
 	public LockLocalService getWrappedLockLocalService() {
 		return _lockLocalService;
 	}
 
+	/**
+	 * @deprecated Renamed to {@link #setWrappedService}
+	 */
 	public void setWrappedLockLocalService(LockLocalService lockLocalService) {
+		_lockLocalService = lockLocalService;
+	}
+
+	public LockLocalService getWrappedService() {
+		return _lockLocalService;
+	}
+
+	public void setWrappedService(LockLocalService lockLocalService) {
 		_lockLocalService = lockLocalService;
 	}
 

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -31,4 +31,9 @@ public interface SocialActivity extends SocialActivityModel, PersistedModel {
 	 *
 	 * Never modify this interface directly. Add methods to {@link com.liferay.portlet.social.model.impl.SocialActivityImpl} and rerun ServiceBuilder to automatically copy the method declarations to this interface.
 	 */
+	public com.liferay.portlet.asset.model.AssetEntry getAssetEntry()
+		throws com.liferay.portal.kernel.exception.SystemException;
+
+	public void setAssetEntry(
+		com.liferay.portlet.asset.model.AssetEntry assetEntry);
 }

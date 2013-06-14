@@ -1,5 +1,6 @@
 alter table AssetCategory add description STRING null;
 
+alter table AssetEntry add classTypeId LONG;
 alter table AssetEntry add layoutUuid VARCHAR(75) null;
 
 update AssetEntry set classUuid = (select uuid_ from JournalArticleResource where AssetEntry.classPK = JournalArticleResource.resourcePrimKey) where visible = TRUE and classNameId = (select classNameId from ClassName_ where value = 'com.liferay.portlet.journal.model.JournalArticle');
@@ -10,6 +11,7 @@ alter table BlogsEntry add smallImageId VARCHAR(75) null;
 alter table BlogsEntry add smallImageURL STRING null;
 
 alter table BookmarksEntry add userName VARCHAR(75) null;
+alter table BookmarksEntry add resourceBlockId LONG;
 alter table BookmarksEntry add description VARCHAR(75) null;
 
 COMMIT_TRANSACTION;
@@ -18,6 +20,7 @@ update BookmarksEntry set description = comments;
 alter table BookmarksEntry drop column comments;
 
 alter table BookmarksFolder add userName VARCHAR(75) null;
+alter table BookmarksFolder add resourceBlockId LONG;
 
 alter table CalEvent add location STRING null;
 
@@ -29,6 +32,12 @@ alter table Company add active_ BOOLEAN;
 COMMIT_TRANSACTION;
 
 update Company set active_ = TRUE;
+
+alter table Country add zipRequired BOOLEAN;
+
+COMMIT_TRANSACTION;
+
+update Country set zipRequired = TRUE;
 
 create table DDLRecord (
 	uuid_ VARCHAR(75) null,
@@ -60,7 +69,26 @@ create table DDLRecordSet (
 	recordSetKey VARCHAR(75) null,
 	name STRING null,
 	description STRING null,
-	minDisplayRows INTEGER
+	minDisplayRows INTEGER,
+	scope INTEGER
+);
+
+create table DDLRecordVersion (
+	recordVersionId LONG not null primary key,
+	groupId LONG,
+	companyId LONG,
+	userId LONG,
+	userName VARCHAR(75) null,
+	createDate DATE null,
+	DDMStorageId LONG,
+	recordSetId LONG,
+	recordId LONG,
+	version VARCHAR(75) null,
+	displayIndex INTEGER,
+	status INTEGER,
+	statusByUserId LONG,
+	statusByUserName VARCHAR(75) null,
+	statusDate DATE null
 );
 
 create table DDMContent (
@@ -99,7 +127,8 @@ create table DDMStructure (
 	name STRING null,
 	description STRING null,
 	xsd TEXT null,
-	storageType VARCHAR(75) null
+	storageType VARCHAR(75) null,
+	type_ INTEGER
 );
 
 create table DDMStructureLink (
@@ -122,6 +151,7 @@ create table DDMTemplate (
 	name STRING null,
 	description STRING null,
 	type_ VARCHAR(75) null,
+	mode_ VARCHAR(75) null,
 	language VARCHAR(75) null,
 	script TEXT null
 );
@@ -130,7 +160,6 @@ create table DLContent (
 	contentId LONG not null primary key,
 	groupId LONG,
 	companyId LONG,
-	portletId VARCHAR(75) null,
 	repositoryId LONG,
 	path_ VARCHAR(255) null,
 	version VARCHAR(75) null,
@@ -149,6 +178,7 @@ create table DLFileEntryMetadata (
 );
 
 create table DLFileEntryType (
+	uuid_ VARCHAR(75) null,
 	fileEntryTypeId LONG not null primary key,
 	groupId LONG,
 	companyId LONG,
@@ -175,6 +205,10 @@ create table DLFileEntryTypes_DLFolders (
 alter table DLFileEntry add repositoryId LONG;
 alter table DLFileEntry add mimeType VARCHAR(75) null;
 alter table DLFileEntry add fileEntryTypeId LONG;
+alter table DLFileEntry add smallImageId LONG;
+alter table DLFileEntry add largeImageId LONG;
+alter table DLFileEntry add custom1ImageId LONG;
+alter table DLFileEntry add custom2ImageId LONG;
 
 COMMIT_TRANSACTION;
 
@@ -196,6 +230,7 @@ update DLFileShortcut set repositoryId = groupId;
 drop index IX_B413F1EC on DLFileVersion;
 drop index IX_94E784D2 on DLFileVersion;
 drop index IX_2F8FED9C on DLFileVersion;
+alter table DLFileVersion add modifiedDate DATE null;
 alter table DLFileVersion add repositoryId LONG;
 alter table DLFileVersion add fileEntryId LONG;
 alter table DLFileVersion add mimeType VARCHAR(75) null;
@@ -203,6 +238,7 @@ alter table DLFileVersion add fileEntryTypeId LONG;
 
 COMMIT_TRANSACTION;
 
+update DLFileVersion set modifiedDate = statusDate;
 update DLFileVersion set repositoryId = groupId;
 
 alter table DLFolder add repositoryId LONG;
@@ -220,10 +256,14 @@ create table DLSync (
 	companyId LONG,
 	createDate DATE null,
 	modifiedDate DATE null,
-	fileId VARCHAR(75) null,
+	fileId LONG,
+	fileUuid VARCHAR(75) null,
 	repositoryId LONG,
+	parentFolderId LONG,
+	name VARCHAR(255) null,
 	event VARCHAR(75) null,
-	type_ VARCHAR(75) null
+	type_ VARCHAR(75) null,
+	version VARCHAR(75) null
 );
 
 alter table Group_ add site BOOLEAN;
@@ -252,6 +292,7 @@ alter table Layout add keywords STRING null;
 alter table Layout add robots STRING null;
 alter table Layout add layoutPrototypeUuid VARCHAR(75) null;
 alter table Layout add layoutPrototypeLinkEnabled BOOLEAN null;
+alter table Layout add sourcePrototypeLayoutUuid VARCHAR(75) null;
 alter table Layout drop column layoutPrototypeId;
 alter table Layout drop column dlFolderId;
 
@@ -272,6 +313,8 @@ create table LayoutBranch (
 	description STRING null,
 	master BOOLEAN
 );
+
+alter table LayoutPrototype add uuid_ VARCHAR(75) null;
 
 create table LayoutRevision (
 	layoutRevisionId LONG not null primary key,
@@ -307,11 +350,18 @@ create table LayoutRevision (
 	statusDate DATE null
 );
 
+alter table LayoutSet add createDate DATE null;
+alter table LayoutSet add modifiedDate DATE null;
+alter table LayoutSet add layoutSetPrototypeUuid VARCHAR(75) null;
+alter table LayoutSet add layoutSetPrototypeLinkEnabled BOOLEAN null;
+alter table LayoutSet drop column layoutSetPrototypeId;
+
 drop index IX_5ABC2905 on LayoutSet;
 
-alter table LayoutSet add layoutSetPrototypeLinkEnabled BOOLEAN null;
-alter table LayoutSet add layoutSetPrototypeUuid VARCHAR(75) null;
-alter table LayoutSet drop column layoutSetPrototypeId;
+COMMIT_TRANSACTION;
+
+update LayoutSet set createDate = CURRENT_TIMESTAMP;
+update LayoutSet set modifiedDate = CURRENT_TIMESTAMP;
 
 create table LayoutSetBranch (
 	layoutSetBranchId LONG not null primary key,
@@ -327,7 +377,14 @@ create table LayoutSetBranch (
 	master BOOLEAN
 );
 
+alter table LayoutSetPrototype add createDate DATE null;
+alter table LayoutSetPrototype add modifiedDate DATE null;
 alter table LayoutSetPrototype add uuid_ VARCHAR(75) null;
+
+COMMIT_TRANSACTION;
+
+update LayoutSetPrototype set createDate = CURRENT_TIMESTAMP;
+update LayoutSetPrototype set modifiedDate = CURRENT_TIMESTAMP;
 
 alter table MBCategory add displayStyle VARCHAR(75) null;
 
@@ -338,6 +395,7 @@ update MBCategory set displayStyle = 'default';
 alter table MBMailingList add allowAnonymous BOOLEAN;
 
 alter table MBMessage add format VARCHAR(75) null;
+alter table MBMessage add answer BOOLEAN;
 
 COMMIT_TRANSACTION;
 
@@ -345,6 +403,85 @@ update MBMessage set format = 'bbcode';
 
 alter table MBThread add companyId LONG;
 alter table MBThread add rootMessageUserId LONG;
+alter table MBThread add question BOOLEAN;
+
+create table MBThreadFlag (
+	threadFlagId LONG not null primary key,
+	userId LONG,
+	modifiedDate DATE null,
+	threadId LONG
+);
+
+create table MDRAction (
+	uuid_ VARCHAR(75) null,
+	actionId LONG not null primary key,
+	groupId LONG,
+	companyId LONG,
+	userId LONG,
+	userName VARCHAR(75) null,
+	createDate DATE null,
+	modifiedDate DATE null,
+	classNameId LONG,
+	classPK LONG,
+	ruleGroupInstanceId LONG,
+	name STRING null,
+	description STRING null,
+	type_ VARCHAR(255) null,
+	typeSettings TEXT null
+);
+
+create table MDRRule (
+	uuid_ VARCHAR(75) null,
+	ruleId LONG not null primary key,
+	groupId LONG,
+	companyId LONG,
+	userId LONG,
+	userName VARCHAR(75) null,
+	createDate DATE null,
+	modifiedDate DATE null,
+	ruleGroupId LONG,
+	name STRING null,
+	description STRING null,
+	type_ VARCHAR(255) null,
+	typeSettings TEXT null
+);
+
+create table MDRRuleGroup (
+	uuid_ VARCHAR(75) null,
+	ruleGroupId LONG not null primary key,
+	groupId LONG,
+	companyId LONG,
+	userId LONG,
+	userName VARCHAR(75) null,
+	createDate DATE null,
+	modifiedDate DATE null,
+	name STRING null,
+	description STRING null
+);
+
+create table MDRRuleGroupInstance (
+	uuid_ VARCHAR(75) null,
+	ruleGroupInstanceId LONG not null primary key,
+	groupId LONG,
+	companyId LONG,
+	userId LONG,
+	userName VARCHAR(75) null,
+	createDate DATE null,
+	modifiedDate DATE null,
+	classNameId LONG,
+	classPK LONG,
+	ruleGroupId LONG,
+	priority INTEGER
+);
+
+alter table Organization_ add treePath STRING null;
+alter table Organization_ drop column leftOrganizationId;
+alter table Organization_ drop column rightOrganizationId;
+
+alter table PollsVote add companyId LONG;
+alter table PollsVote add userName VARCHAR(75) null;
+alter table PollsVote add createDate DATE null;
+alter table PollsVote add modifiedDate DATE null;
 
 create table PortalPreferences (
 	portalPreferencesId LONG not null primary key,
@@ -354,9 +491,12 @@ create table PortalPreferences (
 );
 
 create table Repository (
+	uuid_ VARCHAR(75) null,
 	repositoryId LONG not null primary key,
 	groupId LONG,
 	companyId LONG,
+	userId LONG,
+	userName VARCHAR(75) null,
 	createDate DATE null,
 	modifiedDate DATE null,
 	classNameId LONG,
@@ -375,9 +515,79 @@ create table RepositoryEntry (
 	mappedId VARCHAR(75) null
 );
 
+create table ResourceBlock (
+	resourceBlockId LONG not null primary key,
+	companyId LONG,
+	groupId LONG,
+	name VARCHAR(75) null,
+	permissionsHash VARCHAR(75) null,
+	referenceCount LONG
+);
+
+create table ResourceBlockPermission (
+	resourceBlockPermissionId LONG not null primary key,
+	resourceBlockId LONG,
+	roleId LONG,
+	actionIds LONG
+);
+
 alter table ResourcePermission add ownerId LONG;
 
-alter table SocialEquityLog add extraData VARCHAR(255) null;
+create table ResourceTypePermission (
+	resourceTypePermissionId LONG not null primary key,
+	companyId LONG,
+	groupId LONG,
+	name VARCHAR(75) null,
+	roleId LONG,
+	actionIds LONG
+);
+
+create table SocialActivityAchievement (
+	activityAchievementId LONG not null primary key,
+	groupId LONG,
+	companyId LONG,
+	userId LONG,
+	createDate LONG,
+	name VARCHAR(75) null,
+	firstInGroup BOOLEAN
+);
+
+create table SocialActivityCounter (
+	activityCounterId LONG not null primary key,
+	groupId LONG,
+	companyId LONG,
+	classNameId LONG,
+	classPK LONG,
+	name VARCHAR(75) null,
+	ownerType INTEGER,
+	currentValue INTEGER,
+	totalValue INTEGER,
+	graceValue INTEGER,
+	startPeriod INTEGER,
+	endPeriod INTEGER
+);
+
+create table SocialActivityLimit (
+	activityLimitId LONG not null primary key,
+	groupId LONG,
+	companyId LONG,
+	userId LONG,
+	classNameId LONG,
+	classPK LONG,
+	activityType INTEGER,
+	activityCounterName VARCHAR(75) null,
+	value VARCHAR(75) null
+);
+
+create table SocialActivitySetting (
+	activitySettingId LONG not null primary key,
+	groupId LONG,
+	companyId LONG,
+	classNameId LONG,
+	activityType INTEGER,
+	name VARCHAR(75) null,
+	value VARCHAR(1024) null
+);
 
 update Role_ set name = 'Site Administrator' where name = 'Community Administrator';
 update Role_ set name = 'Site Member' where name = 'Community Member';
@@ -402,8 +612,6 @@ update User_ set status = 5 where active_ = FALSE;
 
 alter table User_ drop column active_;
 
-alter table UserGroup add publicLayoutSetPrototypeId LONG;
-alter table UserGroup add privateLayoutSetPrototypeId LONG;
 alter table UserGroup add addedByLDAPImport BOOLEAN;
 
 create table UserGroups_Teams (
@@ -420,7 +628,8 @@ create table UserNotificationEvent (
 	type_ VARCHAR(75) null,
 	timestamp LONG,
 	deliverBy LONG,
-	payload TEXT null
+	payload TEXT null,
+	archived BOOLEAN
 );
 
 create table VirtualHost (
@@ -432,3 +641,163 @@ create table VirtualHost (
 
 alter table WorkflowDefinitionLink add classPK LONG;
 alter table WorkflowDefinitionLink add typePK LONG;
+
+drop table QUARTZ_BLOB_TRIGGERS;
+drop table QUARTZ_CALENDARS;
+drop table QUARTZ_CRON_TRIGGERS;
+drop table QUARTZ_FIRED_TRIGGERS;
+drop table QUARTZ_JOB_DETAILS;
+drop table QUARTZ_JOB_LISTENERS;
+drop table QUARTZ_LOCKS;
+drop table QUARTZ_PAUSED_TRIGGER_GRPS;
+drop table QUARTZ_SCHEDULER_STATE;
+drop table QUARTZ_SIMPLE_TRIGGERS;
+drop table QUARTZ_TRIGGERS;
+drop table QUARTZ_TRIGGER_LISTENERS;
+
+create table QUARTZ_BLOB_TRIGGERS (
+	SCHED_NAME VARCHAR(120) not null,
+	TRIGGER_NAME VARCHAR(200) not null,
+	TRIGGER_GROUP VARCHAR(200) not null,
+	BLOB_DATA SBLOB null,
+	primary key (SCHED_NAME, TRIGGER_NAME, TRIGGER_GROUP)
+);
+
+create table QUARTZ_CALENDARS (
+	SCHED_NAME VARCHAR(120) not null,
+	CALENDAR_NAME VARCHAR(200) not null,
+	CALENDAR SBLOB not null,
+	primary key (SCHED_NAME,CALENDAR_NAME)
+);
+
+create table QUARTZ_CRON_TRIGGERS (
+	SCHED_NAME VARCHAR(120) not null,
+	TRIGGER_NAME VARCHAR(200) not null,
+	TRIGGER_GROUP VARCHAR(200) not null,
+	CRON_EXPRESSION VARCHAR(200) not null,
+	TIME_ZONE_ID VARCHAR(80),
+	primary key (SCHED_NAME, TRIGGER_NAME, TRIGGER_GROUP)
+);
+
+create table QUARTZ_FIRED_TRIGGERS (
+	SCHED_NAME VARCHAR(120) not null,
+	ENTRY_ID VARCHAR(95) not null,
+	TRIGGER_NAME VARCHAR(200) not null,
+	TRIGGER_GROUP VARCHAR(200) not null,
+	INSTANCE_NAME VARCHAR(200) not null,
+	FIRED_TIME LONG not null,
+	PRIORITY INTEGER not null,
+	STATE VARCHAR(16) not null,
+	JOB_NAME VARCHAR(200) null,
+	JOB_GROUP VARCHAR(200) null,
+	IS_NONCONCURRENT BOOLEAN NULL,
+	REQUESTS_RECOVERY BOOLEAN NULL,
+	primary key (SCHED_NAME, ENTRY_ID)
+);
+
+create table QUARTZ_JOB_DETAILS (
+	SCHED_NAME VARCHAR(120) not null,
+	JOB_NAME VARCHAR(200) not null,
+	JOB_GROUP VARCHAR(200) not null,
+	DESCRIPTION VARCHAR(250) null,
+	JOB_CLASS_NAME VARCHAR(250) not null,
+	IS_DURABLE BOOLEAN not null,
+	IS_NONCONCURRENT BOOLEAN not null,
+	IS_UPDATE_DATA BOOLEAN not null,
+	REQUESTS_RECOVERY BOOLEAN not null,
+	JOB_DATA SBLOB null,
+	primary key (SCHED_NAME, JOB_NAME, JOB_GROUP)
+);
+
+create table QUARTZ_LOCKS (
+	SCHED_NAME VARCHAR(120) not null,
+	LOCK_NAME VARCHAR(40) not null ,
+	primary key (SCHED_NAME, LOCK_NAME)
+);
+
+create table QUARTZ_PAUSED_TRIGGER_GRPS (
+	SCHED_NAME VARCHAR(120) not null,
+	TRIGGER_GROUP VARCHAR(200) not null,
+	primary key (SCHED_NAME, TRIGGER_GROUP)
+);
+
+create table QUARTZ_SCHEDULER_STATE (
+	SCHED_NAME VARCHAR(120) not null,
+	INSTANCE_NAME VARCHAR(200) not null,
+	LAST_CHECKIN_TIME LONG not null,
+	CHECKIN_INTERVAL LONG not null,
+	primary key (SCHED_NAME, INSTANCE_NAME)
+);
+
+create table QUARTZ_SIMPLE_TRIGGERS (
+	SCHED_NAME VARCHAR(120) not null,
+	TRIGGER_NAME VARCHAR(200) not null,
+	TRIGGER_GROUP VARCHAR(200) not null,
+	REPEAT_COUNT LONG not null,
+	REPEAT_INTERVAL LONG not null,
+	TIMES_TRIGGERED LONG not null,
+	primary key (SCHED_NAME, TRIGGER_NAME, TRIGGER_GROUP)
+);
+
+CREATE TABLE QUARTZ_SIMPROP_TRIGGERS (
+	SCHED_NAME VARCHAR(120) not null,
+	TRIGGER_NAME VARCHAR(200) not null,
+	TRIGGER_GROUP VARCHAR(200) not null,
+	STR_PROP_1 VARCHAR(512) null,
+	STR_PROP_2 VARCHAR(512) null,
+	STR_PROP_3 VARCHAR(512) null,
+	INT_PROP_1 INTEGER null,
+	INT_PROP_2 INTEGER null,
+	LONG_PROP_1 LONG null,
+	LONG_PROP_2 LONG null,
+	DEC_PROP_1 NUMERIC(13,4) null,
+	DEC_PROP_2 NUMERIC(13,4) null,
+	BOOL_PROP_1 BOOLEAN null,
+	BOOL_PROP_2 BOOLEAN null,
+	primary key (SCHED_NAME, TRIGGER_NAME, TRIGGER_GROUP)
+);
+
+create table QUARTZ_TRIGGERS (
+	SCHED_NAME VARCHAR(120) not null,
+	TRIGGER_NAME VARCHAR(200) not null,
+	TRIGGER_GROUP VARCHAR(200) not null,
+	JOB_NAME VARCHAR(200) not null,
+	JOB_GROUP VARCHAR(200) not null,
+	DESCRIPTION VARCHAR(250) null,
+	NEXT_FIRE_TIME LONG null,
+	PREV_FIRE_TIME LONG null,
+	PRIORITY INTEGER null,
+	TRIGGER_STATE VARCHAR(16) not null,
+	TRIGGER_TYPE VARCHAR(8) not null,
+	START_TIME LONG not null,
+	END_TIME LONG null,
+	CALENDAR_NAME VARCHAR(200) null,
+	MISFIRE_INSTR INTEGER null,
+	JOB_DATA SBLOB null,
+	primary key  (SCHED_NAME, TRIGGER_NAME, TRIGGER_GROUP)
+);
+
+COMMIT_TRANSACTION;
+
+create index IX_88328984 on QUARTZ_JOB_DETAILS (SCHED_NAME, JOB_GROUP);
+create index IX_779BCA37 on QUARTZ_JOB_DETAILS (SCHED_NAME, REQUESTS_RECOVERY);
+
+create index IX_BE3835E5 on QUARTZ_FIRED_TRIGGERS (SCHED_NAME, TRIGGER_NAME, TRIGGER_GROUP);
+create index IX_4BD722BM on QUARTZ_FIRED_TRIGGERS (SCHED_NAME, TRIGGER_GROUP);
+create index IX_204D31E8 on QUARTZ_FIRED_TRIGGERS (SCHED_NAME, INSTANCE_NAME);
+create index IX_339E078M on QUARTZ_FIRED_TRIGGERS (SCHED_NAME, INSTANCE_NAME, REQUESTS_RECOVERY);
+create index IX_5005E3AF on QUARTZ_FIRED_TRIGGERS (SCHED_NAME, JOB_NAME, JOB_GROUP);
+create index IX_BC2F03B0 on QUARTZ_FIRED_TRIGGERS (SCHED_NAME, JOB_GROUP);
+
+create index IX_186442A4 on QUARTZ_TRIGGERS (SCHED_NAME, TRIGGER_NAME, TRIGGER_GROUP, TRIGGER_STATE);
+create index IX_1BA1F9DC on QUARTZ_TRIGGERS (SCHED_NAME, TRIGGER_GROUP);
+create index IX_91CA7CCE on QUARTZ_TRIGGERS (SCHED_NAME, TRIGGER_GROUP, NEXT_FIRE_TIME, TRIGGER_STATE, MISFIRE_INSTR);
+create index IX_D219AFDE on QUARTZ_TRIGGERS (SCHED_NAME, TRIGGER_GROUP, TRIGGER_STATE);
+create index IX_A85822A0 on QUARTZ_TRIGGERS (SCHED_NAME, JOB_NAME, JOB_GROUP);
+create index IX_8AA50BE1 on QUARTZ_TRIGGERS (SCHED_NAME, JOB_GROUP);
+create index IX_EEFE382A on QUARTZ_TRIGGERS (SCHED_NAME, NEXT_FIRE_TIME);
+create index IX_F026CF4C on QUARTZ_TRIGGERS (SCHED_NAME, NEXT_FIRE_TIME, TRIGGER_STATE);
+create index IX_F2DD7C7E on QUARTZ_TRIGGERS (SCHED_NAME, NEXT_FIRE_TIME, TRIGGER_STATE, MISFIRE_INSTR);
+create index IX_1F92813C on QUARTZ_TRIGGERS (SCHED_NAME, NEXT_FIRE_TIME, MISFIRE_INSTR);
+create index IX_99108B6E on QUARTZ_TRIGGERS (SCHED_NAME, TRIGGER_STATE);
+create index IX_CD7132D0 on QUARTZ_TRIGGERS (SCHED_NAME, CALENDAR_NAME);

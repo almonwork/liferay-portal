@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -17,6 +17,7 @@ package com.liferay.portal.kernel.util;
 import com.liferay.portal.kernel.memory.SoftReferenceThreadLocal;
 
 import java.io.IOException;
+import java.io.Serializable;
 import java.io.Writer;
 
 import java.lang.reflect.Constructor;
@@ -29,7 +30,7 @@ import java.lang.reflect.Constructor;
  * @author Shuyang Zhou
  * @author Brian Wing Shun Chan
  */
-public class StringBundler {
+public class StringBundler implements Serializable {
 
 	public StringBundler() {
 		_array = new String[_DEFAULT_ARRAY_CAPACITY];
@@ -332,10 +333,12 @@ public class StringBundler {
 		System.getProperty(
 			StringBundler.class.getName() + ".unsafe.create.limit"));
 
+	private static final long serialVersionUID = 1L;
+
 	private static ThreadLocal<StringBuilder> _stringBuilderThreadLocal;
+	private static Constructor<String> _stringConstructor;
 	private static int _threadLocalBufferLimit;
 	private static int _unsafeCreateLimit;
-	private static Constructor<String> _stringConstructor;
 
 	static {
 		if (_THREADLOCAL_BUFFER_LIMIT > 0) {

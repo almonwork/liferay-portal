@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -22,8 +22,11 @@ import com.liferay.portalweb.portal.util.RuntimeVariables;
  */
 public class Member_AssertActionsTest extends BaseTestCase {
 	public void testMember_AssertActions() throws Exception {
+		selenium.open("/web/guest/home/");
+		loadRequiredJavaScriptModules();
+
 		for (int second = 0;; second++) {
-			if (second >= 60) {
+			if (second >= 90) {
 				fail("timeout");
 			}
 
@@ -38,29 +41,23 @@ public class Member_AssertActionsTest extends BaseTestCase {
 			Thread.sleep(1000);
 		}
 
-		selenium.saveScreenShotAndSource();
 		selenium.clickAt("link=Blogs Permissions Page",
-			RuntimeVariables.replace(""));
+			RuntimeVariables.replace("Blogs Permissions Page"));
 		selenium.waitForPageToLoad("30000");
-		selenium.saveScreenShotAndSource();
-		assertTrue(selenium.isElementPresent(
-				"link=Permissions Blogs Test Entry"));
+		loadRequiredJavaScriptModules();
 		assertEquals(RuntimeVariables.replace("RSS"),
 			selenium.getText("//div[4]/span/a/span[1]"));
-		assertFalse(selenium.isElementPresent("link=Delete"));
 		assertFalse(selenium.isElementPresent(
 				"//input[@value='Add Blog Entry']"));
-		assertFalse(selenium.isElementPresent("link=Permissions"));
 		assertFalse(selenium.isElementPresent("link=Edit"));
+		assertFalse(selenium.isElementPresent("link=Permissions"));
+		assertFalse(selenium.isElementPresent("link=Delete"));
 		selenium.clickAt("link=Permissions Blogs Test Entry",
-			RuntimeVariables.replace(""));
+			RuntimeVariables.replace("Permissions Blogs Test Entry"));
 		selenium.waitForPageToLoad("30000");
-		selenium.saveScreenShotAndSource();
-		assertFalse(selenium.isElementPresent("link=Delete"));
-		assertFalse(selenium.isElementPresent(
-				"//input[@value='Add Blog Entry']"));
-		assertFalse(selenium.isElementPresent("link=Permissions"));
+		loadRequiredJavaScriptModules();
 		assertFalse(selenium.isElementPresent("link=Edit"));
-		assertTrue(selenium.isElementPresent("link=Add Comment"));
+		assertFalse(selenium.isElementPresent("link=Permissions"));
+		assertFalse(selenium.isElementPresent("link=Delete"));
 	}
 }

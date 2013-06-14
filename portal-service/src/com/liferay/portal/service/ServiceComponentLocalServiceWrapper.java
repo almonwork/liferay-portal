@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -24,7 +24,8 @@ package com.liferay.portal.service;
  * @generated
  */
 public class ServiceComponentLocalServiceWrapper
-	implements ServiceComponentLocalService {
+	implements ServiceComponentLocalService,
+		ServiceWrapper<ServiceComponentLocalService> {
 	public ServiceComponentLocalServiceWrapper(
 		ServiceComponentLocalService serviceComponentLocalService) {
 		_serviceComponentLocalService = serviceComponentLocalService;
@@ -58,25 +59,32 @@ public class ServiceComponentLocalServiceWrapper
 	* Deletes the service component with the primary key from the database. Also notifies the appropriate model listeners.
 	*
 	* @param serviceComponentId the primary key of the service component
+	* @return the service component that was removed
 	* @throws PortalException if a service component with the primary key could not be found
 	* @throws SystemException if a system exception occurred
 	*/
-	public void deleteServiceComponent(long serviceComponentId)
+	public com.liferay.portal.model.ServiceComponent deleteServiceComponent(
+		long serviceComponentId)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException {
-		_serviceComponentLocalService.deleteServiceComponent(serviceComponentId);
+		return _serviceComponentLocalService.deleteServiceComponent(serviceComponentId);
 	}
 
 	/**
 	* Deletes the service component from the database. Also notifies the appropriate model listeners.
 	*
 	* @param serviceComponent the service component
+	* @return the service component that was removed
 	* @throws SystemException if a system exception occurred
 	*/
-	public void deleteServiceComponent(
+	public com.liferay.portal.model.ServiceComponent deleteServiceComponent(
 		com.liferay.portal.model.ServiceComponent serviceComponent)
 		throws com.liferay.portal.kernel.exception.SystemException {
-		_serviceComponentLocalService.deleteServiceComponent(serviceComponent);
+		return _serviceComponentLocalService.deleteServiceComponent(serviceComponent);
+	}
+
+	public com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery() {
+		return _serviceComponentLocalService.dynamicQuery();
 	}
 
 	/**
@@ -149,6 +157,12 @@ public class ServiceComponentLocalServiceWrapper
 		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery)
 		throws com.liferay.portal.kernel.exception.SystemException {
 		return _serviceComponentLocalService.dynamicQueryCount(dynamicQuery);
+	}
+
+	public com.liferay.portal.model.ServiceComponent fetchServiceComponent(
+		long serviceComponentId)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return _serviceComponentLocalService.fetchServiceComponent(serviceComponentId);
 	}
 
 	/**
@@ -284,11 +298,26 @@ public class ServiceComponentLocalServiceWrapper
 		_serviceComponentLocalService.verifyDB();
 	}
 
+	/**
+	 * @deprecated Renamed to {@link #getWrappedService}
+	 */
 	public ServiceComponentLocalService getWrappedServiceComponentLocalService() {
 		return _serviceComponentLocalService;
 	}
 
+	/**
+	 * @deprecated Renamed to {@link #setWrappedService}
+	 */
 	public void setWrappedServiceComponentLocalService(
+		ServiceComponentLocalService serviceComponentLocalService) {
+		_serviceComponentLocalService = serviceComponentLocalService;
+	}
+
+	public ServiceComponentLocalService getWrappedService() {
+		return _serviceComponentLocalService;
+	}
+
+	public void setWrappedService(
 		ServiceComponentLocalService serviceComponentLocalService) {
 		_serviceComponentLocalService = serviceComponentLocalService;
 	}

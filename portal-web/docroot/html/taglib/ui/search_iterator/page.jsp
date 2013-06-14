@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -17,19 +17,19 @@
 <%@ include file="/html/taglib/init.jsp" %>
 
 <%
-String randomId = PwdGenerator.getPassword(PwdGenerator.KEY3, 4);
-
 SearchContainer searchContainer = (SearchContainer)request.getAttribute("liferay-ui:search:searchContainer");
 
 boolean paginate = GetterUtil.getBoolean((String)request.getAttribute("liferay-ui:search-iterator:paginate"));
 String type = (String)request.getAttribute("liferay-ui:search:type");
 
-String id = searchContainer.getId();
+String id = searchContainer.getId(request);
+
 int start = searchContainer.getStart();
 int end = searchContainer.getEnd();
 int total = searchContainer.getTotal();
 List resultRows = searchContainer.getResultRows();
 List<String> headerNames = searchContainer.getHeaderNames();
+List<String> normalizedHeaderNames = searchContainer.getNormalizedHeaderNames();
 Map orderableHeaders = searchContainer.getOrderableHeaders();
 String emptyResultsMessage = searchContainer.getEmptyResultsMessage();
 RowChecker rowChecker = searchContainer.getRowChecker();
@@ -41,6 +41,8 @@ if (end > total) {
 if (rowChecker != null) {
 	if (headerNames != null) {
 		headerNames.add(0, rowChecker.getAllRowsCheckBox());
+
+		normalizedHeaderNames.add(0, "rowChecker");
 	}
 }
 
@@ -68,15 +70,11 @@ int sortColumnIndex = -1;
 <div class="lfr-search-container <%= resultRows.isEmpty() ? "aui-helper-hidden" : StringPool.BLANK %>">
 	<c:if test="<%= PropsValues.SEARCH_CONTAINER_SHOW_PAGINATION_TOP && (resultRows.size() > 10) && paginate %>">
 		<div class="taglib-search-iterator-page-iterator-top">
-			<liferay-ui:search-paginator searchContainer="<%= searchContainer %>" type="<%= type %>" />
+			<liferay-ui:search-paginator id='<%= id + "PageIteratorTop" %>' searchContainer="<%= searchContainer %>" type="<%= type %>" />
 		</div>
 	</c:if>
 
-	<div class="results-grid"
-		<c:if test="<%= Validator.isNotNull(id) %>">
-			id="<%= id %>SearchContainer"
-		</c:if>
-	>
+	<div class="results-grid" id="<%= namespace + id %>SearchContainer">
 		<table class="taglib-search-iterator">
 
 		<c:if test="<%= headerNames != null %>">
@@ -85,6 +83,16 @@ int sortColumnIndex = -1;
 			<%
 			for (int i = 0; i < headerNames.size(); i++) {
 				String headerName = headerNames.get(i);
+
+				String normalizedHeaderName = null;
+
+				if (i < normalizedHeaderNames.size()) {
+					normalizedHeaderName = normalizedHeaderNames.get(i);
+				}
+
+				if (Validator.isNull(normalizedHeaderName)) {
+					normalizedHeaderName = String.valueOf(i +1);
+				}
 
 				String orderKey = null;
 				String orderByType = null;
@@ -130,7 +138,7 @@ int sortColumnIndex = -1;
 				}
 			%>
 
-				<th class="col-<%= i + 1 %> <%= cssClass %>" id="<%= randomId %>_col-<%= i + 1 %>"
+				<th class="col-<%= i + 1 %> col-<%= normalizedHeaderName %> <%= cssClass %>" id="<%= namespace + id %>_col-<%= normalizedHeaderName %>"
 
 					<%--
 
@@ -146,7 +154,19 @@ int sortColumnIndex = -1;
 
 					<c:if test="<%= orderKey != null %>">
 						<span class="result-column-name">
-							<a href="<%= url %>&<%= namespace %><%= searchContainer.getOrderByColParam() %>=<%= orderKey %>&<%= namespace %><%= searchContainer.getOrderByTypeParam() %>=<%= HtmlUtil.escapeURL(orderByType) %>">
+
+							<%
+							String orderByJS = searchContainer.getOrderByJS();
+							%>
+
+							<c:choose>
+								<c:when test="<%= Validator.isNull(orderByJS) %>">
+									<a href="<%= url %>&<%= namespace %><%= searchContainer.getOrderByColParam() %>=<%= orderKey %>&<%= namespace %><%= searchContainer.getOrderByTypeParam() %>=<%= HtmlUtil.escapeURL(orderByType) %>">
+								</c:when>
+								<c:otherwise>
+									<a href="<%= StringUtil.replace(orderByJS, new String[] { "orderKey", "orderByType" }, new String[] { orderKey, orderByType }) %>">
+								</c:otherwise>
+							</c:choose>
 					</c:if>
 
 						<%
@@ -202,14 +222,14 @@ int sortColumnIndex = -1;
 		for (int i = 0; i < resultRows.size(); i++) {
 			ResultRow row = (ResultRow)resultRows.get(i);
 
-			String rowClassName = "portlet-section-alternate results-row alt";
-			String rowClassHoverName = "portlet-section-alternate-hover results-row alt hover";
+			String rowClassName = _ROW_CLASS_NAME_ALTERNATE + " results-row alt";
+			String rowClassHoverName = _ROW_CLASS_NAME_ALTERNATE_HOVER + " results-row alt " + _CLASS_NAME_HOVER;
 
 			primaryKeys.add(row.getPrimaryKey());
 
 			if (MathUtil.isEven(i)) {
-				rowClassName = "portlet-section-body results-row";
-				rowClassHoverName = "portlet-section-body-hover results-row hover";
+				rowClassName = _ROW_CLASS_NAME_BODY + " results-row";
+				rowClassHoverName = _ROW_CLASS_NAME_BODY_HOVER + " results-row " + _CLASS_NAME_HOVER;
 			}
 
 			if (Validator.isNotNull(row.getClassName())) {
@@ -239,6 +259,7 @@ int sortColumnIndex = -1;
 
 			if (rowChecker != null) {
 				boolean rowIsChecked = rowChecker.isChecked(row.getObject());
+				boolean rowIsDisabled = rowChecker.isDisabled(row.getObject());
 
 				if (!rowIsChecked) {
 					allRowsIsChecked = false;
@@ -249,22 +270,32 @@ int sortColumnIndex = -1;
 				textSearchEntry.setAlign(rowChecker.getAlign());
 				textSearchEntry.setColspan(rowChecker.getColspan());
 				textSearchEntry.setCssClass(rowChecker.getCssClass());
-				textSearchEntry.setName(rowChecker.getRowCheckBox(rowIsChecked, row.getPrimaryKey()));
+				textSearchEntry.setName(rowChecker.getRowCheckBox(rowIsChecked, rowIsDisabled, row.getPrimaryKey()));
 				textSearchEntry.setValign(rowChecker.getValign());
 
 				row.addSearchEntry(0, textSearchEntry);
 			}
+
+			request.setAttribute("liferay-ui:search-container-row:rowId", id.concat(StringPool.UNDERLINE.concat(row.getRowId())));
+
+			Map<String, Object> data = row.getData();
 		%>
 
-			<tr class="<%= rowClassName %>"
-				<c:if test="<%= searchContainer.isHover() %>">
-					onmouseover="this.className = '<%= rowClassHoverName %>';" onmouseout="this.className = '<%= rowClassName %>';"
-				</c:if>
-			>
+			<tr class="<%= rowClassName %>" <%= AUIUtil.buildData(data) %>>
 
 			<%
 			for (int j = 0; j < entries.size(); j++) {
 				SearchEntry entry = (SearchEntry)entries.get(j);
+
+				String normalizedHeaderName = null;
+
+				if ((normalizedHeaderNames != null) && (j < normalizedHeaderNames.size())) {
+					normalizedHeaderName = normalizedHeaderNames.get(j);
+				}
+
+				if (Validator.isNull(normalizedHeaderName)) {
+					normalizedHeaderName = String.valueOf(j + 1);
+				}
 
 				entry.setIndex(j);
 
@@ -287,10 +318,12 @@ int sortColumnIndex = -1;
 				}
 			%>
 
-				<td class="align-<%= entry.getAlign() %> col-<%= j + 1 %><%= row.isBold() ? " taglib-search-iterator-highlighted" : "" %> <%= columnClassName %> valign-<%= entry.getValign() %>" colspan="<%= entry.getColspan() %>"
+				<td class="align-<%= entry.getAlign() %> col-<%= j + 1 %><%= row.isBold() ? " taglib-search-iterator-highlighted" : "" %> col-<%= normalizedHeaderName %> <%= columnClassName %> valign-<%= entry.getValign() %>" colspan="<%= entry.getColspan() %>"
 					<c:if test="<%= (headerNames != null) && (headerNames.size() >= (j + 1)) %>">
-						headers="<%= randomId %>_col-<%= (j + 1) %>"
+						headers="<%= namespace + id %>_col-<%= normalizedHeaderName %>"
 					</c:if>
+
+					id="<%= namespace + id %>_col-<%= normalizedHeaderName %>_row-<%= row.getRowId() %>"
 				>
 
 					<%
@@ -306,6 +339,7 @@ int sortColumnIndex = -1;
 			</tr>
 
 		<%
+			request.removeAttribute("liferay-ui:search-container-row:rowId");
 		}
 		%>
 
@@ -314,7 +348,7 @@ int sortColumnIndex = -1;
 
 	<c:if test="<%= PropsValues.SEARCH_CONTAINER_SHOW_PAGINATION_BOTTOM && paginate %>">
 		<div class="taglib-search-iterator-page-iterator-bottom">
-			<liferay-ui:search-paginator searchContainer="<%= searchContainer %>" type="<%= type %>" />
+			<liferay-ui:search-paginator id='<%= id + "PageIteratorBottom" %>' searchContainer="<%= searchContainer %>" type="<%= type %>" />
 		</div>
 	</c:if>
 </div>
@@ -326,13 +360,31 @@ int sortColumnIndex = -1;
 </c:if>
 
 <c:if test="<%= Validator.isNotNull(id) %>">
-	<input id="<%= id %>PrimaryKeys" name="<%= id %>PrimaryKeys" type="hidden" value="<%= StringUtil.merge(primaryKeys) %>" />
+	<input id="<%= namespace + id %>PrimaryKeys" name="<%= id %>PrimaryKeys" type="hidden" value="<%= StringUtil.merge(primaryKeys) %>" />
 
 	<aui:script use="liferay-search-container">
 		new Liferay.SearchContainer(
 			{
-				id: '<%= id %>'
+				classNameHover: '<%= _CLASS_NAME_HOVER %>',
+				hover: <%= searchContainer.isHover() %>,
+				id: '<%= namespace + id %>',
+				rowClassNameAlternate: '<%= _ROW_CLASS_NAME_ALTERNATE %>',
+				rowClassNameAlternateHover: '<%= _ROW_CLASS_NAME_ALTERNATE_HOVER %>',
+				rowClassNameBody: '<%= _ROW_CLASS_NAME_BODY %>',
+				rowClassNameBodyHover: '<%= _ROW_CLASS_NAME_BODY %>'
 			}
 		).render();
 	</aui:script>
 </c:if>
+
+<%!
+private static final String _CLASS_NAME_HOVER = "hover";
+
+private static final String _ROW_CLASS_NAME_ALTERNATE = "portlet-section-alternate";
+
+private static final String _ROW_CLASS_NAME_ALTERNATE_HOVER = "portlet-section-alternate-hover";
+
+private static final String _ROW_CLASS_NAME_BODY = "portlet-section-body";
+
+private static final String _ROW_CLASS_NAME_BODY_HOVER = "portlet-section-body-hover";
+%>

@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -165,6 +165,7 @@ if (step == 1) {
 					document.<portlet:namespace />fm.<portlet:namespace />organizationId.value = organizationId;
 
 					<%
+					portletURL.setParameter("cur", String.valueOf(SearchContainer.DEFAULT_CUR));
 					portletURL.setParameter("step", "2");
 					%>
 
@@ -257,7 +258,7 @@ if (step == 1) {
 					sb.append("', '");
 					sb.append("organizationRoles");
 					sb.append("', '");
-					sb.append(UnicodeFormatter.toString(organization.getGroup().getDescriptiveName()));
+					sb.append(UnicodeFormatter.toString(organization.getGroup().getDescriptiveName(locale)));
 					sb.append("', '");
 					sb.append(organization.getGroup().getGroupId());
 					sb.append("');");

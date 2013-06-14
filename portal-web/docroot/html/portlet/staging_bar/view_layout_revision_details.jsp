@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -19,7 +19,7 @@
 <%
 LayoutRevision layoutRevision = (LayoutRevision)request.getAttribute("view.jsp-layoutRevision");
 
-if (layoutRevision == null && layout != null) {
+if ((layoutRevision == null) && (layout != null)) {
 	layoutRevision = LayoutStagingUtil.getLayoutRevision(layout);
 }
 
@@ -29,114 +29,238 @@ if (layoutSetBranch == null) {
 	layoutSetBranch = LayoutSetBranchLocalServiceUtil.getLayoutSetBranch(layoutRevision.getLayoutSetBranchId());
 }
 
+boolean workflowEnabled = WorkflowDefinitionLinkLocalServiceUtil.hasWorkflowDefinitionLink(themeDisplay.getCompanyId(), scopeGroupId, LayoutRevision.class.getName());
+
+boolean hasWorkflowTask = false;
+
+if (workflowEnabled) {
+	hasWorkflowTask = StagingUtil.hasWorkflowTask(user.getUserId(), layoutRevision);
+}
+
 String taglibHelpMessage = null;
 
 if (layoutRevision.isHead()) {
 	taglibHelpMessage = LanguageUtil.format(pageContext, "this-version-will-be-published-when-x-is-published-to-live", layoutSetBranch.getName());
+}
+else if (hasWorkflowTask) {
+	taglibHelpMessage = "you-are-currently-reviewing-this-page.-you-can-make-changes-and-send-them-to-the-next-step-in-the-workflow-when-ready";
 }
 else {
 	taglibHelpMessage = "a-new-version-will-be-created-automatically-if-this-page-is-modified";
 }
 %>
 
-<aui:model-context bean="<%= layoutRevision %>" model="<%= LayoutRevision.class %>" />
-
 <div class="layout-actions">
-	<aui:workflow-status helpMessage="<%= taglibHelpMessage %>" status='<%= layoutRevision.getStatus() %>' statusMessage='<%= layoutRevision.isHead() ? "ready-for-publication" : null %>' version="<%= String.valueOf(layoutRevision.getLayoutRevisionId()) %>" />
+	<c:choose>
+		<c:when test="<%= layoutRevision.getStatus() == WorkflowConstants.STATUS_INCOMPLETE %>">
+			<liferay-ui:message arguments="<%= new Object[] {layoutRevision.getName(locale), layoutSetBranch.getName()} %>" key="the-page-x-is-not-enabled-in-x,-but-is-available-in-other-pages-variations" />
+		</c:when>
+		<c:otherwise>
+			<aui:model-context bean="<%= layoutRevision %>" model="<%= LayoutRevision.class %>" />
 
-	<span class="layout-revision-toolbar" id="<portlet:namespace />layoutRevisionToolbar"></span>
+			<aui:workflow-status helpMessage="<%= taglibHelpMessage %>" status='<%= layoutRevision.getStatus() %>' statusMessage='<%= layoutRevision.isHead() ? "ready-for-publication" : null %>' version="<%= String.valueOf(layoutRevision.getLayoutRevisionId()) %>" />
+		</c:otherwise>
+	</c:choose>
 </div>
 
-<aui:script position="inline" use="aui-io-request,liferay-staging">
-	var dockbar = Liferay.Staging.Dockbar;
+<span class="layout-revision-toolbar" id="<portlet:namespace />layoutRevisionToolbar"></span>
 
-	dockbar.init(
+<aui:script position="inline" use="liferay-staging-version">
+	var stagingBar = Liferay.StagingBar;
+
+	stagingBar.init(
 		{
-			namespace: '<portlet:namespace />'
+			namespace: '<portlet:namespace />',
+			portletId: '<%= portletDisplay.getId() %>'
+
+			<c:if test="<%= layoutRevision.getStatus() == WorkflowConstants.STATUS_INCOMPLETE %>">
+				, hideHistory: true
+			</c:if>
 		}
 	);
 
-	<c:if test="<%= layoutRevision.hasChildren() %>">
-
-		<%
-		List<LayoutRevision> childLayoutRevisions = layoutRevision.getChildren();
-
-		LayoutRevision firstChildLayoutRevision = childLayoutRevisions.get(0);
-
-		if (firstChildLayoutRevision.getStatus() == WorkflowConstants.STATUS_INACTIVE) {
-		%>
-
-			var redoButton = dockbar.redoButton;
-
-			dockbar.layoutRevisionToolbar.add(redoButton, 0);
-
-			redoButton.get('contentBox').attr(
-				{
-					'data-layoutRevisionId': '<%= firstChildLayoutRevision.getLayoutRevisionId() %>',
-					'data-layoutSetBranchId': '<%= firstChildLayoutRevision.getLayoutSetBranchId() %>'
-				}
-			);
-
-		<%
-		}
-		%>
-
-	</c:if>
-
-	<c:if test="<%= !layoutRevision.isMajor() && (layoutRevision.getParentLayoutRevisionId() != LayoutRevisionConstants.DEFAULT_PARENT_LAYOUT_REVISION_ID) %>">
-		var undoButton = dockbar.undoButton;
-
-		dockbar.layoutRevisionToolbar.add(undoButton, 0);
-
-		undoButton.get('contentBox').attr(
-			{
-				'data-layoutRevisionId': '<%= layoutRevision.getLayoutRevisionId() %>',
-				'data-layoutSetBranchId': '<%= layoutRevision.getLayoutSetBranchId() %>'
-			}
-		);
-	</c:if>
-
-	<c:if test="<%= !layoutRevision.isPending() && LayoutPermissionUtil.contains(permissionChecker, layoutRevision.getPlid(), ActionKeys.UPDATE) %>">
-
-		<%
-		List<LayoutRevision> pendingLayoutRevisions = LayoutRevisionLocalServiceUtil.getLayoutRevisions(layoutRevision.getLayoutSetBranchId(), layoutRevision.getPlid(), WorkflowConstants.STATUS_PENDING);
-		%>
-
-		<c:if test="<%= pendingLayoutRevisions.isEmpty() && !layoutRevision.isHead() %>">
-			dockbar.layoutRevisionToolbar.add(
+	<c:choose>
+		<c:when test="<%= hasWorkflowTask %>">
+			stagingBar.layoutRevisionToolbar.add(
 				{
 					type: 'ToolbarSpacer'
 				}
 			);
 
-			<portlet:actionURL var="publishURL">
-				<portlet:param name="struts_action" value="/staging_bar/edit_layouts" />
-				<portlet:param name="<%= Constants.CMD %>" value="update_layout_revision" />
-				<portlet:param name="redirect" value="<%= PortalUtil.getLayoutFullURL(themeDisplay) %>" />
-				<portlet:param name="groupId" value="<%= String.valueOf(layoutRevision.getGroupId()) %>" />
-				<portlet:param name="layoutRevisionId" value="<%= String.valueOf(layoutRevision.getLayoutRevisionId()) %>" />
-				<portlet:param name="major" value="true" />
-				<portlet:param name="workflowAction" value="<%= String.valueOf(WorkflowConstants.ACTION_PUBLISH) %>" />
-			</portlet:actionURL>
-
-			dockbar.layoutRevisionToolbar.add(
+			stagingBar.layoutRevisionToolbar.add(
 				{
 					handler: function(event) {
-						A.io.request(
-							'<%= publishURL %>',
+
+						<%
+						Group controlPanelGroup = GroupLocalServiceUtil.getGroup(themeDisplay.getCompanyId(), GroupConstants.CONTROL_PANEL);
+
+						long controlPanelPlid = LayoutLocalServiceUtil.getDefaultPlid(controlPanelGroup.getGroupId(), true);
+
+						PortletURL portletURL = liferayPortletResponse.createLiferayPortletURL(controlPanelPlid, PortletKeys.MY_WORKFLOW_TASKS, PortletRequest.RENDER_PHASE);
+
+						portletURL.setParameter("struts_action", "/my_workflow_tasks/edit_workflow_task");
+
+						WorkflowTask workflowTask = StagingUtil.getWorkflowTask(user.getUserId(), layoutRevision);
+
+						portletURL.setParameter("workflowTaskId", String.valueOf(workflowTask.getWorkflowTaskId()));
+
+						portletURL.setPortletMode(PortletMode.VIEW);
+						portletURL.setWindowState(LiferayWindowState.POP_UP);
+
+						String layoutURL = PortalUtil.getLayoutFriendlyURL(layout, themeDisplay);
+
+						layoutURL = HttpUtil.addParameter(layoutURL, "layoutSetBranchId", layoutRevision.getLayoutSetBranchId());
+						layoutURL = HttpUtil.addParameter(layoutURL, "layoutRevisionId", layoutRevision.getLayoutRevisionId());
+
+						portletURL.setParameter("closeRedirect", layoutURL);
+						%>
+
+						Liferay.Util.openWindow(
 							{
-								after: {
-									success: function() {
-										Liferay.fire('updatedLayout');
-									}
-								}
+								dialog:
+									{
+										align: Liferay.Util.Window.ALIGN_CENTER,
+										modal: true,
+										width: '90%'
+									},
+								id: '<portlet:namespace />workflowTasks',
+								title: '<%= UnicodeLanguageUtil.get(pageContext, "workflow") %>',
+								uri: '<%= portletURL.toString() %>'
 							}
 						);
 					},
-					icon: '<%= WorkflowDefinitionLinkLocalServiceUtil.hasWorkflowDefinitionLink(themeDisplay.getCompanyId(), scopeGroupId, LayoutRevision.class.getName()) ? "shuffle" : "circle-check" %>',
-					label: '<%= UnicodeLanguageUtil.get(pageContext, WorkflowDefinitionLinkLocalServiceUtil.hasWorkflowDefinitionLink(themeDisplay.getCompanyId(), scopeGroupId, LayoutRevision.class.getName()) ? "submit-for-publication" : "mark-as-ready-for-publication") %>'
+					icon: 'shuffle',
+					label: '<%= UnicodeLanguageUtil.get(pageContext, "workflow") %>'
 				}
 			);
-		</c:if>
-	</c:if>
+		</c:when>
+		<c:otherwise>
+			<c:if test="<%= layoutRevision.hasChildren() %>">
+
+				<%
+				List<LayoutRevision> childLayoutRevisions = layoutRevision.getChildren();
+
+				LayoutRevision firstChildLayoutRevision = childLayoutRevisions.get(0);
+
+				if (firstChildLayoutRevision.getStatus() == WorkflowConstants.STATUS_INACTIVE) {
+				%>
+
+					var redoButton = stagingBar.redoButton;
+
+					stagingBar.layoutRevisionToolbar.add(redoButton, 0);
+
+					redoButton.get('contentBox').attr(
+						{
+							'data-layoutRevisionId': '<%= firstChildLayoutRevision.getLayoutRevisionId() %>',
+							'data-layoutSetBranchId': '<%= firstChildLayoutRevision.getLayoutSetBranchId() %>'
+						}
+					);
+
+				<%
+				}
+				%>
+
+			</c:if>
+
+			<c:if test="<%= !layoutRevision.isMajor() && (layoutRevision.getParentLayoutRevisionId() != LayoutRevisionConstants.DEFAULT_PARENT_LAYOUT_REVISION_ID) %>">
+				var undoButton = stagingBar.undoButton;
+
+				stagingBar.layoutRevisionToolbar.add(undoButton, 0);
+
+				undoButton.get('contentBox').attr(
+					{
+						'data-layoutRevisionId': '<%= layoutRevision.getLayoutRevisionId() %>',
+						'data-layoutSetBranchId': '<%= layoutRevision.getLayoutSetBranchId() %>'
+					}
+				);
+			</c:if>
+
+			<c:if test="<%= !layoutRevision.isHead() && LayoutPermissionUtil.contains(permissionChecker, layoutRevision.getPlid(), ActionKeys.UPDATE) %>">
+				stagingBar.layoutRevisionToolbar.add(
+					{
+						type: 'ToolbarSpacer'
+					}
+				);
+
+				stagingBar.layoutRevisionToolbar.add(
+					{
+
+						<%
+						List<LayoutRevision> pendingLayoutRevisions = LayoutRevisionLocalServiceUtil.getLayoutRevisions(layoutRevision.getLayoutSetBranchId(), layoutRevision.getPlid(), WorkflowConstants.STATUS_PENDING);
+						%>
+
+						<c:choose>
+							<c:when test="<%= pendingLayoutRevisions.isEmpty() %>">
+								<portlet:actionURL var="publishURL">
+									<portlet:param name="struts_action" value="/staging_bar/edit_layouts" />
+									<portlet:param name="<%= Constants.CMD %>" value="update_layout_revision" />
+									<portlet:param name="redirect" value="<%= PortalUtil.getLayoutFullURL(themeDisplay) %>" />
+									<portlet:param name="groupId" value="<%= String.valueOf(layoutRevision.getGroupId()) %>" />
+									<portlet:param name="layoutRevisionId" value="<%= String.valueOf(layoutRevision.getLayoutRevisionId()) %>" />
+									<portlet:param name="major" value="true" />
+									<portlet:param name="workflowAction" value="<%= String.valueOf((layoutRevision.getStatus() == WorkflowConstants.STATUS_INCOMPLETE) ? WorkflowConstants.ACTION_SAVE_DRAFT : WorkflowConstants.ACTION_PUBLISH) %>" />
+								</portlet:actionURL>
+
+								handler: function(event) {
+									A.io.request(
+										'<%= publishURL %>',
+										{
+											after: {
+												success: function() {
+													<c:choose>
+														<c:when test="<%= layoutRevision.getStatus() == WorkflowConstants.STATUS_INCOMPLETE %>">
+															location.href = '<%= currentURL %>';
+														</c:when>
+														<c:otherwise>
+															Liferay.fire('updatedLayout');
+														</c:otherwise>
+													</c:choose>
+												}
+											}
+										}
+									);
+								},
+							</c:when>
+							<c:when test="<%= workflowEnabled %>">
+
+								<%
+								String submitMessage = "you-cannot-submit-your-changes-because-someone-else-has-submitted-changes-for-approval";
+
+								LayoutRevision pendingLayoutRevision = pendingLayoutRevisions.get(0);
+
+								if ((pendingLayoutRevision != null) && (pendingLayoutRevision.getUserId() == user.getUserId())) {
+									submitMessage = "you-cannot-submit-your-changes-because-your-previous-submission-is-still-waiting-for-approval";
+								}
+								%>
+
+								disabled: true,
+								title: '<%= UnicodeLanguageUtil.get(pageContext, submitMessage) %>',
+							</c:when>
+						</c:choose>
+
+						<%
+						String icon = "circle-check";
+						String label = null;
+
+						if (layoutRevision.getStatus() == WorkflowConstants.STATUS_INCOMPLETE) {
+							label = LanguageUtil.format(pageContext, "enable-in-x", layoutSetBranch.getName());
+						}
+						else {
+							if (workflowEnabled) {
+								icon = "shuffle";
+								label = "submit-for-publication";
+							}
+							else {
+								label = "mark-as-ready-for-publication";
+							}
+						}
+						%>
+
+						icon: '<%= icon %>',
+						label: '<%= UnicodeLanguageUtil.get(pageContext, label) %>'
+					}
+				);
+			</c:if>
+		</c:otherwise>
+	</c:choose>
 </aui:script>

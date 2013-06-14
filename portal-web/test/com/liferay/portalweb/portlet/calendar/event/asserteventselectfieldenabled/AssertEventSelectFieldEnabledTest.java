@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -23,9 +23,10 @@ import com.liferay.portalweb.portal.util.RuntimeVariables;
 public class AssertEventSelectFieldEnabledTest extends BaseTestCase {
 	public void testAssertEventSelectFieldEnabled() throws Exception {
 		selenium.open("/web/guest/home/");
+		loadRequiredJavaScriptModules();
 
 		for (int second = 0;; second++) {
-			if (second >= 60) {
+			if (second >= 90) {
 				fail("timeout");
 			}
 
@@ -40,14 +41,13 @@ public class AssertEventSelectFieldEnabledTest extends BaseTestCase {
 			Thread.sleep(1000);
 		}
 
-		selenium.saveScreenShotAndSource();
 		selenium.clickAt("link=Calendar Test Page", RuntimeVariables.replace(""));
 		selenium.waitForPageToLoad("30000");
-		selenium.saveScreenShotAndSource();
+		loadRequiredJavaScriptModules();
 		selenium.clickAt("//input[@value='Add Event']",
 			RuntimeVariables.replace(""));
 		selenium.waitForPageToLoad("30000");
-		selenium.saveScreenShotAndSource();
+		loadRequiredJavaScriptModules();
 		assertTrue(selenium.isElementPresent(
 				"//select[@name='_8_startDateMonth']"));
 		assertTrue(selenium.isElementPresent(
@@ -69,7 +69,7 @@ public class AssertEventSelectFieldEnabledTest extends BaseTestCase {
 			RuntimeVariables.replace(""));
 
 		for (int second = 0;; second++) {
-			if (second >= 60) {
+			if (second >= 90) {
 				fail("timeout");
 			}
 
@@ -84,7 +84,6 @@ public class AssertEventSelectFieldEnabledTest extends BaseTestCase {
 			Thread.sleep(1000);
 		}
 
-		selenium.saveScreenShotAndSource();
 		assertTrue(selenium.isElementPresent("//select[@name='_8_monthlyPos']"));
 		assertTrue(selenium.isElementPresent("//select[@name='_8_monthlyDay1']"));
 		assertTrue(selenium.isElementPresent("//select[@name='_8_monthlyDay1']"));
@@ -92,7 +91,7 @@ public class AssertEventSelectFieldEnabledTest extends BaseTestCase {
 			RuntimeVariables.replace(""));
 
 		for (int second = 0;; second++) {
-			if (second >= 60) {
+			if (second >= 90) {
 				fail("timeout");
 			}
 
@@ -107,7 +106,6 @@ public class AssertEventSelectFieldEnabledTest extends BaseTestCase {
 			Thread.sleep(1000);
 		}
 
-		selenium.saveScreenShotAndSource();
 		assertTrue(selenium.isElementPresent(
 				"//select[@name='_8_yearlyMonth0']"));
 		assertTrue(selenium.isElementPresent("//select[@name='_8_yearlyPos']"));
@@ -144,7 +142,7 @@ public class AssertEventSelectFieldEnabledTest extends BaseTestCase {
 			RuntimeVariables.replace(""));
 
 		for (int second = 0;; second++) {
-			if (second >= 60) {
+			if (second >= 90) {
 				fail("timeout");
 			}
 
@@ -159,7 +157,6 @@ public class AssertEventSelectFieldEnabledTest extends BaseTestCase {
 			Thread.sleep(1000);
 		}
 
-		selenium.saveScreenShotAndSource();
 		assertFalse(selenium.isElementPresent(
 				"//select[@name='_8_monthlyPos' and @disabled='']"));
 		assertFalse(selenium.isElementPresent(
@@ -170,7 +167,7 @@ public class AssertEventSelectFieldEnabledTest extends BaseTestCase {
 			RuntimeVariables.replace(""));
 
 		for (int second = 0;; second++) {
-			if (second >= 60) {
+			if (second >= 90) {
 				fail("timeout");
 			}
 
@@ -185,7 +182,6 @@ public class AssertEventSelectFieldEnabledTest extends BaseTestCase {
 			Thread.sleep(1000);
 		}
 
-		selenium.saveScreenShotAndSource();
 		assertFalse(selenium.isElementPresent(
 				"//select[@name='_8_yearlyMonth0' and @disabled='']"));
 		assertFalse(selenium.isElementPresent(

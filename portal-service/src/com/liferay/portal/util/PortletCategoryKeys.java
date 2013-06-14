@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -19,14 +19,20 @@ package com.liferay.portal.util;
  */
 public class PortletCategoryKeys {
 
+	public static final String[] ALL = {
+		PortletCategoryKeys.MARKETPLACE, PortletCategoryKeys.MY,
+		PortletCategoryKeys.CONTENT, PortletCategoryKeys.PORTAL,
+		PortletCategoryKeys.SERVER
+	};
+
 	public static final String CONTENT = "content";
+
+	public static final String MARKETPLACE = "marketplace";
 
 	public static final String MY = "my";
 
 	public static final String PORTAL = "portal";
 
 	public static final String SERVER = "server";
-
-	public static final String[] ALL = {MY, CONTENT, PORTAL, SERVER};
 
 }

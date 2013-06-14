@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -165,6 +165,30 @@ public class ExpandoTableLocalServiceImpl
 		long classNameId = PortalUtil.getClassNameId(className);
 
 		deleteTables(companyId, classNameId);
+	}
+
+	public ExpandoTable fetchDefaultTable(long companyId, long classNameId)
+		throws SystemException {
+
+		return fetchTable(
+			companyId, classNameId, ExpandoTableConstants.DEFAULT_TABLE_NAME);
+	}
+
+	public ExpandoTable fetchDefaultTable(long companyId, String className)
+		throws SystemException {
+
+		long classNameId = PortalUtil.getClassNameId(className);
+
+		return fetchTable(
+			companyId, classNameId, ExpandoTableConstants.DEFAULT_TABLE_NAME);
+	}
+
+	public ExpandoTable fetchTable(
+			long companyId, long classNameId, String name)
+		throws SystemException {
+
+		return expandoTablePersistence.fetchByC_C_N(
+			companyId, classNameId, name);
 	}
 
 	public ExpandoTable getDefaultTable(long companyId, long classNameId)

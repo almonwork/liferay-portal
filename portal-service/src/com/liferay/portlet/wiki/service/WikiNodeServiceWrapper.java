@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,6 +14,8 @@
 
 package com.liferay.portlet.wiki.service;
 
+import com.liferay.portal.service.ServiceWrapper;
+
 /**
  * <p>
  * This class is a wrapper for {@link WikiNodeService}.
@@ -23,9 +25,28 @@ package com.liferay.portlet.wiki.service;
  * @see       WikiNodeService
  * @generated
  */
-public class WikiNodeServiceWrapper implements WikiNodeService {
+public class WikiNodeServiceWrapper implements WikiNodeService,
+	ServiceWrapper<WikiNodeService> {
 	public WikiNodeServiceWrapper(WikiNodeService wikiNodeService) {
 		_wikiNodeService = wikiNodeService;
+	}
+
+	/**
+	* Returns the Spring bean ID for this bean.
+	*
+	* @return the Spring bean ID for this bean
+	*/
+	public java.lang.String getBeanIdentifier() {
+		return _wikiNodeService.getBeanIdentifier();
+	}
+
+	/**
+	* Sets the Spring bean ID for this bean.
+	*
+	* @param beanIdentifier the Spring bean ID for this bean
+	*/
+	public void setBeanIdentifier(java.lang.String beanIdentifier) {
+		_wikiNodeService.setBeanIdentifier(beanIdentifier);
 	}
 
 	public com.liferay.portlet.wiki.model.WikiNode addNode(
@@ -56,11 +77,11 @@ public class WikiNodeServiceWrapper implements WikiNodeService {
 	}
 
 	public void importPages(long nodeId, java.lang.String importer,
-		java.io.File[] files,
+		java.io.InputStream[] inputStreams,
 		java.util.Map<java.lang.String, java.lang.String[]> options)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException {
-		_wikiNodeService.importPages(nodeId, importer, files, options);
+		_wikiNodeService.importPages(nodeId, importer, inputStreams, options);
 	}
 
 	public void subscribeNode(long nodeId)
@@ -84,11 +105,25 @@ public class WikiNodeServiceWrapper implements WikiNodeService {
 			serviceContext);
 	}
 
+	/**
+	 * @deprecated Renamed to {@link #getWrappedService}
+	 */
 	public WikiNodeService getWrappedWikiNodeService() {
 		return _wikiNodeService;
 	}
 
+	/**
+	 * @deprecated Renamed to {@link #setWrappedService}
+	 */
 	public void setWrappedWikiNodeService(WikiNodeService wikiNodeService) {
+		_wikiNodeService = wikiNodeService;
+	}
+
+	public WikiNodeService getWrappedService() {
+		return _wikiNodeService;
+	}
+
+	public void setWrappedService(WikiNodeService wikiNodeService) {
 		_wikiNodeService = wikiNodeService;
 	}
 

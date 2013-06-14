@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -39,14 +39,6 @@ import javax.servlet.jsp.JspException;
  * @author Brian Wing Shun Chan
  */
 public class InputTag extends BaseInputTag {
-
-	@Override
-	protected void cleanUp() {
-		super.cleanUp();
-
-		_forLabel = null;
-		_validators = null;
-	}
 
 	@Override
 	public int doEndTag() throws JspException {
@@ -93,9 +85,11 @@ public class InputTag extends BaseInputTag {
 			String validatorName = (String)modelValidator.getObject(1);
 			String validatorErrorMessage = (String)modelValidator.getObject(2);
 			String validatorValue = (String)modelValidator.getObject(3);
+			boolean customValidator = (Boolean)modelValidator.getObject(4);
 
 			ValidatorTag validatorTag = new ValidatorTagImpl(
-				validatorName, validatorErrorMessage, validatorValue);
+				validatorName, validatorErrorMessage, validatorValue,
+				customValidator);
 
 			addValidatorTag(validatorName, validatorTag);
 		}
@@ -112,6 +106,14 @@ public class InputTag extends BaseInputTag {
 	}
 
 	@Override
+	protected void cleanUp() {
+		super.cleanUp();
+
+		_forLabel = null;
+		_validators = null;
+	}
+
+	@Override
 	protected boolean isCleanUpSetAttributes() {
 		return _CLEAN_UP_SET_ATTRIBUTES;
 	}
@@ -124,6 +126,26 @@ public class InputTag extends BaseInputTag {
 
 		if (bean == null) {
 			bean = pageContext.getAttribute("aui:model-context:bean");
+		}
+
+		Class<?> model = getModel();
+
+		if (model == null) {
+			model = (Class<?>)pageContext.getAttribute(
+				"aui:model-context:model");
+		}
+
+		String defaultLanguageId = getDefaultLanguageId();
+
+		if (Validator.isNull(defaultLanguageId)) {
+			defaultLanguageId = (String)pageContext.getAttribute(
+				"aui:model-context:defaultLanguageId");
+		}
+
+		if (Validator.isNull(defaultLanguageId)) {
+			Locale defaultLocale = LocaleUtil.getDefault();
+
+			defaultLanguageId = LocaleUtil.toLanguageId(defaultLocale);
 		}
 
 		String name = getName();
@@ -154,8 +176,12 @@ public class InputTag extends BaseInputTag {
 		String id = getId();
 		String type = getType();
 
-		if (Validator.isNull(id)) {
-			if (!Validator.equals(type, "radio")) {
+		if (Validator.isNull(id) &&
+			((model == null) || Validator.isNotNull(type))) {
+
+			if (!Validator.equals(type, "assetTags") &&
+				!Validator.equals(type, "radio")) {
+
 				id = name;
 			}
 			else {
@@ -169,14 +195,8 @@ public class InputTag extends BaseInputTag {
 			label = TextFormatter.format(name, TextFormatter.K);
 		}
 
-		Class<?> model = getModel();
-
-		if (model == null) {
-			model = (Class<?>)pageContext.getAttribute(
-				"aui:model-context:model");
-		}
-
 		_forLabel = id;
+		_inputName = getName();
 
 		String baseType = null;
 
@@ -187,14 +207,12 @@ public class InputTag extends BaseInputTag {
 
 			if (Validator.isNotNull(fieldParam)) {
 				_forLabel = fieldParam;
+				_inputName = fieldParam;
 			}
 
 			if (ModelHintsUtil.isLocalized(model.getName(), field)) {
-				Locale defaultLocale = LocaleUtil.getDefault();
-				String defaultLanguageId = LocaleUtil.toLanguageId(
-					defaultLocale);
-
 				_forLabel += StringPool.UNDERLINE + defaultLanguageId;
+				_inputName += StringPool.UNDERLINE + defaultLanguageId;
 			}
 		}
 		else if (Validator.isNotNull(type)) {
@@ -211,6 +229,7 @@ public class InputTag extends BaseInputTag {
 
 		setNamespacedAttribute(request, "baseType", baseType);
 		setNamespacedAttribute(request, "bean", bean);
+		setNamespacedAttribute(request, "defaultLanguageId", defaultLanguageId);
 		setNamespacedAttribute(request, "field", field);
 		setNamespacedAttribute(request, "forLabel", _forLabel);
 		setNamespacedAttribute(request, "formName", formName);
@@ -248,12 +267,13 @@ public class InputTag extends BaseInputTag {
 
 		List<ValidatorTag> validatorTags = ListUtil.fromMapValues(_validators);
 
-		validatorTagsMap.put(_forLabel, validatorTags);
+		validatorTagsMap.put(_inputName, validatorTags);
 	}
 
 	private static final boolean _CLEAN_UP_SET_ATTRIBUTES = true;
 
 	private String _forLabel;
+	private String _inputName;
 	private Map<String, ValidatorTag> _validators;
 
 }

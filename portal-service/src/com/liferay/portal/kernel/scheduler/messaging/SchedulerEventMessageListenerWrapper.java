@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -21,9 +21,13 @@ import com.liferay.portal.kernel.messaging.MessageListener;
 import com.liferay.portal.kernel.messaging.MessageListenerException;
 import com.liferay.portal.kernel.scheduler.JobState;
 import com.liferay.portal.kernel.scheduler.SchedulerEngine;
+import com.liferay.portal.kernel.scheduler.SchedulerEngineUtil;
+import com.liferay.portal.kernel.scheduler.TriggerState;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.uuid.PortalUUIDUtil;
+
+import java.util.Date;
 
 /**
  * @author Shuyang Zhou
@@ -31,21 +35,17 @@ import com.liferay.portal.kernel.uuid.PortalUUIDUtil;
 public class SchedulerEventMessageListenerWrapper implements MessageListener {
 
 	public void afterPropertiesSet() {
-		String jobName = _className;
-
-		if (_className.length() > SchedulerEngine.JOB_NAME_MAX_LENGTH) {
-			jobName = _className.substring(
-				0, SchedulerEngine.JOB_NAME_MAX_LENGTH);
-		}
-
-		String groupName = _className;
-
-		if (_className.length() > SchedulerEngine.GROUP_NAME_MAX_LENGTH) {
-			groupName = _className.substring(
+		if (_jobName.length() > SchedulerEngine.GROUP_NAME_MAX_LENGTH) {
+			_jobName = _jobName.substring(
 				0, SchedulerEngine.GROUP_NAME_MAX_LENGTH);
 		}
 
-		_key = jobName.concat(StringPool.PERIOD).concat(groupName);
+		if (_groupName.length() > SchedulerEngine.JOB_NAME_MAX_LENGTH) {
+			_groupName = _groupName.substring(
+				0, SchedulerEngine.JOB_NAME_MAX_LENGTH);
+		}
+
+		_key = _jobName.concat(StringPool.PERIOD).concat(_groupName);
 
 		if (_messageListenerUUID == null) {
 			_messageListenerUUID = PortalUUIDUtil.generate();
@@ -69,7 +69,7 @@ public class SchedulerEventMessageListenerWrapper implements MessageListener {
 			}
 		}
 
-		try{
+		try {
 			_messageListener.receive(message);
 		}
 		catch (Exception e) {
@@ -83,17 +83,45 @@ public class SchedulerEventMessageListenerWrapper implements MessageListener {
 			}
 		}
 		finally {
-			if (message.getBoolean(SchedulerEngine.DISABLE) &&
-				destinationName.equals(DestinationNames.SCHEDULER_DISPATCH)) {
+			TriggerState triggerState = null;
 
-				MessageBusUtil.unregisterMessageListener(
-					destinationName, this);
+			if (message.getBoolean(SchedulerEngine.DISABLE)) {
+				triggerState = TriggerState.COMPLETE;
+
+				if (destinationName.equals(
+						DestinationNames.SCHEDULER_DISPATCH)) {
+
+					MessageBusUtil.unregisterMessageListener(
+						destinationName, this);
+				}
+			}
+			else {
+				triggerState = TriggerState.NORMAL;
+			}
+
+			try {
+				SchedulerEngineUtil.auditSchedulerJobs(message, triggerState);
+			}
+			catch (Exception e) {
+				throw new MessageListenerException(e);
 			}
 		}
 	}
 
+	/**
+	 * @deprecated {@link #setGroupName(String)}
+	 */
 	public void setClassName(String className) {
-		_className = className;
+		_groupName = className;
+		_jobName = className;
+	}
+
+	public void setGroupName(String groupName) {
+		_groupName = groupName;
+	}
+
+	public void setJobName(String jobName) {
+		_jobName = jobName;
 	}
 
 	public void setMessageListener(MessageListener messageListener) {
@@ -108,11 +136,12 @@ public class SchedulerEventMessageListenerWrapper implements MessageListener {
 		JobState jobState = (JobState)message.get(SchedulerEngine.JOB_STATE);
 
 		if (jobState != null) {
-			jobState.addException(exception);
+			jobState.addException(exception, new Date());
 		}
 	}
 
-	private String _className;
+	private String _groupName;
+	private String _jobName;
 	private String _key;
 	private MessageListener _messageListener;
 	private String _messageListenerUUID;

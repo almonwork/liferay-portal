@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -34,7 +34,7 @@ import java.util.List;
 public class LayoutSetBranchFinderImpl
 	extends BasePersistenceImpl<Layout> implements LayoutSetBranchFinder {
 
-	public static String FIND_BY_MASTER =
+	public static final String FIND_BY_MASTER =
 		LayoutSetBranchFinder.class.getName() + ".findByMaster";
 
 	public LayoutSetBranch findByMaster(long groupId, boolean privateLayout)
@@ -57,10 +57,10 @@ public class LayoutSetBranchFinderImpl
 			qPos.add(privateLayout);
 			qPos.add(true);
 
-			List<LayoutSetBranch> list = q.list();
+			List<LayoutSetBranch> layoutSetBranches = q.list();
 
-			if (!list.isEmpty()) {
-				return list.get(0);
+			if (!layoutSetBranches.isEmpty()) {
+				return layoutSetBranches.get(0);
 			}
 		}
 		catch (Exception e) {

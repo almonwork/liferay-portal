@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -49,6 +49,7 @@ ArticleSearchTerms searchTerms = (ArticleSearchTerms)searchContainer.getSearchTe
 searchTerms.setVersion(-1);
 
 List<JournalArticle> results = null;
+int total = 0;
 %>
 
 <%@ include file="/html/portlet/journal/article_search_results.jspf" %>
@@ -83,7 +84,7 @@ for (int i = 0; i < results.size(); i++) {
 
 	// Title
 
-	row.addText(article.getTitle(locale), rowHREF);
+	row.addText(HtmlUtil.escape(article.getTitle(locale)), rowHREF);
 
 	// Version
 

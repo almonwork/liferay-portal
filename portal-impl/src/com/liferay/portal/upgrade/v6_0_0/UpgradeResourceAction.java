@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -15,9 +15,9 @@
 package com.liferay.portal.upgrade.v6_0_0;
 
 import com.liferay.portal.kernel.upgrade.UpgradeProcess;
-import com.liferay.portal.kernel.upgrade.util.UpgradeTable;
-import com.liferay.portal.kernel.upgrade.util.UpgradeTableFactoryUtil;
 import com.liferay.portal.upgrade.v6_0_0.util.ResourceActionTable;
+
+import java.sql.SQLException;
 
 /**
  * @author Brian Wing Shun Chan
@@ -29,19 +29,15 @@ public class UpgradeResourceAction extends UpgradeProcess {
 		try {
 			runSQL("alter_column_type ResourceAction name VARCHAR(255) null");
 		}
-		catch (Exception e) {
+		catch (SQLException sqle) {
 
 			// Resource
 
-			UpgradeTable upgradeTable = UpgradeTableFactoryUtil.getUpgradeTable(
+			upgradeTable(
 				ResourceActionTable.TABLE_NAME,
-				ResourceActionTable.TABLE_COLUMNS);
-
-			upgradeTable.setCreateSQL(ResourceActionTable.TABLE_SQL_CREATE);
-			upgradeTable.setIndexesSQL(
+				ResourceActionTable.TABLE_COLUMNS,
+				ResourceActionTable.TABLE_SQL_CREATE,
 				ResourceActionTable.TABLE_SQL_ADD_INDEXES);
-
-			upgradeTable.updateTable();
 		}
 	}
 

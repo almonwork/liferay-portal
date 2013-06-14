@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -27,32 +27,34 @@ public class RemoteExportException extends PortalException {
 
 	public static final int NO_LAYOUTS = 3;
 
+	public static final int NO_PERMISSIONS = 4;
+
 	public RemoteExportException(int type) {
 		_type = type;
-	}
-
-	public int getType() {
-		return _type;
 	}
 
 	public long getGroupId() {
 		return _groupId;
 	}
 
-	public void setGroupId(long groupId) {
-		_groupId = groupId;
+	public int getType() {
+		return _type;
 	}
 
 	public String getURL() {
 		return _url;
 	}
 
+	public void setGroupId(long groupId) {
+		_groupId = groupId;
+	}
+
 	public void setURL(String url) {
 		_url = url;
 	}
 
-	private int _type;
 	private long _groupId;
+	private int _type;
 	private String _url;
 
 }

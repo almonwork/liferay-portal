@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -71,14 +71,7 @@ String defaultMessage = (String)request.getAttribute("liferay-ui:toggle:defaultM
 				</c:choose>
 
 				if ((saveState == null) || saveState) {
-					A.io(
-						themeDisplay.getPathMain() + '/portal/session_click',
-						{
-							data: {
-								'<%= id %>': 'none'
-							}
-						}
-					);
+					Liferay.Store('<%= id %>', 'none');
 				}
 			}
 			else {
@@ -96,17 +89,10 @@ String defaultMessage = (String)request.getAttribute("liferay-ui:toggle:defaultM
 				</c:choose>
 
 				if ((saveState == null) || saveState) {
-					A.io(
-						themeDisplay.getPathMain() + '/portal/session_click',
-						{
-							data: {
-								'<%= id %>': 'block'
-							}
-						}
-					);
+					Liferay.Store('<%= id %>', 'block');
 				}
 			}
 		},
-		['aui-io']
+		['liferay-store']
 	);
 </aui:script>

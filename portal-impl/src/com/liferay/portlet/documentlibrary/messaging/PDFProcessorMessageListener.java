@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,21 +14,21 @@
 
 package com.liferay.portlet.documentlibrary.messaging;
 
-import com.liferay.portal.kernel.messaging.BaseMessageListener;
-import com.liferay.portal.kernel.messaging.Message;
 import com.liferay.portal.kernel.repository.model.FileVersion;
-import com.liferay.portlet.documentlibrary.util.PDFProcessor;
+import com.liferay.portlet.documentlibrary.util.PDFProcessorUtil;
 
 /**
  * @author Alexander Chow
  */
-public class PDFProcessorMessageListener extends BaseMessageListener {
+public class PDFProcessorMessageListener extends BaseProcessorMessageListener {
 
 	@Override
-	protected void doReceive(Message message) {
-		FileVersion fileVersion = (FileVersion)message.getPayload();
+	protected void generate(
+			FileVersion sourceFileVersion, FileVersion destinationFileVersion)
+		throws Exception {
 
-		PDFProcessor.generateImages(fileVersion);
+		PDFProcessorUtil.generateImages(
+			sourceFileVersion, destinationFileVersion);
 	}
 
 }

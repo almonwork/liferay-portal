@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -88,7 +88,16 @@ private String _buildTagsNavigation(long groupId, String selectedTagName, Portle
 
 	if (showAssetCount && displayStyle.equals("cloud")) {
 		for (AssetTag tag : tags) {
-			int count = tag.getAssetCount();
+			String tagName = tag.getName();
+
+			int count = 0;
+
+			if (classNameId > 0) {
+				count = AssetTagServiceUtil.getTagsCount(groupId, classNameId, tagName);
+			}
+			else {
+				count = AssetTagServiceUtil.getTagsCount(groupId, tagName);
+			}
 
 			if (!showZeroAssetCount && (count == 0)) {
 				continue;
@@ -108,7 +117,14 @@ private String _buildTagsNavigation(long groupId, String selectedTagName, Portle
 	for (AssetTag tag : tags) {
 		String tagName = tag.getName();
 
-		int count = tag.getAssetCount();
+		int count = 0;
+
+		if (classNameId > 0) {
+			count = AssetTagServiceUtil.getTagsCount(groupId, classNameId, tagName);
+		}
+		else {
+			count = AssetTagServiceUtil.getTagsCount(groupId, tagName);
+		}
 
 		int popularity = (int)(1 + ((maxCount - (maxCount - (count - minCount))) * multiplier));
 
@@ -121,20 +137,20 @@ private String _buildTagsNavigation(long groupId, String selectedTagName, Portle
 		sb.append("\"><span>");
 
 		if (tagName.equals(selectedTagName)) {
-			portletURL.setParameter("tag", "");
+			portletURL.setParameter("tag", StringPool.BLANK);
 
 			sb.append("<a class=\"tag-selected\" href=\"");
 		}
 		else {
-			portletURL.setParameter("tag", tag.getName());
+			portletURL.setParameter("resetCur", Boolean.TRUE.toString());
+			portletURL.setParameter("tag", tagName);
 
  			sb.append("<a href=\"");
 		}
 
 		sb.append(portletURL.toString());
-		sb.append("\"><strong>");
+		sb.append("\">");
 		sb.append(tagName);
-		sb.append("</strong>");
 
 		if (showAssetCount) {
 			sb.append("<span class=\"tag-asset-count\">");

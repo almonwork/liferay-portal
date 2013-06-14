@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,29 +14,8 @@
 
 package com.liferay.portal.kernel.upload;
 
-import java.io.File;
-
-import javax.servlet.http.HttpServletRequest;
-
 /**
  * @author Brian Wing Shun Chan
  */
-public interface UploadPortletRequest extends HttpServletRequest {
-
-	public void cleanUp();
-
-	public String getContentType(String name);
-
-	public File getFile(String name);
-
-	public File[] getFiles(String name);
-
-	public String getFileName(String name);
-
-	public String[] getFileNames(String name);
-
-	public String getFullFileName(String name);
-
-	public boolean isFormField(String name);
-
+public interface UploadPortletRequest extends UploadRequest {
 }

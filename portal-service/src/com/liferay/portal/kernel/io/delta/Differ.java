@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -39,8 +39,7 @@ public class Differ {
 		_checksumsByteChannelReader = checksumsByteChannelReader;
 		_deltaByteChannelWriter = deltaByteChannelWriter;
 
-		_checksumsByteChannelReader.resizeBuffer(
-			DeltaUtil.BUFFER_FACTOR * 20);
+		_checksumsByteChannelReader.resizeBuffer(DeltaUtil.BUFFER_FACTOR * 20);
 
 		_checksumsByteBuffer = _checksumsByteChannelReader.getBuffer();
 
@@ -142,7 +141,7 @@ public class Differ {
 					_firstBlockNumber = blockNumber;
 					_lastBlockNumber = blockNumber;
 				}
-				else if (_lastBlockNumber + 1 == blockNumber) {
+				else if ((_lastBlockNumber + 1) == blockNumber) {
 
 					// The blocks must be sequential in a reference range block
 

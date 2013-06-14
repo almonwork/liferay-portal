@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -15,7 +15,7 @@
 --%>
 <%@ include file="/html/portal/init.jsp" %>
 
-<c:if test="<%= !themeDisplay.isStateExclusive() && !themeDisplay.isStatePopUp() %>">
+<c:if test="<%= !themeDisplay.isStatePopUp() %>">
 	<div id="main-content">
 		<table class="lfr-panel-page">
 		<tr>
@@ -26,17 +26,13 @@
 </c:if>
 
 <%
-if (themeDisplay.isStateExclusive() || themeDisplay.isStatePopUp() || layoutTypePortlet.hasStateMax()) {
+if (themeDisplay.isStatePopUp() || layoutTypePortlet.hasStateMax()) {
 	String ppid = ParamUtil.getString(request, "p_p_id");
 
 	String velocityTemplateId = null;
 	String velocityTemplateContent = null;
 
-	if (themeDisplay.isStateExclusive()) {
-		velocityTemplateId = theme.getThemeId() + LayoutTemplateConstants.STANDARD_SEPARATOR + "exclusive";
-		velocityTemplateContent = LayoutTemplateLocalServiceUtil.getContent("exclusive", true, theme.getThemeId());
-	}
-	else if (themeDisplay.isStatePopUp()) {
+	if (themeDisplay.isStatePopUp()) {
 		velocityTemplateId = theme.getThemeId() + LayoutTemplateConstants.STANDARD_SEPARATOR + "pop_up";
 		velocityTemplateContent = LayoutTemplateLocalServiceUtil.getContent("pop_up", true, theme.getThemeId());
 	}
@@ -47,7 +43,9 @@ if (themeDisplay.isStateExclusive() || themeDisplay.isStatePopUp() || layoutType
 		velocityTemplateContent = LayoutTemplateLocalServiceUtil.getContent("max", true, theme.getThemeId());
 	}
 
-	RuntimePortletUtil.processTemplate(application, request, response, pageContext, out, ppid, velocityTemplateId, velocityTemplateContent);
+	if (Validator.isNotNull(velocityTemplateId) && Validator.isNotNull(velocityTemplateContent)) {
+		RuntimePageUtil.processTemplate(pageContext, ppid, new StringTemplateResource(velocityTemplateId, velocityTemplateContent));
+	}
 }
 else {
 	UnicodeProperties typeSettingsProperties = layout.getTypeSettingsProperties();
@@ -71,7 +69,7 @@ else {
 }
 %>
 
-<c:if test="<%= !themeDisplay.isStateExclusive() && !themeDisplay.isStatePopUp() %>">
+<c:if test="<%= !themeDisplay.isStatePopUp() %>">
 			</td>
 		</tr>
 		</table>

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -28,7 +28,6 @@ import com.liferay.portal.model.RoleConstants;
 import com.liferay.portal.security.permission.ActionKeys;
 import com.liferay.portal.security.permission.ResourceActionsUtil;
 import com.liferay.portal.service.base.ResourceActionLocalServiceBaseImpl;
-import com.liferay.portal.util.PropsValues;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -43,10 +42,6 @@ public class ResourceActionLocalServiceImpl
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public void checkResourceActions() throws SystemException {
-		if (PropsValues.PERMISSIONS_USER_CHECK_ALGORITHM != 6) {
-			return;
-		}
-
 		List<ResourceAction> resourceActions =
 			resourceActionPersistence.findAll();
 
@@ -68,10 +63,6 @@ public class ResourceActionLocalServiceImpl
 			String name, List<String> actionIds, boolean addDefaultActions)
 		throws SystemException {
 
-		if (PropsValues.PERMISSIONS_USER_CHECK_ALGORITHM != 6) {
-			return;
-		}
-
 		List<ResourceAction> resourceActions =
 			resourceActionPersistence.findByName(name);
 
@@ -79,6 +70,12 @@ public class ResourceActionLocalServiceImpl
 
 		checkResourceActions(
 			name, actionIds, resourceActions, addDefaultActions);
+	}
+
+	public ResourceAction fetchResourceAction(String name, String actionId) {
+		String key = encodeKey(name, actionId);
+
+		return _resourceActions.get(key);
 	}
 
 	public ResourceAction getResourceAction(String name, String actionId)
@@ -133,6 +130,8 @@ public class ResourceActionLocalServiceImpl
 				name, actionId);
 
 			if (resourceAction != null) {
+				_resourceActions.put(key, resourceAction);
+
 				continue;
 			}
 
@@ -145,8 +144,7 @@ public class ResourceActionLocalServiceImpl
 			long resourceActionId = counterLocalService.increment(
 				ResourceAction.class.getName());
 
-			resourceAction = resourceActionPersistence.create(
-				resourceActionId);
+			resourceAction = resourceActionPersistence.create(resourceActionId);
 
 			resourceAction.setName(name);
 			resourceAction.setActionId(actionId);
@@ -192,7 +190,9 @@ public class ResourceActionLocalServiceImpl
 	}
 
 	protected String encodeKey(String name, String actionId) {
-		return name.concat(StringPool.POUND).concat(actionId);
+		String key = name.concat(StringPool.POUND).concat(actionId);
+
+		return key.toLowerCase();
 	}
 
 	private static Map<String, ResourceAction> _resourceActions =

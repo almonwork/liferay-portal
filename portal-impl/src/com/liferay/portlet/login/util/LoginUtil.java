@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,12 +14,16 @@
 
 package com.liferay.portlet.login.util;
 
-import com.liferay.portal.NoSuchLayoutException;
+import com.liferay.portal.kernel.cluster.ClusterExecutorUtil;
+import com.liferay.portal.kernel.cluster.ClusterNode;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
+import com.liferay.portal.kernel.json.JSONFactoryUtil;
+import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
-import com.liferay.portal.kernel.servlet.PortalSessionContext;
+import com.liferay.portal.kernel.messaging.DestinationNames;
+import com.liferay.portal.kernel.messaging.MessageBusUtil;
 import com.liferay.portal.kernel.servlet.SessionMessages;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.MapUtil;
@@ -29,12 +33,12 @@ import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.liveusers.LiveUsers;
 import com.liferay.portal.model.Company;
 import com.liferay.portal.model.CompanyConstants;
-import com.liferay.portal.model.Layout;
 import com.liferay.portal.model.User;
 import com.liferay.portal.model.UserTracker;
 import com.liferay.portal.security.auth.AuthException;
+import com.liferay.portal.security.auth.AuthenticatedUserUUIDStoreUtil;
 import com.liferay.portal.security.auth.Authenticator;
-import com.liferay.portal.service.LayoutLocalServiceUtil;
+import com.liferay.portal.service.CompanyLocalServiceUtil;
 import com.liferay.portal.service.ServiceContext;
 import com.liferay.portal.service.ServiceContextFactory;
 import com.liferay.portal.service.UserLocalServiceUtil;
@@ -44,7 +48,7 @@ import com.liferay.portal.util.PortalUtil;
 import com.liferay.portal.util.PortletKeys;
 import com.liferay.portal.util.PropsValues;
 import com.liferay.portal.util.WebKeys;
-import com.liferay.portlet.PortletURLImpl;
+import com.liferay.portlet.PortletURLFactoryUtil;
 import com.liferay.util.Encryptor;
 
 import java.util.ArrayList;
@@ -84,8 +88,10 @@ public class LoginUtil {
 
 		String requestURI = request.getRequestURI();
 
-		if (requestURI.startsWith("/tunnel-web/liferay") ||
-			requestURI.startsWith("/tunnel-web/secure/liferay")) {
+		String contextPath = PortalUtil.getPathContext();
+
+		if (requestURI.startsWith(contextPath.concat("/api/liferay")) ||
+			requestURI.startsWith(contextPath.concat("/api/secure/liferay"))) {
 
 			// Tunnel requests are serialized objects and cannot manipulate the
 			// request input stream in any way. Do not use the auth pipeline to
@@ -173,46 +179,20 @@ public class LoginUtil {
 		return userId;
 	}
 
-	public static String getCreateAccountHREF(
-		HttpServletRequest request, ThemeDisplay themeDisplay)
-			throws Exception {
+	public static String getEmailFromAddress(
+			PortletPreferences preferences, long companyId)
+		throws SystemException {
 
-		if (Validator.isNull(PropsValues.COMPANY_SECURITY_STRANGERS_URL)) {
-			PortletURL createAccountURL = new PortletURLImpl(
-				request, PortletKeys.LOGIN, themeDisplay.getPlid(),
-				PortletRequest.RENDER_PHASE);
-
-			createAccountURL.setWindowState(WindowState.MAXIMIZED);
-			createAccountURL.setPortletMode(PortletMode.VIEW);
-
-			createAccountURL.setParameter("saveLastPath", "0");
-			createAccountURL.setParameter(
-				"struts_action", "/login/create_account");
-
-			return createAccountURL.toString();
-		}
-
-		try {
-			Layout layout = LayoutLocalServiceUtil.getFriendlyURLLayout(
-				themeDisplay.getScopeGroupId(), false,
-				PropsValues.COMPANY_SECURITY_STRANGERS_URL);
-
-			return PortalUtil.getLayoutURL(layout, themeDisplay);
-		}
-		catch (NoSuchLayoutException nsle) {
-		}
-
-		return StringPool.BLANK;
+		return PortalUtil.getEmailFromAddress(
+			preferences, companyId, PropsValues.LOGIN_EMAIL_FROM_ADDRESS);
 	}
 
-	public static String getEmailFromAddress(PortletPreferences preferences) {
-		return preferences.getValue(
-			"emailFromAddress", PropsValues.LOGIN_EMAIL_FROM_ADDRESS);
-	}
+	public static String getEmailFromName(
+			PortletPreferences preferences, long companyId)
+		throws SystemException {
 
-	public static String getEmailFromName(PortletPreferences preferences) {
-		return preferences.getValue(
-			"emailFromName", PropsValues.LOGIN_EMAIL_FROM_NAME);
+		return PortalUtil.getEmailFromName(
+			preferences, companyId, PropsValues.LOGIN_EMAIL_FROM_NAME);
 	}
 
 	public static String getLogin(
@@ -221,9 +201,9 @@ public class LoginUtil {
 
 		String login = request.getParameter(paramName);
 
-		if ((login == null) || (login.equals(StringPool.NULL))) {
+		if ((login == null) || login.equals(StringPool.NULL)) {
 			login = GetterUtil.getString(
-				CookieKeys.getCookie(request, CookieKeys.LOGIN));
+				CookieKeys.getCookie(request, CookieKeys.LOGIN, false));
 
 			if (PropsValues.COMPANY_LOGIN_PREPOPULATE_DOMAIN &&
 				Validator.isNull(login) &&
@@ -236,11 +216,10 @@ public class LoginUtil {
 		return login;
 	}
 
-	public static PortletURL getLoginURL(
-			HttpServletRequest request, long plid)
+	public static PortletURL getLoginURL(HttpServletRequest request, long plid)
 		throws PortletModeException, WindowStateException {
 
-		PortletURL portletURL = new PortletURLImpl(
+		PortletURL portletURL = PortletURLFactoryUtil.create(
 			request, PortletKeys.LOGIN, plid, PortletRequest.RENDER_PHASE);
 
 		portletURL.setWindowState(WindowState.MAXIMIZED);
@@ -274,14 +253,31 @@ public class LoginUtil {
 				sessionUsers.values());
 
 			for (UserTracker userTracker : userTrackers) {
-				if (userId == userTracker.getUserId()) {
-					HttpSession userTrackerSession =  PortalSessionContext.get(
-						userTracker.getSessionId());
-
-					if (userTrackerSession != null) {
-						userTrackerSession.invalidate();
-					}
+				if (userId != userTracker.getUserId()) {
+					continue;
 				}
+
+				JSONObject jsonObject = JSONFactoryUtil.createJSONObject();
+
+				ClusterNode clusterNode =
+					ClusterExecutorUtil.getLocalClusterNode();
+
+				if (clusterNode != null) {
+					jsonObject.put(
+						"clusterNodeId", clusterNode.getClusterNodeId());
+				}
+
+				jsonObject.put("command", "signOut");
+
+				long companyId = CompanyLocalServiceUtil.getCompanyIdByUserId(
+					userId);
+
+				jsonObject.put("companyId", companyId);
+				jsonObject.put("sessionId", userTracker.getSessionId());
+				jsonObject.put("userId", userId);
+
+				MessageBusUtil.sendMessage(
+					DestinationNames.LIVE_USERS, jsonObject.toString());
 			}
 		}
 
@@ -390,6 +386,17 @@ public class LoginUtil {
 
 		int loginMaxAge = PropsValues.COMPANY_SECURITY_AUTO_LOGIN_MAX_AGE;
 
+		String userUUID = userIdString.concat(StringPool.PERIOD).concat(
+			String.valueOf(System.nanoTime()));
+
+		Cookie userUUIDCookie = new Cookie(
+			CookieKeys.USER_UUID,
+			Encryptor.encrypt(company.getKeyObj(), userUUID));
+
+		userUUIDCookie.setPath(StringPool.SLASH);
+
+		session.setAttribute(WebKeys.USER_UUID, userUUID);
+
 		if (PropsValues.SESSION_DISABLED) {
 			rememberMe = true;
 		}
@@ -399,6 +406,7 @@ public class LoginUtil {
 			idCookie.setMaxAge(loginMaxAge);
 			passwordCookie.setMaxAge(loginMaxAge);
 			rememberMeCookie.setMaxAge(loginMaxAge);
+			userUUIDCookie.setMaxAge(loginMaxAge);
 		}
 		else {
 
@@ -412,6 +420,7 @@ public class LoginUtil {
 			idCookie.setMaxAge(-1);
 			passwordCookie.setMaxAge(-1);
 			rememberMeCookie.setMaxAge(0);
+			userUUIDCookie.setMaxAge(-1);
 		}
 
 		Cookie loginCookie = new Cookie(CookieKeys.LOGIN, login);
@@ -447,13 +456,16 @@ public class LoginUtil {
 
 		CookieKeys.addCookie(request, response, companyIdCookie, secure);
 		CookieKeys.addCookie(request, response, idCookie, secure);
+		CookieKeys.addCookie(request, response, userUUIDCookie, secure);
 
 		if (rememberMe) {
+			CookieKeys.addCookie(request, response, loginCookie, secure);
 			CookieKeys.addCookie(request, response, passwordCookie, secure);
 			CookieKeys.addCookie(request, response, rememberMeCookie, secure);
-			CookieKeys.addCookie(request, response, loginCookie, secure);
 			CookieKeys.addCookie(request, response, screenNameCookie, secure);
 		}
+
+		AuthenticatedUserUUIDStoreUtil.register(userUUID);
 	}
 
 	public static void sendPassword(ActionRequest actionRequest)

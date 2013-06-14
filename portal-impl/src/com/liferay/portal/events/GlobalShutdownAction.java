@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -22,16 +22,24 @@ import com.liferay.portal.jcr.JCRFactoryUtil;
 import com.liferay.portal.kernel.dao.db.DB;
 import com.liferay.portal.kernel.dao.db.DBFactoryUtil;
 import com.liferay.portal.kernel.dao.jdbc.DataAccess;
+import com.liferay.portal.kernel.deploy.auto.AutoDeployDir;
+import com.liferay.portal.kernel.deploy.auto.AutoDeployUtil;
 import com.liferay.portal.kernel.deploy.hot.HotDeployUtil;
+import com.liferay.portal.kernel.deploy.sandbox.SandboxDeployDir;
+import com.liferay.portal.kernel.deploy.sandbox.SandboxDeployUtil;
 import com.liferay.portal.kernel.events.SimpleAction;
 import com.liferay.portal.kernel.executor.PortalExecutorManagerUtil;
+import com.liferay.portal.kernel.javadoc.JavadocManagerUtil;
 import com.liferay.portal.kernel.log.Jdk14LogFactoryImpl;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.scheduler.SchedulerEngineUtil;
+import com.liferay.portal.kernel.template.TemplateManagerUtil;
+import com.liferay.portal.kernel.template.TemplateResourceLoaderUtil;
 import com.liferay.portal.kernel.util.CentralizedThreadLocal;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.PropsKeys;
+import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.search.lucene.LuceneHelperUtil;
 import com.liferay.portal.util.PropsUtil;
 import com.liferay.portlet.documentlibrary.util.DocumentConversionUtil;
@@ -48,9 +56,17 @@ public class GlobalShutdownAction extends SimpleAction {
 	@Override
 	public void run(String[] ids) {
 
+		// Auto deploy
+
+		AutoDeployUtil.unregisterDir(AutoDeployDir.DEFAULT_NAME);
+
 		// Hot deploy
 
 		HotDeployUtil.unregisterListeners();
+
+		// Sandbox deploy
+
+		SandboxDeployUtil.unregisterDir(SandboxDeployDir.DEFAULT_NAME);
 
 		// Instant messenger AIM
 
@@ -100,6 +116,10 @@ public class GlobalShutdownAction extends SimpleAction {
 		catch (Exception e) {
 		}
 
+		// Javadoc
+
+		JavadocManagerUtil.unload(StringPool.BLANK);
+
 		// JCR
 
 		try {
@@ -119,14 +139,6 @@ public class GlobalShutdownAction extends SimpleAction {
 		// OpenOffice
 
 		DocumentConversionUtil.disconnect();
-
-		// Scheduler
-
-		try {
-			SchedulerEngineUtil.shutdown();
-		}
-		catch (Exception e) {
-		}
 
 		// Thread local registry
 
@@ -168,6 +180,14 @@ public class GlobalShutdownAction extends SimpleAction {
 		catch (Exception e) {
 		}
 
+		// Scheduler engine
+
+		try {
+			SchedulerEngineUtil.shutdown();
+		}
+		catch (Exception e) {
+		}
+
 		// Wait 1 second so Quartz threads can cleanly shutdown
 
 		try {
@@ -177,31 +197,36 @@ public class GlobalShutdownAction extends SimpleAction {
 			e.printStackTrace();
 		}
 
+		// Template manager
+
+		try {
+			TemplateManagerUtil.destroy();
+		}
+		catch (Exception e) {
+		}
+
+		// Template resource loader
+
+		try {
+			TemplateResourceLoaderUtil.destroy();
+		}
+		catch (Exception e) {
+		}
+
 		// Portal executors
 
 		PortalExecutorManagerUtil.shutdown(true);
 
 		// Programmatically exit
 
-		if (GetterUtil.getBoolean(PropsUtil.get(
-				PropsKeys.SHUTDOWN_PROGRAMMATICALLY_EXIT))) {
+		if (GetterUtil.getBoolean(
+				PropsUtil.get(PropsKeys.SHUTDOWN_PROGRAMMATICALLY_EXIT))) {
 
 			Thread currentThread = Thread.currentThread();
 
-			ThreadGroup threadGroup = currentThread.getThreadGroup();
+			ThreadGroup threadGroup = getThreadGroup();
 
-			for (int i = 0; i < 10; i++) {
-				if (threadGroup.getParent() == null) {
-					break;
-				}
-				else {
-					threadGroup = threadGroup.getParent();
-				}
-			}
-
-			Thread[] threads = new Thread[threadGroup.activeCount() * 2];
-
-			threadGroup.enumerate(threads);
+			Thread[] threads = getThreads(threadGroup);
 
 			for (Thread thread : threads) {
 				if ((thread == null) || (thread == currentThread)) {
@@ -217,6 +242,31 @@ public class GlobalShutdownAction extends SimpleAction {
 
 			threadGroup.destroy();
 		}
+	}
+
+	protected ThreadGroup getThreadGroup() {
+		Thread currentThread = Thread.currentThread();
+
+		ThreadGroup threadGroup = currentThread.getThreadGroup();
+
+		for (int i = 0; i < 10; i++) {
+			if (threadGroup.getParent() == null) {
+				break;
+			}
+			else {
+				threadGroup = threadGroup.getParent();
+			}
+		}
+
+		return threadGroup;
+	}
+
+	protected Thread[] getThreads(ThreadGroup threadGroup) {
+		Thread[] threads = new Thread[threadGroup.activeCount() * 2];
+
+		threadGroup.enumerate(threads);
+
+		return threads;
 	}
 
 	private static Log _log = LogFactoryUtil.getLog(GlobalShutdownAction.class);

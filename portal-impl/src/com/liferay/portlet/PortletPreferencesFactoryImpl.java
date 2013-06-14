@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -22,7 +22,6 @@ import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.JavaConstants;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.Validator;
-import com.liferay.portal.kernel.xml.simple.Element;
 import com.liferay.portal.model.Layout;
 import com.liferay.portal.model.LayoutConstants;
 import com.liferay.portal.model.LayoutTypePortlet;
@@ -74,15 +73,12 @@ public class PortletPreferencesFactoryImpl
 	public PortletPreferences fromDefaultXML(String xml)
 		throws SystemException {
 
-		PortletPreferencesImpl portletPreferencesImpl =
-			new PortletPreferencesImpl();
-
 		Map<String, Preference> preferencesMap =
-			portletPreferencesImpl.getPreferences();
+			new HashMap<String, Preference>();
 
 		populateMap(xml, preferencesMap);
 
-		return portletPreferencesImpl;
+		return new PortletPreferencesImpl(xml, preferencesMap);
 	}
 
 	public PortletPreferencesImpl fromXML(
@@ -97,7 +93,7 @@ public class PortletPreferencesFactoryImpl
 			populateMap(xml, preferencesMap);
 
 			return new PortletPreferencesImpl(
-				companyId, ownerId, ownerType, plid, portletId,
+				companyId, ownerId, ownerType, plid, portletId, xml,
 				preferencesMap);
 		}
 		catch (SystemException se) {
@@ -116,7 +112,7 @@ public class PortletPreferencesFactoryImpl
 			populateMap(xml, preferencesMap);
 
 			return new PortalPreferencesImpl(
-				companyId, ownerId, ownerType, preferencesMap, false);
+				companyId, ownerId, ownerType, xml, preferencesMap, false);
 		}
 		catch (SystemException se) {
 			throw se;
@@ -229,7 +225,7 @@ public class PortletPreferencesFactoryImpl
 			WebKeys.THEME_DISPLAY);
 
 		long scopeGroupId = PortalUtil.getScopeGroupId(
-			request, portletId);
+			request, portletId, true);
 		long userId = PortalUtil.getUserId(request);
 		LayoutTypePortlet layoutTypePortlet =
 			themeDisplay.getLayoutTypePortlet();
@@ -240,7 +236,7 @@ public class PortletPreferencesFactoryImpl
 
 		if (portletMode.equals(LiferayPortletMode.EDIT_GUEST.toString()) ||
 			((layoutTypePortlet != null) &&
-			 (layoutTypePortlet.hasModeEditGuestPortletId(portletId)))) {
+			 layoutTypePortlet.hasModeEditGuestPortletId(portletId))) {
 
 			modeEditGuest = true;
 		}
@@ -372,7 +368,8 @@ public class PortletPreferencesFactoryImpl
 		ThemeDisplay themeDisplay = (ThemeDisplay)request.getAttribute(
 			WebKeys.THEME_DISPLAY);
 
-		long scopeGroupId = PortalUtil.getScopeGroupId(request, portletId);
+		long scopeGroupId = PortalUtil.getScopeGroupId(
+			request, portletId, true);
 
 		return getPortletSetup(
 			scopeGroupId, themeDisplay.getLayout(), portletId,
@@ -466,6 +463,34 @@ public class PortletPreferencesFactoryImpl
 		return getPortletSetup(request, portletId);
 	}
 
+	public Map<Long, PortletPreferences> getPortletSetupMap(
+			long companyId, long groupId, long ownerId, int ownerType,
+			String portletId, boolean privateLayout)
+		throws SystemException {
+
+		Map<Long, PortletPreferences> portletSetupMap =
+			new HashMap<Long, PortletPreferences>();
+
+		List<com.liferay.portal.model.PortletPreferences>
+			portletPreferencesList =
+				PortletPreferencesLocalServiceUtil.getPortletPreferences(
+					companyId, groupId, ownerId, ownerType, portletId,
+					privateLayout);
+
+		for (com.liferay.portal.model.PortletPreferences portletPreferences :
+				portletPreferencesList) {
+
+			PortletPreferences portletSetup =
+				PortletPreferencesLocalServiceUtil.getPreferences(
+					companyId, ownerId, ownerType, portletPreferences.getPlid(),
+					portletId);
+
+			portletSetupMap.put(portletPreferences.getPlid(), portletSetup);
+		}
+
+		return portletSetupMap;
+	}
+
 	public PortletPreferences getPreferences(HttpServletRequest request) {
 		PortletRequest portletRequest = (PortletRequest)request.getAttribute(
 			JavaConstants.JAVAX_PORTLET_REQUEST);
@@ -503,20 +528,14 @@ public class PortletPreferencesFactoryImpl
 		PortalPreferencesImpl portalPreferencesImpl =
 			(PortalPreferencesImpl)portalPreferences;
 
-		Map<String, Preference> preferencesMap =
-			portalPreferencesImpl.getPreferences();
-
-		return toXML(preferencesMap);
+		return portalPreferencesImpl.toXML();
 	}
 
 	public String toXML(PortletPreferences portletPreferences) {
 		PortletPreferencesImpl portletPreferencesImpl =
 			(PortletPreferencesImpl)portletPreferences;
 
-		Map<String, Preference> preferencesMap =
-			portletPreferencesImpl.getPreferences();
-
-		return toXML(preferencesMap);
+		return portletPreferencesImpl.toXML();
 	}
 
 	protected void populateMap(
@@ -608,30 +627,6 @@ public class PortletPreferencesFactoryImpl
 
 		return new Preference(
 			name, values.toArray(new String[values.size()]), readOnly);
-	}
-
-	protected String toXML(Map<String, Preference> preferencesMap) {
-		Element portletPreferencesElement = new Element(
-			"portlet-preferences", false);
-
-		for (Map.Entry<String, Preference> entry : preferencesMap.entrySet()) {
-			Preference preference = entry.getValue();
-
-			Element preferenceElement = portletPreferencesElement.addElement(
-				"preference");
-
-			preferenceElement.addElement("name", preference.getName());
-
-			for (String value : preference.getValues()) {
-				preferenceElement.addElement("value", value);
-			}
-
-			if (preference.isReadOnly()) {
-				preferenceElement.addElement("read-only", Boolean.TRUE);
-			}
-		}
-
-		return portletPreferencesElement.toXMLString();
 	}
 
 }

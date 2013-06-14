@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -19,4 +19,4 @@
 WikiPage wikiPage = (WikiPage)request.getAttribute("edit_page.jsp-wikiPage");
 %>
 
-<liferay-ui:input-field model="<%= WikiPage.class %>" bean="<%= wikiPage %>" field="content" />
+<liferay-ui:input-field bean="<%= wikiPage %>" field="content" model="<%= WikiPage.class %>" />

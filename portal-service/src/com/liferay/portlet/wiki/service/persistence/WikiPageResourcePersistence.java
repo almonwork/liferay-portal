@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,7 +14,6 @@
 
 package com.liferay.portlet.wiki.service.persistence;
 
-import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.service.persistence.BasePersistence;
 
 import com.liferay.portlet.wiki.model.WikiPageResource;
@@ -306,9 +305,11 @@ public interface WikiPageResourcePersistence extends BasePersistence<WikiPageRes
 	*
 	* @param nodeId the node ID
 	* @param title the title
+	* @return the wiki page resource that was removed
 	* @throws SystemException if a system exception occurred
 	*/
-	public void removeByN_T(long nodeId, java.lang.String title)
+	public com.liferay.portlet.wiki.model.WikiPageResource removeByN_T(
+		long nodeId, java.lang.String title)
 		throws com.liferay.portal.kernel.exception.SystemException,
 			com.liferay.portlet.wiki.NoSuchPageResourceException;
 
@@ -349,7 +350,4 @@ public interface WikiPageResourcePersistence extends BasePersistence<WikiPageRes
 	*/
 	public int countAll()
 		throws com.liferay.portal.kernel.exception.SystemException;
-
-	public WikiPageResource remove(WikiPageResource wikiPageResource)
-		throws SystemException;
 }

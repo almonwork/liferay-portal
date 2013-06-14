@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -66,6 +66,7 @@ MBThread thread = message.getThread();
 
 			<%
 			rssURL.setParameter("p_l_id", String.valueOf(plid));
+			rssURL.setParameter("mbCategoryId", StringPool.BLANK);
 			rssURL.setParameter("threadId", String.valueOf(message.getThreadId()));
 			%>
 

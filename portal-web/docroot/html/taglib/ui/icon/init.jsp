@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -15,6 +15,8 @@
 --%>
 
 <%@ include file="/html/taglib/init.jsp" %>
+
+<%@ page import="java.net.URL" %>
 
 <%
 String id = (String)request.getAttribute("liferay-ui:icon:id");
@@ -44,6 +46,8 @@ String imageHover = (String)request.getAttribute("liferay-ui:icon:imageHover");
 
 boolean auiImage = (image != null) && image.startsWith(_AUI_PATH);
 
+String alt = (String)request.getAttribute("liferay-ui:icon:alt");
+
 String message = (String)request.getAttribute("liferay-ui:icon:message");
 
 if (message == null) {
@@ -57,7 +61,7 @@ if (Validator.isNull(src)) {
 	if (auiImage) {
 		src = themeDisplay.getPathThemeImages().concat("/spacer.png");
 	}
-	else {
+	else if (Validator.isNotNull(image)) {
 		StringBundler sb = new StringBundler(4);
 
 		sb.append(themeDisplay.getPathThemeImages());
@@ -91,8 +95,11 @@ if (Validator.isNull(method)) {
 String target = GetterUtil.getString((String)request.getAttribute("liferay-ui:icon:target"));
 boolean label = GetterUtil.getBoolean((String)request.getAttribute("liferay-ui:icon:label"));
 String lang = GetterUtil.getString((String)request.getAttribute("liferay-ui:icon:lang"));
+boolean localizeMessage = GetterUtil.getBoolean((String)request.getAttribute("liferay-ui:icon:localizeMessage"));
 boolean toolTip = GetterUtil.getBoolean((String)request.getAttribute("liferay-ui:icon:toolTip"));
 String cssClass = GetterUtil.getString((String)request.getAttribute("liferay-ui:icon:cssClass"));
+Map<String, Object> data = (Map<String, Object>)request.getAttribute("liferay-ui:icon:data");
+String onClick = GetterUtil.getString((String)request.getAttribute("liferay-ui:icon:onClick"));
 
 if ((iconListIconCount != null) || (iconListSingleIcon != null)) {
 	label = true;
@@ -104,7 +111,16 @@ if ((iconMenuIconCount != null) || (iconMenuSingleIcon != null)) {
 
 String details = null;
 
-if (label) {
+if (alt != null) {
+	StringBundler sb = new StringBundler(3);
+
+	sb.append(" alt=\"");
+	sb.append(LanguageUtil.get(pageContext, alt));
+	sb.append("\"");
+
+	details = sb.toString();
+}
+else if (label) {
 	details = " alt=\"\"";
 }
 else {

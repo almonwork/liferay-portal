@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -17,8 +17,6 @@
 <%@ include file="/html/taglib/ui/asset_categories_selector/init.jsp" %>
 
 <%
-themeDisplay.setIncludeServiceJs(true);
-
 String randomNamespace = PortalUtil.generateRandomKey(request, "taglib_ui_asset_categories_selector_page") + StringPool.UNDERLINE;
 
 String className = (String)request.getAttribute("liferay-ui:asset-categories-selector:className");
@@ -27,18 +25,27 @@ String hiddenInput = (String)request.getAttribute("liferay-ui:asset-categories-s
 String curCategoryIds = GetterUtil.getString((String)request.getAttribute("liferay-ui:asset-categories-selector:curCategoryIds"), "");
 String curCategoryNames = StringPool.BLANK;
 
+List<AssetVocabulary> vocabularies = new ArrayList<AssetVocabulary>();
+
+Group group = themeDisplay.getScopeGroup();
+
+if (group.isLayout()) {
+	vocabularies.addAll(AssetVocabularyLocalServiceUtil.getGroupVocabularies(group.getParentGroupId(), false));
+}
+else {
+	vocabularies.addAll(AssetVocabularyLocalServiceUtil.getGroupVocabularies(scopeGroupId, false));
+}
+
+if (scopeGroupId != themeDisplay.getCompanyGroupId()) {
+	vocabularies.addAll(AssetVocabularyLocalServiceUtil.getGroupVocabularies(themeDisplay.getCompanyGroupId(), false));
+}
+
 if (Validator.isNotNull(className)) {
 	long classNameId = PortalUtil.getClassNameId(className);
 
-	List<AssetVocabulary> vocabularies = new ArrayList<AssetVocabulary>();
-
-	vocabularies.addAll(AssetVocabularyLocalServiceUtil.getGroupVocabularies(scopeGroupId, false));
-
-	if (scopeGroupId != themeDisplay.getCompanyGroupId()) {
-		vocabularies.addAll(AssetVocabularyLocalServiceUtil.getGroupVocabularies(themeDisplay.getCompanyGroupId(), false));
-	}
-
 	for (AssetVocabulary vocabulary : vocabularies) {
+		vocabulary = vocabulary.toEscapedModel();
+
 		int vocabularyCategoriesCount = AssetCategoryLocalServiceUtil.getVocabularyCategoriesCount(vocabulary.getVocabularyId());
 
 		if (vocabularyCategoriesCount == 0) {
@@ -67,7 +74,7 @@ if (Validator.isNotNull(className)) {
 			curCategoryNames = StringPool.BLANK;
 		}
 
-		String[] categoryIdsNames = _getCategoryIdsNames(curCategoryIds, curCategoryNames, vocabulary.getVocabularyId());
+		String[] categoryIdsTitles = _getCategoryIdsTitles(curCategoryIds, curCategoryNames, vocabulary.getVocabularyId(), themeDisplay);
 	%>
 
 		<span class="aui-field-content">
@@ -93,13 +100,14 @@ if (Validator.isNotNull(className)) {
 				{
 					className: '<%= className %>',
 					contentBox: '#<%= namespace + randomNamespace %>assetCategoriesSelector_<%= vocabulary.getVocabularyId() %>',
-					curEntries: '<%= HtmlUtil.escapeJS(categoryIdsNames[1]) %>',
-					curEntryIds: '<%= categoryIdsNames[0] %>',
+					curEntries: '<%= HtmlUtil.escapeJS(categoryIdsTitles[1]) %>',
+					curEntryIds: '<%= categoryIdsTitles[0] %>',
 					hiddenInput: '#<%= namespace + hiddenInput + StringPool.UNDERLINE + vocabulary.getVocabularyId() %>',
 					instanceVar: '<%= namespace + randomNamespace %>',
 					labelNode: '#<%= namespace %>assetCategoriesLabel_<%= vocabulary.getVocabularyId() %>',
 					portalModelResource: <%= Validator.isNotNull(className) && (ResourceActionsUtil.isPortalModelResource(className) || className.equals(Group.class.getName())) %>,
 					singleSelect: <%= !vocabulary.isMultiValued() %>,
+					vocabularyGroupIds: '<%= vocabulary.getGroupId() %>',
 					vocabularyIds: '<%= String.valueOf(vocabulary.getVocabularyId()) %>'
 				}
 			).render();
@@ -115,7 +123,7 @@ else {
 		curCategoryIds = curCategoryIdsParam;
 	}
 
-	String[] categoryIdsNames = _getCategoryIdsNames(curCategoryIds, curCategoryNames, 0);
+	String[] categoryIdsTitles = _getCategoryIdsTitles(curCategoryIds, curCategoryNames, 0, themeDisplay);
 %>
 
 	<div class="lfr-tags-selector-content" id="<%= namespace + randomNamespace %>assetCategoriesSelector">
@@ -127,11 +135,13 @@ else {
 			{
 				className: '<%= className %>',
 				contentBox: '#<%= namespace + randomNamespace %>assetCategoriesSelector',
-				curEntries: '<%= HtmlUtil.escapeJS(categoryIdsNames[1]) %>',
-				curEntryIds: '<%= categoryIdsNames[0] %>',
+				curEntries: '<%= HtmlUtil.escapeJS(categoryIdsTitles[1]) %>',
+				curEntryIds: '<%= categoryIdsTitles[0] %>',
 				hiddenInput: '#<%= namespace + hiddenInput %>',
 				instanceVar: '<%= namespace + randomNamespace %>',
-				portalModelResource: <%= Validator.isNotNull(className) && (ResourceActionsUtil.isPortalModelResource(className) || className.equals(Group.class.getName())) %>
+				portalModelResource: <%= Validator.isNotNull(className) && (ResourceActionsUtil.isPortalModelResource(className) || className.equals(Group.class.getName())) %>,
+				vocabularyGroupIds: '<%= scopeGroupId %>',
+				vocabularyIds: '<%= ListUtil.toString(vocabularies, "vocabularyId") %>'
 			}
 		).render();
 	</aui:script>
@@ -155,7 +165,7 @@ private long[] _filterCategoryIds(long vocabularyId, long[] categoryIds) throws 
 	return ArrayUtil.toArray(filteredCategoryIds.toArray(new Long[filteredCategoryIds.size()]));
 }
 
-private String[] _getCategoryIdsNames(String categoryIds, String categoryNames, long vocabularyId) throws PortalException, SystemException {
+private String[] _getCategoryIdsTitles(String categoryIds, String categoryNames, long vocabularyId, ThemeDisplay themeDisplay) throws PortalException, SystemException {
 	if (Validator.isNotNull(categoryIds)) {
 		long[] categoryIdsArray = GetterUtil.getLongValues(StringUtil.split(categoryIds));
 
@@ -175,8 +185,8 @@ private String[] _getCategoryIdsNames(String categoryIds, String categoryNames, 
 
 				category = category.toEscapedModel();
 
-				sb.append(category.getName());
-				sb.append(StringPool.COMMA);
+				sb.append(category.getTitle(themeDisplay.getLocale()));
+				sb.append(_CATEGORY_SEPARATOR);
 			}
 
 			sb.setIndex(sb.index() - 1);
@@ -188,4 +198,6 @@ private String[] _getCategoryIdsNames(String categoryIds, String categoryNames, 
 
 	return new String[] {categoryIds, categoryNames};
 }
+
+private static final String _CATEGORY_SEPARATOR = "_CATEGORY_";
 %>

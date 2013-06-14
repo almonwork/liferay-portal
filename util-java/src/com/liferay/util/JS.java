@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,6 +14,7 @@
 
 package com.liferay.util;
 
+import com.liferay.portal.kernel.util.CharPool;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
@@ -24,54 +25,9 @@ import java.net.URLEncoder;
 
 /**
  * @author Brian Wing Shun Chan
+ * @author Shuyang Zhou
  */
 public class JS {
-
-	public static String getSafeName(String name) {
-		String safeName =
-			StringUtil.replace(
-				name,
-				new String[] {
-					StringPool.SPACE, StringPool.DASH, StringPool.PERIOD
-				},
-				new String[] {
-					StringPool.BLANK, StringPool.BLANK, StringPool.BLANK
-				});
-
-		return safeName;
-	}
-
-	/**
-	 * @deprecated Use <code>encodeURIComponent</code>.
-	 */
-	public static String escape(String s) {
-		return encodeURIComponent(s);
-	}
-
-	/**
-	 * @deprecated Use <code>decodeURIComponent</code>.
-	 */
-	public static String unescape(String s) {
-		return decodeURIComponent(s);
-	}
-
-	public static String encodeURIComponent(String s) {
-
-		// Encode URL
-
-		try {
-			s = URLEncoder.encode(s, StringPool.UTF8);
-		}
-		catch (Exception e) {
-		}
-
-		// Adjust for JavaScript specific annoyances
-
-		s = StringUtil.replace(s, "+", "%20");
-		s = StringUtil.replace(s, "%2B", "+");
-
-		return s;
-	}
 
 	public static String decodeURIComponent(String s) {
 
@@ -95,6 +51,72 @@ public class JS {
 		return s;
 	}
 
+	public static String encodeURIComponent(String s) {
+
+		// Encode URL
+
+		try {
+			s = URLEncoder.encode(s, StringPool.UTF8);
+		}
+		catch (Exception e) {
+		}
+
+		// Adjust for JavaScript specific annoyances
+
+		s = StringUtil.replace(s, "+", "%20");
+		s = StringUtil.replace(s, "%2B", "+");
+
+		return s;
+	}
+
+	/**
+	 * @deprecated Use <code>encodeURIComponent</code>.
+	 */
+	public static String escape(String s) {
+		return encodeURIComponent(s);
+	}
+
+	public static String getSafeName(String name) {
+		if (name == null) {
+			return null;
+		}
+
+		StringBuilder sb = null;
+
+		int index = 0;
+
+		for (int i = 0; i < name.length(); i++) {
+			char c = name.charAt(i);
+
+			switch (c) {
+				case CharPool.SPACE:
+
+				case CharPool.DASH:
+
+				case CharPool.PERIOD:
+					if (sb == null) {
+						sb = new StringBuilder(name.length() - 1);
+
+						sb.append(name, index, i);
+					}
+
+					break;
+
+				default:
+					if (sb != null) {
+						sb.append(c);
+					}
+			}
+		}
+
+		if (sb == null) {
+			return name;
+		}
+		else {
+			return sb.toString();
+		}
+	}
+
 	public static String toScript(String[] array) {
 		StringBundler sb = new StringBundler(array.length * 4 + 2);
 
@@ -105,7 +127,7 @@ public class JS {
 			sb.append(UnicodeFormatter.toString(array[i]));
 			sb.append(StringPool.APOSTROPHE);
 
-			if (i + 1 < array.length) {
+			if ((i + 1) < array.length) {
 				sb.append(StringPool.COMMA);
 			}
 		}
@@ -113,6 +135,13 @@ public class JS {
 		sb.append(StringPool.CLOSE_BRACKET);
 
 		return sb.toString();
+	}
+
+	/**
+	 * @deprecated Use <code>decodeURIComponent</code>.
+	 */
+	public static String unescape(String s) {
+		return decodeURIComponent(s);
 	}
 
 }

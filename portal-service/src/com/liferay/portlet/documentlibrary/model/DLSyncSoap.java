@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -36,9 +36,14 @@ public class DLSyncSoap implements Serializable {
 		soapModel.setCreateDate(model.getCreateDate());
 		soapModel.setModifiedDate(model.getModifiedDate());
 		soapModel.setFileId(model.getFileId());
+		soapModel.setFileUuid(model.getFileUuid());
 		soapModel.setRepositoryId(model.getRepositoryId());
+		soapModel.setParentFolderId(model.getParentFolderId());
+		soapModel.setName(model.getName());
+		soapModel.setDescription(model.getDescription());
 		soapModel.setEvent(model.getEvent());
 		soapModel.setType(model.getType());
+		soapModel.setVersion(model.getVersion());
 
 		return soapModel;
 	}
@@ -123,12 +128,20 @@ public class DLSyncSoap implements Serializable {
 		_modifiedDate = modifiedDate;
 	}
 
-	public String getFileId() {
+	public long getFileId() {
 		return _fileId;
 	}
 
-	public void setFileId(String fileId) {
+	public void setFileId(long fileId) {
 		_fileId = fileId;
+	}
+
+	public String getFileUuid() {
+		return _fileUuid;
+	}
+
+	public void setFileUuid(String fileUuid) {
+		_fileUuid = fileUuid;
 	}
 
 	public long getRepositoryId() {
@@ -137,6 +150,30 @@ public class DLSyncSoap implements Serializable {
 
 	public void setRepositoryId(long repositoryId) {
 		_repositoryId = repositoryId;
+	}
+
+	public long getParentFolderId() {
+		return _parentFolderId;
+	}
+
+	public void setParentFolderId(long parentFolderId) {
+		_parentFolderId = parentFolderId;
+	}
+
+	public String getName() {
+		return _name;
+	}
+
+	public void setName(String name) {
+		_name = name;
+	}
+
+	public String getDescription() {
+		return _description;
+	}
+
+	public void setDescription(String description) {
+		_description = description;
 	}
 
 	public String getEvent() {
@@ -155,12 +192,25 @@ public class DLSyncSoap implements Serializable {
 		_type = type;
 	}
 
+	public String getVersion() {
+		return _version;
+	}
+
+	public void setVersion(String version) {
+		_version = version;
+	}
+
 	private long _syncId;
 	private long _companyId;
 	private Date _createDate;
 	private Date _modifiedDate;
-	private String _fileId;
+	private long _fileId;
+	private String _fileUuid;
 	private long _repositoryId;
+	private long _parentFolderId;
+	private String _name;
+	private String _description;
 	private String _event;
 	private String _type;
+	private String _version;
 }

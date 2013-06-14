@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -28,9 +28,10 @@ public class AdvancedSearchUserFirstNameTest extends BaseTestCase {
 			switch (label) {
 			case 1:
 				selenium.open("/web/guest/home/");
+				loadRequiredJavaScriptModules();
 
 				for (int second = 0;; second++) {
-					if (second >= 60) {
+					if (second >= 90) {
 						fail("timeout");
 					}
 
@@ -45,65 +46,74 @@ public class AdvancedSearchUserFirstNameTest extends BaseTestCase {
 					Thread.sleep(1000);
 				}
 
-				selenium.saveScreenShotAndSource();
 				selenium.clickAt("link=Control Panel",
-					RuntimeVariables.replace(""));
+					RuntimeVariables.replace("Control Panel"));
 				selenium.waitForPageToLoad("30000");
-				selenium.saveScreenShotAndSource();
-				selenium.clickAt("link=Users", RuntimeVariables.replace(""));
+				loadRequiredJavaScriptModules();
+				selenium.clickAt("link=Users and Organizations",
+					RuntimeVariables.replace("Users and Organizations"));
 				selenium.waitForPageToLoad("30000");
-				selenium.saveScreenShotAndSource();
+				loadRequiredJavaScriptModules();
+				assertEquals(RuntimeVariables.replace("Search All Users"),
+					selenium.getText("//a[@id='_125_allUsersLink']"));
+				selenium.clickAt("//a[@id='_125_allUsersLink']",
+					RuntimeVariables.replace("Search All Users"));
+				selenium.waitForPageToLoad("30000");
+				loadRequiredJavaScriptModules();
 
-				boolean AdvancedPresent = selenium.isVisible(
+				boolean advanced1Present = selenium.isVisible(
 						"link=Advanced \u00bb");
 
-				if (!AdvancedPresent) {
+				if (!advanced1Present) {
 					label = 2;
 
 					continue;
 				}
 
 				selenium.clickAt("link=Advanced \u00bb",
-					RuntimeVariables.replace(""));
+					RuntimeVariables.replace("Advanced \u00bb"));
 
 			case 2:
+				selenium.type("//input[@id='_125_firstName']",
+					RuntimeVariables.replace("Selen*"));
+				selenium.clickAt("xPath=(//input[@value='Search'])[2]",
+					RuntimeVariables.replace("Search"));
+				selenium.waitForPageToLoad("30000");
+				loadRequiredJavaScriptModules();
+				assertTrue(selenium.isTextPresent("selenium01"));
+				selenium.clickAt("link=Users and Organizations",
+					RuntimeVariables.replace("Users and Organizations"));
+				selenium.waitForPageToLoad("30000");
+				loadRequiredJavaScriptModules();
+				assertEquals(RuntimeVariables.replace("Search All Users"),
+					selenium.getText("//a[@id='_125_allUsersLink']"));
+				selenium.clickAt("//a[@id='_125_allUsersLink']",
+					RuntimeVariables.replace("Search All Users"));
+				selenium.waitForPageToLoad("30000");
+				loadRequiredJavaScriptModules();
 
-				for (int second = 0;; second++) {
-					if (second >= 60) {
-						fail("timeout");
-					}
+				boolean advanced2Present = selenium.isVisible(
+						"link=Advanced \u00bb");
 
-					try {
-						if (selenium.isVisible("_125_firstName")) {
-							break;
-						}
-					}
-					catch (Exception e) {
-					}
+				if (!advanced2Present) {
+					label = 3;
 
-					Thread.sleep(1000);
+					continue;
 				}
 
-				selenium.saveScreenShotAndSource();
-				selenium.type("_125_firstName",
-					RuntimeVariables.replace("Selen"));
-				selenium.saveScreenShotAndSource();
-				selenium.clickAt("//div[2]/span[2]/span/input",
-					RuntimeVariables.replace(""));
-				selenium.waitForPageToLoad("30000");
-				selenium.saveScreenShotAndSource();
-				selenium.type("_125_firstName",
+				selenium.clickAt("link=Advanced \u00bb",
+					RuntimeVariables.replace("Advanced \u00bb"));
+
+			case 3:
+				selenium.type("//input[@id='_125_firstName']",
 					RuntimeVariables.replace("selen1"));
-				selenium.saveScreenShotAndSource();
-				selenium.clickAt("//div[2]/span[2]/span/input",
-					RuntimeVariables.replace(""));
+				selenium.clickAt("xPath=(//input[@value='Search'])[2]",
+					RuntimeVariables.replace("Search"));
 				selenium.waitForPageToLoad("30000");
-				selenium.saveScreenShotAndSource();
+				loadRequiredJavaScriptModules();
 				assertFalse(selenium.isTextPresent("selenium01"));
-				selenium.type("_125_firstName", RuntimeVariables.replace(""));
-				selenium.saveScreenShotAndSource();
 				selenium.clickAt("link=\u00ab Basic",
-					RuntimeVariables.replace(""));
+					RuntimeVariables.replace("\u00ab Basic"));
 
 			case 100:
 				label = -1;

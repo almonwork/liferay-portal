@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -92,14 +92,6 @@ public class DDLRecordVersionUtil {
 		return getPersistence()
 				   .findWithDynamicQuery(dynamicQuery, start, end,
 			orderByComparator);
-	}
-
-	/**
-	 * @see com.liferay.portal.service.persistence.BasePersistence#remove(com.liferay.portal.model.BaseModel)
-	 */
-	public static DDLRecordVersion remove(DDLRecordVersion ddlRecordVersion)
-		throws SystemException {
-		return getPersistence().remove(ddlRecordVersion);
 	}
 
 	/**
@@ -557,12 +549,14 @@ public class DDLRecordVersionUtil {
 	*
 	* @param recordId the record ID
 	* @param version the version
+	* @return the d d l record version that was removed
 	* @throws SystemException if a system exception occurred
 	*/
-	public static void removeByR_V(long recordId, java.lang.String version)
+	public static com.liferay.portlet.dynamicdatalists.model.DDLRecordVersion removeByR_V(
+		long recordId, java.lang.String version)
 		throws com.liferay.portal.kernel.exception.SystemException,
 			com.liferay.portlet.dynamicdatalists.NoSuchRecordVersionException {
-		getPersistence().removeByR_V(recordId, version);
+		return getPersistence().removeByR_V(recordId, version);
 	}
 
 	/**
@@ -647,11 +641,10 @@ public class DDLRecordVersionUtil {
 		return _persistence;
 	}
 
+	/**
+	 * @deprecated
+	 */
 	public void setPersistence(DDLRecordVersionPersistence persistence) {
-		_persistence = persistence;
-
-		ReferenceRegistry.registerReference(DDLRecordVersionUtil.class,
-			"_persistence");
 	}
 
 	private static DDLRecordVersionPersistence _persistence;

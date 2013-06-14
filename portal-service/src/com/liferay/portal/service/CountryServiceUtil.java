@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -15,7 +15,6 @@
 package com.liferay.portal.service;
 
 import com.liferay.portal.kernel.bean.PortalBeanLocatorUtil;
-import com.liferay.portal.kernel.util.MethodCache;
 import com.liferay.portal.kernel.util.ReferenceRegistry;
 
 /**
@@ -37,12 +36,48 @@ public class CountryServiceUtil {
 	 *
 	 * Never modify this class directly. Add custom service methods to {@link com.liferay.portal.service.impl.CountryServiceImpl} and rerun ServiceBuilder to regenerate this class.
 	 */
+
+	/**
+	* Returns the Spring bean ID for this bean.
+	*
+	* @return the Spring bean ID for this bean
+	*/
+	public static java.lang.String getBeanIdentifier() {
+		return getService().getBeanIdentifier();
+	}
+
+	/**
+	* Sets the Spring bean ID for this bean.
+	*
+	* @param beanIdentifier the Spring bean ID for this bean
+	*/
+	public static void setBeanIdentifier(java.lang.String beanIdentifier) {
+		getService().setBeanIdentifier(beanIdentifier);
+	}
+
 	public static com.liferay.portal.model.Country addCountry(
 		java.lang.String name, java.lang.String a2, java.lang.String a3,
 		java.lang.String number, java.lang.String idd, boolean active)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException {
 		return getService().addCountry(name, a2, a3, number, idd, active);
+	}
+
+	public static com.liferay.portal.model.Country fetchCountry(long countryId)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getService().fetchCountry(countryId);
+	}
+
+	public static com.liferay.portal.model.Country fetchCountryByA2(
+		java.lang.String a2)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getService().fetchCountryByA2(a2);
+	}
+
+	public static com.liferay.portal.model.Country fetchCountryByA3(
+		java.lang.String a3)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getService().fetchCountryByA3(a3);
 	}
 
 	public static java.util.List<com.liferay.portal.model.Country> getCountries()
@@ -89,19 +124,15 @@ public class CountryServiceUtil {
 
 			ReferenceRegistry.registerReference(CountryServiceUtil.class,
 				"_service");
-			MethodCache.remove(CountryService.class);
 		}
 
 		return _service;
 	}
 
+	/**
+	 * @deprecated
+	 */
 	public void setService(CountryService service) {
-		MethodCache.remove(CountryService.class);
-
-		_service = service;
-
-		ReferenceRegistry.registerReference(CountryServiceUtil.class, "_service");
-		MethodCache.remove(CountryService.class);
 	}
 
 	private static CountryService _service;

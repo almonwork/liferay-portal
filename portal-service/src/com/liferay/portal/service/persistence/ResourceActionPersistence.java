@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,7 +14,6 @@
 
 package com.liferay.portal.service.persistence;
 
-import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.model.ResourceAction;
 
 /**
@@ -302,9 +301,11 @@ public interface ResourceActionPersistence extends BasePersistence<ResourceActio
 	*
 	* @param name the name
 	* @param actionId the action ID
+	* @return the resource action that was removed
 	* @throws SystemException if a system exception occurred
 	*/
-	public void removeByN_A(java.lang.String name, java.lang.String actionId)
+	public com.liferay.portal.model.ResourceAction removeByN_A(
+		java.lang.String name, java.lang.String actionId)
 		throws com.liferay.portal.NoSuchResourceActionException,
 			com.liferay.portal.kernel.exception.SystemException;
 
@@ -345,7 +346,4 @@ public interface ResourceActionPersistence extends BasePersistence<ResourceActio
 	*/
 	public int countAll()
 		throws com.liferay.portal.kernel.exception.SystemException;
-
-	public ResourceAction remove(ResourceAction resourceAction)
-		throws SystemException;
 }

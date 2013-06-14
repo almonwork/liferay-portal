@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -30,14 +30,14 @@ public interface ServletContextProvider {
 	public static final String STRUTS_BRIDGES_CONTEXT_PROVIDER =
 		"STRUTS_BRIDGES_CONTEXT_PROVIDER";
 
-	public ServletContext getServletContext(GenericPortlet portlet);
-
-	public ServletContext getServletContext(ServletContext servletContext);
-
 	public HttpServletRequest getHttpServletRequest(
 		GenericPortlet portlet, PortletRequest portletRequest);
 
 	public HttpServletResponse getHttpServletResponse(
 		GenericPortlet portlet, PortletResponse portletResponse);
+
+	public ServletContext getServletContext(GenericPortlet portlet);
+
+	public ServletContext getServletContext(ServletContext servletContext);
 
 }

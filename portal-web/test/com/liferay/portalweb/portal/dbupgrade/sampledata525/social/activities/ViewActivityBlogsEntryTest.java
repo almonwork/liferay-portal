@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -23,29 +23,13 @@ import com.liferay.portalweb.portal.util.RuntimeVariables;
 public class ViewActivityBlogsEntryTest extends BaseTestCase {
 	public void testViewActivityBlogsEntry() throws Exception {
 		selenium.open("/web/joebloggs/home/");
-
-		for (int second = 0;; second++) {
-			if (second >= 60) {
-				fail("timeout");
-			}
-
-			try {
-				if (selenium.isElementPresent("link=Activities Page")) {
-					break;
-				}
-			}
-			catch (Exception e) {
-			}
-
-			Thread.sleep(1000);
-		}
-
-		selenium.saveScreenShotAndSource();
-		selenium.clickAt("link=Activities Page", RuntimeVariables.replace(""));
+		loadRequiredJavaScriptModules();
+		selenium.clickAt("link=Activities Page",
+			RuntimeVariables.replace("Activities Page"));
 		selenium.waitForPageToLoad("30000");
-		selenium.saveScreenShotAndSource();
+		loadRequiredJavaScriptModules();
 		assertEquals(RuntimeVariables.replace(
-				"Joe wrote a new blog entry, Blogs Entry Title."),
+				"Joe wrote a new blog entry, Blogs Entry Title, in Guest."),
 			selenium.getText("xPath=(//div[@class='activity-title'])[2]"));
 		assertEquals(RuntimeVariables.replace("Blogs Entry Title"),
 			selenium.getText("xPath=(//div[@class='activity-title'])[2]/a"));

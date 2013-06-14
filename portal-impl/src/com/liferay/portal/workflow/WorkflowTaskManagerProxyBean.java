@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -165,6 +165,14 @@ public class WorkflowTaskManagerProxyBean
 		throw new UnsupportedOperationException();
 	}
 
+	public List<WorkflowTask> search(
+		long companyId, long userId, String keywords, String[] assetTypes,
+		Boolean completed, Boolean searchByUserRoles, int start, int end,
+		OrderByComparator orderByComparator) {
+
+		throw new UnsupportedOperationException();
+	}
+
 	public int searchCount(
 		long companyId, long userId, String keywords, Boolean completed,
 		Boolean searchByUserRoles) {
@@ -176,6 +184,13 @@ public class WorkflowTaskManagerProxyBean
 		long companyId, long userId, String taskName, String assetType,
 		Long[] assetPrimaryKey, Date dueDateGT, Date dueDateLT,
 		Boolean completed, Boolean searchByUserRoles, boolean andOperator) {
+
+		throw new UnsupportedOperationException();
+	}
+
+	public int searchCount(
+		long companyId, long userId, String keywords, String[] assetTypes,
+		Boolean completed, Boolean searchByUserRoles) {
 
 		throw new UnsupportedOperationException();
 	}

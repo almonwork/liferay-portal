@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -18,13 +18,47 @@
 
 <%@ include file="/html/portlet/layouts_admin/init_attributes.jspf" %>
 
+<%
+SitesUtil.addPortletBreadcrumbEntries(group, pagesName, redirectURL, request, renderResponse);
+%>
+
+<liferay-ui:error exception="<%= LayoutTypeException.class %>">
+
+	<%
+	LayoutTypeException lte = (LayoutTypeException)errorException;
+
+	String type = BeanParamUtil.getString(selLayout, request, "type");
+	%>
+
+	<c:if test="<%= lte.getType() == LayoutTypeException.FIRST_LAYOUT %>">
+		<liferay-ui:message arguments='<%= Validator.isNull(lte.getLayoutType()) ? type : "layout.types." + lte.getLayoutType() %>' key="the-first-page-cannot-be-of-type-x" />
+	</c:if>
+
+	<c:if test="<%= lte.getType() == LayoutTypeException.NOT_PARENTABLE %>">
+		<liferay-ui:message arguments="<%= type %>" key="pages-of-type-x-cannot-have-child-pages" />
+	</c:if>
+</liferay-ui:error>
+
+<liferay-ui:error exception="<%= LayoutNameException.class %>" message="please-enter-a-valid-name" />
+
+<liferay-ui:error exception="<%= RequiredLayoutException.class %>">
+
+	<%
+	RequiredLayoutException rle = (RequiredLayoutException)errorException;
+	%>
+
+	<c:if test="<%= rle.getType() == RequiredLayoutException.AT_LEAST_ONE %>">
+		<liferay-ui:message key="you-must-have-at-least-one-page" />
+	</c:if>
+</liferay-ui:error>
+
 <c:choose>
-	<c:when test="<%= portletName.equals(PortletKeys.COMMUNITIES) || portletName.equals(PortletKeys.GROUP_PAGES) || portletName.equals(PortletKeys.MY_PAGES) || portletName.equals(PortletKeys.SITES_ADMIN) || portletName.equals(PortletKeys.USERS_ADMIN) %>">
-		<c:if test="<%= portletName.equals(PortletKeys.COMMUNITIES) || portletName.equals(PortletKeys.SITES_ADMIN) || portletName.equals(PortletKeys.USERS_ADMIN) %>">
+	<c:when test="<%= portletName.equals(PortletKeys.MY_SITES) || portletName.equals(PortletKeys.GROUP_PAGES) || portletName.equals(PortletKeys.MY_PAGES) || portletName.equals(PortletKeys.SITES_ADMIN) || portletName.equals(PortletKeys.USER_GROUPS_ADMIN) || portletName.equals(PortletKeys.USERS_ADMIN) %>">
+		<c:if test="<%= portletName.equals(PortletKeys.MY_SITES) || portletName.equals(PortletKeys.GROUP_PAGES) || portletName.equals(PortletKeys.SITES_ADMIN) || portletName.equals(PortletKeys.USER_GROUPS_ADMIN) || portletName.equals(PortletKeys.USERS_ADMIN) %>">
 			<liferay-ui:header
 				backURL="<%= backURL %>"
 				localizeTitle="<%= false %>"
-				title="<%= liveGroup.getDescriptiveName() %>"
+				title="<%= liveGroup.getDescriptiveName(locale) %>"
 			/>
 		</c:if>
 
@@ -46,8 +80,8 @@
 		<liferay-ui:tabs
 			names="<%= tabs1Names %>"
 			param="tabs1"
-			value="<%= tabs1 %>"
 			url="<%= tabs1URL %>"
+			value="<%= tabs1 %>"
 		/>
 
 		<%
@@ -59,6 +93,7 @@
 			PortalUtil.addPortletBreadcrumbEntry(request, selLayout.getName(locale), currentURL);
 		}
 		%>
+
 	</c:when>
 	<c:otherwise>
 
@@ -71,48 +106,49 @@
 		%>
 
 		<div class="layout-breadcrumb">
-			<liferay-ui:breadcrumb displayStyle="horizontal" showPortletBreadcrumb="<%= true %>" showGuestGroup="<%= false %>" showLayout="<%= false %>" showParentGroups="<%= false %>" />
+			<liferay-ui:breadcrumb displayStyle="horizontal" showGuestGroup="<%= false %>" showLayout="<%= false %>" showParentGroups="<%= false %>" showPortletBreadcrumb="<%= true %>" />
 		</div>
 	</c:otherwise>
 </c:choose>
 
-<%
-if ((selLayout != null) && !group.isLayoutPrototype()) {
-	redirectURL.setParameter("selPlid", String.valueOf(selLayout.getPlid()));
-
-	PortalUtil.addPortletBreadcrumbEntry(request, selLayout.getName(locale), redirectURL.toString());
-}
-%>
-
-<aui:layout cssClass="manage-view">
+<aui:layout cssClass="manage-view lfr-app-column-view">
 	<c:if test="<%= !group.isLayoutPrototype() %>">
 		<aui:column columnWidth="25" cssClass="manage-sitemap">
 			<div class="lfr-header-row">
 				<div class="lfr-header-row-content">
-
-					<%
-					long layoutSetBranchId = ParamUtil.getLong(request, "layoutSetBranchId");
-
-					if (layoutSetBranchId <= 0) {
-						layoutSetBranchId = StagingUtil.getRecentLayoutSetBranchId(user);
-					}
-
-					LayoutSetBranch layoutSetBranch = null;
-
-					if (layoutSetBranchId > 0) {
-						layoutSetBranch = LayoutSetBranchLocalServiceUtil.getLayoutSetBranch(layoutSetBranchId);
-					}
-					%>
-
-					<c:if test="<%= (stagingGroup != null) && (layoutSetBranch != null) %>">
+					<c:if test="<%= stagingGroup != null %>">
 
 						<%
+						long layoutSetBranchId = ParamUtil.getLong(request, "layoutSetBranchId");
+
+						if (layoutSetBranchId <= 0) {
+							layoutSetBranchId = StagingUtil.getRecentLayoutSetBranchId(user, selLayoutSet.getLayoutSetId());
+						}
+
+						LayoutSetBranch layoutSetBranch = null;
+
+						if (layoutSetBranchId > 0) {
+							try {
+								layoutSetBranch = LayoutSetBranchLocalServiceUtil.getLayoutSetBranch(layoutSetBranchId);
+							}
+							catch (NoSuchLayoutSetBranchException nslsbe) {
+							}
+						}
+
+						if (layoutSetBranch == null) {
+							try {
+								layoutSetBranch = LayoutSetBranchLocalServiceUtil.getMasterLayoutSetBranch(stagingGroup.getGroupId(), privateLayout);
+							}
+							catch (NoSuchLayoutSetBranchException nslsbe) {
+							}
+						}
+
 						List<LayoutSetBranch> layoutSetBranches = LayoutSetBranchLocalServiceUtil.getLayoutSetBranches(stagingGroup.getGroupId(), privateLayout);
 						%>
 
 						<c:choose>
 							<c:when test="<%= layoutSetBranches.size() > 1 %>">
-								<liferay-ui:icon-menu align="left" cssClass="layoutset-branches-menu" direction="down" extended="<%= true %>" message="<%= layoutSetBranch.getName() %>" icon='<%= themeDisplay.getPathThemeImages() + "/dock/staging.png" %>' >
+								<liferay-ui:icon-menu align="left" cssClass="layoutset-branches-menu" direction="down" extended="<%= true %>" icon='<%= themeDisplay.getPathThemeImages() + "/common/staging.png" %>' message="<%= layoutSetBranch.getName() %>">
 
 									<%
 									for (int i = 0; i < layoutSetBranches.size(); i++) {
@@ -126,6 +162,7 @@ if ((selLayout != null) && !group.isLayoutPrototype()) {
 											<portlet:param name="<%= Constants.CMD %>" value="select_layout_set_branch" />
 											<portlet:param name="redirect" value="<%= redirectURL.toString() %>" />
 											<portlet:param name="groupId" value="<%= String.valueOf(curLayoutSetBranch.getGroupId()) %>" />
+											<portlet:param name="privateLayout" value="<%= String.valueOf(privateLayout) %>" />
 											<portlet:param name="layoutSetBranchId" value="<%= String.valueOf(curLayoutSetBranch.getLayoutSetBranchId()) %>" />
 										</portlet:actionURL>
 
@@ -143,7 +180,12 @@ if ((selLayout != null) && !group.isLayoutPrototype()) {
 								</liferay-ui:icon-menu>
 							</c:when>
 							<c:otherwise>
-								<liferay-ui:icon cssClass="layoutset-branch" image="../dock/staging" label="<%= true %>" message="<%= layoutSetBranch.getName() %>" />
+								<liferay-ui:icon
+									cssClass="layoutset-branch"
+									image="../common/staging"
+									label="<%= true %>"
+									message='<%= (layoutSetBranch == null || (layoutSetBranches.size() == 1)) ? "staging" : layoutSetBranch.getName() %>'
+								/>
 							</c:otherwise>
 						</c:choose>
 
@@ -188,9 +230,27 @@ if ((selLayout != null) && !group.isLayoutPrototype()) {
 			function(event) {
 				event.preventDefault();
 
-				var requestUri = event.currentTarget.get('href');
+				var hash = location.hash;
+
+				var prefix = '#_LFR_FN_<portlet:namespace />';
+				var historyKey = '';
+
+				if (hash.indexOf(prefix) != -1) {
+					historyKey = hash.replace(prefix, '');
+				}
+
+				var requestUri = A.Lang.sub(
+					event.currentTarget.get('href'),
+					{
+						historyKey: historyKey
+					}
+				);
 
 				layoutsContainer.io.set('uri', requestUri);
+
+				if (layoutsContainer.ParseContent) {
+					layoutsContainer.ParseContent.get('queue').stop();
+				}
 
 				layoutsContainer.io.start();
 			},

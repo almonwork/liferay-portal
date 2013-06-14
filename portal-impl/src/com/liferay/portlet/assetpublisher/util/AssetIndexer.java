@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -41,6 +41,10 @@ public class AssetIndexer extends BaseIndexer {
 		return CLASS_NAMES;
 	}
 
+	public String getPortletId() {
+		return PORTLET_ID;
+	}
+
 	@Override
 	public void postProcessSearchQuery(
 			BooleanQuery searchQuery, SearchContext searchContext)
@@ -50,9 +54,9 @@ public class AssetIndexer extends BaseIndexer {
 			return;
 		}
 
-		addSearchTerm(searchQuery, searchContext, Field.DESCRIPTION, true);
-		addSearchTerm(searchQuery, searchContext, Field.TITLE, true);
-		addSearchTerm(searchQuery, searchContext, Field.USER_NAME, true);
+		addSearchTerm(searchQuery, searchContext, Field.DESCRIPTION, false);
+		addSearchTerm(searchQuery, searchContext, Field.TITLE, false);
+		addSearchTerm(searchQuery, searchContext, Field.USER_NAME, false);
 	}
 
 	@Override

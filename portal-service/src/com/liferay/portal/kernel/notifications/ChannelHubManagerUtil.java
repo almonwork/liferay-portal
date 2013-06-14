@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,6 +14,8 @@
 
 package com.liferay.portal.kernel.notifications;
 
+import com.liferay.portal.kernel.security.pacl.permission.PortalRuntimePermission;
+
 import java.util.Collection;
 import java.util.List;
 
@@ -23,11 +25,38 @@ import java.util.List;
 public class ChannelHubManagerUtil {
 
 	public static void confirmDelivery(
+			long companyId, long userId,
+			Collection<String> notificationEventUuids)
+		throws ChannelException {
+
+		getChannelHubManager().confirmDelivery(
+			companyId, userId, notificationEventUuids);
+	}
+
+	public static void confirmDelivery(
+			long companyId, long userId,
+			Collection<String> notificationEventUuids, boolean archived)
+		throws ChannelException {
+
+		getChannelHubManager().confirmDelivery(
+			companyId, userId, notificationEventUuids, archived);
+	}
+
+	public static void confirmDelivery(
 			long companyId, long userId, String notificationEventUuid)
 		throws ChannelException {
 
 		getChannelHubManager().confirmDelivery(
 			companyId, userId, notificationEventUuid);
+	}
+
+	public static void confirmDelivery(
+			long companyId, long userId, String notificationEventUuid,
+			boolean archived)
+		throws ChannelException {
+
+		getChannelHubManager().confirmDelivery(
+			companyId, userId, notificationEventUuid, archived);
 	}
 
 	public static Channel createChannel(long companyId, long userId)
@@ -42,6 +71,23 @@ public class ChannelHubManagerUtil {
 		return getChannelHubManager().createChannelHub(companyId);
 	}
 
+	public static void deleteUserNotificiationEvent(
+			long companyId, long userId, String notificationEventUuid)
+		throws ChannelException {
+
+		getChannelHubManager().deleteUserNotificiationEvent(
+			companyId, userId, notificationEventUuid);
+	}
+
+	public static void deleteUserNotificiationEvents(
+			long companyId, long userId,
+			Collection<String> notificationEventUuids)
+		throws ChannelException {
+
+		getChannelHubManager().deleteUserNotificiationEvents(
+			companyId, userId, notificationEventUuids);
+	}
+
 	public static void destroyChannel(long companyId, long userId)
 		throws ChannelException {
 
@@ -52,6 +98,28 @@ public class ChannelHubManagerUtil {
 		throws ChannelException {
 
 		getChannelHubManager().destroyChannelHub(companyId);
+	}
+
+	public static ChannelHub fetchChannelHub(long companyId)
+		throws ChannelException {
+
+		return getChannelHubManager().fetchChannelHub(companyId);
+	}
+
+	public static ChannelHub fetchChannelHub(
+			long companyId, boolean createIfAbsent)
+		throws ChannelException {
+
+		return getChannelHubManager().fetchChannelHub(
+			companyId, createIfAbsent);
+	}
+
+	public static List<NotificationEvent> fetchNotificationEvents(
+			long companyId, long userId, boolean flush)
+		throws ChannelException {
+
+		return getChannelHubManager().fetchNotificationEvents(
+			companyId, userId, flush);
 	}
 
 	public static void flush() throws ChannelException {
@@ -96,22 +164,25 @@ public class ChannelHubManagerUtil {
 	}
 
 	public static ChannelHubManager getChannelHubManager() {
+		PortalRuntimePermission.checkGetBeanProperty(
+			ChannelHubManagerUtil.class);
+
 		return _channelHubManager;
 	}
 
 	public static List<NotificationEvent> getNotificationEvents(
-			long compnayId, long userId)
+			long companyId, long userId)
 		throws ChannelException {
 
-		return getChannelHubManager().getNotificationEvents(compnayId, userId);
+		return getChannelHubManager().getNotificationEvents(companyId, userId);
 	}
 
 	public static List<NotificationEvent> getNotificationEvents(
-			long compnayId, long userId, boolean flush)
+			long companyId, long userId, boolean flush)
 		throws ChannelException {
 
 		return getChannelHubManager().getNotificationEvents(
-			compnayId, userId, flush);
+			companyId, userId, flush);
 	}
 
 	public static Collection<Long> getUserIds(long companyId)
@@ -172,6 +243,8 @@ public class ChannelHubManagerUtil {
 	}
 
 	public void setChannelHubManager(ChannelHubManager channelHubManager) {
+		PortalRuntimePermission.checkSetBeanProperty(getClass());
+
 		_channelHubManager = channelHubManager;
 	}
 

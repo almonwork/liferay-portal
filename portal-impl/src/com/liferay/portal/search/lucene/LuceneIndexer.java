@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -26,7 +26,9 @@ import com.liferay.portal.service.PortletLocalServiceUtil;
 import com.liferay.portal.util.PropsValues;
 import com.liferay.portal.util.comparator.PortletLuceneComparator;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.apache.commons.lang.time.StopWatch;
 
@@ -37,6 +39,11 @@ public class LuceneIndexer implements Runnable {
 
 	public LuceneIndexer(long companyId) {
 		_companyId = companyId;
+		_usedSearchEngineIds = new HashSet<String>();
+	}
+
+	public Set<String> getUsedSearchEngineIds() {
+		return _usedSearchEngineIds;
 	}
 
 	public void halt() {
@@ -44,10 +51,6 @@ public class LuceneIndexer implements Runnable {
 
 	public boolean isFinished() {
 		return _finished;
-	}
-
-	public void run() {
-		reindex(PropsValues.INDEX_ON_STARTUP_DELAY);
 	}
 
 	public void reindex() {
@@ -63,6 +66,10 @@ public class LuceneIndexer implements Runnable {
 		finally {
 			ShardUtil.popCompanyService();
 		}
+	}
+
+	public void run() {
+		reindex(PropsValues.INDEX_ON_STARTUP_DELAY);
 	}
 
 	protected void doReIndex(int delay) {
@@ -150,6 +157,8 @@ public class LuceneIndexer implements Runnable {
 
 		indexer.reindex(new String[] {String.valueOf(_companyId)});
 
+		_usedSearchEngineIds.add(indexer.getSearchEngineId());
+
 		if (_log.isInfoEnabled()) {
 			_log.info(
 				"Reindexing with " + indexer.getClass() +
@@ -162,5 +171,6 @@ public class LuceneIndexer implements Runnable {
 
 	private long _companyId;
 	private boolean _finished;
+	private Set<String> _usedSearchEngineIds;
 
 }

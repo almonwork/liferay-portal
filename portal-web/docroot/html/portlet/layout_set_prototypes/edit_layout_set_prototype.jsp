@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -31,8 +31,7 @@ if (layoutSetPrototype == null) {
 
 long layoutSetPrototypeId = BeanParamUtil.getLong(layoutSetPrototype, request, "layoutSetPrototypeId");
 
-boolean allowModifications = GetterUtil.getBoolean(layoutSetPrototype.getSettingsProperty("allowModifications"), true);
-boolean allowLayoutAdditions = GetterUtil.getBoolean(layoutSetPrototype.getSettingsProperty("allowLayoutAdditions"), true);
+boolean layoutsUpdateable = GetterUtil.getBoolean(layoutSetPrototype.getSettingsProperty("layoutsUpdateable"), true);
 
 Locale defaultLocale = LocaleUtil.getDefault();
 String defaultLanguageId = LocaleUtil.toLanguageId(defaultLocale);
@@ -62,15 +61,13 @@ Locale[] locales = LanguageUtil.getAvailableLocales();
 
 		<aui:input name="description" />
 
-		<aui:input inlineLabel="left" name="active" />
+		<aui:input name="active" />
 
-		<aui:input name="allowModifications" type="checkbox" value="<%= allowModifications %>" />
-
-		<aui:input name="allowLayoutAdditions" type="checkbox" value="<%= allowLayoutAdditions %>" />
+		<aui:input helpMessage="allow-site-administrators-to-modify-pages-associated-with-this-site-template-help" label="allow-site-administrators-to-modify-pages-associated-with-this-site-template" name="layoutsUpdateable" type="checkbox" value="<%= layoutsUpdateable %>" />
 
 		<c:if test="<%= !layoutSetPrototype.isNew() %>">
 			<aui:field-wrapper label="configuration">
-				<liferay-portlet:actionURL var="viewURL" portletName="<%= PortletKeys.MY_SITES %>">
+				<liferay-portlet:actionURL portletName="<%= PortletKeys.SITE_REDIRECTOR %>" var="viewURL">
 					<portlet:param name="struts_action" value="/my_sites/view" />
 					<portlet:param name="groupId" value="<%= String.valueOf(layoutSetPrototype.getGroup().getGroupId()) %>" />
 					<portlet:param name="privateLayout" value="<%= Boolean.TRUE.toString() %>" />
@@ -99,20 +96,22 @@ Locale[] locales = LanguageUtil.getAvailableLocales();
 		}
 		%>
 
-		<aui:select label="application-adapter" name="customJspServletContextName">
-			<aui:option label="none" />
+		<c:if test="<%= !servletContextNames.isEmpty() %>">
+			<aui:select label="application-adapter" name="customJspServletContextName">
+				<aui:option label="none" />
 
-			<%
-			for (String servletContextName : servletContextNames) {
-			%>
+				<%
+				for (String servletContextName : servletContextNames) {
+				%>
 
-				<aui:option selected="<%= customJspServletContextName.equals(servletContextName) %>" value="<%= servletContextName %>"><%= CustomJspRegistryUtil.getDisplayName(servletContextName) %></aui:option>
+					<aui:option selected="<%= customJspServletContextName.equals(servletContextName) %>" value="<%= servletContextName %>"><%= CustomJspRegistryUtil.getDisplayName(servletContextName) %></aui:option>
 
-			<%
-			}
-			%>
+				<%
+				}
+				%>
 
-		</aui:select>
+			</aui:select>
+		</c:if>
 
 		<aui:button-row>
 			<aui:button type="submit" />

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -23,9 +23,10 @@ import com.liferay.portalweb.portal.util.RuntimeVariables;
 public class ViewImportLARTest extends BaseTestCase {
 	public void testViewImportLAR() throws Exception {
 		selenium.open("/web/guest/home/");
+		loadRequiredJavaScriptModules();
 
 		for (int second = 0;; second++) {
-			if (second >= 60) {
+			if (second >= 90) {
 				fail("timeout");
 			}
 
@@ -40,17 +41,18 @@ public class ViewImportLARTest extends BaseTestCase {
 			Thread.sleep(1000);
 		}
 
-		selenium.saveScreenShotAndSource();
 		selenium.clickAt("link=Asset Publisher Test Page",
 			RuntimeVariables.replace("Asset Publisher Test Page"));
 		selenium.waitForPageToLoad("30000");
-		selenium.saveScreenShotAndSource();
+		loadRequiredJavaScriptModules();
+		Thread.sleep(5000);
 		assertEquals(RuntimeVariables.replace("Options"),
-			selenium.getText("//strong/a"));
-		selenium.clickAt("//strong/a", RuntimeVariables.replace("Options"));
+			selenium.getText("//span[@title='Options']/ul/li/strong/a"));
+		selenium.clickAt("//span[@title='Options']/ul/li/strong/a",
+			RuntimeVariables.replace("Options"));
 
 		for (int second = 0;; second++) {
-			if (second >= 60) {
+			if (second >= 90) {
 				fail("timeout");
 			}
 
@@ -66,14 +68,14 @@ public class ViewImportLARTest extends BaseTestCase {
 			Thread.sleep(1000);
 		}
 
-		selenium.saveScreenShotAndSource();
 		assertEquals(RuntimeVariables.replace("Configuration"),
 			selenium.getText(
 				"//div[@class='lfr-component lfr-menu-list']/ul/li[2]/a"));
-		selenium.click("//div[@class='lfr-component lfr-menu-list']/ul/li[2]/a");
+		selenium.clickAt("//div[@class='lfr-component lfr-menu-list']/ul/li[2]/a",
+			RuntimeVariables.replace("Configuration"));
 
 		for (int second = 0;; second++) {
-			if (second >= 60) {
+			if (second >= 90) {
 				fail("timeout");
 			}
 
@@ -88,20 +90,17 @@ public class ViewImportLARTest extends BaseTestCase {
 			Thread.sleep(1000);
 		}
 
-		selenium.saveScreenShotAndSource();
 		assertEquals("Dynamic",
 			selenium.getSelectedLabel("//select[@id='_86_selectionStyle']"));
 		assertEquals(RuntimeVariables.replace("Source"),
-			selenium.getText(
-				"//form[@id='_86_fm']/div[1]/div[1]/div[1]/div/span"));
+			selenium.getText("xpath=(//div[@class='lfr-panel-title'])[1]"));
 		assertEquals(RuntimeVariables.replace("Filter"),
-			selenium.getText(
-				"//form[@id='_86_fm']/div[1]/div[2]/div[1]/div/span"));
+			selenium.getText("xpath=(//div[@class='lfr-panel-title'])[2]"));
+		assertEquals(RuntimeVariables.replace("Custom User Attributes"),
+			selenium.getText("xpath=(//div[@class='lfr-panel-title'])[3]"));
 		assertEquals(RuntimeVariables.replace("Ordering and Grouping"),
-			selenium.getText(
-				"//form[@id='_86_fm']/div[1]/div[3]/div[1]/div/span"));
+			selenium.getText("xpath=(//div[@class='lfr-panel-title'])[4]"));
 		assertEquals(RuntimeVariables.replace("Display Settings"),
-			selenium.getText(
-				"//form[@id='_86_fm']/div[1]/div[4]/div[1]/div/span"));
+			selenium.getText("xpath=(//div[@class='lfr-panel-title'])[5]"));
 	}
 }

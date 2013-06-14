@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -56,9 +56,13 @@ public class JspFactoryWrapper extends JspFactory {
 		ServletResponse servletResponse, String errorPageURL,
 		boolean needsSession, int buffer, boolean autoflush) {
 
+		if (autoflush) {
+			buffer = _JSP_WRITER_BUFFER_SIZE;
+		}
+
 		PageContext pageContext = _jspFactory.getPageContext(
 			servlet, servletRequest, servletResponse, errorPageURL,
-			needsSession, _JSP_WRITER_BUFFER_SIZE, autoflush);
+			needsSession, buffer, autoflush);
 
 		if (_DIRECT_SERVLET_CONTEXT_ENABLED) {
 			String servletPath = (String)servletRequest.getAttribute(
@@ -72,7 +76,7 @@ public class JspFactoryWrapper extends JspFactory {
 				String contextPath = ContextPathUtil.getContextPath(
 					servletContext);
 
-				DirectServletRegistry.putServlet(
+				DirectServletRegistryUtil.putServlet(
 					contextPath.concat(servletPath), servlet);
 			}
 		}
@@ -92,7 +96,7 @@ public class JspFactoryWrapper extends JspFactory {
 		_jspFactory.releasePageContext(pageContext);
 	}
 
-	private static boolean _DIRECT_SERVLET_CONTEXT_ENABLED =
+	private static final boolean _DIRECT_SERVLET_CONTEXT_ENABLED =
 		GetterUtil.getBoolean(
 			PropsUtil.get(PropsKeys.DIRECT_SERVLET_CONTEXT_ENABLED));
 

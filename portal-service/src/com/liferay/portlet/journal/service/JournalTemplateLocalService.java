@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -19,6 +19,7 @@ import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.transaction.Isolation;
 import com.liferay.portal.kernel.transaction.Propagation;
 import com.liferay.portal.kernel.transaction.Transactional;
+import com.liferay.portal.service.BaseLocalService;
 import com.liferay.portal.service.PersistedModelLocalService;
 
 /**
@@ -36,7 +37,8 @@ import com.liferay.portal.service.PersistedModelLocalService;
  */
 @Transactional(isolation = Isolation.PORTAL, rollbackFor =  {
 	PortalException.class, SystemException.class})
-public interface JournalTemplateLocalService extends PersistedModelLocalService {
+public interface JournalTemplateLocalService extends BaseLocalService,
+	PersistedModelLocalService {
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
@@ -67,10 +69,12 @@ public interface JournalTemplateLocalService extends PersistedModelLocalService 
 	* Deletes the journal template with the primary key from the database. Also notifies the appropriate model listeners.
 	*
 	* @param id the primary key of the journal template
+	* @return the journal template that was removed
 	* @throws PortalException if a journal template with the primary key could not be found
 	* @throws SystemException if a system exception occurred
 	*/
-	public void deleteJournalTemplate(long id)
+	public com.liferay.portlet.journal.model.JournalTemplate deleteJournalTemplate(
+		long id)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException;
 
@@ -78,11 +82,14 @@ public interface JournalTemplateLocalService extends PersistedModelLocalService 
 	* Deletes the journal template from the database. Also notifies the appropriate model listeners.
 	*
 	* @param journalTemplate the journal template
+	* @return the journal template that was removed
 	* @throws SystemException if a system exception occurred
 	*/
-	public void deleteJournalTemplate(
+	public com.liferay.portlet.journal.model.JournalTemplate deleteJournalTemplate(
 		com.liferay.portlet.journal.model.JournalTemplate journalTemplate)
 		throws com.liferay.portal.kernel.exception.SystemException;
+
+	public com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery();
 
 	/**
 	* Performs a dynamic query on the database and returns the matching rows.
@@ -145,6 +152,10 @@ public interface JournalTemplateLocalService extends PersistedModelLocalService 
 	public long dynamicQueryCount(
 		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery)
 		throws com.liferay.portal.kernel.exception.SystemException;
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public com.liferay.portlet.journal.model.JournalTemplate fetchJournalTemplate(
+		long id) throws com.liferay.portal.kernel.exception.SystemException;
 
 	/**
 	* Returns the journal template with the primary key.
@@ -249,32 +260,33 @@ public interface JournalTemplateLocalService extends PersistedModelLocalService 
 	public com.liferay.portlet.journal.model.JournalTemplate addTemplate(
 		long userId, long groupId, java.lang.String templateId,
 		boolean autoTemplateId, java.lang.String structureId,
-		java.lang.String name, java.lang.String description,
+		java.util.Map<java.util.Locale, java.lang.String> nameMap,
+		java.util.Map<java.util.Locale, java.lang.String> descriptionMap,
 		java.lang.String xsl, boolean formatXsl, java.lang.String langType,
 		boolean cacheable, boolean smallImage, java.lang.String smallImageURL,
-		java.io.File smallFile,
+		java.io.File smallImageFile,
 		com.liferay.portal.service.ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException;
 
-	public void addTemplateResources(long groupId, java.lang.String templateId,
-		boolean addGroupPermissions, boolean addGuestPermissions)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException;
-
 	public void addTemplateResources(
 		com.liferay.portlet.journal.model.JournalTemplate template,
 		boolean addGroupPermissions, boolean addGuestPermissions)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException;
 
-	public void addTemplateResources(long groupId, java.lang.String templateId,
+	public void addTemplateResources(
+		com.liferay.portlet.journal.model.JournalTemplate template,
 		java.lang.String[] groupPermissions, java.lang.String[] guestPermissions)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException;
 
-	public void addTemplateResources(
-		com.liferay.portlet.journal.model.JournalTemplate template,
+	public void addTemplateResources(long groupId, java.lang.String templateId,
+		boolean addGroupPermissions, boolean addGuestPermissions)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException;
+
+	public void addTemplateResources(long groupId, java.lang.String templateId,
 		java.lang.String[] groupPermissions, java.lang.String[] guestPermissions)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException;
@@ -289,12 +301,12 @@ public interface JournalTemplateLocalService extends PersistedModelLocalService 
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException;
 
-	public void deleteTemplate(long groupId, java.lang.String templateId)
+	public void deleteTemplate(
+		com.liferay.portlet.journal.model.JournalTemplate template)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException;
 
-	public void deleteTemplate(
-		com.liferay.portlet.journal.model.JournalTemplate template)
+	public void deleteTemplate(long groupId, java.lang.String templateId)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException;
 
@@ -326,6 +338,13 @@ public interface JournalTemplateLocalService extends PersistedModelLocalService 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public com.liferay.portlet.journal.model.JournalTemplate getTemplate(
 		long groupId, java.lang.String templateId)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException;
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public com.liferay.portlet.journal.model.JournalTemplate getTemplate(
+		long groupId, java.lang.String templateId,
+		boolean includeGlobalTemplates)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException;
 
@@ -388,10 +407,12 @@ public interface JournalTemplateLocalService extends PersistedModelLocalService 
 
 	public com.liferay.portlet.journal.model.JournalTemplate updateTemplate(
 		long groupId, java.lang.String templateId,
-		java.lang.String structureId, java.lang.String name,
-		java.lang.String description, java.lang.String xsl, boolean formatXsl,
-		java.lang.String langType, boolean cacheable, boolean smallImage,
-		java.lang.String smallImageURL, java.io.File smallFile,
+		java.lang.String structureId,
+		java.util.Map<java.util.Locale, java.lang.String> nameMap,
+		java.util.Map<java.util.Locale, java.lang.String> descriptionMap,
+		java.lang.String xsl, boolean formatXsl, java.lang.String langType,
+		boolean cacheable, boolean smallImage, java.lang.String smallImageURL,
+		java.io.File smallImageFile,
 		com.liferay.portal.service.ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException;

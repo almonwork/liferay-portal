@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -17,6 +17,7 @@ package com.liferay.portal.model.impl;
 import com.liferay.portal.kernel.bean.AutoEscapeBeanHandler;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.ProxyUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.model.BrowserTracker;
 import com.liferay.portal.model.BrowserTrackerModel;
@@ -29,9 +30,10 @@ import com.liferay.portlet.expando.util.ExpandoBridgeFactoryUtil;
 
 import java.io.Serializable;
 
-import java.lang.reflect.Proxy;
-
 import java.sql.Types;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * The base model implementation for the BrowserTracker service. Represents a row in the &quot;BrowserTracker&quot; database table, with each column mapped to a property of this class.
@@ -70,15 +72,10 @@ public class BrowserTrackerModelImpl extends BaseModelImpl<BrowserTracker>
 	public static final boolean FINDER_CACHE_ENABLED = GetterUtil.getBoolean(com.liferay.portal.util.PropsUtil.get(
 				"value.object.finder.cache.enabled.com.liferay.portal.model.BrowserTracker"),
 			true);
-
-	public Class<?> getModelClass() {
-		return BrowserTracker.class;
-	}
-
-	public String getModelClassName() {
-		return BrowserTracker.class.getName();
-	}
-
+	public static final boolean COLUMN_BITMASK_ENABLED = GetterUtil.getBoolean(com.liferay.portal.util.PropsUtil.get(
+				"value.object.column.bitmask.enabled.com.liferay.portal.model.BrowserTracker"),
+			true);
+	public static long USERID_COLUMN_BITMASK = 1L;
 	public static final long LOCK_EXPIRATION_TIME = GetterUtil.getLong(com.liferay.portal.util.PropsUtil.get(
 				"lock.expiration.time.com.liferay.portal.model.BrowserTracker"));
 
@@ -101,6 +98,46 @@ public class BrowserTrackerModelImpl extends BaseModelImpl<BrowserTracker>
 		setPrimaryKey(((Long)primaryKeyObj).longValue());
 	}
 
+	public Class<?> getModelClass() {
+		return BrowserTracker.class;
+	}
+
+	public String getModelClassName() {
+		return BrowserTracker.class.getName();
+	}
+
+	@Override
+	public Map<String, Object> getModelAttributes() {
+		Map<String, Object> attributes = new HashMap<String, Object>();
+
+		attributes.put("browserTrackerId", getBrowserTrackerId());
+		attributes.put("userId", getUserId());
+		attributes.put("browserKey", getBrowserKey());
+
+		return attributes;
+	}
+
+	@Override
+	public void setModelAttributes(Map<String, Object> attributes) {
+		Long browserTrackerId = (Long)attributes.get("browserTrackerId");
+
+		if (browserTrackerId != null) {
+			setBrowserTrackerId(browserTrackerId);
+		}
+
+		Long userId = (Long)attributes.get("userId");
+
+		if (userId != null) {
+			setUserId(userId);
+		}
+
+		Long browserKey = (Long)attributes.get("browserKey");
+
+		if (browserKey != null) {
+			setBrowserKey(browserKey);
+		}
+	}
+
 	public long getBrowserTrackerId() {
 		return _browserTrackerId;
 	}
@@ -114,6 +151,8 @@ public class BrowserTrackerModelImpl extends BaseModelImpl<BrowserTracker>
 	}
 
 	public void setUserId(long userId) {
+		_columnBitmask |= USERID_COLUMN_BITMASK;
+
 		if (!_setOriginalUserId) {
 			_setOriginalUserId = true;
 
@@ -143,35 +182,32 @@ public class BrowserTrackerModelImpl extends BaseModelImpl<BrowserTracker>
 		_browserKey = browserKey;
 	}
 
+	public long getColumnBitmask() {
+		return _columnBitmask;
+	}
+
 	@Override
 	public BrowserTracker toEscapedModel() {
-		if (isEscapedModel()) {
-			return (BrowserTracker)this;
+		if (_escapedModelProxy == null) {
+			_escapedModelProxy = (BrowserTracker)ProxyUtil.newProxyInstance(_classLoader,
+					_escapedModelProxyInterfaces,
+					new AutoEscapeBeanHandler(this));
 		}
-		else {
-			if (_escapedModelProxy == null) {
-				_escapedModelProxy = (BrowserTracker)Proxy.newProxyInstance(_classLoader,
-						_escapedModelProxyInterfaces,
-						new AutoEscapeBeanHandler(this));
-			}
 
-			return _escapedModelProxy;
-		}
+		return _escapedModelProxy;
 	}
 
 	@Override
 	public ExpandoBridge getExpandoBridge() {
-		if (_expandoBridge == null) {
-			_expandoBridge = ExpandoBridgeFactoryUtil.getExpandoBridge(0,
-					BrowserTracker.class.getName(), getPrimaryKey());
-		}
-
-		return _expandoBridge;
+		return ExpandoBridgeFactoryUtil.getExpandoBridge(0,
+			BrowserTracker.class.getName(), getPrimaryKey());
 	}
 
 	@Override
 	public void setExpandoBridgeAttributes(ServiceContext serviceContext) {
-		getExpandoBridge().setAttributes(serviceContext);
+		ExpandoBridge expandoBridge = getExpandoBridge();
+
+		expandoBridge.setAttributes(serviceContext);
 	}
 
 	@Override
@@ -238,6 +274,8 @@ public class BrowserTrackerModelImpl extends BaseModelImpl<BrowserTracker>
 		browserTrackerModelImpl._originalUserId = browserTrackerModelImpl._userId;
 
 		browserTrackerModelImpl._setOriginalUserId = false;
+
+		browserTrackerModelImpl._columnBitmask = 0;
 	}
 
 	@Override
@@ -303,6 +341,6 @@ public class BrowserTrackerModelImpl extends BaseModelImpl<BrowserTracker>
 	private long _originalUserId;
 	private boolean _setOriginalUserId;
 	private long _browserKey;
-	private transient ExpandoBridge _expandoBridge;
+	private long _columnBitmask;
 	private BrowserTracker _escapedModelProxy;
 }

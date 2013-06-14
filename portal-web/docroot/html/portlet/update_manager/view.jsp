@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -19,6 +19,8 @@
 <%
 List updatablePackageIds = new ArrayList();
 %>
+
+<liferay-ui:success key="triggeredPortletUndeploy" message="plugin-is-undeploying.-the-undeploy-process-will-complete-in-a-separate-process" />
 
 <c:choose>
 	<c:when test="<%= permissionChecker.isOmniadmin() %>">
@@ -39,12 +41,6 @@ List updatablePackageIds = new ArrayList();
 
 				<%
 				String uploadProgressId = PortalUtil.generateRandomKey(request, "portlet_update_manager_view");
-
-				PortletURL pluginInstallerURL = ((RenderResponseImpl)renderResponse).createRenderURL(PortletKeys.PLUGIN_INSTALLER);
-
-				pluginInstallerURL.setParameter("struts_action", "/plugin_installer/view");
-				pluginInstallerURL.setParameter("tabs1", "browse-repository");
-				pluginInstallerURL.setParameter("backURL", currentURL);
 				%>
 
 				<portlet:actionURL var="installPluginURL">
@@ -201,7 +197,14 @@ List updatablePackageIds = new ArrayList();
 						/>
 
 						<aui:button-row>
-							<aui:button onClick='<%= "submitForm(document.hrefFm," + StringPool.APOSTROPHE + pluginInstallerURL.toString() + StringPool.APOSTROPHE + ");" %>' value="install-more-plugins" />
+							<c:if test="<%= PortletLocalServiceUtil.hasPortlet(themeDisplay.getCompanyId(), PortletKeys.MARKETPLACE_STORE) %>">
+
+								<%
+								PortletURL marketplaceURL = ((RenderResponseImpl)renderResponse).createRenderURL(PortletKeys.MARKETPLACE_STORE);
+								%>
+
+								<aui:button onClick='<%= "submitForm(document.hrefFm," + StringPool.APOSTROPHE + marketplaceURL.toString() + StringPool.APOSTROPHE + ");" %>' value="install-more-plugins" />
+							</c:if>
 
 							<c:if test="<%= !updatablePackageIds.isEmpty() %>">
 								<portlet:actionURL var="ignoreAllURL">
@@ -258,6 +261,14 @@ List updatablePackageIds = new ArrayList();
 		<liferay-util:include page="/html/portal/portlet_access_denied.jsp" />
 	</c:otherwise>
 </c:choose>
+
+<aui:script use="aui-base">
+	var description = A.one('#cpContextPanelTemplate');
+
+	if (description) {
+		description.append('<span class="warn"><liferay-ui:message key="warning-x-will-be-replaced-with-liferay-marketplace" arguments="<%= portletDisplay.getTitle() %>" /></span>');
+	}
+</aui:script>
 
 <%!
 private static Log _log = LogFactoryUtil.getLog("portal-web.docroot.html.portlet.update_manager.view_jsp");

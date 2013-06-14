@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -51,8 +51,7 @@ public class LayoutLister {
 		return new LayoutView(_list, _depth);
 	}
 
-	private void _createList(
-			long parentLayoutId, int parentId, int depth)
+	private void _createList(long parentLayoutId, int parentId, int depth)
 		throws PortalException, SystemException {
 
 		List<Layout> layouts = LayoutLocalServiceUtil.getLayouts(
@@ -99,11 +98,11 @@ public class LayoutLister {
 		}
 	}
 
+	private int _depth;
 	private long _groupId;
-	private boolean _privateLayout;
+	private List<String> _list;
 	private Locale _locale;
 	private int _nodeId;
-	private List<String> _list;
-	private int _depth;
+	private boolean _privateLayout;
 
 }

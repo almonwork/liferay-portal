@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -40,7 +40,7 @@ public class UpgradeRSS extends BaseUpgradePortletPreferences {
 		ResultSet rs = null;
 
 		try {
-			con = DataAccess.getConnection();
+			con = DataAccess.getUpgradeOptimizedConnection();
 
 			ps = con.prepareStatement(
 				"select groupId, articleId from JournalArticle where " +
@@ -69,7 +69,7 @@ public class UpgradeRSS extends BaseUpgradePortletPreferences {
 		return new String[] {"39_INSTANCE_%"};
 	}
 
-	protected void upgradeFooterValues(PortletPreferences portletPreferences)
+	protected void updateFooterValues(PortletPreferences portletPreferences)
 		throws Exception {
 
 		String[] footerArticleResouceValues = portletPreferences.getValues(
@@ -84,7 +84,7 @@ public class UpgradeRSS extends BaseUpgradePortletPreferences {
 		portletPreferences.reset("footer-article-resource-values");
 	}
 
-	protected void upgradeHeaderValues(PortletPreferences portletPreferences)
+	protected void updateHeaderValues(PortletPreferences portletPreferences)
 		throws Exception {
 
 		String[] headerArticleResouceValues = portletPreferences.getValues(
@@ -109,8 +109,8 @@ public class UpgradeRSS extends BaseUpgradePortletPreferences {
 			PortletPreferencesFactoryUtil.fromXML(
 				companyId, ownerId, ownerType, plid, portletId, xml);
 
-		upgradeFooterValues(portletPreferences);
-		upgradeHeaderValues(portletPreferences);
+		updateFooterValues(portletPreferences);
+		updateHeaderValues(portletPreferences);
 
 		return PortletPreferencesFactoryUtil.toXML(portletPreferences);
 	}

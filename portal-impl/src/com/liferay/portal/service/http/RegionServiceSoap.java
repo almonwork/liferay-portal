@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -48,8 +48,8 @@ import java.rmi.RemoteException;
  *
  * <p>
  * You can see a list of services at
- * http://localhost:8080/tunnel-web/secure/axis. Set the property
- * <b>tunnel.servlet.hosts.allowed</b> in portal.properties to configure
+ * http://localhost:8080/api/secure/axis. Set the property
+ * <b>axis.servlet.hosts.allowed</b> in portal.properties to configure
  * security.
  * </p>
  *
@@ -80,12 +80,13 @@ public class RegionServiceSoap {
 		}
 	}
 
-	public static com.liferay.portal.model.RegionSoap[] getRegions()
-		throws RemoteException {
+	public static com.liferay.portal.model.RegionSoap fetchRegion(
+		long countryId, java.lang.String regionCode) throws RemoteException {
 		try {
-			java.util.List<com.liferay.portal.model.Region> returnValue = RegionServiceUtil.getRegions();
+			com.liferay.portal.model.Region returnValue = RegionServiceUtil.fetchRegion(countryId,
+					regionCode);
 
-			return com.liferay.portal.model.RegionSoap.toSoapModels(returnValue);
+			return com.liferay.portal.model.RegionSoap.toSoapModel(returnValue);
 		}
 		catch (Exception e) {
 			_log.error(e, e);
@@ -94,10 +95,39 @@ public class RegionServiceSoap {
 		}
 	}
 
-	public static com.liferay.portal.model.RegionSoap[] getRegions(
-		long countryId) throws RemoteException {
+	public static com.liferay.portal.model.RegionSoap getRegion(long regionId)
+		throws RemoteException {
 		try {
-			java.util.List<com.liferay.portal.model.Region> returnValue = RegionServiceUtil.getRegions(countryId);
+			com.liferay.portal.model.Region returnValue = RegionServiceUtil.getRegion(regionId);
+
+			return com.liferay.portal.model.RegionSoap.toSoapModel(returnValue);
+		}
+		catch (Exception e) {
+			_log.error(e, e);
+
+			throw new RemoteException(e.getMessage());
+		}
+	}
+
+	public static com.liferay.portal.model.RegionSoap getRegion(
+		long countryId, java.lang.String regionCode) throws RemoteException {
+		try {
+			com.liferay.portal.model.Region returnValue = RegionServiceUtil.getRegion(countryId,
+					regionCode);
+
+			return com.liferay.portal.model.RegionSoap.toSoapModel(returnValue);
+		}
+		catch (Exception e) {
+			_log.error(e, e);
+
+			throw new RemoteException(e.getMessage());
+		}
+	}
+
+	public static com.liferay.portal.model.RegionSoap[] getRegions()
+		throws RemoteException {
+		try {
+			java.util.List<com.liferay.portal.model.Region> returnValue = RegionServiceUtil.getRegions();
 
 			return com.liferay.portal.model.RegionSoap.toSoapModels(returnValue);
 		}
@@ -123,10 +153,9 @@ public class RegionServiceSoap {
 	}
 
 	public static com.liferay.portal.model.RegionSoap[] getRegions(
-		long countryId, boolean active) throws RemoteException {
+		long countryId) throws RemoteException {
 		try {
-			java.util.List<com.liferay.portal.model.Region> returnValue = RegionServiceUtil.getRegions(countryId,
-					active);
+			java.util.List<com.liferay.portal.model.Region> returnValue = RegionServiceUtil.getRegions(countryId);
 
 			return com.liferay.portal.model.RegionSoap.toSoapModels(returnValue);
 		}
@@ -137,12 +166,13 @@ public class RegionServiceSoap {
 		}
 	}
 
-	public static com.liferay.portal.model.RegionSoap getRegion(long regionId)
-		throws RemoteException {
+	public static com.liferay.portal.model.RegionSoap[] getRegions(
+		long countryId, boolean active) throws RemoteException {
 		try {
-			com.liferay.portal.model.Region returnValue = RegionServiceUtil.getRegion(regionId);
+			java.util.List<com.liferay.portal.model.Region> returnValue = RegionServiceUtil.getRegions(countryId,
+					active);
 
-			return com.liferay.portal.model.RegionSoap.toSoapModel(returnValue);
+			return com.liferay.portal.model.RegionSoap.toSoapModels(returnValue);
 		}
 		catch (Exception e) {
 			_log.error(e, e);

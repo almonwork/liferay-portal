@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -24,9 +24,10 @@ public class AssertConfigurePortletDisplayStyle2Test extends BaseTestCase {
 	public void testAssertConfigurePortletDisplayStyle2()
 		throws Exception {
 		selenium.open("/web/guest/home/");
+		loadRequiredJavaScriptModules();
 
 		for (int second = 0;; second++) {
-			if (second >= 60) {
+			if (second >= 90) {
 				fail("timeout");
 			}
 
@@ -41,13 +42,14 @@ public class AssertConfigurePortletDisplayStyle2Test extends BaseTestCase {
 			Thread.sleep(1000);
 		}
 
-		selenium.saveScreenShotAndSource();
 		selenium.click(RuntimeVariables.replace("link=Breadcrumb Test Page"));
 		selenium.waitForPageToLoad("30000");
-		selenium.saveScreenShotAndSource();
+		loadRequiredJavaScriptModules();
 		assertEquals(RuntimeVariables.replace("Liferay"),
-			selenium.getText("//div[@class='portlet-body']/li/span/a"));
+			selenium.getText(
+				"//div/ul[@class='breadcrumbs breadcrumbs-vertical lfr-component']/li[1]/span/a"));
 		assertEquals(RuntimeVariables.replace("Breadcrumb Test Page"),
-			selenium.getText("//div[@class='portlet-body']/div"));
+			selenium.getText(
+				"//div/ul[@class='breadcrumbs breadcrumbs-vertical lfr-component']/li[2]/span/a"));
 	}
 }

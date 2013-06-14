@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,7 +14,8 @@
 
 package com.liferay.portalweb.portal.dbupgrade.sampledatalatest.blogs.pagescope;
 
-import com.liferay.portalweb.portal.BaseTests;
+import com.liferay.portalweb.portal.BaseTestSuite;
+import com.liferay.portalweb.portal.controlpanel.users.user.signin.SignOutTest;
 
 import junit.framework.Test;
 import junit.framework.TestSuite;
@@ -22,11 +23,9 @@ import junit.framework.TestSuite;
 /**
  * @author Brian Wing Shun Chan
  */
-public class PageScopeTests extends BaseTests {
-
+public class PageScopeTests extends BaseTestSuite {
 	public static Test suite() {
 		TestSuite testSuite = new TestSuite();
-
 		testSuite.addTestSuite(AddCustomSiteBlogsPageScopeTest.class);
 		testSuite.addTestSuite(AddPage1BlogsPageScopeTest.class);
 		testSuite.addTestSuite(AddPage1PortletBlogsPageScopeTest.class);
@@ -35,10 +34,8 @@ public class PageScopeTests extends BaseTests {
 		testSuite.addTestSuite(AddPage3BlogsPageScopeTest.class);
 		testSuite.addTestSuite(AddPage3PortletBlogsPageScopeTest.class);
 		testSuite.addTestSuite(ConfigurePortlet1BlogsScopeDefaultTest.class);
-		testSuite.addTestSuite(
-			ConfigurePortlet2BlogsScopeLayoutCurrentPageTest.class);
-		testSuite.addTestSuite(
-			ConfigurePortlet3BlogsScopeLayoutPage2Test.class);
+		testSuite.addTestSuite(ConfigurePortlet2BlogsScopeLayoutCurrentPageTest.class);
+		testSuite.addTestSuite(ConfigurePortlet3BlogsScopeLayoutPage2Test.class);
 		testSuite.addTestSuite(AddPage1BlogsEntry1Test.class);
 		testSuite.addTestSuite(AddPage1BlogsEntry1Comment1Test.class);
 		testSuite.addTestSuite(AddPage1BlogsEntry1Comment2Test.class);
@@ -53,10 +50,8 @@ public class PageScopeTests extends BaseTests {
 		testSuite.addTestSuite(RatePage2BlogsEntry2Comment2Test.class);
 		testSuite.addTestSuite(AddPage2BlogsEntry3Test.class);
 		testSuite.addTestSuite(AddPage2BlogsEntry4Test.class);
-		testSuite.addTestSuite(
-			ConfigurePortlet2MaximumItemsToDisplay1Test.class);
-		testSuite.addTestSuite(
-			PermissionsPage2BlogsEntry4GuestViewOffTest.class);
+		testSuite.addTestSuite(ConfigurePortlet2MaximumItemsToDisplay1Test.class);
+		testSuite.addTestSuite(PermissionsPage2BlogsEntry4GuestViewOffTest.class);
 		testSuite.addTestSuite(ViewPage1BlogsEntry1Test.class);
 		testSuite.addTestSuite(ViewPage1BlogsEntry1Comment1Test.class);
 		testSuite.addTestSuite(ViewPage1BlogsEntry1Comment2Test.class);
@@ -71,18 +66,15 @@ public class PageScopeTests extends BaseTests {
 		testSuite.addTestSuite(ViewRatePage2BlogsEntry2Comment2Test.class);
 		testSuite.addTestSuite(ViewPage2BlogsEntry3Test.class);
 		testSuite.addTestSuite(ViewPage2BlogsEntry4Test.class);
-		testSuite.addTestSuite(
-			ViewConfigurePortlet2MaximumItemsToDisplay1Test.class);
+		testSuite.addTestSuite(ViewConfigurePortlet2MaximumItemsToDisplay1Test.class);
 		testSuite.addTestSuite(SignOutTest.class);
 		testSuite.addTestSuite(Guest_ViewPage1BlogsEntry1Test.class);
 		testSuite.addTestSuite(Guest_ViewPage2BlogsEntry2Test.class);
 		testSuite.addTestSuite(Guest_ViewPage2BlogsEntry3Test.class);
 		testSuite.addTestSuite(Guest_ViewPage2BlogsEntry4Test.class);
-		testSuite.addTestSuite(
-			Guest_ViewPortlet2MaximumItemsToDisplay1Test.class);
+		testSuite.addTestSuite(Guest_ViewConfigurePortlet2MaximumItemsToDisplay1Test.class);
 		testSuite.addTestSuite(SignInTest.class);
 
 		return testSuite;
 	}
-
 }

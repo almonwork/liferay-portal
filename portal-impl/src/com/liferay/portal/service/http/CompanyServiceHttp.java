@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -506,8 +506,9 @@ public class CompanyServiceHttp {
 		}
 	}
 
-	public static void updateLogo(HttpPrincipal httpPrincipal, long companyId,
-		java.io.File file)
+	public static com.liferay.portal.model.Company updateLogo(
+		HttpPrincipal httpPrincipal, long companyId,
+		java.io.InputStream inputStream)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException {
 		try {
@@ -515,10 +516,12 @@ public class CompanyServiceHttp {
 					"updateLogo", _updateLogoParameterTypes12);
 
 			MethodHandler methodHandler = new MethodHandler(methodKey,
-					companyId, file);
+					companyId, inputStream);
+
+			Object returnObj = null;
 
 			try {
-				TunnelUtil.invoke(httpPrincipal, methodHandler);
+				returnObj = TunnelUtil.invoke(httpPrincipal, methodHandler);
 			}
 			catch (Exception e) {
 				if (e instanceof com.liferay.portal.kernel.exception.PortalException) {
@@ -531,6 +534,8 @@ public class CompanyServiceHttp {
 
 				throw new com.liferay.portal.kernel.exception.SystemException(e);
 			}
+
+			return (com.liferay.portal.model.Company)returnObj;
 		}
 		catch (com.liferay.portal.kernel.exception.SystemException se) {
 			_log.error(se, se);
@@ -663,7 +668,7 @@ public class CompanyServiceHttp {
 			long.class, java.lang.String.class, java.lang.String.class
 		};
 	private static final Class<?>[] _updateLogoParameterTypes12 = new Class[] {
-			long.class, java.io.File.class
+			long.class, java.io.InputStream.class
 		};
 	private static final Class<?>[] _updatePreferencesParameterTypes13 = new Class[] {
 			long.class, com.liferay.portal.kernel.util.UnicodeProperties.class

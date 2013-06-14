@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -25,16 +25,20 @@ import com.liferay.portal.kernel.repository.model.Folder;
 import com.liferay.portal.kernel.util.ContentTypes;
 import com.liferay.portal.kernel.util.FileUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.MimeTypesUtil;
 import com.liferay.portal.kernel.util.StringPool;
+import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.model.Lock;
 import com.liferay.portal.model.User;
 import com.liferay.portal.repository.cmis.CMISRepository;
+import com.liferay.portal.security.auth.PrincipalThreadLocal;
 import com.liferay.portal.security.permission.PermissionChecker;
 import com.liferay.portal.service.CMISRepositoryLocalServiceUtil;
 import com.liferay.portal.service.persistence.LockUtil;
+import com.liferay.portlet.documentlibrary.NoSuchFileEntryException;
 import com.liferay.portlet.documentlibrary.NoSuchFileVersionException;
 import com.liferay.portlet.documentlibrary.model.DLFileEntry;
-import com.liferay.portlet.documentlibrary.model.DLFileEntryConstants;
+import com.liferay.portlet.documentlibrary.service.DLAppHelperLocalServiceUtil;
 import com.liferay.portlet.documentlibrary.util.DLUtil;
 
 import java.io.InputStream;
@@ -49,8 +53,10 @@ import java.util.Set;
 
 import org.apache.chemistry.opencmis.client.api.Document;
 import org.apache.chemistry.opencmis.commons.data.AllowableActions;
+import org.apache.chemistry.opencmis.commons.data.CmisExtensionElement;
 import org.apache.chemistry.opencmis.commons.data.ContentStream;
 import org.apache.chemistry.opencmis.commons.enums.Action;
+import org.apache.chemistry.opencmis.commons.exceptions.CmisObjectNotFoundException;
 
 /**
  * @author Alexander Chow
@@ -86,15 +92,33 @@ public class CMISFileEntry extends CMISModel implements FileEntry {
 	public InputStream getContentStream() {
 		ContentStream contentStream = _document.getContentStream();
 
+		try {
+			DLAppHelperLocalServiceUtil.getFileAsStream(
+				PrincipalThreadLocal.getUserId(), this, true);
+		}
+		catch (Exception e) {
+			_log.error(e, e);
+		}
+
 		return contentStream.getStream();
 	}
 
-	public InputStream getContentStream(String version)
-		throws PortalException {
+	public InputStream getContentStream(String version) throws PortalException {
+		if (Validator.isNull(version)) {
+			return getContentStream();
+		}
 
-		for (Document document : _document.getAllVersions()) {
+		for (Document document : getAllVersions()) {
 			if (version.equals(document.getVersionLabel())) {
 				ContentStream contentStream = document.getContentStream();
+
+				try {
+					DLAppHelperLocalServiceUtil.getFileAsStream(
+						PrincipalThreadLocal.getUserId(), this, true);
+				}
+				catch (Exception e) {
+					_log.error(e, e);
+				}
 
 				return contentStream.getStream();
 			}
@@ -120,14 +144,17 @@ public class CMISFileEntry extends CMISModel implements FileEntry {
 	public FileVersion getFileVersion()
 		throws PortalException, SystemException {
 
-		return CMISRepositoryLocalServiceUtil.toFileVersion(
-			getRepositoryId(), _document);
+		return getLatestFileVersion();
 	}
 
 	public FileVersion getFileVersion(String version)
 		throws PortalException, SystemException {
 
-		for (Document document : _document.getAllVersions()) {
+		if (Validator.isNull(version)) {
+			return getFileVersion();
+		}
+
+		for (Document document : getAllVersions()) {
 			if (version.equals(document.getVersionLabel())) {
 				return CMISRepositoryLocalServiceUtil.toFileVersion(
 					getRepositoryId(), document);
@@ -142,12 +169,12 @@ public class CMISFileEntry extends CMISModel implements FileEntry {
 	public List<FileVersion> getFileVersions(int status)
 		throws SystemException {
 
-		List<Document> documents = _document.getAllVersions();
-
-		List<FileVersion> fileVersions = new ArrayList<FileVersion>(
-			documents.size());
-
 		try {
+			List<Document> documents = getAllVersions();
+
+			List<FileVersion> fileVersions = new ArrayList<FileVersion>(
+				documents.size());
+
 			for (Document document : documents) {
 				FileVersion fileVersion =
 					CMISRepositoryLocalServiceUtil.toFileVersion(
@@ -155,12 +182,12 @@ public class CMISFileEntry extends CMISModel implements FileEntry {
 
 				fileVersions.add(fileVersion);
 			}
+
+			return fileVersions;
 		}
 		catch (PortalException pe) {
 			throw new RepositoryException(pe);
 		}
-
-		return fileVersions;
 	}
 
 	public Folder getFolder() {
@@ -177,8 +204,17 @@ public class CMISFileEntry extends CMISModel implements FileEntry {
 		}
 
 		try {
+			List<org.apache.chemistry.opencmis.client.api.Folder>
+				cmisParentFolders = _document.getParents();
+
+			if (cmisParentFolders.isEmpty()) {
+				_document = _document.getObjectOfLatestVersion(false);
+
+				cmisParentFolders = _document.getParents();
+			}
+
 			parentFolder = CMISRepositoryLocalServiceUtil.toFolder(
-				getRepositoryId(), _document.getParents().get(0));
+				getRepositoryId(), cmisParentFolders.get(0));
 
 			setParentFolder(parentFolder);
 		}
@@ -206,23 +242,21 @@ public class CMISFileEntry extends CMISModel implements FileEntry {
 	public FileVersion getLatestFileVersion()
 		throws PortalException, SystemException {
 
-		if (_latestFileVersion == null) {
-			Document latestDocumentVersion = null;
+		if (_latestFileVersion != null) {
+			return _latestFileVersion;
+		}
 
-			CMISRepository cmisRepository = getCmisRepository();
+		List<Document> documents = getAllVersions();
 
-			if (cmisRepository.isDocumentRetrievableByVersionSeriesId()) {
-				latestDocumentVersion = _document.getObjectOfLatestVersion(
-					false);
-			}
-			else {
-				List<Document> documentVersions = _document.getAllVersions();
-
-				latestDocumentVersion = documentVersions.get(0);
-			}
+		if (!documents.isEmpty()) {
+			Document latestDocumentVersion = documents.get(0);
 
 			_latestFileVersion = CMISRepositoryLocalServiceUtil.toFileVersion(
 				getRepositoryId(), latestDocumentVersion);
+		}
+		else {
+			_latestFileVersion = CMISRepositoryLocalServiceUtil.toFileVersion(
+				getRepositoryId(), _document);
 		}
 
 		return _latestFileVersion;
@@ -252,14 +286,37 @@ public class CMISFileEntry extends CMISModel implements FileEntry {
 	}
 
 	public String getMimeType() {
-		return _document.getContentStreamMimeType();
+		String mimeType = _document.getContentStreamMimeType();
+
+		if (Validator.isNotNull(mimeType)) {
+			return mimeType;
+		}
+
+		return MimeTypesUtil.getContentType(getTitle());
 	}
 
 	public String getMimeType(String version) {
-		for (Document document : _document.getAllVersions()) {
-			if (version.equals(document.getVersionLabel())) {
-				return document.getContentStreamMimeType();
+		if (Validator.isNull(version)) {
+			return getMimeType();
+		}
+
+		try {
+			for (Document document : getAllVersions()) {
+				if (!version.equals(document.getVersionLabel())) {
+					continue;
+				}
+
+				String mimeType = document.getContentStreamMimeType();
+
+				if (Validator.isNotNull(mimeType)) {
+					return mimeType;
+				}
+
+				return MimeTypesUtil.getContentType(document.getName());
 			}
+		}
+		catch (PortalException pe) {
+			_log.error(pe, pe);
 		}
 
 		return ContentTypes.APPLICATION_OCTET_STREAM;
@@ -346,8 +403,7 @@ public class CMISFileEntry extends CMISModel implements FileEntry {
 	}
 
 	public String getVersion() {
-		return GetterUtil.get(
-			_document.getVersionLabel(), DLFileEntryConstants.DEFAULT_VERSION);
+		return GetterUtil.getString(_document.getVersionLabel(), null);
 	}
 
 	public long getVersionUserId() {
@@ -367,12 +423,29 @@ public class CMISFileEntry extends CMISModel implements FileEntry {
 			return false;
 		}
 
- 		AllowableActions allowableActions = _document.getAllowableActions();
+		AllowableActions allowableActions = _document.getAllowableActions();
 
 		Set<Action> allowableActionsSet =
 			allowableActions.getAllowableActions();
 
-		return allowableActionsSet.contains(Action.CAN_CHECK_IN);
+		if (allowableActionsSet.contains(Action.CAN_CHECK_IN)) {
+			return true;
+		}
+
+		List<CmisExtensionElement> cmisExtensionElements =
+			allowableActions.getExtensions();
+
+		for (CmisExtensionElement cmisExtensionElement :
+				cmisExtensionElements) {
+
+			String name = cmisExtensionElement.getName();
+
+			if (name.equals("canCheckInSpecified")) {
+				return GetterUtil.getBoolean(cmisExtensionElement.getValue());
+			}
+		}
+
+		return false;
 	}
 
 	public boolean isCheckedOut() {
@@ -438,6 +511,21 @@ public class CMISFileEntry extends CMISModel implements FileEntry {
 		return this;
 	}
 
+	protected List<Document> getAllVersions() throws PortalException {
+		if (_allVersions == null) {
+			try {
+				_document.refresh();
+
+				_allVersions = _document.getAllVersions();
+			}
+			catch (CmisObjectNotFoundException confe) {
+				throw new NoSuchFileEntryException(confe);
+			}
+		}
+
+		return _allVersions;
+	}
+
 	@Override
 	protected CMISRepository getCmisRepository() {
 		return _cmisRepository;
@@ -445,6 +533,7 @@ public class CMISFileEntry extends CMISModel implements FileEntry {
 
 	private static Log _log = LogFactoryUtil.getLog(CMISFileEntry.class);
 
+	private List<Document> _allVersions;
 	private CMISRepository _cmisRepository;
 	private Document _document;
 	private long _fileEntryId;

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -269,7 +269,9 @@ public class Validator {
 	public static boolean isChar(char c) {
 		int x = c;
 
-		if ((x >= _CHAR_BEGIN) && (x <= _CHAR_END)) {
+		if (((x >= _CHAR_LOWER_CASE_BEGIN) && (x <= _CHAR_LOWER_CASE_END)) ||
+			((x >= _CHAR_UPPER_CASE_BEGIN) && (x <= _CHAR_UPPER_CASE_END))) {
+
 			return true;
 		}
 
@@ -303,6 +305,7 @@ public class Validator {
 	 *
 	 * @param  month the month to check
 	 * @param  day the day to check
+	 * @param  year the year to check
 	 * @return <code>true</code> if the date is valid in the Gregorian calendar;
 	 *         <code>false</code> otherwise
 	 */
@@ -372,6 +375,18 @@ public class Validator {
 			return false;
 		}
 
+		if (domainName.startsWith(StringPool.PERIOD) ||
+			domainName.endsWith(StringPool.PERIOD)) {
+
+			return false;
+		}
+
+		if (!domainName.contains(StringPool.PERIOD) &&
+			!domainName.equals(_LOCALHOST)) {
+
+			return false;
+		}
+
 		String[] domainNameArray = StringUtil.split(
 			domainName, CharPool.PERIOD);
 
@@ -384,14 +399,14 @@ public class Validator {
 				if ((i == 0) && (c == CharPool.DASH)) {
 					return false;
 				}
-				else if ((i == (domainNamePartCharArray.length - 1)) &&
-						 (c == CharPool.DASH)) {
+
+				if ((i == (domainNamePartCharArray.length - 1)) &&
+					(c == CharPool.DASH)) {
 
 					return false;
 				}
-				else if ((!isChar(c)) && (!isDigit(c)) &&
-						 (c != CharPool.DASH)) {
 
+				if (!isChar(c) && !isDigit(c) && (c != CharPool.DASH)) {
 					return false;
 				}
 			}
@@ -483,6 +498,38 @@ public class Validator {
 	public static boolean isHex(String s) {
 		if (isNull(s)) {
 			return false;
+		}
+
+		return true;
+	}
+
+	/**
+	 * Returns <code>true</code> if the string is a valid host name.
+	 *
+	 * @param  name the string to check
+	 * @return <code>true</code> if the string is a valid host name;
+	 *         <code>false</code> otherwise
+	 */
+	public static boolean isHostName(String name) {
+		if (isNull(name)) {
+			return false;
+		}
+
+		char[] nameCharArray = name.toCharArray();
+
+		if ((nameCharArray[0] == CharPool.DASH) ||
+			(nameCharArray[0] == CharPool.PERIOD) ||
+			(nameCharArray[nameCharArray.length - 1] == CharPool.DASH)) {
+
+			return false;
+		}
+
+		for (char c : nameCharArray) {
+			if (!isChar(c) && !isDigit(c) && (c != CharPool.DASH) &&
+				(c != CharPool.PERIOD)) {
+
+				return false;
+			}
 		}
 
 		return true;
@@ -812,6 +859,7 @@ public class Validator {
 	 * is at least four characters long and contains only letters and decimal
 	 * digits.
 	 *
+	 * @param  password the password to check
 	 * @return <code>true</code> if the string is a valid password;
 	 *         <code>false</code> otherwise
 	 */
@@ -951,9 +999,13 @@ public class Validator {
 		}
 	}
 
-	private static final int _CHAR_BEGIN = 65;
+	private static final int _CHAR_LOWER_CASE_BEGIN = 97;
 
-	private static final int _CHAR_END = 122;
+	private static final int _CHAR_LOWER_CASE_END = 122;
+
+	private static final int _CHAR_UPPER_CASE_BEGIN = 65;
+
+	private static final int _CHAR_UPPER_CASE_END = 90;
 
 	private static final int _DIGIT_BEGIN = 48;
 
@@ -963,6 +1015,8 @@ public class Validator {
 		'.', '!', '#', '$', '%', '&', '\'', '*', '+', '-', '/', '=', '?', '^',
 		'_', '`', '{', '|', '}', '~'
 	};
+
+	private static final String _LOCALHOST = "localhost";
 
 	private static final String _VARIABLE_TERM_BEGIN = "[$";
 

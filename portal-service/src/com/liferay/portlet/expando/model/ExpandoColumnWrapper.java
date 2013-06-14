@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,6 +14,11 @@
 
 package com.liferay.portlet.expando.model;
 
+import com.liferay.portal.model.ModelWrapper;
+
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * <p>
  * This class is a wrapper for {@link ExpandoColumn}.
@@ -23,7 +28,8 @@ package com.liferay.portlet.expando.model;
  * @see       ExpandoColumn
  * @generated
  */
-public class ExpandoColumnWrapper implements ExpandoColumn {
+public class ExpandoColumnWrapper implements ExpandoColumn,
+	ModelWrapper<ExpandoColumn> {
 	public ExpandoColumnWrapper(ExpandoColumn expandoColumn) {
 		_expandoColumn = expandoColumn;
 	}
@@ -34,6 +40,64 @@ public class ExpandoColumnWrapper implements ExpandoColumn {
 
 	public String getModelClassName() {
 		return ExpandoColumn.class.getName();
+	}
+
+	public Map<String, Object> getModelAttributes() {
+		Map<String, Object> attributes = new HashMap<String, Object>();
+
+		attributes.put("columnId", getColumnId());
+		attributes.put("companyId", getCompanyId());
+		attributes.put("tableId", getTableId());
+		attributes.put("name", getName());
+		attributes.put("type", getType());
+		attributes.put("defaultData", getDefaultData());
+		attributes.put("typeSettings", getTypeSettings());
+
+		return attributes;
+	}
+
+	public void setModelAttributes(Map<String, Object> attributes) {
+		Long columnId = (Long)attributes.get("columnId");
+
+		if (columnId != null) {
+			setColumnId(columnId);
+		}
+
+		Long companyId = (Long)attributes.get("companyId");
+
+		if (companyId != null) {
+			setCompanyId(companyId);
+		}
+
+		Long tableId = (Long)attributes.get("tableId");
+
+		if (tableId != null) {
+			setTableId(tableId);
+		}
+
+		String name = (String)attributes.get("name");
+
+		if (name != null) {
+			setName(name);
+		}
+
+		Integer type = (Integer)attributes.get("type");
+
+		if (type != null) {
+			setType(type);
+		}
+
+		String defaultData = (String)attributes.get("defaultData");
+
+		if (defaultData != null) {
+			setDefaultData(defaultData);
+		}
+
+		String typeSettings = (String)attributes.get("typeSettings");
+
+		if (typeSettings != null) {
+			setTypeSettings(typeSettings);
+		}
 	}
 
 	/**
@@ -200,10 +264,6 @@ public class ExpandoColumnWrapper implements ExpandoColumn {
 		return _expandoColumn.isEscapedModel();
 	}
 
-	public void setEscapedModel(boolean escapedModel) {
-		_expandoColumn.setEscapedModel(escapedModel);
-	}
-
 	public java.io.Serializable getPrimaryKeyObj() {
 		return _expandoColumn.getPrimaryKeyObj();
 	}
@@ -275,7 +335,14 @@ public class ExpandoColumnWrapper implements ExpandoColumn {
 		_expandoColumn.setTypeSettingsProperties(typeSettingsProperties);
 	}
 
+	/**
+	 * @deprecated Renamed to {@link #getWrappedModel}
+	 */
 	public ExpandoColumn getWrappedExpandoColumn() {
+		return _expandoColumn;
+	}
+
+	public ExpandoColumn getWrappedModel() {
 		return _expandoColumn;
 	}
 

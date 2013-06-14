@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -19,6 +19,7 @@ import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.transaction.Isolation;
 import com.liferay.portal.kernel.transaction.Propagation;
 import com.liferay.portal.kernel.transaction.Transactional;
+import com.liferay.portal.service.BaseLocalService;
 import com.liferay.portal.service.PersistedModelLocalService;
 
 /**
@@ -36,8 +37,8 @@ import com.liferay.portal.service.PersistedModelLocalService;
  */
 @Transactional(isolation = Isolation.PORTAL, rollbackFor =  {
 	PortalException.class, SystemException.class})
-public interface ShoppingItemFieldLocalService
-	extends PersistedModelLocalService {
+public interface ShoppingItemFieldLocalService extends BaseLocalService,
+	PersistedModelLocalService {
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
@@ -68,10 +69,12 @@ public interface ShoppingItemFieldLocalService
 	* Deletes the shopping item field with the primary key from the database. Also notifies the appropriate model listeners.
 	*
 	* @param itemFieldId the primary key of the shopping item field
+	* @return the shopping item field that was removed
 	* @throws PortalException if a shopping item field with the primary key could not be found
 	* @throws SystemException if a system exception occurred
 	*/
-	public void deleteShoppingItemField(long itemFieldId)
+	public com.liferay.portlet.shopping.model.ShoppingItemField deleteShoppingItemField(
+		long itemFieldId)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException;
 
@@ -79,11 +82,14 @@ public interface ShoppingItemFieldLocalService
 	* Deletes the shopping item field from the database. Also notifies the appropriate model listeners.
 	*
 	* @param shoppingItemField the shopping item field
+	* @return the shopping item field that was removed
 	* @throws SystemException if a system exception occurred
 	*/
-	public void deleteShoppingItemField(
+	public com.liferay.portlet.shopping.model.ShoppingItemField deleteShoppingItemField(
 		com.liferay.portlet.shopping.model.ShoppingItemField shoppingItemField)
 		throws com.liferay.portal.kernel.exception.SystemException;
+
+	public com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery();
 
 	/**
 	* Performs a dynamic query on the database and returns the matching rows.
@@ -145,6 +151,11 @@ public interface ShoppingItemFieldLocalService
 	*/
 	public long dynamicQueryCount(
 		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery)
+		throws com.liferay.portal.kernel.exception.SystemException;
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public com.liferay.portlet.shopping.model.ShoppingItemField fetchShoppingItemField(
+		long itemFieldId)
 		throws com.liferay.portal.kernel.exception.SystemException;
 
 	/**

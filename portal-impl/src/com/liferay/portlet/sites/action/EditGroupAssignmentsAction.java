@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -24,6 +24,8 @@ import com.liferay.portal.liveusers.LiveUsers;
 import com.liferay.portal.model.User;
 import com.liferay.portal.security.auth.PrincipalException;
 import com.liferay.portal.service.OrganizationServiceUtil;
+import com.liferay.portal.service.ServiceContext;
+import com.liferay.portal.service.ServiceContextFactory;
 import com.liferay.portal.service.UserGroupGroupRoleServiceUtil;
 import com.liferay.portal.service.UserGroupRoleServiceUtil;
 import com.liferay.portal.service.UserGroupServiceUtil;
@@ -88,7 +90,7 @@ public class EditGroupAssignmentsAction extends PortletAction {
 			if (e instanceof NoSuchGroupException ||
 				e instanceof PrincipalException) {
 
-				SessionErrors.add(actionRequest, e.getClass().getName());
+				SessionErrors.add(actionRequest, e.getClass());
 
 				setForward(actionRequest, "portlet.sites_admin.error");
 			}
@@ -111,7 +113,7 @@ public class EditGroupAssignmentsAction extends PortletAction {
 			if (e instanceof NoSuchGroupException ||
 				e instanceof PrincipalException) {
 
-				SessionErrors.add(renderRequest, e.getClass().getName());
+				SessionErrors.add(renderRequest, e.getClass());
 
 				return mapping.findForward("portlet.sites_admin.error");
 			}
@@ -120,8 +122,9 @@ public class EditGroupAssignmentsAction extends PortletAction {
 			}
 		}
 
-		return mapping.findForward(getForward(renderRequest,
-			"portlet.sites_admin.edit_site_assignments"));
+		return mapping.findForward(
+			getForward(
+				renderRequest, "portlet.sites_admin.edit_site_assignments"));
 	}
 
 	protected void updateGroupOrganizations(ActionRequest actionRequest)
@@ -167,8 +170,11 @@ public class EditGroupAssignmentsAction extends PortletAction {
 		long[] removeUserIds = StringUtil.split(
 			ParamUtil.getString(actionRequest, "removeUserIds"), 0L);
 
-		UserServiceUtil.addGroupUsers(groupId, addUserIds);
-		UserServiceUtil.unsetGroupUsers(groupId, removeUserIds);
+		ServiceContext serviceContext = ServiceContextFactory.getInstance(
+			actionRequest);
+
+		UserServiceUtil.addGroupUsers(groupId, addUserIds, serviceContext);
+		UserServiceUtil.unsetGroupUsers(groupId, removeUserIds, serviceContext);
 
 		LiveUsers.joinGroup(themeDisplay.getCompanyId(), groupId, addUserIds);
 		LiveUsers.leaveGroup(

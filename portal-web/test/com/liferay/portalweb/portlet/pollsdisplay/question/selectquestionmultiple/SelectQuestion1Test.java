@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -23,14 +23,15 @@ import com.liferay.portalweb.portal.util.RuntimeVariables;
 public class SelectQuestion1Test extends BaseTestCase {
 	public void testSelectQuestion1() throws Exception {
 		selenium.open("/web/guest/home/");
+		loadRequiredJavaScriptModules();
 
 		for (int second = 0;; second++) {
-			if (second >= 60) {
+			if (second >= 90) {
 				fail("timeout");
 			}
 
 			try {
-				if (selenium.isElementPresent("link=Polls Display Test Page")) {
+				if (selenium.isVisible("link=Polls Display Test Page")) {
 					break;
 				}
 			}
@@ -40,15 +41,17 @@ public class SelectQuestion1Test extends BaseTestCase {
 			Thread.sleep(1000);
 		}
 
-		selenium.saveScreenShotAndSource();
 		selenium.clickAt("link=Polls Display Test Page",
-			RuntimeVariables.replace(""));
+			RuntimeVariables.replace("Polls Display Test Page"));
 		selenium.waitForPageToLoad("30000");
-		selenium.saveScreenShotAndSource();
+		loadRequiredJavaScriptModules();
+		Thread.sleep(5000);
+		assertEquals(RuntimeVariables.replace("Options"),
+			selenium.getText("//strong/a"));
 		selenium.clickAt("//strong/a", RuntimeVariables.replace("Options"));
 
 		for (int second = 0;; second++) {
-			if (second >= 60) {
+			if (second >= 90) {
 				fail("timeout");
 			}
 
@@ -64,19 +67,19 @@ public class SelectQuestion1Test extends BaseTestCase {
 			Thread.sleep(1000);
 		}
 
-		selenium.saveScreenShotAndSource();
 		assertEquals(RuntimeVariables.replace("Configuration"),
 			selenium.getText(
 				"//div[@class='lfr-component lfr-menu-list']/ul/li[2]/a"));
-		selenium.click("//div[@class='lfr-component lfr-menu-list']/ul/li[2]/a");
+		selenium.clickAt("//div[@class='lfr-component lfr-menu-list']/ul/li[2]/a",
+			RuntimeVariables.replace("Configuration"));
 
 		for (int second = 0;; second++) {
-			if (second >= 60) {
+			if (second >= 90) {
 				fail("timeout");
 			}
 
 			try {
-				if (selenium.isVisible("_86_questionId")) {
+				if (selenium.isVisible("//select[@id='_86_questionId']")) {
 					break;
 				}
 			}
@@ -86,26 +89,27 @@ public class SelectQuestion1Test extends BaseTestCase {
 			Thread.sleep(1000);
 		}
 
-		selenium.saveScreenShotAndSource();
-		selenium.select("_86_questionId",
-			RuntimeVariables.replace("label=Test1 Poll1 Question1"));
-		selenium.clickAt("//input[@value='Save']", RuntimeVariables.replace(""));
+		selenium.select("//select[@id='_86_questionId']",
+			RuntimeVariables.replace("PD Question1 Title"));
+		selenium.clickAt("//input[@value='Save']",
+			RuntimeVariables.replace("Save"));
 		selenium.waitForPageToLoad("30000");
-		selenium.saveScreenShotAndSource();
+		loadRequiredJavaScriptModules();
 		assertEquals(RuntimeVariables.replace(
 				"You have successfully updated the setup."),
 			selenium.getText("//div[@class='portlet-msg-success']"));
-		assertEquals("Test1 Poll1 Question1",
-			selenium.getSelectedLabel("_86_questionId"));
+		assertEquals("PD Question1 Title",
+			selenium.getSelectedLabel("//select[@id='_86_questionId']"));
 		selenium.open("/web/guest/home/");
+		loadRequiredJavaScriptModules();
 
 		for (int second = 0;; second++) {
-			if (second >= 60) {
+			if (second >= 90) {
 				fail("timeout");
 			}
 
 			try {
-				if (selenium.isElementPresent("link=Polls Display Test Page")) {
+				if (selenium.isVisible("link=Polls Display Test Page")) {
 					break;
 				}
 			}
@@ -115,19 +119,18 @@ public class SelectQuestion1Test extends BaseTestCase {
 			Thread.sleep(1000);
 		}
 
-		selenium.saveScreenShotAndSource();
 		selenium.clickAt("link=Polls Display Test Page",
-			RuntimeVariables.replace(""));
+			RuntimeVariables.replace("Polls Display Test Page"));
 		selenium.waitForPageToLoad("30000");
-		selenium.saveScreenShotAndSource();
-		assertTrue(selenium.isElementPresent("//span[1]/span/span/input"));
-		assertTrue(selenium.isElementPresent("//span[2]/span/span/input"));
-		assertTrue(selenium.isElementPresent("//span[3]/span/span/input"));
-		assertEquals(RuntimeVariables.replace("a. Test1 Choice1 A1"),
-			selenium.getText("//span[1]/span/label"));
-		assertEquals(RuntimeVariables.replace("b. Test1 Choice1 B1"),
-			selenium.getText("//span[2]/span/label"));
-		assertEquals(RuntimeVariables.replace("c. Test1 Choice1 C1"),
-			selenium.getText("//span[3]/span/label"));
+		loadRequiredJavaScriptModules();
+		assertTrue(selenium.isElementPresent("//div/span[1]/span/span/input"));
+		assertTrue(selenium.isElementPresent("//div/span[2]/span/span/input"));
+		assertTrue(selenium.isElementPresent("//div/span[3]/span/span/input"));
+		assertEquals(RuntimeVariables.replace("a. PD Question1 ChoiceA"),
+			selenium.getText("//div/span[1]/span/label"));
+		assertEquals(RuntimeVariables.replace("b. PD Question1 ChoiceB"),
+			selenium.getText("//div/span[2]/span/label"));
+		assertEquals(RuntimeVariables.replace("c. PD Question1 ChoiceC"),
+			selenium.getText("//div/span[3]/span/label"));
 	}
 }

@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -17,8 +17,6 @@
 <%@ include file="/html/portlet/message_boards/init.jsp" %>
 
 <%
-themeDisplay.setIncludeServiceJs(true);
-
 MBMessageDisplay messageDisplay = (MBMessageDisplay)request.getAttribute(WebKeys.MESSAGE_BOARDS_MESSAGE);
 
 MBMessage message = messageDisplay.getMessage();
@@ -106,9 +104,12 @@ MBThread thread = messageDisplay.getThread();
 		function(messageId) {
 			var A = AUI();
 
-			Liferay.Service.MB.MBMessageFlag.addAnswerFlag(
+			Liferay.Service(
+				'/mbmessage/update-answer',
 				{
-					messageId: messageId
+					messageId: messageId,
+					answer: true,
+					cascade: false
 				}
 			);
 
@@ -157,9 +158,12 @@ MBThread thread = messageDisplay.getThread();
 		function(messageId) {
 			var A = AUI();
 
-			Liferay.Service.MB.MBMessageFlag.deleteAnswerFlag(
+			Liferay.Service(
+				'/mbmessage/update-answer',
 				{
-					messageId: messageId
+					messageId: messageId,
+					answer: false,
+					cascade: false
 				}
 			);
 
@@ -189,7 +193,7 @@ MBThread thread = messageDisplay.getThread();
 </aui:script>
 
 <%
-MBMessageFlagLocalServiceUtil.addReadFlags(themeDisplay.getUserId(), thread);
+MBThreadFlagLocalServiceUtil.addThreadFlag(themeDisplay.getUserId(), thread);
 
 message = messageDisplay.getMessage();
 

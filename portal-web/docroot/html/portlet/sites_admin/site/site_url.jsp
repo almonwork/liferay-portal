@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -28,6 +28,10 @@ LayoutSet privateLayoutSet = LayoutSetLocalServiceUtil.getLayoutSet(liveGroupId,
 String publicVirtualHost = ParamUtil.getString(request, "publicVirtualHost", BeanParamUtil.getString(publicLayoutSet, request, "virtualHostname"));
 String privateVirtualHost = ParamUtil.getString(request, "privateVirtualHost", BeanParamUtil.getString(privateLayoutSet, request, "virtualHostname"));
 %>
+
+<liferay-ui:error-marker key="errorSection" value="siteUrl" />
+
+<aui:model-context bean="<%= liveGroup %>" model="<%= Group.class %>" />
 
 <liferay-ui:error exception="<%= GroupFriendlyURLException.class %>">
 
@@ -81,16 +85,21 @@ String privateVirtualHost = ParamUtil.getString(request, "privateVirtualHost", B
 <aui:fieldset label="friendly-url">
 	<liferay-ui:message key="enter-the-friendly-url-that-will-be-used-by-both-public-and-private-pages" />
 
-	<liferay-ui:message arguments="<%= new Object[] {publicVirtualHost + themeDisplay.getPathFriendlyURLPublic(), themeDisplay.getPortalURL() + themeDisplay.getPathFriendlyURLPrivateGroup()} %>" key="the-friendly-url-is-appended-to-x-for-public-pages-and-x-for-private-pages" />
+	<liferay-ui:message arguments="<%= new Object[] {themeDisplay.getPortalURL() + themeDisplay.getPathFriendlyURLPublic(), themeDisplay.getPortalURL() + themeDisplay.getPathFriendlyURLPrivateGroup()} %>" key="the-friendly-url-is-appended-to-x-for-public-pages-and-x-for-private-pages" />
 
-	<aui:field-wrapper label="friendly-url">
+	<%
+	String taglibLabel = "site-friendly-url";
 
-		<%
-		String friendlyURL = BeanParamUtil.getString(liveGroup, request, "friendlyURL");
-		%>
+	if (!liveGroup.hasStagingGroup()) {
+		taglibLabel = "<span class=\"aui-helper-hidden-accessible\">" + LanguageUtil.get(pageContext, taglibLabel) + "</span>";
+	}
+	%>
 
-		<input name="<portlet:namespace />friendlyURL" size="30" type="text" value="<%= HtmlUtil.escape(friendlyURL) %>" />
-	</aui:field-wrapper>
+	<aui:input label="<%= taglibLabel %>" name="friendlyURL" />
+
+	<c:if test="<%= liveGroup.hasStagingGroup() %>">
+		<aui:input bean="<%= stagingGroup %>" field="friendlyURL" fieldParam="stagingFriendlyURL" label="staging-friendly-url" model="<%= Group.class %>" name="stagingFriendlyURL" />
+	</c:if>
 </aui:fieldset>
 
 <aui:fieldset label="virtual-hosts">
@@ -98,46 +107,69 @@ String privateVirtualHost = ParamUtil.getString(request, "privateVirtualHost", B
 
 	<liferay-ui:message arguments="<%= new Object[] {HttpUtil.getProtocol(request), themeDisplay.getPortalURL() + themeDisplay.getPathFriendlyURLPublic()} %>" key="for-example,-if-the-public-virtual-host-is-www.helloworld.com-and-the-friendly-url-is-/helloworld" />
 
-	<aui:field-wrapper label="public-pages">
-		<input name="<portlet:namespace />publicVirtualHost" size="50" type="text" value="<%= HtmlUtil.escape(publicVirtualHost) %>" />
-	</aui:field-wrapper>
+	<aui:input label="public-pages" name="publicVirtualHost" type="text" value="<%= publicVirtualHost %>" />
 
-	<aui:field-wrapper label="private-pages">
-		<input name="<portlet:namespace />privateVirtualHost" size="50" type="text" value="<%= HtmlUtil.escape(privateVirtualHost) %>" />
-	</aui:field-wrapper>
+	<aui:input label="private-pages" name="privateVirtualHost" type="text" value="<%= privateVirtualHost %>">
+		<aui:validator errorMessage="please-enter-a-unique-virtual-host" name="custom">
+			function(val, fieldNode, ruleValue) {
+				return (!val || val != A.one('#<portlet:namespace />publicVirtualHost').val());
+			}
+		</aui:validator>
+	</aui:input>
+
+	<c:if test="<%= liveGroup.hasStagingGroup() %>">
+
+		<%
+		LayoutSet stagingPublicLayoutSet = LayoutSetLocalServiceUtil.getLayoutSet(stagingGroupId, false);
+
+		String stagingPublicVirtualHost = ParamUtil.getString(request, "stagingPublicVirtualHost", stagingPublicLayoutSet.getVirtualHostname());
+		%>
+
+		<aui:input label="staging-public-pages" name="stagingPublicVirtualHost" type="text" value="<%= stagingPublicVirtualHost %>" />
+
+		<%
+		LayoutSet stagingPrivateLayoutSet = LayoutSetLocalServiceUtil.getLayoutSet(stagingGroupId, true);
+
+		String stagingPrivateVirtualHost = ParamUtil.getString(request, "stagingPrivateVirtualHost", stagingPrivateLayoutSet.getVirtualHostname());
+		%>
+
+		<aui:input label="staging-private-pages" name="stagingPrivateVirtualHost" type="text" value="<%= stagingPrivateVirtualHost %>">
+			<aui:validator errorMessage="please-enter-a-unique-virtual-host" name="custom">
+				function(val, fieldNode, ruleValue) {
+					return (!val || val != A.one('#<portlet:namespace />stagingPublicVirtualHost').val());
+				}
+			</aui:validator>
+		</aui:input>
+	</c:if>
 </aui:fieldset>
 
-<c:if test="<%= liveGroup.hasStagingGroup() %>">
-	<aui:fieldset label="staging-friendly-url">
-		<aui:field-wrapper label="friendly-url">
+<aui:script use="aui-base">
+	var friendlyURL = A.one('#<portlet:namespace />friendlyURL');
 
-			<%
-			String friendlyURL = ParamUtil.getString(request, "stagingFriendlyURL", stagingGroup.getFriendlyURL());
-			%>
+	friendlyURL.on(
+		['blur', 'change', 'focus'],
+		function(event) {
+			var value = A.Lang.trim(friendlyURL.val());
 
-			<input name="<portlet:namespace />stagingFriendlyURL" size="30" type="text" value="<%= HtmlUtil.escape(friendlyURL) %>" />
-		</aui:field-wrapper>
-	</aui:fieldset>
-	<aui:fieldset label="staging-virtual-hosts">
-		<aui:field-wrapper label="public-pages">
+			if (value == '/') {
+				value = '';
+			}
+			else {
+				value = value.replace(
+					/^[^\/]|\/$/g,
+					function(match, index) {
+						var str = '';
 
-			<%
-			LayoutSet stagingPublicLayoutSet = LayoutSetLocalServiceUtil.getLayoutSet(stagingGroupId, false);
+						if (index == 0) {
+							str = '/' + match
+						}
 
-			String stagingPublicVirtualHost = ParamUtil.getString(request, "stagingPublicVirtualHost", stagingPublicLayoutSet.getVirtualHostname());
-			%>
+						return str;
+					}
+				);
+			}
 
-			<input name="<portlet:namespace />stagingPublicVirtualHost" size="50" type="text" value="<%= HtmlUtil.escape(stagingPublicVirtualHost) %>" />
-		</aui:field-wrapper>
-		<aui:field-wrapper label="private-pages">
-
-			<%
-			LayoutSet stagingPrivateLayoutSet = LayoutSetLocalServiceUtil.getLayoutSet(stagingGroupId, true);
-
-			String stagingPrivateVirtualHost = ParamUtil.getString(request, "stagingPrivateVirtualHost", stagingPrivateLayoutSet.getVirtualHostname());
-			%>
-
-			<input name="<portlet:namespace />stagingPrivateVirtualHost" size="50" type="text" value="<%= HtmlUtil.escape(stagingPrivateVirtualHost) %>" />
-		</aui:field-wrapper>
-	</aui:fieldset>
-</c:if>
+			friendlyURL.val(value);
+		}
+	);
+</aui:script>

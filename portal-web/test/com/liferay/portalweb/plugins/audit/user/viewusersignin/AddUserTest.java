@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -23,9 +23,10 @@ import com.liferay.portalweb.portal.util.RuntimeVariables;
 public class AddUserTest extends BaseTestCase {
 	public void testAddUser() throws Exception {
 		selenium.open("/web/guest/home/");
+		loadRequiredJavaScriptModules();
 
 		for (int second = 0;; second++) {
-			if (second >= 60) {
+			if (second >= 90) {
 				fail("timeout");
 			}
 
@@ -40,41 +41,61 @@ public class AddUserTest extends BaseTestCase {
 			Thread.sleep(1000);
 		}
 
-		selenium.saveScreenShotAndSource();
-		selenium.clickAt("link=Control Panel", RuntimeVariables.replace(""));
+		selenium.clickAt("link=Control Panel",
+			RuntimeVariables.replace("Control Panel"));
 		selenium.waitForPageToLoad("30000");
-		selenium.saveScreenShotAndSource();
-		selenium.clickAt("link=Users", RuntimeVariables.replace(""));
+		loadRequiredJavaScriptModules();
+		selenium.clickAt("link=Users and Organizations",
+			RuntimeVariables.replace("Users and Organizations"));
 		selenium.waitForPageToLoad("30000");
-		selenium.saveScreenShotAndSource();
-		selenium.clickAt("link=Add", RuntimeVariables.replace(""));
+		loadRequiredJavaScriptModules();
+		Thread.sleep(5000);
+		selenium.clickAt("link=Add", RuntimeVariables.replace("Add"));
+
+		for (int second = 0;; second++) {
+			if (second >= 90) {
+				fail("timeout");
+			}
+
+			try {
+				if (selenium.isVisible(
+							"//div[@class='lfr-component lfr-menu-list']/ul/li[1]/a")) {
+					break;
+				}
+			}
+			catch (Exception e) {
+			}
+
+			Thread.sleep(1000);
+		}
+
+		assertEquals(RuntimeVariables.replace("User"),
+			selenium.getText(
+				"//div[@class='lfr-component lfr-menu-list']/ul/li[1]/a"));
+		selenium.click(RuntimeVariables.replace(
+				"//div[@class='lfr-component lfr-menu-list']/ul/li[1]/a"));
 		selenium.waitForPageToLoad("30000");
-		selenium.saveScreenShotAndSource();
+		loadRequiredJavaScriptModules();
 		selenium.select("_125_prefixId", RuntimeVariables.replace("label=Mr."));
 		selenium.type("_125_screenName", RuntimeVariables.replace("selenium01"));
-		selenium.saveScreenShotAndSource();
 		selenium.type("_125_emailAddress",
 			RuntimeVariables.replace("test01@selenium.com"));
-		selenium.saveScreenShotAndSource();
 		selenium.type("_125_firstName", RuntimeVariables.replace("selen01"));
-		selenium.saveScreenShotAndSource();
 		selenium.type("_125_middleName", RuntimeVariables.replace("lenn"));
-		selenium.saveScreenShotAndSource();
 		selenium.type("_125_lastName", RuntimeVariables.replace("nium01"));
-		selenium.saveScreenShotAndSource();
-		selenium.select("_125_suffixId", RuntimeVariables.replace("label=PhD."));
 		selenium.select("_125_birthdayMonth",
 			RuntimeVariables.replace("label=April"));
 		selenium.select("_125_birthdayDay", RuntimeVariables.replace("label=10"));
 		selenium.select("_125_birthdayYear",
 			RuntimeVariables.replace("label=1986"));
 		selenium.select("_125_male", RuntimeVariables.replace("label=Male"));
-		selenium.clickAt("//input[@value='Save']", RuntimeVariables.replace(""));
+		selenium.clickAt("//input[@value='Save']",
+			RuntimeVariables.replace("Save"));
 		selenium.waitForPageToLoad("30000");
-		selenium.saveScreenShotAndSource();
+		loadRequiredJavaScriptModules();
 		assertEquals(RuntimeVariables.replace(
 				"Your request completed successfully."),
-			selenium.getText("//section/div/div/div/div[1]"));
+			selenium.getText("//div[@class='portlet-msg-success']"));
 		assertEquals("selenium01", selenium.getValue("_125_screenName"));
 		assertEquals("test01@selenium.com",
 			selenium.getValue("_125_emailAddress"));

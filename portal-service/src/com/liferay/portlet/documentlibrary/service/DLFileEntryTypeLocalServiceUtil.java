@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -15,7 +15,6 @@
 package com.liferay.portlet.documentlibrary.service;
 
 import com.liferay.portal.kernel.bean.PortalBeanLocatorUtil;
-import com.liferay.portal.kernel.util.MethodCache;
 import com.liferay.portal.kernel.util.ReferenceRegistry;
 
 /**
@@ -66,25 +65,32 @@ public class DLFileEntryTypeLocalServiceUtil {
 	* Deletes the document library file entry type with the primary key from the database. Also notifies the appropriate model listeners.
 	*
 	* @param fileEntryTypeId the primary key of the document library file entry type
+	* @return the document library file entry type that was removed
 	* @throws PortalException if a document library file entry type with the primary key could not be found
 	* @throws SystemException if a system exception occurred
 	*/
-	public static void deleteDLFileEntryType(long fileEntryTypeId)
+	public static com.liferay.portlet.documentlibrary.model.DLFileEntryType deleteDLFileEntryType(
+		long fileEntryTypeId)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException {
-		getService().deleteDLFileEntryType(fileEntryTypeId);
+		return getService().deleteDLFileEntryType(fileEntryTypeId);
 	}
 
 	/**
 	* Deletes the document library file entry type from the database. Also notifies the appropriate model listeners.
 	*
 	* @param dlFileEntryType the document library file entry type
+	* @return the document library file entry type that was removed
 	* @throws SystemException if a system exception occurred
 	*/
-	public static void deleteDLFileEntryType(
+	public static com.liferay.portlet.documentlibrary.model.DLFileEntryType deleteDLFileEntryType(
 		com.liferay.portlet.documentlibrary.model.DLFileEntryType dlFileEntryType)
 		throws com.liferay.portal.kernel.exception.SystemException {
-		getService().deleteDLFileEntryType(dlFileEntryType);
+		return getService().deleteDLFileEntryType(dlFileEntryType);
+	}
+
+	public static com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery() {
+		return getService().dynamicQuery();
 	}
 
 	/**
@@ -158,6 +164,12 @@ public class DLFileEntryTypeLocalServiceUtil {
 		return getService().dynamicQueryCount(dynamicQuery);
 	}
 
+	public static com.liferay.portlet.documentlibrary.model.DLFileEntryType fetchDLFileEntryType(
+		long fileEntryTypeId)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getService().fetchDLFileEntryType(fileEntryTypeId);
+	}
+
 	/**
 	* Returns the document library file entry type with the primary key.
 	*
@@ -178,6 +190,22 @@ public class DLFileEntryTypeLocalServiceUtil {
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException {
 		return getService().getPersistedModel(primaryKeyObj);
+	}
+
+	/**
+	* Returns the document library file entry type with the UUID in the group.
+	*
+	* @param uuid the UUID of document library file entry type
+	* @param groupId the group id of the document library file entry type
+	* @return the document library file entry type
+	* @throws PortalException if a document library file entry type with the UUID in the group could not be found
+	* @throws SystemException if a system exception occurred
+	*/
+	public static com.liferay.portlet.documentlibrary.model.DLFileEntryType getDLFileEntryTypeByUuidAndGroupId(
+		java.lang.String uuid, long groupId)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException {
+		return getService().getDLFileEntryTypeByUuidAndGroupId(uuid, groupId);
 	}
 
 	/**
@@ -273,21 +301,35 @@ public class DLFileEntryTypeLocalServiceUtil {
 		getService().cascadeFileEntryTypes(userId, dlFolder);
 	}
 
+	public static void deleteFileEntryType(
+		com.liferay.portlet.documentlibrary.model.DLFileEntryType dlFileEntryType)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException {
+		getService().deleteFileEntryType(dlFileEntryType);
+	}
+
 	public static void deleteFileEntryType(long fileEntryTypeId)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException {
 		getService().deleteFileEntryType(fileEntryTypeId);
 	}
 
-	public static void deleteFileEntryTypes(long folderId)
-		throws com.liferay.portal.kernel.exception.SystemException {
-		getService().deleteFileEntryTypes(folderId);
-	}
-
-	public static long getDefaultFileEntryType(long groupId, long folderId)
+	public static void deleteFileEntryTypes(long groupId)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException {
-		return getService().getDefaultFileEntryType(groupId, folderId);
+		getService().deleteFileEntryTypes(groupId);
+	}
+
+	public static com.liferay.portlet.documentlibrary.model.DLFileEntryType fetchFileEntryType(
+		long fileEntryTypeId)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getService().fetchFileEntryType(fileEntryTypeId);
+	}
+
+	public static long getDefaultFileEntryTypeId(long folderId)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException {
+		return getService().getDefaultFileEntryTypeId(folderId);
 	}
 
 	public static com.liferay.portlet.documentlibrary.model.DLFileEntryType getFileEntryType(
@@ -297,55 +339,67 @@ public class DLFileEntryTypeLocalServiceUtil {
 		return getService().getFileEntryType(fileEntryTypeId);
 	}
 
-	public static java.util.List<com.liferay.portlet.documentlibrary.model.DLFileEntryType> getFileEntryTypes(
-		long groupId)
-		throws com.liferay.portal.kernel.exception.SystemException {
-		return getService().getFileEntryTypes(groupId);
+	public static com.liferay.portlet.documentlibrary.model.DLFileEntryType getFileEntryType(
+		long groupId, java.lang.String name)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException {
+		return getService().getFileEntryType(groupId, name);
 	}
 
 	public static java.util.List<com.liferay.portlet.documentlibrary.model.DLFileEntryType> getFileEntryTypes(
-		long groupId, int start, int end)
+		long[] groupIds)
 		throws com.liferay.portal.kernel.exception.SystemException {
-		return getService().getFileEntryTypes(groupId, start, end);
-	}
-
-	public static java.util.List<com.liferay.portlet.documentlibrary.model.DLFileEntryType> getFileEntryTypes(
-		long groupId, java.lang.String name, java.lang.String description)
-		throws com.liferay.portal.kernel.exception.SystemException {
-		return getService().getFileEntryTypes(groupId, name, description);
+		return getService().getFileEntryTypes(groupIds);
 	}
 
 	public static java.util.List<com.liferay.portlet.documentlibrary.model.DLFileEntryType> getFolderFileEntryTypes(
-		long groupId, long folderId, boolean inherited)
+		long[] groupIds, long folderId, boolean inherited)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException {
-		return getService().getFolderFileEntryTypes(groupId, folderId, inherited);
+		return getService()
+				   .getFolderFileEntryTypes(groupIds, folderId, inherited);
 	}
 
 	public static java.util.List<com.liferay.portlet.documentlibrary.model.DLFileEntryType> search(
-		long companyId, long groupId, java.lang.String keywords, int start,
-		int end,
+		long companyId, long[] groupIds, java.lang.String keywords,
+		boolean includeBasicFileEntryType, int start, int end,
 		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
 		throws com.liferay.portal.kernel.exception.SystemException {
 		return getService()
-				   .search(companyId, groupId, keywords, start, end,
-			orderByComparator);
+				   .search(companyId, groupIds, keywords,
+			includeBasicFileEntryType, start, end, orderByComparator);
 	}
 
-	public static int searchCount(long companyId, long groupId,
-		java.lang.String keywords)
+	public static int searchCount(long companyId, long[] groupIds,
+		java.lang.String keywords, boolean includeBasicFileEntryType)
 		throws com.liferay.portal.kernel.exception.SystemException {
-		return getService().searchCount(companyId, groupId, keywords);
+		return getService()
+				   .searchCount(companyId, groupIds, keywords,
+			includeBasicFileEntryType);
 	}
 
-	public static void updateFileEntryType(long fileEntryTypeId,
+	public static void unsetFolderFileEntryTypes(long folderId)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		getService().unsetFolderFileEntryTypes(folderId);
+	}
+
+	public static com.liferay.portlet.documentlibrary.model.DLFileEntry updateFileEntryFileEntryType(
+		com.liferay.portlet.documentlibrary.model.DLFileEntry dlFileEntry,
+		com.liferay.portal.service.ServiceContext serviceContext)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException {
+		return getService()
+				   .updateFileEntryFileEntryType(dlFileEntry, serviceContext);
+	}
+
+	public static void updateFileEntryType(long userId, long fileEntryTypeId,
 		java.lang.String name, java.lang.String description,
 		long[] ddmStructureIds,
 		com.liferay.portal.service.ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException {
 		getService()
-			.updateFileEntryType(fileEntryTypeId, name, description,
+			.updateFileEntryType(userId, fileEntryTypeId, name, description,
 			ddmStructureIds, serviceContext);
 	}
 
@@ -354,7 +408,8 @@ public class DLFileEntryTypeLocalServiceUtil {
 		java.util.List<java.lang.Long> fileEntryTypeIds,
 		long defaultFileEntryTypeId,
 		com.liferay.portal.service.ServiceContext serviceContext)
-		throws com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException {
 		getService()
 			.updateFolderFileEntryTypes(dlFolder, fileEntryTypeIds,
 			defaultFileEntryTypeId, serviceContext);
@@ -366,20 +421,15 @@ public class DLFileEntryTypeLocalServiceUtil {
 
 			ReferenceRegistry.registerReference(DLFileEntryTypeLocalServiceUtil.class,
 				"_service");
-			MethodCache.remove(DLFileEntryTypeLocalService.class);
 		}
 
 		return _service;
 	}
 
+	/**
+	 * @deprecated
+	 */
 	public void setService(DLFileEntryTypeLocalService service) {
-		MethodCache.remove(DLFileEntryTypeLocalService.class);
-
-		_service = service;
-
-		ReferenceRegistry.registerReference(DLFileEntryTypeLocalServiceUtil.class,
-			"_service");
-		MethodCache.remove(DLFileEntryTypeLocalService.class);
 	}
 
 	private static DLFileEntryTypeLocalService _service;

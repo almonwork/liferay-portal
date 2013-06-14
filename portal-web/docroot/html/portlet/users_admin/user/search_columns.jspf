@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -47,23 +47,21 @@
 		<liferay-ui:search-container-column-text
 			buffer="buffer"
 			href="<%= rowURL %>"
-			name="organization-roles">
+			name="organization-roles"
+		>
 
 			<%
 			List<UserGroupRole> userGroupRoles = UserGroupRoleLocalServiceUtil.getUserGroupRoles(user2.getUserId(), organizationGroupId);
 
-			Iterator itr = userGroupRoles.iterator();
-
-			while (itr.hasNext()) {
-				UserGroupRole userGroupRole = (UserGroupRole)itr.next();
-
+			for (UserGroupRole userGroupRole : userGroupRoles) {
 				Role curRole = RoleLocalServiceUtil.getRole(userGroupRole.getRoleId());
 
 				buffer.append(HtmlUtil.escape(curRole.getTitle(locale)));
+				buffer.append(StringPool.COMMA_AND_SPACE);
+			}
 
-				if (itr.hasNext()) {
-					buffer.append(StringPool.COMMA_AND_SPACE);
-				}
+			if (!userGroupRoles.isEmpty()) {
+				buffer.setIndex(buffer.index() - 1);
 			}
 			%>
 

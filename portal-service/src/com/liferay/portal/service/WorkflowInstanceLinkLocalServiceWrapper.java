@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -24,7 +24,8 @@ package com.liferay.portal.service;
  * @generated
  */
 public class WorkflowInstanceLinkLocalServiceWrapper
-	implements WorkflowInstanceLinkLocalService {
+	implements WorkflowInstanceLinkLocalService,
+		ServiceWrapper<WorkflowInstanceLinkLocalService> {
 	public WorkflowInstanceLinkLocalServiceWrapper(
 		WorkflowInstanceLinkLocalService workflowInstanceLinkLocalService) {
 		_workflowInstanceLinkLocalService = workflowInstanceLinkLocalService;
@@ -58,25 +59,34 @@ public class WorkflowInstanceLinkLocalServiceWrapper
 	* Deletes the workflow instance link with the primary key from the database. Also notifies the appropriate model listeners.
 	*
 	* @param workflowInstanceLinkId the primary key of the workflow instance link
+	* @return the workflow instance link that was removed
 	* @throws PortalException if a workflow instance link with the primary key could not be found
 	* @throws SystemException if a system exception occurred
 	*/
-	public void deleteWorkflowInstanceLink(long workflowInstanceLinkId)
+	public com.liferay.portal.model.WorkflowInstanceLink deleteWorkflowInstanceLink(
+		long workflowInstanceLinkId)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException {
-		_workflowInstanceLinkLocalService.deleteWorkflowInstanceLink(workflowInstanceLinkId);
+		return _workflowInstanceLinkLocalService.deleteWorkflowInstanceLink(workflowInstanceLinkId);
 	}
 
 	/**
 	* Deletes the workflow instance link from the database. Also notifies the appropriate model listeners.
 	*
 	* @param workflowInstanceLink the workflow instance link
+	* @return the workflow instance link that was removed
+	* @throws PortalException
 	* @throws SystemException if a system exception occurred
 	*/
-	public void deleteWorkflowInstanceLink(
+	public com.liferay.portal.model.WorkflowInstanceLink deleteWorkflowInstanceLink(
 		com.liferay.portal.model.WorkflowInstanceLink workflowInstanceLink)
-		throws com.liferay.portal.kernel.exception.SystemException {
-		_workflowInstanceLinkLocalService.deleteWorkflowInstanceLink(workflowInstanceLink);
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException {
+		return _workflowInstanceLinkLocalService.deleteWorkflowInstanceLink(workflowInstanceLink);
+	}
+
+	public com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery() {
+		return _workflowInstanceLinkLocalService.dynamicQuery();
 	}
 
 	/**
@@ -149,6 +159,12 @@ public class WorkflowInstanceLinkLocalServiceWrapper
 		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery)
 		throws com.liferay.portal.kernel.exception.SystemException {
 		return _workflowInstanceLinkLocalService.dynamicQueryCount(dynamicQuery);
+	}
+
+	public com.liferay.portal.model.WorkflowInstanceLink fetchWorkflowInstanceLink(
+		long workflowInstanceLinkId)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return _workflowInstanceLinkLocalService.fetchWorkflowInstanceLink(workflowInstanceLinkId);
 	}
 
 	/**
@@ -259,11 +275,11 @@ public class WorkflowInstanceLinkLocalServiceWrapper
 			companyId, groupId, className, classPK, workflowInstanceId);
 	}
 
-	public void deleteWorkflowInstanceLink(long companyId, long groupId,
-		java.lang.String className, long classPK)
+	public com.liferay.portal.model.WorkflowInstanceLink deleteWorkflowInstanceLink(
+		long companyId, long groupId, java.lang.String className, long classPK)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException {
-		_workflowInstanceLinkLocalService.deleteWorkflowInstanceLink(companyId,
+		return _workflowInstanceLinkLocalService.deleteWorkflowInstanceLink(companyId,
 			groupId, className, classPK);
 	}
 
@@ -337,11 +353,26 @@ public class WorkflowInstanceLinkLocalServiceWrapper
 			className, oldClassPK, newClassPK);
 	}
 
+	/**
+	 * @deprecated Renamed to {@link #getWrappedService}
+	 */
 	public WorkflowInstanceLinkLocalService getWrappedWorkflowInstanceLinkLocalService() {
 		return _workflowInstanceLinkLocalService;
 	}
 
+	/**
+	 * @deprecated Renamed to {@link #setWrappedService}
+	 */
 	public void setWrappedWorkflowInstanceLinkLocalService(
+		WorkflowInstanceLinkLocalService workflowInstanceLinkLocalService) {
+		_workflowInstanceLinkLocalService = workflowInstanceLinkLocalService;
+	}
+
+	public WorkflowInstanceLinkLocalService getWrappedService() {
+		return _workflowInstanceLinkLocalService;
+	}
+
+	public void setWrappedService(
 		WorkflowInstanceLinkLocalService workflowInstanceLinkLocalService) {
 		_workflowInstanceLinkLocalService = workflowInstanceLinkLocalService;
 	}

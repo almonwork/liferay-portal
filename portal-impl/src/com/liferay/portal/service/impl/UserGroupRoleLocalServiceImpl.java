@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -17,8 +17,6 @@ package com.liferay.portal.service.impl;
 import com.liferay.portal.NoSuchUserGroupRoleException;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
-import com.liferay.portal.model.Group;
-import com.liferay.portal.model.ResourceConstants;
 import com.liferay.portal.model.Role;
 import com.liferay.portal.model.User;
 import com.liferay.portal.model.UserGroupRole;
@@ -35,9 +33,7 @@ public class UserGroupRoleLocalServiceImpl
 	extends UserGroupRoleLocalServiceBaseImpl {
 
 	public void addUserGroupRoles(long userId, long groupId, long[] roleIds)
-		throws PortalException, SystemException {
-
-		checkGroupResource(groupId);
+		throws SystemException {
 
 		for (long roleId : roleIds) {
 			UserGroupRolePK pk = new UserGroupRolePK(userId, groupId, roleId);
@@ -56,9 +52,7 @@ public class UserGroupRoleLocalServiceImpl
 	}
 
 	public void addUserGroupRoles(long[] userIds, long groupId, long roleId)
-		throws PortalException, SystemException {
-
-		checkGroupResource(groupId);
+		throws SystemException {
 
 		for (long userId : userIds) {
 			UserGroupRolePK pk = new UserGroupRolePK(userId, groupId, roleId);
@@ -77,16 +71,17 @@ public class UserGroupRoleLocalServiceImpl
 	}
 
 	@Override
-	public void deleteUserGroupRole(UserGroupRole userGroupRole)
+	public UserGroupRole deleteUserGroupRole(UserGroupRole userGroupRole)
 		throws SystemException {
 
 		userGroupRolePersistence.remove(userGroupRole);
 
 		PermissionCacheUtil.clearCache();
+
+		return userGroupRole;
 	}
 
-	public void deleteUserGroupRoles(
-			long userId, long groupId, long[] roleIds)
+	public void deleteUserGroupRoles(long userId, long groupId, long[] roleIds)
 		throws SystemException {
 
 		for (long roleId : roleIds) {
@@ -236,18 +231,6 @@ public class UserGroupRoleLocalServiceImpl
 		long roleId = role.getRoleId();
 
 		return hasUserGroupRole(userId, groupId, roleId, inherit);
-	}
-
-	protected void checkGroupResource(long groupId)
-		throws PortalException, SystemException {
-
-		// Make sure that the individual resource for the group exists
-
-		Group group = groupPersistence.findByPrimaryKey(groupId);
-
-		resourceLocalService.addResource(
-			group.getCompanyId(), Group.class.getName(),
-			ResourceConstants.SCOPE_INDIVIDUAL, String.valueOf(groupId));
 	}
 
 }

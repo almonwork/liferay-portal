@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -25,11 +25,11 @@ import javax.jcr.Session;
  */
 public interface JCRFactory {
 
-	public static final String WORKSPACE_NAME =
-		PropsUtil.get(PropsKeys.JCR_WORKSPACE_NAME);
+	public static final String NODE_DOCUMENTLIBRARY = PropsUtil.get(
+		PropsKeys.JCR_NODE_DOCUMENTLIBRARY);
 
-	public static final String NODE_DOCUMENTLIBRARY =
-		PropsUtil.get(PropsKeys.JCR_NODE_DOCUMENTLIBRARY);
+	public static final String WORKSPACE_NAME = PropsUtil.get(
+		PropsKeys.JCR_WORKSPACE_NAME);
 
 	public Session createSession(String workspaceName)
 		throws RepositoryException;

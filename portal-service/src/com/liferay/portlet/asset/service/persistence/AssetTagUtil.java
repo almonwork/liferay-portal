@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -92,13 +92,6 @@ public class AssetTagUtil {
 		return getPersistence()
 				   .findWithDynamicQuery(dynamicQuery, start, end,
 			orderByComparator);
-	}
-
-	/**
-	 * @see com.liferay.portal.service.persistence.BasePersistence#remove(com.liferay.portal.model.BaseModel)
-	 */
-	public static AssetTag remove(AssetTag assetTag) throws SystemException {
-		return getPersistence().remove(assetTag);
 	}
 
 	/**
@@ -388,6 +381,51 @@ public class AssetTagUtil {
 	}
 
 	/**
+	* Returns the asset tag where groupId = &#63; and name = &#63; or throws a {@link com.liferay.portlet.asset.NoSuchTagException} if it could not be found.
+	*
+	* @param groupId the group ID
+	* @param name the name
+	* @return the matching asset tag
+	* @throws com.liferay.portlet.asset.NoSuchTagException if a matching asset tag could not be found
+	* @throws SystemException if a system exception occurred
+	*/
+	public static com.liferay.portlet.asset.model.AssetTag findByG_N(
+		long groupId, java.lang.String name)
+		throws com.liferay.portal.kernel.exception.SystemException,
+			com.liferay.portlet.asset.NoSuchTagException {
+		return getPersistence().findByG_N(groupId, name);
+	}
+
+	/**
+	* Returns the asset tag where groupId = &#63; and name = &#63; or returns <code>null</code> if it could not be found. Uses the finder cache.
+	*
+	* @param groupId the group ID
+	* @param name the name
+	* @return the matching asset tag, or <code>null</code> if a matching asset tag could not be found
+	* @throws SystemException if a system exception occurred
+	*/
+	public static com.liferay.portlet.asset.model.AssetTag fetchByG_N(
+		long groupId, java.lang.String name)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getPersistence().fetchByG_N(groupId, name);
+	}
+
+	/**
+	* Returns the asset tag where groupId = &#63; and name = &#63; or returns <code>null</code> if it could not be found, optionally using the finder cache.
+	*
+	* @param groupId the group ID
+	* @param name the name
+	* @param retrieveFromCache whether to use the finder cache
+	* @return the matching asset tag, or <code>null</code> if a matching asset tag could not be found
+	* @throws SystemException if a system exception occurred
+	*/
+	public static com.liferay.portlet.asset.model.AssetTag fetchByG_N(
+		long groupId, java.lang.String name, boolean retrieveFromCache)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getPersistence().fetchByG_N(groupId, name, retrieveFromCache);
+	}
+
+	/**
 	* Returns all the asset tags.
 	*
 	* @return the asset tags
@@ -448,6 +486,21 @@ public class AssetTagUtil {
 	}
 
 	/**
+	* Removes the asset tag where groupId = &#63; and name = &#63; from the database.
+	*
+	* @param groupId the group ID
+	* @param name the name
+	* @return the asset tag that was removed
+	* @throws SystemException if a system exception occurred
+	*/
+	public static com.liferay.portlet.asset.model.AssetTag removeByG_N(
+		long groupId, java.lang.String name)
+		throws com.liferay.portal.kernel.exception.SystemException,
+			com.liferay.portlet.asset.NoSuchTagException {
+		return getPersistence().removeByG_N(groupId, name);
+	}
+
+	/**
 	* Removes all the asset tags from the database.
 	*
 	* @throws SystemException if a system exception occurred
@@ -479,6 +532,19 @@ public class AssetTagUtil {
 	public static int filterCountByGroupId(long groupId)
 		throws com.liferay.portal.kernel.exception.SystemException {
 		return getPersistence().filterCountByGroupId(groupId);
+	}
+
+	/**
+	* Returns the number of asset tags where groupId = &#63; and name = &#63;.
+	*
+	* @param groupId the group ID
+	* @param name the name
+	* @return the number of matching asset tags
+	* @throws SystemException if a system exception occurred
+	*/
+	public static int countByG_N(long groupId, java.lang.String name)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getPersistence().countByG_N(groupId, name);
 	}
 
 	/**
@@ -729,10 +795,10 @@ public class AssetTagUtil {
 		return _persistence;
 	}
 
+	/**
+	 * @deprecated
+	 */
 	public void setPersistence(AssetTagPersistence persistence) {
-		_persistence = persistence;
-
-		ReferenceRegistry.registerReference(AssetTagUtil.class, "_persistence");
 	}
 
 	private static AssetTagPersistence _persistence;

@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -25,7 +25,7 @@ SearchContainer searchContainer = new SearchContainer();
 
 List<String> headerNames = new ArrayList<String>();
 
-headerNames.add("description");
+headerNames.add("title");
 headerNames.add("start-date");
 headerNames.add("end-date");
 headerNames.add(StringPool.BLANK);
@@ -42,7 +42,7 @@ for (int i = 0; i < results.size(); i++) {
 
 	ResultRow row = new ResultRow(schedulerResponse, schedulerResponse.getJobName(), i);
 
-	// Description
+	// Title
 
 	row.addText(schedulerResponse.getDescription());
 
@@ -78,4 +78,4 @@ for (int i = 0; i < results.size(); i++) {
 }
 %>
 
-<liferay-ui:search-iterator searchContainer="<%= searchContainer %>" paginate="<%= false %>" />
+<liferay-ui:search-iterator paginate="<%= false %>" searchContainer="<%= searchContainer %>" />

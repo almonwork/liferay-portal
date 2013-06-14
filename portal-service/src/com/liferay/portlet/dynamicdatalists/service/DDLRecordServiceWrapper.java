@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,6 +14,8 @@
 
 package com.liferay.portlet.dynamicdatalists.service;
 
+import com.liferay.portal.service.ServiceWrapper;
+
 /**
  * <p>
  * This class is a wrapper for {@link DDLRecordService}.
@@ -23,9 +25,28 @@ package com.liferay.portlet.dynamicdatalists.service;
  * @see       DDLRecordService
  * @generated
  */
-public class DDLRecordServiceWrapper implements DDLRecordService {
+public class DDLRecordServiceWrapper implements DDLRecordService,
+	ServiceWrapper<DDLRecordService> {
 	public DDLRecordServiceWrapper(DDLRecordService ddlRecordService) {
 		_ddlRecordService = ddlRecordService;
+	}
+
+	/**
+	* Returns the Spring bean ID for this bean.
+	*
+	* @return the Spring bean ID for this bean
+	*/
+	public java.lang.String getBeanIdentifier() {
+		return _ddlRecordService.getBeanIdentifier();
+	}
+
+	/**
+	* Sets the Spring bean ID for this bean.
+	*
+	* @param beanIdentifier the Spring bean ID for this bean
+	*/
+	public void setBeanIdentifier(java.lang.String beanIdentifier) {
+		_ddlRecordService.setBeanIdentifier(beanIdentifier);
 	}
 
 	public com.liferay.portlet.dynamicdatalists.model.DDLRecord addRecord(
@@ -46,6 +67,13 @@ public class DDLRecordServiceWrapper implements DDLRecordService {
 			com.liferay.portal.kernel.exception.SystemException {
 		return _ddlRecordService.addRecord(groupId, recordSetId, displayIndex,
 			fieldsMap, serviceContext);
+	}
+
+	public com.liferay.portlet.dynamicdatalists.model.DDLRecord getRecord(
+		long recordId)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException {
+		return _ddlRecordService.getRecord(recordId);
 	}
 
 	public com.liferay.portlet.dynamicdatalists.model.DDLRecord updateRecord(
@@ -70,11 +98,25 @@ public class DDLRecordServiceWrapper implements DDLRecordService {
 			fieldsMap, mergeFields, serviceContext);
 	}
 
+	/**
+	 * @deprecated Renamed to {@link #getWrappedService}
+	 */
 	public DDLRecordService getWrappedDDLRecordService() {
 		return _ddlRecordService;
 	}
 
+	/**
+	 * @deprecated Renamed to {@link #setWrappedService}
+	 */
 	public void setWrappedDDLRecordService(DDLRecordService ddlRecordService) {
+		_ddlRecordService = ddlRecordService;
+	}
+
+	public DDLRecordService getWrappedService() {
+		return _ddlRecordService;
+	}
+
+	public void setWrappedService(DDLRecordService ddlRecordService) {
 		_ddlRecordService = ddlRecordService;
 	}
 

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -21,27 +21,27 @@ public interface Log {
 
 	public void debug(Object msg);
 
-	public void debug(Throwable t);
-
 	public void debug(Object msg, Throwable t);
+
+	public void debug(Throwable t);
 
 	public void error(Object msg);
 
-	public void error(Throwable t);
-
 	public void error(Object msg, Throwable t);
+
+	public void error(Throwable t);
 
 	public void fatal(Object msg);
 
-	public void fatal(Throwable t);
-
 	public void fatal(Object msg, Throwable t);
+
+	public void fatal(Throwable t);
 
 	public void info(Object msg);
 
-	public void info(Throwable t);
-
 	public void info(Object msg, Throwable t);
+
+	public void info(Throwable t);
 
 	public boolean isDebugEnabled();
 
@@ -57,14 +57,14 @@ public interface Log {
 
 	public void trace(Object msg);
 
-	public void trace(Throwable t);
-
 	public void trace(Object msg, Throwable t);
+
+	public void trace(Throwable t);
 
 	public void warn(Object msg);
 
-	public void warn(Throwable t);
-
 	public void warn(Object msg, Throwable t);
+
+	public void warn(Throwable t);
 
 }

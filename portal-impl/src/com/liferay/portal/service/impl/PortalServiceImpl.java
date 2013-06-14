@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -17,6 +17,8 @@ package com.liferay.portal.service.impl;
 import com.liferay.portal.kernel.bean.PortalBeanLocatorUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
+import com.liferay.portal.kernel.jsonwebservice.JSONWebService;
+import com.liferay.portal.kernel.jsonwebservice.JSONWebServiceMode;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.messaging.DestinationNames;
@@ -34,6 +36,7 @@ import com.liferay.portal.util.PropsValues;
 /**
  * @author Brian Wing Shun Chan
  */
+@JSONWebService(mode = JSONWebServiceMode.MANUAL)
 public class PortalServiceImpl extends PortalServiceBaseImpl {
 
 	public String getAutoDeployDirectory() throws SystemException {
@@ -42,6 +45,7 @@ public class PortalServiceImpl extends PortalServiceBaseImpl {
 			PropsValues.AUTO_DEPLOY_DEPLOY_DIR);
 	}
 
+	@JSONWebService
 	public int getBuildNumber() {
 		return ReleaseInfo.getBuildNumber();
 	}
@@ -99,10 +103,12 @@ public class PortalServiceImpl extends PortalServiceBaseImpl {
 		throw new SystemException();
 	}
 
-	public void testDeleteClassName()
-		throws PortalException, SystemException {
-
+	public void testDeleteClassName() throws PortalException, SystemException {
 		classNamePersistence.removeByValue(PortalService.class.getName());
+	}
+
+	public int testGetBuildNumber() {
+		return portalService.getBuildNumber();
 	}
 
 	public void testGetUserId() {
@@ -112,7 +118,7 @@ public class PortalServiceImpl extends PortalServiceBaseImpl {
 			userId = getUserId();
 		}
 		catch (Exception e) {
-			e.printStackTrace();
+			_log.error(e, e);
 		}
 
 		if (_log.isInfoEnabled()) {

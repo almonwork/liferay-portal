@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -43,7 +43,7 @@ long frameworkVersionId = BeanParamUtil.getLong(frameworkVersion, request, "fram
 		<liferay-ui:message key="name" />
 	</td>
 	<td>
-		<liferay-ui:input-field model="<%= SCFrameworkVersion.class %>" bean="<%= frameworkVersion %>" field="name" />
+		<liferay-ui:input-field bean="<%= frameworkVersion %>" field="name" model="<%= SCFrameworkVersion.class %>" />
 	</td>
 </tr>
 <tr>
@@ -51,7 +51,7 @@ long frameworkVersionId = BeanParamUtil.getLong(frameworkVersion, request, "fram
 		<liferay-ui:message key="url" />
 	</td>
 	<td>
-		<liferay-ui:input-field model="<%= SCFrameworkVersion.class %>" bean="<%= frameworkVersion %>" field="url" />
+		<liferay-ui:input-field bean="<%= frameworkVersion %>" field="url" model="<%= SCFrameworkVersion.class %>" />
 	</td>
 </tr>
 <tr>
@@ -59,7 +59,7 @@ long frameworkVersionId = BeanParamUtil.getLong(frameworkVersion, request, "fram
 		<liferay-ui:message key="active" />
 	</td>
 	<td>
-		<liferay-ui:input-field model="<%= SCFrameworkVersion.class %>" bean="<%= frameworkVersion %>" field="active" defaultValue="<%= Boolean.TRUE %>" />
+		<liferay-ui:input-field bean="<%= frameworkVersion %>" defaultValue="<%= Boolean.TRUE %>" field="active" model="<%= SCFrameworkVersion.class %>" />
 	</td>
 </tr>
 

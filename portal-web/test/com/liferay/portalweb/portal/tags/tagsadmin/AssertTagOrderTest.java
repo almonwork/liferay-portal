@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -23,9 +23,10 @@ import com.liferay.portalweb.portal.util.RuntimeVariables;
 public class AssertTagOrderTest extends BaseTestCase {
 	public void testAssertTagOrder() throws Exception {
 		selenium.open("/web/guest/home/");
+		loadRequiredJavaScriptModules();
 
 		for (int second = 0;; second++) {
-			if (second >= 60) {
+			if (second >= 90) {
 				fail("timeout");
 			}
 
@@ -40,21 +41,21 @@ public class AssertTagOrderTest extends BaseTestCase {
 			Thread.sleep(1000);
 		}
 
-		selenium.saveScreenShotAndSource();
-		selenium.clickAt("link=Control Panel", RuntimeVariables.replace(""));
+		selenium.clickAt("link=Control Panel",
+			RuntimeVariables.replace("Control Panel"));
 		selenium.waitForPageToLoad("30000");
-		selenium.saveScreenShotAndSource();
-		selenium.clickAt("link=Tags", RuntimeVariables.replace(""));
+		loadRequiredJavaScriptModules();
+		selenium.clickAt("link=Tags", RuntimeVariables.replace("Tags"));
 		selenium.waitForPageToLoad("30000");
-		selenium.saveScreenShotAndSource();
+		loadRequiredJavaScriptModules();
 
 		for (int second = 0;; second++) {
-			if (second >= 60) {
+			if (second >= 90) {
 				fail("timeout");
 			}
 
 			try {
-				if (selenium.isElementPresent("//div[4]/ul/li[1]/span/a")) {
+				if (selenium.isElementPresent("//div[2]/ul/li[1]/div/span/a")) {
 					break;
 				}
 			}
@@ -64,16 +65,15 @@ public class AssertTagOrderTest extends BaseTestCase {
 			Thread.sleep(1000);
 		}
 
-		selenium.saveScreenShotAndSource();
 		assertEquals(RuntimeVariables.replace("blue"),
-			selenium.getText("//div[4]/ul/li[1]/span/a"));
+			selenium.getText("//div[2]/ul/li[1]/div/span/a"));
 		assertEquals(RuntimeVariables.replace("blue car"),
-			selenium.getText("//div[4]/ul/li[2]/span/a"));
+			selenium.getText("//div[2]/ul/li[2]/div/span/a"));
 		assertEquals(RuntimeVariables.replace("blue green"),
-			selenium.getText("//div[4]/ul/li[3]/span/a"));
+			selenium.getText("//div[2]/ul/li[3]/div/span/a"));
 		assertEquals(RuntimeVariables.replace("green"),
-			selenium.getText("//div[4]/ul/li[4]/span/a"));
+			selenium.getText("//div[2]/ul/li[4]/div/span/a"));
 		assertEquals(RuntimeVariables.replace("green tree"),
-			selenium.getText("//div[4]/ul/li[5]/span/a"));
+			selenium.getText("//div[2]/ul/li[5]/div/span/a"));
 	}
 }

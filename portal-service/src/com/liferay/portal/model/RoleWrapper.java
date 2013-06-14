@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,6 +14,9 @@
 
 package com.liferay.portal.model;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * <p>
  * This class is a wrapper for {@link Role}.
@@ -23,7 +26,7 @@ package com.liferay.portal.model;
  * @see       Role
  * @generated
  */
-public class RoleWrapper implements Role {
+public class RoleWrapper implements Role, ModelWrapper<Role> {
 	public RoleWrapper(Role role) {
 		_role = role;
 	}
@@ -34,6 +37,78 @@ public class RoleWrapper implements Role {
 
 	public String getModelClassName() {
 		return Role.class.getName();
+	}
+
+	public Map<String, Object> getModelAttributes() {
+		Map<String, Object> attributes = new HashMap<String, Object>();
+
+		attributes.put("roleId", getRoleId());
+		attributes.put("companyId", getCompanyId());
+		attributes.put("classNameId", getClassNameId());
+		attributes.put("classPK", getClassPK());
+		attributes.put("name", getName());
+		attributes.put("title", getTitle());
+		attributes.put("description", getDescription());
+		attributes.put("type", getType());
+		attributes.put("subtype", getSubtype());
+
+		return attributes;
+	}
+
+	public void setModelAttributes(Map<String, Object> attributes) {
+		Long roleId = (Long)attributes.get("roleId");
+
+		if (roleId != null) {
+			setRoleId(roleId);
+		}
+
+		Long companyId = (Long)attributes.get("companyId");
+
+		if (companyId != null) {
+			setCompanyId(companyId);
+		}
+
+		Long classNameId = (Long)attributes.get("classNameId");
+
+		if (classNameId != null) {
+			setClassNameId(classNameId);
+		}
+
+		Long classPK = (Long)attributes.get("classPK");
+
+		if (classPK != null) {
+			setClassPK(classPK);
+		}
+
+		String name = (String)attributes.get("name");
+
+		if (name != null) {
+			setName(name);
+		}
+
+		String title = (String)attributes.get("title");
+
+		if (title != null) {
+			setTitle(title);
+		}
+
+		String description = (String)attributes.get("description");
+
+		if (description != null) {
+			setDescription(description);
+		}
+
+		Integer type = (Integer)attributes.get("type");
+
+		if (type != null) {
+			setType(type);
+		}
+
+		String subtype = (String)attributes.get("subtype");
+
+		if (subtype != null) {
+			setSubtype(subtype);
+		}
 	}
 
 	/**
@@ -97,6 +172,10 @@ public class RoleWrapper implements Role {
 	*/
 	public java.lang.String getClassName() {
 		return _role.getClassName();
+	}
+
+	public void setClassName(java.lang.String className) {
+		_role.setClassName(className);
 	}
 
 	/**
@@ -205,6 +284,14 @@ public class RoleWrapper implements Role {
 		return _role.getTitle(languageId, useDefault);
 	}
 
+	public java.lang.String getTitleCurrentLanguageId() {
+		return _role.getTitleCurrentLanguageId();
+	}
+
+	public java.lang.String getTitleCurrentValue() {
+		return _role.getTitleCurrentValue();
+	}
+
 	/**
 	* Returns a map of the locales and localized titles of this role.
 	*
@@ -245,6 +332,10 @@ public class RoleWrapper implements Role {
 		_role.setTitle(title, locale, defaultLocale);
 	}
 
+	public void setTitleCurrentLanguageId(java.lang.String languageId) {
+		_role.setTitleCurrentLanguageId(languageId);
+	}
+
 	/**
 	* Sets the localized titles of this role from the map of locales and localized titles.
 	*
@@ -277,12 +368,122 @@ public class RoleWrapper implements Role {
 	}
 
 	/**
+	* Returns the localized description of this role in the language. Uses the default language if no localization exists for the requested language.
+	*
+	* @param locale the locale of the language
+	* @return the localized description of this role
+	*/
+	public java.lang.String getDescription(java.util.Locale locale) {
+		return _role.getDescription(locale);
+	}
+
+	/**
+	* Returns the localized description of this role in the language, optionally using the default language if no localization exists for the requested language.
+	*
+	* @param locale the local of the language
+	* @param useDefault whether to use the default language if no localization exists for the requested language
+	* @return the localized description of this role. If <code>useDefault</code> is <code>false</code> and no localization exists for the requested language, an empty string will be returned.
+	*/
+	public java.lang.String getDescription(java.util.Locale locale,
+		boolean useDefault) {
+		return _role.getDescription(locale, useDefault);
+	}
+
+	/**
+	* Returns the localized description of this role in the language. Uses the default language if no localization exists for the requested language.
+	*
+	* @param languageId the ID of the language
+	* @return the localized description of this role
+	*/
+	public java.lang.String getDescription(java.lang.String languageId) {
+		return _role.getDescription(languageId);
+	}
+
+	/**
+	* Returns the localized description of this role in the language, optionally using the default language if no localization exists for the requested language.
+	*
+	* @param languageId the ID of the language
+	* @param useDefault whether to use the default language if no localization exists for the requested language
+	* @return the localized description of this role
+	*/
+	public java.lang.String getDescription(java.lang.String languageId,
+		boolean useDefault) {
+		return _role.getDescription(languageId, useDefault);
+	}
+
+	public java.lang.String getDescriptionCurrentLanguageId() {
+		return _role.getDescriptionCurrentLanguageId();
+	}
+
+	public java.lang.String getDescriptionCurrentValue() {
+		return _role.getDescriptionCurrentValue();
+	}
+
+	/**
+	* Returns a map of the locales and localized descriptions of this role.
+	*
+	* @return the locales and localized descriptions of this role
+	*/
+	public java.util.Map<java.util.Locale, java.lang.String> getDescriptionMap() {
+		return _role.getDescriptionMap();
+	}
+
+	/**
 	* Sets the description of this role.
 	*
 	* @param description the description of this role
 	*/
 	public void setDescription(java.lang.String description) {
 		_role.setDescription(description);
+	}
+
+	/**
+	* Sets the localized description of this role in the language.
+	*
+	* @param description the localized description of this role
+	* @param locale the locale of the language
+	*/
+	public void setDescription(java.lang.String description,
+		java.util.Locale locale) {
+		_role.setDescription(description, locale);
+	}
+
+	/**
+	* Sets the localized description of this role in the language, and sets the default locale.
+	*
+	* @param description the localized description of this role
+	* @param locale the locale of the language
+	* @param defaultLocale the default locale
+	*/
+	public void setDescription(java.lang.String description,
+		java.util.Locale locale, java.util.Locale defaultLocale) {
+		_role.setDescription(description, locale, defaultLocale);
+	}
+
+	public void setDescriptionCurrentLanguageId(java.lang.String languageId) {
+		_role.setDescriptionCurrentLanguageId(languageId);
+	}
+
+	/**
+	* Sets the localized descriptions of this role from the map of locales and localized descriptions.
+	*
+	* @param descriptionMap the locales and localized descriptions of this role
+	*/
+	public void setDescriptionMap(
+		java.util.Map<java.util.Locale, java.lang.String> descriptionMap) {
+		_role.setDescriptionMap(descriptionMap);
+	}
+
+	/**
+	* Sets the localized descriptions of this role from the map of locales and localized descriptions, and sets the default locale.
+	*
+	* @param descriptionMap the locales and localized descriptions of this role
+	* @param defaultLocale the default locale
+	*/
+	public void setDescriptionMap(
+		java.util.Map<java.util.Locale, java.lang.String> descriptionMap,
+		java.util.Locale defaultLocale) {
+		_role.setDescriptionMap(descriptionMap, defaultLocale);
 	}
 
 	/**
@@ -339,10 +540,6 @@ public class RoleWrapper implements Role {
 
 	public boolean isEscapedModel() {
 		return _role.isEscapedModel();
-	}
-
-	public void setEscapedModel(boolean escapedModel) {
-		_role.setEscapedModel(escapedModel);
 	}
 
 	public java.io.Serializable getPrimaryKeyObj() {
@@ -412,7 +609,14 @@ public class RoleWrapper implements Role {
 		return _role.isTeam();
 	}
 
+	/**
+	 * @deprecated Renamed to {@link #getWrappedModel}
+	 */
 	public Role getWrappedRole() {
+		return _role;
+	}
+
+	public Role getWrappedModel() {
 		return _role;
 	}
 

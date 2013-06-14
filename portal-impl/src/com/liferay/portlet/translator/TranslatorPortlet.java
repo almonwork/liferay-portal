@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,8 +14,11 @@
 
 package com.liferay.portlet.translator;
 
+import com.liferay.portal.kernel.microsofttranslator.MicrosoftTranslatorException;
+import com.liferay.portal.kernel.servlet.SessionErrors;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.Validator;
+import com.liferay.portal.kernel.webcache.WebCacheException;
 import com.liferay.portal.util.WebKeys;
 import com.liferay.portlet.translator.model.Translation;
 import com.liferay.portlet.translator.util.TranslatorUtil;
@@ -36,15 +39,28 @@ public class TranslatorPortlet extends MVCPortlet {
 		throws PortletException {
 
 		try {
-			String translationId = ParamUtil.getString(actionRequest, "id");
+			String fromLanguageId = ParamUtil.getString(
+				actionRequest, "fromLanguageId");
+			String toLanguageId = ParamUtil.getString(
+				actionRequest, "toLanguageId");
 			String fromText = ParamUtil.getString(actionRequest, "text");
 
 			if (Validator.isNotNull(fromText)) {
-				Translation translation =
-					TranslatorUtil.getTranslation(translationId, fromText);
+				Translation translation = TranslatorUtil.getTranslation(
+					fromLanguageId, toLanguageId, fromText);
 
 				actionRequest.setAttribute(
 					WebKeys.TRANSLATOR_TRANSLATION, translation);
+			}
+		}
+		catch (WebCacheException wce) {
+			Throwable cause = wce.getCause();
+
+			if (cause instanceof MicrosoftTranslatorException) {
+				SessionErrors.add(actionRequest, cause.getClass(), cause);
+			}
+			else {
+				throw new PortletException(wce);
 			}
 		}
 		catch (Exception e) {

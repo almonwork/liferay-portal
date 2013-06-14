@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -92,14 +92,6 @@ public class ShoppingItemUtil {
 		return getPersistence()
 				   .findWithDynamicQuery(dynamicQuery, start, end,
 			orderByComparator);
-	}
-
-	/**
-	 * @see com.liferay.portal.service.persistence.BasePersistence#remove(com.liferay.portal.model.BaseModel)
-	 */
-	public static ShoppingItem remove(ShoppingItem shoppingItem)
-		throws SystemException {
-		return getPersistence().remove(shoppingItem);
 	}
 
 	/**
@@ -632,36 +624,42 @@ public class ShoppingItemUtil {
 	* Removes the shopping item where smallImageId = &#63; from the database.
 	*
 	* @param smallImageId the small image ID
+	* @return the shopping item that was removed
 	* @throws SystemException if a system exception occurred
 	*/
-	public static void removeBySmallImageId(long smallImageId)
+	public static com.liferay.portlet.shopping.model.ShoppingItem removeBySmallImageId(
+		long smallImageId)
 		throws com.liferay.portal.kernel.exception.SystemException,
 			com.liferay.portlet.shopping.NoSuchItemException {
-		getPersistence().removeBySmallImageId(smallImageId);
+		return getPersistence().removeBySmallImageId(smallImageId);
 	}
 
 	/**
 	* Removes the shopping item where mediumImageId = &#63; from the database.
 	*
 	* @param mediumImageId the medium image ID
+	* @return the shopping item that was removed
 	* @throws SystemException if a system exception occurred
 	*/
-	public static void removeByMediumImageId(long mediumImageId)
+	public static com.liferay.portlet.shopping.model.ShoppingItem removeByMediumImageId(
+		long mediumImageId)
 		throws com.liferay.portal.kernel.exception.SystemException,
 			com.liferay.portlet.shopping.NoSuchItemException {
-		getPersistence().removeByMediumImageId(mediumImageId);
+		return getPersistence().removeByMediumImageId(mediumImageId);
 	}
 
 	/**
 	* Removes the shopping item where largeImageId = &#63; from the database.
 	*
 	* @param largeImageId the large image ID
+	* @return the shopping item that was removed
 	* @throws SystemException if a system exception occurred
 	*/
-	public static void removeByLargeImageId(long largeImageId)
+	public static com.liferay.portlet.shopping.model.ShoppingItem removeByLargeImageId(
+		long largeImageId)
 		throws com.liferay.portal.kernel.exception.SystemException,
 			com.liferay.portlet.shopping.NoSuchItemException {
-		getPersistence().removeByLargeImageId(largeImageId);
+		return getPersistence().removeByLargeImageId(largeImageId);
 	}
 
 	/**
@@ -681,12 +679,14 @@ public class ShoppingItemUtil {
 	*
 	* @param companyId the company ID
 	* @param sku the sku
+	* @return the shopping item that was removed
 	* @throws SystemException if a system exception occurred
 	*/
-	public static void removeByC_S(long companyId, java.lang.String sku)
+	public static com.liferay.portlet.shopping.model.ShoppingItem removeByC_S(
+		long companyId, java.lang.String sku)
 		throws com.liferay.portal.kernel.exception.SystemException,
 			com.liferay.portlet.shopping.NoSuchItemException {
-		getPersistence().removeByC_S(companyId, sku);
+		return getPersistence().removeByC_S(companyId, sku);
 	}
 
 	/**
@@ -888,11 +888,10 @@ public class ShoppingItemUtil {
 		return _persistence;
 	}
 
+	/**
+	 * @deprecated
+	 */
 	public void setPersistence(ShoppingItemPersistence persistence) {
-		_persistence = persistence;
-
-		ReferenceRegistry.registerReference(ShoppingItemUtil.class,
-			"_persistence");
 	}
 
 	private static ShoppingItemPersistence _persistence;

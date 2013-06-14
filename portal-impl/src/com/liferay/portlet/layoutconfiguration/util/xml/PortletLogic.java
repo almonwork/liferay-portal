@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,46 +14,39 @@
 
 package com.liferay.portlet.layoutconfiguration.util.xml;
 
+import com.liferay.portal.kernel.portlet.PortletContainerUtil;
+import com.liferay.portal.kernel.servlet.DynamicServletRequest;
+import com.liferay.portal.kernel.servlet.StringServletResponse;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.xml.Document;
 import com.liferay.portal.kernel.xml.Element;
 import com.liferay.portal.kernel.xml.SAXReaderUtil;
+import com.liferay.portal.model.Portlet;
 import com.liferay.portal.model.PortletConstants;
-import com.liferay.portlet.layoutconfiguration.util.RuntimePortletUtil;
+import com.liferay.portal.service.PortletLocalServiceUtil;
+import com.liferay.portal.theme.ThemeDisplay;
+import com.liferay.portal.util.WebKeys;
 
-import javax.portlet.RenderRequest;
-import javax.portlet.RenderResponse;
-
-import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 /**
  * @author Brian Wing Shun Chan
+ * @author Douglas Wong
  */
 public class PortletLogic extends RuntimeLogic {
-
-	public static final String OPEN_TAG = "<runtime-portlet";
 
 	public static final String CLOSE_1_TAG = "</runtime-portlet>";
 
 	public static final String CLOSE_2_TAG = "/>";
 
-	public PortletLogic(
-		ServletContext servletContext, HttpServletRequest request,
-		HttpServletResponse response, RenderRequest renderRequest,
-		RenderResponse renderResponse) {
+	public static final String OPEN_TAG = "<runtime-portlet";
 
-		_servletContext = servletContext;
+	public PortletLogic(
+		HttpServletRequest request, HttpServletResponse response) {
+
 		_request = request;
 		_response = response;
-		_renderRequest = renderRequest;
-		_renderResponse = renderResponse;
-	}
-
-	@Override
-	public String getOpenTag() {
-		return OPEN_TAG;
 	}
 
 	@Override
@@ -62,14 +55,19 @@ public class PortletLogic extends RuntimeLogic {
 	}
 
 	@Override
+	public String getOpenTag() {
+		return OPEN_TAG;
+	}
+
+	@Override
 	public String processXML(String xml) throws Exception {
-		Document doc = SAXReaderUtil.read(xml);
+		Document document = SAXReaderUtil.read(xml);
 
-		Element root = doc.getRootElement();
+		Element rootElement = document.getRootElement();
 
-		String rootPortletId = root.attributeValue("name");
-		String instanceId = root.attributeValue("instance");
-		String queryString = root.attributeValue("queryString");
+		String rootPortletId = rootElement.attributeValue("name");
+		String instanceId = rootElement.attributeValue("instance");
+		String queryString = rootElement.attributeValue("queryString");
 
 		String portletId = rootPortletId;
 
@@ -77,15 +75,24 @@ public class PortletLogic extends RuntimeLogic {
 			portletId += PortletConstants.INSTANCE_SEPARATOR + instanceId;
 		}
 
-		return RuntimePortletUtil.processPortlet(
-			_servletContext, _request, _response, _renderRequest,
-			_renderResponse, portletId, queryString, false);
+		StringServletResponse stringServletResponse =
+			new StringServletResponse(_response);
+
+		HttpServletRequest request = DynamicServletRequest.addQueryString(
+			_request, queryString);
+
+		ThemeDisplay themeDisplay = (ThemeDisplay)request.getAttribute(
+			WebKeys.THEME_DISPLAY);
+
+		Portlet portlet = PortletLocalServiceUtil.getPortletById(
+			themeDisplay.getCompanyId(), portletId);
+
+		PortletContainerUtil.render(request, stringServletResponse, portlet);
+
+		return stringServletResponse.getString();
 	}
 
-	private ServletContext _servletContext;
 	private HttpServletRequest _request;
 	private HttpServletResponse _response;
-	private RenderRequest _renderRequest;
-	private RenderResponse _renderResponse;
 
 }

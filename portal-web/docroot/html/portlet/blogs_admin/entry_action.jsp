@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -71,11 +71,11 @@ BlogsEntry entry = (BlogsEntry)row.getObject();
 	<c:if test="<%= BlogsEntryPermission.contains(permissionChecker, entry, ActionKeys.DELETE) %>">
 		<portlet:actionURL var="deleteEntryURL">
 			<portlet:param name="struts_action" value="/blogs_admin/edit_entry" />
-			<portlet:param name="<%= Constants.CMD %>" value="<%= Constants.DELETE %>" />
+			<portlet:param name="<%= Constants.CMD %>" value="<%= Constants.MOVE_TO_TRASH %>" />
 			<portlet:param name="redirect" value="<%= redirect %>" />
 			<portlet:param name="entryId" value="<%= String.valueOf(entry.getEntryId()) %>" />
 		</portlet:actionURL>
 
-		<liferay-ui:icon-delete url="<%= deleteEntryURL %>" />
+		<liferay-ui:icon-delete trash="<%= true %>" url="<%= deleteEntryURL %>" />
 	</c:if>
 </liferay-ui:icon-menu>

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,6 +14,8 @@
 
 package com.liferay.portlet.calendar.service;
 
+import com.liferay.portal.service.ServiceWrapper;
+
 /**
  * <p>
  * This class is a wrapper for {@link CalEventLocalService}.
@@ -23,7 +25,8 @@ package com.liferay.portlet.calendar.service;
  * @see       CalEventLocalService
  * @generated
  */
-public class CalEventLocalServiceWrapper implements CalEventLocalService {
+public class CalEventLocalServiceWrapper implements CalEventLocalService,
+	ServiceWrapper<CalEventLocalService> {
 	public CalEventLocalServiceWrapper(
 		CalEventLocalService calEventLocalService) {
 		_calEventLocalService = calEventLocalService;
@@ -57,25 +60,32 @@ public class CalEventLocalServiceWrapper implements CalEventLocalService {
 	* Deletes the cal event with the primary key from the database. Also notifies the appropriate model listeners.
 	*
 	* @param eventId the primary key of the cal event
+	* @return the cal event that was removed
 	* @throws PortalException if a cal event with the primary key could not be found
 	* @throws SystemException if a system exception occurred
 	*/
-	public void deleteCalEvent(long eventId)
+	public com.liferay.portlet.calendar.model.CalEvent deleteCalEvent(
+		long eventId)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException {
-		_calEventLocalService.deleteCalEvent(eventId);
+		return _calEventLocalService.deleteCalEvent(eventId);
 	}
 
 	/**
 	* Deletes the cal event from the database. Also notifies the appropriate model listeners.
 	*
 	* @param calEvent the cal event
+	* @return the cal event that was removed
 	* @throws SystemException if a system exception occurred
 	*/
-	public void deleteCalEvent(
+	public com.liferay.portlet.calendar.model.CalEvent deleteCalEvent(
 		com.liferay.portlet.calendar.model.CalEvent calEvent)
 		throws com.liferay.portal.kernel.exception.SystemException {
-		_calEventLocalService.deleteCalEvent(calEvent);
+		return _calEventLocalService.deleteCalEvent(calEvent);
+	}
+
+	public com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery() {
+		return _calEventLocalService.dynamicQuery();
 	}
 
 	/**
@@ -147,6 +157,12 @@ public class CalEventLocalServiceWrapper implements CalEventLocalService {
 		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery)
 		throws com.liferay.portal.kernel.exception.SystemException {
 		return _calEventLocalService.dynamicQueryCount(dynamicQuery);
+	}
+
+	public com.liferay.portlet.calendar.model.CalEvent fetchCalEvent(
+		long eventId)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return _calEventLocalService.fetchCalEvent(eventId);
 	}
 
 	/**
@@ -320,16 +336,17 @@ public class CalEventLocalServiceWrapper implements CalEventLocalService {
 		_calEventLocalService.checkEvents();
 	}
 
-	public void deleteEvent(com.liferay.portlet.calendar.model.CalEvent event)
+	public com.liferay.portlet.calendar.model.CalEvent deleteEvent(
+		com.liferay.portlet.calendar.model.CalEvent event)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException {
-		_calEventLocalService.deleteEvent(event);
+		return _calEventLocalService.deleteEvent(event);
 	}
 
-	public void deleteEvent(long eventId)
+	public com.liferay.portlet.calendar.model.CalEvent deleteEvent(long eventId)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException {
-		_calEventLocalService.deleteEvent(eventId);
+		return _calEventLocalService.deleteEvent(eventId);
 	}
 
 	public void deleteEvents(long groupId)
@@ -442,10 +459,11 @@ public class CalEventLocalServiceWrapper implements CalEventLocalService {
 		return _calEventLocalService.hasEvents(groupId, cal, types);
 	}
 
-	public void importICal4j(long userId, long groupId, java.io.File file)
+	public void importICal4j(long userId, long groupId,
+		java.io.InputStream inputStream)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException {
-		_calEventLocalService.importICal4j(userId, groupId, file);
+		_calEventLocalService.importICal4j(userId, groupId, inputStream);
 	}
 
 	public void updateAsset(long userId,
@@ -479,12 +497,26 @@ public class CalEventLocalServiceWrapper implements CalEventLocalService {
 			firstReminder, secondReminder, serviceContext);
 	}
 
+	/**
+	 * @deprecated Renamed to {@link #getWrappedService}
+	 */
 	public CalEventLocalService getWrappedCalEventLocalService() {
 		return _calEventLocalService;
 	}
 
+	/**
+	 * @deprecated Renamed to {@link #setWrappedService}
+	 */
 	public void setWrappedCalEventLocalService(
 		CalEventLocalService calEventLocalService) {
+		_calEventLocalService = calEventLocalService;
+	}
+
+	public CalEventLocalService getWrappedService() {
+		return _calEventLocalService;
+	}
+
+	public void setWrappedService(CalEventLocalService calEventLocalService) {
 		_calEventLocalService = calEventLocalService;
 	}
 

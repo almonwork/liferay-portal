@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -22,6 +22,10 @@ public class UnicodeFormatter_IW {
 		return _instance;
 	}
 
+	public java.lang.String bytesToHex(byte[] bytes) {
+		return UnicodeFormatter.bytesToHex(bytes);
+	}
+
 	public java.lang.String byteToHex(byte b) {
 		return UnicodeFormatter.byteToHex(b);
 	}
@@ -30,8 +34,16 @@ public class UnicodeFormatter_IW {
 		return UnicodeFormatter.byteToHex(b, hexes);
 	}
 
+	public char[] byteToHex(byte b, char[] hexes, boolean upperCase) {
+		return UnicodeFormatter.byteToHex(b, hexes, upperCase);
+	}
+
 	public java.lang.String charToHex(char c) {
 		return UnicodeFormatter.charToHex(c);
+	}
+
+	public byte[] hexToBytes(java.lang.String hexString) {
+		return UnicodeFormatter.hexToBytes(hexString);
 	}
 
 	public java.lang.String parseString(java.lang.String hexString) {

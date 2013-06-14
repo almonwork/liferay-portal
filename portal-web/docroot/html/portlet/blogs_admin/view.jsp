@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -59,6 +59,7 @@ portletURL.setParameter("struts_action", "/blogs_admin/view");
 			escapedModel="<%= true %>"
 			keyProperty="entryId"
 			modelVar="entry"
+			rowIdProperty="urlTitle"
 		>
 			<liferay-portlet:renderURL varImpl="rowURL">
 				<portlet:param name="struts_action" value="/blogs_admin/view_entry" />
@@ -74,9 +75,11 @@ portletURL.setParameter("struts_action", "/blogs_admin/view");
 			/>
 		</liferay-ui:search-container-row>
 
-		<aui:button onClick='<%= renderResponse.getNamespace() + "deleteEntries();" %>' value="delete" />
+		<c:if test="<%= total > 0 %>">
+			<aui:button onClick='<%= renderResponse.getNamespace() + "deleteEntries();" %>' value="move-to-the-recycle-bin" />
 
-		<div class="separator"><!-- --></div>
+			<div class="separator"><!-- --></div>
+		</c:if>
 
 		<liferay-ui:search-iterator />
 	</liferay-ui:search-container>
@@ -87,9 +90,9 @@ portletURL.setParameter("struts_action", "/blogs_admin/view");
 		window,
 		'<portlet:namespace />deleteEntries',
 		function() {
-			if (confirm('<%= UnicodeLanguageUtil.get(pageContext, "are-you-sure-you-want-to-delete-the-selected-entries") %>')) {
+			if (confirm('<%= UnicodeLanguageUtil.get(pageContext, "are-you-sure-you-want-to-move-the-selected-entries-to-the-recycle-bin") %>')) {
 				document.<portlet:namespace />fm.method = "post";
-				document.<portlet:namespace />fm.<portlet:namespace /><%= Constants.CMD %>.value = "<%= Constants.DELETE %>";
+				document.<portlet:namespace />fm.<portlet:namespace /><%= Constants.CMD %>.value = "<%= Constants.MOVE_TO_TRASH %>";
 				document.<portlet:namespace />fm.<portlet:namespace />deleteEntryIds.value = Liferay.Util.listCheckedExcept(document.<portlet:namespace />fm, "<portlet:namespace />allRowIds");
 				submitForm(document.<portlet:namespace />fm, "<portlet:actionURL><portlet:param name="struts_action" value="/blogs_admin/edit_entry" /></portlet:actionURL>");
 			}

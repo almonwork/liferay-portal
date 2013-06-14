@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -119,13 +119,13 @@ public class OpenSSOFilter extends BasePortalFilter {
 			return;
 		}
 
+		HttpSession session = request.getSession();
+
 		if (authenticated) {
 
 			// LEP-5943
 
 			String newSubjectId = OpenSSOUtil.getSubjectId(request, serviceUrl);
-
-			HttpSession session = request.getSession();
 
 			String oldSubjectId = (String)session.getAttribute(_SUBJECT_ID_KEY);
 
@@ -143,6 +143,9 @@ public class OpenSSOFilter extends BasePortalFilter {
 			processFilter(OpenSSOFilter.class, request, response, filterChain);
 
 			return;
+		}
+		else if (PortalUtil.getUserId(request) > 0) {
+			session.invalidate();
 		}
 
 		if (!PropsValues.AUTH_FORWARD_BY_LAST_PATH ||

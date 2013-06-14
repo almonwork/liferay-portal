@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,6 +14,7 @@
 
 package com.liferay.portal.struts;
 
+import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.portlet.PortletResponseUtil;
@@ -22,6 +23,7 @@ import com.liferay.portal.kernel.servlet.ServletResponseUtil;
 import com.liferay.portal.kernel.servlet.SessionErrors;
 import com.liferay.portal.kernel.servlet.SessionMessages;
 import com.liferay.portal.kernel.util.ContentTypes;
+import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.JavaConstants;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.StringPool;
@@ -39,6 +41,8 @@ import java.io.IOException;
 
 import javax.portlet.ActionRequest;
 import javax.portlet.ActionResponse;
+import javax.portlet.EventRequest;
+import javax.portlet.EventResponse;
 import javax.portlet.MimeResponse;
 import javax.portlet.PortletConfig;
 import javax.portlet.PortletContext;
@@ -111,25 +115,31 @@ public class PortletAction extends Action {
 				(RenderResponse)portletResponse);
 		}
 		else {
-			serveResource(
-				mapping, form, portletConfig, (ResourceRequest)portletRequest,
-				(ResourceResponse)portletResponse);
+			if (portletRequest instanceof EventRequest) {
+				processEvent(
+					mapping, form, portletConfig, (EventRequest)portletRequest,
+					(EventResponse)portletResponse);
+			}
+			else {
+				serveResource(
+					mapping, form, portletConfig,
+					(ResourceRequest)portletRequest,
+					(ResourceResponse)portletResponse);
+			}
 
 			return mapping.findForward(ActionConstants.COMMON_NULL);
 		}
 	}
 
-	public ActionForward strutsExecute(
-			ActionMapping mapping, ActionForm form, HttpServletRequest request,
-			HttpServletResponse response)
-		throws Exception {
-
-		return super.execute(mapping, form, request, response);
-	}
-
 	public void processAction(
 			ActionMapping mapping, ActionForm form, PortletConfig portletConfig,
 			ActionRequest actionRequest, ActionResponse actionResponse)
+		throws Exception {
+	}
+
+	public void processEvent(
+			ActionMapping mapping, ActionForm form, PortletConfig portletConfig,
+			EventRequest eventRequest, EventResponse eventResponse)
 		throws Exception {
 	}
 
@@ -152,21 +162,43 @@ public class PortletAction extends Action {
 
 		String resourceId = resourceRequest.getResourceID();
 
-		if (Validator.isNotNull(resourceId)) {
-			PortletContext portletContext = portletConfig.getPortletContext();
-
-			PortletRequestDispatcher portletRequestDispatcher =
-				portletContext.getRequestDispatcher(resourceId);
-
-			if (portletRequestDispatcher != null) {
-				portletRequestDispatcher.forward(
-					resourceRequest, resourceResponse);
-			}
+		if (Validator.isNull(resourceId)) {
+			return;
 		}
+
+		PortletContext portletContext = portletConfig.getPortletContext();
+
+		PortletRequestDispatcher portletRequestDispatcher =
+			portletContext.getRequestDispatcher(resourceId);
+
+		if (portletRequestDispatcher == null) {
+			return;
+		}
+
+		portletRequestDispatcher.forward(resourceRequest, resourceResponse);
+	}
+
+	public ActionForward strutsExecute(
+			ActionMapping mapping, ActionForm form, HttpServletRequest request,
+			HttpServletResponse response)
+		throws Exception {
+
+		return super.execute(mapping, form, request, response);
 	}
 
 	protected void addSuccessMessage(
 		ActionRequest actionRequest, ActionResponse actionResponse) {
+
+		PortletConfig portletConfig = (PortletConfig)actionRequest.getAttribute(
+			JavaConstants.JAVAX_PORTLET_CONFIG);
+
+		boolean addProcessActionSuccessMessage = GetterUtil.getBoolean(
+			portletConfig.getInitParameter("add-process-action-success-action"),
+			true);
+
+		if (!addProcessActionSuccessMessage) {
+			return;
+		}
 
 		String successMessage = ParamUtil.getString(
 			actionRequest, "successMessage");
@@ -190,10 +222,6 @@ public class PortletAction extends Action {
 		else {
 			return forward;
 		}
-	}
-
-	protected void setForward(PortletRequest portletRequest, String forward) {
-		portletRequest.setAttribute(getForwardKey(portletRequest), forward);
 	}
 
 	protected ModuleConfig getModuleConfig(PortletRequest portletRequest) {
@@ -220,77 +248,6 @@ public class PortletAction extends Action {
 		return _CHECK_METHOD_ON_PROCESS_ACTION;
 	}
 
-	protected void sendRedirect(
-			ActionRequest actionRequest, ActionResponse actionResponse)
-		throws IOException {
-
-		sendRedirect(actionRequest, actionResponse, null);
-	}
-
-	protected void sendRedirect(
-			ActionRequest actionRequest, ActionResponse actionResponse,
-			String redirect)
-		throws IOException {
-
-		if (SessionErrors.isEmpty(actionRequest)) {
-			ThemeDisplay themeDisplay =
-				(ThemeDisplay)actionRequest.getAttribute(
-					WebKeys.THEME_DISPLAY);
-
-			LayoutTypePortlet layoutTypePortlet =
-				themeDisplay.getLayoutTypePortlet();
-
-			boolean hasPortletId = false;
-
-			String portletId = (String)actionRequest.getAttribute(
-				WebKeys.PORTLET_ID);
-
-			try {
-				hasPortletId = layoutTypePortlet.hasPortletId(portletId);
-			}
-			catch (Exception e) {
-			}
-
-			Portlet portlet = PortletLocalServiceUtil.getPortletById(portletId);
-
-			if (hasPortletId || portlet.isAddDefaultResource()) {
-				addSuccessMessage(actionRequest, actionResponse);
-			}
-		}
-
-		if (Validator.isNull(redirect)) {
-			redirect = ParamUtil.getString(actionRequest, "redirect");
-		}
-
-		if (Validator.isNotNull(redirect)) {
-
-			// LPS-1928
-
-			HttpServletRequest request = PortalUtil.getHttpServletRequest(
-				actionRequest);
-
-			if ((BrowserSnifferUtil.isIe(request)) &&
-				(BrowserSnifferUtil.getMajorVersion(request) == 6.0) &&
-				(redirect.contains(StringPool.POUND))) {
-
-				String redirectToken = "&#";
-
-				if (!redirect.contains(StringPool.QUESTION)) {
-					redirectToken = StringPool.QUESTION + redirectToken;
-				}
-
-				redirect = StringUtil.replace(
-					redirect, StringPool.POUND, redirectToken);
-			}
-
-			redirect = PortalUtil.escapeRedirect(redirect);
-
-			if (Validator.isNotNull(redirect)) {
-				actionResponse.sendRedirect(redirect);
-			}
-		}
-	}
-
 	protected boolean redirectToLogin(
 			ActionRequest actionRequest, ActionResponse actionResponse)
 		throws IOException {
@@ -311,6 +268,85 @@ public class PortletAction extends Action {
 		else {
 			return false;
 		}
+	}
+
+	protected void sendRedirect(
+			ActionRequest actionRequest, ActionResponse actionResponse)
+		throws IOException, SystemException {
+
+		sendRedirect(actionRequest, actionResponse, null);
+	}
+
+	protected void sendRedirect(
+			ActionRequest actionRequest, ActionResponse actionResponse,
+			String redirect)
+		throws IOException, SystemException {
+
+		if (SessionErrors.isEmpty(actionRequest)) {
+			ThemeDisplay themeDisplay =
+				(ThemeDisplay)actionRequest.getAttribute(WebKeys.THEME_DISPLAY);
+
+			LayoutTypePortlet layoutTypePortlet =
+				themeDisplay.getLayoutTypePortlet();
+
+			boolean hasPortletId = false;
+
+			String portletId = (String)actionRequest.getAttribute(
+				WebKeys.PORTLET_ID);
+
+			try {
+				hasPortletId = layoutTypePortlet.hasPortletId(portletId);
+			}
+			catch (Exception e) {
+			}
+
+			Portlet portlet = PortletLocalServiceUtil.getPortletById(
+				themeDisplay.getCompanyId(), portletId);
+
+			if (hasPortletId || portlet.isAddDefaultResource()) {
+				addSuccessMessage(actionRequest, actionResponse);
+			}
+		}
+
+		if (Validator.isNull(redirect)) {
+			redirect = (String)actionRequest.getAttribute(WebKeys.REDIRECT);
+		}
+
+		if (Validator.isNull(redirect)) {
+			redirect = ParamUtil.getString(actionRequest, "redirect");
+		}
+
+		if (Validator.isNotNull(redirect)) {
+
+			// LPS-1928
+
+			HttpServletRequest request = PortalUtil.getHttpServletRequest(
+				actionRequest);
+
+			if (BrowserSnifferUtil.isIe(request) &&
+				(BrowserSnifferUtil.getMajorVersion(request) == 6.0) &&
+				redirect.contains(StringPool.POUND)) {
+
+				String redirectToken = "&#";
+
+				if (!redirect.contains(StringPool.QUESTION)) {
+					redirectToken = StringPool.QUESTION + redirectToken;
+				}
+
+				redirect = StringUtil.replace(
+					redirect, StringPool.POUND, redirectToken);
+			}
+
+			redirect = PortalUtil.escapeRedirect(redirect);
+
+			if (Validator.isNotNull(redirect)) {
+				actionResponse.sendRedirect(redirect);
+			}
+		}
+	}
+
+	protected void setForward(PortletRequest portletRequest, String forward) {
+		portletRequest.setAttribute(getForwardKey(portletRequest), forward);
 	}
 
 	protected void writeJSON(

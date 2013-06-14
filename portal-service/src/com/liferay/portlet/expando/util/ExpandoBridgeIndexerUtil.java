@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -15,6 +15,7 @@
 package com.liferay.portlet.expando.util;
 
 import com.liferay.portal.kernel.search.Document;
+import com.liferay.portal.kernel.security.pacl.permission.PortalRuntimePermission;
 import com.liferay.portlet.expando.model.ExpandoBridge;
 
 /**
@@ -33,11 +34,16 @@ public class ExpandoBridgeIndexerUtil {
 	}
 
 	public static ExpandoBridgeIndexer getExpandoBridgeIndexer() {
+		PortalRuntimePermission.checkGetBeanProperty(
+			ExpandoBridgeIndexerUtil.class);
+
 		return _expandoBridgeIndexer;
 	}
 
 	public void setExpandoBridgeIndexer(
 		ExpandoBridgeIndexer expandoBridgeIndexer) {
+
+		PortalRuntimePermission.checkSetBeanProperty(getClass());
 
 		_expandoBridgeIndexer = expandoBridgeIndexer;
 	}

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -21,7 +21,6 @@ import com.liferay.portal.kernel.webcache.WebCachePoolUtil;
 import com.liferay.portlet.currencyconverter.model.Currency;
 
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
@@ -52,11 +51,7 @@ public class CurrencyUtil {
 
 		symbols = new TreeMap<String, String>();
 
-		Iterator<String> itr = _instance._currencyIds.iterator();
-
-		while (itr.hasNext()) {
-			String symbol = itr.next();
-
+		for (String symbol : _instance._currencyIds) {
 			symbols.put(LanguageUtil.get(pageContext, symbol), symbol);
 		}
 

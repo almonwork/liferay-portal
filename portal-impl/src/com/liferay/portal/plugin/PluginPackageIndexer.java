@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -63,16 +63,15 @@ public class PluginPackageIndexer extends BaseIndexer {
 		return CLASS_NAMES;
 	}
 
+	public String getPortletId() {
+		return PORTLET_ID;
+	}
+
 	@Override
 	protected void doDelete(Object obj) throws Exception {
 		PluginPackage pluginPackage = (PluginPackage)obj;
 
-		Document document = new DocumentImpl();
-
-		document.addUID(PORTLET_ID, pluginPackage.getModuleId());
-
-		SearchEngineUtil.deleteDocument(
-			CompanyConstants.SYSTEM, document.get(Field.UID));
+		deleteDocument(CompanyConstants.SYSTEM, pluginPackage.getModuleId());
 	}
 
 	@Override
@@ -106,7 +105,8 @@ public class PluginPackageIndexer extends BaseIndexer {
 
 		document.addText(Field.CONTENT, sb.toString());
 
-		document.addKeyword(Field.PORTLET_ID, PORTLET_ID);
+		document.addKeyword(
+			Field.ENTRY_CLASS_NAME, PluginPackage.class.getName());
 
 		ModuleId moduleIdObj = ModuleId.getInstance(
 			pluginPackage.getModuleId());
@@ -114,6 +114,7 @@ public class PluginPackageIndexer extends BaseIndexer {
 		document.addKeyword(Field.GROUP_ID, moduleIdObj.getGroupId());
 
 		document.addDate(Field.MODIFIED_DATE, pluginPackage.getModifiedDate());
+		document.addKeyword(Field.PORTLET_ID, PORTLET_ID);
 
 		String[] statusAndInstalledVersion =
 			PluginPackageUtil.getStatusAndInstalledVersion(pluginPackage);
@@ -183,8 +184,7 @@ public class PluginPackageIndexer extends BaseIndexer {
 		String moduleId = document.get("moduleId");
 		String repositoryURL = document.get("repositoryURL");
 
-		portletURL.setParameter(
-			"struts_action", "/admin/view");
+		portletURL.setParameter("struts_action", "/admin/view");
 		portletURL.setParameter("tabs2", "repositories");
 		portletURL.setParameter("moduleId", moduleId);
 		portletURL.setParameter("repositoryURL", repositoryURL);
@@ -198,7 +198,8 @@ public class PluginPackageIndexer extends BaseIndexer {
 
 		Document document = getDocument(pluginPackage);
 
-		SearchEngineUtil.updateDocument(CompanyConstants.SYSTEM, document);
+		SearchEngineUtil.updateDocument(
+			getSearchEngineId(), CompanyConstants.SYSTEM, document);
 	}
 
 	@Override
@@ -208,7 +209,7 @@ public class PluginPackageIndexer extends BaseIndexer {
 	@Override
 	protected void doReindex(String[] ids) throws Exception {
 		SearchEngineUtil.deletePortletDocuments(
-			CompanyConstants.SYSTEM, PORTLET_ID);
+			getSearchEngineId(), CompanyConstants.SYSTEM, PORTLET_ID);
 
 		Collection<Document> documents = new ArrayList<Document>();
 
@@ -220,7 +221,8 @@ public class PluginPackageIndexer extends BaseIndexer {
 			documents.add(document);
 		}
 
-		SearchEngineUtil.updateDocuments(CompanyConstants.SYSTEM, documents);
+		SearchEngineUtil.updateDocuments(
+			getSearchEngineId(), CompanyConstants.SYSTEM, documents);
 	}
 
 	@Override

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -60,7 +60,7 @@ public class EditInstanceAction extends PortletAction {
 			if (e instanceof NoSuchCompanyException ||
 				e instanceof PrincipalException) {
 
-				SessionErrors.add(actionRequest, e.getClass().getName());
+				SessionErrors.add(actionRequest, e.getClass());
 
 				setForward(actionRequest, "portlet.admin.error");
 			}
@@ -68,7 +68,7 @@ public class EditInstanceAction extends PortletAction {
 					 e instanceof CompanyVirtualHostException ||
 					 e instanceof CompanyWebIdException) {
 
-				SessionErrors.add(actionRequest, e.getClass().getName());
+				SessionErrors.add(actionRequest, e.getClass());
 			}
 			else {
 				throw e;
@@ -89,7 +89,7 @@ public class EditInstanceAction extends PortletAction {
 			if (e instanceof NoSuchCompanyException ||
 				e instanceof PrincipalException) {
 
-				SessionErrors.add(renderRequest, e.getClass().getName());
+				SessionErrors.add(renderRequest, e.getClass());
 
 				return mapping.findForward("portlet.admin.error");
 			}

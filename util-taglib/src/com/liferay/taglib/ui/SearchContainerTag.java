@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -20,7 +20,6 @@ import com.liferay.portal.kernel.dao.search.SearchContainer;
 import com.liferay.portal.kernel.util.JavaConstants;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.OrderByComparator;
-import com.liferay.portal.kernel.util.ServerDetector;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.taglib.util.ParamAndPropertyAncestorTagImpl;
@@ -32,7 +31,6 @@ import javax.portlet.PortletRequest;
 import javax.portlet.PortletResponse;
 import javax.portlet.PortletURL;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.jsp.JspException;
 
 /**
@@ -44,28 +42,26 @@ public class SearchContainerTag<R> extends ParamAndPropertyAncestorTagImpl {
 
 	@Override
 	public int doEndTag() {
-		if (!ServerDetector.isResin()) {
-			_curParam = SearchContainer.DEFAULT_CUR_PARAM;
-			_delta = SearchContainer.DEFAULT_DELTA;
-			_deltaConfigurable = SearchContainer.DEFAULT_DELTA_CONFIGURABLE;
-			_deltaParam = SearchContainer.DEFAULT_DELTA_PARAM;
-			_displayTerms = null;
-			_emptyResultsMessage = null;
-			_hasResults = false;
-			_headerNames = null;
-			_hover = false;
-			_id = null;
-			_iteratorURL = null;
-			_orderByCol = null;
-			_orderByColParam = SearchContainer.DEFAULT_ORDER_BY_COL_PARAM;
-			_orderByComparator = null;
-			_orderByType = null;
-			_orderByTypeParam = SearchContainer.DEFAULT_ORDER_BY_TYPE_PARAM;
-			_rowChecker = null;
-			_searchContainer = null;
-			_searchTerms = null;
-			_var = DEFAULT_VAR;
-		}
+		_curParam = SearchContainer.DEFAULT_CUR_PARAM;
+		_delta = SearchContainer.DEFAULT_DELTA;
+		_deltaConfigurable = SearchContainer.DEFAULT_DELTA_CONFIGURABLE;
+		_deltaParam = SearchContainer.DEFAULT_DELTA_PARAM;
+		_displayTerms = null;
+		_emptyResultsMessage = null;
+		_hasResults = false;
+		_headerNames = null;
+		_hover = false;
+		_id = null;
+		_iteratorURL = null;
+		_orderByCol = null;
+		_orderByColParam = SearchContainer.DEFAULT_ORDER_BY_COL_PARAM;
+		_orderByComparator = null;
+		_orderByType = null;
+		_orderByTypeParam = SearchContainer.DEFAULT_ORDER_BY_TYPE_PARAM;
+		_rowChecker = null;
+		_searchContainer = null;
+		_searchTerms = null;
+		_var = DEFAULT_VAR;
 
 		return EVAL_PAGE;
 	}
@@ -73,8 +69,6 @@ public class SearchContainerTag<R> extends ParamAndPropertyAncestorTagImpl {
 	@Override
 	public int doStartTag() throws JspException {
 		try {
-			HttpServletRequest request = getServletRequest();
-
 			PortletRequest portletRequest =
 				(PortletRequest)request.getAttribute(
 					JavaConstants.JAVAX_PORTLET_REQUEST);
@@ -299,10 +293,10 @@ public class SearchContainerTag<R> extends ParamAndPropertyAncestorTagImpl {
 	private boolean _hover = true;
 	private String _id;
 	private PortletURL _iteratorURL;
-	private OrderByComparator _orderByComparator;
 	private String _orderByCol;
 	private String _orderByColParam =
 		SearchContainer.DEFAULT_ORDER_BY_COL_PARAM;
+	private OrderByComparator _orderByComparator;
 	private String _orderByType;
 	private String _orderByTypeParam =
 		SearchContainer.DEFAULT_ORDER_BY_TYPE_PARAM;

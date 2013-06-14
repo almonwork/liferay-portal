@@ -14,14 +14,24 @@
 	<td></td>
 </tr>
 <tr>
-	<td>waitForElementPresent</td>
+	<td>waitForVisible</td>
 	<td>link=Shopping Test Page</td>
-	<td></td>
+	<td>Shopping Test Page</td>
 </tr>
 <tr>
 	<td>clickAtAndWait</td>
 	<td>link=Shopping Test Page</td>
+	<td>Shopping Test Page</td>
+</tr>
+<tr>
+	<td>pause</td>
+	<td>5000</td>
 	<td></td>
+</tr>
+<tr>
+	<td>assertText</td>
+	<td>//strong/a</td>
+	<td>Options</td>
 </tr>
 <tr>
 	<td>clickAt</td>
@@ -39,18 +49,18 @@
 	<td>Configuration</td>
 </tr>
 <tr>
-	<td>click</td>
+	<td>clickAt</td>
 	<td>//div[@class='lfr-component lfr-menu-list']/ul/li[2]/a</td>
 	<td>Configuration</td>
 </tr>
 <tr>
 	<td>waitForVisible</td>
-	<td>//span[@class='taglib-text']</td>
+	<td>//a[@class='taglib-icon']/span</td>
 	<td>Archive/Restore Setup</td>
 </tr>
 <tr>
 	<td>clickAtAndWait</td>
-	<td>//span[@class='taglib-text']</td>
+	<td>//a[@class='taglib-icon']/span</td>
 	<td>Archive/Restore Setup</td>
 </tr>
 <tr>
@@ -64,6 +74,21 @@
 	<td>ShoppingArchivedSetup1NotPresent</td>
 </tr>
 <tr>
+	<td>selectFrame</td>
+	<td>//iframe</td>
+	<td>Shopping - Configuration</td>
+</tr>
+<tr>
+	<td>pause</td>
+	<td>5000</td>
+	<td></td>
+</tr>
+<tr>
+	<td>assertText</td>
+	<td>//tr[3]/td[4]/span/ul/li/strong/a</td>
+	<td>Actions</td>
+</tr>
+<tr>
 	<td>clickAt</td>
 	<td>//tr[3]/td[4]/span/ul/li/strong/a</td>
 	<td>Actions</td>
@@ -94,6 +119,11 @@
 	<td></td>
 </tr>
 <tr>
+	<td>selectFrame</td>
+	<td>relative=top</td>
+	<td>top</td>
+</tr>
+<tr>
 	<td>store</td>
 	<td>eval(selenium.isElementPresent('//tr[3]/td[4]/span/ul/li/strong/a'))</td>
 	<td>shoppingArchivedSetup2Present</td>
@@ -102,6 +132,21 @@
 	<td>gotoIf</td>
 	<td>!${shoppingArchivedSetup2Present}</td>
 	<td>ShoppingArchivedSetup2NotPresent</td>
+</tr>
+<tr>
+	<td>selectFrame</td>
+	<td>//iframe</td>
+	<td>Shopping - Configuration</td>
+</tr>
+<tr>
+	<td>pause</td>
+	<td>5000</td>
+	<td></td>
+</tr>
+<tr>
+	<td>assertText</td>
+	<td>//tr[3]/td[4]/span/ul/li/strong/a</td>
+	<td>Actions</td>
 </tr>
 <tr>
 	<td>clickAt</td>
@@ -132,6 +177,11 @@
 	<td>label</td>
 	<td>ShoppingArchivedSetup2NotPresent</td>
 	<td></td>
+</tr>
+<tr>
+	<td>selectFrame</td>
+	<td>relative=top</td>
+	<td>top</td>
 </tr>
 <tr>
 	<td>store</td>
@@ -144,6 +194,21 @@
 	<td>ShoppingArchivedSetup3NotPresent</td>
 </tr>
 <tr>
+	<td>selectFrame</td>
+	<td>//iframe</td>
+	<td>Shopping - Configuration</td>
+</tr>
+<tr>
+	<td>pause</td>
+	<td>5000</td>
+	<td></td>
+</tr>
+<tr>
+	<td>assertText</td>
+	<td>//tr[3]/td[4]/span/ul/li/strong/a</td>
+	<td>Actions</td>
+</tr>
+<tr>
 	<td>clickAt</td>
 	<td>//tr[3]/td[4]/span/ul/li/strong/a</td>
 	<td>Actions</td>
@@ -174,6 +239,11 @@
 	<td></td>
 </tr>
 <tr>
+	<td>selectFrame</td>
+	<td>relative=top</td>
+	<td>top</td>
+</tr>
+<tr>
 	<td>store</td>
 	<td>eval(selenium.isElementPresent('//tr[3]/td[4]/span/ul/li/strong/a'))</td>
 	<td>shoppingArchivedSetup4Present</td>
@@ -182,6 +252,21 @@
 	<td>gotoIf</td>
 	<td>!${shoppingArchivedSetup4Present}</td>
 	<td>ShoppingArchivedSetup4NotPresent</td>
+</tr>
+<tr>
+	<td>selectFrame</td>
+	<td>//iframe</td>
+	<td>Shopping - Configuration</td>
+</tr>
+<tr>
+	<td>pause</td>
+	<td>5000</td>
+	<td></td>
+</tr>
+<tr>
+	<td>assertText</td>
+	<td>//tr[3]/td[4]/span/ul/li/strong/a</td>
+	<td>Actions</td>
 </tr>
 <tr>
 	<td>clickAt</td>
@@ -212,6 +297,11 @@
 	<td>label</td>
 	<td>ShoppingArchivedSetup4NotPresent</td>
 	<td></td>
+</tr>
+<tr>
+	<td>selectFrame</td>
+	<td>relative=top</td>
+	<td>top</td>
 </tr>
 <tr>
 	<td>store</td>
@@ -224,6 +314,21 @@
 	<td>ShoppingArchivedSetup5NotPresent</td>
 </tr>
 <tr>
+	<td>selectFrame</td>
+	<td>//iframe</td>
+	<td>Shopping - Configuration</td>
+</tr>
+<tr>
+	<td>pause</td>
+	<td>5000</td>
+	<td></td>
+</tr>
+<tr>
+	<td>assertText</td>
+	<td>//tr[3]/td[4]/span/ul/li/strong/a</td>
+	<td>Actions</td>
+</tr>
+<tr>
 	<td>clickAt</td>
 	<td>//tr[3]/td[4]/span/ul/li/strong/a</td>
 	<td>Actions</td>
@@ -253,7 +358,11 @@
 	<td>ShoppingArchivedSetup5NotPresent</td>
 	<td></td>
 </tr>
-
+<tr>
+	<td>selectFrame</td>
+	<td>relative=top</td>
+	<td>top</td>
+</tr>
 </tbody></table>
 </body>
 </html>

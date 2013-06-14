@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -32,25 +32,7 @@ import org.apache.commons.codec.binary.Hex;
  * @author Brian Wing Shun Chan
  * @author Minhchau Dang
  */
-public class CookieKeys {
-
-	public static final String COOKIE_SUPPORT = "COOKIE_SUPPORT";
-
-	public static final String COMPANY_ID = "COMPANY_ID";
-
-	public static final String GUEST_LANGUAGE_ID = "GUEST_LANGUAGE_ID";
-
-	public static final String ID = "ID";
-
-	public static final String JSESSIONID = "jsessionid";
-
-	public static final String LOGIN = "LOGIN";
-
-	public static final String PASSWORD = "PASSWORD";
-
-	public static final String REMEMBER_ME = "REMEMBER_ME";
-
-	public static final String SCREEN_NAME = "SCREEN_NAME";
+public class CookieKeys implements com.liferay.portal.kernel.util.CookieKeys {
 
 	public static final int MAX_AGE = 31536000;
 
@@ -64,8 +46,8 @@ public class CookieKeys {
 	}
 
 	public static void addCookie(
-		HttpServletRequest request, HttpServletResponse response,
-		Cookie cookie, boolean secure) {
+		HttpServletRequest request, HttpServletResponse response, Cookie cookie,
+		boolean secure) {
 
 		if (!PropsValues.SESSION_ENABLE_PERSISTENT_COOKIES ||
 			PropsValues.TCK_URL) {
@@ -112,7 +94,13 @@ public class CookieKeys {
 	}
 
 	public static String getCookie(HttpServletRequest request, String name) {
-		String value = CookieUtil.get(request, name);
+		return getCookie(request, name, true);
+	}
+
+	public static String getCookie(
+		HttpServletRequest request, String name, boolean toUpperCase) {
+
+		String value = CookieUtil.get(request, name, toUpperCase);
 
 		if ((value != null) && isEncodedCookie(name)) {
 			try {
@@ -194,7 +182,7 @@ public class CookieKeys {
 	}
 
 	public static boolean hasSessionId(HttpServletRequest request) {
-		String jsessionid = getCookie(request, JSESSIONID);
+		String jsessionid = getCookie(request, JSESSIONID, false);
 
 		if (jsessionid != null) {
 			return true;
@@ -221,7 +209,7 @@ public class CookieKeys {
 		if (PropsValues.SESSION_ENABLE_PERSISTENT_COOKIES &&
 			PropsValues.SESSION_TEST_COOKIE_SUPPORT) {
 
-			String cookieSupport = getCookie(request, COOKIE_SUPPORT);
+			String cookieSupport = getCookie(request, COOKIE_SUPPORT, false);
 
 			if (Validator.isNull(cookieSupport)) {
 				throw new CookieNotSupportedException();

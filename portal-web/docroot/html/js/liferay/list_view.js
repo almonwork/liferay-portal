@@ -1,4 +1,4 @@
-AUI().add(
+AUI.add(
 	'liferay-list-view',
 	function(A) {
 		var Lang = A.Lang;
@@ -7,11 +7,9 @@ AUI().add(
 
 		var CONTENT_BOX = 'contentBox';
 
-		var EVENT_ITEM_CHOSEN = 'itemChosen';
+		var NAME = 'listview';
 
-		var NAME = 'liferaylistview';
-
-		var CSS_DATA_CONTAINER = getClassName(NAME, 'data', 'container');
+		var CSS_DATA_CONTAINER = 'lfr-list-view-data-container';
 
 		var STR_BOTTOM = 'bottom';
 
@@ -25,9 +23,14 @@ AUI().add(
 
 		var TPL_DATA_CONTAINER = '<div class="' + CSS_DATA_CONTAINER + ' aui-helper-hidden"></div>';
 
+		var UI_SRC = A.Widget.UI_SRC;
+
 		var ListView = A.Component.create(
 			{
 				ATTRS: {
+					cssClass: {
+						value: 'lfr-list-view'
+					},
 					data: {
 						setter: '_setData',
 						validator: '_validateData',
@@ -39,7 +42,12 @@ AUI().add(
 						value: STR_LEFT
 					},
 
-					itemChosen: {
+					item: {
+						validator: Lang.isObject,
+						value: null
+					},
+
+					itemChosenEvent: {
 						validator: isString,
 						value: 'click'
 					},
@@ -47,12 +55,6 @@ AUI().add(
 					itemSelector: {
 						validator: isString,
 						value: null
-					},
-
-					itemAttributes: {
-						setter: A.Array,
-						validator: '_validateItemAttributes',
-						value: 'href'
 					},
 
 					transitionConfig: {
@@ -77,7 +79,7 @@ AUI().add(
 					initializer: function() {
 						var instance = this;
 
-						instance._transitionCompleteProxy = A.bind(instance._onTransitionCompleted, instance);
+						instance._transitionCompleteProxy = A.fn(instance.fire, instance, 'transitionComplete');
 					},
 
 					renderUI: function() {
@@ -97,12 +99,19 @@ AUI().add(
 
 						var contentBox = instance.get(CONTENT_BOX);
 
-						var itemChosenEvent = instance.get(EVENT_ITEM_CHOSEN);
+						var itemChosenEvent = instance.get('itemChosenEvent');
 						var itemSelector = instance.get('itemSelector');
 
 						instance._itemChosenHandle = contentBox.delegate(itemChosenEvent, instance._onItemChosen, itemSelector, instance);
 
 						instance.after('dataChange', instance._afterDataChange);
+
+						instance.publish(
+							'transitionComplete',
+							{
+								defaultFn: instance._defTransitionCompletedFn
+							}
+						);
 					},
 
 					destructor: function() {
@@ -125,13 +134,46 @@ AUI().add(
 						var newData = event.newVal;
 
 						if (useTransition) {
-							instance._dataContainer.setContent(newData);
+							var dataContainer = instance._dataContainer;
+
+							dataContainer.plug(A.Plugin.ParseContent);
+
+							dataContainer.setContent(newData);
 
 							instance._moveContainer();
 						}
 						else {
-							instance.get(CONTENT_BOX).setContent(newData);
+							var contentBox = instance.get(CONTENT_BOX);
+
+							contentBox.plug(A.Plugin.ParseContent);
+
+							contentBox.setContent(newData);
 						}
+					},
+
+					_defTransitionCompletedFn: function(event) {
+						var instance = this;
+
+						var dataContainer = instance._dataContainer;
+
+						instance.get(CONTENT_BOX).setContent(dataContainer.getDOM().childNodes);
+
+						dataContainer.hide();
+						dataContainer.empty();
+					},
+
+					_onItemChosen: function(event) {
+						var instance = this;
+
+						event.preventDefault();
+
+						instance.set(
+							'item',
+							event.currentTarget,
+							{
+								src: UI_SRC
+							}
+						);
 					},
 
 					_moveContainer: function() {
@@ -150,48 +192,6 @@ AUI().add(
 						var transitionConfig = instance.get('transitionConfig');
 
 						dataContainer.transition(transitionConfig, instance._transitionCompleteProxy);
-					},
-
-					_onItemChosen: function(event) {
-						var instance = this;
-
-						var itemAttributes = instance.get('itemAttributes');
-
-						if (itemAttributes) {
-							event.preventDefault();
-
-							var attributesData = {};
-
-							var target = event.currentTarget;
-
-							A.Array.each(
-								itemAttributes,
-								function(item, index, collection) {
-									var attributeData = target.getAttribute(item);
-
-									attributesData[item] = attributeData;
-								}
-							);
-
-							instance.fire(
-								EVENT_ITEM_CHOSEN,
-								{
-									item: target,
-									attributes: attributesData
-								}
-							);
-						}
-					},
-
-					_onTransitionCompleted: function() {
-						var instance = this;
-
-						var dataContainer = instance._dataContainer;
-
-						instance.get(CONTENT_BOX).html(dataContainer.html());
-
-						dataContainer.hide();
-						dataContainer.empty();
 					},
 
 					_setData: function(value) {
@@ -244,10 +244,6 @@ AUI().add(
 					_validateDirection: function(value) {
 						return value === STR_BOTTOM || value === STR_LEFT ||
 							value === STR_RIGHT || value === STR_TOP;
-					},
-
-					_validateItemAttributes: function(value) {
-						return isString(value) || Lang.isArray(value);
 					}
 				}
 			}
@@ -257,6 +253,6 @@ AUI().add(
 	},
 	'',
 	{
-		requires: ['aui-base']
+		requires: ['aui-base', 'transition']
 	}
 );

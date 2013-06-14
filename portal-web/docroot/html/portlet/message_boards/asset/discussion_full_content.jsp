@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -36,9 +36,9 @@ MBMessage parentMessage = MBMessageLocalServiceUtil.getMessage(message.getParent
 <tr>
 	<td class="lfr-center lfr-top">
 		<liferay-ui:user-display
+			displayStyle="<%= 2 %>"
 			userId="<%= message.getUserId() %>"
 			userName="<%= HtmlUtil.escape(message.getUserName()) %>"
-			displayStyle="<%= 2 %>"
 		/>
 	</td>
 	<td class="lfr-top stretch">

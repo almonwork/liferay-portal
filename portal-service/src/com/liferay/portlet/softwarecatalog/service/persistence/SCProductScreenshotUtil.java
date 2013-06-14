@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -92,14 +92,6 @@ public class SCProductScreenshotUtil {
 		return getPersistence()
 				   .findWithDynamicQuery(dynamicQuery, start, end,
 			orderByComparator);
-	}
-
-	/**
-	 * @see com.liferay.portal.service.persistence.BasePersistence#remove(com.liferay.portal.model.BaseModel)
-	 */
-	public static SCProductScreenshot remove(
-		SCProductScreenshot scProductScreenshot) throws SystemException {
-		return getPersistence().remove(scProductScreenshot);
 	}
 
 	/**
@@ -521,24 +513,28 @@ public class SCProductScreenshotUtil {
 	* Removes the s c product screenshot where thumbnailId = &#63; from the database.
 	*
 	* @param thumbnailId the thumbnail ID
+	* @return the s c product screenshot that was removed
 	* @throws SystemException if a system exception occurred
 	*/
-	public static void removeByThumbnailId(long thumbnailId)
+	public static com.liferay.portlet.softwarecatalog.model.SCProductScreenshot removeByThumbnailId(
+		long thumbnailId)
 		throws com.liferay.portal.kernel.exception.SystemException,
 			com.liferay.portlet.softwarecatalog.NoSuchProductScreenshotException {
-		getPersistence().removeByThumbnailId(thumbnailId);
+		return getPersistence().removeByThumbnailId(thumbnailId);
 	}
 
 	/**
 	* Removes the s c product screenshot where fullImageId = &#63; from the database.
 	*
 	* @param fullImageId the full image ID
+	* @return the s c product screenshot that was removed
 	* @throws SystemException if a system exception occurred
 	*/
-	public static void removeByFullImageId(long fullImageId)
+	public static com.liferay.portlet.softwarecatalog.model.SCProductScreenshot removeByFullImageId(
+		long fullImageId)
 		throws com.liferay.portal.kernel.exception.SystemException,
 			com.liferay.portlet.softwarecatalog.NoSuchProductScreenshotException {
-		getPersistence().removeByFullImageId(fullImageId);
+		return getPersistence().removeByFullImageId(fullImageId);
 	}
 
 	/**
@@ -546,12 +542,14 @@ public class SCProductScreenshotUtil {
 	*
 	* @param productEntryId the product entry ID
 	* @param priority the priority
+	* @return the s c product screenshot that was removed
 	* @throws SystemException if a system exception occurred
 	*/
-	public static void removeByP_P(long productEntryId, int priority)
+	public static com.liferay.portlet.softwarecatalog.model.SCProductScreenshot removeByP_P(
+		long productEntryId, int priority)
 		throws com.liferay.portal.kernel.exception.SystemException,
 			com.liferay.portlet.softwarecatalog.NoSuchProductScreenshotException {
-		getPersistence().removeByP_P(productEntryId, priority);
+		return getPersistence().removeByP_P(productEntryId, priority);
 	}
 
 	/**
@@ -635,11 +633,10 @@ public class SCProductScreenshotUtil {
 		return _persistence;
 	}
 
+	/**
+	 * @deprecated
+	 */
 	public void setPersistence(SCProductScreenshotPersistence persistence) {
-		_persistence = persistence;
-
-		ReferenceRegistry.registerReference(SCProductScreenshotUtil.class,
-			"_persistence");
 	}
 
 	private static SCProductScreenshotPersistence _persistence;

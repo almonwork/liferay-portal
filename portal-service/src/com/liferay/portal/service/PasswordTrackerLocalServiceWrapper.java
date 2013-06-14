@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -24,7 +24,8 @@ package com.liferay.portal.service;
  * @generated
  */
 public class PasswordTrackerLocalServiceWrapper
-	implements PasswordTrackerLocalService {
+	implements PasswordTrackerLocalService,
+		ServiceWrapper<PasswordTrackerLocalService> {
 	public PasswordTrackerLocalServiceWrapper(
 		PasswordTrackerLocalService passwordTrackerLocalService) {
 		_passwordTrackerLocalService = passwordTrackerLocalService;
@@ -58,25 +59,32 @@ public class PasswordTrackerLocalServiceWrapper
 	* Deletes the password tracker with the primary key from the database. Also notifies the appropriate model listeners.
 	*
 	* @param passwordTrackerId the primary key of the password tracker
+	* @return the password tracker that was removed
 	* @throws PortalException if a password tracker with the primary key could not be found
 	* @throws SystemException if a system exception occurred
 	*/
-	public void deletePasswordTracker(long passwordTrackerId)
+	public com.liferay.portal.model.PasswordTracker deletePasswordTracker(
+		long passwordTrackerId)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException {
-		_passwordTrackerLocalService.deletePasswordTracker(passwordTrackerId);
+		return _passwordTrackerLocalService.deletePasswordTracker(passwordTrackerId);
 	}
 
 	/**
 	* Deletes the password tracker from the database. Also notifies the appropriate model listeners.
 	*
 	* @param passwordTracker the password tracker
+	* @return the password tracker that was removed
 	* @throws SystemException if a system exception occurred
 	*/
-	public void deletePasswordTracker(
+	public com.liferay.portal.model.PasswordTracker deletePasswordTracker(
 		com.liferay.portal.model.PasswordTracker passwordTracker)
 		throws com.liferay.portal.kernel.exception.SystemException {
-		_passwordTrackerLocalService.deletePasswordTracker(passwordTracker);
+		return _passwordTrackerLocalService.deletePasswordTracker(passwordTracker);
+	}
+
+	public com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery() {
+		return _passwordTrackerLocalService.dynamicQuery();
 	}
 
 	/**
@@ -149,6 +157,12 @@ public class PasswordTrackerLocalServiceWrapper
 		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery)
 		throws com.liferay.portal.kernel.exception.SystemException {
 		return _passwordTrackerLocalService.dynamicQueryCount(dynamicQuery);
+	}
+
+	public com.liferay.portal.model.PasswordTracker fetchPasswordTracker(
+		long passwordTrackerId)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return _passwordTrackerLocalService.fetchPasswordTracker(passwordTrackerId);
 	}
 
 	/**
@@ -274,11 +288,26 @@ public class PasswordTrackerLocalServiceWrapper
 		_passwordTrackerLocalService.trackPassword(userId, encPassword);
 	}
 
+	/**
+	 * @deprecated Renamed to {@link #getWrappedService}
+	 */
 	public PasswordTrackerLocalService getWrappedPasswordTrackerLocalService() {
 		return _passwordTrackerLocalService;
 	}
 
+	/**
+	 * @deprecated Renamed to {@link #setWrappedService}
+	 */
 	public void setWrappedPasswordTrackerLocalService(
+		PasswordTrackerLocalService passwordTrackerLocalService) {
+		_passwordTrackerLocalService = passwordTrackerLocalService;
+	}
+
+	public PasswordTrackerLocalService getWrappedService() {
+		return _passwordTrackerLocalService;
+	}
+
+	public void setWrappedService(
 		PasswordTrackerLocalService passwordTrackerLocalService) {
 		_passwordTrackerLocalService = passwordTrackerLocalService;
 	}

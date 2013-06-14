@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,6 +14,8 @@
 
 package com.liferay.portlet.shopping.service;
 
+import com.liferay.portal.service.ServiceWrapper;
+
 /**
  * <p>
  * This class is a wrapper for {@link ShoppingOrderLocalService}.
@@ -24,7 +26,8 @@ package com.liferay.portlet.shopping.service;
  * @generated
  */
 public class ShoppingOrderLocalServiceWrapper
-	implements ShoppingOrderLocalService {
+	implements ShoppingOrderLocalService,
+		ServiceWrapper<ShoppingOrderLocalService> {
 	public ShoppingOrderLocalServiceWrapper(
 		ShoppingOrderLocalService shoppingOrderLocalService) {
 		_shoppingOrderLocalService = shoppingOrderLocalService;
@@ -58,25 +61,32 @@ public class ShoppingOrderLocalServiceWrapper
 	* Deletes the shopping order with the primary key from the database. Also notifies the appropriate model listeners.
 	*
 	* @param orderId the primary key of the shopping order
+	* @return the shopping order that was removed
 	* @throws PortalException if a shopping order with the primary key could not be found
 	* @throws SystemException if a system exception occurred
 	*/
-	public void deleteShoppingOrder(long orderId)
+	public com.liferay.portlet.shopping.model.ShoppingOrder deleteShoppingOrder(
+		long orderId)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException {
-		_shoppingOrderLocalService.deleteShoppingOrder(orderId);
+		return _shoppingOrderLocalService.deleteShoppingOrder(orderId);
 	}
 
 	/**
 	* Deletes the shopping order from the database. Also notifies the appropriate model listeners.
 	*
 	* @param shoppingOrder the shopping order
+	* @return the shopping order that was removed
 	* @throws SystemException if a system exception occurred
 	*/
-	public void deleteShoppingOrder(
+	public com.liferay.portlet.shopping.model.ShoppingOrder deleteShoppingOrder(
 		com.liferay.portlet.shopping.model.ShoppingOrder shoppingOrder)
 		throws com.liferay.portal.kernel.exception.SystemException {
-		_shoppingOrderLocalService.deleteShoppingOrder(shoppingOrder);
+		return _shoppingOrderLocalService.deleteShoppingOrder(shoppingOrder);
+	}
+
+	public com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery() {
+		return _shoppingOrderLocalService.dynamicQuery();
 	}
 
 	/**
@@ -148,6 +158,12 @@ public class ShoppingOrderLocalServiceWrapper
 		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery)
 		throws com.liferay.portal.kernel.exception.SystemException {
 		return _shoppingOrderLocalService.dynamicQueryCount(dynamicQuery);
+	}
+
+	public com.liferay.portlet.shopping.model.ShoppingOrder fetchShoppingOrder(
+		long orderId)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return _shoppingOrderLocalService.fetchShoppingOrder(orderId);
 	}
 
 	/**
@@ -258,12 +274,13 @@ public class ShoppingOrderLocalServiceWrapper
 	public void completeOrder(java.lang.String number,
 		java.lang.String ppTxnId, java.lang.String ppPaymentStatus,
 		double ppPaymentGross, java.lang.String ppReceiverEmail,
-		java.lang.String ppPayerEmail, boolean updateInventory)
+		java.lang.String ppPayerEmail, boolean updateInventory,
+		com.liferay.portal.service.ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException {
 		_shoppingOrderLocalService.completeOrder(number, ppTxnId,
 			ppPaymentStatus, ppPaymentGross, ppReceiverEmail, ppPayerEmail,
-			updateInventory);
+			updateInventory, serviceContext);
 	}
 
 	public void deleteOrder(long orderId)
@@ -347,18 +364,20 @@ public class ShoppingOrderLocalServiceWrapper
 			shippingEmailAddress, ppPaymentStatus, andOperator);
 	}
 
-	public void sendEmail(long orderId, java.lang.String emailType)
+	public void sendEmail(long orderId, java.lang.String emailType,
+		com.liferay.portal.service.ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException {
-		_shoppingOrderLocalService.sendEmail(orderId, emailType);
+		_shoppingOrderLocalService.sendEmail(orderId, emailType, serviceContext);
 	}
 
 	public void sendEmail(
 		com.liferay.portlet.shopping.model.ShoppingOrder order,
-		java.lang.String emailType)
+		java.lang.String emailType,
+		com.liferay.portal.service.ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException {
-		_shoppingOrderLocalService.sendEmail(order, emailType);
+		_shoppingOrderLocalService.sendEmail(order, emailType, serviceContext);
 	}
 
 	public com.liferay.portlet.shopping.model.ShoppingOrder updateLatestOrder(
@@ -425,11 +444,26 @@ public class ShoppingOrderLocalServiceWrapper
 			ccNumber, ccExpMonth, ccExpYear, ccVerNumber, comments);
 	}
 
+	/**
+	 * @deprecated Renamed to {@link #getWrappedService}
+	 */
 	public ShoppingOrderLocalService getWrappedShoppingOrderLocalService() {
 		return _shoppingOrderLocalService;
 	}
 
+	/**
+	 * @deprecated Renamed to {@link #setWrappedService}
+	 */
 	public void setWrappedShoppingOrderLocalService(
+		ShoppingOrderLocalService shoppingOrderLocalService) {
+		_shoppingOrderLocalService = shoppingOrderLocalService;
+	}
+
+	public ShoppingOrderLocalService getWrappedService() {
+		return _shoppingOrderLocalService;
+	}
+
+	public void setWrappedService(
 		ShoppingOrderLocalService shoppingOrderLocalService) {
 		_shoppingOrderLocalService = shoppingOrderLocalService;
 	}

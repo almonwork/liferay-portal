@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -31,13 +31,6 @@ public class Wsdl2JavaTask {
 	public static void generateJava(String url, String output, String mapping) {
 		Wsdl2javaAntTask wsdl2Java = new Wsdl2javaAntTask();
 
-		wsdl2Java.setProject(AntUtil.getProject());
-		wsdl2Java.setURL(url);
-		wsdl2Java.setOutput(new File(output));
-		wsdl2Java.setServerSide(true);
-		wsdl2Java.setTestCase(false);
-		wsdl2Java.setVerbose(false);
-
 		if (mapping != null) {
 			NamespaceMapping namespaceMapping = new NamespaceMapping();
 
@@ -46,7 +39,20 @@ public class Wsdl2JavaTask {
 			wsdl2Java.addMapping(namespaceMapping);
 		}
 
-		wsdl2Java.execute();
+		wsdl2Java.setFailOnNetworkErrors(true);
+		wsdl2Java.setOutput(new File(output));
+		wsdl2Java.setPrintStackTraceOnFailure(true);
+		wsdl2Java.setProject(AntUtil.getProject());
+		wsdl2Java.setServerSide(true);
+		wsdl2Java.setTestCase(false);
+		wsdl2Java.setURL(url);
+
+		try {
+			wsdl2Java.execute();
+		}
+		catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 
 }

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,6 +14,10 @@
 
 package com.liferay.portal.model;
 
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * <p>
  * This class is a wrapper for {@link Lock}.
@@ -23,7 +27,7 @@ package com.liferay.portal.model;
  * @see       Lock
  * @generated
  */
-public class LockWrapper implements Lock {
+public class LockWrapper implements Lock, ModelWrapper<Lock> {
 	public LockWrapper(Lock lock) {
 		_lock = lock;
 	}
@@ -34,6 +38,92 @@ public class LockWrapper implements Lock {
 
 	public String getModelClassName() {
 		return Lock.class.getName();
+	}
+
+	public Map<String, Object> getModelAttributes() {
+		Map<String, Object> attributes = new HashMap<String, Object>();
+
+		attributes.put("uuid", getUuid());
+		attributes.put("lockId", getLockId());
+		attributes.put("companyId", getCompanyId());
+		attributes.put("userId", getUserId());
+		attributes.put("userName", getUserName());
+		attributes.put("createDate", getCreateDate());
+		attributes.put("className", getClassName());
+		attributes.put("key", getKey());
+		attributes.put("owner", getOwner());
+		attributes.put("inheritable", getInheritable());
+		attributes.put("expirationDate", getExpirationDate());
+
+		return attributes;
+	}
+
+	public void setModelAttributes(Map<String, Object> attributes) {
+		String uuid = (String)attributes.get("uuid");
+
+		if (uuid != null) {
+			setUuid(uuid);
+		}
+
+		Long lockId = (Long)attributes.get("lockId");
+
+		if (lockId != null) {
+			setLockId(lockId);
+		}
+
+		Long companyId = (Long)attributes.get("companyId");
+
+		if (companyId != null) {
+			setCompanyId(companyId);
+		}
+
+		Long userId = (Long)attributes.get("userId");
+
+		if (userId != null) {
+			setUserId(userId);
+		}
+
+		String userName = (String)attributes.get("userName");
+
+		if (userName != null) {
+			setUserName(userName);
+		}
+
+		Date createDate = (Date)attributes.get("createDate");
+
+		if (createDate != null) {
+			setCreateDate(createDate);
+		}
+
+		String className = (String)attributes.get("className");
+
+		if (className != null) {
+			setClassName(className);
+		}
+
+		String key = (String)attributes.get("key");
+
+		if (key != null) {
+			setKey(key);
+		}
+
+		String owner = (String)attributes.get("owner");
+
+		if (owner != null) {
+			setOwner(owner);
+		}
+
+		Boolean inheritable = (Boolean)attributes.get("inheritable");
+
+		if (inheritable != null) {
+			setInheritable(inheritable);
+		}
+
+		Date expirationDate = (Date)attributes.get("expirationDate");
+
+		if (expirationDate != null) {
+			setExpirationDate(expirationDate);
+		}
 	}
 
 	/**
@@ -301,10 +391,6 @@ public class LockWrapper implements Lock {
 		return _lock.isEscapedModel();
 	}
 
-	public void setEscapedModel(boolean escapedModel) {
-		_lock.setEscapedModel(escapedModel);
-	}
-
 	public java.io.Serializable getPrimaryKeyObj() {
 		return _lock.getPrimaryKeyObj();
 	}
@@ -370,7 +456,14 @@ public class LockWrapper implements Lock {
 		return _lock.isNeverExpires();
 	}
 
+	/**
+	 * @deprecated Renamed to {@link #getWrappedModel}
+	 */
 	public Lock getWrappedLock() {
+		return _lock;
+	}
+
+	public Lock getWrappedModel() {
 		return _lock;
 	}
 

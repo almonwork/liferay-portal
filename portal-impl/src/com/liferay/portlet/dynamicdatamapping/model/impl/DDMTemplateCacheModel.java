@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -20,6 +20,8 @@ import com.liferay.portal.model.CacheModel;
 
 import com.liferay.portlet.dynamicdatamapping.model.DDMTemplate;
 
+import java.io.Serializable;
+
 import java.util.Date;
 
 /**
@@ -29,10 +31,11 @@ import java.util.Date;
  * @see DDMTemplate
  * @generated
  */
-public class DDMTemplateCacheModel implements CacheModel<DDMTemplate> {
+public class DDMTemplateCacheModel implements CacheModel<DDMTemplate>,
+	Serializable {
 	@Override
 	public String toString() {
-		StringBundler sb = new StringBundler(29);
+		StringBundler sb = new StringBundler(35);
 
 		sb.append("{uuid=");
 		sb.append(uuid);
@@ -50,14 +53,20 @@ public class DDMTemplateCacheModel implements CacheModel<DDMTemplate> {
 		sb.append(createDate);
 		sb.append(", modifiedDate=");
 		sb.append(modifiedDate);
-		sb.append(", structureId=");
-		sb.append(structureId);
+		sb.append(", classNameId=");
+		sb.append(classNameId);
+		sb.append(", classPK=");
+		sb.append(classPK);
+		sb.append(", templateKey=");
+		sb.append(templateKey);
 		sb.append(", name=");
 		sb.append(name);
 		sb.append(", description=");
 		sb.append(description);
 		sb.append(", type=");
 		sb.append(type);
+		sb.append(", mode=");
+		sb.append(mode);
 		sb.append(", language=");
 		sb.append(language);
 		sb.append(", script=");
@@ -103,7 +112,15 @@ public class DDMTemplateCacheModel implements CacheModel<DDMTemplate> {
 			ddmTemplateImpl.setModifiedDate(new Date(modifiedDate));
 		}
 
-		ddmTemplateImpl.setStructureId(structureId);
+		ddmTemplateImpl.setClassNameId(classNameId);
+		ddmTemplateImpl.setClassPK(classPK);
+
+		if (templateKey == null) {
+			ddmTemplateImpl.setTemplateKey(StringPool.BLANK);
+		}
+		else {
+			ddmTemplateImpl.setTemplateKey(templateKey);
+		}
 
 		if (name == null) {
 			ddmTemplateImpl.setName(StringPool.BLANK);
@@ -124,6 +141,13 @@ public class DDMTemplateCacheModel implements CacheModel<DDMTemplate> {
 		}
 		else {
 			ddmTemplateImpl.setType(type);
+		}
+
+		if (mode == null) {
+			ddmTemplateImpl.setMode(StringPool.BLANK);
+		}
+		else {
+			ddmTemplateImpl.setMode(mode);
 		}
 
 		if (language == null) {
@@ -153,10 +177,13 @@ public class DDMTemplateCacheModel implements CacheModel<DDMTemplate> {
 	public String userName;
 	public long createDate;
 	public long modifiedDate;
-	public long structureId;
+	public long classNameId;
+	public long classPK;
+	public String templateKey;
 	public String name;
 	public String description;
 	public String type;
+	public String mode;
 	public String language;
 	public String script;
 }

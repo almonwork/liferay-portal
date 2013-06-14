@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,6 +14,8 @@
 
 package com.liferay.portlet.messageboards.service;
 
+import com.liferay.portal.service.ServiceWrapper;
+
 /**
  * <p>
  * This class is a wrapper for {@link MBBanLocalService}.
@@ -23,7 +25,8 @@ package com.liferay.portlet.messageboards.service;
  * @see       MBBanLocalService
  * @generated
  */
-public class MBBanLocalServiceWrapper implements MBBanLocalService {
+public class MBBanLocalServiceWrapper implements MBBanLocalService,
+	ServiceWrapper<MBBanLocalService> {
 	public MBBanLocalServiceWrapper(MBBanLocalService mbBanLocalService) {
 		_mbBanLocalService = mbBanLocalService;
 	}
@@ -55,24 +58,31 @@ public class MBBanLocalServiceWrapper implements MBBanLocalService {
 	* Deletes the message boards ban with the primary key from the database. Also notifies the appropriate model listeners.
 	*
 	* @param banId the primary key of the message boards ban
+	* @return the message boards ban that was removed
 	* @throws PortalException if a message boards ban with the primary key could not be found
 	* @throws SystemException if a system exception occurred
 	*/
-	public void deleteMBBan(long banId)
+	public com.liferay.portlet.messageboards.model.MBBan deleteMBBan(long banId)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException {
-		_mbBanLocalService.deleteMBBan(banId);
+		return _mbBanLocalService.deleteMBBan(banId);
 	}
 
 	/**
 	* Deletes the message boards ban from the database. Also notifies the appropriate model listeners.
 	*
 	* @param mbBan the message boards ban
+	* @return the message boards ban that was removed
 	* @throws SystemException if a system exception occurred
 	*/
-	public void deleteMBBan(com.liferay.portlet.messageboards.model.MBBan mbBan)
+	public com.liferay.portlet.messageboards.model.MBBan deleteMBBan(
+		com.liferay.portlet.messageboards.model.MBBan mbBan)
 		throws com.liferay.portal.kernel.exception.SystemException {
-		_mbBanLocalService.deleteMBBan(mbBan);
+		return _mbBanLocalService.deleteMBBan(mbBan);
+	}
+
+	public com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery() {
+		return _mbBanLocalService.dynamicQuery();
 	}
 
 	/**
@@ -144,6 +154,11 @@ public class MBBanLocalServiceWrapper implements MBBanLocalService {
 		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery)
 		throws com.liferay.portal.kernel.exception.SystemException {
 		return _mbBanLocalService.dynamicQueryCount(dynamicQuery);
+	}
+
+	public com.liferay.portlet.messageboards.model.MBBan fetchMBBan(long banId)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return _mbBanLocalService.fetchMBBan(banId);
 	}
 
 	/**
@@ -302,11 +317,25 @@ public class MBBanLocalServiceWrapper implements MBBanLocalService {
 		return _mbBanLocalService.hasBan(groupId, banUserId);
 	}
 
+	/**
+	 * @deprecated Renamed to {@link #getWrappedService}
+	 */
 	public MBBanLocalService getWrappedMBBanLocalService() {
 		return _mbBanLocalService;
 	}
 
+	/**
+	 * @deprecated Renamed to {@link #setWrappedService}
+	 */
 	public void setWrappedMBBanLocalService(MBBanLocalService mbBanLocalService) {
+		_mbBanLocalService = mbBanLocalService;
+	}
+
+	public MBBanLocalService getWrappedService() {
+		return _mbBanLocalService;
+	}
+
+	public void setWrappedService(MBBanLocalService mbBanLocalService) {
 		_mbBanLocalService = mbBanLocalService;
 	}
 

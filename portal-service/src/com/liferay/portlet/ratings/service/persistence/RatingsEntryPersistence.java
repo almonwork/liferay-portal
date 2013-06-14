@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,7 +14,6 @@
 
 package com.liferay.portlet.ratings.service.persistence;
 
-import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.service.persistence.BasePersistence;
 
 import com.liferay.portlet.ratings.model.RatingsEntry;
@@ -432,9 +431,11 @@ public interface RatingsEntryPersistence extends BasePersistence<RatingsEntry> {
 	* @param userId the user ID
 	* @param classNameId the class name ID
 	* @param classPK the class p k
+	* @return the ratings entry that was removed
 	* @throws SystemException if a system exception occurred
 	*/
-	public void removeByU_C_C(long userId, long classNameId, long classPK)
+	public com.liferay.portlet.ratings.model.RatingsEntry removeByU_C_C(
+		long userId, long classNameId, long classPK)
 		throws com.liferay.portal.kernel.exception.SystemException,
 			com.liferay.portlet.ratings.NoSuchEntryException;
 
@@ -500,7 +501,4 @@ public interface RatingsEntryPersistence extends BasePersistence<RatingsEntry> {
 	*/
 	public int countAll()
 		throws com.liferay.portal.kernel.exception.SystemException;
-
-	public RatingsEntry remove(RatingsEntry ratingsEntry)
-		throws SystemException;
 }

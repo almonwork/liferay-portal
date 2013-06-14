@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -28,9 +28,15 @@ long recordSetId = BeanParamUtil.getLong(record, request, "recordSetId");
 
 long detailDDMTemplateId = ParamUtil.getLong(request, "detailDDMTemplateId");
 
-String version = ParamUtil.getString(request, "version");
+String version = ParamUtil.getString(request, "version", DDLRecordConstants.VERSION_DEFAULT);
 
 DDLRecordVersion recordVersion = record.getRecordVersion(version);
+
+boolean editable = ParamUtil.getBoolean(request, "editable");
+
+if (editable) {
+	recordVersion = record.getLatestRecordVersion();
+}
 %>
 
 <liferay-ui:header

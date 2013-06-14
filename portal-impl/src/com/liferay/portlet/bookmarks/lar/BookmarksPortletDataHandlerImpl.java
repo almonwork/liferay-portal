@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -49,15 +49,36 @@ public class BookmarksPortletDataHandlerImpl extends BasePortletDataHandler {
 	@Override
 	public PortletDataHandlerControl[] getExportControls() {
 		return new PortletDataHandlerControl[] {
-			_foldersAndEntries, _categories, _ratings, _tags
+			_foldersAndEntries
+		};
+	}
+
+	@Override
+	public PortletDataHandlerControl[] getExportMetadataControls() {
+		return new PortletDataHandlerControl[] {
+			new PortletDataHandlerBoolean(
+				_NAMESPACE, "bookmarks", true, _metadataControls)
 		};
 	}
 
 	@Override
 	public PortletDataHandlerControl[] getImportControls() {
 		return new PortletDataHandlerControl[] {
-			_foldersAndEntries, _categories, _ratings, _tags
+			_foldersAndEntries
 		};
+	}
+
+	@Override
+	public PortletDataHandlerControl[] getImportMetadataControls() {
+		return new PortletDataHandlerControl[] {
+			new PortletDataHandlerBoolean(
+				_NAMESPACE, "bookmarks", true, _metadataControls)
+		};
+	}
+
+	@Override
+	public boolean isAlwaysExportable() {
+		return _ALWAYS_EXPORTABLE;
 	}
 
 	@Override
@@ -172,6 +193,30 @@ public class BookmarksPortletDataHandlerImpl extends BasePortletDataHandler {
 		return null;
 	}
 
+	protected void exportEntry(
+			PortletDataContext portletDataContext, Element foldersElement,
+			Element entriesElement, BookmarksEntry entry)
+		throws Exception {
+
+		if (!portletDataContext.isWithinDateRange(entry.getModifiedDate())) {
+			return;
+		}
+
+		if (foldersElement != null) {
+			exportParentFolder(
+				portletDataContext, foldersElement, entry.getFolderId());
+		}
+
+		String path = getEntryPath(portletDataContext, entry);
+
+		if (portletDataContext.isPathNotProcessed(path)) {
+			Element entryElement = entriesElement.addElement("entry");
+
+			portletDataContext.addClassedModel(
+				entryElement, path, entry, _NAMESPACE);
+		}
+	}
+
 	protected void exportFolder(
 			PortletDataContext portletDataContext, Element foldersElement,
 			Element entriesElement, BookmarksFolder folder)
@@ -197,30 +242,6 @@ public class BookmarksPortletDataHandlerImpl extends BasePortletDataHandler {
 		for (BookmarksEntry entry : entries) {
 			exportEntry(
 				portletDataContext, foldersElement, entriesElement, entry);
-		}
-	}
-
-	protected void exportEntry(
-			PortletDataContext portletDataContext, Element foldersElement,
-			Element entriesElement, BookmarksEntry entry)
-		throws Exception {
-
-		if (!portletDataContext.isWithinDateRange(entry.getModifiedDate())) {
-			return;
-		}
-
-		if (foldersElement != null) {
-			exportParentFolder(
-				portletDataContext, foldersElement, entry.getFolderId());
-		}
-
-		String path = getEntryPath(portletDataContext, entry);
-
-		if (portletDataContext.isPathNotProcessed(path)) {
-			Element entryElement = entriesElement.addElement("entry");
-
-			portletDataContext.addClassedModel(
-				entryElement, path, entry, _NAMESPACE);
 		}
 	}
 
@@ -295,12 +316,12 @@ public class BookmarksPortletDataHandlerImpl extends BasePortletDataHandler {
 
 		long userId = portletDataContext.getUserId(entry.getUserUuid());
 
-		Map<Long, Long> folderPKs =
+		Map<Long, Long> folderIds =
 			(Map<Long, Long>)portletDataContext.getNewPrimaryKeysMap(
 				BookmarksFolder.class);
 
 		long folderId = MapUtil.getLong(
-			folderPKs, entry.getFolderId(), entry.getFolderId());
+			folderIds, entry.getFolderId(), entry.getFolderId());
 
 		if ((folderId != BookmarksFolderConstants.DEFAULT_PARENT_FOLDER_ID) &&
 			(folderId == entry.getFolderId())) {
@@ -313,7 +334,7 @@ public class BookmarksPortletDataHandlerImpl extends BasePortletDataHandler {
 			importFolder(portletDataContext, path, folder);
 
 			folderId = MapUtil.getLong(
-				folderPKs, entry.getFolderId(), entry.getFolderId());
+				folderIds, entry.getFolderId(), entry.getFolderId());
 		}
 
 		ServiceContext serviceContext = portletDataContext.createServiceContext(
@@ -358,12 +379,12 @@ public class BookmarksPortletDataHandlerImpl extends BasePortletDataHandler {
 
 		long userId = portletDataContext.getUserId(folder.getUserUuid());
 
-		Map<Long, Long> folderPKs =
+		Map<Long, Long> folderIds =
 			(Map<Long, Long>)portletDataContext.getNewPrimaryKeysMap(
 				BookmarksFolder.class);
 
 		long parentFolderId = MapUtil.getLong(
-			folderPKs, folder.getParentFolderId(), folder.getParentFolderId());
+			folderIds, folder.getParentFolderId(), folder.getParentFolderId());
 
 		if ((parentFolderId !=
 				BookmarksFolderConstants.DEFAULT_PARENT_FOLDER_ID) &&
@@ -378,7 +399,7 @@ public class BookmarksPortletDataHandlerImpl extends BasePortletDataHandler {
 			importFolder(portletDataContext, path, parentFolder);
 
 			parentFolderId = MapUtil.getLong(
-				folderPKs, folder.getParentFolderId(),
+				folderIds, folder.getParentFolderId(),
 				folder.getParentFolderId());
 		}
 
@@ -415,21 +436,21 @@ public class BookmarksPortletDataHandlerImpl extends BasePortletDataHandler {
 			folder, importedFolder, _NAMESPACE);
 	}
 
+	private static final boolean _ALWAYS_EXPORTABLE = true;
+
 	private static final String _NAMESPACE = "bookmarks";
 
 	private static final boolean _PUBLISH_TO_LIVE_BY_DEFAULT = true;
-
-	private static PortletDataHandlerBoolean _categories =
-		new PortletDataHandlerBoolean(_NAMESPACE, "categories");
 
 	private static PortletDataHandlerBoolean _foldersAndEntries =
 		new PortletDataHandlerBoolean(
 			_NAMESPACE, "folders-and-entries", true, true);
 
-	private static PortletDataHandlerBoolean _ratings =
-		new PortletDataHandlerBoolean(_NAMESPACE, "ratings");
-
-	private static PortletDataHandlerBoolean _tags =
-		new PortletDataHandlerBoolean(_NAMESPACE, "tags");
+	private static PortletDataHandlerControl[] _metadataControls =
+		new PortletDataHandlerControl[] {
+			new PortletDataHandlerBoolean(_NAMESPACE, "categories"),
+			new PortletDataHandlerBoolean(_NAMESPACE, "ratings"),
+			new PortletDataHandlerBoolean(_NAMESPACE, "tags")
+		};
 
 }

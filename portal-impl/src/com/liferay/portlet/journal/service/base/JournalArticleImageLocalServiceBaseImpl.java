@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -21,25 +21,21 @@ import com.liferay.portal.kernel.bean.IdentifiableBean;
 import com.liferay.portal.kernel.dao.jdbc.SqlUpdate;
 import com.liferay.portal.kernel.dao.jdbc.SqlUpdateFactoryUtil;
 import com.liferay.portal.kernel.dao.orm.DynamicQuery;
+import com.liferay.portal.kernel.dao.orm.DynamicQueryFactoryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
-import com.liferay.portal.kernel.search.Indexer;
-import com.liferay.portal.kernel.search.IndexerRegistryUtil;
-import com.liferay.portal.kernel.search.SearchException;
+import com.liferay.portal.kernel.search.Indexable;
+import com.liferay.portal.kernel.search.IndexableType;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.model.PersistedModel;
+import com.liferay.portal.service.BaseLocalServiceImpl;
 import com.liferay.portal.service.ImageLocalService;
 import com.liferay.portal.service.ImageService;
 import com.liferay.portal.service.PersistedModelLocalServiceRegistry;
 import com.liferay.portal.service.ResourceLocalService;
-import com.liferay.portal.service.ResourceService;
 import com.liferay.portal.service.UserLocalService;
 import com.liferay.portal.service.UserService;
 import com.liferay.portal.service.persistence.ImagePersistence;
-import com.liferay.portal.service.persistence.ResourceFinder;
-import com.liferay.portal.service.persistence.ResourcePersistence;
 import com.liferay.portal.service.persistence.UserFinder;
 import com.liferay.portal.service.persistence.UserPersistence;
 
@@ -51,6 +47,8 @@ import com.liferay.portlet.journal.service.JournalArticleService;
 import com.liferay.portlet.journal.service.JournalContentSearchLocalService;
 import com.liferay.portlet.journal.service.JournalFeedLocalService;
 import com.liferay.portlet.journal.service.JournalFeedService;
+import com.liferay.portlet.journal.service.JournalFolderLocalService;
+import com.liferay.portlet.journal.service.JournalFolderService;
 import com.liferay.portlet.journal.service.JournalStructureLocalService;
 import com.liferay.portlet.journal.service.JournalStructureService;
 import com.liferay.portlet.journal.service.JournalTemplateLocalService;
@@ -62,6 +60,8 @@ import com.liferay.portlet.journal.service.persistence.JournalArticleResourcePer
 import com.liferay.portlet.journal.service.persistence.JournalContentSearchPersistence;
 import com.liferay.portlet.journal.service.persistence.JournalFeedFinder;
 import com.liferay.portlet.journal.service.persistence.JournalFeedPersistence;
+import com.liferay.portlet.journal.service.persistence.JournalFolderFinder;
+import com.liferay.portlet.journal.service.persistence.JournalFolderPersistence;
 import com.liferay.portlet.journal.service.persistence.JournalStructureFinder;
 import com.liferay.portlet.journal.service.persistence.JournalStructurePersistence;
 import com.liferay.portlet.journal.service.persistence.JournalTemplateFinder;
@@ -86,7 +86,8 @@ import javax.sql.DataSource;
  * @generated
  */
 public abstract class JournalArticleImageLocalServiceBaseImpl
-	implements JournalArticleImageLocalService, IdentifiableBean {
+	extends BaseLocalServiceImpl implements JournalArticleImageLocalService,
+		IdentifiableBean {
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
@@ -100,27 +101,12 @@ public abstract class JournalArticleImageLocalServiceBaseImpl
 	 * @return the journal article image that was added
 	 * @throws SystemException if a system exception occurred
 	 */
+	@Indexable(type = IndexableType.REINDEX)
 	public JournalArticleImage addJournalArticleImage(
 		JournalArticleImage journalArticleImage) throws SystemException {
 		journalArticleImage.setNew(true);
 
-		journalArticleImage = journalArticleImagePersistence.update(journalArticleImage,
-				false);
-
-		Indexer indexer = IndexerRegistryUtil.getIndexer(getModelClassName());
-
-		if (indexer != null) {
-			try {
-				indexer.reindex(journalArticleImage);
-			}
-			catch (SearchException se) {
-				if (_log.isWarnEnabled()) {
-					_log.warn(se, se);
-				}
-			}
-		}
-
-		return journalArticleImage;
+		return journalArticleImagePersistence.update(journalArticleImage, false);
 	}
 
 	/**
@@ -137,49 +123,34 @@ public abstract class JournalArticleImageLocalServiceBaseImpl
 	 * Deletes the journal article image with the primary key from the database. Also notifies the appropriate model listeners.
 	 *
 	 * @param articleImageId the primary key of the journal article image
+	 * @return the journal article image that was removed
 	 * @throws PortalException if a journal article image with the primary key could not be found
 	 * @throws SystemException if a system exception occurred
 	 */
-	public void deleteJournalArticleImage(long articleImageId)
+	@Indexable(type = IndexableType.DELETE)
+	public JournalArticleImage deleteJournalArticleImage(long articleImageId)
 		throws PortalException, SystemException {
-		JournalArticleImage journalArticleImage = journalArticleImagePersistence.remove(articleImageId);
-
-		Indexer indexer = IndexerRegistryUtil.getIndexer(getModelClassName());
-
-		if (indexer != null) {
-			try {
-				indexer.delete(journalArticleImage);
-			}
-			catch (SearchException se) {
-				if (_log.isWarnEnabled()) {
-					_log.warn(se, se);
-				}
-			}
-		}
+		return journalArticleImagePersistence.remove(articleImageId);
 	}
 
 	/**
 	 * Deletes the journal article image from the database. Also notifies the appropriate model listeners.
 	 *
 	 * @param journalArticleImage the journal article image
+	 * @return the journal article image that was removed
 	 * @throws SystemException if a system exception occurred
 	 */
-	public void deleteJournalArticleImage(
+	@Indexable(type = IndexableType.DELETE)
+	public JournalArticleImage deleteJournalArticleImage(
 		JournalArticleImage journalArticleImage) throws SystemException {
-		journalArticleImagePersistence.remove(journalArticleImage);
+		return journalArticleImagePersistence.remove(journalArticleImage);
+	}
 
-		Indexer indexer = IndexerRegistryUtil.getIndexer(getModelClassName());
+	public DynamicQuery dynamicQuery() {
+		Class<?> clazz = getClass();
 
-		if (indexer != null) {
-			try {
-				indexer.delete(journalArticleImage);
-			}
-			catch (SearchException se) {
-				if (_log.isWarnEnabled()) {
-					_log.warn(se, se);
-				}
-			}
-		}
+		return DynamicQueryFactoryUtil.forClass(JournalArticleImage.class,
+			clazz.getClassLoader());
 	}
 
 	/**
@@ -248,6 +219,11 @@ public abstract class JournalArticleImageLocalServiceBaseImpl
 		return journalArticleImagePersistence.countWithDynamicQuery(dynamicQuery);
 	}
 
+	public JournalArticleImage fetchJournalArticleImage(long articleImageId)
+		throws SystemException {
+		return journalArticleImagePersistence.fetchByPrimaryKey(articleImageId);
+	}
+
 	/**
 	 * Returns the journal article image with the primary key.
 	 *
@@ -300,6 +276,7 @@ public abstract class JournalArticleImageLocalServiceBaseImpl
 	 * @return the journal article image that was updated
 	 * @throws SystemException if a system exception occurred
 	 */
+	@Indexable(type = IndexableType.REINDEX)
 	public JournalArticleImage updateJournalArticleImage(
 		JournalArticleImage journalArticleImage) throws SystemException {
 		return updateJournalArticleImage(journalArticleImage, true);
@@ -313,28 +290,13 @@ public abstract class JournalArticleImageLocalServiceBaseImpl
 	 * @return the journal article image that was updated
 	 * @throws SystemException if a system exception occurred
 	 */
+	@Indexable(type = IndexableType.REINDEX)
 	public JournalArticleImage updateJournalArticleImage(
 		JournalArticleImage journalArticleImage, boolean merge)
 		throws SystemException {
 		journalArticleImage.setNew(false);
 
-		journalArticleImage = journalArticleImagePersistence.update(journalArticleImage,
-				merge);
-
-		Indexer indexer = IndexerRegistryUtil.getIndexer(getModelClassName());
-
-		if (indexer != null) {
-			try {
-				indexer.reindex(journalArticleImage);
-			}
-			catch (SearchException se) {
-				if (_log.isWarnEnabled()) {
-					_log.warn(se, se);
-				}
-			}
-		}
-
-		return journalArticleImage;
+		return journalArticleImagePersistence.update(journalArticleImage, merge);
 	}
 
 	/**
@@ -602,6 +564,81 @@ public abstract class JournalArticleImageLocalServiceBaseImpl
 	}
 
 	/**
+	 * Returns the journal folder local service.
+	 *
+	 * @return the journal folder local service
+	 */
+	public JournalFolderLocalService getJournalFolderLocalService() {
+		return journalFolderLocalService;
+	}
+
+	/**
+	 * Sets the journal folder local service.
+	 *
+	 * @param journalFolderLocalService the journal folder local service
+	 */
+	public void setJournalFolderLocalService(
+		JournalFolderLocalService journalFolderLocalService) {
+		this.journalFolderLocalService = journalFolderLocalService;
+	}
+
+	/**
+	 * Returns the journal folder remote service.
+	 *
+	 * @return the journal folder remote service
+	 */
+	public JournalFolderService getJournalFolderService() {
+		return journalFolderService;
+	}
+
+	/**
+	 * Sets the journal folder remote service.
+	 *
+	 * @param journalFolderService the journal folder remote service
+	 */
+	public void setJournalFolderService(
+		JournalFolderService journalFolderService) {
+		this.journalFolderService = journalFolderService;
+	}
+
+	/**
+	 * Returns the journal folder persistence.
+	 *
+	 * @return the journal folder persistence
+	 */
+	public JournalFolderPersistence getJournalFolderPersistence() {
+		return journalFolderPersistence;
+	}
+
+	/**
+	 * Sets the journal folder persistence.
+	 *
+	 * @param journalFolderPersistence the journal folder persistence
+	 */
+	public void setJournalFolderPersistence(
+		JournalFolderPersistence journalFolderPersistence) {
+		this.journalFolderPersistence = journalFolderPersistence;
+	}
+
+	/**
+	 * Returns the journal folder finder.
+	 *
+	 * @return the journal folder finder
+	 */
+	public JournalFolderFinder getJournalFolderFinder() {
+		return journalFolderFinder;
+	}
+
+	/**
+	 * Sets the journal folder finder.
+	 *
+	 * @param journalFolderFinder the journal folder finder
+	 */
+	public void setJournalFolderFinder(JournalFolderFinder journalFolderFinder) {
+		this.journalFolderFinder = journalFolderFinder;
+	}
+
+	/**
 	 * Returns the journal structure local service.
 	 *
 	 * @return the journal structure local service
@@ -845,60 +882,6 @@ public abstract class JournalArticleImageLocalServiceBaseImpl
 	}
 
 	/**
-	 * Returns the resource remote service.
-	 *
-	 * @return the resource remote service
-	 */
-	public ResourceService getResourceService() {
-		return resourceService;
-	}
-
-	/**
-	 * Sets the resource remote service.
-	 *
-	 * @param resourceService the resource remote service
-	 */
-	public void setResourceService(ResourceService resourceService) {
-		this.resourceService = resourceService;
-	}
-
-	/**
-	 * Returns the resource persistence.
-	 *
-	 * @return the resource persistence
-	 */
-	public ResourcePersistence getResourcePersistence() {
-		return resourcePersistence;
-	}
-
-	/**
-	 * Sets the resource persistence.
-	 *
-	 * @param resourcePersistence the resource persistence
-	 */
-	public void setResourcePersistence(ResourcePersistence resourcePersistence) {
-		this.resourcePersistence = resourcePersistence;
-	}
-
-	/**
-	 * Returns the resource finder.
-	 *
-	 * @return the resource finder
-	 */
-	public ResourceFinder getResourceFinder() {
-		return resourceFinder;
-	}
-
-	/**
-	 * Sets the resource finder.
-	 *
-	 * @param resourceFinder the resource finder
-	 */
-	public void setResourceFinder(ResourceFinder resourceFinder) {
-		this.resourceFinder = resourceFinder;
-	}
-
-	/**
 	 * Returns the user local service.
 	 *
 	 * @return the user local service
@@ -1053,6 +1036,14 @@ public abstract class JournalArticleImageLocalServiceBaseImpl
 	protected JournalFeedPersistence journalFeedPersistence;
 	@BeanReference(type = JournalFeedFinder.class)
 	protected JournalFeedFinder journalFeedFinder;
+	@BeanReference(type = JournalFolderLocalService.class)
+	protected JournalFolderLocalService journalFolderLocalService;
+	@BeanReference(type = JournalFolderService.class)
+	protected JournalFolderService journalFolderService;
+	@BeanReference(type = JournalFolderPersistence.class)
+	protected JournalFolderPersistence journalFolderPersistence;
+	@BeanReference(type = JournalFolderFinder.class)
+	protected JournalFolderFinder journalFolderFinder;
 	@BeanReference(type = JournalStructureLocalService.class)
 	protected JournalStructureLocalService journalStructureLocalService;
 	@BeanReference(type = JournalStructureService.class)
@@ -1079,12 +1070,6 @@ public abstract class JournalArticleImageLocalServiceBaseImpl
 	protected ImagePersistence imagePersistence;
 	@BeanReference(type = ResourceLocalService.class)
 	protected ResourceLocalService resourceLocalService;
-	@BeanReference(type = ResourceService.class)
-	protected ResourceService resourceService;
-	@BeanReference(type = ResourcePersistence.class)
-	protected ResourcePersistence resourcePersistence;
-	@BeanReference(type = ResourceFinder.class)
-	protected ResourceFinder resourceFinder;
 	@BeanReference(type = UserLocalService.class)
 	protected UserLocalService userLocalService;
 	@BeanReference(type = UserService.class)
@@ -1095,6 +1080,5 @@ public abstract class JournalArticleImageLocalServiceBaseImpl
 	protected UserFinder userFinder;
 	@BeanReference(type = PersistedModelLocalServiceRegistry.class)
 	protected PersistedModelLocalServiceRegistry persistedModelLocalServiceRegistry;
-	private static Log _log = LogFactoryUtil.getLog(JournalArticleImageLocalServiceBaseImpl.class);
 	private String _beanIdentifier;
 }

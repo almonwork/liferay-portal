@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,7 +14,6 @@
 
 package com.liferay.portlet.asset.service.persistence;
 
-import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.service.persistence.BasePersistence;
 
 import com.liferay.portlet.asset.model.AssetLink;
@@ -782,9 +781,11 @@ public interface AssetLinkPersistence extends BasePersistence<AssetLink> {
 	* @param entryId1 the entry id1
 	* @param entryId2 the entry id2
 	* @param type the type
+	* @return the asset link that was removed
 	* @throws SystemException if a system exception occurred
 	*/
-	public void removeByE_E_T(long entryId1, long entryId2, int type)
+	public com.liferay.portlet.asset.model.AssetLink removeByE_E_T(
+		long entryId1, long entryId2, int type)
 		throws com.liferay.portal.kernel.exception.SystemException,
 			com.liferay.portlet.asset.NoSuchLinkException;
 
@@ -869,6 +870,4 @@ public interface AssetLinkPersistence extends BasePersistence<AssetLink> {
 	*/
 	public int countAll()
 		throws com.liferay.portal.kernel.exception.SystemException;
-
-	public AssetLink remove(AssetLink assetLink) throws SystemException;
 }

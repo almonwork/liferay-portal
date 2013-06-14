@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -46,12 +46,12 @@ public class PortletDataHandlerControl {
 		_disabled = disabled;
 	}
 
-	public String getNamespace() {
-		return _namespace;
-	}
-
 	public String getControlName() {
 		return _controlName;
+	}
+
+	public String getNamespace() {
+		return _namespace;
 	}
 
 	public String getNamespacedControlName() {
@@ -62,8 +62,8 @@ public class PortletDataHandlerControl {
 		return _disabled;
 	}
 
-	private String _namespace;
 	private String _controlName;
 	private boolean _disabled;
+	private String _namespace;
 
 }

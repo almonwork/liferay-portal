@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -24,7 +24,8 @@ package com.liferay.portal.service;
  * @generated
  */
 public class PortalPreferencesLocalServiceWrapper
-	implements PortalPreferencesLocalService {
+	implements PortalPreferencesLocalService,
+		ServiceWrapper<PortalPreferencesLocalService> {
 	public PortalPreferencesLocalServiceWrapper(
 		PortalPreferencesLocalService portalPreferencesLocalService) {
 		_portalPreferencesLocalService = portalPreferencesLocalService;
@@ -58,25 +59,32 @@ public class PortalPreferencesLocalServiceWrapper
 	* Deletes the portal preferences with the primary key from the database. Also notifies the appropriate model listeners.
 	*
 	* @param portalPreferencesId the primary key of the portal preferences
+	* @return the portal preferences that was removed
 	* @throws PortalException if a portal preferences with the primary key could not be found
 	* @throws SystemException if a system exception occurred
 	*/
-	public void deletePortalPreferences(long portalPreferencesId)
+	public com.liferay.portal.model.PortalPreferences deletePortalPreferences(
+		long portalPreferencesId)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException {
-		_portalPreferencesLocalService.deletePortalPreferences(portalPreferencesId);
+		return _portalPreferencesLocalService.deletePortalPreferences(portalPreferencesId);
 	}
 
 	/**
 	* Deletes the portal preferences from the database. Also notifies the appropriate model listeners.
 	*
 	* @param portalPreferences the portal preferences
+	* @return the portal preferences that was removed
 	* @throws SystemException if a system exception occurred
 	*/
-	public void deletePortalPreferences(
+	public com.liferay.portal.model.PortalPreferences deletePortalPreferences(
 		com.liferay.portal.model.PortalPreferences portalPreferences)
 		throws com.liferay.portal.kernel.exception.SystemException {
-		_portalPreferencesLocalService.deletePortalPreferences(portalPreferences);
+		return _portalPreferencesLocalService.deletePortalPreferences(portalPreferences);
+	}
+
+	public com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery() {
+		return _portalPreferencesLocalService.dynamicQuery();
 	}
 
 	/**
@@ -149,6 +157,12 @@ public class PortalPreferencesLocalServiceWrapper
 		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery)
 		throws com.liferay.portal.kernel.exception.SystemException {
 		return _portalPreferencesLocalService.dynamicQueryCount(dynamicQuery);
+	}
+
+	public com.liferay.portal.model.PortalPreferences fetchPortalPreferences(
+		long portalPreferencesId)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return _portalPreferencesLocalService.fetchPortalPreferences(portalPreferencesId);
 	}
 
 	/**
@@ -286,11 +300,26 @@ public class PortalPreferencesLocalServiceWrapper
 			ownerType, xml);
 	}
 
+	/**
+	 * @deprecated Renamed to {@link #getWrappedService}
+	 */
 	public PortalPreferencesLocalService getWrappedPortalPreferencesLocalService() {
 		return _portalPreferencesLocalService;
 	}
 
+	/**
+	 * @deprecated Renamed to {@link #setWrappedService}
+	 */
 	public void setWrappedPortalPreferencesLocalService(
+		PortalPreferencesLocalService portalPreferencesLocalService) {
+		_portalPreferencesLocalService = portalPreferencesLocalService;
+	}
+
+	public PortalPreferencesLocalService getWrappedService() {
+		return _portalPreferencesLocalService;
+	}
+
+	public void setWrappedService(
 		PortalPreferencesLocalService portalPreferencesLocalService) {
 		_portalPreferencesLocalService = portalPreferencesLocalService;
 	}

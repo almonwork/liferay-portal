@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -46,6 +46,10 @@ public class MBMessageAssetRenderer extends BaseAssetRenderer {
 
 	public MBMessageAssetRenderer(MBMessage message) {
 		_message = message;
+	}
+
+	public String getAssetRendererFactoryClassName() {
+		return MBCategoryAssetRendererFactory.CLASS_NAME;
 	}
 
 	public long getClassPK() {
@@ -107,16 +111,18 @@ public class MBMessageAssetRenderer extends BaseAssetRenderer {
 		LiferayPortletResponse liferayPortletResponse,
 		String noSuchEntryRedirect) {
 
-		ThemeDisplay themeDisplay =
-			(ThemeDisplay)liferayPortletRequest.getAttribute(
-				WebKeys.THEME_DISPLAY);
-
-		return themeDisplay.getPortalURL() + themeDisplay.getPathMain() +
-			"/message_boards/find_message?messageId=" + _message.getMessageId();
+		return getURLViewInContext(
+			liferayPortletRequest, noSuchEntryRedirect,
+			"/message_boards/find_message", "messageId",
+			_message.getMessageId());
 	}
 
 	public long getUserId() {
 		return _message.getUserId();
+	}
+
+	public String getUserName() {
+		return _message.getUserName();
 	}
 
 	public String getUuid() {

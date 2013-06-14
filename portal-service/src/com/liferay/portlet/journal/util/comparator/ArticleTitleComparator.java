@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -22,11 +22,11 @@ import com.liferay.portlet.journal.model.JournalArticle;
  */
 public class ArticleTitleComparator extends OrderByComparator {
 
-	public static String ORDER_BY_ASC = "title ASC";
+	public static final String ORDER_BY_ASC = "JournalArticle.title ASC";
 
-	public static String ORDER_BY_DESC = "title DESC";
+	public static final String ORDER_BY_DESC = "JournalArticle.title DESC";
 
-	public static String[] ORDER_BY_FIELDS = {"title"};
+	public static final String[] ORDER_BY_FIELDS = {"title"};
 
 	public ArticleTitleComparator() {
 		this(false);

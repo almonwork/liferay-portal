@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -58,18 +58,6 @@ import javax.portlet.ResourceResponse;
 public class ScriptingPortlet extends GenericPortlet {
 
 	@Override
-	public void init() {
-		actionFile = getInitParameter("action-file");
-		editFile = getInitParameter("edit-file");
-		helpFile = getInitParameter("help-file");
-		resourceFile = getInitParameter("resource-file");
-		viewFile = getInitParameter("view-file");
-
-		language = getInitParameter("scripting-language");
-		globalFiles = StringUtil.split(getInitParameter("global-files"));
-	}
-
-	@Override
 	public void doDispatch(
 			RenderRequest renderRequest, RenderResponse renderResponse)
 		throws IOException, PortletException {
@@ -111,6 +99,18 @@ public class ScriptingPortlet extends GenericPortlet {
 		throws IOException {
 
 		include(viewFile, renderRequest, renderResponse);
+	}
+
+	@Override
+	public void init() {
+		actionFile = getInitParameter("action-file");
+		editFile = getInitParameter("edit-file");
+		helpFile = getInitParameter("help-file");
+		resourceFile = getInitParameter("resource-file");
+		viewFile = getInitParameter("view-file");
+
+		language = getInitParameter("scripting-language");
+		globalFiles = StringUtil.split(getInitParameter("global-files"));
 	}
 
 	@Override
@@ -226,16 +226,11 @@ public class ScriptingPortlet extends GenericPortlet {
 				}
 			}
 
-			try {
-				if (is != null) {
-					String script = new String(FileUtil.getBytes(is));
+			if (is != null) {
+				String script = new String(FileUtil.getBytes(is));
 
-					sb.append(script);
-					sb.append(StringPool.NEW_LINE);
-				}
-			}
-			finally {
-				is.close();
+				sb.append(script);
+				sb.append(StringPool.NEW_LINE);
 			}
 		}
 
@@ -298,17 +293,17 @@ public class ScriptingPortlet extends GenericPortlet {
 		PortletResponseUtil.write(renderResponse, sb.toString());
 	}
 
+	protected String actionFile;
+	protected String editFile;
+	protected String[] globalFiles;
+	protected String globalScript;
+	protected String helpFile;
+	protected String language;
+	protected String resourceFile;
+	protected String viewFile;
+
 	private static final String _ERROR = ScriptingPortlet.class + ".ERROR";
 
 	private static Log _log = LogFactoryUtil.getLog(ScriptingPortlet.class);
-
-	protected String actionFile;
-	protected String editFile;
-	protected String helpFile;
-	protected String[] globalFiles;
-	protected String globalScript;
-	protected String resourceFile;
-	protected String language;
-	protected String viewFile;
 
 }

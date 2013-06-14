@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -90,13 +90,6 @@ public class LockUtil {
 		return getPersistence()
 				   .findWithDynamicQuery(dynamicQuery, start, end,
 			orderByComparator);
-	}
-
-	/**
-	 * @see com.liferay.portal.service.persistence.BasePersistence#remove(com.liferay.portal.model.BaseModel)
-	 */
-	public static Lock remove(Lock lock) throws SystemException {
-		return getPersistence().remove(lock);
 	}
 
 	/**
@@ -309,6 +302,134 @@ public class LockUtil {
 	}
 
 	/**
+	* Returns all the locks where uuid = &#63; and companyId = &#63;.
+	*
+	* @param uuid the uuid
+	* @param companyId the company ID
+	* @return the matching locks
+	* @throws SystemException if a system exception occurred
+	*/
+	public static java.util.List<com.liferay.portal.model.Lock> findByUuid_C(
+		java.lang.String uuid, long companyId)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getPersistence().findByUuid_C(uuid, companyId);
+	}
+
+	/**
+	* Returns a range of all the locks where uuid = &#63; and companyId = &#63;.
+	*
+	* <p>
+	* Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set.
+	* </p>
+	*
+	* @param uuid the uuid
+	* @param companyId the company ID
+	* @param start the lower bound of the range of locks
+	* @param end the upper bound of the range of locks (not inclusive)
+	* @return the range of matching locks
+	* @throws SystemException if a system exception occurred
+	*/
+	public static java.util.List<com.liferay.portal.model.Lock> findByUuid_C(
+		java.lang.String uuid, long companyId, int start, int end)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getPersistence().findByUuid_C(uuid, companyId, start, end);
+	}
+
+	/**
+	* Returns an ordered range of all the locks where uuid = &#63; and companyId = &#63;.
+	*
+	* <p>
+	* Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set.
+	* </p>
+	*
+	* @param uuid the uuid
+	* @param companyId the company ID
+	* @param start the lower bound of the range of locks
+	* @param end the upper bound of the range of locks (not inclusive)
+	* @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
+	* @return the ordered range of matching locks
+	* @throws SystemException if a system exception occurred
+	*/
+	public static java.util.List<com.liferay.portal.model.Lock> findByUuid_C(
+		java.lang.String uuid, long companyId, int start, int end,
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getPersistence()
+				   .findByUuid_C(uuid, companyId, start, end, orderByComparator);
+	}
+
+	/**
+	* Returns the first lock in the ordered set where uuid = &#63; and companyId = &#63;.
+	*
+	* <p>
+	* Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set.
+	* </p>
+	*
+	* @param uuid the uuid
+	* @param companyId the company ID
+	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	* @return the first matching lock
+	* @throws com.liferay.portal.NoSuchLockException if a matching lock could not be found
+	* @throws SystemException if a system exception occurred
+	*/
+	public static com.liferay.portal.model.Lock findByUuid_C_First(
+		java.lang.String uuid, long companyId,
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
+		throws com.liferay.portal.NoSuchLockException,
+			com.liferay.portal.kernel.exception.SystemException {
+		return getPersistence()
+				   .findByUuid_C_First(uuid, companyId, orderByComparator);
+	}
+
+	/**
+	* Returns the last lock in the ordered set where uuid = &#63; and companyId = &#63;.
+	*
+	* <p>
+	* Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set.
+	* </p>
+	*
+	* @param uuid the uuid
+	* @param companyId the company ID
+	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	* @return the last matching lock
+	* @throws com.liferay.portal.NoSuchLockException if a matching lock could not be found
+	* @throws SystemException if a system exception occurred
+	*/
+	public static com.liferay.portal.model.Lock findByUuid_C_Last(
+		java.lang.String uuid, long companyId,
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
+		throws com.liferay.portal.NoSuchLockException,
+			com.liferay.portal.kernel.exception.SystemException {
+		return getPersistence()
+				   .findByUuid_C_Last(uuid, companyId, orderByComparator);
+	}
+
+	/**
+	* Returns the locks before and after the current lock in the ordered set where uuid = &#63; and companyId = &#63;.
+	*
+	* <p>
+	* Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set.
+	* </p>
+	*
+	* @param lockId the primary key of the current lock
+	* @param uuid the uuid
+	* @param companyId the company ID
+	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	* @return the previous, current, and next lock
+	* @throws com.liferay.portal.NoSuchLockException if a lock with the primary key could not be found
+	* @throws SystemException if a system exception occurred
+	*/
+	public static com.liferay.portal.model.Lock[] findByUuid_C_PrevAndNext(
+		long lockId, java.lang.String uuid, long companyId,
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
+		throws com.liferay.portal.NoSuchLockException,
+			com.liferay.portal.kernel.exception.SystemException {
+		return getPersistence()
+				   .findByUuid_C_PrevAndNext(lockId, uuid, companyId,
+			orderByComparator);
+	}
+
+	/**
 	* Returns all the locks where expirationDate &lt; &#63;.
 	*
 	* @param expirationDate the expiration date
@@ -481,6 +602,56 @@ public class LockUtil {
 	}
 
 	/**
+	* Returns the lock where className = &#63; and key = &#63; and owner = &#63; or throws a {@link com.liferay.portal.NoSuchLockException} if it could not be found.
+	*
+	* @param className the class name
+	* @param key the key
+	* @param owner the owner
+	* @return the matching lock
+	* @throws com.liferay.portal.NoSuchLockException if a matching lock could not be found
+	* @throws SystemException if a system exception occurred
+	*/
+	public static com.liferay.portal.model.Lock findByC_K_O(
+		java.lang.String className, java.lang.String key, java.lang.String owner)
+		throws com.liferay.portal.NoSuchLockException,
+			com.liferay.portal.kernel.exception.SystemException {
+		return getPersistence().findByC_K_O(className, key, owner);
+	}
+
+	/**
+	* Returns the lock where className = &#63; and key = &#63; and owner = &#63; or returns <code>null</code> if it could not be found. Uses the finder cache.
+	*
+	* @param className the class name
+	* @param key the key
+	* @param owner the owner
+	* @return the matching lock, or <code>null</code> if a matching lock could not be found
+	* @throws SystemException if a system exception occurred
+	*/
+	public static com.liferay.portal.model.Lock fetchByC_K_O(
+		java.lang.String className, java.lang.String key, java.lang.String owner)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getPersistence().fetchByC_K_O(className, key, owner);
+	}
+
+	/**
+	* Returns the lock where className = &#63; and key = &#63; and owner = &#63; or returns <code>null</code> if it could not be found, optionally using the finder cache.
+	*
+	* @param className the class name
+	* @param key the key
+	* @param owner the owner
+	* @param retrieveFromCache whether to use the finder cache
+	* @return the matching lock, or <code>null</code> if a matching lock could not be found
+	* @throws SystemException if a system exception occurred
+	*/
+	public static com.liferay.portal.model.Lock fetchByC_K_O(
+		java.lang.String className, java.lang.String key,
+		java.lang.String owner, boolean retrieveFromCache)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getPersistence()
+				   .fetchByC_K_O(className, key, owner, retrieveFromCache);
+	}
+
+	/**
 	* Returns all the locks.
 	*
 	* @return the locks
@@ -541,6 +712,18 @@ public class LockUtil {
 	}
 
 	/**
+	* Removes all the locks where uuid = &#63; and companyId = &#63; from the database.
+	*
+	* @param uuid the uuid
+	* @param companyId the company ID
+	* @throws SystemException if a system exception occurred
+	*/
+	public static void removeByUuid_C(java.lang.String uuid, long companyId)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		getPersistence().removeByUuid_C(uuid, companyId);
+	}
+
+	/**
 	* Removes all the locks where expirationDate &lt; &#63; from the database.
 	*
 	* @param expirationDate the expiration date
@@ -556,13 +739,30 @@ public class LockUtil {
 	*
 	* @param className the class name
 	* @param key the key
+	* @return the lock that was removed
 	* @throws SystemException if a system exception occurred
 	*/
-	public static void removeByC_K(java.lang.String className,
-		java.lang.String key)
+	public static com.liferay.portal.model.Lock removeByC_K(
+		java.lang.String className, java.lang.String key)
 		throws com.liferay.portal.NoSuchLockException,
 			com.liferay.portal.kernel.exception.SystemException {
-		getPersistence().removeByC_K(className, key);
+		return getPersistence().removeByC_K(className, key);
+	}
+
+	/**
+	* Removes the lock where className = &#63; and key = &#63; and owner = &#63; from the database.
+	*
+	* @param className the class name
+	* @param key the key
+	* @param owner the owner
+	* @return the lock that was removed
+	* @throws SystemException if a system exception occurred
+	*/
+	public static com.liferay.portal.model.Lock removeByC_K_O(
+		java.lang.String className, java.lang.String key, java.lang.String owner)
+		throws com.liferay.portal.NoSuchLockException,
+			com.liferay.portal.kernel.exception.SystemException {
+		return getPersistence().removeByC_K_O(className, key, owner);
 	}
 
 	/**
@@ -585,6 +785,19 @@ public class LockUtil {
 	public static int countByUuid(java.lang.String uuid)
 		throws com.liferay.portal.kernel.exception.SystemException {
 		return getPersistence().countByUuid(uuid);
+	}
+
+	/**
+	* Returns the number of locks where uuid = &#63; and companyId = &#63;.
+	*
+	* @param uuid the uuid
+	* @param companyId the company ID
+	* @return the number of matching locks
+	* @throws SystemException if a system exception occurred
+	*/
+	public static int countByUuid_C(java.lang.String uuid, long companyId)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getPersistence().countByUuid_C(uuid, companyId);
 	}
 
 	/**
@@ -614,6 +827,21 @@ public class LockUtil {
 	}
 
 	/**
+	* Returns the number of locks where className = &#63; and key = &#63; and owner = &#63;.
+	*
+	* @param className the class name
+	* @param key the key
+	* @param owner the owner
+	* @return the number of matching locks
+	* @throws SystemException if a system exception occurred
+	*/
+	public static int countByC_K_O(java.lang.String className,
+		java.lang.String key, java.lang.String owner)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getPersistence().countByC_K_O(className, key, owner);
+	}
+
+	/**
 	* Returns the number of locks.
 	*
 	* @return the number of locks
@@ -634,10 +862,10 @@ public class LockUtil {
 		return _persistence;
 	}
 
+	/**
+	 * @deprecated
+	 */
 	public void setPersistence(LockPersistence persistence) {
-		_persistence = persistence;
-
-		ReferenceRegistry.registerReference(LockUtil.class, "_persistence");
 	}
 
 	private static LockPersistence _persistence;

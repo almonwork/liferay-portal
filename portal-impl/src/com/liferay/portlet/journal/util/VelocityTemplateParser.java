@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -15,17 +15,21 @@
 package com.liferay.portlet.journal.util;
 
 import com.liferay.portal.kernel.io.unsync.UnsyncStringWriter;
+import com.liferay.portal.kernel.template.StringTemplateResource;
+import com.liferay.portal.kernel.template.Template;
+import com.liferay.portal.kernel.template.TemplateContextType;
+import com.liferay.portal.kernel.template.TemplateManager;
+import com.liferay.portal.kernel.template.TemplateManagerUtil;
+import com.liferay.portal.kernel.template.TemplateResource;
 import com.liferay.portal.kernel.templateparser.BaseTemplateParser;
 import com.liferay.portal.kernel.templateparser.TemplateContext;
 import com.liferay.portal.kernel.templateparser.TemplateNode;
 import com.liferay.portal.kernel.templateparser.TransformException;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
-import com.liferay.portal.kernel.velocity.VelocityContext;
-import com.liferay.portal.kernel.velocity.VelocityEngineUtil;
 import com.liferay.portal.kernel.xml.Element;
+import com.liferay.portal.template.TemplateResourceParser;
 import com.liferay.portal.util.PropsValues;
-import com.liferay.portal.velocity.VelocityResourceListener;
 import com.liferay.util.ContentUtil;
 import com.liferay.util.PwdGenerator;
 
@@ -33,9 +37,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import org.apache.velocity.exception.ParseErrorException;
-import org.apache.velocity.exception.VelocityException;
 
 /**
  * @author Alexander Chow
@@ -55,7 +56,7 @@ public class VelocityTemplateParser extends BaseTemplateParser {
 	protected String getJournalTemplatesPath() {
 		StringBundler sb = new StringBundler(5);
 
-		sb.append(VelocityResourceListener.JOURNAL_SEPARATOR);
+		sb.append(TemplateResourceParser.JOURNAL_SEPARATOR);
 		sb.append(StringPool.SLASH);
 		sb.append(getCompanyId());
 		sb.append(StringPool.SLASH);
@@ -66,7 +67,14 @@ public class VelocityTemplateParser extends BaseTemplateParser {
 
 	@Override
 	protected TemplateContext getTemplateContext() throws Exception {
-		return VelocityEngineUtil.getWrappedRestrictedToolsContext();
+		TemplateResource templateResource = new StringTemplateResource(
+			getTemplateId(), getScript());
+		TemplateResource errorTemplateResource = new StringTemplateResource(
+			getErrorTemplateId(), getErrorTemplateContent());
+
+		return TemplateManagerUtil.getTemplate(
+			TemplateManager.VELOCITY, templateResource, errorTemplateResource,
+			TemplateContextType.RESTRICTED);
 	}
 
 	@Override
@@ -142,33 +150,9 @@ public class VelocityTemplateParser extends BaseTemplateParser {
 			UnsyncStringWriter unsyncStringWriter)
 		throws Exception {
 
-		VelocityContext velocityContext = (VelocityContext)templateContext;
+		Template template = (Template)templateContext;
 
-		try {
-			return VelocityEngineUtil.mergeTemplate(
-				getTemplateId(), getScript(), velocityContext,
-				unsyncStringWriter);
-		}
-		catch (VelocityException ve) {
-			String errorTemplateId = getErrorTemplateId();
-			String errorTemplateContent = getErrorTemplateContent();
-
-			velocityContext.put("exception", ve.getMessage());
-			velocityContext.put("script", getScript());
-
-			if (ve instanceof ParseErrorException) {
-				ParseErrorException pee = (ParseErrorException)ve;
-
-				velocityContext.put("column", pee.getColumnNumber());
-				velocityContext.put("line", pee.getLineNumber());
-			}
-
-			unsyncStringWriter.reset();
-
-			return VelocityEngineUtil.mergeTemplate(
-				errorTemplateId, errorTemplateContent, velocityContext,
-				unsyncStringWriter);
-		}
+		return template.processTemplate(unsyncStringWriter);
 	}
 
 	@Override

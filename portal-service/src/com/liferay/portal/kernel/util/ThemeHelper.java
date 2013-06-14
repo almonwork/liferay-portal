@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,8 +14,9 @@
 
 package com.liferay.portal.kernel.util;
 
-import com.liferay.portal.kernel.freemarker.FreeMarkerEngineUtil;
-import com.liferay.portal.kernel.velocity.VelocityEngineUtil;
+import com.liferay.portal.kernel.template.TemplateManager;
+import com.liferay.portal.kernel.template.TemplateResourceLoaderUtil;
+import com.liferay.portal.model.PortletConstants;
 import com.liferay.portal.model.Theme;
 import com.liferay.portal.util.PortalUtil;
 
@@ -30,10 +31,13 @@ public class ThemeHelper {
 
 	public static final String TEMPLATE_EXTENSION_FTL = "ftl";
 
+	public static final String TEMPLATE_EXTENSION_JSP = "jsp";
+
 	public static final String TEMPLATE_EXTENSION_VM = "vm";
 
 	public static String getResourcePath(
-		ServletContext servletContext, Theme theme, String path) {
+		ServletContext servletContext, Theme theme, String portletId,
+		String path) {
 
 		StringBundler sb = new StringBundler(9);
 
@@ -75,6 +79,12 @@ public class ThemeHelper {
 			sb.append(StringPool.SLASH);
 			sb.append(path.substring(start, end));
 			sb.append(StringPool.PERIOD);
+
+			if (Validator.isNotNull(portletId)) {
+				sb.append(portletId);
+				sb.append(StringPool.PERIOD);
+			}
+
 			sb.append(TEMPLATE_EXTENSION_FTL);
 
 			return sb.toString();
@@ -93,6 +103,12 @@ public class ThemeHelper {
 			sb.append(StringPool.SLASH);
 			sb.append(path.substring(start, end));
 			sb.append(StringPool.PERIOD);
+
+			if (Validator.isNotNull(portletId)) {
+				sb.append(portletId);
+				sb.append(StringPool.PERIOD);
+			}
+
 			sb.append(TEMPLATE_EXTENSION_VM);
 
 			return sb.toString();
@@ -103,22 +119,58 @@ public class ThemeHelper {
 	}
 
 	public static boolean resourceExists(
-			ServletContext servletContext, Theme theme, String path)
+			ServletContext servletContext, Theme theme, String portletId,
+			String path)
+		throws Exception {
+
+		Boolean exists = null;
+
+		if (Validator.isNotNull(portletId)) {
+			exists = _resourceExists(servletContext, theme, portletId, path);
+
+			if (!exists &&
+				portletId.contains(PortletConstants.INSTANCE_SEPARATOR)) {
+
+				String rootPortletId = PortletConstants.getRootPortletId(
+					portletId);
+
+				exists = _resourceExists(
+					servletContext, theme, rootPortletId, path);
+			}
+
+			if (!exists) {
+				exists = _resourceExists(servletContext, theme, null, path);
+			}
+		}
+
+		if (exists == null) {
+			exists = _resourceExists(servletContext, theme, portletId, path);
+		}
+
+		return exists;
+	}
+
+	private static boolean _resourceExists(
+			ServletContext servletContext, Theme theme, String portletId,
+			String path)
 		throws Exception {
 
 		if (Validator.isNull(path)) {
 			return false;
 		}
 
-		String resourcePath = getResourcePath(servletContext, theme, path);
+		String resourcePath = getResourcePath(
+			servletContext, theme, portletId, path);
 
 		String extension = theme.getTemplateExtension();
 
 		if (extension.equals(TEMPLATE_EXTENSION_FTL)) {
-			return FreeMarkerEngineUtil.resourceExists(resourcePath);
+			return TemplateResourceLoaderUtil.hasTemplateResource(
+				TemplateManager.FREEMARKER, resourcePath);
 		}
 		else if (extension.equals(TEMPLATE_EXTENSION_VM)) {
-			return VelocityEngineUtil.resourceExists(resourcePath);
+			return TemplateResourceLoaderUtil.hasTemplateResource(
+				TemplateManager.VELOCITY, resourcePath);
 		}
 		else {
 			URL url = null;

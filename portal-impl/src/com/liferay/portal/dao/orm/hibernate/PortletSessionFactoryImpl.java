@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -39,6 +39,34 @@ import org.hibernate.SessionFactory;
  */
 public class PortletSessionFactoryImpl extends SessionFactoryImpl {
 
+	public void afterPropertiesSet() {
+		if (_dataSource == InfrastructureUtil.getDataSource()) {
+
+			// Register only if the current session factory is using the portal
+			// data source
+
+			portletSessionFactories.add(this);
+		}
+	}
+
+	@Override
+	public void destroy() {
+		portletSessionFactories.remove(this);
+	}
+
+	public DataSource getDataSource() {
+		ShardDataSourceTargetSource shardDataSourceTargetSource =
+			(ShardDataSourceTargetSource)
+				InfrastructureUtil.getShardDataSourceTargetSource();
+
+		if (shardDataSourceTargetSource != null) {
+			return shardDataSourceTargetSource.getDataSource();
+		}
+		else {
+			return _dataSource;
+		}
+	}
+
 	@Override
 	public Session openSession() throws ORMException {
 		SessionFactory sessionFactory = getSessionFactory();
@@ -74,19 +102,6 @@ public class PortletSessionFactoryImpl extends SessionFactoryImpl {
 
 	public void setDataSource(DataSource dataSource) {
 		_dataSource = dataSource;
-	}
-
-	protected DataSource getDataSource() {
-		ShardDataSourceTargetSource shardDataSourceTargetSource =
-			(ShardDataSourceTargetSource)
-				InfrastructureUtil.getShardDataSourceTargetSource();
-
-		if (shardDataSourceTargetSource != null) {
-			return shardDataSourceTargetSource.getDataSource();
-		}
-		else {
-			return _dataSource;
-		}
 	}
 
 	protected SessionFactory getSessionFactory() {

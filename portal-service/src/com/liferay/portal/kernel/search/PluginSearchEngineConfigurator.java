@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -25,6 +25,15 @@ import com.liferay.portal.kernel.portlet.PortletClassLoaderUtil;
  */
 public class PluginSearchEngineConfigurator
 	extends AbstractSearchEngineConfigurator {
+
+	public void setDefaultSearchEngineId(String defaultSearchEngineId) {
+		_defaultSearchEngineId = defaultSearchEngineId;
+	}
+
+	@Override
+	protected String getDefaultSearchEngineId() {
+		return _defaultSearchEngineId;
+	}
 
 	@Override
 	protected IndexSearcher getIndexSearcher() {
@@ -59,5 +68,7 @@ public class PluginSearchEngineConfigurator
 
 		return classLoader;
 	}
+
+	private String _defaultSearchEngineId;
 
 }

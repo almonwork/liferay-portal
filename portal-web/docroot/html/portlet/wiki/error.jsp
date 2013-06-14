@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -21,7 +21,6 @@
 	title="error"
 />
 
-<liferay-ui:error exception="<%= DuplicateFileException.class %>" message="please-enter-a-file-with-a-valid-file-name" />
 <liferay-ui:error exception="<%= NoSuchNodeException.class %>" message="please-enter-a-valid-page-title" />
 
 <c:if test="<%= SessionErrors.contains(renderRequest, NoSuchPageException.class.getName()) %>">
@@ -67,7 +66,7 @@
 			<%
 			WikiPage draftPage = WikiPageLocalServiceUtil.getDraftPage(node.getNodeId(), title);
 
-			boolean editableDraft = true;
+			boolean editableDraft = false;
 
 			if (permissionChecker.isCompanyAdmin() || permissionChecker.isGroupAdmin(scopeGroupId) || (draftPage.getUserId() == user.getUserId())) {
 				editableDraft = true;
@@ -97,9 +96,9 @@
 			</div>
 
 			<div>
-				<input onclick="location.href = '<%= searchURL.toString() %>'" type="button" value="<%= LanguageUtil.format(pageContext, "search-for-x", title) %>" />
+				<input onclick="location.href = '<%= searchURL.toString() %>'" type="button" value="<%= LanguageUtil.format(pageContext, "search-for-x", HtmlUtil.escapeAttribute(title)) %>" />
 
-				<input onclick="location.href = '<%= editPageURL.toString() %>'" type="button" value="<%= LanguageUtil.format(pageContext, "create-page-x", title) %>" />
+				<input onclick="location.href = '<%= editPageURL.toString() %>'" type="button" value="<%= LanguageUtil.format(pageContext, "create-page-x", HtmlUtil.escapeAttribute(title)) %>" />
 			</div>
 		</c:otherwise>
 	</c:choose>

@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -25,75 +25,74 @@
 	PortletURL portletURL = renderResponse.createRenderURL();
 
 	portletURL.setParameter("struts_action", "/document_library/select_group");
-
-	GroupSearch searchContainer = new GroupSearch(renderRequest, portletURL);
 	%>
 
-	<liferay-ui:search-form
-		page="/html/portlet/users_admin/group_search.jsp"
-		searchContainer="<%= searchContainer %>"
-	/>
+	<liferay-ui:search-container
+		searchContainer="<%= new GroupSearch(renderRequest, portletURL) %>"
+	>
+		<liferay-ui:search-form
+			page="/html/portlet/users_admin/group_search.jsp"
+			searchContainer="<%= searchContainer %>"
+		/>
 
-	<div class="separator"><!-- --></div>
+		<div class="separator"><!-- --></div>
 
-	<%
-	GroupSearchTerms searchTerms = (GroupSearchTerms)searchContainer.getSearchTerms();
+		<%
+		List<Group> mySites = user.getMySites();
 
-	List<Group> mySites = user.getMySites();
+		if (PortalUtil.isCompanyControlPanelPortlet(portletId, themeDisplay)) {
+			mySites = ListUtil.copy(mySites);
 
-	if (PortalUtil.isCompanyControlPanelPortlet(portletId, themeDisplay)) {
-		mySites = ListUtil.copy(mySites);
-
-		mySites.add(0, GroupLocalServiceUtil.getGroup(themeDisplay.getCompanyGroupId()));
-	}
-
-	int total = mySites.size();
-
-	searchContainer.setTotal(total);
-
-	searchContainer.setResults(mySites);
-
-	List resultRows = searchContainer.getResultRows();
-
-	for (int i = 0; i < mySites.size(); i++) {
-		Group group = mySites.get(i);
-
-		ResultRow row = new ResultRow(group, group.getGroupId(), i);
-
-		String groupName = HtmlUtil.escape(group.getDescriptiveName());
-
-		if (group.isCompany()) {
-			groupName = LanguageUtil.get(pageContext, "global");
+			mySites.add(0, GroupLocalServiceUtil.getGroup(themeDisplay.getCompanyGroupId()));
 		}
-		else if (group.isUser()) {
-			groupName = LanguageUtil.get(pageContext, "my-site");
-		}
+		%>
 
-		StringBundler sb = new StringBundler(7);
+		<liferay-ui:search-container-results
+			results="<%= mySites %>"
+			total="<%= mySites.size() %>"
+		/>
 
-		sb.append("javascript:opener.");
-		sb.append(renderResponse.getNamespace());
-		sb.append("selectGroup('");
-		sb.append(group.getGroupId());
-		sb.append("', '");
-		sb.append(UnicodeFormatter.toString(groupName));
-		sb.append("'); window.close();");
+		<liferay-ui:search-container-row
+			className="com.liferay.portal.model.Group"
+			escapedModel="<%= true %>"
+			keyProperty="groupId"
+			modelVar="group"
+			rowIdProperty="friendlyURL"
+		>
 
-		String rowHREF = sb.toString();
+			<%
+			String groupName = HtmlUtil.escape(group.getDescriptiveName(locale));
 
-		// Name
+			if (group.isUser()) {
+				groupName = LanguageUtil.get(pageContext, "my-site");
+			}
 
-		row.addText(groupName, rowHREF);
+			StringBundler sb = new StringBundler(7);
 
-		// Type
+			sb.append("javascript:opener.");
+			sb.append(renderResponse.getNamespace());
+			sb.append("selectGroup('");
+			sb.append(group.getGroupId());
+			sb.append("', '");
+			sb.append(UnicodeFormatter.toString(groupName));
+			sb.append("'); window.close();");
 
-		row.addText(LanguageUtil.get(pageContext, group.getTypeLabel()), rowHREF);
+			String rowHREF = sb.toString();
+			%>
 
-		// Add result row
+			<liferay-ui:search-container-column-text
+				href="<%= rowHREF %>"
+				name="name"
+				value="<%= groupName %>"
+			/>
 
-		resultRows.add(row);
-	}
-	%>
+			<liferay-ui:search-container-column-text
+				href="<%= rowHREF %>"
+				name="type"
+				value="<%= LanguageUtil.get(pageContext, group.getTypeLabel()) %>"
+			/>
+		</liferay-ui:search-container-row>
 
-	<liferay-ui:search-iterator searchContainer="<%= searchContainer %>" />
+		<liferay-ui:search-iterator />
+	</liferay-ui:search-container>
 </aui:form>

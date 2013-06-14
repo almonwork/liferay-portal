@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -46,6 +46,10 @@ public class MBCategoryAssetRenderer extends BaseAssetRenderer {
 
 	public MBCategoryAssetRenderer(MBCategory category) {
 		_category = category;
+	}
+
+	public String getAssetRendererFactoryClassName() {
+		return MBCategoryAssetRendererFactory.CLASS_NAME;
 	}
 
 	public long getClassPK() {
@@ -106,17 +110,18 @@ public class MBCategoryAssetRenderer extends BaseAssetRenderer {
 		LiferayPortletResponse liferayPortletResponse,
 		String noSuchEntryRedirect) {
 
-		ThemeDisplay themeDisplay =
-			(ThemeDisplay)liferayPortletRequest.getAttribute(
-				WebKeys.THEME_DISPLAY);
-
-		return themeDisplay.getPortalURL() + themeDisplay.getPathMain() +
-			"/message_boards/find_category?mbCategoryId=" +
-				_category.getCategoryId();
+		return getURLViewInContext(
+			liferayPortletRequest, noSuchEntryRedirect,
+			"/message_boards/find_category", "mbCategoryId",
+			_category.getCategoryId());
 	}
 
 	public long getUserId() {
 		return _category.getUserId();
+	}
+
+	public String getUserName() {
+		return _category.getUserName();
 	}
 
 	public String getUuid() {

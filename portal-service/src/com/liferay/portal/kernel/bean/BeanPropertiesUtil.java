@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -13,6 +13,8 @@
  */
 
 package com.liferay.portal.kernel.bean;
+
+import com.liferay.portal.kernel.security.pacl.permission.PortalRuntimePermission;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -38,6 +40,8 @@ public class BeanPropertiesUtil {
 	}
 
 	public static BeanProperties getBeanProperties() {
+		PortalRuntimePermission.checkGetBeanProperty(BeanPropertiesUtil.class);
+
 		return _beanProperties;
 	}
 
@@ -65,9 +69,7 @@ public class BeanPropertiesUtil {
 		return getBeanProperties().getByte(bean, param);
 	}
 
-	public static byte getByte(
-		Object bean, String param, byte defaultValue) {
-
+	public static byte getByte(Object bean, String param, byte defaultValue) {
 		return getBeanProperties().getByte(bean, param, defaultValue);
 	}
 
@@ -125,9 +127,7 @@ public class BeanPropertiesUtil {
 		return getBeanProperties().getInteger(bean, param);
 	}
 
-	public static int getInteger(
-		Object bean, String param, int defaultValue) {
-
+	public static int getInteger(Object bean, String param, int defaultValue) {
 		return getBeanProperties().getInteger(bean, param, defaultValue);
 	}
 
@@ -145,9 +145,7 @@ public class BeanPropertiesUtil {
 		return getBeanProperties().getLong(bean, param);
 	}
 
-	public static long getLong(
-		Object bean, String param, long defaultValue) {
-
+	public static long getLong(Object bean, String param, long defaultValue) {
 		return getBeanProperties().getLong(bean, param, defaultValue);
 	}
 
@@ -179,6 +177,26 @@ public class BeanPropertiesUtil {
 		Object bean, String param, Object defaultValue) {
 
 		return getBeanProperties().getObjectSilent(bean, param, defaultValue);
+	}
+
+	public static Class<?> getObjectType(Object bean, String param) {
+		return getBeanProperties().getObjectType(bean, param);
+	}
+
+	public static Class<?> getObjectType(
+		Object bean, String param, Class<?> defaultValue) {
+
+		return getBeanProperties().getObjectType(bean, param, defaultValue);
+	}
+
+	public static Class<?> getObjectTypeSilent(Object bean, String param) {
+		return getBeanProperties().getObjectType(bean, param);
+	}
+
+	public static Class<?> getObjectTypeSilent(
+		Object bean, String param, Class<?> defaultValue) {
+
+		return getBeanProperties().getObjectType(bean, param, defaultValue);
 	}
 
 	public static short getShort(Object bean, String param) {
@@ -230,6 +248,8 @@ public class BeanPropertiesUtil {
 	}
 
 	public void setBeanProperties(BeanProperties beanProperties) {
+		PortalRuntimePermission.checkSetBeanProperty(getClass());
+
 		_beanProperties = beanProperties;
 	}
 

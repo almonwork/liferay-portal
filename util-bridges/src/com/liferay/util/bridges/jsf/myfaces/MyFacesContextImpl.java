@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -28,20 +28,11 @@ import org.apache.myfaces.context.servlet.ServletFacesContextImpl;
  */
 public class MyFacesContextImpl extends ServletFacesContextImpl {
 
-	public MyFacesContextImpl(PortletContext portletContext,
-							  PortletRequest portletRequest,
-							  PortletResponse portletResponse) {
+	public MyFacesContextImpl(
+		PortletContext portletContext, PortletRequest portletRequest,
+		PortletResponse portletResponse) {
 
 		super(portletContext, portletRequest, portletResponse);
-	}
-
-	@Override
-	public void setResponseWriter(ResponseWriter responseWriter) {
-		if (responseWriter == null) {
-			throw new NullPointerException("responseWriter");
-		}
-
-		_responseWriter = responseWriter;
 	}
 
 	@Override
@@ -61,6 +52,15 @@ public class MyFacesContextImpl extends ServletFacesContextImpl {
 		_responseWriter = null;
 
 		super.setExternalContext(extContext);
+	}
+
+	@Override
+	public void setResponseWriter(ResponseWriter responseWriter) {
+		if (responseWriter == null) {
+			throw new NullPointerException("responseWriter");
+		}
+
+		_responseWriter = responseWriter;
 	}
 
 	private ResponseWriter _responseWriter = null;

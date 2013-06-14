@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -43,6 +43,13 @@ public class ResultRow {
 	}
 
 	public ResultRow(Object obj, String primaryKey, int pos, boolean bold) {
+		this(String.valueOf(pos + 1), obj, primaryKey, pos, bold);
+	}
+
+	public ResultRow(
+		String rowId, Object obj, String primaryKey, int pos, boolean bold) {
+
+		_rowId = rowId;
 		_obj = obj;
 		_primaryKey = primaryKey;
 		_pos = pos;
@@ -180,18 +187,6 @@ public class ResultRow {
 			path, servletContext, request, response);
 	}
 
-	public void addScore(float score) {
-		addScore(_searchEntries.size(), score);
-	}
-
-	public void addScore(int index, float score) {
-		ScoreSearchEntry scoreSearchEntry = new ScoreSearchEntry();
-
-		scoreSearchEntry.setScore(score);
-
-		_searchEntries.add(index, scoreSearchEntry);
-	}
-
 	public void addSearchEntry(int index, SearchEntry searchEntry) {
 		_searchEntries.add(index, searchEntry);
 	}
@@ -290,9 +285,7 @@ public class ResultRow {
 		addText(_searchEntries.size(), name, href);
 	}
 
-	public void addText(
-		String align, String valign, int colspan, String name) {
-
+	public void addText(String align, String valign, int colspan, String name) {
 		addText(_searchEntries.size(), align, valign, colspan, name);
 	}
 
@@ -323,8 +316,7 @@ public class ResultRow {
 	public void addText(
 		String align, String valign, String name, PortletURL portletURL) {
 
-		addText(
-			align, valign, SearchEntry.DEFAULT_COLSPAN, name, portletURL);
+		addText(align, valign, SearchEntry.DEFAULT_COLSPAN, name, portletURL);
 	}
 
 	public void addText(String align, String valign, String name, String href) {
@@ -349,6 +341,10 @@ public class ResultRow {
 		return _className;
 	}
 
+	public Map<String, Object> getData() {
+		return _data;
+	}
+
 	public List<SearchEntry> getEntries() {
 		return _searchEntries;
 	}
@@ -371,6 +367,10 @@ public class ResultRow {
 
 	public String getPrimaryKey() {
 		return _primaryKey;
+	}
+
+	public String getRowId() {
+		return _rowId;
 	}
 
 	public boolean isBold() {
@@ -401,6 +401,10 @@ public class ResultRow {
 		_className = className;
 	}
 
+	public void setData(Map<String, Object> data) {
+		_data = data;
+	}
+
 	public void setObject(Object obj) {
 		_obj = obj;
 	}
@@ -421,6 +425,10 @@ public class ResultRow {
 		_restricted = restricted;
 	}
 
+	public void setRowId(String rowId) {
+		_rowId = rowId;
+	}
+
 	public void setSkip(boolean skip) {
 		_skip = skip;
 	}
@@ -428,12 +436,14 @@ public class ResultRow {
 	private boolean _bold;
 	private String _classHoverName;
 	private String _className;
-	private List<SearchEntry> _searchEntries;
+	private Map<String, Object> _data;
 	private Object _obj;
 	private Map<String, Object> _params;
 	private int _pos;
 	private String _primaryKey;
 	private boolean _restricted;
+	private String _rowId;
+	private List<SearchEntry> _searchEntries;
 	private boolean _skip;
 
 }

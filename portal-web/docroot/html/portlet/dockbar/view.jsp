@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -18,9 +18,11 @@
 
 <%
 Group group = null;
+LayoutSet layoutSet = null;
 
 if (layout != null) {
 	group = layout.getGroup();
+	layoutSet = layout.getLayoutSet();
 }
 
 List<Portlet> portlets = new ArrayList<Portlet>();
@@ -32,6 +34,9 @@ for (String portletId : PropsValues.DOCKBAR_ADD_PORTLETS) {
 		portlets.add(portlet);
 	}
 }
+
+boolean hasLayoutCustomizePermission = LayoutPermissionUtil.contains(permissionChecker, layout, ActionKeys.CUSTOMIZE);
+boolean hasLayoutUpdatePermission = LayoutPermissionUtil.contains(permissionChecker, layout, ActionKeys.UPDATE);
 %>
 
 <div class="dockbar" data-namespace="<portlet:namespace />" id="dockbar">
@@ -40,7 +45,7 @@ for (String portletId : PropsValues.DOCKBAR_ADD_PORTLETS) {
 			<a href="javascript:;"><img alt='<liferay-ui:message key="pin-the-dockbar" />' src="<%= HtmlUtil.escape(themeDisplay.getPathThemeImages()) %>/spacer.png" /></a>
 		</li>
 
-		<c:if test="<%= (group != null) && !group.isControlPanel() && (!group.hasStagingGroup() || group.isStagingGroup()) && (GroupPermissionUtil.contains(permissionChecker, scopeGroupId, ActionKeys.ADD_LAYOUT) || LayoutPermissionUtil.contains(permissionChecker, layout, ActionKeys.UPDATE) || (layoutTypePortlet.isCustomizable() && layoutTypePortlet.isCustomizedView() && LayoutPermissionUtil.contains(permissionChecker, layout, ActionKeys.CUSTOMIZE))) %>">
+		<c:if test="<%= !group.isControlPanel() && (!group.hasStagingGroup() || group.isStagingGroup()) && (GroupPermissionUtil.contains(permissionChecker, group.getGroupId(), ActionKeys.ADD_LAYOUT) || hasLayoutUpdatePermission || (layoutTypePortlet.isCustomizable() && layoutTypePortlet.isCustomizedView() && hasLayoutCustomizePermission)) %>">
 			<li class="add-content has-submenu" id="<portlet:namespace />addContent">
 				<a class="menu-button" href="javascript:;">
 					<span>
@@ -59,29 +64,45 @@ for (String portletId : PropsValues.DOCKBAR_ADD_PORTLETS) {
 								</li>
 							</c:if>
 
-							<c:if test="<%= !themeDisplay.isStateMaximized() %>">
+							<c:if test="<%= !themeDisplay.isStateMaximized() && layout.isTypePortlet() && !layout.isLayoutPrototypeLinkActive() %>">
 								<li class="last common-items">
 									<div class="aui-menugroup">
 										<div class="aui-menugroup-content">
-											<span class="aui-menu-label"><liferay-ui:message key="applications" /></span>
+											<c:if test="<%= hasLayoutUpdatePermission || (layoutTypePortlet.isCustomizable() && layoutTypePortlet.isCustomizedView() && hasLayoutCustomizePermission) %>">
+												<span class="aui-menu-label"><liferay-ui:message key="applications" /></span>
 
-											<c:if test="<%= LayoutPermissionUtil.contains(permissionChecker, layout, ActionKeys.UPDATE) || (layoutTypePortlet.isCustomizable() && layoutTypePortlet.isCustomizedView() && LayoutPermissionUtil.contains(permissionChecker, layout, ActionKeys.CUSTOMIZE)) %>">
 												<ul>
 
 													<%
+													Set<String> runtimePortletIds = RuntimeTag.getRuntimePortletIDs(request);
+
 													int j = 0;
 
 													for (int i = 0; i < portlets.size(); i++) {
 														Portlet portlet = portlets.get(i);
 
 														boolean portletInstanceable = portlet.isInstanceable();
+
 														boolean portletUsed = layoutTypePortlet.hasPortletId(portlet.getPortletId());
+
+														if (runtimePortletIds != null) {
+															for (String runtimePortletId : runtimePortletIds) {
+																String portletId = portlet.getPortletId();
+
+																if (runtimePortletId.equals(portletId) ||
+																	runtimePortletId.startsWith(portletId.concat(PortletConstants.INSTANCE_SEPARATOR))) {
+
+																	portletUsed = true;
+																}
+															}
+														}
+
 														boolean portletLocked = (!portletInstanceable && portletUsed);
 
-													if (!PortletPermissionUtil.contains(permissionChecker, layout, portlet.getPortletId(), ActionKeys.ADD_TO_PAGE)) {
-														continue;
-													}
-												%>
+														if (!PortletPermissionUtil.contains(permissionChecker, layout, portlet.getPortletId(), ActionKeys.ADD_TO_PAGE)) {
+															continue;
+														}
+													%>
 
 														<li class="<%= (j == 0) ? "first" : "" %>">
 															<a class="app-shortcut <c:if test="<%= portletLocked %>">lfr-portlet-used</c:if> <c:if test="<%= portletInstanceable %>">lfr-instanceable</c:if>" data-portlet-id="<%= portlet.getPortletId() %>" href="javascript:;" <c:if test="<%= portletLocked %>">tabIndex="-1"</c:if>>
@@ -113,7 +134,7 @@ for (String portletId : PropsValues.DOCKBAR_ADD_PORTLETS) {
 			</li>
 		</c:if>
 
-		<c:if test="<%= !group.isControlPanel() && (themeDisplay.isShowLayoutTemplatesIcon() || themeDisplay.isShowPageSettingsIcon() || themeDisplay.isShowSiteContentIcon() || themeDisplay.isShowSiteSettingsIcon()) %>">
+		<c:if test="<%= !group.isControlPanel() && (themeDisplay.isShowLayoutTemplatesIcon() || themeDisplay.isShowManageSiteMembershipsIcon() || themeDisplay.isShowPageSettingsIcon() || themeDisplay.isShowSiteContentIcon() || themeDisplay.isShowSiteMapSettingsIcon() || themeDisplay.isShowSiteSettingsIcon()) %>">
 			<li class="manage-content has-submenu" id="<portlet:namespace />manageContent">
 				<a class="menu-button" href="javascript:;">
 					<span>
@@ -125,43 +146,43 @@ for (String portletId : PropsValues.DOCKBAR_ADD_PORTLETS) {
 					<div class="aui-menu-content">
 						<ul>
 							<c:if test="<%= themeDisplay.isShowPageSettingsIcon() %>">
-								<li class="first manage-page use-dialog">
+								<li class="first manage-page use-dialog full-dialog">
 									<aui:a href="<%= themeDisplay.getURLPageSettings().toString() %>" label="page" title="manage-page" />
 								</li>
 							</c:if>
 
 							<c:if test="<%= themeDisplay.isShowLayoutTemplatesIcon() && !themeDisplay.isStateMaximized() %>">
-								<li class="page-layout use-dialog">
+								<li class="page-layout use-dialog full-dialog">
 									<aui:a href='<%= themeDisplay.getURLPageSettings().toString() + "#layout" %>' label="page-layout" title="manage-page" />
 								</li>
 							</c:if>
 
-							<c:if test="<%= themeDisplay.isShowPageCustomizationIcon()  && !group.isLayoutSetPrototype() %>">
+							<c:if test="<%= themeDisplay.isShowPageCustomizationIcon() %>">
 								<li class="manage-page-customization">
 									<aui:a cssClass='<%= themeDisplay.isFreeformLayout() ? "disabled" : StringPool.BLANK %>' href='<%= themeDisplay.isFreeformLayout() ? null : "javascript:;" %>' id="manageCustomization" label='<%= group.isLayoutPrototype() ? "page-modifications" : "page-customizations" %>' title='<%= themeDisplay.isFreeformLayout() ? "it-is-not-possible-to-specify-customization-settings-for-freeform-layouts" : null %>' />
 								</li>
 							</c:if>
 
-							<c:if test="<%= themeDisplay.isShowSiteSettingsIcon() && !group.isLayoutPrototype() %>">
-								<li class="settings use-dialog">
+							<c:if test="<%= themeDisplay.isShowSiteSettingsIcon() %>">
+								<li class="settings use-dialog full-dialog">
 									<aui:a href="<%= themeDisplay.getURLSiteSettings().toString() %>" label="site-settings" title="edit-site-settings" />
 								</li>
 							</c:if>
 
 							<c:if test="<%= themeDisplay.isShowSiteMapSettingsIcon() %>">
-								<li class="sitemap use-dialog">
+								<li class="sitemap use-dialog full-dialog">
 									<aui:a href="<%= themeDisplay.getURLSiteMapSettings().toString() %>" label="site-pages" title="manage-site-pages" />
 								</li>
 							</c:if>
 
-							<c:if test="<%= themeDisplay.isShowManageSiteMembershipsIcon() && !group.isLayoutPrototype() %>">
-								<li class="manage-site-memberships use-dialog">
+							<c:if test="<%= themeDisplay.isShowManageSiteMembershipsIcon() %>">
+								<li class="manage-site-memberships use-dialog full-dialog">
 									<aui:a href="<%= themeDisplay.getURLManageSiteMemberships().toString() %>" label="site-memberships" title="manage-site-memberships" />
 								</li>
 							</c:if>
 
 							<c:if test="<%= themeDisplay.isShowSiteContentIcon() %>">
-								<li class="manage-site-content use-dialog">
+								<li class="manage-site-content use-dialog full-dialog">
 									<aui:a href="<%= themeDisplay.getURLSiteContent() %>" label="site-content" title="manage-site-content" />
 								</li>
 							</c:if>
@@ -170,10 +191,10 @@ for (String portletId : PropsValues.DOCKBAR_ADD_PORTLETS) {
 				</div>
 			</li>
 
-			<c:if test="<%= themeDisplay.isShowPageCustomizationIcon()  && !group.isLayoutSetPrototype() %>">
+			<c:if test="<%= themeDisplay.isShowPageCustomizationIcon() %>">
 				<div class="aui-helper-hidden layout-customizable-controls" id="<portlet:namespace />layout-customizable-controls">
 					<span title='<liferay-ui:message key="customizable-help" />'>
-						<aui:input helpMessage='<%= group.isLayoutPrototype() ? "modifiable-help" : "customizable-help" %>' inputCssClass="layout-customizable-checkbox" id="TypeSettingsProperties--[COLUMN_ID]-customizable--" label='<%= (group.isLayoutSetPrototype() || group.isLayoutPrototype()) ? "modifiable" : "customizable" %>' name="TypeSettingsProperties--[COLUMN_ID]-customizable--" type="checkbox" useNamespace="<%= false %>" />
+						<aui:input helpMessage='<%= group.isLayoutPrototype() ? "modifiable-help" : "customizable-help" %>' id="TypeSettingsProperties--[COLUMN_ID]-customizable--" inputCssClass="layout-customizable-checkbox" label='<%= (group.isLayoutSetPrototype() || group.isLayoutPrototype()) ? "modifiable" : "customizable" %>' name="TypeSettingsProperties--[COLUMN_ID]-customizable--" type="checkbox" useNamespace="<%= false %>" />
 					</span>
 				</div>
 			</c:if>
@@ -183,7 +204,7 @@ for (String portletId : PropsValues.DOCKBAR_ADD_PORTLETS) {
 			<span></span>
 		</li>
 
-		<c:if test="<%= !group.isControlPanel() && themeDisplay.isSignedIn() %>">
+		<c:if test="<%= !group.isControlPanel() && hasLayoutUpdatePermission || (layoutTypePortlet.isCustomizable() && layoutTypePortlet.isCustomizedView() && hasLayoutCustomizePermission) %>">
 			<li class="toggle-controls" id="<portlet:namespace />toggleControls">
 				<a href="javascript:;">
 					<liferay-ui:message key="edit-controls" />
@@ -198,28 +219,31 @@ for (String portletId : PropsValues.DOCKBAR_ADD_PORTLETS) {
 			String backURL = null;
 
 			if (themeDisplay.getRefererPlid() > 0) {
-				Layout refererLayout = LayoutLocalServiceUtil.getLayout(themeDisplay.getRefererPlid());
+				Layout refererLayout = LayoutLocalServiceUtil.fetchLayout(themeDisplay.getRefererPlid());
 
-				Group refererGroup = refererLayout.getGroup();
+				if (refererLayout != null) {
+					Group refererGroup = refererLayout.getGroup();
 
-				refererGroupDescriptiveName = refererGroup.getDescriptiveName();
+					refererGroupDescriptiveName = refererGroup.getDescriptiveName(locale);
 
-				if (refererGroup.isUser() && (refererGroup.getClassPK() == user.getUserId())) {
-					if (refererLayout.isPublicLayout()) {
-						refererGroupDescriptiveName = LanguageUtil.get(pageContext, "my-public-pages");
+					if (refererGroup.isUser() && (refererGroup.getClassPK() == user.getUserId())) {
+						if (refererLayout.isPublicLayout()) {
+							refererGroupDescriptiveName = LanguageUtil.get(pageContext, "my-public-pages");
+						}
+						else {
+							refererGroupDescriptiveName = LanguageUtil.get(pageContext, "my-private-pages");
+						}
 					}
-					else {
-						refererGroupDescriptiveName = LanguageUtil.get(pageContext, "my-private-pages");
+
+					backURL = PortalUtil.getLayoutURL(refererLayout, themeDisplay);
+
+					if (!CookieKeys.hasSessionId(request)) {
+						backURL = PortalUtil.getURLWithSessionId(backURL, session.getId());
 					}
-				}
-
-				backURL = PortalUtil.getLayoutURL(refererLayout, themeDisplay);
-
-				if (!CookieKeys.hasSessionId(request)) {
-					backURL = PortalUtil.getURLWithSessionId(backURL, session.getId());
 				}
 			}
-			else {
+
+			if (Validator.isNull(refererGroupDescriptiveName) || Validator.isNull(backURL)) {
 				refererGroupDescriptiveName = themeDisplay.getAccount().getName();
 				backURL = themeDisplay.getURLHome();
 			}
@@ -235,7 +259,7 @@ for (String portletId : PropsValues.DOCKBAR_ADD_PORTLETS) {
 
 			<li class="back-link" id="<portlet:namespace />backLink">
 				<a class="portlet-icon-back nobr" href="<%= PortalUtil.escapeRedirect(backURL) %>">
-					<%= LanguageUtil.format(pageContext, "back-to-x", HtmlUtil.escape(refererGroupDescriptiveName)) %>
+					<%= LanguageUtil.format(pageContext, "back-to-x", HtmlUtil.escape(refererGroupDescriptiveName), false) %>
 				</a>
 			</li>
 		</c:if>
@@ -264,11 +288,24 @@ for (String portletId : PropsValues.DOCKBAR_ADD_PORTLETS) {
 
 		<li class="user-avatar <%= themeDisplay.isImpersonated() ? "impersonating-user has-submenu" : "" %>" id="<portlet:namespace />userAvatar">
 			<span class="user-links <%= themeDisplay.isImpersonated() ? "menu-button": "" %>">
-				<aui:a cssClass="user-portrait use-dialog" href="<%= themeDisplay.getURLMyAccount().toString() %>" title="manage-my-account">
+
+				<%
+				String controlPanelCategory = StringPool.BLANK;
+				String useDialog = StringPool.BLANK;
+
+				if (!group.isControlPanel()) {
+					controlPanelCategory = PortletCategoryKeys.MY;
+					useDialog = StringPool.SPACE + "use-dialog";
+				}
+				%>
+
+				<aui:a cssClass='<%= "user-portrait" + useDialog %>' data-controlPanelCategory="<%= controlPanelCategory %>" href="<%= themeDisplay.getURLMyAccount().toString() %>" title="manage-my-account">
 					<img alt="<%= HtmlUtil.escape(user.getFullName()) %>" src="<%= HtmlUtil.escape(user.getPortraitURL(themeDisplay)) %>" />
 				</aui:a>
 
-				<aui:a cssClass="user-fullname use-dialog" href="<%= themeDisplay.getURLMyAccount().toString() %>" title="manage-my-account"><%= HtmlUtil.escape(user.getFullName()) %></aui:a>
+				<aui:a cssClass='<%= "user-fullname" + useDialog %>' data-controlPanelCategory="<%= controlPanelCategory %>" href="<%= themeDisplay.getURLMyAccount().toString() %>" title="manage-my-account">
+					<%= HtmlUtil.escape(user.getFullName()) %>
+				</aui:a>
 
 				<c:if test="<%= themeDisplay.isShowSignOutIcon() %>">
 					<span class="sign-out">(<aui:a href="<%= themeDisplay.getURLSignOut() %>" label="sign-out" />)</span>
@@ -339,12 +376,13 @@ for (String portletId : PropsValues.DOCKBAR_ADD_PORTLETS) {
 	%>
 
 	<c:if test="<%= !layoutPrototypes.isEmpty() %>">
-		<div id="layoutPrototypeTemplate" class="aui-html-template">
+		<div class="aui-html-template" id="layoutPrototypeTemplate">
 			<ul>
 
 				<%
 				for (LayoutPrototype layoutPrototype : layoutPrototypes) {
 				%>
+
 					<li>
 						<label>
 							<a href="javascript:;">
@@ -352,6 +390,7 @@ for (String portletId : PropsValues.DOCKBAR_ADD_PORTLETS) {
 							</a>
 						</label>
 					</li>
+
 				<%
 				}
 				%>
@@ -361,7 +400,46 @@ for (String portletId : PropsValues.DOCKBAR_ADD_PORTLETS) {
 	</c:if>
 </div>
 
-<c:if test="<%= !(group.isLayoutPrototype() || group.isLayoutSetPrototype()) && layoutTypePortlet.isCustomizable() && LayoutPermissionUtil.contains(permissionChecker, layout, ActionKeys.CUSTOMIZE) %>">
+<c:if test="<%= (layoutSet != null) && layoutSet.isLayoutSetPrototypeLinkActive() && SitesUtil.isLayoutModifiedSinceLastMerge(layout) && LayoutPermissionUtil.contains(themeDisplay.getPermissionChecker(), layout, ActionKeys.UPDATE) %>">
+	<div class="page-customization-bar">
+		<img alt="" class="customized-icon" src="<%= themeDisplay.getPathThemeImages() %>/common/edit.png" />
+
+		<liferay-ui:message key="this-page-has-been-changed-since-the-last-update-from-the-site-template" />
+
+		<c:if test="<%= GroupPermissionUtil.contains(permissionChecker, layout.getGroupId(), ActionKeys.UPDATE) %>">
+			<liferay-portlet:actionURL portletName="<%= PortletKeys.LAYOUTS_ADMIN %>" var="resetPrototypeURL">
+				<portlet:param name="struts_action" value="/layouts_admin/edit_layouts" />
+				<portlet:param name="<%= Constants.CMD %>" value="reset_prototype" />
+				<portlet:param name="redirect" value="<%= PortalUtil.getLayoutURL(themeDisplay) %>" />
+				<portlet:param name="groupId" value="<%= String.valueOf(themeDisplay.getParentGroupId()) %>" />
+			</liferay-portlet:actionURL>
+
+			<aui:form action="<%= resetPrototypeURL %>" cssClass="reset-prototype" name="resetFm">
+				<aui:button name="submit" type="submit" value="reset" />
+			</aui:form>
+		</c:if>
+	</div>
+</c:if>
+
+<c:if test="<%= (!SitesUtil.isLayoutUpdateable(layout) || (layout.isLayoutPrototypeLinkActive() && !group.hasStagingGroup())) && LayoutPermissionUtil.containsWithoutViewableGroup(themeDisplay.getPermissionChecker(), layout, null, false, ActionKeys.UPDATE) %>">
+	<div class="page-customization-bar">
+		<img alt="" class="customized-icon" src="<%= themeDisplay.getPathThemeImages() %>/common/site_icon.png" />
+
+		<c:choose>
+			<c:when test="<%= layout.isLayoutPrototypeLinkActive() && !group.hasStagingGroup() %>">
+				<liferay-ui:message key="this-page-is-linked-to-a-page-template" />
+			</c:when>
+			<c:when test="<%= layout instanceof VirtualLayout %>">
+				<liferay-ui:message key="this-page-belongs-to-a-user-group" />
+			</c:when>
+			<c:otherwise>
+				<liferay-ui:message key="this-page-is-linked-to-a-site-template-which-does-not-allow-modifications-to-it" />
+			</c:otherwise>
+		</c:choose>
+	</div>
+</c:if>
+
+<c:if test="<%= !(group.isLayoutPrototype() || group.isLayoutSetPrototype() || group.isUserGroup()) && layoutTypePortlet.isCustomizable() && LayoutPermissionUtil.containsWithoutViewableGroup(permissionChecker, layout, null, false, ActionKeys.CUSTOMIZE) %>">
 	<div class="page-customization-bar">
 		<img alt="" class="customized-icon" src="<%= themeDisplay.getPathThemeImages() %>/common/guest_icon.png" />
 
@@ -374,8 +452,8 @@ for (String portletId : PropsValues.DOCKBAR_ADD_PORTLETS) {
 			<c:otherwise>
 				<liferay-ui:message key="this-is-the-default-page-without-your-customizations" />
 
-				<c:if test="<%= LayoutPermissionUtil.contains(permissionChecker, layout, ActionKeys.UPDATE) %>">
-					<liferay-ui:icon-help message="customizable-admin-helpp" />
+				<c:if test="<%= hasLayoutUpdatePermission %>">
+					<liferay-ui:icon-help message="customizable-admin-help" />
 				</c:if>
 			</c:otherwise>
 		</c:choose>
@@ -423,7 +501,8 @@ for (String portletId : PropsValues.DOCKBAR_ADD_PORTLETS) {
 						{
 							data: {
 								cmd: 'toggle_customized_view',
-								customized_view: '<%= String.valueOf(!layoutTypePortlet.isCustomizedView()) %>'
+								customized_view: '<%= String.valueOf(!layoutTypePortlet.isCustomizedView()) %>',
+								p_auth: '<%= AuthTokenUtil.getToken(request) %>'
 							},
 							on: {
 								success: function(event, id, obj) {
@@ -436,14 +515,6 @@ for (String portletId : PropsValues.DOCKBAR_ADD_PORTLETS) {
 			);
 		}
 	</aui:script>
-</c:if>
-
-<c:if test="<%= themeDisplay.isShowPageSettingsIcon() && SitesUtil.isLayoutLocked(layoutTypePortlet) %>">
-	<div class="page-customization-bar">
-		<img alt="" class="customized-icon" src="<%= themeDisplay.getPathThemeImages() %>/common/site_icon.png" />
-
-		<liferay-ui:message key="this-page-is-locked-by-the-template" />
-	</div>
 </c:if>
 
 <aui:script position="inline" use="liferay-dockbar">

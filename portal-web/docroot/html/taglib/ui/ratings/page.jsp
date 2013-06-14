@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -16,7 +16,6 @@
 
 <%@ include file="/html/taglib/init.jsp" %>
 
-<%@ page import="com.liferay.portlet.ratings.NoSuchEntryException" %>
 <%@ page import="com.liferay.portlet.ratings.model.RatingsEntry" %>
 <%@ page import="com.liferay.portlet.ratings.model.RatingsStats" %>
 <%@ page import="com.liferay.portlet.ratings.service.RatingsEntryLocalServiceUtil" %>
@@ -40,11 +39,7 @@ if (numberOfStars < 1) {
 }
 
 if (!setRatingsEntry) {
-	try {
-		ratingsEntry = RatingsEntryLocalServiceUtil.getEntry(themeDisplay.getUserId(), className, classPK);
-	}
-	catch (NoSuchEntryException nsee) {
-	}
+	ratingsEntry = RatingsEntryLocalServiceUtil.fetchEntry(themeDisplay.getUserId(), className, classPK);
 }
 
 if (!setRatingsStats) {
@@ -63,7 +58,7 @@ if (ratingsEntry != null) {
 %>
 
 <c:if test="<%= !themeDisplay.isFacebook() %>">
-	<div class="taglib-ratings <%= type %>">
+	<div class="taglib-ratings <%= type %>" id="<%= randomNamespace %>ratingContainer">
 		<c:choose>
 			<c:when test='<%= type.equals("stars") %>'>
 				<c:choose>
@@ -149,16 +144,17 @@ if (ratingsEntry != null) {
 	<aui:script use="liferay-ratings">
 		Liferay.Ratings.register(
 			{
+				averageScore: <%= ratingsStats.getAverageScore() %>,
 				className: '<%= className %>',
 				classPK: '<%= classPK %>',
-				yourScore: <%= yourScore %>,
+				containerId: '<%= randomNamespace %>ratingContainer',
 				namespace: '<%= randomNamespace %>',
+				size: <%= numberOfStars %>,
 				totalEntries: <%= ratingsStats.getTotalEntries() %>,
 				totalScore: <%= ratingsStats.getTotalScore() %>,
-				averageScore: <%= ratingsStats.getAverageScore() %>,
-				size: <%= numberOfStars %>,
+				type: '<%= type %>',
 				uri: '<%= url %>',
-				type: '<%= type %>'
+				yourScore: <%= yourScore %>
 			}
 		);
 	</aui:script>

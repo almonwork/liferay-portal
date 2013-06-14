@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -20,10 +20,15 @@
 ResultRow row = (ResultRow)request.getAttribute(WebKeys.SEARCH_CONTAINER_RESULT_ROW);
 
 Group group = (Group)row.getObject();
+
+boolean organizationUser = GetterUtil.getBoolean(row.getParameter("organizationUser"));
+boolean userGroupUser = GetterUtil.getBoolean(row.getParameter("userGroupUser"));
+
+boolean hasUpdatePermission = GroupPermissionUtil.contains(permissionChecker, group.getGroupId(), ActionKeys.UPDATE);
 %>
 
 <liferay-ui:icon-menu>
-	<c:if test="<%= GroupPermissionUtil.contains(permissionChecker, group.getGroupId(), ActionKeys.UPDATE) %>">
+	<c:if test="<%= hasUpdatePermission %>">
 		<liferay-portlet:renderURL doAsGroupId="<%= group.getGroupId() %>" portletName="<%= PortletKeys.SITE_SETTINGS %>" var="editURL">
 			<portlet:param name="redirect" value="<%= currentURL %>" />
 		</liferay-portlet:renderURL>
@@ -34,20 +39,6 @@ Group group = (Group)row.getObject();
 			url="<%= editURL %>"
 		/>
 	</c:if>
-
-	<%--<c:if test="<%= GroupPermissionUtil.contains(permissionChecker, group.getGroupId(), ActionKeys.PERMISSIONS) %>">
-		<liferay-security:permissionsURL
-			modelResource="<%= Group.class.getName() %>"
-			modelResourceDescription="<%= group.getName() %>"
-			resourcePrimKey="<%= String.valueOf(group.getGroupId()) %>"
-			var="permissionsURL"
-		/>
-
-		<liferay-ui:icon
-			image="permissions"
-			url="<%= permissionsURL %>"
-		/>
-	</c:if>--%>
 
 	<c:if test="<%= GroupPermissionUtil.contains(permissionChecker, group.getGroupId(), ActionKeys.MANAGE_LAYOUTS) %>">
 		<liferay-portlet:renderURL doAsGroupId="<%= group.getGroupId() %>" portletName="<%= PortletKeys.GROUP_PAGES %>" var="managePagesURL">
@@ -105,7 +96,7 @@ Group group = (Group)row.getObject();
 		/>
 	</c:if>
 
-	<c:if test="<%= (group.getType() == GroupConstants.TYPE_SITE_OPEN) || (group.getType() == GroupConstants.TYPE_SITE_RESTRICTED) %>">
+	<c:if test="<%= (!(organizationUser || userGroupUser) && (group.getType() == GroupConstants.TYPE_SITE_OPEN) || (group.getType() == GroupConstants.TYPE_SITE_RESTRICTED)) %>">
 		<portlet:actionURL var="leaveURL">
 			<portlet:param name="struts_action" value="/sites_admin/edit_site_assignments" />
 			<portlet:param name="<%= Constants.CMD %>" value="group_users" />
@@ -120,7 +111,7 @@ Group group = (Group)row.getObject();
 		/>
 	</c:if>
 
-	<c:if test="<%= GroupPermissionUtil.contains(permissionChecker, group.getGroupId(), ActionKeys.UPDATE) %>">
+	<c:if test="<%= hasUpdatePermission %>">
 		<portlet:actionURL var="activateURL">
 			<portlet:param name="struts_action" value="/sites_admin/edit_site" />
 			<portlet:param name="<%= Constants.CMD %>" value="<%= group.isActive() ? Constants.DEACTIVATE : Constants.RESTORE %>" />
@@ -151,5 +142,49 @@ Group group = (Group)row.getObject();
 		</portlet:actionURL>
 
 		<liferay-ui:icon-delete url="<%= deleteURL %>" />
+	</c:if>
+
+	<c:if test="<%= PortalPermissionUtil.contains(permissionChecker, ActionKeys.ADD_COMMUNITY) || GroupPermissionUtil.contains(permissionChecker, group.getGroupId(), ActionKeys.MANAGE_SUBGROUPS) %>">
+
+		<%
+		List<LayoutSetPrototype> layoutSetPrototypes = LayoutSetPrototypeServiceUtil.search(company.getCompanyId(), Boolean.TRUE, null);
+		%>
+
+		<liferay-portlet:renderURL varImpl="addSiteURL">
+			<portlet:param name="struts_action" value="/sites_admin/edit_site" />
+			<portlet:param name="<%= Constants.CMD %>" value="<%= Constants.ADD %>" />
+			<portlet:param name="redirect" value="<%= currentURL %>" />
+			<portlet:param name="parentGroupSearchContainerPrimaryKeys" value="<%= String.valueOf(group.getGroupId()) %>" />
+		</liferay-portlet:renderURL>
+
+		<%
+		addSiteURL.setParameter("showPrototypes", "0");
+		%>
+
+		<liferay-ui:icon
+			image="site_icon"
+			message='<%= LanguageUtil.format(pageContext, "add-x", "blank-site") %>'
+			method="get"
+			url='<%= addSiteURL.toString() %>'
+		/>
+
+		<%
+		addSiteURL.setParameter("showPrototypes", "1");
+
+		for (LayoutSetPrototype layoutSetPrototype : layoutSetPrototypes) {
+			addSiteURL.setParameter("layoutSetPrototypeId", String.valueOf(layoutSetPrototype.getLayoutSetPrototypeId()));
+		%>
+
+			<liferay-ui:icon
+				image="site_icon"
+				message='<%= LanguageUtil.format(pageContext, "add-x", HtmlUtil.escape(layoutSetPrototype.getName(locale))) %>'
+				method="get"
+				url='<%= addSiteURL.toString() %>'
+			/>
+
+		<%
+		}
+		%>
+
 	</c:if>
 </liferay-ui:icon-menu>

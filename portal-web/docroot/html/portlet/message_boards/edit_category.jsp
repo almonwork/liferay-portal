@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -77,7 +77,7 @@ catch (NoSuchMailingListException nsmle) {
 
 				parentCategoryName = parentCategory.getName();
 			}
-			catch (NoSuchCategoryException nscce) {
+			catch (NoSuchCategoryException nsce) {
 			}
 			%>
 
@@ -88,7 +88,7 @@ catch (NoSuchMailingListException nsmle) {
 
 			<aui:a href="<%= viewCategoryURL %>" id="parentCategoryName"><%= parentCategoryName %></aui:a>
 
-			<portlet:renderURL windowState="<%= LiferayWindowState.POP_UP.toString() %>" var="selectCategoryURL">
+			<portlet:renderURL var="selectCategoryURL" windowState="<%= LiferayWindowState.POP_UP.toString() %>">
 				<portlet:param name="struts_action" value="/message_boards/select_category" />
 				<portlet:param name="mbCategoryId" value="<%= String.valueOf((category == null) ? MBCategoryConstants.DEFAULT_PARENT_CATEGORY_ID : category.getParentCategoryId()) %>" />
 			</portlet:renderURL>
@@ -101,7 +101,7 @@ catch (NoSuchMailingListException nsmle) {
 
 			<aui:button id="removeCategoryButton" onClick='<%= renderResponse.getNamespace() + "removeCategory();" %>' value="remove" />
 
-			<aui:input inlineLabel="left" label="merge-with-parent-category" name="mergeWithParentCategory" type="checkbox" />
+			<aui:input label="merge-with-parent-category" name="mergeWithParentCategory" type="checkbox" />
 		</aui:field-wrapper>
 
 		<aui:input name="name" />
@@ -148,7 +148,7 @@ catch (NoSuchMailingListException nsmle) {
 
 				<aui:input fieldParam="mailingListActive" name="active" />
 
-				<aui:input inlineLabel="left" label="allow-anonymous-emails" name="allowAnonymous" />
+				<aui:input label="allow-anonymous-emails" name="allowAnonymous" />
 
 				<div id="<portlet:namespace />mailingListSettings">
 					<aui:input name="emailAddress" />
@@ -162,15 +162,15 @@ catch (NoSuchMailingListException nsmle) {
 						%>
 
 						<aui:field-wrapper label="protocol">
-							<aui:input checked='<%= protocol.startsWith("pop3") %>' inlineLabel="left" label="pop" name="inProtocol" type="radio" value="pop3" />
-							<aui:input checked='<%= protocol.startsWith("imap") %>' inlineLabel="left" label="imap" name="inProtocol" type="radio" value="imap" />
+							<aui:input checked='<%= protocol.startsWith("pop3") %>' label="pop" name="inProtocol" type="radio" value="pop3" />
+							<aui:input checked='<%= protocol.startsWith("imap") %>' label="imap" name="inProtocol" type="radio" value="imap" />
 						</aui:field-wrapper>
 
 						<aui:input label="server-name" name="inServerName" />
 
 						<aui:input label="server-port" name="inServerPort" value="110" />
 
-						<aui:input inlineLabel="left" label="use-a-secure-network-connection" name="inUseSSL" />
+						<aui:input label="use-a-secure-network-connection" name="inUseSSL" />
 
 						<aui:input label="user-name" name="inUserName" />
 
@@ -182,14 +182,14 @@ catch (NoSuchMailingListException nsmle) {
 					<aui:fieldset label="outgoing">
 						<aui:input label="email-address" name="outEmailAddress" />
 
-						<aui:input inlineLabel="left" label="use-custom-outgoing-server" name="outCustom" />
+						<aui:input label="use-custom-outgoing-server" name="outCustom" />
 
 						<div id="<portlet:namespace />outCustomSettings">
 							<aui:input label="server-name" name="outServerName" />
 
 							<aui:input label="server-port" name="outServerPort" value="25" />
 
-							<aui:input inlineLabel="left" label="use-a-secure-network-connection" name="outUseSSL" />
+							<aui:input label="use-a-secure-network-connection" name="outUseSSL" />
 
 							<aui:input label="user-name" name="outUserName" />
 
@@ -204,9 +204,9 @@ catch (NoSuchMailingListException nsmle) {
 	<br />
 
 	<c:if test="<%= (category == null) && PropsValues.CAPTCHA_CHECK_PORTLET_MESSAGE_BOARDS_EDIT_CATEGORY %>">
-		<portlet:actionURL windowState="<%= LiferayWindowState.EXCLUSIVE.toString() %>" var="captchaURL">
+		<portlet:resourceURL var="captchaURL">
 			<portlet:param name="struts_action" value="/message_boards/captcha" />
-		</portlet:actionURL>
+		</portlet:resourceURL>
 
 		<liferay-ui:captcha url="<%= captchaURL %>" />
 	</c:if>

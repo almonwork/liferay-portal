@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -20,14 +20,12 @@ import com.liferay.portal.model.EmailAddress;
 import com.liferay.portal.model.OrgLabor;
 import com.liferay.portal.model.Organization;
 import com.liferay.portal.model.Phone;
-import com.liferay.portal.model.UserGroup;
 import com.liferay.portal.model.Website;
 import com.liferay.portal.service.AddressServiceUtil;
 import com.liferay.portal.service.EmailAddressServiceUtil;
 import com.liferay.portal.service.OrgLaborServiceUtil;
 import com.liferay.portal.service.OrganizationServiceUtil;
 import com.liferay.portal.service.PhoneServiceUtil;
-import com.liferay.portal.service.UserGroupServiceUtil;
 import com.liferay.portal.service.WebsiteServiceUtil;
 import com.liferay.portal.util.PortalUtil;
 import com.liferay.portal.util.WebKeys;
@@ -42,9 +40,7 @@ import javax.servlet.http.HttpServletRequest;
  */
 public class ActionUtil {
 
-	public static void getAddress(HttpServletRequest request)
-		throws Exception {
-
+	public static void getAddress(HttpServletRequest request) throws Exception {
 		long addressId = ParamUtil.getLong(request, "addressId");
 
 		Address address = null;
@@ -73,8 +69,8 @@ public class ActionUtil {
 		EmailAddress emailAddress = null;
 
 		if (emailAddressId > 0) {
-			emailAddress =
-				EmailAddressServiceUtil.getEmailAddress(emailAddressId);
+			emailAddress = EmailAddressServiceUtil.getEmailAddress(
+				emailAddressId);
 		}
 
 		request.setAttribute(WebKeys.EMAIL_ADDRESS, emailAddress);
@@ -97,8 +93,8 @@ public class ActionUtil {
 		Organization organization = null;
 
 		if (organizationId > 0) {
-			organization =
-				OrganizationServiceUtil.getOrganization(organizationId);
+			organization = OrganizationServiceUtil.getOrganization(
+				organizationId);
 		}
 
 		request.setAttribute(WebKeys.ORGANIZATION, organization);
@@ -155,29 +151,6 @@ public class ActionUtil {
 			portletRequest);
 
 		getPhone(request);
-	}
-
-	public static void getUserGroup(HttpServletRequest request)
-		throws Exception {
-
-		long userGroupId = ParamUtil.getLong(request, "userGroupId");
-
-		UserGroup userGroup = null;
-
-		if (userGroupId > 0) {
-			userGroup = UserGroupServiceUtil.getUserGroup(userGroupId);
-		}
-
-		request.setAttribute(WebKeys.USER_GROUP, userGroup);
-	}
-
-	public static void getUserGroup(PortletRequest portletRequest)
-		throws Exception {
-
-		HttpServletRequest request = PortalUtil.getHttpServletRequest(
-			portletRequest);
-
-		getUserGroup(request);
 	}
 
 	public static void getWebsite(HttpServletRequest request) throws Exception {

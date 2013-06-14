@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -23,13 +23,18 @@ public class LogWrapper implements Log {
 		_log = log;
 	}
 
-	public void setLog(Log log) {
-		_log = log;
-	}
-
 	public void debug(Object msg) {
 		try {
 			_log.debug(msg);
+		}
+		catch (Exception e) {
+			printMsg(msg);
+		}
+	}
+
+	public void debug(Object msg, Throwable t) {
+		try {
+			_log.debug(msg, t);
 		}
 		catch (Exception e) {
 			printMsg(msg);
@@ -45,18 +50,18 @@ public class LogWrapper implements Log {
 		}
 	}
 
-	public void debug(Object msg, Throwable t) {
+	public void error(Object msg) {
 		try {
-			_log.debug(msg, t);
+			_log.error(msg);
 		}
 		catch (Exception e) {
 			printMsg(msg);
 		}
 	}
 
-	public void error(Object msg) {
+	public void error(Object msg, Throwable t) {
 		try {
-			_log.error(msg);
+			_log.error(msg, t);
 		}
 		catch (Exception e) {
 			printMsg(msg);
@@ -72,18 +77,18 @@ public class LogWrapper implements Log {
 		}
 	}
 
-	public void error(Object msg, Throwable t) {
+	public void fatal(Object msg) {
 		try {
-			_log.error(msg, t);
+			_log.fatal(msg);
 		}
 		catch (Exception e) {
 			printMsg(msg);
 		}
 	}
 
-	public void fatal(Object msg) {
+	public void fatal(Object msg, Throwable t) {
 		try {
-			_log.fatal(msg);
+			_log.fatal(msg, t);
 		}
 		catch (Exception e) {
 			printMsg(msg);
@@ -99,18 +104,18 @@ public class LogWrapper implements Log {
 		}
 	}
 
-	public void fatal(Object msg, Throwable t) {
+	public void info(Object msg) {
 		try {
-			_log.fatal(msg, t);
+			_log.info(msg);
 		}
 		catch (Exception e) {
 			printMsg(msg);
 		}
 	}
 
-	public void info(Object msg) {
+	public void info(Object msg, Throwable t) {
 		try {
-			_log.info(msg);
+			_log.info(msg, t);
 		}
 		catch (Exception e) {
 			printMsg(msg);
@@ -123,15 +128,6 @@ public class LogWrapper implements Log {
 		}
 		catch (Exception e) {
 			printMsg(t.getMessage());
-		}
-	}
-
-	public void info(Object msg, Throwable t) {
-		try {
-			_log.info(msg, t);
-		}
-		catch (Exception e) {
-			printMsg(msg);
 		}
 	}
 
@@ -159,9 +155,22 @@ public class LogWrapper implements Log {
 		return _log.isWarnEnabled();
 	}
 
+	public void setLog(Log log) {
+		_log = log;
+	}
+
 	public void trace(Object msg) {
 		try {
 			_log.trace(msg);
+		}
+		catch (Exception e) {
+			printMsg(msg);
+		}
+	}
+
+	public void trace(Object msg, Throwable t) {
+		try {
+			_log.trace(msg, t);
 		}
 		catch (Exception e) {
 			printMsg(msg);
@@ -177,18 +186,18 @@ public class LogWrapper implements Log {
 		}
 	}
 
-	public void trace(Object msg, Throwable t) {
+	public void warn(Object msg) {
 		try {
-			_log.trace(msg, t);
+			_log.warn(msg);
 		}
 		catch (Exception e) {
 			printMsg(msg);
 		}
 	}
 
-	public void warn(Object msg) {
+	public void warn(Object msg, Throwable t) {
 		try {
-			_log.warn(msg);
+			_log.warn(msg, t);
 		}
 		catch (Exception e) {
 			printMsg(msg);
@@ -201,15 +210,6 @@ public class LogWrapper implements Log {
 		}
 		catch (Exception e) {
 			printMsg(t.getMessage());
-		}
-	}
-
-	public void warn(Object msg, Throwable t) {
-		try {
-			_log.warn(msg, t);
-		}
-		catch (Exception e) {
-			printMsg(msg);
 		}
 	}
 

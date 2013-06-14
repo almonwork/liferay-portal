@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -26,6 +26,7 @@ import com.liferay.portal.kernel.xml.Element;
 import com.liferay.portal.kernel.xml.SAXReaderUtil;
 import com.liferay.portal.service.ServiceContext;
 import com.liferay.portal.util.PortletKeys;
+import com.liferay.portlet.polls.DuplicateVoteException;
 import com.liferay.portlet.polls.model.PollsChoice;
 import com.liferay.portlet.polls.model.PollsQuestion;
 import com.liferay.portlet.polls.model.PollsVote;
@@ -183,12 +184,12 @@ public class PollsPortletDataHandlerImpl extends BasePortletDataHandler {
 			PortletDataContext portletDataContext, PollsChoice choice)
 		throws Exception {
 
-		Map<Long, Long> questionPKs =
+		Map<Long, Long> questionIds =
 			(Map<Long, Long>)portletDataContext.getNewPrimaryKeysMap(
 				PollsQuestion.class);
 
 		long questionId = MapUtil.getLong(
-			questionPKs, choice.getQuestionId(), choice.getQuestionId());
+			questionIds, choice.getQuestionId(), choice.getQuestionId());
 
 		PollsChoice importedChoice = null;
 
@@ -207,8 +208,8 @@ public class PollsPortletDataHandlerImpl extends BasePortletDataHandler {
 			}
 			else {
 				importedChoice = PollsChoiceLocalServiceUtil.updateChoice(
-					existingChoice.getChoiceId(), questionId,
-					choice.getName(), choice.getDescription());
+					existingChoice.getChoiceId(), questionId, choice.getName(),
+					choice.getDescription());
 			}
 		}
 		else {
@@ -260,7 +261,7 @@ public class PollsPortletDataHandlerImpl extends BasePortletDataHandler {
 		PollsQuestion importedQuestion = null;
 
 		if (portletDataContext.isDataStrategyMirror()) {
-			PollsQuestion existingQuestion =  PollsQuestionUtil.fetchByUUID_G(
+			PollsQuestion existingQuestion = PollsQuestionUtil.fetchByUUID_G(
 				question.getUuid(), portletDataContext.getScopeGroupId());
 
 			if (existingQuestion == null) {
@@ -298,26 +299,30 @@ public class PollsPortletDataHandlerImpl extends BasePortletDataHandler {
 
 		long userId = portletDataContext.getUserId(vote.getUserUuid());
 
-		Map<Long, Long> questionPKs =
+		Map<Long, Long> questionIds =
 			(Map<Long, Long>)portletDataContext.getNewPrimaryKeysMap(
 				PollsQuestion.class);
 
 		long questionId = MapUtil.getLong(
-			questionPKs, vote.getQuestionId(), vote.getQuestionId());
+			questionIds, vote.getQuestionId(), vote.getQuestionId());
 
-		Map<Long, Long> choicePKs =
+		Map<Long, Long> choiceIds =
 			(Map<Long, Long>)portletDataContext.getNewPrimaryKeysMap(
 				PollsChoice.class);
 
 		long choiceId = MapUtil.getLong(
-			choicePKs, vote.getChoiceId(), vote.getChoiceId());
+			choiceIds, vote.getChoiceId(), vote.getChoiceId());
 
 		ServiceContext serviceContext = new ServiceContext();
 
 		serviceContext.setCreateDate(vote.getVoteDate());
 
-		PollsVoteLocalServiceUtil.addVote(
-			userId, questionId, choiceId, serviceContext);
+		try {
+			PollsVoteLocalServiceUtil.addVote(
+				userId, questionId, choiceId, serviceContext);
+		}
+		catch (DuplicateVoteException dve) {
+		}
 	}
 
 	@Override

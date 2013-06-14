@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -31,32 +31,32 @@ public class EventDefinitionImpl implements EventDefinition {
 		_portletApp = portletApp;
 	}
 
-	public QName getQName() {
-		return _qName;
+	public PortletApp getPortletApp() {
+		return _portletApp;
 	}
 
-	public void setQName(QName qName) {
-		_qName = qName;
+	public QName getQName() {
+		return _qName;
 	}
 
 	public String getValueType() {
 		return _valueType;
 	}
 
-	public void setValueType(String valueType) {
-		_valueType = valueType;
-	}
-
-	public PortletApp getPortletApp() {
-		return _portletApp;
-	}
-
 	public void setPortletApp(PortletApp portletApp) {
 		_portletApp = portletApp;
 	}
 
+	public void setQName(QName qName) {
+		_qName = qName;
+	}
+
+	public void setValueType(String valueType) {
+		_valueType = valueType;
+	}
+
+	private PortletApp _portletApp;
 	private QName _qName;
 	private String _valueType;
-	private PortletApp _portletApp;
 
 }

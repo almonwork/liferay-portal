@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -21,9 +21,6 @@ import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
-import com.liferay.portal.kernel.util.Validator;
-
-import java.util.StringTokenizer;
 
 import javax.portlet.PortletURL;
 
@@ -91,14 +88,11 @@ public class RenderURLParamsTag extends TagSupport {
 
 		String queryString = HttpUtil.getQueryString(url);
 
-		StringTokenizer st = new StringTokenizer(
-			queryString, StringPool.AMPERSAND);
+		String[] parameters = StringUtil.split(queryString, CharPool.AMPERSAND);
 
-		while (st.hasMoreTokens()) {
-			String token = st.nextToken();
-
-			if (Validator.isNotNull(token)) {
-				String[] kvp = StringUtil.split(token, CharPool.EQUAL);
+		for (String parameter : parameters) {
+			if (parameter.length() > 0) {
+				String[] kvp = StringUtil.split(parameter, CharPool.EQUAL);
 
 				if ((kvp != null) && (kvp.length > 0)) {
 					String key = kvp[0];

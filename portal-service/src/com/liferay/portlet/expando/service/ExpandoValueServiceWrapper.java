@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,6 +14,8 @@
 
 package com.liferay.portlet.expando.service;
 
+import com.liferay.portal.service.ServiceWrapper;
+
 /**
  * <p>
  * This class is a wrapper for {@link ExpandoValueService}.
@@ -23,9 +25,28 @@ package com.liferay.portlet.expando.service;
  * @see       ExpandoValueService
  * @generated
  */
-public class ExpandoValueServiceWrapper implements ExpandoValueService {
+public class ExpandoValueServiceWrapper implements ExpandoValueService,
+	ServiceWrapper<ExpandoValueService> {
 	public ExpandoValueServiceWrapper(ExpandoValueService expandoValueService) {
 		_expandoValueService = expandoValueService;
+	}
+
+	/**
+	* Returns the Spring bean ID for this bean.
+	*
+	* @return the Spring bean ID for this bean
+	*/
+	public java.lang.String getBeanIdentifier() {
+		return _expandoValueService.getBeanIdentifier();
+	}
+
+	/**
+	* Sets the Spring bean ID for this bean.
+	*
+	* @param beanIdentifier the Spring bean ID for this bean
+	*/
+	public void setBeanIdentifier(java.lang.String beanIdentifier) {
+		_expandoValueService.setBeanIdentifier(beanIdentifier);
 	}
 
 	public com.liferay.portlet.expando.model.ExpandoValue addValue(
@@ -46,6 +67,24 @@ public class ExpandoValueServiceWrapper implements ExpandoValueService {
 			columnName, classPK, data);
 	}
 
+	public void addValues(long companyId, java.lang.String className,
+		java.lang.String tableName, long classPK,
+		java.util.Map<java.lang.String, java.io.Serializable> attributeValues)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException {
+		_expandoValueService.addValues(companyId, className, tableName,
+			classPK, attributeValues);
+	}
+
+	public java.util.Map<java.lang.String, java.io.Serializable> getData(
+		long companyId, java.lang.String className, java.lang.String tableName,
+		java.util.Collection<java.lang.String> columnNames, long classPK)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException {
+		return _expandoValueService.getData(companyId, className, tableName,
+			columnNames, classPK);
+	}
+
 	public java.io.Serializable getData(long companyId,
 		java.lang.String className, java.lang.String tableName,
 		java.lang.String columnName, long classPK)
@@ -64,12 +103,26 @@ public class ExpandoValueServiceWrapper implements ExpandoValueService {
 			tableName, columnName, classPK);
 	}
 
+	/**
+	 * @deprecated Renamed to {@link #getWrappedService}
+	 */
 	public ExpandoValueService getWrappedExpandoValueService() {
 		return _expandoValueService;
 	}
 
+	/**
+	 * @deprecated Renamed to {@link #setWrappedService}
+	 */
 	public void setWrappedExpandoValueService(
 		ExpandoValueService expandoValueService) {
+		_expandoValueService = expandoValueService;
+	}
+
+	public ExpandoValueService getWrappedService() {
+		return _expandoValueService;
+	}
+
+	public void setWrappedService(ExpandoValueService expandoValueService) {
 		_expandoValueService = expandoValueService;
 	}
 

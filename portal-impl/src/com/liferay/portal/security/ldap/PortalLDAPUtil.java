@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -28,6 +28,7 @@ import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.model.CompanyConstants;
 import com.liferay.portal.util.PrefsPropsUtil;
+import com.liferay.portal.util.PropsUtil;
 import com.liferay.portal.util.PropsValues;
 
 import java.util.ArrayList;
@@ -85,31 +86,30 @@ public class PortalLDAPUtil {
 			String credentials)
 		throws Exception {
 
-		Properties env = new Properties();
+		Properties environmentProperties = new Properties();
 
-		env.put(
+		environmentProperties.put(
 			Context.INITIAL_CONTEXT_FACTORY,
 			PrefsPropsUtil.getString(
 				companyId, PropsKeys.LDAP_FACTORY_INITIAL));
-		env.put(Context.PROVIDER_URL, providerURL);
-		env.put(Context.SECURITY_PRINCIPAL, principal);
-		env.put(Context.SECURITY_CREDENTIALS, credentials);
-		env.put(
+		environmentProperties.put(Context.PROVIDER_URL, providerURL);
+		environmentProperties.put(Context.SECURITY_PRINCIPAL, principal);
+		environmentProperties.put(Context.SECURITY_CREDENTIALS, credentials);
+		environmentProperties.put(
 			Context.REFERRAL,
 			PrefsPropsUtil.getString(companyId, PropsKeys.LDAP_REFERRAL));
 
-		// Enable pooling
+		Properties ldapConnectionProperties = PropsUtil.getProperties(
+			PropsKeys.LDAP_CONNECTION_PROPERTY_PREFIX, true);
 
-		env.put("com.sun.jndi.ldap.connect.pool", "true");
-		env.put("com.sun.jndi.ldap.connect.pool.maxsize","50");
-		env.put("com.sun.jndi.ldap.connect.pool.timeout", "10000");
+		PropertiesUtil.merge(environmentProperties, ldapConnectionProperties);
 
-		LogUtil.debug(_log, env);
+		LogUtil.debug(_log, environmentProperties);
 
 		LdapContext ldapContext = null;
 
 		try {
-			ldapContext = new InitialLdapContext(env, null);
+			ldapContext = new InitialLdapContext(environmentProperties, null);
 		}
 		catch (Exception e) {
 			if (_log.isWarnEnabled()) {
@@ -158,9 +158,6 @@ public class PortalLDAPUtil {
 
 			enu = ldapContext.search(baseDN, filter.toString(), searchControls);
 		}
-		catch (Exception e) {
-			throw e;
-		}
 		finally {
 			if (ldapContext != null) {
 				ldapContext.close();
@@ -184,8 +181,8 @@ public class PortalLDAPUtil {
 			String fullDistinguishedName)
 		throws Exception {
 
-		return getGroupAttributes(ldapServerId, companyId, ldapContext,
-			fullDistinguishedName, false);
+		return getGroupAttributes(
+			ldapServerId, companyId, ldapContext, fullDistinguishedName, false);
 	}
 
 	public static Attributes getGroupAttributes(
@@ -475,9 +472,6 @@ public class PortalLDAPUtil {
 
 			enu = ldapContext.search(baseDN, filter, searchControls);
 		}
-		catch (Exception e) {
-			throw e;
-		}
 		finally {
 			if (ldapContext != null) {
 				ldapContext.close();
@@ -504,8 +498,7 @@ public class PortalLDAPUtil {
 		Properties userMappings = LDAPSettingsUtil.getUserMappings(
 			ldapServerId, companyId);
 		Properties userExpandoMappings =
-			LDAPSettingsUtil.getUserExpandoMappings(
-				ldapServerId, companyId);
+			LDAPSettingsUtil.getUserExpandoMappings(ldapServerId, companyId);
 
 		PropertiesUtil.merge(userMappings, userExpandoMappings);
 
@@ -612,6 +605,8 @@ public class PortalLDAPUtil {
 
 		LdapContext ldapContext = getContext(ldapServerId, companyId);
 
+		NamingEnumeration<SearchResult> enu = null;
+
 		try {
 			if (ldapContext == null) {
 				return false;
@@ -631,7 +626,7 @@ public class PortalLDAPUtil {
 			SearchControls searchControls = new SearchControls(
 				SearchControls.SUBTREE_SCOPE, 1, 0, null, false, false);
 
-			NamingEnumeration<SearchResult> enu = ldapContext.search(
+			enu = ldapContext.search(
 				groupDN, filter.toString(), searchControls);
 
 			if (enu.hasMoreElements()) {
@@ -647,6 +642,10 @@ public class PortalLDAPUtil {
 			}
 		}
 		finally {
+			if (enu != null) {
+				enu.close();
+			}
+
 			if (ldapContext != null) {
 				ldapContext.close();
 			}
@@ -660,6 +659,8 @@ public class PortalLDAPUtil {
 		throws Exception {
 
 		LdapContext ldapContext = getContext(ldapServerId, companyId);
+
+		NamingEnumeration<SearchResult> enu = null;
 
 		try {
 			if (ldapContext == null) {
@@ -680,8 +681,7 @@ public class PortalLDAPUtil {
 			SearchControls searchControls = new SearchControls(
 				SearchControls.SUBTREE_SCOPE, 1, 0, null, false, false);
 
-			NamingEnumeration<SearchResult> enu = ldapContext.search(
-				userDN, filter.toString(), searchControls);
+			enu = ldapContext.search(userDN, filter.toString(), searchControls);
 
 			if (enu.hasMoreElements()) {
 				return true;
@@ -696,6 +696,10 @@ public class PortalLDAPUtil {
 			}
 		}
 		finally {
+			if (enu != null) {
+				enu.close();
+			}
+
 			if (ldapContext != null) {
 				ldapContext.close();
 			}
@@ -706,13 +710,15 @@ public class PortalLDAPUtil {
 
 	public static byte[] searchLDAP(
 			long companyId, LdapContext ldapContext, byte[] cookie,
-			int maxResults, String baseDN, String filter,
-			String[] attributeIds, List<SearchResult> searchResults)
+			int maxResults, String baseDN, String filter, String[] attributeIds,
+			List<SearchResult> searchResults)
 		throws Exception {
 
 		SearchControls searchControls = new SearchControls(
 			SearchControls.SUBTREE_SCOPE, maxResults, 0, attributeIds, false,
 			false);
+
+		NamingEnumeration<SearchResult> enu = null;
 
 		try {
 			if (cookie != null) {
@@ -732,31 +738,33 @@ public class PortalLDAPUtil {
 						});
 				}
 
-				NamingEnumeration<SearchResult> enu = ldapContext.search(
-					baseDN, filter, searchControls);
+				enu = ldapContext.search(baseDN, filter, searchControls);
 
 				while (enu.hasMoreElements()) {
 					searchResults.add(enu.nextElement());
 				}
 
-				enu.close();
-
 				return _getCookie(ldapContext.getResponseControls());
 			}
 		}
 		catch (OperationNotSupportedException onse) {
+			if (enu != null) {
+				enu.close();
+			}
+
 			ldapContext.setRequestControls(null);
 
-			NamingEnumeration<SearchResult> enu = ldapContext.search(
-				baseDN, filter, searchControls);
+			enu = ldapContext.search(baseDN, filter, searchControls);
 
 			while (enu.hasMoreElements()) {
 				searchResults.add(enu.nextElement());
 			}
-
-			enu.close();
 		}
 		finally {
+			if (enu != null) {
+				enu.close();
+			}
+
 			ldapContext.setRequestControls(null);
 		}
 

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,6 +14,8 @@
 
 package com.liferay.portlet.dynamicdatamapping.service;
 
+import com.liferay.portal.service.ServiceWrapper;
+
 /**
  * <p>
  * This class is a wrapper for {@link DDMStorageLinkLocalService}.
@@ -24,7 +26,8 @@ package com.liferay.portlet.dynamicdatamapping.service;
  * @generated
  */
 public class DDMStorageLinkLocalServiceWrapper
-	implements DDMStorageLinkLocalService {
+	implements DDMStorageLinkLocalService,
+		ServiceWrapper<DDMStorageLinkLocalService> {
 	public DDMStorageLinkLocalServiceWrapper(
 		DDMStorageLinkLocalService ddmStorageLinkLocalService) {
 		_ddmStorageLinkLocalService = ddmStorageLinkLocalService;
@@ -58,25 +61,32 @@ public class DDMStorageLinkLocalServiceWrapper
 	* Deletes the d d m storage link with the primary key from the database. Also notifies the appropriate model listeners.
 	*
 	* @param storageLinkId the primary key of the d d m storage link
+	* @return the d d m storage link that was removed
 	* @throws PortalException if a d d m storage link with the primary key could not be found
 	* @throws SystemException if a system exception occurred
 	*/
-	public void deleteDDMStorageLink(long storageLinkId)
+	public com.liferay.portlet.dynamicdatamapping.model.DDMStorageLink deleteDDMStorageLink(
+		long storageLinkId)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException {
-		_ddmStorageLinkLocalService.deleteDDMStorageLink(storageLinkId);
+		return _ddmStorageLinkLocalService.deleteDDMStorageLink(storageLinkId);
 	}
 
 	/**
 	* Deletes the d d m storage link from the database. Also notifies the appropriate model listeners.
 	*
 	* @param ddmStorageLink the d d m storage link
+	* @return the d d m storage link that was removed
 	* @throws SystemException if a system exception occurred
 	*/
-	public void deleteDDMStorageLink(
+	public com.liferay.portlet.dynamicdatamapping.model.DDMStorageLink deleteDDMStorageLink(
 		com.liferay.portlet.dynamicdatamapping.model.DDMStorageLink ddmStorageLink)
 		throws com.liferay.portal.kernel.exception.SystemException {
-		_ddmStorageLinkLocalService.deleteDDMStorageLink(ddmStorageLink);
+		return _ddmStorageLinkLocalService.deleteDDMStorageLink(ddmStorageLink);
+	}
+
+	public com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery() {
+		return _ddmStorageLinkLocalService.dynamicQuery();
 	}
 
 	/**
@@ -148,6 +158,12 @@ public class DDMStorageLinkLocalServiceWrapper
 		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery)
 		throws com.liferay.portal.kernel.exception.SystemException {
 		return _ddmStorageLinkLocalService.dynamicQueryCount(dynamicQuery);
+	}
+
+	public com.liferay.portlet.dynamicdatamapping.model.DDMStorageLink fetchDDMStorageLink(
+		long storageLinkId)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return _ddmStorageLinkLocalService.fetchDDMStorageLink(storageLinkId);
 	}
 
 	/**
@@ -307,11 +323,26 @@ public class DDMStorageLinkLocalServiceWrapper
 			classNameId, classPK);
 	}
 
+	/**
+	 * @deprecated Renamed to {@link #getWrappedService}
+	 */
 	public DDMStorageLinkLocalService getWrappedDDMStorageLinkLocalService() {
 		return _ddmStorageLinkLocalService;
 	}
 
+	/**
+	 * @deprecated Renamed to {@link #setWrappedService}
+	 */
 	public void setWrappedDDMStorageLinkLocalService(
+		DDMStorageLinkLocalService ddmStorageLinkLocalService) {
+		_ddmStorageLinkLocalService = ddmStorageLinkLocalService;
+	}
+
+	public DDMStorageLinkLocalService getWrappedService() {
+		return _ddmStorageLinkLocalService;
+	}
+
+	public void setWrappedService(
 		DDMStorageLinkLocalService ddmStorageLinkLocalService) {
 		_ddmStorageLinkLocalService = ddmStorageLinkLocalService;
 	}

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -29,24 +29,28 @@ import javax.portlet.RenderResponse;
  */
 public class ActionURLLogic extends RuntimeLogic {
 
-	public static final String OPEN_TAG = "<runtime-action-url";
-
 	public static final String CLOSE_1_TAG = "</runtime-action-url>";
 
 	public static final String CLOSE_2_TAG = "/>";
+
+	public static final String OPEN_TAG = "<runtime-action-url";
 
 	public ActionURLLogic(RenderResponse renderResponse) {
 		_renderResponseImpl = (RenderResponseImpl)renderResponse;
 	}
 
 	@Override
-	public String getOpenTag() {
-		return OPEN_TAG;
+	public String getClose1Tag() {
+		return CLOSE_1_TAG;
+	}
+
+	public String getLifecycle() {
+		return _lifecycle;
 	}
 
 	@Override
-	public String getClose1Tag() {
-		return CLOSE_1_TAG;
+	public String getOpenTag() {
+		return OPEN_TAG;
 	}
 
 	@Override
@@ -80,11 +84,7 @@ public class ActionURLLogic extends RuntimeLogic {
 		return liferayPortletURL.toString();
 	}
 
-	public String getLifecycle() {
-		return _lifecycle;
-	}
-
-	private RenderResponseImpl _renderResponseImpl;
 	private String _lifecycle = PortletRequest.ACTION_PHASE;
+	private RenderResponseImpl _renderResponseImpl;
 
 }

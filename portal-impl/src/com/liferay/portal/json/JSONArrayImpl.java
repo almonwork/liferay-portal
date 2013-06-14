@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -130,12 +130,6 @@ public class JSONArrayImpl implements JSONArray {
 		return this;
 	}
 
-	public JSONArray put(long value) {
-		_jsonArray.put(value);
-
-		return this;
-	}
-
 	public JSONArray put(JSONArray value) {
 		_jsonArray.put(((JSONArrayImpl)value).getJSONArray());
 
@@ -144,6 +138,12 @@ public class JSONArrayImpl implements JSONArray {
 
 	public JSONArray put(JSONObject value) {
 		_jsonArray.put(((JSONObjectImpl)value).getJSONObject());
+
+		return this;
+	}
+
+	public JSONArray put(long value) {
+		_jsonArray.put(value);
 
 		return this;
 	}

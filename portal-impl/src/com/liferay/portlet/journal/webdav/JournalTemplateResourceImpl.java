@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -44,16 +44,6 @@ public class JournalTemplateResourceImpl extends BaseResourceImpl {
 	}
 
 	@Override
-	public boolean isCollection() {
-		return false;
-	}
-
-	@Override
-	public String getContentType() {
-		return ContentTypes.TEXT_XML;
-	}
-
-	@Override
 	public InputStream getContentAsStream() throws WebDAVException {
 		try {
 			return new UnsyncByteArrayInputStream(
@@ -62,6 +52,16 @@ public class JournalTemplateResourceImpl extends BaseResourceImpl {
 		catch (Exception e) {
 			throw new WebDAVException(e);
 		}
+	}
+
+	@Override
+	public String getContentType() {
+		return ContentTypes.TEXT_XML;
+	}
+
+	@Override
+	public boolean isCollection() {
+		return false;
 	}
 
 	private JournalTemplate _template;

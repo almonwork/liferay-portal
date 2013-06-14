@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -19,12 +19,18 @@ import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.model.Organization;
 import com.liferay.portal.model.User;
+import com.liferay.portal.security.permission.ActionKeys;
+import com.liferay.portal.security.permission.PermissionChecker;
+import com.liferay.portal.security.permission.PermissionThreadLocal;
 import com.liferay.portal.service.UserLocalServiceUtil;
+import com.liferay.portal.service.permission.UserPermissionUtil;
+import com.liferay.portal.util.PropsValues;
 
 import javax.portlet.RenderResponse;
 
 /**
  * @author Brian Wing Shun Chan
+ * @author Jorge Ferrer
  */
 public class UserOrganizationChecker extends RowChecker {
 
@@ -43,6 +49,28 @@ public class UserOrganizationChecker extends RowChecker {
 		try {
 			return UserLocalServiceUtil.hasOrganizationUser(
 				_organization.getOrganizationId(), user.getUserId());
+		}
+		catch (Exception e) {
+			_log.error(e, e);
+
+			return false;
+		}
+	}
+
+	@Override
+	public boolean isDisabled(Object obj) {
+		if (!PropsValues.ORGANIZATIONS_ASSIGNMENT_STRICT) {
+			return false;
+		}
+
+		User user = (User)obj;
+
+		try {
+			PermissionChecker permissionChecker =
+				PermissionThreadLocal.getPermissionChecker();
+
+			return !UserPermissionUtil.contains(
+				permissionChecker, user.getUserId(), ActionKeys.UPDATE);
 		}
 		catch (Exception e) {
 			_log.error(e, e);

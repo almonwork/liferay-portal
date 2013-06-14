@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -22,13 +22,15 @@ import com.liferay.portlet.shopping.model.ShoppingItem;
  */
 public class ItemMinQuantityComparator extends OrderByComparator {
 
-	public static String ORDER_BY_ASC =
-		"categoryId ASC, minQuantity ASC, name ASC";
+	public static final String ORDER_BY_ASC =
+		"ShoppingItem.categoryId ASC, ShoppingItem.minQuantity ASC, " +
+			"ShoppingItem.name ASC";
 
-	public static String ORDER_BY_DESC =
-		"categoryId DESC, minQuantity DESC, name DESC";
+	public static final String ORDER_BY_DESC =
+		"ShoppingItem.categoryId DESC, ShoppingItem.minQuantity DESC, " +
+			"ShoppingItem.name DESC";
 
-	public static String[] ORDER_BY_FIELDS = {
+	public static final String[] ORDER_BY_FIELDS = {
 		"categoryId", "minQuantity", "name"
 	};
 

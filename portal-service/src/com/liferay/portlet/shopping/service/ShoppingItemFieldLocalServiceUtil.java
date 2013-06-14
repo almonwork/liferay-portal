@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -15,7 +15,6 @@
 package com.liferay.portlet.shopping.service;
 
 import com.liferay.portal.kernel.bean.PortalBeanLocatorUtil;
-import com.liferay.portal.kernel.util.MethodCache;
 import com.liferay.portal.kernel.util.ReferenceRegistry;
 
 /**
@@ -66,25 +65,32 @@ public class ShoppingItemFieldLocalServiceUtil {
 	* Deletes the shopping item field with the primary key from the database. Also notifies the appropriate model listeners.
 	*
 	* @param itemFieldId the primary key of the shopping item field
+	* @return the shopping item field that was removed
 	* @throws PortalException if a shopping item field with the primary key could not be found
 	* @throws SystemException if a system exception occurred
 	*/
-	public static void deleteShoppingItemField(long itemFieldId)
+	public static com.liferay.portlet.shopping.model.ShoppingItemField deleteShoppingItemField(
+		long itemFieldId)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException {
-		getService().deleteShoppingItemField(itemFieldId);
+		return getService().deleteShoppingItemField(itemFieldId);
 	}
 
 	/**
 	* Deletes the shopping item field from the database. Also notifies the appropriate model listeners.
 	*
 	* @param shoppingItemField the shopping item field
+	* @return the shopping item field that was removed
 	* @throws SystemException if a system exception occurred
 	*/
-	public static void deleteShoppingItemField(
+	public static com.liferay.portlet.shopping.model.ShoppingItemField deleteShoppingItemField(
 		com.liferay.portlet.shopping.model.ShoppingItemField shoppingItemField)
 		throws com.liferay.portal.kernel.exception.SystemException {
-		getService().deleteShoppingItemField(shoppingItemField);
+		return getService().deleteShoppingItemField(shoppingItemField);
+	}
+
+	public static com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery() {
+		return getService().dynamicQuery();
 	}
 
 	/**
@@ -156,6 +162,12 @@ public class ShoppingItemFieldLocalServiceUtil {
 		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery)
 		throws com.liferay.portal.kernel.exception.SystemException {
 		return getService().dynamicQueryCount(dynamicQuery);
+	}
+
+	public static com.liferay.portlet.shopping.model.ShoppingItemField fetchShoppingItemField(
+		long itemFieldId)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getService().fetchShoppingItemField(itemFieldId);
 	}
 
 	/**
@@ -266,20 +278,15 @@ public class ShoppingItemFieldLocalServiceUtil {
 
 			ReferenceRegistry.registerReference(ShoppingItemFieldLocalServiceUtil.class,
 				"_service");
-			MethodCache.remove(ShoppingItemFieldLocalService.class);
 		}
 
 		return _service;
 	}
 
+	/**
+	 * @deprecated
+	 */
 	public void setService(ShoppingItemFieldLocalService service) {
-		MethodCache.remove(ShoppingItemFieldLocalService.class);
-
-		_service = service;
-
-		ReferenceRegistry.registerReference(ShoppingItemFieldLocalServiceUtil.class,
-			"_service");
-		MethodCache.remove(ShoppingItemFieldLocalService.class);
 	}
 
 	private static ShoppingItemFieldLocalService _service;

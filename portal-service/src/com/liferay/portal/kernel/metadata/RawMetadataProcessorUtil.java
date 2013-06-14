@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,9 +14,15 @@
 
 package com.liferay.portal.kernel.metadata;
 
+import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.exception.SystemException;
+import com.liferay.portal.kernel.security.pacl.permission.PortalRuntimePermission;
 import com.liferay.portlet.dynamicdatamapping.storage.Fields;
 
+import java.io.File;
 import java.io.InputStream;
+
+import java.lang.reflect.Field;
 
 import java.util.Map;
 
@@ -25,18 +31,37 @@ import java.util.Map;
  */
 public class RawMetadataProcessorUtil {
 
-	public static Map<String, Fields> getRawMetadataMap(
-		InputStream inputStream) {
+	public static Map<String, Field[]> getFields() {
+		return getRawMetadataProcessor().getFields();
+	}
 
-		return getRawMetadataProcessor().getRawMetadataMap(inputStream);
+	public static Map<String, Fields> getRawMetadataMap(
+			String extension, String mimeType, File file)
+		throws PortalException, SystemException {
+
+		return getRawMetadataProcessor().getRawMetadataMap(
+			extension, mimeType, file);
+	}
+
+	public static Map<String, Fields> getRawMetadataMap(
+			String extension, String mimeType, InputStream inputStream)
+		throws PortalException, SystemException {
+
+		return getRawMetadataProcessor().getRawMetadataMap(
+			extension, mimeType, inputStream);
 	}
 
 	public static RawMetadataProcessor getRawMetadataProcessor() {
+		PortalRuntimePermission.checkGetBeanProperty(
+			RawMetadataProcessorUtil.class);
+
 		return _rawMetadataProcessor;
 	}
 
 	public void setRawMetadataProcessor(
 		RawMetadataProcessor rawMetadataProcessor) {
+
+		PortalRuntimePermission.checkSetBeanProperty(getClass());
 
 		_rawMetadataProcessor = rawMetadataProcessor;
 	}

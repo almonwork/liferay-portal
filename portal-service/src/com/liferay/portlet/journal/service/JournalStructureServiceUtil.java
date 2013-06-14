@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -15,7 +15,6 @@
 package com.liferay.portlet.journal.service;
 
 import com.liferay.portal.kernel.bean.PortalBeanLocatorUtil;
-import com.liferay.portal.kernel.util.MethodCache;
 import com.liferay.portal.kernel.util.ReferenceRegistry;
 
 /**
@@ -37,16 +36,37 @@ public class JournalStructureServiceUtil {
 	 *
 	 * Never modify this class directly. Add custom service methods to {@link com.liferay.portlet.journal.service.impl.JournalStructureServiceImpl} and rerun ServiceBuilder to regenerate this class.
 	 */
+
+	/**
+	* Returns the Spring bean ID for this bean.
+	*
+	* @return the Spring bean ID for this bean
+	*/
+	public static java.lang.String getBeanIdentifier() {
+		return getService().getBeanIdentifier();
+	}
+
+	/**
+	* Sets the Spring bean ID for this bean.
+	*
+	* @param beanIdentifier the Spring bean ID for this bean
+	*/
+	public static void setBeanIdentifier(java.lang.String beanIdentifier) {
+		getService().setBeanIdentifier(beanIdentifier);
+	}
+
 	public static com.liferay.portlet.journal.model.JournalStructure addStructure(
 		long groupId, java.lang.String structureId, boolean autoStructureId,
-		java.lang.String parentStructureId, java.lang.String name,
-		java.lang.String description, java.lang.String xsd,
+		java.lang.String parentStructureId,
+		java.util.Map<java.util.Locale, java.lang.String> nameMap,
+		java.util.Map<java.util.Locale, java.lang.String> descriptionMap,
+		java.lang.String xsd,
 		com.liferay.portal.service.ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException {
 		return getService()
 				   .addStructure(groupId, structureId, autoStructureId,
-			parentStructureId, name, description, xsd, serviceContext);
+			parentStructureId, nameMap, descriptionMap, xsd, serviceContext);
 	}
 
 	public static com.liferay.portlet.journal.model.JournalStructure copyStructure(
@@ -115,14 +135,16 @@ public class JournalStructureServiceUtil {
 
 	public static com.liferay.portlet.journal.model.JournalStructure updateStructure(
 		long groupId, java.lang.String structureId,
-		java.lang.String parentStructureId, java.lang.String name,
-		java.lang.String description, java.lang.String xsd,
+		java.lang.String parentStructureId,
+		java.util.Map<java.util.Locale, java.lang.String> nameMap,
+		java.util.Map<java.util.Locale, java.lang.String> descriptionMap,
+		java.lang.String xsd,
 		com.liferay.portal.service.ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException {
 		return getService()
 				   .updateStructure(groupId, structureId, parentStructureId,
-			name, description, xsd, serviceContext);
+			nameMap, descriptionMap, xsd, serviceContext);
 	}
 
 	public static JournalStructureService getService() {
@@ -131,20 +153,15 @@ public class JournalStructureServiceUtil {
 
 			ReferenceRegistry.registerReference(JournalStructureServiceUtil.class,
 				"_service");
-			MethodCache.remove(JournalStructureService.class);
 		}
 
 		return _service;
 	}
 
+	/**
+	 * @deprecated
+	 */
 	public void setService(JournalStructureService service) {
-		MethodCache.remove(JournalStructureService.class);
-
-		_service = service;
-
-		ReferenceRegistry.registerReference(JournalStructureServiceUtil.class,
-			"_service");
-		MethodCache.remove(JournalStructureService.class);
 	}
 
 	private static JournalStructureService _service;

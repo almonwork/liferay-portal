@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -90,6 +90,12 @@ public class RoleFinderUtil {
 	}
 
 	public static java.util.List<com.liferay.portal.model.Role> findByU_G(
+		long userId, java.util.List<com.liferay.portal.model.Group> groups)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getFinder().findByU_G(userId, groups);
+	}
+
+	public static java.util.List<com.liferay.portal.model.Role> findByU_G(
 		long userId, long groupId)
 		throws com.liferay.portal.kernel.exception.SystemException {
 		return getFinder().findByU_G(userId, groupId);
@@ -101,10 +107,11 @@ public class RoleFinderUtil {
 		return getFinder().findByU_G(userId, groupIds);
 	}
 
-	public static java.util.List<com.liferay.portal.model.Role> findByU_G(
-		long userId, java.util.List<com.liferay.portal.model.Group> groups)
+	public static java.util.List<com.liferay.portal.model.Role> findByR_N_A(
+		long resourceBlockId, java.lang.String className,
+		java.lang.String actionId)
 		throws com.liferay.portal.kernel.exception.SystemException {
-		return getFinder().findByU_G(userId, groups);
+		return getFinder().findByR_N_A(resourceBlockId, className, actionId);
 	}
 
 	public static java.util.List<com.liferay.portal.model.Role> findByC_N_D_T(

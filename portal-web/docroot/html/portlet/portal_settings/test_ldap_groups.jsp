@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -86,8 +86,8 @@ int counter = 0;
 for (SearchResult searchResult : searchResults) {
 	Attributes attributes = searchResult.getAttributes();
 
-	String name = LDAPUtil.getAttributeValue(attributes, groupMappings.getProperty("groupName")).toLowerCase();
-	String description = LDAPUtil.getAttributeValue(attributes, groupMappings.getProperty("description"));
+	String name = LDAPUtil.getAttributeString(attributes, groupMappings.getProperty("groupName")).toLowerCase();
+	String description = LDAPUtil.getAttributeString(attributes, groupMappings.getProperty("description"));
 	Attribute attribute = attributes.get(groupMappings.getProperty("user"));
 
 	if (Validator.isNull(name)) {

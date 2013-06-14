@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -74,6 +74,10 @@ public interface PortletDataContext extends Serializable {
 
 	public void addComments(
 		String className, long classPK, List<MBMessage> messages);
+
+	public void addExpando(
+			Element element, String path, ClassedModel classedModel)
+		throws PortalException, SystemException;
 
 	public void addLocks(Class<?> clazz, String key)
 		throws PortalException, SystemException;
@@ -190,7 +194,7 @@ public interface PortletDataContext extends Serializable {
 
 	public long getUserId(String userUuid) throws SystemException;
 
-	public UserIdStrategy getUserIdStrategy() throws SystemException;
+	public UserIdStrategy getUserIdStrategy();
 
 	public List<String> getZipEntries();
 
@@ -228,8 +232,7 @@ public interface PortletDataContext extends Serializable {
 	public void importLocks(Class<?> clazz, String key, String newKey)
 		throws PortalException, SystemException;
 
-	public void importPermissions(
-			Class<?> clazz, long classPK, long newClassPK)
+	public void importPermissions(Class<?> clazz, long classPK, long newClassPK)
 		throws PortalException, SystemException;
 
 	public void importPermissions(
@@ -242,7 +245,7 @@ public interface PortletDataContext extends Serializable {
 
 	public boolean isDataStrategyMirror();
 
-	public boolean isDataStrategyMirrorWithOverwritting();
+	public boolean isDataStrategyMirrorWithOverwriting();
 
 	public boolean isPathNotProcessed(String path);
 

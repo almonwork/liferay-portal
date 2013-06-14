@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,6 +14,8 @@
 
 package com.liferay.portlet.wiki.action;
 
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.servlet.ServletResponseUtil;
 import com.liferay.portal.kernel.util.CharPool;
 import com.liferay.portal.kernel.util.MimeTypesUtil;
@@ -22,7 +24,9 @@ import com.liferay.portal.model.CompanyConstants;
 import com.liferay.portal.struts.ActionConstants;
 import com.liferay.portal.struts.PortletAction;
 import com.liferay.portal.util.PortalUtil;
+import com.liferay.portlet.documentlibrary.NoSuchFileException;
 import com.liferay.portlet.documentlibrary.store.DLStoreUtil;
+import com.liferay.portlet.wiki.NoSuchPageException;
 import com.liferay.portlet.wiki.model.WikiPage;
 import com.liferay.portlet.wiki.service.WikiPageServiceUtil;
 
@@ -43,28 +47,6 @@ import org.apache.struts.action.ActionMapping;
  * @author Jorge Ferrer
  */
 public class GetPageAttachmentAction extends PortletAction {
-
-	@Override
-	public ActionForward strutsExecute(
-			ActionMapping mapping, ActionForm form, HttpServletRequest request,
-			HttpServletResponse response)
-		throws Exception {
-
-		try {
-			long nodeId = ParamUtil.getLong(request, "nodeId");
-			String title = ParamUtil.getString(request, "title");
-			String fileName = ParamUtil.getString(request, "fileName");
-
-			getFile(nodeId, title, fileName, request, response);
-
-			return null;
-		}
-		catch (Exception e) {
-			PortalUtil.sendError(e, request, response);
-
-			return null;
-		}
-	}
 
 	@Override
 	public void processAction(
@@ -88,6 +70,37 @@ public class GetPageAttachmentAction extends PortletAction {
 		}
 		catch (Exception e) {
 			PortalUtil.sendError(e, actionRequest, actionResponse);
+		}
+	}
+
+	@Override
+	public ActionForward strutsExecute(
+			ActionMapping mapping, ActionForm form, HttpServletRequest request,
+			HttpServletResponse response)
+		throws Exception {
+
+		try {
+			long nodeId = ParamUtil.getLong(request, "nodeId");
+			String title = ParamUtil.getString(request, "title");
+			String fileName = ParamUtil.getString(request, "fileName");
+
+			getFile(nodeId, title, fileName, request, response);
+
+			return null;
+		}
+		catch (Exception e) {
+			if ((e instanceof NoSuchPageException) ||
+				(e instanceof NoSuchFileException)) {
+
+				if (_log.isWarnEnabled()) {
+					_log.warn(e);
+				}
+			}
+			else {
+				PortalUtil.sendError(e, request, response);
+			}
+
+			return null;
 		}
 	}
 
@@ -123,5 +136,8 @@ public class GetPageAttachmentAction extends PortletAction {
 	}
 
 	private static final boolean _CHECK_METHOD_ON_PROCESS_ACTION = false;
+
+	private static Log _log = LogFactoryUtil.getLog(
+		GetPageAttachmentAction.class);
 
 }

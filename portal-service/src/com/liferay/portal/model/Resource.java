@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -15,35 +15,33 @@
 package com.liferay.portal.model;
 
 /**
- * The extended model interface for the Resource service. Represents a row in the &quot;Resource_&quot; database table, with each column mapped to a property of this class.
- *
  * @author Brian Wing Shun Chan
- * @see ResourceModel
- * @see com.liferay.portal.model.impl.ResourceImpl
- * @see com.liferay.portal.model.impl.ResourceModelImpl
- * @generated
+ * @see    com.liferay.portal.model.impl.ResourceImpl
  */
-public interface Resource extends ResourceModel, PersistedModel {
-	/*
-	 * NOTE FOR DEVELOPERS:
-	 *
-	 * Never modify this interface directly. Add methods to {@link com.liferay.portal.model.impl.ResourceImpl} and rerun ServiceBuilder to automatically copy the method declarations to this interface.
-	 */
-	public long getCompanyId()
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException;
+public interface Resource {
 
-	public java.lang.String getName()
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException;
+	public long getCodeId();
 
-	public int getScope()
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException;
+	public long getCompanyId();
+
+	public String getName();
+
+	public String getPrimKey();
+
+	public long getResourceId();
+
+	public int getScope();
+
+	public void setCodeId(long codeId);
 
 	public void setCompanyId(long companyId);
 
-	public void setName(java.lang.String name);
+	public void setName(String name);
+
+	public void setPrimKey(String primKey);
+
+	public void setResourceId(long resourceId);
 
 	public void setScope(int scope);
+
 }

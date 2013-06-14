@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -68,35 +68,11 @@ public class LiferayResourceBundle extends ResourceBundle {
 	}
 
 	@Override
-	public Object handleGetObject(String key) {
-		if (key == null) {
-			throw new NullPointerException();
-		}
-
-		String value = _map.get(key);
-
-		if ((value == null) && ResourceBundleThreadLocal.isReplace()) {
-			if (parent != null) {
-				try {
-					value = parent.getString(key);
-				}
-				catch (MissingResourceException mre) {
-				}
-			}
-
-			if (value == null) {
-				value = ResourceBundleUtil.NULL_VALUE;
-			}
-		}
-
-		return value;
-	}
-
-	@Override
 	public Enumeration<String> getKeys() {
 		final Set<String> keys = _map.keySet();
 
-		final Enumeration<String> parentKeys = parent.getKeys();
+		final Enumeration<String> parentKeys =
+			(parent == null) ? null : parent.getKeys();
 
 		final Iterator<String> itr = keys.iterator();
 
@@ -140,6 +116,31 @@ public class LiferayResourceBundle extends ResourceBundle {
 				}
 			}
 		};
+	}
+
+	@Override
+	public Object handleGetObject(String key) {
+		if (key == null) {
+			throw new NullPointerException();
+		}
+
+		String value = _map.get(key);
+
+		if ((value == null) && ResourceBundleThreadLocal.isReplace()) {
+			if (parent != null) {
+				try {
+					value = parent.getString(key);
+				}
+				catch (MissingResourceException mre) {
+				}
+			}
+
+			if (value == null) {
+				value = ResourceBundleUtil.NULL_VALUE;
+			}
+		}
+
+		return value;
 	}
 
 	private Map<String, String> _map;

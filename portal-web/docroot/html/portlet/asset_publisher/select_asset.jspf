@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -15,11 +15,9 @@
 --%>
 
 <%
-String modelResourceName = ResourceActionsUtil.getModelResource(locale, typeSelection);
+long groupId = ParamUtil.getLong(request, "groupId");
 
 int assetEntryOrder = ParamUtil.getInteger(request, "assetEntryOrder", -1);
-
-String keywords = ParamUtil.getString(request, "keywords");
 
 PortletURL portletURL = renderResponse.createRenderURL();
 
@@ -27,6 +25,11 @@ portletURL.setParameter("struts_action", "/portlet_configuration/edit_configurat
 portletURL.setParameter("redirect", redirect);
 portletURL.setParameter("backURL", redirect);
 portletURL.setParameter("portletResource", portletResource);
+
+if (groupId > 0) {
+	portletURL.setParameter("groupId", String.valueOf(groupId));
+}
+
 portletURL.setParameter("typeSelection", typeSelection);
 %>
 
@@ -73,7 +76,11 @@ portletURL.setParameter("typeSelection", typeSelection);
 
 			long entryId = GetterUtil.getLong(doc.get(Field.ENTRY_CLASS_PK));
 
-			AssetEntry entry = AssetEntryLocalServiceUtil.getEntry(typeSelection, entryId);
+			AssetEntry entry = AssetEntryLocalServiceUtil.fetchEntry(typeSelection, entryId);
+
+			if (entry == null) {
+				continue;
+			}
 
 			entry = entry.toEscapedModel();
 
@@ -93,7 +100,7 @@ portletURL.setParameter("typeSelection", typeSelection);
 
 			AssetRenderer assetRenderer = assetRendererFactory.getAssetRenderer(entry.getClassPK());
 
-			row.addText(assetRenderer.getTitle(locale), rowHREF);
+			row.addText(HtmlUtil.escape(assetRenderer.getTitle(locale)), rowHREF);
 
 			// Description
 
@@ -101,7 +108,9 @@ portletURL.setParameter("typeSelection", typeSelection);
 
 			// User name
 
-			row.addText(HtmlUtil.escape(PortalUtil.getUserName(entry.getUserId(), entry.getUserName())), rowHREF);
+			String userName = PortalUtil.getUserName(assetRenderer.getUserId(), assetRenderer.getUserName());
+
+			row.addText(HtmlUtil.escape(userName), rowHREF);
 
 			// Modified date
 

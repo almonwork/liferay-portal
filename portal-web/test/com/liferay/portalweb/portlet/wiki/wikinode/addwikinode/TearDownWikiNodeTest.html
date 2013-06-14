@@ -14,23 +14,38 @@
 	<td></td>
 </tr>
 <tr>
-	<td>waitForElementPresent</td>
+	<td>assertText</td>
+	<td>//li[@id='_145_mySites']/a/span</td>
+	<td>Go to</td>
+</tr>
+<tr>
+	<td>mouseOver</td>
+	<td>//li[@id='_145_mySites']/a/span</td>
+	<td>Go to</td>
+</tr>
+<tr>
+	<td>waitForVisible</td>
 	<td>link=Control Panel</td>
-	<td></td>
+	<td>Control Panel</td>
 </tr>
 <tr>
 	<td>clickAtAndWait</td>
 	<td>link=Control Panel</td>
-	<td></td>
+	<td>Control Panel</td>
+</tr>
+<tr>
+	<td>assertText</td>
+	<td>//ul[@class='category-portlets']/li[contains(.,'Wiki')]/a</td>
+	<td>Wiki</td>
 </tr>
 <tr>
 	<td>clickAtAndWait</td>
-	<td>link=Wiki</td>
-	<td></td>
+	<td>//ul[@class='category-portlets']/li[contains(.,'Wiki')]/a</td>
+	<td>Wiki</td>
 </tr>
 <tr>
-	<td>store</td>
-	<td>eval(selenium.isElementPresent('//tr[4]/td[4]/span/ul/li/strong/a'))</td>
+	<td>storeElementPresent</td>
+	<td>xPath=(//span[@title='Actions']/ul/li/strong/a/span)[2]</td>
 	<td>wikiNode1Present</td>
 </tr>
 <tr>
@@ -39,38 +54,38 @@
 	<td>WikiNode1NotPresent</td>
 </tr>
 <tr>
+	<td>assertText</td>
+	<td>xPath=(//span[@title='Actions']/ul/li/strong/a/span)[2]</td>
+	<td>Actions</td>
+</tr>
+<tr>
 	<td>clickAt</td>
-	<td>//tr[4]/td[4]/span/ul/li/strong/a</td>
+	<td>xPath=(//span[@title='Actions']/ul/li/strong/a/span)[2]</td>
 	<td>Actions</td>
 </tr>
 <tr>
 	<td>waitForVisible</td>
-	<td>//div[@class='lfr-component lfr-menu-list']/ul/li[6]/a</td>
+	<td>//div[@class='lfr-component lfr-menu-list']/ul/li[contains(.,'Delete')]/a</td>
 	<td>Delete</td>
 </tr>
 <tr>
 	<td>assertText</td>
-	<td>//div[@class='lfr-component lfr-menu-list']/ul/li[6]/a</td>
+	<td>//div[@class='lfr-component lfr-menu-list']/ul/li[contains(.,'Delete')]/a</td>
 	<td>Delete</td>
 </tr>
 <tr>
 	<td>clickAndWait</td>
-	<td>//div[@class='lfr-component lfr-menu-list']/ul/li[6]/a</td>
+	<td>//div[@class='lfr-component lfr-menu-list']/ul/li[contains(.,'Delete')]/a</td>
 	<td>Delete</td>
 </tr>
 <tr>
 	<td>assertConfirmation</td>
-	<td>Are you sure you want to delete this?</td>
+	<td>Are you sure you want to delete this? It will be deleted immediately.</td>
 	<td></td>
 </tr>
 <tr>
-	<td>label</td>
-	<td>WikiNode1NotPresent</td>
-	<td></td>
-</tr>
-<tr>
-	<td>store</td>
-	<td>eval(selenium.isElementPresent('//tr[4]/td[4]/span/ul/li/strong/a'))</td>
+	<td>storeElementPresent</td>
+	<td>xPath=(//span[@title='Actions']/ul/li/strong/a/span)[2]</td>
 	<td>wikiNode2Present</td>
 </tr>
 <tr>
@@ -79,38 +94,38 @@
 	<td>WikiNode2NotPresent</td>
 </tr>
 <tr>
+	<td>assertText</td>
+	<td>xPath=(//span[@title='Actions']/ul/li/strong/a/span)[2]</td>
+	<td>Actions</td>
+</tr>
+<tr>
 	<td>clickAt</td>
-	<td>//tr[4]/td[4]/span/ul/li/strong/a</td>
+	<td>xPath=(//span[@title='Actions']/ul/li/strong/a/span)[2]</td>
 	<td>Actions</td>
 </tr>
 <tr>
 	<td>waitForVisible</td>
-	<td>//div[@class='lfr-component lfr-menu-list']/ul/li[6]/a</td>
+	<td>//div[@class='lfr-component lfr-menu-list']/ul/li[contains(.,'Delete')]/a</td>
 	<td>Delete</td>
 </tr>
 <tr>
 	<td>assertText</td>
-	<td>//div[@class='lfr-component lfr-menu-list']/ul/li[6]/a</td>
+	<td>//div[@class='lfr-component lfr-menu-list']/ul/li[contains(.,'Delete')]/a</td>
 	<td>Delete</td>
 </tr>
 <tr>
 	<td>clickAndWait</td>
-	<td>//div[@class='lfr-component lfr-menu-list']/ul/li[6]/a</td>
+	<td>//div[@class='lfr-component lfr-menu-list']/ul/li[contains(.,'Delete')]/a</td>
 	<td>Delete</td>
 </tr>
 <tr>
 	<td>assertConfirmation</td>
-	<td>Are you sure you want to delete this?</td>
+	<td>Are you sure you want to delete this? It will be deleted immediately.</td>
 	<td></td>
 </tr>
 <tr>
-	<td>label</td>
-	<td>WikiNode2NotPresent</td>
-	<td></td>
-</tr>
-<tr>
-	<td>store</td>
-	<td>eval(selenium.isElementPresent('//tr[4]/td[4]/span/ul/li/strong/a'))</td>
+	<td>storeElementPresent</td>
+	<td>xPath=(//span[@title='Actions']/ul/li/strong/a/span)[2]</td>
 	<td>wikiNode3Present</td>
 </tr>
 <tr>
@@ -119,38 +134,38 @@
 	<td>WikiNode3NotPresent</td>
 </tr>
 <tr>
+	<td>assertText</td>
+	<td>xPath=(//span[@title='Actions']/ul/li/strong/a/span)[2]</td>
+	<td>Actions</td>
+</tr>
+<tr>
 	<td>clickAt</td>
-	<td>//tr[4]/td[4]/span/ul/li/strong/a</td>
+	<td>xPath=(//span[@title='Actions']/ul/li/strong/a/span)[2]</td>
 	<td>Actions</td>
 </tr>
 <tr>
 	<td>waitForVisible</td>
-	<td>//div[@class='lfr-component lfr-menu-list']/ul/li[6]/a</td>
+	<td>//div[@class='lfr-component lfr-menu-list']/ul/li[contains(.,'Delete')]/a</td>
 	<td>Delete</td>
 </tr>
 <tr>
 	<td>assertText</td>
-	<td>//div[@class='lfr-component lfr-menu-list']/ul/li[6]/a</td>
+	<td>//div[@class='lfr-component lfr-menu-list']/ul/li[contains(.,'Delete')]/a</td>
 	<td>Delete</td>
 </tr>
 <tr>
 	<td>clickAndWait</td>
-	<td>//div[@class='lfr-component lfr-menu-list']/ul/li[6]/a</td>
+	<td>//div[@class='lfr-component lfr-menu-list']/ul/li[contains(.,'Delete')]/a</td>
 	<td>Delete</td>
 </tr>
 <tr>
 	<td>assertConfirmation</td>
-	<td>Are you sure you want to delete this?</td>
+	<td>Are you sure you want to delete this? It will be deleted immediately.</td>
 	<td></td>
 </tr>
 <tr>
-	<td>label</td>
-	<td>WikiNode3NotPresent</td>
-	<td></td>
-</tr>
-<tr>
-	<td>store</td>
-	<td>eval(selenium.isElementPresent('//tr[4]/td[4]/span/ul/li/strong/a'))</td>
+	<td>storeElementPresent</td>
+	<td>xPath=(//span[@title='Actions']/ul/li/strong/a/span)[2]</td>
 	<td>wikiNode4Present</td>
 </tr>
 <tr>
@@ -159,38 +174,38 @@
 	<td>WikiNode4NotPresent</td>
 </tr>
 <tr>
+	<td>assertText</td>
+	<td>xPath=(//span[@title='Actions']/ul/li/strong/a/span)[2]</td>
+	<td>Actions</td>
+</tr>
+<tr>
 	<td>clickAt</td>
-	<td>//tr[4]/td[4]/span/ul/li/strong/a</td>
+	<td>xPath=(//span[@title='Actions']/ul/li/strong/a/span)[2]</td>
 	<td>Actions</td>
 </tr>
 <tr>
 	<td>waitForVisible</td>
-	<td>//div[@class='lfr-component lfr-menu-list']/ul/li[6]/a</td>
+	<td>//div[@class='lfr-component lfr-menu-list']/ul/li[contains(.,'Delete')]/a</td>
 	<td>Delete</td>
 </tr>
 <tr>
 	<td>assertText</td>
-	<td>//div[@class='lfr-component lfr-menu-list']/ul/li[6]/a</td>
+	<td>//div[@class='lfr-component lfr-menu-list']/ul/li[contains(.,'Delete')]/a</td>
 	<td>Delete</td>
 </tr>
 <tr>
 	<td>clickAndWait</td>
-	<td>//div[@class='lfr-component lfr-menu-list']/ul/li[6]/a</td>
+	<td>//div[@class='lfr-component lfr-menu-list']/ul/li[contains(.,'Delete')]/a</td>
 	<td>Delete</td>
 </tr>
 <tr>
 	<td>assertConfirmation</td>
-	<td>Are you sure you want to delete this?</td>
+	<td>Are you sure you want to delete this? It will be deleted immediately.</td>
 	<td></td>
 </tr>
 <tr>
-	<td>label</td>
-	<td>WikiNode4NotPresent</td>
-	<td></td>
-</tr>
-<tr>
-	<td>store</td>
-	<td>eval(selenium.isElementPresent('//tr[4]/td[4]/span/ul/li/strong/a'))</td>
+	<td>storeElementPresent</td>
+	<td>xPath=(//span[@title='Actions']/ul/li/strong/a/span)[2]</td>
 	<td>wikiNode5Present</td>
 </tr>
 <tr>
@@ -199,28 +214,53 @@
 	<td>WikiNode5NotPresent</td>
 </tr>
 <tr>
+	<td>assertText</td>
+	<td>xPath=(//span[@title='Actions']/ul/li/strong/a/span)[2]</td>
+	<td>Actions</td>
+</tr>
+<tr>
 	<td>clickAt</td>
-	<td>//tr[4]/td[4]/span/ul/li/strong/a</td>
+	<td>xPath=(//span[@title='Actions']/ul/li/strong/a/span)[2]</td>
 	<td>Actions</td>
 </tr>
 <tr>
 	<td>waitForVisible</td>
-	<td>//div[@class='lfr-component lfr-menu-list']/ul/li[6]/a</td>
+	<td>//div[@class='lfr-component lfr-menu-list']/ul/li[contains(.,'Delete')]/a</td>
 	<td>Delete</td>
 </tr>
 <tr>
 	<td>assertText</td>
-	<td>//div[@class='lfr-component lfr-menu-list']/ul/li[6]/a</td>
+	<td>//div[@class='lfr-component lfr-menu-list']/ul/li[contains(.,'Delete')]/a</td>
 	<td>Delete</td>
 </tr>
 <tr>
 	<td>clickAndWait</td>
-	<td>//div[@class='lfr-component lfr-menu-list']/ul/li[6]/a</td>
+	<td>//div[@class='lfr-component lfr-menu-list']/ul/li[contains(.,'Delete')]/a</td>
 	<td>Delete</td>
 </tr>
 <tr>
 	<td>assertConfirmation</td>
-	<td>Are you sure you want to delete this?</td>
+	<td>Are you sure you want to delete this? It will be deleted immediately.</td>
+	<td></td>
+</tr>
+<tr>
+	<td>label</td>
+	<td>WikiNode1NotPresent</td>
+	<td></td>
+</tr>
+<tr>
+	<td>label</td>
+	<td>WikiNode2NotPresent</td>
+	<td></td>
+</tr>
+<tr>
+	<td>label</td>
+	<td>WikiNode3NotPresent</td>
+	<td></td>
+</tr>
+<tr>
+	<td>label</td>
+	<td>WikiNode4NotPresent</td>
 	<td></td>
 </tr>
 <tr>
@@ -229,31 +269,35 @@
 	<td></td>
 </tr>
 <tr>
+	<td>assertText</td>
+	<td>//span[@title='Actions']/ul/li/strong/a/span</td>
+	<td>Actions</td>
+</tr>
+<tr>
 	<td>clickAt</td>
-	<td>//td[4]/span/ul/li/strong/a</td>
+	<td>//span[@title='Actions']/ul/li/strong/a/span</td>
 	<td>Actions</td>
 </tr>
 <tr>
 	<td>waitForVisible</td>
-	<td>//div[@class='lfr-component lfr-menu-list']/ul/li[6]/a</td>
+	<td>//div[@class='lfr-component lfr-menu-list']/ul/li[contains(.,'Delete')]/a</td>
 	<td>Delete</td>
 </tr>
 <tr>
 	<td>assertText</td>
-	<td>//div[@class='lfr-component lfr-menu-list']/ul/li[6]/a</td>
+	<td>//div[@class='lfr-component lfr-menu-list']/ul/li[contains(.,'Delete')]/a</td>
 	<td>Delete</td>
 </tr>
 <tr>
 	<td>clickAndWait</td>
-	<td>//div[@class='lfr-component lfr-menu-list']/ul/li[6]/a</td>
+	<td>//div[@class='lfr-component lfr-menu-list']/ul/li[contains(.,'Delete')]/a</td>
 	<td>Delete</td>
 </tr>
 <tr>
 	<td>assertConfirmation</td>
-	<td>Are you sure you want to delete this?</td>
+	<td>Are you sure you want to delete this? It will be deleted immediately.</td>
 	<td></td>
 </tr>
-
 </tbody></table>
 </body>
 </html>

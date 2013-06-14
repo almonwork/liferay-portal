@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,6 +14,10 @@
 
 package com.liferay.portal.model;
 
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * <p>
  * This class is a wrapper for {@link LayoutRevision}.
@@ -23,7 +27,8 @@ package com.liferay.portal.model;
  * @see       LayoutRevision
  * @generated
  */
-public class LayoutRevisionWrapper implements LayoutRevision {
+public class LayoutRevisionWrapper implements LayoutRevision,
+	ModelWrapper<LayoutRevision> {
 	public LayoutRevisionWrapper(LayoutRevision layoutRevision) {
 		_layoutRevision = layoutRevision;
 	}
@@ -34,6 +39,233 @@ public class LayoutRevisionWrapper implements LayoutRevision {
 
 	public String getModelClassName() {
 		return LayoutRevision.class.getName();
+	}
+
+	public Map<String, Object> getModelAttributes() {
+		Map<String, Object> attributes = new HashMap<String, Object>();
+
+		attributes.put("layoutRevisionId", getLayoutRevisionId());
+		attributes.put("groupId", getGroupId());
+		attributes.put("companyId", getCompanyId());
+		attributes.put("userId", getUserId());
+		attributes.put("userName", getUserName());
+		attributes.put("createDate", getCreateDate());
+		attributes.put("modifiedDate", getModifiedDate());
+		attributes.put("layoutSetBranchId", getLayoutSetBranchId());
+		attributes.put("layoutBranchId", getLayoutBranchId());
+		attributes.put("parentLayoutRevisionId", getParentLayoutRevisionId());
+		attributes.put("head", getHead());
+		attributes.put("major", getMajor());
+		attributes.put("plid", getPlid());
+		attributes.put("privateLayout", getPrivateLayout());
+		attributes.put("name", getName());
+		attributes.put("title", getTitle());
+		attributes.put("description", getDescription());
+		attributes.put("keywords", getKeywords());
+		attributes.put("robots", getRobots());
+		attributes.put("typeSettings", getTypeSettings());
+		attributes.put("iconImage", getIconImage());
+		attributes.put("iconImageId", getIconImageId());
+		attributes.put("themeId", getThemeId());
+		attributes.put("colorSchemeId", getColorSchemeId());
+		attributes.put("wapThemeId", getWapThemeId());
+		attributes.put("wapColorSchemeId", getWapColorSchemeId());
+		attributes.put("css", getCss());
+		attributes.put("status", getStatus());
+		attributes.put("statusByUserId", getStatusByUserId());
+		attributes.put("statusByUserName", getStatusByUserName());
+		attributes.put("statusDate", getStatusDate());
+
+		return attributes;
+	}
+
+	public void setModelAttributes(Map<String, Object> attributes) {
+		Long layoutRevisionId = (Long)attributes.get("layoutRevisionId");
+
+		if (layoutRevisionId != null) {
+			setLayoutRevisionId(layoutRevisionId);
+		}
+
+		Long groupId = (Long)attributes.get("groupId");
+
+		if (groupId != null) {
+			setGroupId(groupId);
+		}
+
+		Long companyId = (Long)attributes.get("companyId");
+
+		if (companyId != null) {
+			setCompanyId(companyId);
+		}
+
+		Long userId = (Long)attributes.get("userId");
+
+		if (userId != null) {
+			setUserId(userId);
+		}
+
+		String userName = (String)attributes.get("userName");
+
+		if (userName != null) {
+			setUserName(userName);
+		}
+
+		Date createDate = (Date)attributes.get("createDate");
+
+		if (createDate != null) {
+			setCreateDate(createDate);
+		}
+
+		Date modifiedDate = (Date)attributes.get("modifiedDate");
+
+		if (modifiedDate != null) {
+			setModifiedDate(modifiedDate);
+		}
+
+		Long layoutSetBranchId = (Long)attributes.get("layoutSetBranchId");
+
+		if (layoutSetBranchId != null) {
+			setLayoutSetBranchId(layoutSetBranchId);
+		}
+
+		Long layoutBranchId = (Long)attributes.get("layoutBranchId");
+
+		if (layoutBranchId != null) {
+			setLayoutBranchId(layoutBranchId);
+		}
+
+		Long parentLayoutRevisionId = (Long)attributes.get(
+				"parentLayoutRevisionId");
+
+		if (parentLayoutRevisionId != null) {
+			setParentLayoutRevisionId(parentLayoutRevisionId);
+		}
+
+		Boolean head = (Boolean)attributes.get("head");
+
+		if (head != null) {
+			setHead(head);
+		}
+
+		Boolean major = (Boolean)attributes.get("major");
+
+		if (major != null) {
+			setMajor(major);
+		}
+
+		Long plid = (Long)attributes.get("plid");
+
+		if (plid != null) {
+			setPlid(plid);
+		}
+
+		Boolean privateLayout = (Boolean)attributes.get("privateLayout");
+
+		if (privateLayout != null) {
+			setPrivateLayout(privateLayout);
+		}
+
+		String name = (String)attributes.get("name");
+
+		if (name != null) {
+			setName(name);
+		}
+
+		String title = (String)attributes.get("title");
+
+		if (title != null) {
+			setTitle(title);
+		}
+
+		String description = (String)attributes.get("description");
+
+		if (description != null) {
+			setDescription(description);
+		}
+
+		String keywords = (String)attributes.get("keywords");
+
+		if (keywords != null) {
+			setKeywords(keywords);
+		}
+
+		String robots = (String)attributes.get("robots");
+
+		if (robots != null) {
+			setRobots(robots);
+		}
+
+		String typeSettings = (String)attributes.get("typeSettings");
+
+		if (typeSettings != null) {
+			setTypeSettings(typeSettings);
+		}
+
+		Boolean iconImage = (Boolean)attributes.get("iconImage");
+
+		if (iconImage != null) {
+			setIconImage(iconImage);
+		}
+
+		Long iconImageId = (Long)attributes.get("iconImageId");
+
+		if (iconImageId != null) {
+			setIconImageId(iconImageId);
+		}
+
+		String themeId = (String)attributes.get("themeId");
+
+		if (themeId != null) {
+			setThemeId(themeId);
+		}
+
+		String colorSchemeId = (String)attributes.get("colorSchemeId");
+
+		if (colorSchemeId != null) {
+			setColorSchemeId(colorSchemeId);
+		}
+
+		String wapThemeId = (String)attributes.get("wapThemeId");
+
+		if (wapThemeId != null) {
+			setWapThemeId(wapThemeId);
+		}
+
+		String wapColorSchemeId = (String)attributes.get("wapColorSchemeId");
+
+		if (wapColorSchemeId != null) {
+			setWapColorSchemeId(wapColorSchemeId);
+		}
+
+		String css = (String)attributes.get("css");
+
+		if (css != null) {
+			setCss(css);
+		}
+
+		Integer status = (Integer)attributes.get("status");
+
+		if (status != null) {
+			setStatus(status);
+		}
+
+		Long statusByUserId = (Long)attributes.get("statusByUserId");
+
+		if (statusByUserId != null) {
+			setStatusByUserId(statusByUserId);
+		}
+
+		String statusByUserName = (String)attributes.get("statusByUserName");
+
+		if (statusByUserName != null) {
+			setStatusByUserName(statusByUserName);
+		}
+
+		Date statusDate = (Date)attributes.get("statusDate");
+
+		if (statusDate != null) {
+			setStatusDate(statusDate);
+		}
 	}
 
 	/**
@@ -405,6 +637,14 @@ public class LayoutRevisionWrapper implements LayoutRevision {
 		return _layoutRevision.getName(languageId, useDefault);
 	}
 
+	public java.lang.String getNameCurrentLanguageId() {
+		return _layoutRevision.getNameCurrentLanguageId();
+	}
+
+	public java.lang.String getNameCurrentValue() {
+		return _layoutRevision.getNameCurrentValue();
+	}
+
 	/**
 	* Returns a map of the locales and localized names of this layout revision.
 	*
@@ -443,6 +683,10 @@ public class LayoutRevisionWrapper implements LayoutRevision {
 	public void setName(java.lang.String name, java.util.Locale locale,
 		java.util.Locale defaultLocale) {
 		_layoutRevision.setName(name, locale, defaultLocale);
+	}
+
+	public void setNameCurrentLanguageId(java.lang.String languageId) {
+		_layoutRevision.setNameCurrentLanguageId(languageId);
 	}
 
 	/**
@@ -519,6 +763,14 @@ public class LayoutRevisionWrapper implements LayoutRevision {
 		return _layoutRevision.getTitle(languageId, useDefault);
 	}
 
+	public java.lang.String getTitleCurrentLanguageId() {
+		return _layoutRevision.getTitleCurrentLanguageId();
+	}
+
+	public java.lang.String getTitleCurrentValue() {
+		return _layoutRevision.getTitleCurrentValue();
+	}
+
 	/**
 	* Returns a map of the locales and localized titles of this layout revision.
 	*
@@ -557,6 +809,10 @@ public class LayoutRevisionWrapper implements LayoutRevision {
 	public void setTitle(java.lang.String title, java.util.Locale locale,
 		java.util.Locale defaultLocale) {
 		_layoutRevision.setTitle(title, locale, defaultLocale);
+	}
+
+	public void setTitleCurrentLanguageId(java.lang.String languageId) {
+		_layoutRevision.setTitleCurrentLanguageId(languageId);
 	}
 
 	/**
@@ -634,6 +890,14 @@ public class LayoutRevisionWrapper implements LayoutRevision {
 		return _layoutRevision.getDescription(languageId, useDefault);
 	}
 
+	public java.lang.String getDescriptionCurrentLanguageId() {
+		return _layoutRevision.getDescriptionCurrentLanguageId();
+	}
+
+	public java.lang.String getDescriptionCurrentValue() {
+		return _layoutRevision.getDescriptionCurrentValue();
+	}
+
 	/**
 	* Returns a map of the locales and localized descriptions of this layout revision.
 	*
@@ -673,6 +937,10 @@ public class LayoutRevisionWrapper implements LayoutRevision {
 	public void setDescription(java.lang.String description,
 		java.util.Locale locale, java.util.Locale defaultLocale) {
 		_layoutRevision.setDescription(description, locale, defaultLocale);
+	}
+
+	public void setDescriptionCurrentLanguageId(java.lang.String languageId) {
+		_layoutRevision.setDescriptionCurrentLanguageId(languageId);
 	}
 
 	/**
@@ -750,6 +1018,14 @@ public class LayoutRevisionWrapper implements LayoutRevision {
 		return _layoutRevision.getKeywords(languageId, useDefault);
 	}
 
+	public java.lang.String getKeywordsCurrentLanguageId() {
+		return _layoutRevision.getKeywordsCurrentLanguageId();
+	}
+
+	public java.lang.String getKeywordsCurrentValue() {
+		return _layoutRevision.getKeywordsCurrentValue();
+	}
+
 	/**
 	* Returns a map of the locales and localized keywordses of this layout revision.
 	*
@@ -788,6 +1064,10 @@ public class LayoutRevisionWrapper implements LayoutRevision {
 	public void setKeywords(java.lang.String keywords, java.util.Locale locale,
 		java.util.Locale defaultLocale) {
 		_layoutRevision.setKeywords(keywords, locale, defaultLocale);
+	}
+
+	public void setKeywordsCurrentLanguageId(java.lang.String languageId) {
+		_layoutRevision.setKeywordsCurrentLanguageId(languageId);
 	}
 
 	/**
@@ -865,6 +1145,14 @@ public class LayoutRevisionWrapper implements LayoutRevision {
 		return _layoutRevision.getRobots(languageId, useDefault);
 	}
 
+	public java.lang.String getRobotsCurrentLanguageId() {
+		return _layoutRevision.getRobotsCurrentLanguageId();
+	}
+
+	public java.lang.String getRobotsCurrentValue() {
+		return _layoutRevision.getRobotsCurrentValue();
+	}
+
 	/**
 	* Returns a map of the locales and localized robotses of this layout revision.
 	*
@@ -903,6 +1191,10 @@ public class LayoutRevisionWrapper implements LayoutRevision {
 	public void setRobots(java.lang.String robots, java.util.Locale locale,
 		java.util.Locale defaultLocale) {
 		_layoutRevision.setRobots(robots, locale, defaultLocale);
+	}
+
+	public void setRobotsCurrentLanguageId(java.lang.String languageId) {
+		_layoutRevision.setRobotsCurrentLanguageId(languageId);
 	}
 
 	/**
@@ -1207,6 +1499,15 @@ public class LayoutRevisionWrapper implements LayoutRevision {
 	}
 
 	/**
+	* Returns <code>true</code> if this layout revision is in the Recycle Bin.
+	*
+	* @return <code>true</code> if this layout revision is in the Recycle Bin; <code>false</code> otherwise
+	*/
+	public boolean isInTrash() {
+		return _layoutRevision.isInTrash();
+	}
+
+	/**
 	* Returns <code>true</code> if this layout revision is pending.
 	*
 	* @return <code>true</code> if this layout revision is pending; <code>false</code> otherwise
@@ -1233,10 +1534,6 @@ public class LayoutRevisionWrapper implements LayoutRevision {
 
 	public boolean isEscapedModel() {
 		return _layoutRevision.isEscapedModel();
-	}
-
-	public void setEscapedModel(boolean escapedModel) {
-		_layoutRevision.setEscapedModel(escapedModel);
 	}
 
 	public java.io.Serializable getPrimaryKeyObj() {
@@ -1369,7 +1666,14 @@ public class LayoutRevisionWrapper implements LayoutRevision {
 		_layoutRevision.setTypeSettingsProperties(typeSettingsProperties);
 	}
 
+	/**
+	 * @deprecated Renamed to {@link #getWrappedModel}
+	 */
 	public LayoutRevision getWrappedLayoutRevision() {
+		return _layoutRevision;
+	}
+
+	public LayoutRevision getWrappedModel() {
 		return _layoutRevision;
 	}
 

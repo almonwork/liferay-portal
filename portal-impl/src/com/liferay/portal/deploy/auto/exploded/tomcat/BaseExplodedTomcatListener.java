@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -16,6 +16,7 @@ package com.liferay.portal.deploy.auto.exploded.tomcat;
 
 import com.liferay.portal.kernel.deploy.auto.AutoDeployException;
 import com.liferay.portal.kernel.deploy.auto.AutoDeployListener;
+import com.liferay.portal.kernel.deploy.auto.context.AutoDeploymentContext;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.util.FileUtil;
@@ -57,6 +58,14 @@ public abstract class BaseExplodedTomcatListener implements AutoDeployListener {
 		}
 	}
 
+	public void deploy(AutoDeploymentContext autoDeploymentContext)
+		throws AutoDeployException {
+
+		File file = autoDeploymentContext.getFile();
+
+		deploy(file);
+	}
+
 	public File getDocBaseDir(File file, String checkXmlFile)
 		throws AutoDeployException {
 
@@ -84,8 +93,7 @@ public abstract class BaseExplodedTomcatListener implements AutoDeployListener {
 
 		if (Validator.isNull(docBase)) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(
-					file.getPath() + " does not have a docBase defined");
+				_log.debug(file.getPath() + " does not have a docBase defined");
 			}
 
 			return null;
@@ -137,6 +145,8 @@ public abstract class BaseExplodedTomcatListener implements AutoDeployListener {
 			return false;
 		}
 	}
+
+	protected abstract void deploy(File file) throws AutoDeployException;
 
 	private static Log _log = LogFactoryUtil.getLog(
 		BaseExplodedTomcatListener.class);

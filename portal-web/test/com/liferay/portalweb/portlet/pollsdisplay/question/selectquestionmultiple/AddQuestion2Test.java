@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -23,9 +23,10 @@ import com.liferay.portalweb.portal.util.RuntimeVariables;
 public class AddQuestion2Test extends BaseTestCase {
 	public void testAddQuestion2() throws Exception {
 		selenium.open("/web/guest/home/");
+		loadRequiredJavaScriptModules();
 
 		for (int second = 0;; second++) {
-			if (second >= 60) {
+			if (second >= 90) {
 				fail("timeout");
 			}
 
@@ -40,59 +41,41 @@ public class AddQuestion2Test extends BaseTestCase {
 			Thread.sleep(1000);
 		}
 
-		selenium.saveScreenShotAndSource();
-		selenium.clickAt("link=Control Panel", RuntimeVariables.replace(""));
+		selenium.clickAt("link=Control Panel",
+			RuntimeVariables.replace("Control Panel"));
 		selenium.waitForPageToLoad("30000");
-		selenium.saveScreenShotAndSource();
-		selenium.clickAt("link=Polls", RuntimeVariables.replace(""));
+		loadRequiredJavaScriptModules();
+		selenium.clickAt("link=Polls", RuntimeVariables.replace("Polls"));
 		selenium.waitForPageToLoad("30000");
-		selenium.saveScreenShotAndSource();
+		loadRequiredJavaScriptModules();
 		selenium.clickAt("//input[@value='Add Question']",
-			RuntimeVariables.replace(""));
+			RuntimeVariables.replace("Add Question"));
 		selenium.waitForPageToLoad("30000");
-		selenium.saveScreenShotAndSource();
-		selenium.type("_25_title_en_US",
-			RuntimeVariables.replace("Test2 Poll2 Question2"));
-		selenium.saveScreenShotAndSource();
-		selenium.type("_25_description_en_US",
-			RuntimeVariables.replace("This is a test2 poll2 description2."));
-		selenium.saveScreenShotAndSource();
-		selenium.type("_25_choiceDescriptiona_en_US",
-			RuntimeVariables.replace("Test2 Choice2 A2"));
-		selenium.saveScreenShotAndSource();
-		selenium.type("_25_choiceDescriptionb_en_US",
-			RuntimeVariables.replace("Test2 Choice2 B2"));
-		selenium.saveScreenShotAndSource();
+		loadRequiredJavaScriptModules();
+		selenium.type("//input[@id='_25_title_en_US']",
+			RuntimeVariables.replace("PD Question2 Title"));
+		selenium.type("//textarea[@id='_25_description_en_US']",
+			RuntimeVariables.replace("PD Question2 Description"));
+		selenium.type("//input[@name='_25_choiceDescriptiona_en_US']",
+			RuntimeVariables.replace("PD Question2 ChoiceA"));
+		selenium.type("//input[@name='_25_choiceDescriptionb_en_US']",
+			RuntimeVariables.replace("PD Question2 ChoiceB"));
 		selenium.clickAt("//input[@value='Add Choice']",
-			RuntimeVariables.replace(""));
+			RuntimeVariables.replace("Add Choice"));
 		selenium.waitForPageToLoad("30000");
-		selenium.saveScreenShotAndSource();
-
-		for (int second = 0;; second++) {
-			if (second >= 60) {
-				fail("timeout");
-			}
-
-			try {
-				if (selenium.isElementPresent("_25_choiceDescriptionc_en_US")) {
-					break;
-				}
-			}
-			catch (Exception e) {
-			}
-
-			Thread.sleep(1000);
-		}
-
-		selenium.saveScreenShotAndSource();
-		selenium.type("_25_choiceDescriptionc_en_US",
-			RuntimeVariables.replace("Test2 Choice2 C2"));
-		selenium.saveScreenShotAndSource();
-		selenium.clickAt("//input[@value='Save']", RuntimeVariables.replace(""));
+		loadRequiredJavaScriptModules();
+		selenium.type("//input[@name='_25_choiceDescriptionc_en_US']",
+			RuntimeVariables.replace("PD Question2 ChoiceC"));
+		selenium.clickAt("//input[@value='Save']",
+			RuntimeVariables.replace("Save"));
 		selenium.waitForPageToLoad("30000");
-		selenium.saveScreenShotAndSource();
-		assertTrue(selenium.isTextPresent(
-				"Your request completed successfully."));
-		assertTrue(selenium.isElementPresent("link=Test2 Poll2 Question2"));
+		loadRequiredJavaScriptModules();
+		assertEquals(RuntimeVariables.replace(
+				"Your request completed successfully."),
+			selenium.getText("//div[@class='portlet-msg-success']"));
+		assertEquals(RuntimeVariables.replace("PD Question2 Title"),
+			selenium.getText("//tr[3]/td[1]/a"));
+		assertEquals(RuntimeVariables.replace("PD Question1 Title"),
+			selenium.getText("//tr[4]/td[1]/a"));
 	}
 }

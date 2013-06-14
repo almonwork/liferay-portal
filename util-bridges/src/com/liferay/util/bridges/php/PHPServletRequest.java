@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -153,11 +153,11 @@ public class PHPServletRequest extends HttpServletRequestWrapper {
 		return _path;
 	}
 
-	private ServletConfig _servletConfig;
+	private String _path;
 	private PortletConfig _portletConfig;
+	private String _queryString;
 	private RenderRequest _renderRequest;
 	private RenderResponse _renderResponse;
-	private String _queryString;
-	private String _path;
+	private ServletConfig _servletConfig;
 
 }

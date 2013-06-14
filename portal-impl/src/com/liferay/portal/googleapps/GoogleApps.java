@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -26,6 +26,12 @@ public class GoogleApps {
 
 	public GoogleApps(long companyId) {
 		_gAuthenticator = new GAuthenticator(companyId);
+
+		init();
+	}
+
+	public GoogleApps(String domain, String userName, String password) {
+		_gAuthenticator = new GAuthenticator(domain, userName, password);
 
 		init();
 	}

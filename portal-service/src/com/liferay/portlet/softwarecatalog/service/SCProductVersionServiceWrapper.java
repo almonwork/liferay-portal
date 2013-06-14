@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,6 +14,8 @@
 
 package com.liferay.portlet.softwarecatalog.service;
 
+import com.liferay.portal.service.ServiceWrapper;
+
 /**
  * <p>
  * This class is a wrapper for {@link SCProductVersionService}.
@@ -23,10 +25,29 @@ package com.liferay.portlet.softwarecatalog.service;
  * @see       SCProductVersionService
  * @generated
  */
-public class SCProductVersionServiceWrapper implements SCProductVersionService {
+public class SCProductVersionServiceWrapper implements SCProductVersionService,
+	ServiceWrapper<SCProductVersionService> {
 	public SCProductVersionServiceWrapper(
 		SCProductVersionService scProductVersionService) {
 		_scProductVersionService = scProductVersionService;
+	}
+
+	/**
+	* Returns the Spring bean ID for this bean.
+	*
+	* @return the Spring bean ID for this bean
+	*/
+	public java.lang.String getBeanIdentifier() {
+		return _scProductVersionService.getBeanIdentifier();
+	}
+
+	/**
+	* Sets the Spring bean ID for this bean.
+	*
+	* @param beanIdentifier the Spring bean ID for this bean
+	*/
+	public void setBeanIdentifier(java.lang.String beanIdentifier) {
+		_scProductVersionService.setBeanIdentifier(beanIdentifier);
 	}
 
 	public com.liferay.portlet.softwarecatalog.model.SCProductVersion addProductVersion(
@@ -82,11 +103,26 @@ public class SCProductVersionServiceWrapper implements SCProductVersionService {
 			testDirectDownloadURL, repoStoreArtifact, frameworkVersionIds);
 	}
 
+	/**
+	 * @deprecated Renamed to {@link #getWrappedService}
+	 */
 	public SCProductVersionService getWrappedSCProductVersionService() {
 		return _scProductVersionService;
 	}
 
+	/**
+	 * @deprecated Renamed to {@link #setWrappedService}
+	 */
 	public void setWrappedSCProductVersionService(
+		SCProductVersionService scProductVersionService) {
+		_scProductVersionService = scProductVersionService;
+	}
+
+	public SCProductVersionService getWrappedService() {
+		return _scProductVersionService;
+	}
+
+	public void setWrappedService(
 		SCProductVersionService scProductVersionService) {
 		_scProductVersionService = scProductVersionService;
 	}

@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -32,7 +32,7 @@ if (event.getRepeating()) {
 
 int endDateType = ParamUtil.getInteger(request, "endDateType");
 
-if ((event.getRepeating()) && (recurrence != null)) {
+if (event.getRepeating() && (recurrence != null)) {
 	if (recurrence.getUntil() != null) {
 		endDateType = 2;
 	}
@@ -120,21 +120,21 @@ request.setAttribute("view_event.jsp-event", event);
 
 				<c:choose>
 					<c:when test="<%= allDay %>">
-						<abbr class="duration" title="<liferay-ui:message key="all-day" />">
+						<span class="duration" title="<liferay-ui:message key="all-day" />">
 							<liferay-ui:message key="all-day" />:
-						</abbr>
+						</span>
 					</c:when>
 					<c:otherwise>
 						<c:choose>
 							<c:when test="<%= event.isTimeZoneSensitive() %>">
-								<abbr class="dtstart" title="<%= dateFormatISO8601.format(Time.getDate(event.getStartDate(), timeZone)) %>">
+								<span class="dtstart" title="<%= dateFormatISO8601.format(Time.getDate(event.getStartDate(), timeZone)) %>">
 									<%= dateFormatTime.format(Time.getDate(event.getStartDate(), timeZone)) %>
-								</abbr>
+								</span>
 							</c:when>
 							<c:otherwise>
-								<abbr class="dtstart" title="<%= dateFormatISO8601.format(event.getStartDate()) %>">
-									<%= dateFormatTime.format(Time.getDate(event.getStartDate(), TimeZoneUtil.getDefault())) %>
-								</abbr>
+								<span class="dtstart" title="<%= dateFormatISO8601.format(event.getStartDate()) %>">
+									<%= dateFormatTime.format(event.getStartDate()) %>
+								</span>
 							</c:otherwise>
 						</c:choose>
 						&#150;
@@ -179,7 +179,7 @@ request.setAttribute("view_event.jsp-event", event);
 					<liferay-ui:message key="location" />:
 				</dt>
 				<dd>
-					<span class="location"><%= event.getLocation() %></span>
+					<span class="location"><%= HtmlUtil.escape(event.getLocation()) %></span>
 				</dd>
 			</c:if>
 		</dl>
@@ -223,8 +223,7 @@ request.setAttribute("view_event.jsp-event", event);
 		<c:if test="<%= enableRelatedAssets %>">
 			<div class="entry-links">
 				<liferay-ui:asset-links
-					className="<%= CalEvent.class.getName() %>"
-					classPK="<%= event.getEventId() %>"
+					assetEntryId="<%= layoutAssetEntry.getEntryId() %>"
 				/>
 			</div>
 		</c:if>
@@ -283,7 +282,7 @@ request.setAttribute("view_event.jsp-event", event);
 
 <%
 PortalUtil.setPageSubtitle(event.getTitle(), request);
-PortalUtil.setPageDescription(event.getDescription(), request);
+PortalUtil.setPageDescription(HtmlUtil.extractText(event.getDescription()), request);
 
 List<AssetTag> assetTags = AssetTagLocalServiceUtil.getTags(CalEvent.class.getName(), event.getEventId());
 

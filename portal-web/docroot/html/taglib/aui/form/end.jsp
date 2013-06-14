@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -39,9 +39,9 @@
 
 							{
 								body: <%= validatorTag.getBody() %>,
-								errorMessage: '<%= validatorTag.getErrorMessage() %>',
+								custom: <%= validatorTag.isCustom() %>,
+								errorMessage: '<%= UnicodeLanguageUtil.get(pageContext, validatorTag.getErrorMessage()) %>',
 								fieldName: '<%= namespace + fieldName %>',
-								isCustom: <%= validatorTag.isCustom() %>,
 								validatorName: '<%= validatorTag.getName() %>'
 							}
 

@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -17,26 +17,8 @@
 <%@ include file="/html/portlet/blogs/init.jsp" %>
 
 <%
-long categoryId = ParamUtil.getLong(request, "categoryId");
-
-String categoryName = null;
-String vocabularyName = null;
-
-if (categoryId != 0) {
-	AssetCategory assetCategory = AssetCategoryLocalServiceUtil.getAssetCategory(categoryId);
-
-	assetCategory = assetCategory.toEscapedModel();
-
-	categoryName = assetCategory.getName();
-
-	AssetVocabulary assetVocabulary = AssetVocabularyLocalServiceUtil.getAssetVocabulary(assetCategory.getVocabularyId());
-
-	assetVocabulary = assetVocabulary.toEscapedModel();
-
-	vocabularyName = assetVocabulary.getName();
-}
-
-String tagName = ParamUtil.getString(request, "tag");
+long assetCategoryId = ParamUtil.getLong(request, "categoryId");
+String assetTagName = ParamUtil.getString(request, "tag");
 
 PortletURL portletURL = renderResponse.createRenderURL();
 
@@ -61,14 +43,11 @@ portletURL.setParameter("struts_action", "/blogs/view");
 	int total = 0;
 	List results = null;
 
-	if ((categoryId != 0) || Validator.isNotNull(tagName)) {
+	if ((assetCategoryId != 0) || Validator.isNotNull(assetTagName)) {
 		AssetEntryQuery assetEntryQuery = new AssetEntryQuery(BlogsEntry.class.getName(), searchContainer);
 
 		assetEntryQuery.setExcludeZeroViewCount(false);
-
-		if (BlogsPermission.contains(permissionChecker, scopeGroupId, ActionKeys.ADD_ENTRY)) {
-			assetEntryQuery.setVisible(Boolean.TRUE);
-		}
+		assetEntryQuery.setVisible(Boolean.TRUE);
 
 		total = AssetEntryServiceUtil.getEntriesCount(assetEntryQuery);
 		results = AssetEntryServiceUtil.getEntries(assetEntryQuery);

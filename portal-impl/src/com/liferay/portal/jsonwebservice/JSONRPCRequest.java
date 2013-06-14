@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -18,6 +18,8 @@ import com.liferay.portal.kernel.json.JSONDeserializer;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.util.StringPool;
+import com.liferay.portal.kernel.util.Validator;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -32,9 +34,18 @@ import jodd.servlet.ServletUtil;
  */
 public class JSONRPCRequest {
 
-	public JSONRPCRequest(HttpServletRequest request) {
+	public static JSONRPCRequest detectJSONRPCRequest(
+		HttpServletRequest request) {
+
 		try {
 			String requestBody = ServletUtil.readRequestBody(request);
+
+			if (Validator.isNull(requestBody) ||
+				!requestBody.startsWith(StringPool.OPEN_CURLY_BRACE) ||
+				!requestBody.endsWith(StringPool.CLOSE_CURLY_BRACE)) {
+
+				return null;
+			}
 
 			JSONDeserializer<HashMap<Object, Object>> jsonDeserializer =
 				JSONFactoryUtil.createJSONDeserializer();
@@ -45,15 +56,26 @@ public class JSONRPCRequest {
 			HashMap<Object, Object> requestBodyMap =
 				jsonDeserializer.deserialize(requestBody);
 
-			_id = (Integer)requestBodyMap.get("id");
-			_jsonrpc = (String)requestBodyMap.get("jsonrpc");
-			_method = (String)requestBodyMap.get("method");
-			_parameters = (Map<String, ?>)requestBodyMap.get("params");
+			JSONRPCRequest jsonrpcRequest = new JSONRPCRequest();
 
-			_valid = true;
+			jsonrpcRequest._id = (Integer)requestBodyMap.get("id");
+			jsonrpcRequest._jsonrpc = (String)requestBodyMap.get("jsonrpc");
+			jsonrpcRequest._method = (String)requestBodyMap.get("method");
+			jsonrpcRequest._parameters = (Map<String, ?>)requestBodyMap.get(
+				"params");
+
+			if (Validator.isNull(jsonrpcRequest._method)) {
+				return null;
+			}
+
+			return jsonrpcRequest;
 		}
 		catch (Exception e) {
-			_log.error(e, e);
+			if (_log.isDebugEnabled()) {
+				_log.debug("Unable to parse JSON RPC request", e);
+			}
+
+			return null;
 		}
 	}
 
@@ -70,15 +92,34 @@ public class JSONRPCRequest {
 	}
 
 	public String getParameter(String name) {
-		return String.valueOf(_parameters.get(name));
+		Object value = _parameters.get(name);
+
+		if (value != null) {
+			return String.valueOf(value);
+		}
+		else {
+			return null;
+		}
 	}
 
 	public Set<String> getParameterNames() {
 		return _parameters.keySet();
 	}
 
-	public boolean isValid() {
-		return _valid;
+	public void setId(Integer id) {
+		_id = id;
+	}
+
+	public void setJsonrpc(String jsonrpc) {
+		_jsonrpc = jsonrpc;
+	}
+
+	public void setMethod(String method) {
+		_method = method;
+	}
+
+	public void setParameters(Map<String, ?> parameters) {
+		_parameters = parameters;
 	}
 
 	private static Log _log = LogFactoryUtil.getLog(JSONRPCRequest.class);
@@ -87,6 +128,5 @@ public class JSONRPCRequest {
 	private String _jsonrpc;
 	private String _method;
 	private Map<String, ?> _parameters;
-	private boolean _valid;
 
 }

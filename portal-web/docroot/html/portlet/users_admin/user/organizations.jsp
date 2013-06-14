@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -33,7 +33,6 @@ List<Organization> organizations = (List<Organization>)request.getAttribute("use
 <h3><liferay-ui:message key="organizations" /></h3>
 
 <liferay-ui:search-container
-	id='<%= renderResponse.getNamespace() + "organizationsSearchContainer" %>'
 	headerNames="name,type,roles,null"
 >
 	<liferay-ui:search-container-results
@@ -66,18 +65,15 @@ List<Organization> organizations = (List<Organization>)request.getAttribute("use
 			if (selUser != null) {
 				List<UserGroupRole> userGroupRoles = UserGroupRoleLocalServiceUtil.getUserGroupRoles(selUser.getUserId(), organization.getGroup().getGroupId());
 
-				Iterator itr = userGroupRoles.iterator();
-
-				while (itr.hasNext()) {
-					UserGroupRole userGroupRole = (UserGroupRole)itr.next();
-
+				for (UserGroupRole userGroupRole : userGroupRoles) {
 					Role role = RoleLocalServiceUtil.getRole(userGroupRole.getRoleId());
 
 					buffer.append(HtmlUtil.escape(role.getTitle(locale)));
+					buffer.append(StringPool.COMMA_AND_SPACE);
+				}
 
-					if (itr.hasNext()) {
-						buffer.append(StringPool.COMMA_AND_SPACE);
-					}
+				if (!userGroupRoles.isEmpty()) {
+					buffer.setIndex(buffer.index() - 1);
 				}
 			}
 			%>

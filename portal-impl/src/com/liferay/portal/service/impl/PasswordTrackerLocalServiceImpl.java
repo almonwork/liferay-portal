@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -23,7 +23,7 @@ import com.liferay.portal.security.pwd.PwdEncryptor;
 import com.liferay.portal.service.base.PasswordTrackerLocalServiceBaseImpl;
 
 import java.util.Date;
-import java.util.Iterator;
+import java.util.List;
 
 /**
  * @author Brian Wing Shun Chan
@@ -78,15 +78,13 @@ public class PasswordTrackerLocalServiceImpl
 
 		int historyCount = 1;
 
-		Iterator<PasswordTracker> itr = passwordTrackerPersistence.findByUserId(
-			userId).iterator();
+		List<PasswordTracker> passwordTrackers =
+			passwordTrackerPersistence.findByUserId(userId);
 
-		while (itr.hasNext()) {
+		for (PasswordTracker passwordTracker : passwordTrackers) {
 			if (historyCount >= passwordPolicy.getHistoryCount()) {
 				break;
 			}
-
-			PasswordTracker passwordTracker = itr.next();
 
 			String oldEncPwd = passwordTracker.getPassword();
 			String newEncPwd = PwdEncryptor.encrypt(newClearTextPwd, oldEncPwd);

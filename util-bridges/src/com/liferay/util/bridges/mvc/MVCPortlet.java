@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -36,6 +36,7 @@ import javax.portlet.EventResponse;
 import javax.portlet.PortletConfig;
 import javax.portlet.PortletContext;
 import javax.portlet.PortletException;
+import javax.portlet.PortletPreferences;
 import javax.portlet.PortletRequest;
 import javax.portlet.PortletRequestDispatcher;
 import javax.portlet.PortletResponse;
@@ -47,6 +48,7 @@ import javax.portlet.WindowState;
 
 /**
  * @author Brian Wing Shun Chan
+ * @author Raymond Augé
  */
 public class MVCPortlet extends LiferayPortlet {
 
@@ -55,7 +57,7 @@ public class MVCPortlet extends LiferayPortlet {
 			RenderRequest renderRequest, RenderResponse renderResponse)
 		throws IOException, PortletException {
 
-		include(aboutJSP, renderRequest, renderResponse);
+		include(aboutTemplate, renderRequest, renderResponse);
 	}
 
 	@Override
@@ -63,7 +65,7 @@ public class MVCPortlet extends LiferayPortlet {
 			RenderRequest renderRequest, RenderResponse renderResponse)
 		throws IOException, PortletException {
 
-		include(configJSP, renderRequest, renderResponse);
+		include(configTemplate, renderRequest, renderResponse);
 	}
 
 	@Override
@@ -71,11 +73,13 @@ public class MVCPortlet extends LiferayPortlet {
 			RenderRequest renderRequest, RenderResponse renderResponse)
 		throws IOException, PortletException {
 
-		if (renderRequest.getPreferences() == null) {
+		PortletPreferences portletPreferences = renderRequest.getPreferences();
+
+		if (portletPreferences == null) {
 			super.doEdit(renderRequest, renderResponse);
 		}
 		else {
-			include(editJSP, renderRequest, renderResponse);
+			include(editTemplate, renderRequest, renderResponse);
 		}
 	}
 
@@ -84,11 +88,13 @@ public class MVCPortlet extends LiferayPortlet {
 			RenderRequest renderRequest, RenderResponse renderResponse)
 		throws IOException, PortletException {
 
-		if (renderRequest.getPreferences() == null) {
+		PortletPreferences portletPreferences = renderRequest.getPreferences();
+
+		if (portletPreferences == null) {
 			super.doEdit(renderRequest, renderResponse);
 		}
 		else {
-			include(editDefaultsJSP, renderRequest, renderResponse);
+			include(editDefaultsTemplate, renderRequest, renderResponse);
 		}
 	}
 
@@ -97,11 +103,13 @@ public class MVCPortlet extends LiferayPortlet {
 			RenderRequest renderRequest, RenderResponse renderResponse)
 		throws IOException, PortletException {
 
-		if (renderRequest.getPreferences() == null) {
+		PortletPreferences portletPreferences = renderRequest.getPreferences();
+
+		if (portletPreferences == null) {
 			super.doEdit(renderRequest, renderResponse);
 		}
 		else {
-			include(editGuestJSP, renderRequest, renderResponse);
+			include(editGuestTemplate, renderRequest, renderResponse);
 		}
 	}
 
@@ -110,7 +118,7 @@ public class MVCPortlet extends LiferayPortlet {
 			RenderRequest renderRequest, RenderResponse renderResponse)
 		throws IOException, PortletException {
 
-		include(helpJSP, renderRequest, renderResponse);
+		include(helpTemplate, renderRequest, renderResponse);
 	}
 
 	@Override
@@ -118,7 +126,7 @@ public class MVCPortlet extends LiferayPortlet {
 			RenderRequest renderRequest, RenderResponse renderResponse)
 		throws IOException, PortletException {
 
-		include(previewJSP, renderRequest, renderResponse);
+		include(previewTemplate, renderRequest, renderResponse);
 	}
 
 	@Override
@@ -126,7 +134,7 @@ public class MVCPortlet extends LiferayPortlet {
 			RenderRequest renderRequest, RenderResponse renderResponse)
 		throws IOException, PortletException {
 
-		include(printJSP, renderRequest, renderResponse);
+		include(printTemplate, renderRequest, renderResponse);
 	}
 
 	@Override
@@ -134,42 +142,43 @@ public class MVCPortlet extends LiferayPortlet {
 			RenderRequest renderRequest, RenderResponse renderResponse)
 		throws IOException, PortletException {
 
-		include(viewJSP, renderRequest, renderResponse);
+		include(viewTemplate, renderRequest, renderResponse);
 	}
 
 	@Override
 	public void init() throws PortletException {
 		super.init();
 
-		jspPath = getInitParameter("jsp-path");
+		templatePath = _getInitParameter("template-path");
 
-		if (Validator.isNull(jspPath)) {
-			jspPath = StringPool.SLASH;
+		if (Validator.isNull(templatePath)) {
+			templatePath = StringPool.SLASH;
 		}
-		else if (jspPath.contains(StringPool.BACK_SLASH) ||
-				 jspPath.contains(StringPool.DOUBLE_SLASH) ||
-				 jspPath.contains(StringPool.PERIOD) ||
-				 jspPath.contains(StringPool.SPACE)) {
+		else if (templatePath.contains(StringPool.BACK_SLASH) ||
+				 templatePath.contains(StringPool.DOUBLE_SLASH) ||
+				 templatePath.contains(StringPool.PERIOD) ||
+				 templatePath.contains(StringPool.SPACE)) {
 
 			throw new PortletException(
-				"jsp-path " + jspPath + " has invalid characters");
+				"template-path " + templatePath + " has invalid characters");
 		}
-		else if (!jspPath.startsWith(StringPool.SLASH) ||
-				 !jspPath.endsWith(StringPool.SLASH)) {
+		else if (!templatePath.startsWith(StringPool.SLASH) ||
+				 !templatePath.endsWith(StringPool.SLASH)) {
 
 			throw new PortletException(
-				"jsp-path " + jspPath + " must start and end with a /");
+				"template-path " + templatePath +
+					" must start and end with a /");
 		}
 
-		aboutJSP = getInitParameter("about-jsp");
-		configJSP = getInitParameter("config-jsp");
-		editJSP = getInitParameter("edit-jsp");
-		editDefaultsJSP = getInitParameter("edit-defaults-jsp");
-		editGuestJSP = getInitParameter("edit-guest-jsp");
-		helpJSP = getInitParameter("help-jsp");
-		previewJSP = getInitParameter("preview-jsp");
-		printJSP = getInitParameter("print-jsp");
-		viewJSP = getInitParameter("view-jsp");
+		aboutTemplate = _getInitParameter("about-template");
+		configTemplate = _getInitParameter("config-template");
+		editTemplate = _getInitParameter("edit-template");
+		editDefaultsTemplate = _getInitParameter("edit-defaults-template");
+		editGuestTemplate = _getInitParameter("edit-guest-template");
+		helpTemplate = _getInitParameter("help-template");
+		previewTemplate = _getInitParameter("preview-template");
+		printTemplate = _getInitParameter("print-template");
+		viewTemplate = _getInitParameter("view-template");
 
 		clearRequestParameters = GetterUtil.getBoolean(
 			getInitParameter("clear-request-parameters"));
@@ -220,11 +229,11 @@ public class MVCPortlet extends LiferayPortlet {
 			ResourceRequest resourceRequest, ResourceResponse resourceResponse)
 		throws IOException, PortletException {
 
-		String jspPage = resourceRequest.getParameter("jspPage");
+		String path = getPath(resourceRequest);
 
-		if (jspPage != null) {
+		if (path != null) {
 			include(
-				jspPage, resourceRequest, resourceResponse,
+				path, resourceRequest, resourceResponse,
 				PortletRequest.RESOURCE_PHASE);
 		}
 		else {
@@ -272,10 +281,11 @@ public class MVCPortlet extends LiferayPortlet {
 		return false;
 	}
 
-	protected void checkJSPPath(String path) throws PortletException {
-		if (!path.startsWith(jspPath) ||
-			path.contains(StringPool.DOUBLE_PERIOD) ||
-			!PortalUtil.isValidResourceId(path)) {
+	protected void checkPath(String path) throws PortletException {
+		if (Validator.isNotNull(path) &&
+			(!path.startsWith(templatePath) ||
+			 path.contains(StringPool.DOUBLE_PERIOD) ||
+			 !PortalUtil.isValidResourceId(path))) {
 
 			throw new PortletException(
 				"Path " + path + " is not accessible by this portlet");
@@ -287,9 +297,9 @@ public class MVCPortlet extends LiferayPortlet {
 			RenderRequest renderRequest, RenderResponse renderResponse)
 		throws IOException, PortletException {
 
-		String jspPage = renderRequest.getParameter("jspPage");
+		String path = getPath(renderRequest);
 
-		if (jspPage != null) {
+		if (path != null) {
 			if (!isProcessRenderRequest(renderRequest)) {
 				renderRequest.setAttribute(
 					WebKeys.PORTLET_DECORATE, Boolean.FALSE);
@@ -303,11 +313,23 @@ public class MVCPortlet extends LiferayPortlet {
 				return;
 			}
 
-			include(jspPage, renderRequest, renderResponse);
+			include(path, renderRequest, renderResponse);
 		}
 		else {
 			super.doDispatch(renderRequest, renderResponse);
 		}
+	}
+
+	protected String getPath(PortletRequest portletRequest) {
+		String mvcPath = portletRequest.getParameter("mvcPath");
+
+		// Check deprecated parameter
+
+		if (mvcPath == null) {
+			mvcPath = portletRequest.getParameter("jspPage");
+		}
+
+		return mvcPath;
 	}
 
 	protected void include(
@@ -340,14 +362,15 @@ public class MVCPortlet extends LiferayPortlet {
 			_log.error(path + " is not a valid include");
 		}
 		else {
-			checkJSPPath(path);
+			checkPath(path);
 
 			portletRequestDispatcher.include(portletRequest, portletResponse);
 		}
 
 		if (clearRequestParameters) {
 			if (lifecycle.equals(PortletRequest.RENDER_PHASE)) {
-				portletResponse.setProperty("clear-request-parameters", "true");
+				portletResponse.setProperty(
+					"clear-request-parameters", Boolean.TRUE.toString());
 			}
 		}
 	}
@@ -371,21 +394,42 @@ public class MVCPortlet extends LiferayPortlet {
 			PortletRequest.RESOURCE_PHASE);
 	}
 
+	protected String aboutTemplate;
+	protected boolean clearRequestParameters;
+	protected String configTemplate;
+	protected boolean copyRequestParameters;
+	protected String editDefaultsTemplate;
+	protected String editGuestTemplate;
+	protected String editTemplate;
+	protected String helpTemplate;
+	protected String previewTemplate;
+	protected String printTemplate;
+	protected String templatePath;
+	protected String viewTemplate;
+
+	private String _getInitParameter(String name) {
+		String value = getInitParameter(name);
+
+		if (value != null) {
+			return value;
+		}
+
+		// Check deprecated parameter
+
+		if (name.equals("template-path")) {
+			return getInitParameter("jsp-path");
+		}
+		else if (name.endsWith("-template")) {
+			name = name.substring(0, name.length() - 9) + "-jsp";
+
+			return getInitParameter(name);
+		}
+
+		return null;
+	}
+
 	private static Log _log = LogFactoryUtil.getLog(MVCPortlet.class);
 
-	protected ActionCommandCache _actionCommandCache;
-
-	protected String aboutJSP;
-	protected boolean clearRequestParameters;
-	protected String configJSP;
-	protected boolean copyRequestParameters;
-	protected String editDefaultsJSP;
-	protected String editGuestJSP;
-	protected String editJSP;
-	protected String helpJSP;
-	protected String jspPath;
-	protected String previewJSP;
-	protected String printJSP;
-	protected String viewJSP;
+	private ActionCommandCache _actionCommandCache;
 
 }

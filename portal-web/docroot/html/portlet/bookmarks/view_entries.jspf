@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -27,7 +27,7 @@ else {
 	orderByType = portalPreferences.getValue(PortletKeys.BOOKMARKS, "entries-order-by-type", "asc");
 }
 
-OrderByComparator orderByComparator = BookmarksUtil.getEntriesOrderByComparator(orderByCol, orderByType);
+OrderByComparator orderByComparator = BookmarksUtil.getEntryOrderByComparator(orderByCol, orderByType);
 %>
 
 <liferay-ui:search-container
@@ -69,7 +69,8 @@ OrderByComparator orderByComparator = BookmarksUtil.getEntriesOrderByComparator(
 	<liferay-ui:search-container-row
 		className="com.liferay.portal.model.BaseModel"
 		keyProperty="primaryKeyObj"
-		modelVar="result">
+		modelVar="result"
+	>
 
 		<%@ include file="/html/portlet/bookmarks/cast_result.jspf" %>
 

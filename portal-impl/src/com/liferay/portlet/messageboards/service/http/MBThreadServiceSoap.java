@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -49,8 +49,8 @@ import java.rmi.RemoteException;
  *
  * <p>
  * You can see a list of services at
- * http://localhost:8080/tunnel-web/secure/axis. Set the property
- * <b>tunnel.servlet.hosts.allowed</b> in portal.properties to configure
+ * http://localhost:8080/api/secure/axis. Set the property
+ * <b>axis.servlet.hosts.allowed</b> in portal.properties to configure
  * security.
  * </p>
  *
@@ -68,6 +68,23 @@ public class MBThreadServiceSoap {
 	public static void deleteThread(long threadId) throws RemoteException {
 		try {
 			MBThreadServiceUtil.deleteThread(threadId);
+		}
+		catch (Exception e) {
+			_log.error(e, e);
+
+			throw new RemoteException(e.getMessage());
+		}
+	}
+
+	public static com.liferay.portlet.messageboards.model.MBThreadSoap[] getGroupThreads(
+		long groupId, long userId, java.util.Date modifiedDate, int status,
+		int start, int end) throws RemoteException {
+		try {
+			java.util.List<com.liferay.portlet.messageboards.model.MBThread> returnValue =
+				MBThreadServiceUtil.getGroupThreads(groupId, userId,
+					modifiedDate, status, start, end);
+
+			return com.liferay.portlet.messageboards.model.MBThreadSoap.toSoapModels(returnValue);
 		}
 		catch (Exception e) {
 			_log.error(e, e);
@@ -119,6 +136,21 @@ public class MBThreadServiceSoap {
 					start, end);
 
 			return com.liferay.portlet.messageboards.model.MBThreadSoap.toSoapModels(returnValue);
+		}
+		catch (Exception e) {
+			_log.error(e, e);
+
+			throw new RemoteException(e.getMessage());
+		}
+	}
+
+	public static int getGroupThreadsCount(long groupId, long userId,
+		java.util.Date modifiedDate, int status) throws RemoteException {
+		try {
+			int returnValue = MBThreadServiceUtil.getGroupThreadsCount(groupId,
+					userId, modifiedDate, status);
+
+			return returnValue;
 		}
 		catch (Exception e) {
 			_log.error(e, e);

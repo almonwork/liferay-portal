@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -64,12 +64,14 @@ else {
 				String blogType = LanguageUtil.get(pageContext, "personal");
 
 				if (group.isOrganization() || group.isRegularSite()) {
-					blogType = group.getDescriptiveName();// + " " + LanguageUtil.get(pageContext, "site");
+					blogType = group.getDescriptiveName(locale);// + " " + LanguageUtil.get(pageContext, "site");
 				}
 
-				int entryCount = BlogsEntryLocalServiceUtil.getGroupUserEntriesCount(group.getGroupId(), user2.getUserId(), WorkflowConstants.STATUS_APPROVED);
+				Date now = new Date();
 
-				List entries = BlogsEntryLocalServiceUtil.getGroupUserEntries(group.getGroupId(), user2.getUserId(), WorkflowConstants.STATUS_APPROVED, 0, 1);
+				int entryCount = BlogsEntryLocalServiceUtil.getGroupUserEntriesCount(group.getGroupId(), user2.getUserId(), now, WorkflowConstants.STATUS_APPROVED);
+
+				List entries = BlogsEntryLocalServiceUtil.getGroupUserEntries(group.getGroupId(), user2.getUserId(), now, WorkflowConstants.STATUS_APPROVED, 0, 1);
 
 				if (entries.size() == 1) {
 					BlogsEntry entry = (BlogsEntry)entries.get(0);
@@ -120,6 +122,6 @@ else {
 		}
 		%>
 
-		<liferay-ui:search-iterator searchContainer="<%= searchContainer %>" paginate="<%= false %>" />
+		<liferay-ui:search-iterator paginate="<%= false %>" searchContainer="<%= searchContainer %>" />
 	</c:otherwise>
 </c:choose>

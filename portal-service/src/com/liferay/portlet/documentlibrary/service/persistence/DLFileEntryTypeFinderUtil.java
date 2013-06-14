@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -21,58 +21,40 @@ import com.liferay.portal.kernel.util.ReferenceRegistry;
  * @author Brian Wing Shun Chan
  */
 public class DLFileEntryTypeFinderUtil {
-	public static int countByKeywords(long companyId, long groupId,
-		java.lang.String keywords)
-		throws com.liferay.portal.kernel.exception.SystemException {
-		return getFinder().countByKeywords(companyId, groupId, keywords);
-	}
-
-	public static int countByC_G_N_D_S(long companyId, long groupId,
-		java.lang.String name, java.lang.String description, boolean andOperator)
+	public static int countByKeywords(long companyId, long[] groupIds,
+		java.lang.String keywords, boolean includeBasicFileEntryType)
 		throws com.liferay.portal.kernel.exception.SystemException {
 		return getFinder()
-				   .countByC_G_N_D_S(companyId, groupId, name, description,
-			andOperator);
+				   .countByKeywords(companyId, groupIds, keywords,
+			includeBasicFileEntryType);
 	}
 
-	public static int countByC_G_N_D_S(long companyId, long groupId,
-		java.lang.String[] names, java.lang.String[] descriptions,
-		boolean andOperator)
+	public static int filterCountByKeywords(long companyId, long[] groupIds,
+		java.lang.String keywords, boolean includeBasicFileEntryType)
 		throws com.liferay.portal.kernel.exception.SystemException {
 		return getFinder()
-				   .countByC_G_N_D_S(companyId, groupId, names, descriptions,
-			andOperator);
+				   .filterCountByKeywords(companyId, groupIds, keywords,
+			includeBasicFileEntryType);
+	}
+
+	public static java.util.List<com.liferay.portlet.documentlibrary.model.DLFileEntryType> filterFindByKeywords(
+		long companyId, long[] groupIds, java.lang.String keywords,
+		boolean includeBasicFileEntryType, int start, int end,
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getFinder()
+				   .filterFindByKeywords(companyId, groupIds, keywords,
+			includeBasicFileEntryType, start, end, orderByComparator);
 	}
 
 	public static java.util.List<com.liferay.portlet.documentlibrary.model.DLFileEntryType> findByKeywords(
-		long companyId, long groupId, java.lang.String keywords, int start,
-		int end,
+		long companyId, long[] groupIds, java.lang.String keywords,
+		boolean includeBasicFileEntryType, int start, int end,
 		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
 		throws com.liferay.portal.kernel.exception.SystemException {
 		return getFinder()
-				   .findByKeywords(companyId, groupId, keywords, start, end,
-			orderByComparator);
-	}
-
-	public static java.util.List<com.liferay.portlet.documentlibrary.model.DLFileEntryType> findByC_G_N_D_S(
-		long companyId, long groupId, java.lang.String name,
-		java.lang.String description, boolean andOperator, int start, int end,
-		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
-		throws com.liferay.portal.kernel.exception.SystemException {
-		return getFinder()
-				   .findByC_G_N_D_S(companyId, groupId, name, description,
-			andOperator, start, end, orderByComparator);
-	}
-
-	public static java.util.List<com.liferay.portlet.documentlibrary.model.DLFileEntryType> findByC_G_N_D_S(
-		long companyId, long groupId, java.lang.String[] names,
-		java.lang.String[] descriptions, boolean andOperator, int start,
-		int end,
-		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
-		throws com.liferay.portal.kernel.exception.SystemException {
-		return getFinder()
-				   .findByC_G_N_D_S(companyId, groupId, names, descriptions,
-			andOperator, start, end, orderByComparator);
+				   .findByKeywords(companyId, groupIds, keywords,
+			includeBasicFileEntryType, start, end, orderByComparator);
 	}
 
 	public static DLFileEntryTypeFinder getFinder() {

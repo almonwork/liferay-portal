@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -16,27 +16,40 @@
 
 <%@ include file="/html/common/init.jsp" %>
 
+<%@ page import="org.apache.struts.taglib.tiles.ComponentConstants" %>
+<%@ page import="org.apache.struts.tiles.ComponentContext" %>
+
 <%
 StringBundler sb = (StringBundler)request.getAttribute(WebKeys.LAYOUT_CONTENT);
+
+if ((sb != null) && (themeDisplay.isFacebook() || themeDisplay.isStateExclusive())) {
+	sb.writeTo(out);
+}
+else {
+	ComponentContext componentContext = (ComponentContext)request.getAttribute(ComponentConstants.COMPONENT_CONTEXT);
+
+	boolean tilesPopUp = false;
+
+	if (componentContext != null) {
+		tilesPopUp = GetterUtil.getBoolean(componentContext.getAttribute("pop_up"));
+	}
+
+	if (tilesPopUp || themeDisplay.isStatePopUp() || themeDisplay.isWidget()) {
 %>
 
-<c:choose>
-	<c:when test="<%= (sb != null) && (themeDisplay.isFacebook() || themeDisplay.isStateExclusive()) %>">
-
-		<%
-		sb.writeTo(out);
-		%>
-
-	</c:when>
-	<c:when test="<%= themeDisplay.isStatePopUp() || themeDisplay.isWidget() %>">
 		<liferay-theme:include page="portal_pop_up.jsp" />
-	</c:when>
-	<c:otherwise>
-		<liferay-theme:include page="portal_normal.jsp" />
-	</c:otherwise>
-</c:choose>
 
 <%
+	}
+	else {
+%>
+
+		<liferay-theme:include page="portal_normal.jsp" />
+
+<%
+	}
+}
+
 request.removeAttribute(WebKeys.LAYOUT_CONTENT);
 
 SessionMessages.clear(request);

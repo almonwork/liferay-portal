@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,7 +14,6 @@
 
 package com.liferay.portlet.expando.service.persistence;
 
-import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.service.persistence.BasePersistence;
 
 import com.liferay.portlet.expando.model.ExpandoTable;
@@ -316,10 +315,11 @@ public interface ExpandoTablePersistence extends BasePersistence<ExpandoTable> {
 	* @param companyId the company ID
 	* @param classNameId the class name ID
 	* @param name the name
+	* @return the expando table that was removed
 	* @throws SystemException if a system exception occurred
 	*/
-	public void removeByC_C_N(long companyId, long classNameId,
-		java.lang.String name)
+	public com.liferay.portlet.expando.model.ExpandoTable removeByC_C_N(
+		long companyId, long classNameId, java.lang.String name)
 		throws com.liferay.portal.kernel.exception.SystemException,
 			com.liferay.portlet.expando.NoSuchTableException;
 
@@ -363,7 +363,4 @@ public interface ExpandoTablePersistence extends BasePersistence<ExpandoTable> {
 	*/
 	public int countAll()
 		throws com.liferay.portal.kernel.exception.SystemException;
-
-	public ExpandoTable remove(ExpandoTable expandoTable)
-		throws SystemException;
 }

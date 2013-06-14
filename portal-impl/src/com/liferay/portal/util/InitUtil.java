@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -24,17 +24,20 @@ import com.liferay.portal.kernel.dao.db.DBFactoryUtil;
 import com.liferay.portal.kernel.dao.jdbc.DataSourceFactoryUtil;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
-import com.liferay.portal.kernel.util.JavaProps;
+import com.liferay.portal.kernel.util.JavaDetector;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.PortalClassLoaderUtil;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.SystemProperties;
 import com.liferay.portal.kernel.util.TimeZoneUtil;
 import com.liferay.portal.log.Log4jLogFactoryImpl;
+import com.liferay.portal.security.pacl.PACLClassLoaderUtil;
 import com.liferay.portal.spring.util.SpringUtil;
 import com.liferay.util.log4j.Log4JUtil;
 
 import com.sun.syndication.io.XmlReader;
+
+import java.util.List;
 
 import org.apache.commons.lang.time.StopWatch;
 
@@ -75,26 +78,25 @@ public class InitUtil {
 		// Shared class loader
 
 		try {
-			Thread currentThread = Thread.currentThread();
-
 			PortalClassLoaderUtil.setClassLoader(
-				currentThread.getContextClassLoader());
+				PACLClassLoaderUtil.getContextClassLoader());
 		}
 		catch (Exception e) {
 			e.printStackTrace();
 		}
 
+		// Properties
+
+		com.liferay.portal.kernel.util.PropsUtil.setProps(new PropsImpl());
+
 		// Log4J
 
-		if (GetterUtil.getBoolean(SystemProperties.get(
-				"log4j.configure.on.startup"), true)) {
+		if (GetterUtil.getBoolean(
+				SystemProperties.get("log4j.configure.on.startup"), true)) {
 
 			ClassLoader classLoader = InitUtil.class.getClassLoader();
 
-			Log4JUtil.configureLog4J(
-				classLoader.getResource("META-INF/portal-log4j.xml"));
-			Log4JUtil.configureLog4J(
-				classLoader.getResource("META-INF/portal-log4j-ext.xml"));
+			Log4JUtil.configureLog4J(classLoader);
 		}
 
 		// Shared log
@@ -125,7 +127,7 @@ public class InitUtil {
 
 		// Java properties
 
-		JavaProps.isJDK5();
+		JavaDetector.isJDK5();
 
 		// ROME
 
@@ -140,10 +142,16 @@ public class InitUtil {
 	}
 
 	public synchronized static void initWithSpring() {
-		initWithSpring(false);
+		initWithSpring(false, null);
 	}
 
 	public synchronized static void initWithSpring(boolean force) {
+		initWithSpring(force, null);
+	}
+
+	public synchronized static void initWithSpring(
+		boolean force, List<String> extraConfigLocations) {
+
 		if (force) {
 			_initialized = false;
 		}
@@ -161,9 +169,15 @@ public class InitUtil {
 
 		init();
 
-		SpringUtil.loadContext();
+		SpringUtil.loadContext(extraConfigLocations);
 
 		_initialized = true;
+	}
+
+	public synchronized static void initWithSpring(
+		List<String> extraConfigLocations) {
+
+		initWithSpring(false, extraConfigLocations);
 	}
 
 	private static final boolean _PRINT_TIME = false;

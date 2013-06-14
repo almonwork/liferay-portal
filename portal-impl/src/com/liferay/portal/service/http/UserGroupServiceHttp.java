@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -120,8 +120,7 @@ public class UserGroupServiceHttp {
 
 	public static com.liferay.portal.model.UserGroup addUserGroup(
 		HttpPrincipal httpPrincipal, java.lang.String name,
-		java.lang.String description, long publicLayoutSetPrototypeId,
-		long privateLayoutSetPrototypeId)
+		java.lang.String description)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException {
 		try {
@@ -129,8 +128,7 @@ public class UserGroupServiceHttp {
 					"addUserGroup", _addUserGroupParameterTypes2);
 
 			MethodHandler methodHandler = new MethodHandler(methodKey, name,
-					description, publicLayoutSetPrototypeId,
-					privateLayoutSetPrototypeId);
+					description);
 
 			Object returnObj = null;
 
@@ -266,7 +264,8 @@ public class UserGroupServiceHttp {
 
 	public static java.util.List<com.liferay.portal.model.UserGroup> getUserUserGroups(
 		HttpPrincipal httpPrincipal, long userId)
-		throws com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException {
 		try {
 			MethodKey methodKey = new MethodKey(UserGroupServiceUtil.class.getName(),
 					"getUserUserGroups", _getUserUserGroupsParameterTypes6);
@@ -279,6 +278,10 @@ public class UserGroupServiceHttp {
 				returnObj = TunnelUtil.invoke(httpPrincipal, methodHandler);
 			}
 			catch (Exception e) {
+				if (e instanceof com.liferay.portal.kernel.exception.PortalException) {
+					throw (com.liferay.portal.kernel.exception.PortalException)e;
+				}
+
 				if (e instanceof com.liferay.portal.kernel.exception.SystemException) {
 					throw (com.liferay.portal.kernel.exception.SystemException)e;
 				}
@@ -363,8 +366,7 @@ public class UserGroupServiceHttp {
 
 	public static com.liferay.portal.model.UserGroup updateUserGroup(
 		HttpPrincipal httpPrincipal, long userGroupId, java.lang.String name,
-		java.lang.String description, long publicLayoutSetPrototypeId,
-		long privateLayoutSetPrototypeId)
+		java.lang.String description)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException {
 		try {
@@ -372,8 +374,7 @@ public class UserGroupServiceHttp {
 					"updateUserGroup", _updateUserGroupParameterTypes9);
 
 			MethodHandler methodHandler = new MethodHandler(methodKey,
-					userGroupId, name, description, publicLayoutSetPrototypeId,
-					privateLayoutSetPrototypeId);
+					userGroupId, name, description);
 
 			Object returnObj = null;
 
@@ -409,8 +410,7 @@ public class UserGroupServiceHttp {
 			long.class, long[].class
 		};
 	private static final Class<?>[] _addUserGroupParameterTypes2 = new Class[] {
-			java.lang.String.class, java.lang.String.class, long.class,
-			long.class
+			java.lang.String.class, java.lang.String.class
 		};
 	private static final Class<?>[] _deleteUserGroupParameterTypes3 = new Class[] {
 			long.class
@@ -431,7 +431,6 @@ public class UserGroupServiceHttp {
 			long.class, long[].class
 		};
 	private static final Class<?>[] _updateUserGroupParameterTypes9 = new Class[] {
-			long.class, java.lang.String.class, java.lang.String.class,
-			long.class, long.class
+			long.class, java.lang.String.class, java.lang.String.class
 		};
 }

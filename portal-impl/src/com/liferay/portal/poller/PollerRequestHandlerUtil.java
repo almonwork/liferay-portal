@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -15,26 +15,36 @@
 package com.liferay.portal.poller;
 
 import com.liferay.portal.kernel.json.JSONObject;
+import com.liferay.portal.kernel.poller.PollerHeader;
+import com.liferay.portal.kernel.security.pacl.permission.PortalRuntimePermission;
+
+import javax.servlet.http.HttpServletRequest;
 
 /**
  * @author Edward Han
  */
 public class PollerRequestHandlerUtil {
 
+	public static PollerHeader getPollerHeader(String pollerRequestString) {
+		return getPollerRequestHandler().getPollerHeader(pollerRequestString);
+	}
+
 	public static PollerRequestHandler getPollerRequestHandler() {
 		return _pollerRequestHandler;
 	}
 
 	public static JSONObject processRequest(
-			String path, String pollerRequestString)
+			HttpServletRequest request, String pollerRequestString)
 		throws Exception {
 
 		return getPollerRequestHandler().processRequest(
-			path, pollerRequestString);
+			request, pollerRequestString);
 	}
 
 	public void setPollerRequestHandler(
 		PollerRequestHandler pollerRequestHandler) {
+
+		PortalRuntimePermission.checkSetBeanProperty(getClass());
 
 		_pollerRequestHandler = pollerRequestHandler;
 	}

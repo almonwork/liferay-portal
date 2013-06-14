@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -24,6 +24,13 @@ import com.liferay.portal.util.PortalInstances;
  * @author Brian Wing Shun Chan
  */
 public class VerifyRole extends VerifyProcess {
+
+	protected void deleteImplicitAssociations(Role role) throws Exception {
+		runSQL(
+			"delete from UserGroupGroupRole where roleId = " +
+				role.getRoleId());
+		runSQL("delete from UserGroupRole where roleId = " + role.getRoleId());
+	}
 
 	@Override
 	protected void doVerify() throws Exception {
@@ -50,14 +57,6 @@ public class VerifyRole extends VerifyProcess {
 			catch (NoSuchRoleException nsre) {
 			}
 		}
-	}
-
-	protected void deleteImplicitAssociations(Role role) throws Exception {
-		runSQL(
-			"delete from UserGroupGroupRole where roleId = " +
-				role.getRoleId());
-		runSQL(
-			"delete from UserGroupRole where roleId = " + role.getRoleId());
 	}
 
 }

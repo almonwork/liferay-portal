@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -35,8 +35,8 @@ import com.liferay.portal.kernel.transaction.Transactional;
  */
 @Transactional(isolation = Isolation.PORTAL, rollbackFor =  {
 	PortalException.class, SystemException.class})
-public interface WorkflowInstanceLinkLocalService
-	extends PersistedModelLocalService {
+public interface WorkflowInstanceLinkLocalService extends BaseLocalService,
+	PersistedModelLocalService {
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
@@ -67,10 +67,12 @@ public interface WorkflowInstanceLinkLocalService
 	* Deletes the workflow instance link with the primary key from the database. Also notifies the appropriate model listeners.
 	*
 	* @param workflowInstanceLinkId the primary key of the workflow instance link
+	* @return the workflow instance link that was removed
 	* @throws PortalException if a workflow instance link with the primary key could not be found
 	* @throws SystemException if a system exception occurred
 	*/
-	public void deleteWorkflowInstanceLink(long workflowInstanceLinkId)
+	public com.liferay.portal.model.WorkflowInstanceLink deleteWorkflowInstanceLink(
+		long workflowInstanceLinkId)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException;
 
@@ -78,11 +80,16 @@ public interface WorkflowInstanceLinkLocalService
 	* Deletes the workflow instance link from the database. Also notifies the appropriate model listeners.
 	*
 	* @param workflowInstanceLink the workflow instance link
+	* @return the workflow instance link that was removed
+	* @throws PortalException
 	* @throws SystemException if a system exception occurred
 	*/
-	public void deleteWorkflowInstanceLink(
+	public com.liferay.portal.model.WorkflowInstanceLink deleteWorkflowInstanceLink(
 		com.liferay.portal.model.WorkflowInstanceLink workflowInstanceLink)
-		throws com.liferay.portal.kernel.exception.SystemException;
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException;
+
+	public com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery();
 
 	/**
 	* Performs a dynamic query on the database and returns the matching rows.
@@ -144,6 +151,11 @@ public interface WorkflowInstanceLinkLocalService
 	*/
 	public long dynamicQueryCount(
 		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery)
+		throws com.liferay.portal.kernel.exception.SystemException;
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public com.liferay.portal.model.WorkflowInstanceLink fetchWorkflowInstanceLink(
+		long workflowInstanceLinkId)
 		throws com.liferay.portal.kernel.exception.SystemException;
 
 	/**
@@ -237,8 +249,8 @@ public interface WorkflowInstanceLinkLocalService
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException;
 
-	public void deleteWorkflowInstanceLink(long companyId, long groupId,
-		java.lang.String className, long classPK)
+	public com.liferay.portal.model.WorkflowInstanceLink deleteWorkflowInstanceLink(
+		long companyId, long groupId, java.lang.String className, long classPK)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException;
 

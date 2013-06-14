@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -39,8 +39,6 @@ public class UserPasswordException extends PortalException {
 
 	public static final int PASSWORDS_DO_NOT_MATCH = 10;
 
-	private int _type;
-
 	public UserPasswordException(int type) {
 		_type = type;
 	}
@@ -48,5 +46,7 @@ public class UserPasswordException extends PortalException {
 	public int getType() {
 		return _type;
 	}
+
+	private int _type;
 
 }

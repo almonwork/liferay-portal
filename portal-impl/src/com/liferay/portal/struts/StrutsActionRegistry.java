@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -18,38 +18,22 @@ import com.liferay.portal.kernel.struts.StrutsAction;
 import com.liferay.portal.kernel.struts.StrutsPortletAction;
 
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.struts.action.Action;
 
 /**
- * @author Mika Koivisto
+ * @author Raymond Augé
  */
-public class StrutsActionRegistry {
+public interface StrutsActionRegistry {
 
-	public static void register(
-		String path, StrutsPortletAction strutsPortletAction) {
+	public Action getAction(String path);
 
-		Action action = new PortletActionAdapter(strutsPortletAction);
+	public Map<String, Action> getActions();
 
-		_actions.put(path, action);
-	}
+	public void register(String path, StrutsAction strutsAction);
 
-	public static void register(String path, StrutsAction strutsAction) {
-		Action action = new ActionAdapter(strutsAction);
+	public void register(String path, StrutsPortletAction strutsPortletAction);
 
-		_actions.put(path, action);
-	}
-
-	public static void unregister(String path) {
-		_actions.remove(path);
-	}
-
-	public static Action getAction(String path) {
-		return _actions.get(path);
-	}
-
-	private static Map<String, Action> _actions =
-		new ConcurrentHashMap<String, Action>();
+	public void unregister(String path);
 
 }

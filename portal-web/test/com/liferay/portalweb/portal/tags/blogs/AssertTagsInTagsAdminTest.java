@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -23,9 +23,10 @@ import com.liferay.portalweb.portal.util.RuntimeVariables;
 public class AssertTagsInTagsAdminTest extends BaseTestCase {
 	public void testAssertTagsInTagsAdmin() throws Exception {
 		selenium.open("/web/guest/home/");
+		loadRequiredJavaScriptModules();
 
 		for (int second = 0;; second++) {
-			if (second >= 60) {
+			if (second >= 90) {
 				fail("timeout");
 			}
 
@@ -40,21 +41,21 @@ public class AssertTagsInTagsAdminTest extends BaseTestCase {
 			Thread.sleep(1000);
 		}
 
-		selenium.saveScreenShotAndSource();
-		selenium.clickAt("link=Control Panel", RuntimeVariables.replace(""));
+		selenium.clickAt("link=Control Panel",
+			RuntimeVariables.replace("Control Panel"));
 		selenium.waitForPageToLoad("30000");
-		selenium.saveScreenShotAndSource();
-		selenium.clickAt("link=Tags", RuntimeVariables.replace(""));
+		loadRequiredJavaScriptModules();
+		selenium.clickAt("link=Tags", RuntimeVariables.replace("Tags"));
 		selenium.waitForPageToLoad("30000");
-		selenium.saveScreenShotAndSource();
+		loadRequiredJavaScriptModules();
 
 		for (int second = 0;; second++) {
-			if (second >= 60) {
+			if (second >= 90) {
 				fail("timeout");
 			}
 
 			try {
-				if (selenium.isElementPresent("link=selenium1 liferay1")) {
+				if (selenium.isVisible("xPath=(//span[@class='tag-item']/a)[1]")) {
 					break;
 				}
 			}
@@ -64,10 +65,13 @@ public class AssertTagsInTagsAdminTest extends BaseTestCase {
 			Thread.sleep(1000);
 		}
 
-		selenium.saveScreenShotAndSource();
-		assertTrue(selenium.isElementPresent("link=selenium1 liferay1"));
-		assertTrue(selenium.isElementPresent("link=selenium2 liferay2"));
-		assertTrue(selenium.isElementPresent("link=selenium3 liferay3"));
-		assertTrue(selenium.isElementPresent("link=selenium4 liferay4"));
+		assertEquals(RuntimeVariables.replace("selenium1 liferay1"),
+			selenium.getText("xPath=(//span[@class='tag-item']/a)[1]"));
+		assertEquals(RuntimeVariables.replace("selenium2 liferay2"),
+			selenium.getText("xPath=(//span[@class='tag-item']/a)[2]"));
+		assertEquals(RuntimeVariables.replace("selenium3 liferay3"),
+			selenium.getText("xPath=(//span[@class='tag-item']/a)[3]"));
+		assertEquals(RuntimeVariables.replace("selenium4 liferay4"),
+			selenium.getText("xPath=(//span[@class='tag-item']/a)[4]"));
 	}
 }

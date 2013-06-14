@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -22,7 +22,6 @@ import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.PropsKeys;
 import com.liferay.portal.kernel.util.ServerDetector;
 import com.liferay.portal.kernel.util.StreamUtil;
-import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.SystemProperties;
 import com.liferay.portal.kernel.util.Validator;
@@ -36,7 +35,10 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
+import java.util.HashMap;
 import java.util.Map;
+
+import org.apache.commons.io.FileUtils;
 
 /**
  * @author Brian Wing Shun Chan
@@ -44,16 +46,17 @@ import java.util.Map;
 public class DeployUtil {
 
 	public static void copyDependencyXml(
-			String fileName, String targetDir, Map<String, String> filterMap,
-			boolean overwrite)
+			String fileName, String targetDir, String targetFileName,
+			Map<String, String> filterMap, boolean overwrite)
 		throws Exception {
 
 		File file = new File(getResourcePath(fileName));
-		File targetFile = new File(targetDir + StringPool.SLASH + fileName);
+		File targetFile = new File(targetDir, targetFileName);
 
 		if (!targetFile.exists()) {
 			CopyTask.copyFile(
-				file, new File(targetDir), filterMap, overwrite, true);
+				file, new File(targetDir), targetFileName, filterMap, overwrite,
+				true);
 		}
 	}
 
@@ -95,10 +98,33 @@ public class DeployUtil {
 		return destDir;
 	}
 
-	public static String getResourcePath(String resource)
-		throws Exception {
-
+	public static String getResourcePath(String resource) throws Exception {
 		return _instance._getResourcePath(resource);
+	}
+
+	public static void redeployJetty(String context) throws Exception {
+		String contextsDirName = System.getProperty("jetty.home") + "/contexts";
+
+		File contextXml = new File(contextsDirName + "/" + context + ".xml");
+
+		if (contextXml.exists()) {
+			FileUtils.touch(contextXml);
+		}
+		else {
+			Map<String, String> filterMap = new HashMap<String, String>();
+
+			filterMap.put("context", context);
+
+			copyDependencyXml(
+				"jetty-context-configure.xml", contextsDirName,
+				context + ".xml", filterMap, true);
+		}
+	}
+
+	public static void redeployTomcat(String context) throws Exception {
+		File webXml = new File(getAutoDeployDestDir(), "/WEB-INF/web.xml");
+
+		FileUtils.touch(webXml);
 	}
 
 	public static void undeploy(String appServerType, File deployDir)
@@ -111,35 +137,53 @@ public class DeployUtil {
 			return;
 		}
 
-		if (!appServerType.startsWith(ServerDetector.JBOSS_ID) &&
-			!appServerType.equals(ServerDetector.TOMCAT_ID)) {
+		if (!appServerType.equals(ServerDetector.GLASSFISH_ID) &&
+			!appServerType.equals(ServerDetector.JBOSS_ID) &&
+			!appServerType.equals(ServerDetector.JETTY_ID) &&
+			!appServerType.equals(ServerDetector.TOMCAT_ID) &&
+			!appServerType.equals(ServerDetector.WEBLOGIC_ID)) {
 
 			return;
 		}
 
-		File webXml = new File(deployDir + "/WEB-INF/web.xml");
-
-		if (!webXml.exists()) {
+		if (!deployDir.exists()) {
 			return;
 		}
 
-		if (_log.isInfoEnabled()) {
-			_log.info("Undeploy " + deployDir);
+		if (deployDir.isFile()) {
+			FileUtil.delete(deployDir);
+		}
+		else {
+			File webXml = new File(deployDir + "/WEB-INF/web.xml");
+
+			if (!webXml.exists()) {
+				return;
+			}
+
+			if (_log.isInfoEnabled()) {
+				_log.info("Undeploy " + deployDir);
+			}
+
+			FileUtil.delete(deployDir + "/WEB-INF/web.xml");
+
+			DeleteTask.deleteDirectory(deployDir);
 		}
 
-		FileUtil.delete(deployDir + "/WEB-INF/web.xml");
-
-		DeleteTask.deleteDirectory(deployDir);
-
-		if (ServerDetector.isJetty()) {
+		if (appServerType.equals(ServerDetector.JETTY_ID)) {
 			FileUtil.delete(
 				System.getProperty("jetty.home") + "/contexts/" +
 					deployDir.getName() + ".xml");
 		}
 
+		if (appServerType.equals(ServerDetector.JBOSS_ID)) {
+			File deployedFile = new File(
+				deployDir.getParent(), deployDir.getName() + ".deployed");
+
+			FileUtil.delete(deployedFile);
+		}
+
 		int undeployInterval = PrefsPropsUtil.getInteger(
-			PropsKeys.HOT_UNDEPLOY_INTERVAL,
-			PropsValues.HOT_UNDEPLOY_INTERVAL);
+			PropsKeys.HOT_UNDEPLOY_INTERVAL, PropsValues.HOT_UNDEPLOY_INTERVAL);
 
 		if (_log.isInfoEnabled()) {
 			_log.info(

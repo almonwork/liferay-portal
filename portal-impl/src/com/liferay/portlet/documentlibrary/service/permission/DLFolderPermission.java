@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -44,8 +44,7 @@ public class DLFolderPermission {
 	}
 
 	public static void check(
-			PermissionChecker permissionChecker, Folder folder,
-			String actionId)
+			PermissionChecker permissionChecker, Folder folder, String actionId)
 		throws PortalException, SystemException {
 
 		if (!folder.containsPermission(permissionChecker, actionId)) {
@@ -145,6 +144,17 @@ public class DLFolderPermission {
 		throws PortalException, SystemException {
 
 		if (folderId == DLFolderConstants.DEFAULT_PARENT_FOLDER_ID) {
+
+			// Prevent the propagation of checks for actions that are not
+			// supported at the application resource level. See LPS-24245.
+
+			if (actionId.equals(ActionKeys.ACCESS) ||
+				actionId.equals(ActionKeys.ADD_SUBFOLDER) ||
+				actionId.equals(ActionKeys.DELETE)) {
+
+				return false;
+			}
+
 			return DLPermission.contains(permissionChecker, groupId, actionId);
 		}
 		else {

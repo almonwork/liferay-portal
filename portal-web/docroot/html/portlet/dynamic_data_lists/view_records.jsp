@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -35,107 +35,123 @@ PortletURL portletURL = renderResponse.createRenderURL();
 
 portletURL.setParameter("struts_action", "/dynamic_data_lists/view_record_set");
 portletURL.setParameter("recordSetId", String.valueOf(recordSet.getRecordSetId()));
+%>
 
-DDMStructure ddmStructure = recordSet.getDDMStructure(detailDDMTemplateId);
+<aui:form action="<%= portletURL.toString() %>" method="post" name="fm">
 
-Map<String, Map<String, String>> fieldsMap = ddmStructure.getFieldsMap();
+	<%
+	DDMStructure ddmStructure = recordSet.getDDMStructure(detailDDMTemplateId);
 
-List<String> headerNames = new ArrayList();
+	String languageId = LanguageUtil.getLanguageId(request);
 
-for (Map<String, String> fields : fieldsMap.values()) {
-	String label = fields.get(DDMFieldConstants.LABEL);
+	Map<String, Map<String, String>> fieldsMap = ddmStructure.getFieldsMap(languageId);
 
-	headerNames.add(label);
-}
-
-if (editable) {
-	headerNames.add("status");
-	headerNames.add("modified-date");
-	headerNames.add("author");
-	headerNames.add(StringPool.BLANK);
-}
-
-SearchContainer searchContainer = new SearchContainer(renderRequest, portletURL, headerNames, "no-records-were-found");
-
-int status = WorkflowConstants.STATUS_APPROVED;
-
-if (DDLRecordSetPermission.contains(permissionChecker, recordSet, ActionKeys.ADD_RECORD)) {
-	status = WorkflowConstants.STATUS_ANY;
-}
-
-int total = DDLRecordLocalServiceUtil.getRecordsCount(recordSet.getRecordSetId(), status);
-
-searchContainer.setTotal(total);
-
-List<DDLRecord> results = DDLRecordLocalServiceUtil.getRecords(recordSet.getRecordSetId(), status, searchContainer.getStart(), searchContainer.getEnd(), searchContainer.getOrderByComparator());
-
-searchContainer.setResults(results);
-
-List resultRows = searchContainer.getResultRows();
-
-for (int i = 0; i < results.size(); i++) {
-	DDLRecord record = results.get(i);
-
-	Fields fieldsModel = record.getFields();
-
-	ResultRow row = new ResultRow(record, record.getRecordId(), i);
-
-	row.setParameter("detailDDMTemplateId", String.valueOf(detailDDMTemplateId));
-
-	PortletURL rowURL = renderResponse.createRenderURL();
-
-	rowURL.setParameter("struts_action", "/dynamic_data_lists/view_record");
-	rowURL.setParameter("redirect", currentURL);
-	rowURL.setParameter("recordId", String.valueOf(record.getRecordId()));
-	rowURL.setParameter("version", record.getVersion());
-	rowURL.setParameter("detailDDMTemplateId", String.valueOf(detailDDMTemplateId));
-
-	// Columns
+	List<String> headerNames = new ArrayList<String>();
 
 	for (Map<String, String> fields : fieldsMap.values()) {
-		String name = fields.get(DDMFieldConstants.NAME);
+		String label = fields.get(FieldConstants.LABEL);
 
-		String value = null;
-
-		if (fieldsModel.contains(name)) {
-			com.liferay.portlet.dynamicdatamapping.storage.Field field = fieldsModel.get(name);
-
-			value = String.valueOf(field.getValue());
-
-			if (ddmStructure.getFieldDisplayChildLabelAsValue(name)) {
-				Map<String, String> childFields = ddmStructure.getFields(name, DDMFieldConstants.VALUE, value);
-
-				if (childFields != null) {
-					value = childFields.get(DDMFieldConstants.LABEL);
-				}
-			}
-		}
-		else {
-			value = StringPool.BLANK;
-		}
-
-		if (editable) {
-			row.addText(value, rowURL);
-		}
-		else {
-			row.addText(value);
-		}
+		headerNames.add(label);
 	}
 
 	if (editable) {
-		row.addText(LanguageUtil.get(pageContext, WorkflowConstants.toLabel(record.getStatus())), rowURL);
-		row.addText(dateFormatDateTime.format(record.getModifiedDate()), rowURL);
-		row.addText(HtmlUtil.escape(PortalUtil.getUserName(record.getUserId(), record.getUserName())), rowURL);
-
-		// Action
-
-		row.addJSP("right", SearchEntry.DEFAULT_VALIGN, "/html/portlet/dynamic_data_lists/record_action.jsp");
+		headerNames.add("status");
+		headerNames.add("modified-date");
+		headerNames.add("author");
+		headerNames.add(StringPool.BLANK);
 	}
 
-	// Add result row
+	boolean showAddRecordButton = false;
 
-	resultRows.add(row);
-}
-%>
+	if (editable) {
+		showAddRecordButton = DDLRecordSetPermission.contains(permissionChecker, recordSet, ActionKeys.ADD_RECORD);
+	}
+	%>
 
-<liferay-ui:search-iterator searchContainer="<%= searchContainer %>" />
+	<liferay-ui:search-container
+		searchContainer='<%= new SearchContainer(renderRequest, new DisplayTerms(request), null, SearchContainer.DEFAULT_CUR_PARAM, SearchContainer.DEFAULT_DELTA, portletURL, headerNames, LanguageUtil.get(pageContext, "no-records-were-found")) %>'
+	>
+
+		<liferay-ui:search-form
+			page="/html/portlet/dynamic_data_lists/record_search.jsp"
+			searchContainer="<%= searchContainer %>"
+			showAddButton="<%= showAddRecordButton%>"
+		/>
+
+		<liferay-ui:search-container-results>
+			<%@ include file="/html/portlet/dynamic_data_lists/record_search_results.jspf" %>
+		</liferay-ui:search-container-results>
+
+		<div class="separator"><!-- --></div>
+
+		<%
+		List resultRows = searchContainer.getResultRows();
+
+		for (int i = 0; i < results.size(); i++) {
+			DDLRecord record = (DDLRecord)results.get(i);
+
+			DDLRecordVersion recordVersion = record.getRecordVersion();
+
+			if (editable) {
+				recordVersion = record.getLatestRecordVersion();
+			}
+
+			Fields fieldsModel = StorageEngineUtil.getFields(recordVersion.getDDMStorageId());
+
+			ResultRow row = new ResultRow(record, record.getRecordId(), i);
+
+			row.setParameter("detailDDMTemplateId", String.valueOf(detailDDMTemplateId));
+			row.setParameter("editable", String.valueOf(editable));
+
+			PortletURL rowURL = renderResponse.createRenderURL();
+
+			rowURL.setParameter("struts_action", "/dynamic_data_lists/view_record");
+			rowURL.setParameter("redirect", currentURL);
+			rowURL.setParameter("recordId", String.valueOf(record.getRecordId()));
+			rowURL.setParameter("detailDDMTemplateId", String.valueOf(detailDDMTemplateId));
+			rowURL.setParameter("editable", String.valueOf(editable));
+
+			// Columns
+
+			for (Map<String, String> fields : fieldsMap.values()) {
+				String dataType = fields.get(FieldConstants.DATA_TYPE);
+				String name = fields.get(FieldConstants.NAME);
+
+				String value = null;
+
+				if (fieldsModel.contains(name)) {
+					com.liferay.portlet.dynamicdatamapping.storage.Field field = fieldsModel.get(name);
+
+					value = field.getRenderedValue(themeDisplay);
+				}
+				else {
+					value = StringPool.BLANK;
+				}
+
+				if (editable) {
+					row.addText(value, rowURL);
+				}
+				else {
+					row.addText(value);
+				}
+			}
+
+			if (editable) {
+				row.addText(LanguageUtil.get(pageContext, WorkflowConstants.toLabel(recordVersion.getStatus())), rowURL);
+				row.addText(dateFormatDateTime.format(record.getModifiedDate()), rowURL);
+				row.addText(HtmlUtil.escape(PortalUtil.getUserName(recordVersion.getUserId(), recordVersion.getUserName())), rowURL);
+
+				// Action
+
+				row.addJSP("right", SearchEntry.DEFAULT_VALIGN, "/html/portlet/dynamic_data_lists/record_action.jsp");
+			}
+
+			// Add result row
+
+			resultRows.add(row);
+		}
+		%>
+
+		<liferay-ui:search-iterator />
+	</liferay-ui:search-container>
+</aui:form>

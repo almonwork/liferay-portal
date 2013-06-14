@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -19,8 +19,10 @@ import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.json.JSON;
 import com.liferay.portal.kernel.util.DateUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.ProxyUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
+import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.model.Address;
 import com.liferay.portal.model.AddressModel;
 import com.liferay.portal.model.AddressSoap;
@@ -33,13 +35,13 @@ import com.liferay.portlet.expando.util.ExpandoBridgeFactoryUtil;
 
 import java.io.Serializable;
 
-import java.lang.reflect.Proxy;
-
 import java.sql.Types;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * The base model implementation for the Address service. Represents a row in the &quot;Address&quot; database table, with each column mapped to a property of this class.
@@ -96,6 +98,15 @@ public class AddressModelImpl extends BaseModelImpl<Address>
 	public static final boolean FINDER_CACHE_ENABLED = GetterUtil.getBoolean(com.liferay.portal.util.PropsUtil.get(
 				"value.object.finder.cache.enabled.com.liferay.portal.model.Address"),
 			true);
+	public static final boolean COLUMN_BITMASK_ENABLED = GetterUtil.getBoolean(com.liferay.portal.util.PropsUtil.get(
+				"value.object.column.bitmask.enabled.com.liferay.portal.model.Address"),
+			true);
+	public static long CLASSNAMEID_COLUMN_BITMASK = 1L;
+	public static long CLASSPK_COLUMN_BITMASK = 2L;
+	public static long COMPANYID_COLUMN_BITMASK = 4L;
+	public static long MAILING_COLUMN_BITMASK = 8L;
+	public static long PRIMARY_COLUMN_BITMASK = 16L;
+	public static long USERID_COLUMN_BITMASK = 32L;
 
 	/**
 	 * Converts the soap model instance into a normal model instance.
@@ -144,14 +155,6 @@ public class AddressModelImpl extends BaseModelImpl<Address>
 		return models;
 	}
 
-	public Class<?> getModelClass() {
-		return Address.class;
-	}
-
-	public String getModelClassName() {
-		return Address.class.getName();
-	}
-
 	public static final long LOCK_EXPIRATION_TIME = GetterUtil.getLong(com.liferay.portal.util.PropsUtil.get(
 				"lock.expiration.time.com.liferay.portal.model.Address"));
 
@@ -174,6 +177,151 @@ public class AddressModelImpl extends BaseModelImpl<Address>
 		setPrimaryKey(((Long)primaryKeyObj).longValue());
 	}
 
+	public Class<?> getModelClass() {
+		return Address.class;
+	}
+
+	public String getModelClassName() {
+		return Address.class.getName();
+	}
+
+	@Override
+	public Map<String, Object> getModelAttributes() {
+		Map<String, Object> attributes = new HashMap<String, Object>();
+
+		attributes.put("addressId", getAddressId());
+		attributes.put("companyId", getCompanyId());
+		attributes.put("userId", getUserId());
+		attributes.put("userName", getUserName());
+		attributes.put("createDate", getCreateDate());
+		attributes.put("modifiedDate", getModifiedDate());
+		attributes.put("classNameId", getClassNameId());
+		attributes.put("classPK", getClassPK());
+		attributes.put("street1", getStreet1());
+		attributes.put("street2", getStreet2());
+		attributes.put("street3", getStreet3());
+		attributes.put("city", getCity());
+		attributes.put("zip", getZip());
+		attributes.put("regionId", getRegionId());
+		attributes.put("countryId", getCountryId());
+		attributes.put("typeId", getTypeId());
+		attributes.put("mailing", getMailing());
+		attributes.put("primary", getPrimary());
+
+		return attributes;
+	}
+
+	@Override
+	public void setModelAttributes(Map<String, Object> attributes) {
+		Long addressId = (Long)attributes.get("addressId");
+
+		if (addressId != null) {
+			setAddressId(addressId);
+		}
+
+		Long companyId = (Long)attributes.get("companyId");
+
+		if (companyId != null) {
+			setCompanyId(companyId);
+		}
+
+		Long userId = (Long)attributes.get("userId");
+
+		if (userId != null) {
+			setUserId(userId);
+		}
+
+		String userName = (String)attributes.get("userName");
+
+		if (userName != null) {
+			setUserName(userName);
+		}
+
+		Date createDate = (Date)attributes.get("createDate");
+
+		if (createDate != null) {
+			setCreateDate(createDate);
+		}
+
+		Date modifiedDate = (Date)attributes.get("modifiedDate");
+
+		if (modifiedDate != null) {
+			setModifiedDate(modifiedDate);
+		}
+
+		Long classNameId = (Long)attributes.get("classNameId");
+
+		if (classNameId != null) {
+			setClassNameId(classNameId);
+		}
+
+		Long classPK = (Long)attributes.get("classPK");
+
+		if (classPK != null) {
+			setClassPK(classPK);
+		}
+
+		String street1 = (String)attributes.get("street1");
+
+		if (street1 != null) {
+			setStreet1(street1);
+		}
+
+		String street2 = (String)attributes.get("street2");
+
+		if (street2 != null) {
+			setStreet2(street2);
+		}
+
+		String street3 = (String)attributes.get("street3");
+
+		if (street3 != null) {
+			setStreet3(street3);
+		}
+
+		String city = (String)attributes.get("city");
+
+		if (city != null) {
+			setCity(city);
+		}
+
+		String zip = (String)attributes.get("zip");
+
+		if (zip != null) {
+			setZip(zip);
+		}
+
+		Long regionId = (Long)attributes.get("regionId");
+
+		if (regionId != null) {
+			setRegionId(regionId);
+		}
+
+		Long countryId = (Long)attributes.get("countryId");
+
+		if (countryId != null) {
+			setCountryId(countryId);
+		}
+
+		Integer typeId = (Integer)attributes.get("typeId");
+
+		if (typeId != null) {
+			setTypeId(typeId);
+		}
+
+		Boolean mailing = (Boolean)attributes.get("mailing");
+
+		if (mailing != null) {
+			setMailing(mailing);
+		}
+
+		Boolean primary = (Boolean)attributes.get("primary");
+
+		if (primary != null) {
+			setPrimary(primary);
+		}
+	}
+
 	@JSON
 	public long getAddressId() {
 		return _addressId;
@@ -189,7 +337,19 @@ public class AddressModelImpl extends BaseModelImpl<Address>
 	}
 
 	public void setCompanyId(long companyId) {
+		_columnBitmask |= COMPANYID_COLUMN_BITMASK;
+
+		if (!_setOriginalCompanyId) {
+			_setOriginalCompanyId = true;
+
+			_originalCompanyId = _companyId;
+		}
+
 		_companyId = companyId;
+	}
+
+	public long getOriginalCompanyId() {
+		return _originalCompanyId;
 	}
 
 	@JSON
@@ -198,6 +358,14 @@ public class AddressModelImpl extends BaseModelImpl<Address>
 	}
 
 	public void setUserId(long userId) {
+		_columnBitmask |= USERID_COLUMN_BITMASK;
+
+		if (!_setOriginalUserId) {
+			_setOriginalUserId = true;
+
+			_originalUserId = _userId;
+		}
+
 		_userId = userId;
 	}
 
@@ -207,6 +375,10 @@ public class AddressModelImpl extends BaseModelImpl<Address>
 
 	public void setUserUuid(String userUuid) {
 		_userUuid = userUuid;
+	}
+
+	public long getOriginalUserId() {
+		return _originalUserId;
 	}
 
 	@JSON
@@ -229,6 +401,8 @@ public class AddressModelImpl extends BaseModelImpl<Address>
 	}
 
 	public void setCreateDate(Date createDate) {
+		_columnBitmask = -1L;
+
 		_createDate = createDate;
 	}
 
@@ -249,13 +423,35 @@ public class AddressModelImpl extends BaseModelImpl<Address>
 		return PortalUtil.getClassName(getClassNameId());
 	}
 
+	public void setClassName(String className) {
+		long classNameId = 0;
+
+		if (Validator.isNotNull(className)) {
+			classNameId = PortalUtil.getClassNameId(className);
+		}
+
+		setClassNameId(classNameId);
+	}
+
 	@JSON
 	public long getClassNameId() {
 		return _classNameId;
 	}
 
 	public void setClassNameId(long classNameId) {
+		_columnBitmask |= CLASSNAMEID_COLUMN_BITMASK;
+
+		if (!_setOriginalClassNameId) {
+			_setOriginalClassNameId = true;
+
+			_originalClassNameId = _classNameId;
+		}
+
 		_classNameId = classNameId;
+	}
+
+	public long getOriginalClassNameId() {
+		return _originalClassNameId;
 	}
 
 	@JSON
@@ -264,7 +460,19 @@ public class AddressModelImpl extends BaseModelImpl<Address>
 	}
 
 	public void setClassPK(long classPK) {
+		_columnBitmask |= CLASSPK_COLUMN_BITMASK;
+
+		if (!_setOriginalClassPK) {
+			_setOriginalClassPK = true;
+
+			_originalClassPK = _classPK;
+		}
+
 		_classPK = classPK;
+	}
+
+	public long getOriginalClassPK() {
+		return _originalClassPK;
 	}
 
 	@JSON
@@ -374,7 +582,19 @@ public class AddressModelImpl extends BaseModelImpl<Address>
 	}
 
 	public void setMailing(boolean mailing) {
+		_columnBitmask |= MAILING_COLUMN_BITMASK;
+
+		if (!_setOriginalMailing) {
+			_setOriginalMailing = true;
+
+			_originalMailing = _mailing;
+		}
+
 		_mailing = mailing;
+	}
+
+	public boolean getOriginalMailing() {
+		return _originalMailing;
 	}
 
 	@JSON
@@ -387,38 +607,47 @@ public class AddressModelImpl extends BaseModelImpl<Address>
 	}
 
 	public void setPrimary(boolean primary) {
+		_columnBitmask |= PRIMARY_COLUMN_BITMASK;
+
+		if (!_setOriginalPrimary) {
+			_setOriginalPrimary = true;
+
+			_originalPrimary = _primary;
+		}
+
 		_primary = primary;
+	}
+
+	public boolean getOriginalPrimary() {
+		return _originalPrimary;
+	}
+
+	public long getColumnBitmask() {
+		return _columnBitmask;
 	}
 
 	@Override
 	public Address toEscapedModel() {
-		if (isEscapedModel()) {
-			return (Address)this;
+		if (_escapedModelProxy == null) {
+			_escapedModelProxy = (Address)ProxyUtil.newProxyInstance(_classLoader,
+					_escapedModelProxyInterfaces,
+					new AutoEscapeBeanHandler(this));
 		}
-		else {
-			if (_escapedModelProxy == null) {
-				_escapedModelProxy = (Address)Proxy.newProxyInstance(_classLoader,
-						_escapedModelProxyInterfaces,
-						new AutoEscapeBeanHandler(this));
-			}
 
-			return _escapedModelProxy;
-		}
+		return _escapedModelProxy;
 	}
 
 	@Override
 	public ExpandoBridge getExpandoBridge() {
-		if (_expandoBridge == null) {
-			_expandoBridge = ExpandoBridgeFactoryUtil.getExpandoBridge(getCompanyId(),
-					Address.class.getName(), getPrimaryKey());
-		}
-
-		return _expandoBridge;
+		return ExpandoBridgeFactoryUtil.getExpandoBridge(getCompanyId(),
+			Address.class.getName(), getPrimaryKey());
 	}
 
 	@Override
 	public void setExpandoBridgeAttributes(ServiceContext serviceContext) {
-		getExpandoBridge().setAttributes(serviceContext);
+		ExpandoBridge expandoBridge = getExpandoBridge();
+
+		expandoBridge.setAttributes(serviceContext);
 	}
 
 	@Override
@@ -493,6 +722,33 @@ public class AddressModelImpl extends BaseModelImpl<Address>
 
 	@Override
 	public void resetOriginalValues() {
+		AddressModelImpl addressModelImpl = this;
+
+		addressModelImpl._originalCompanyId = addressModelImpl._companyId;
+
+		addressModelImpl._setOriginalCompanyId = false;
+
+		addressModelImpl._originalUserId = addressModelImpl._userId;
+
+		addressModelImpl._setOriginalUserId = false;
+
+		addressModelImpl._originalClassNameId = addressModelImpl._classNameId;
+
+		addressModelImpl._setOriginalClassNameId = false;
+
+		addressModelImpl._originalClassPK = addressModelImpl._classPK;
+
+		addressModelImpl._setOriginalClassPK = false;
+
+		addressModelImpl._originalMailing = addressModelImpl._mailing;
+
+		addressModelImpl._setOriginalMailing = false;
+
+		addressModelImpl._originalPrimary = addressModelImpl._primary;
+
+		addressModelImpl._setOriginalPrimary = false;
+
+		addressModelImpl._columnBitmask = 0;
 	}
 
 	@Override
@@ -724,13 +980,21 @@ public class AddressModelImpl extends BaseModelImpl<Address>
 		};
 	private long _addressId;
 	private long _companyId;
+	private long _originalCompanyId;
+	private boolean _setOriginalCompanyId;
 	private long _userId;
 	private String _userUuid;
+	private long _originalUserId;
+	private boolean _setOriginalUserId;
 	private String _userName;
 	private Date _createDate;
 	private Date _modifiedDate;
 	private long _classNameId;
+	private long _originalClassNameId;
+	private boolean _setOriginalClassNameId;
 	private long _classPK;
+	private long _originalClassPK;
+	private boolean _setOriginalClassPK;
 	private String _street1;
 	private String _street2;
 	private String _street3;
@@ -740,7 +1004,11 @@ public class AddressModelImpl extends BaseModelImpl<Address>
 	private long _countryId;
 	private int _typeId;
 	private boolean _mailing;
+	private boolean _originalMailing;
+	private boolean _setOriginalMailing;
 	private boolean _primary;
-	private transient ExpandoBridge _expandoBridge;
+	private boolean _originalPrimary;
+	private boolean _setOriginalPrimary;
+	private long _columnBitmask;
 	private Address _escapedModelProxy;
 }

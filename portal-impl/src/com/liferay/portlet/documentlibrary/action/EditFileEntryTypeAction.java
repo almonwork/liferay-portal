@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -15,19 +15,31 @@
 package com.liferay.portlet.documentlibrary.action;
 
 import com.liferay.portal.kernel.servlet.SessionErrors;
+import com.liferay.portal.kernel.servlet.SessionMessages;
 import com.liferay.portal.kernel.util.Constants;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.StringUtil;
+import com.liferay.portal.model.Group;
 import com.liferay.portal.security.auth.PrincipalException;
+import com.liferay.portal.service.GroupLocalServiceUtil;
 import com.liferay.portal.service.ServiceContext;
 import com.liferay.portal.service.ServiceContextFactory;
 import com.liferay.portal.struts.PortletAction;
 import com.liferay.portal.theme.ThemeDisplay;
+import com.liferay.portal.util.PortletKeys;
 import com.liferay.portal.util.WebKeys;
+import com.liferay.portlet.documentlibrary.DuplicateFileEntryTypeException;
 import com.liferay.portlet.documentlibrary.NoSuchFileEntryTypeException;
+import com.liferay.portlet.documentlibrary.NoSuchMetadataSetException;
 import com.liferay.portlet.documentlibrary.model.DLFileEntryType;
 import com.liferay.portlet.documentlibrary.service.DLFileEntryTypeServiceUtil;
+import com.liferay.portlet.documentlibrary.util.DLUtil;
+import com.liferay.portlet.dynamicdatamapping.NoSuchStructureException;
+import com.liferay.portlet.dynamicdatamapping.RequiredStructureException;
+import com.liferay.portlet.dynamicdatamapping.StructureDuplicateElementException;
+import com.liferay.portlet.dynamicdatamapping.model.DDMStructure;
+import com.liferay.portlet.dynamicdatamapping.service.DDMStructureLocalServiceUtil;
 
 import javax.portlet.ActionRequest;
 import javax.portlet.ActionResponse;
@@ -62,15 +74,35 @@ public class EditFileEntryTypeAction extends PortletAction {
 				deleteFileEntryType(actionRequest, actionResponse);
 			}
 
+			if (SessionErrors.isEmpty(actionRequest)) {
+				SessionMessages.add(
+					actionRequest,
+					portletConfig.getPortletName() +
+						SessionMessages.KEY_SUFFIX_REFRESH_PORTLET,
+					PortletKeys.DOCUMENT_LIBRARY);
+			}
+
 			sendRedirect(actionRequest, actionResponse);
 		}
 		catch (Exception e) {
-			if (e instanceof NoSuchFileEntryTypeException ||
-				e instanceof PrincipalException) {
+			if (e instanceof DuplicateFileEntryTypeException ||
+				e instanceof NoSuchMetadataSetException ||
+				e instanceof StructureDuplicateElementException) {
 
-				SessionErrors.add(actionRequest, e.getClass().getName());
+				SessionErrors.add(actionRequest, e.getClass());
+			}
+			else if (e instanceof NoSuchFileEntryTypeException ||
+					 e instanceof NoSuchStructureException ||
+					 e instanceof PrincipalException) {
+
+				SessionErrors.add(actionRequest, e.getClass());
 
 				setForward(actionRequest, "portlet.document_library.error");
+			}
+			else if (e instanceof RequiredStructureException) {
+				SessionErrors.add(actionRequest, e.getClass());
+
+				sendRedirect(actionRequest, actionResponse);
 			}
 			else {
 				throw e;
@@ -84,25 +116,39 @@ public class EditFileEntryTypeAction extends PortletAction {
 			RenderRequest renderRequest, RenderResponse renderResponse)
 		throws Exception {
 
-		DLFileEntryType fileEntryType = null;
+		DLFileEntryType dlFileEntryType = null;
 
 		try {
 			long fileEntryTypeId = ParamUtil.getLong(
 				renderRequest, "fileEntryTypeId");
 
 			if (fileEntryTypeId > 0) {
-				fileEntryType = DLFileEntryTypeServiceUtil.getFileEntryType(
+				dlFileEntryType = DLFileEntryTypeServiceUtil.getFileEntryType(
 					fileEntryTypeId);
 
 				renderRequest.setAttribute(
-					WebKeys.DOCUMENT_LIBRARY_FILE_ENTRY_TYPE, fileEntryType);
+					WebKeys.DOCUMENT_LIBRARY_FILE_ENTRY_TYPE, dlFileEntryType);
+
+				DDMStructure ddmStructure =
+					DDMStructureLocalServiceUtil.fetchStructure(
+						dlFileEntryType.getGroupId(),
+						DLUtil.getDDMStructureKey(dlFileEntryType));
+
+				if (ddmStructure == null) {
+					ddmStructure = DDMStructureLocalServiceUtil.fetchStructure(
+						dlFileEntryType.getGroupId(),
+						DLUtil.getDeprecatedDDMStructureKey(dlFileEntryType));
+				}
+
+				renderRequest.setAttribute(
+					WebKeys.DYNAMIC_DATA_MAPPING_STRUCTURE, ddmStructure);
 			}
 		}
 		catch (Exception e) {
 			if (e instanceof NoSuchFileEntryTypeException ||
 				e instanceof PrincipalException) {
 
-				SessionErrors.add(renderRequest, e.getClass().getName());
+				SessionErrors.add(renderRequest, e.getClass());
 
 				return mapping.findForward("portlet.document_library.error");
 			}
@@ -149,9 +195,8 @@ public class EditFileEntryTypeAction extends PortletAction {
 
 		String name = ParamUtil.getString(actionRequest, "name");
 		String description = ParamUtil.getString(actionRequest, "description");
-
 		long[] ddmStructureIds = getLongArray(
-			actionRequest, "structuresSearchContainerPrimaryKeys");
+			actionRequest, "ddmStructuresSearchContainerPrimaryKeys");
 
 		ServiceContext serviceContext = ServiceContextFactory.getInstance(
 			DLFileEntryType.class.getName(), actionRequest);
@@ -160,9 +205,16 @@ public class EditFileEntryTypeAction extends PortletAction {
 
 			// Add file entry type
 
+			long groupId = themeDisplay.getScopeGroupId();
+
+			Group scopeGroup = GroupLocalServiceUtil.getGroup(groupId);
+
+			if (scopeGroup.isLayout()) {
+				groupId = scopeGroup.getParentGroupId();
+			}
+
 			DLFileEntryTypeServiceUtil.addFileEntryType(
-				themeDisplay.getScopeGroupId(), name, description,
-				ddmStructureIds, serviceContext);
+				groupId, name, description, ddmStructureIds, serviceContext);
 		}
 		else {
 

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -18,6 +18,7 @@ import com.liferay.portal.kernel.bean.AutoEscapeBeanHandler;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.util.DateUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.ProxyUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.model.CacheModel;
 import com.liferay.portal.model.impl.BaseModelImpl;
@@ -31,11 +32,11 @@ import com.liferay.portlet.expando.util.ExpandoBridgeFactoryUtil;
 
 import java.io.Serializable;
 
-import java.lang.reflect.Proxy;
-
 import java.sql.Types;
 
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * The base model implementation for the DLFileRank service. Represents a row in the &quot;DLFileRank&quot; database table, with each column mapped to a property of this class.
@@ -64,9 +65,10 @@ public class DLFileRankModelImpl extends BaseModelImpl<DLFileRank>
 			{ "companyId", Types.BIGINT },
 			{ "userId", Types.BIGINT },
 			{ "createDate", Types.TIMESTAMP },
-			{ "fileEntryId", Types.BIGINT }
+			{ "fileEntryId", Types.BIGINT },
+			{ "active_", Types.BOOLEAN }
 		};
-	public static final String TABLE_SQL_CREATE = "create table DLFileRank (fileRankId LONG not null primary key,groupId LONG,companyId LONG,userId LONG,createDate DATE null,fileEntryId LONG)";
+	public static final String TABLE_SQL_CREATE = "create table DLFileRank (fileRankId LONG not null primary key,groupId LONG,companyId LONG,userId LONG,createDate DATE null,fileEntryId LONG,active_ BOOLEAN)";
 	public static final String TABLE_SQL_DROP = "drop table DLFileRank";
 	public static final String ORDER_BY_JPQL = " ORDER BY dlFileRank.createDate DESC";
 	public static final String ORDER_BY_SQL = " ORDER BY DLFileRank.createDate DESC";
@@ -79,15 +81,14 @@ public class DLFileRankModelImpl extends BaseModelImpl<DLFileRank>
 	public static final boolean FINDER_CACHE_ENABLED = GetterUtil.getBoolean(com.liferay.portal.util.PropsUtil.get(
 				"value.object.finder.cache.enabled.com.liferay.portlet.documentlibrary.model.DLFileRank"),
 			true);
-
-	public Class<?> getModelClass() {
-		return DLFileRank.class;
-	}
-
-	public String getModelClassName() {
-		return DLFileRank.class.getName();
-	}
-
+	public static final boolean COLUMN_BITMASK_ENABLED = GetterUtil.getBoolean(com.liferay.portal.util.PropsUtil.get(
+				"value.object.column.bitmask.enabled.com.liferay.portlet.documentlibrary.model.DLFileRank"),
+			true);
+	public static long ACTIVE_COLUMN_BITMASK = 1L;
+	public static long COMPANYID_COLUMN_BITMASK = 2L;
+	public static long FILEENTRYID_COLUMN_BITMASK = 4L;
+	public static long GROUPID_COLUMN_BITMASK = 8L;
+	public static long USERID_COLUMN_BITMASK = 16L;
 	public static final long LOCK_EXPIRATION_TIME = GetterUtil.getLong(com.liferay.portal.util.PropsUtil.get(
 				"lock.expiration.time.com.liferay.portlet.documentlibrary.model.DLFileRank"));
 
@@ -110,6 +111,74 @@ public class DLFileRankModelImpl extends BaseModelImpl<DLFileRank>
 		setPrimaryKey(((Long)primaryKeyObj).longValue());
 	}
 
+	public Class<?> getModelClass() {
+		return DLFileRank.class;
+	}
+
+	public String getModelClassName() {
+		return DLFileRank.class.getName();
+	}
+
+	@Override
+	public Map<String, Object> getModelAttributes() {
+		Map<String, Object> attributes = new HashMap<String, Object>();
+
+		attributes.put("fileRankId", getFileRankId());
+		attributes.put("groupId", getGroupId());
+		attributes.put("companyId", getCompanyId());
+		attributes.put("userId", getUserId());
+		attributes.put("createDate", getCreateDate());
+		attributes.put("fileEntryId", getFileEntryId());
+		attributes.put("active", getActive());
+
+		return attributes;
+	}
+
+	@Override
+	public void setModelAttributes(Map<String, Object> attributes) {
+		Long fileRankId = (Long)attributes.get("fileRankId");
+
+		if (fileRankId != null) {
+			setFileRankId(fileRankId);
+		}
+
+		Long groupId = (Long)attributes.get("groupId");
+
+		if (groupId != null) {
+			setGroupId(groupId);
+		}
+
+		Long companyId = (Long)attributes.get("companyId");
+
+		if (companyId != null) {
+			setCompanyId(companyId);
+		}
+
+		Long userId = (Long)attributes.get("userId");
+
+		if (userId != null) {
+			setUserId(userId);
+		}
+
+		Date createDate = (Date)attributes.get("createDate");
+
+		if (createDate != null) {
+			setCreateDate(createDate);
+		}
+
+		Long fileEntryId = (Long)attributes.get("fileEntryId");
+
+		if (fileEntryId != null) {
+			setFileEntryId(fileEntryId);
+		}
+
+		Boolean active = (Boolean)attributes.get("active");
+
+		if (active != null) {
+			setActive(active);
+		}
+	}
+
 	public long getFileRankId() {
 		return _fileRankId;
 	}
@@ -123,7 +192,19 @@ public class DLFileRankModelImpl extends BaseModelImpl<DLFileRank>
 	}
 
 	public void setGroupId(long groupId) {
+		_columnBitmask |= GROUPID_COLUMN_BITMASK;
+
+		if (!_setOriginalGroupId) {
+			_setOriginalGroupId = true;
+
+			_originalGroupId = _groupId;
+		}
+
 		_groupId = groupId;
+	}
+
+	public long getOriginalGroupId() {
+		return _originalGroupId;
 	}
 
 	public long getCompanyId() {
@@ -131,6 +212,8 @@ public class DLFileRankModelImpl extends BaseModelImpl<DLFileRank>
 	}
 
 	public void setCompanyId(long companyId) {
+		_columnBitmask |= COMPANYID_COLUMN_BITMASK;
+
 		if (!_setOriginalCompanyId) {
 			_setOriginalCompanyId = true;
 
@@ -149,6 +232,8 @@ public class DLFileRankModelImpl extends BaseModelImpl<DLFileRank>
 	}
 
 	public void setUserId(long userId) {
+		_columnBitmask |= USERID_COLUMN_BITMASK;
+
 		if (!_setOriginalUserId) {
 			_setOriginalUserId = true;
 
@@ -175,6 +260,8 @@ public class DLFileRankModelImpl extends BaseModelImpl<DLFileRank>
 	}
 
 	public void setCreateDate(Date createDate) {
+		_columnBitmask = -1L;
+
 		_createDate = createDate;
 	}
 
@@ -183,6 +270,8 @@ public class DLFileRankModelImpl extends BaseModelImpl<DLFileRank>
 	}
 
 	public void setFileEntryId(long fileEntryId) {
+		_columnBitmask |= FILEENTRYID_COLUMN_BITMASK;
+
 		if (!_setOriginalFileEntryId) {
 			_setOriginalFileEntryId = true;
 
@@ -196,35 +285,56 @@ public class DLFileRankModelImpl extends BaseModelImpl<DLFileRank>
 		return _originalFileEntryId;
 	}
 
+	public boolean getActive() {
+		return _active;
+	}
+
+	public boolean isActive() {
+		return _active;
+	}
+
+	public void setActive(boolean active) {
+		_columnBitmask |= ACTIVE_COLUMN_BITMASK;
+
+		if (!_setOriginalActive) {
+			_setOriginalActive = true;
+
+			_originalActive = _active;
+		}
+
+		_active = active;
+	}
+
+	public boolean getOriginalActive() {
+		return _originalActive;
+	}
+
+	public long getColumnBitmask() {
+		return _columnBitmask;
+	}
+
 	@Override
 	public DLFileRank toEscapedModel() {
-		if (isEscapedModel()) {
-			return (DLFileRank)this;
+		if (_escapedModelProxy == null) {
+			_escapedModelProxy = (DLFileRank)ProxyUtil.newProxyInstance(_classLoader,
+					_escapedModelProxyInterfaces,
+					new AutoEscapeBeanHandler(this));
 		}
-		else {
-			if (_escapedModelProxy == null) {
-				_escapedModelProxy = (DLFileRank)Proxy.newProxyInstance(_classLoader,
-						_escapedModelProxyInterfaces,
-						new AutoEscapeBeanHandler(this));
-			}
 
-			return _escapedModelProxy;
-		}
+		return _escapedModelProxy;
 	}
 
 	@Override
 	public ExpandoBridge getExpandoBridge() {
-		if (_expandoBridge == null) {
-			_expandoBridge = ExpandoBridgeFactoryUtil.getExpandoBridge(getCompanyId(),
-					DLFileRank.class.getName(), getPrimaryKey());
-		}
-
-		return _expandoBridge;
+		return ExpandoBridgeFactoryUtil.getExpandoBridge(getCompanyId(),
+			DLFileRank.class.getName(), getPrimaryKey());
 	}
 
 	@Override
 	public void setExpandoBridgeAttributes(ServiceContext serviceContext) {
-		getExpandoBridge().setAttributes(serviceContext);
+		ExpandoBridge expandoBridge = getExpandoBridge();
+
+		expandoBridge.setAttributes(serviceContext);
 	}
 
 	@Override
@@ -237,6 +347,7 @@ public class DLFileRankModelImpl extends BaseModelImpl<DLFileRank>
 		dlFileRankImpl.setUserId(getUserId());
 		dlFileRankImpl.setCreateDate(getCreateDate());
 		dlFileRankImpl.setFileEntryId(getFileEntryId());
+		dlFileRankImpl.setActive(getActive());
 
 		dlFileRankImpl.resetOriginalValues();
 
@@ -291,6 +402,10 @@ public class DLFileRankModelImpl extends BaseModelImpl<DLFileRank>
 	public void resetOriginalValues() {
 		DLFileRankModelImpl dlFileRankModelImpl = this;
 
+		dlFileRankModelImpl._originalGroupId = dlFileRankModelImpl._groupId;
+
+		dlFileRankModelImpl._setOriginalGroupId = false;
+
 		dlFileRankModelImpl._originalCompanyId = dlFileRankModelImpl._companyId;
 
 		dlFileRankModelImpl._setOriginalCompanyId = false;
@@ -302,6 +417,12 @@ public class DLFileRankModelImpl extends BaseModelImpl<DLFileRank>
 		dlFileRankModelImpl._originalFileEntryId = dlFileRankModelImpl._fileEntryId;
 
 		dlFileRankModelImpl._setOriginalFileEntryId = false;
+
+		dlFileRankModelImpl._originalActive = dlFileRankModelImpl._active;
+
+		dlFileRankModelImpl._setOriginalActive = false;
+
+		dlFileRankModelImpl._columnBitmask = 0;
 	}
 
 	@Override
@@ -327,12 +448,14 @@ public class DLFileRankModelImpl extends BaseModelImpl<DLFileRank>
 
 		dlFileRankCacheModel.fileEntryId = getFileEntryId();
 
+		dlFileRankCacheModel.active = getActive();
+
 		return dlFileRankCacheModel;
 	}
 
 	@Override
 	public String toString() {
-		StringBundler sb = new StringBundler(13);
+		StringBundler sb = new StringBundler(15);
 
 		sb.append("{fileRankId=");
 		sb.append(getFileRankId());
@@ -346,13 +469,15 @@ public class DLFileRankModelImpl extends BaseModelImpl<DLFileRank>
 		sb.append(getCreateDate());
 		sb.append(", fileEntryId=");
 		sb.append(getFileEntryId());
+		sb.append(", active=");
+		sb.append(getActive());
 		sb.append("}");
 
 		return sb.toString();
 	}
 
 	public String toXmlString() {
-		StringBundler sb = new StringBundler(22);
+		StringBundler sb = new StringBundler(25);
 
 		sb.append("<model><model-name>");
 		sb.append("com.liferay.portlet.documentlibrary.model.DLFileRank");
@@ -382,6 +507,10 @@ public class DLFileRankModelImpl extends BaseModelImpl<DLFileRank>
 			"<column><column-name>fileEntryId</column-name><column-value><![CDATA[");
 		sb.append(getFileEntryId());
 		sb.append("]]></column-value></column>");
+		sb.append(
+			"<column><column-name>active</column-name><column-value><![CDATA[");
+		sb.append(getActive());
+		sb.append("]]></column-value></column>");
 
 		sb.append("</model>");
 
@@ -394,6 +523,8 @@ public class DLFileRankModelImpl extends BaseModelImpl<DLFileRank>
 		};
 	private long _fileRankId;
 	private long _groupId;
+	private long _originalGroupId;
+	private boolean _setOriginalGroupId;
 	private long _companyId;
 	private long _originalCompanyId;
 	private boolean _setOriginalCompanyId;
@@ -405,6 +536,9 @@ public class DLFileRankModelImpl extends BaseModelImpl<DLFileRank>
 	private long _fileEntryId;
 	private long _originalFileEntryId;
 	private boolean _setOriginalFileEntryId;
-	private transient ExpandoBridge _expandoBridge;
+	private boolean _active;
+	private boolean _originalActive;
+	private boolean _setOriginalActive;
+	private long _columnBitmask;
 	private DLFileRank _escapedModelProxy;
 }

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -47,8 +47,8 @@ public class ServiceStatistics
 				return requestStatistics.getAverageTime();
 			}
 		}
-		catch (ClassNotFoundException e) {
-			throw new SystemException(e);
+		catch (ClassNotFoundException cnfe) {
+			throw new SystemException(cnfe);
 		}
 
 		return -1;
@@ -68,8 +68,8 @@ public class ServiceStatistics
 				return requestStatistics.getErrorCount();
 			}
 		}
-		catch (ClassNotFoundException e) {
-			throw new SystemException(e);
+		catch (ClassNotFoundException cnfe) {
+			throw new SystemException(cnfe);
 		}
 
 		return -1;
@@ -89,8 +89,8 @@ public class ServiceStatistics
 				return requestStatistics.getMaxTime();
 			}
 		}
-		catch (ClassNotFoundException e) {
-			throw new SystemException(e);
+		catch (ClassNotFoundException cnfe) {
+			throw new SystemException(cnfe);
 		}
 
 		return -1;
@@ -110,8 +110,8 @@ public class ServiceStatistics
 				return requestStatistics.getMinTime();
 			}
 		}
-		catch (ClassNotFoundException e) {
-			throw new SystemException(e);
+		catch (ClassNotFoundException cnfe) {
+			throw new SystemException(cnfe);
 		}
 
 		return -1;
@@ -131,8 +131,8 @@ public class ServiceStatistics
 				return requestStatistics.getRequestCount();
 			}
 		}
-		catch (ClassNotFoundException e) {
-			throw new SystemException(e);
+		catch (ClassNotFoundException cnfe) {
+			throw new SystemException(cnfe);
 		}
 
 		return -1;

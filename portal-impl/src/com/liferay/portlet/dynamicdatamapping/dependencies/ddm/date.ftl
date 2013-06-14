@@ -1,34 +1,29 @@
 <#include "../init.ftl">
 
-<#if (fieldValue == "")>
-	<#assign fieldValue = field.predefinedValue>
+<#if (fieldRawValue?is_date)>
+	<#assign fieldDateValue = fieldRawValue>
+<#else>
+	<#assign fieldDateValue = dateUtil.newDate()>
 </#if>
 
-<div class="aui-field-wrapper-content lfr-forms-field-wrapper">
-	<@aui.input cssClass=cssClass helpMessage=field.tip label=label name=namespacedFieldName type="text" value=fieldValue>
-		<@aui.validator name="date" />
+<@aui["field-wrapper"] helpMessage=fieldStructure.tip label=label>
+	<#if required>
+		<@aui.validator name="required" />
+	</#if>
 
-		<#if required>
-			<@aui.validator name="required" />
-		</#if>
-	</@aui.input>
+	<@liferay_ui["input-date"]
+		cssClass=cssClass
+		dayParam="${namespacedFieldName}Day"
+		dayValue=fieldDateValue?string("dd")?number
+		disabled=false
+		helpMessage=fieldStructure.tip
+		monthParam="${namespacedFieldName}Month"
+		monthValue=fieldDateValue?string("MM")?number - 1
+		yearParam="${namespacedFieldName}Year"
+		yearRangeEnd=fieldDateValue?string("yyyy")?number + 100
+		yearRangeStart=fieldDateValue?string("yyyy")?number - 100
+		yearValue=fieldDateValue?string("yyyy")?number
+	/>
 
-	${field.children}
-</div>
-
-<@aui.script use="aui-datepicker">
-	new A.DatePicker(
-		{
-			calendar:
-			{
-				dates:
-				[
-					<#if (fieldValue != "")>
-						'${fieldValue}'
-					</#if>
-				]
-			},
-			trigger: '#${portletNamespace}${namespacedFieldName}'
-		}
-	).render();
-</@aui.script>
+	${fieldStructure.children}
+</@>

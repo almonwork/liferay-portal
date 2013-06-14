@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -20,6 +20,8 @@ import com.liferay.portal.model.CacheModel;
 
 import com.liferay.portlet.documentlibrary.model.DLFileShortcut;
 
+import java.io.Serializable;
+
 import java.util.Date;
 
 /**
@@ -29,10 +31,11 @@ import java.util.Date;
  * @see DLFileShortcut
  * @generated
  */
-public class DLFileShortcutCacheModel implements CacheModel<DLFileShortcut> {
+public class DLFileShortcutCacheModel implements CacheModel<DLFileShortcut>,
+	Serializable {
 	@Override
 	public String toString() {
-		StringBundler sb = new StringBundler(31);
+		StringBundler sb = new StringBundler(33);
 
 		sb.append("{uuid=");
 		sb.append(uuid);
@@ -56,6 +59,8 @@ public class DLFileShortcutCacheModel implements CacheModel<DLFileShortcut> {
 		sb.append(folderId);
 		sb.append(", toFileEntryId=");
 		sb.append(toFileEntryId);
+		sb.append(", active=");
+		sb.append(active);
 		sb.append(", status=");
 		sb.append(status);
 		sb.append(", statusByUserId=");
@@ -108,6 +113,7 @@ public class DLFileShortcutCacheModel implements CacheModel<DLFileShortcut> {
 		dlFileShortcutImpl.setRepositoryId(repositoryId);
 		dlFileShortcutImpl.setFolderId(folderId);
 		dlFileShortcutImpl.setToFileEntryId(toFileEntryId);
+		dlFileShortcutImpl.setActive(active);
 		dlFileShortcutImpl.setStatus(status);
 		dlFileShortcutImpl.setStatusByUserId(statusByUserId);
 
@@ -141,6 +147,7 @@ public class DLFileShortcutCacheModel implements CacheModel<DLFileShortcut> {
 	public long repositoryId;
 	public long folderId;
 	public long toFileEntryId;
+	public boolean active;
 	public int status;
 	public long statusByUserId;
 	public String statusByUserName;

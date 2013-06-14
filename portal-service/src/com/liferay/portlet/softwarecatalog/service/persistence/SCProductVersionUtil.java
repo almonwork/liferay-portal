@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -92,14 +92,6 @@ public class SCProductVersionUtil {
 		return getPersistence()
 				   .findWithDynamicQuery(dynamicQuery, start, end,
 			orderByComparator);
-	}
-
-	/**
-	 * @see com.liferay.portal.service.persistence.BasePersistence#remove(com.liferay.portal.model.BaseModel)
-	 */
-	public static SCProductVersion remove(SCProductVersion scProductVersion)
-		throws SystemException {
-		return getPersistence().remove(scProductVersion);
 	}
 
 	/**
@@ -430,13 +422,14 @@ public class SCProductVersionUtil {
 	* Removes the s c product version where directDownloadURL = &#63; from the database.
 	*
 	* @param directDownloadURL the direct download u r l
+	* @return the s c product version that was removed
 	* @throws SystemException if a system exception occurred
 	*/
-	public static void removeByDirectDownloadURL(
+	public static com.liferay.portlet.softwarecatalog.model.SCProductVersion removeByDirectDownloadURL(
 		java.lang.String directDownloadURL)
 		throws com.liferay.portal.kernel.exception.SystemException,
 			com.liferay.portlet.softwarecatalog.NoSuchProductVersionException {
-		getPersistence().removeByDirectDownloadURL(directDownloadURL);
+		return getPersistence().removeByDirectDownloadURL(directDownloadURL);
 	}
 
 	/**
@@ -728,11 +721,10 @@ public class SCProductVersionUtil {
 		return _persistence;
 	}
 
+	/**
+	 * @deprecated
+	 */
 	public void setPersistence(SCProductVersionPersistence persistence) {
-		_persistence = persistence;
-
-		ReferenceRegistry.registerReference(SCProductVersionUtil.class,
-			"_persistence");
 	}
 
 	private static SCProductVersionPersistence _persistence;

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -25,18 +25,6 @@ import javax.servlet.ServletContext;
  * @author Brian Wing Shun Chan
  */
 public class ThemeLoaderFactory {
-
-	public static void init(
-		String servletContextName, ServletContext servletContext,
-		String[] xmls) {
-
-		ServletContextPool.put(servletContextName, servletContext);
-
-		ThemeLoader themeLoader = new ThemeLoader(
-			servletContextName, servletContext, xmls);
-
-		_themeLoaders.put(servletContextName, themeLoader);
-	}
 
 	public static boolean destroy(String servletContextName) {
 		ThemeLoader themeLoader = _themeLoaders.remove(servletContextName);
@@ -67,6 +55,18 @@ public class ThemeLoaderFactory {
 
 	public static ThemeLoader getThemeLoader(String servletContextName) {
 		return _themeLoaders.get(servletContextName);
+	}
+
+	public static void init(
+		String servletContextName, ServletContext servletContext,
+		String[] xmls) {
+
+		ServletContextPool.put(servletContextName, servletContext);
+
+		ThemeLoader themeLoader = new ThemeLoader(
+			servletContextName, servletContext, xmls);
+
+		_themeLoaders.put(servletContextName, themeLoader);
 	}
 
 	public static void loadThemes() {

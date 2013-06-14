@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,7 +14,6 @@
 
 package com.liferay.portal.service.persistence;
 
-import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.model.WorkflowDefinitionLink;
 
 /**
@@ -453,10 +452,12 @@ public interface WorkflowDefinitionLinkPersistence extends BasePersistence<Workf
 	* @param classNameId the class name ID
 	* @param classPK the class p k
 	* @param typePK the type p k
+	* @return the workflow definition link that was removed
 	* @throws SystemException if a system exception occurred
 	*/
-	public void removeByG_C_C_C_T(long groupId, long companyId,
-		long classNameId, long classPK, long typePK)
+	public com.liferay.portal.model.WorkflowDefinitionLink removeByG_C_C_C_T(
+		long groupId, long companyId, long classNameId, long classPK,
+		long typePK)
 		throws com.liferay.portal.NoSuchWorkflowDefinitionLinkException,
 			com.liferay.portal.kernel.exception.SystemException;
 
@@ -514,8 +515,4 @@ public interface WorkflowDefinitionLinkPersistence extends BasePersistence<Workf
 	*/
 	public int countAll()
 		throws com.liferay.portal.kernel.exception.SystemException;
-
-	public WorkflowDefinitionLink remove(
-		WorkflowDefinitionLink workflowDefinitionLink)
-		throws SystemException;
 }

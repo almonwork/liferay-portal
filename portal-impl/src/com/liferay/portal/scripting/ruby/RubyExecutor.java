@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -17,9 +17,10 @@ package com.liferay.portal.scripting.ruby;
 import com.liferay.portal.kernel.scripting.BaseScriptingExecutor;
 import com.liferay.portal.kernel.scripting.ExecutionException;
 import com.liferay.portal.kernel.scripting.ScriptingException;
-import com.liferay.portal.kernel.servlet.WebDirDetector;
-import com.liferay.portal.kernel.util.PortalClassLoaderUtil;
+import com.liferay.portal.kernel.util.AggregateClassLoader;
 import com.liferay.portal.kernel.util.StringPool;
+import com.liferay.portal.security.pacl.PACLClassLoaderUtil;
+import com.liferay.portal.util.PortalUtil;
 import com.liferay.portal.util.PropsValues;
 
 import java.io.File;
@@ -57,8 +58,6 @@ public class RubyExecutor extends BaseScriptingExecutor {
 		RubyInstanceConfig rubyInstanceConfig =
 			localContextProvider.getRubyInstanceConfig();
 
-		rubyInstanceConfig.setLoader(PortalClassLoaderUtil.getClassLoader());
-
 		if (PropsValues.SCRIPTING_JRUBY_COMPILE_MODE.equals(
 				_COMPILE_MODE_FORCE)) {
 
@@ -72,17 +71,17 @@ public class RubyExecutor extends BaseScriptingExecutor {
 
 		rubyInstanceConfig.setJitThreshold(
 			PropsValues.SCRIPTING_JRUBY_COMPILE_THRESHOLD);
+		rubyInstanceConfig.setLoader(
+			PACLClassLoaderUtil.getPortalClassLoader());
 
-		_basePath = WebDirDetector.getRootDir(
-			PortalClassLoaderUtil.getClassLoader());
+		_basePath = PortalUtil.getPortalLibDir();
 
-		_loadPaths = new ArrayList<String>(3);
+		_loadPaths = new ArrayList<String>(
+			PropsValues.SCRIPTING_JRUBY_LOAD_PATHS.length);
 
-		_loadPaths.add("META-INF/jruby.home/lib/ruby/1.8");
-		_loadPaths.add("META-INF/jruby.home/lib/ruby/site_ruby/1.8");
-		_loadPaths.add(
-			"file:" + _basePath +
-				"WEB-INF/lib/ruby-gems.jar!/gems/haml-3.0.25/lib");
+		for (String gemLibPath : PropsValues.SCRIPTING_JRUBY_LOAD_PATHS) {
+			_loadPaths.add(gemLibPath);
+		}
 
 		rubyInstanceConfig.setLoadPaths(_loadPaths);
 
@@ -92,19 +91,23 @@ public class RubyExecutor extends BaseScriptingExecutor {
 	@Override
 	public Map<String, Object> eval(
 			Set<String> allowedClasses, Map<String, Object> inputObjects,
-			Set<String> outputNames, File scriptFile)
+			Set<String> outputNames, File scriptFile,
+			ClassLoader... classLoaders)
 		throws ScriptingException {
 
 		return eval(
-			allowedClasses, inputObjects, outputNames, scriptFile, null);
+			allowedClasses, inputObjects, outputNames, scriptFile, null,
+			classLoaders);
 	}
 
 	public Map<String, Object> eval(
 			Set<String> allowedClasses, Map<String, Object> inputObjects,
-			Set<String> outputNames, String script)
+			Set<String> outputNames, String script, ClassLoader... classLoaders)
 		throws ScriptingException {
 
-		return eval(allowedClasses, inputObjects, outputNames, null, script);
+		return eval(
+			allowedClasses, inputObjects, outputNames, null, script,
+			classLoaders);
 	}
 
 	public String getLanguage() {
@@ -113,7 +116,8 @@ public class RubyExecutor extends BaseScriptingExecutor {
 
 	protected Map<String, Object> eval(
 			Set<String> allowedClasses, Map<String, Object> inputObjects,
-			Set<String> outputNames, File scriptFile, String script)
+			Set<String> outputNames, File scriptFile, String script,
+			ClassLoader... classLoaders)
 		throws ScriptingException {
 
 		if (allowedClasses != null) {
@@ -122,10 +126,23 @@ public class RubyExecutor extends BaseScriptingExecutor {
 		}
 
 		try {
+			LocalContextProvider localContextProvider =
+				_scriptingContainer.getProvider();
+
 			RubyInstanceConfig rubyInstanceConfig =
-				_scriptingContainer.getProvider().getRubyInstanceConfig();
+				localContextProvider.getRubyInstanceConfig();
 
 			rubyInstanceConfig.setCurrentDirectory(_basePath);
+
+			if ((classLoaders != null) && (classLoaders.length > 0)) {
+				ClassLoader aggregateClassLoader =
+					AggregateClassLoader.getAggregateClassLoader(
+						PACLClassLoaderUtil.getPortalClassLoader(),
+						classLoaders);
+
+				rubyInstanceConfig.setLoader(aggregateClassLoader);
+			}
+
 			rubyInstanceConfig.setLoadPaths(_loadPaths);
 
 			for (Map.Entry<String, Object> entry : inputObjects.entrySet()) {

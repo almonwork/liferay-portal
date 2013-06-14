@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -46,20 +46,20 @@ public class LongWrapper
 		}
 	}
 
-	public long getValue() {
-		return _value;
+	public long decrement() {
+		return --_value;
 	}
 
-	public void setValue(long value) {
-		_value = value;
+	public long getValue() {
+		return _value;
 	}
 
 	public long increment() {
 		return ++_value;
 	}
 
-	public long decrement() {
-		return --_value;
+	public void setValue(long value) {
+		_value = value;
 	}
 
 	private long _value;

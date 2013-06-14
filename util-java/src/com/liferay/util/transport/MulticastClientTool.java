@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -13,8 +13,6 @@
  */
 
 package com.liferay.util.transport;
-
-import com.liferay.portal.kernel.util.StringBundler;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -37,12 +35,11 @@ public class MulticastClientTool {
 		catch (Exception e) {
 			e.printStackTrace();
 
-			StringBundler sb = new StringBundler(4);
+			StringBuilder sb = new StringBuilder(3);
 
-			sb.append("Usage: java -classpath ");
-			sb.append("commons-logging.jar:util-java.jar ");
-			sb.append("com.liferay.util.transport.MulticastClientTool [-g] ");
-			sb.append("[-s] -h [multicastAddress] -p [port]");
+			sb.append("Usage: java -classpath util-java.jar ");
+			sb.append(MulticastClientTool.class.getName());
+			sb.append("[-g] [-s] -h [multicastAddress] -p [port]");
 
 			System.err.println(sb.toString());
 
@@ -58,11 +55,11 @@ public class MulticastClientTool {
 		Boolean gzipData = (Boolean)argsMap.get("gzip");
 		Boolean shortData = (Boolean)argsMap.get("short");
 
-		DatagramHandler handler = new MulticastDatagramHandler(
+		DatagramHandler datagramHandler = new MulticastDatagramHandler(
 			gzipData.booleanValue(), shortData.booleanValue());
 
-		MulticastTransport transport = new MulticastTransport(
-			handler, host, port);
+		MulticastTransport multicastTransport = new MulticastTransport(
+			datagramHandler, host, port);
 
 		if (shortData.booleanValue()) {
 			System.out.println("Truncating to 96 bytes.");
@@ -70,16 +67,14 @@ public class MulticastClientTool {
 
 		System.out.println("Started up and waiting...");
 
-		transport.connect();
+		multicastTransport.connect();
 
-		synchronized (transport) {
-			transport.wait();
+		synchronized (multicastTransport) {
+			multicastTransport.wait();
 		}
 	}
 
-	private Map<String, Object> _getArgsMap(String[] args)
-		throws Exception {
-
+	private Map<String, Object> _getArgsMap(String[] args) throws Exception {
 		Map<String, Object> argsMap = new HashMap<String, Object>();
 
 		for (int i = 0; i < args.length; i++) {

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -38,7 +38,7 @@ public class JDataStoreDB extends FirebirdDB {
 		template = reword(template);
 		template = StringUtil.replace(
 			template,
-			new String[] {"\\'", "\\\"", "\\\\",  "\\n", "\\r"},
+			new String[] {"\\'", "\\\"", "\\\\", "\\n", "\\r"},
 			new String[] {"''", "\"", "\\", "\n", "\r"});
 
 		return template;
@@ -58,13 +58,10 @@ public class JDataStoreDB extends FirebirdDB {
 		return _JDATASTORE;
 	}
 
-	private static String[] _JDATASTORE = {
-		"--", "TRUE", "FALSE",
-		"'1970-01-01'", "current_timestamp",
-		" binary", " boolean", " date",
-		" double", " integer", " bigint",
-		" long varchar", " long varchar", " varchar",
-		"", "commit"
+	private static final String[] _JDATASTORE = {
+		"--", "TRUE", "FALSE", "'1970-01-01'", "current_timestamp", " binary",
+		" binary", " boolean", " date", " double", " integer", " bigint",
+		" long varchar", " long varchar", " varchar", "", "commit"
 	};
 
 	private static JDataStoreDB _instance = new JDataStoreDB();

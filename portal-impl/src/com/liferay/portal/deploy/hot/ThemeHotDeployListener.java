@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -19,10 +19,12 @@ import com.liferay.portal.kernel.deploy.hot.HotDeployEvent;
 import com.liferay.portal.kernel.deploy.hot.HotDeployException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.servlet.FileTimestampUtil;
+import com.liferay.portal.kernel.template.TemplateManager;
+import com.liferay.portal.kernel.template.TemplateResourceLoaderUtil;
 import com.liferay.portal.kernel.util.HttpUtil;
-import com.liferay.portal.kernel.util.PortalClassLoaderUtil;
+import com.liferay.portal.security.pacl.PACLClassLoaderUtil;
 import com.liferay.portal.service.ThemeLocalServiceUtil;
-import com.liferay.portal.velocity.LiferayResourceCacheUtil;
 
 import java.util.HashMap;
 import java.util.List;
@@ -37,27 +39,34 @@ import javax.servlet.ServletContext;
  */
 public class ThemeHotDeployListener extends BaseHotDeployListener {
 
-	public void invokeDeploy(HotDeployEvent event) throws HotDeployException {
-		try {
-			doInvokeDeploy(event);
-		}
-		catch (Throwable t) {
-			throwHotDeployException(event, "Error registering themes for ", t);
-		}
-	}
+	public void invokeDeploy(HotDeployEvent hotDeployEvent)
+		throws HotDeployException {
 
-	public void invokeUndeploy(HotDeployEvent event) throws HotDeployException {
 		try {
-			doInvokeUndeploy(event);
+			doInvokeDeploy(hotDeployEvent);
 		}
 		catch (Throwable t) {
 			throwHotDeployException(
-				event, "Error unregistering themes for ", t);
+				hotDeployEvent, "Error registering themes for ", t);
 		}
 	}
 
-	protected void doInvokeDeploy(HotDeployEvent event) throws Exception {
-		ServletContext servletContext = event.getServletContext();
+	public void invokeUndeploy(HotDeployEvent hotDeployEvent)
+		throws HotDeployException {
+
+		try {
+			doInvokeUndeploy(hotDeployEvent);
+		}
+		catch (Throwable t) {
+			throwHotDeployException(
+				hotDeployEvent, "Error unregistering themes for ", t);
+		}
+	}
+
+	protected void doInvokeDeploy(HotDeployEvent hotDeployEvent)
+		throws Exception {
+
+		ServletContext servletContext = hotDeployEvent.getServletContext();
 
 		String servletContextName = servletContext.getServletContextName();
 
@@ -81,9 +90,11 @@ public class ThemeHotDeployListener extends BaseHotDeployListener {
 
 		List<String> themeIds = ThemeLocalServiceUtil.init(
 			servletContextName, servletContext, null, true, xmls,
-			event.getPluginPackage());
+			hotDeployEvent.getPluginPackage());
 
-		_vars.put(servletContextName, themeIds);
+		FileTimestampUtil.reset();
+
+		_themeIds.put(servletContextName, themeIds);
 
 		if (_log.isInfoEnabled()) {
 			if (themeIds.size() == 1) {
@@ -99,8 +110,10 @@ public class ThemeHotDeployListener extends BaseHotDeployListener {
 		}
 	}
 
-	protected void doInvokeUndeploy(HotDeployEvent event) throws Exception {
-		ServletContext servletContext = event.getServletContext();
+	protected void doInvokeUndeploy(HotDeployEvent hotDeployEvent)
+		throws Exception {
+
+		ServletContext servletContext = hotDeployEvent.getServletContext();
 
 		String servletContextName = servletContext.getServletContextName();
 
@@ -108,7 +121,7 @@ public class ThemeHotDeployListener extends BaseHotDeployListener {
 			_log.debug("Invoking undeploy for " + servletContextName);
 		}
 
-		List<String> themeIds = _vars.remove(servletContextName);
+		List<String> themeIds = _themeIds.remove(servletContextName);
 
 		if (themeIds != null) {
 			if (_log.isInfoEnabled()) {
@@ -128,18 +141,17 @@ public class ThemeHotDeployListener extends BaseHotDeployListener {
 
 		// LEP-2057
 
-		Thread currentThread = Thread.currentThread();
-
-		ClassLoader contextClassLoader = currentThread.getContextClassLoader();
+		ClassLoader contextClassLoader =
+			PACLClassLoaderUtil.getContextClassLoader();
 
 		try {
-			currentThread.setContextClassLoader(
-				PortalClassLoaderUtil.getClassLoader());
+			PACLClassLoaderUtil.setContextClassLoader(
+				PACLClassLoaderUtil.getPortalClassLoader());
 
-			LiferayResourceCacheUtil.clear();
+			TemplateResourceLoaderUtil.clearCache(TemplateManager.VELOCITY);
 		}
 		finally {
-			currentThread.setContextClassLoader(contextClassLoader);
+			PACLClassLoaderUtil.setContextClassLoader(contextClassLoader);
 		}
 
 		if (_log.isInfoEnabled()) {
@@ -158,7 +170,7 @@ public class ThemeHotDeployListener extends BaseHotDeployListener {
 	private static Log _log = LogFactoryUtil.getLog(
 		ThemeHotDeployListener.class);
 
-	private static Map<String, List<String>> _vars =
+	private static Map<String, List<String>> _themeIds =
 		new HashMap<String, List<String>>();
 
 }

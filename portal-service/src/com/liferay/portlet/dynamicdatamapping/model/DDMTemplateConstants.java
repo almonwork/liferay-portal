@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -29,6 +29,16 @@ public class DDMTemplateConstants {
 
 	public static final String[] LANG_TYPES = PropsUtil.getArray(
 		PropsKeys.DYNAMIC_DATA_MAPPING_TEMPLATE_LANGUAGE_TYPES);
+
+	public static final String TEMPLATE_KEY_CUSTOM_ABSTRACTS =
+		"custom_abstracts";
+
+	public static final String TEMPLATE_KEY_CUSTOM_TITLE_LIST =
+		"custom_title_list";
+
+	public static final String TEMPLATE_MODE_CREATE = "create";
+
+	public static final String TEMPLATE_MODE_EDIT = "edit";
 
 	public static final String TEMPLATE_TYPE_DETAIL = "detail";
 

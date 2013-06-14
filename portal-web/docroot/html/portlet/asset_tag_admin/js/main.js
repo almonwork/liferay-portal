@@ -1,4 +1,4 @@
-AUI().add(
+AUI.add(
 	'liferay-tags-admin',
 	function(A) {
 		var AObject = A.Object;
@@ -20,7 +20,7 @@ AUI().add(
 
 		var DRAG_NODE = 'dragNode';
 
-		var EVENT_CLICK  = 'click';
+		var EVENT_CLICK = 'click';
 
 		var EVENT_SUBMIT = 'submit';
 
@@ -128,7 +128,7 @@ AUI().add(
 
 						var portletMessageContainer = instance._portletMessageContainer;
 
-						instance._hideMessageTask = A.debounce(portletMessageContainer.hide, 7000, portletMessageContainer);
+						instance._hideMessageTask = A.debounce('hide', 7000, portletMessageContainer);
 
 						instance._tagsList.on(EVENT_CLICK, instance._onTagsListClick, instance);
 						instance._tagsList.on('key', instance._onTagsListSelect, 'up:13', instance);
@@ -404,7 +404,8 @@ AUI().add(
 								var checkedItemsIds = tagsNodes.attr('data-tagId');
 
 								if (checkedItemsIds.length > 0) {
-									Liferay.Service.Asset.AssetTag.deleteTags(
+									Liferay.Service(
+										'/assettag/delete-tags',
 										{
 											tagIds: checkedItemsIds
 										},
@@ -421,7 +422,8 @@ AUI().add(
 					_deleteTag: function(tagId, callback) {
 						var instance = this;
 
-						Liferay.Service.Asset.AssetTag.deleteTag(
+						Liferay.Service(
+							'/assettag/delete-tag',
 							{
 								tagId: tagId
 							},
@@ -806,10 +808,11 @@ AUI().add(
 						var start = currentPage * rowsPerPage;
 						var end = start + rowsPerPage;
 
-						Liferay.Service.Asset.AssetTag.getJSONGroupTags(
+						Liferay.Service(
+							'/assettag/get-json-group-tags',
 							{
 								groupId: themeDisplay.getParentGroupId(),
-								tagName: query,
+								name: query,
 								start: start,
 								end: end
 							},
@@ -1039,8 +1042,9 @@ AUI().add(
 						}
 					},
 
-					_mergeMultipleTags: function(fromIds, toId, overrideProperties, callback) {
-						Liferay.Service.Asset.AssetTag.mergeMultipleTags(
+					_mergeTags: function(fromIds, toId, overrideProperties, callback) {
+						Liferay.Service(
+							'/assettag/merge-tags',
 							{
 								fromTagIds: fromIds,
 								toTagId: toId,
@@ -1051,18 +1055,12 @@ AUI().add(
 					},
 
 					_mergeTag: function(fromId, toId, callback) {
-						var serviceParameterTypes = [
-							'long',
-							'long',
-							'boolean'
-						];
-
-						Liferay.Service.Asset.AssetTag.mergeTags(
+						Liferay.Service(
+							'/assettag/merge-tags',
 							{
 								fromTagId: fromId,
 								toTagId: toId,
-								overrideProperties: true,
-								serviceParameterTypes: A.JSON.stringify(serviceParameterTypes)
+								overrideProperties: true
 							},
 							callback
 						);
@@ -1179,8 +1177,9 @@ AUI().add(
 					_onTagMergeClick: function(event) {
 						var instance = this;
 
-						var namespace = instance._prefixedPortletId;
 						var selectedList = instance._selectedTagsList;
+
+						var namespace = instance._prefixedPortletId;
 
 						var mergeOnlySelected = A.one('#' + namespace + 'mergeOnlySelectedTags').get('checked');
 
@@ -1201,7 +1200,7 @@ AUI().add(
 
 								var overrideProperties = A.one('#' + namespace + 'overrideProperties').attr('checked');
 
-								instance._mergeMultipleTags(
+								instance._mergeTags(
 									tagsIds,
 									targetTagId,
 									overrideProperties,
@@ -1285,13 +1284,18 @@ AUI().add(
 						else {
 							var errorText;
 
+							var autoHide = true;
+
 							if (exception.indexOf('DuplicateTagException') > -1) {
 								errorText = Liferay.Language.get('that-tag-already-exists');
 							}
-							else if ((exception.indexOf('TagNameException') > -1) ||
-									 (exception.indexOf('AssetTagException') > -1)) {
+							else if ((exception.indexOf('AssetTagException') > -1)) {
+								errorText = Lang.sub(
+									Liferay.Language.get('tag-names-cannot-be-empty-string-or-contain-characters-such-as-x'),
+									['<br />' + exception.substr(exception.lastIndexOf(':') + 1)]
+								);
 
-								errorText = Liferay.Language.get('one-of-your-fields-contains-invalid-characters');
+								autoHide = false;
 							}
 							else if (exception.indexOf('auth.PrincipalException') > -1) {
 								errorText = Liferay.Language.get('you-do-not-have-permission-to-access-the-requested-resource');
@@ -1300,7 +1304,7 @@ AUI().add(
 								errorText = Liferay.Language.get('your-request-failed-to-complete');
 							}
 
-							instance._sendMessage(MESSAGE_TYPE_ERROR, errorText);
+							instance._sendMessage(MESSAGE_TYPE_ERROR, errorText, autoHide);
 						}
 					},
 
@@ -1429,7 +1433,10 @@ AUI().add(
 
 						var contextPanel = event.currentTarget;
 						var boundingBox = contextPanel.get('boundingBox');
-						var propertiesTrigger = boundingBox.one('fieldset#tagProperties');
+
+						var namespace = instance._prefixedPortletId;
+
+						var propertiesTrigger = boundingBox.one('fieldset#' + namespace + 'tagProperties');
 
 						var autoFieldsInstance = propertiesTrigger.getData('autoFieldsInstance');
 
@@ -1462,7 +1469,7 @@ AUI().add(
 						return tag;
 					},
 
-					_sendMessage: function(type, message) {
+					_sendMessage: function(type, message, autoHide) {
 						var instance = this;
 
 						var output = instance._portletMessageContainer;
@@ -1474,7 +1481,9 @@ AUI().add(
 
 						output.show();
 
-						instance._hideMessageTask();
+						if(autoHide !== false) {
+							instance._hideMessageTask();
+						}
 					},
 
 					_showTagPanel: function(action) {

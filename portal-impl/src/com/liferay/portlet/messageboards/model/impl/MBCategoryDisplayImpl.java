@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -108,9 +108,7 @@ public class MBCategoryDisplayImpl implements MBCategoryDisplay {
 		return count;
 	}
 
-	public void getSubcategoryIds(
-		MBCategory category, List<Long> categoryIds) {
-
+	public void getSubcategoryIds(MBCategory category, List<Long> categoryIds) {
 		List<MBCategory> categories = getCategories(category);
 
 		for (MBCategory curCategory : categories) {

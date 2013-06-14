@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -76,6 +76,18 @@ public class CountryServiceImpl extends CountryServiceBaseImpl {
 		countryPersistence.update(country, false);
 
 		return country;
+	}
+
+	public Country fetchCountry(long countryId) throws SystemException {
+		return countryPersistence.fetchByPrimaryKey(countryId);
+	}
+
+	public Country fetchCountryByA2(String a2) throws SystemException {
+		return countryPersistence.fetchByA2(a2);
+	}
+
+	public Country fetchCountryByA3(String a3) throws SystemException {
+		return countryPersistence.fetchByA3(a3);
 	}
 
 	public List<Country> getCountries() throws SystemException {

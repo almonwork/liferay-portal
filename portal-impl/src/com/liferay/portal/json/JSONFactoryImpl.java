@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,6 +14,10 @@
 
 package com.liferay.portal.json;
 
+import com.liferay.alloy.util.json.StringTransformer;
+import com.liferay.portal.json.jabsorb.serializer.LiferayJSONSerializer;
+import com.liferay.portal.json.jabsorb.serializer.LiferaySerializer;
+import com.liferay.portal.json.jabsorb.serializer.LocaleSerializer;
 import com.liferay.portal.kernel.json.JSONArray;
 import com.liferay.portal.kernel.json.JSONDeserializer;
 import com.liferay.portal.kernel.json.JSONException;
@@ -26,7 +30,11 @@ import com.liferay.portal.kernel.log.LogFactoryUtil;
 
 import java.lang.reflect.InvocationTargetException;
 
+import java.util.List;
+
 import org.jabsorb.serializer.MarshallException;
+
+import org.json.JSONML;
 
 /**
  * @author Brian Wing Shun Chan
@@ -36,14 +44,87 @@ public class JSONFactoryImpl implements JSONFactory {
 	public JSONFactoryImpl() {
 		JSONInit.init();
 
-		_jsonSerializer = new org.jabsorb.JSONSerializer();
+		_jsonSerializer = new LiferayJSONSerializer();
 
 		 try {
 			 _jsonSerializer.registerDefaultSerializers();
+
+			 _jsonSerializer.registerSerializer(new LiferaySerializer());
+			 _jsonSerializer.registerSerializer(new LocaleSerializer());
 		 }
 		 catch (Exception e) {
 			 _log.error(e, e);
 		 }
+	}
+
+	public String convertJSONMLArrayToXML(String jsonml) {
+		try {
+			org.json.JSONArray jsonArray = new org.json.JSONArray(jsonml);
+
+			return JSONML.toString(jsonArray);
+		}
+		catch (Exception e) {
+			if (_log.isWarnEnabled()) {
+				_log.warn(e, e);
+			}
+
+			throw new IllegalStateException("Unable to convert to XML", e);
+		}
+	}
+
+	public String convertJSONMLObjectToXML(String jsonml) {
+		try {
+			org.json.JSONObject jsonObject = new org.json.JSONObject(jsonml);
+
+			return JSONML.toString(jsonObject);
+		}
+		catch (Exception e) {
+			if (_log.isWarnEnabled()) {
+				_log.warn(e, e);
+			}
+
+			throw new IllegalStateException("Unable to convert to XML", e);
+		}
+	}
+
+	public String convertXMLtoJSONMLArray(String xml) {
+		try {
+			org.json.JSONArray jsonArray = JSONML.toJSONArray(xml);
+
+			return jsonArray.toString();
+		}
+		catch (Exception e) {
+			if (_log.isWarnEnabled()) {
+				_log.warn(e, e);
+			}
+
+			throw new IllegalStateException("Unable to convert to JSONML", e);
+		}
+	}
+
+	public String convertXMLtoJSONMLObject(String xml) {
+		try {
+			org.json.JSONObject jsonObject = JSONML.toJSONObject(xml);
+
+			return jsonObject.toString();
+		}
+		catch (Exception e) {
+			if (_log.isWarnEnabled()) {
+				_log.warn(e, e);
+			}
+
+			throw new IllegalStateException("Unable to convert to JSONML", e);
+		}
+	}
+
+	public JSONTransformer createJavaScriptNormalizerJSONTransformer(
+		List<String> javaScriptAttributes) {
+
+		StringTransformer stringTransformer = new StringTransformer();
+
+		stringTransformer.setJavaScriptAttributes(javaScriptAttributes);
+
+		return stringTransformer;
 	}
 
 	public JSONArray createJSONArray() {
@@ -79,7 +160,9 @@ public class JSONFactoryImpl implements JSONFactory {
 			return _jsonSerializer.fromJSON(json);
 		}
 		catch (Exception e) {
-			 _log.error(e, e);
+			if (_log.isWarnEnabled()) {
+				_log.warn(e, e);
+			}
 
 			throw new IllegalStateException("Unable to deserialize object", e);
 		}
@@ -91,17 +174,52 @@ public class JSONFactoryImpl implements JSONFactory {
 
 	public Object looseDeserialize(String json) {
 		try {
-			return createJSONDeserializer().deserialize(json);
+			JSONDeserializer<?> jsonDeserializer = createJSONDeserializer();
+
+			return jsonDeserializer.deserialize(json);
 		}
 		catch (Exception e) {
-			 _log.error(e, e);
+			if (_log.isWarnEnabled()) {
+				_log.warn(e, e);
+			}
 
 			throw new IllegalStateException("Unable to deserialize object", e);
 		}
 	}
 
 	public <T> T looseDeserialize(String json, Class<T> clazz) {
-		return (T) createJSONDeserializer().use(null, clazz).deserialize(json);
+		JSONDeserializer<?> jsonDeserializer = createJSONDeserializer();
+
+		jsonDeserializer.use(null, clazz);
+
+		return (T)jsonDeserializer.deserialize(json);
+	}
+
+	public Object looseDeserializeSafe(String json) {
+		try {
+			JSONDeserializer<?> jsonDeserializer = createJSONDeserializer();
+
+			jsonDeserializer.safeMode(true);
+
+			return jsonDeserializer.deserialize(json);
+		}
+		catch (Exception e) {
+			if (_log.isWarnEnabled()) {
+				_log.warn(e, e);
+			}
+
+			throw new IllegalStateException("Unable to deserialize object", e);
+		}
+	}
+
+	public <T> T looseDeserializeSafe(String json, Class<T> clazz) {
+		JSONDeserializer<?> jsonDeserializer = createJSONDeserializer();
+
+		jsonDeserializer.safeMode(true);
+
+		jsonDeserializer.use(null, clazz);
+
+		return (T)jsonDeserializer.deserialize(json);
 	}
 
 	public String looseSerialize(Object object) {
@@ -134,12 +252,24 @@ public class JSONFactoryImpl implements JSONFactory {
 		return jsonSerializer.serializeDeep(object);
 	}
 
+	public String looseSerializeDeep(
+		Object object, JSONTransformer jsonTransformer, Class<?> clazz) {
+
+		JSONSerializer jsonSerializer = createJSONSerializer();
+
+		jsonSerializer.transform(jsonTransformer, clazz);
+
+		return jsonSerializer.serializeDeep(object);
+	}
+
 	public String serialize(Object object) {
 		try {
 			return _jsonSerializer.toJSON(object);
 		}
 		catch (MarshallException me) {
-			_log.error(me, me);
+			if (_log.isWarnEnabled()) {
+				_log.warn(me, me);
+			}
 
 			throw new IllegalStateException("Unable to serialize oject", me);
 		}

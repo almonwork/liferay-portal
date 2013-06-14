@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -31,8 +31,8 @@ import java.util.List;
  */
 public class ShellHook implements Hook {
 
-	public static String SHELL_SCRIPT =
-		PropsUtil.get(PropsKeys.MAIL_HOOK_SHELL_SCRIPT);
+	public static final String SHELL_SCRIPT = PropsUtil.get(
+		PropsKeys.MAIL_HOOK_SHELL_SCRIPT);
 
 	public void addFilters(long companyId, long userId, List<String> filters) {
 	}

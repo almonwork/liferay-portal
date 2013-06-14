@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -18,6 +18,7 @@ import com.liferay.portal.kernel.bean.AutoEscapeBeanHandler;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.json.JSON;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.ProxyUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.model.CacheModel;
@@ -33,13 +34,13 @@ import com.liferay.portlet.shopping.model.ShoppingItemSoap;
 
 import java.io.Serializable;
 
-import java.lang.reflect.Proxy;
-
 import java.sql.Types;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * The base model implementation for the ShoppingItem service. Represents a row in the &quot;ShoppingItem&quot; database table, with each column mapped to a property of this class.
@@ -112,6 +113,16 @@ public class ShoppingItemModelImpl extends BaseModelImpl<ShoppingItem>
 	public static final boolean FINDER_CACHE_ENABLED = GetterUtil.getBoolean(com.liferay.portal.util.PropsUtil.get(
 				"value.object.finder.cache.enabled.com.liferay.portlet.shopping.model.ShoppingItem"),
 			true);
+	public static final boolean COLUMN_BITMASK_ENABLED = GetterUtil.getBoolean(com.liferay.portal.util.PropsUtil.get(
+				"value.object.column.bitmask.enabled.com.liferay.portlet.shopping.model.ShoppingItem"),
+			true);
+	public static long CATEGORYID_COLUMN_BITMASK = 1L;
+	public static long COMPANYID_COLUMN_BITMASK = 2L;
+	public static long GROUPID_COLUMN_BITMASK = 4L;
+	public static long LARGEIMAGEID_COLUMN_BITMASK = 8L;
+	public static long MEDIUMIMAGEID_COLUMN_BITMASK = 16L;
+	public static long SKU_COLUMN_BITMASK = 32L;
+	public static long SMALLIMAGEID_COLUMN_BITMASK = 64L;
 
 	/**
 	 * Converts the soap model instance into a normal model instance.
@@ -176,14 +187,6 @@ public class ShoppingItemModelImpl extends BaseModelImpl<ShoppingItem>
 		return models;
 	}
 
-	public Class<?> getModelClass() {
-		return ShoppingItem.class;
-	}
-
-	public String getModelClassName() {
-		return ShoppingItem.class.getName();
-	}
-
 	public static final long LOCK_EXPIRATION_TIME = GetterUtil.getLong(com.liferay.portal.util.PropsUtil.get(
 				"lock.expiration.time.com.liferay.portlet.shopping.model.ShoppingItem"));
 
@@ -206,12 +209,272 @@ public class ShoppingItemModelImpl extends BaseModelImpl<ShoppingItem>
 		setPrimaryKey(((Long)primaryKeyObj).longValue());
 	}
 
+	public Class<?> getModelClass() {
+		return ShoppingItem.class;
+	}
+
+	public String getModelClassName() {
+		return ShoppingItem.class.getName();
+	}
+
+	@Override
+	public Map<String, Object> getModelAttributes() {
+		Map<String, Object> attributes = new HashMap<String, Object>();
+
+		attributes.put("itemId", getItemId());
+		attributes.put("groupId", getGroupId());
+		attributes.put("companyId", getCompanyId());
+		attributes.put("userId", getUserId());
+		attributes.put("userName", getUserName());
+		attributes.put("createDate", getCreateDate());
+		attributes.put("modifiedDate", getModifiedDate());
+		attributes.put("categoryId", getCategoryId());
+		attributes.put("sku", getSku());
+		attributes.put("name", getName());
+		attributes.put("description", getDescription());
+		attributes.put("properties", getProperties());
+		attributes.put("fields", getFields());
+		attributes.put("fieldsQuantities", getFieldsQuantities());
+		attributes.put("minQuantity", getMinQuantity());
+		attributes.put("maxQuantity", getMaxQuantity());
+		attributes.put("price", getPrice());
+		attributes.put("discount", getDiscount());
+		attributes.put("taxable", getTaxable());
+		attributes.put("shipping", getShipping());
+		attributes.put("useShippingFormula", getUseShippingFormula());
+		attributes.put("requiresShipping", getRequiresShipping());
+		attributes.put("stockQuantity", getStockQuantity());
+		attributes.put("featured", getFeatured());
+		attributes.put("sale", getSale());
+		attributes.put("smallImage", getSmallImage());
+		attributes.put("smallImageId", getSmallImageId());
+		attributes.put("smallImageURL", getSmallImageURL());
+		attributes.put("mediumImage", getMediumImage());
+		attributes.put("mediumImageId", getMediumImageId());
+		attributes.put("mediumImageURL", getMediumImageURL());
+		attributes.put("largeImage", getLargeImage());
+		attributes.put("largeImageId", getLargeImageId());
+		attributes.put("largeImageURL", getLargeImageURL());
+
+		return attributes;
+	}
+
+	@Override
+	public void setModelAttributes(Map<String, Object> attributes) {
+		Long itemId = (Long)attributes.get("itemId");
+
+		if (itemId != null) {
+			setItemId(itemId);
+		}
+
+		Long groupId = (Long)attributes.get("groupId");
+
+		if (groupId != null) {
+			setGroupId(groupId);
+		}
+
+		Long companyId = (Long)attributes.get("companyId");
+
+		if (companyId != null) {
+			setCompanyId(companyId);
+		}
+
+		Long userId = (Long)attributes.get("userId");
+
+		if (userId != null) {
+			setUserId(userId);
+		}
+
+		String userName = (String)attributes.get("userName");
+
+		if (userName != null) {
+			setUserName(userName);
+		}
+
+		Date createDate = (Date)attributes.get("createDate");
+
+		if (createDate != null) {
+			setCreateDate(createDate);
+		}
+
+		Date modifiedDate = (Date)attributes.get("modifiedDate");
+
+		if (modifiedDate != null) {
+			setModifiedDate(modifiedDate);
+		}
+
+		Long categoryId = (Long)attributes.get("categoryId");
+
+		if (categoryId != null) {
+			setCategoryId(categoryId);
+		}
+
+		String sku = (String)attributes.get("sku");
+
+		if (sku != null) {
+			setSku(sku);
+		}
+
+		String name = (String)attributes.get("name");
+
+		if (name != null) {
+			setName(name);
+		}
+
+		String description = (String)attributes.get("description");
+
+		if (description != null) {
+			setDescription(description);
+		}
+
+		String properties = (String)attributes.get("properties");
+
+		if (properties != null) {
+			setProperties(properties);
+		}
+
+		Boolean fields = (Boolean)attributes.get("fields");
+
+		if (fields != null) {
+			setFields(fields);
+		}
+
+		String fieldsQuantities = (String)attributes.get("fieldsQuantities");
+
+		if (fieldsQuantities != null) {
+			setFieldsQuantities(fieldsQuantities);
+		}
+
+		Integer minQuantity = (Integer)attributes.get("minQuantity");
+
+		if (minQuantity != null) {
+			setMinQuantity(minQuantity);
+		}
+
+		Integer maxQuantity = (Integer)attributes.get("maxQuantity");
+
+		if (maxQuantity != null) {
+			setMaxQuantity(maxQuantity);
+		}
+
+		Double price = (Double)attributes.get("price");
+
+		if (price != null) {
+			setPrice(price);
+		}
+
+		Double discount = (Double)attributes.get("discount");
+
+		if (discount != null) {
+			setDiscount(discount);
+		}
+
+		Boolean taxable = (Boolean)attributes.get("taxable");
+
+		if (taxable != null) {
+			setTaxable(taxable);
+		}
+
+		Double shipping = (Double)attributes.get("shipping");
+
+		if (shipping != null) {
+			setShipping(shipping);
+		}
+
+		Boolean useShippingFormula = (Boolean)attributes.get(
+				"useShippingFormula");
+
+		if (useShippingFormula != null) {
+			setUseShippingFormula(useShippingFormula);
+		}
+
+		Boolean requiresShipping = (Boolean)attributes.get("requiresShipping");
+
+		if (requiresShipping != null) {
+			setRequiresShipping(requiresShipping);
+		}
+
+		Integer stockQuantity = (Integer)attributes.get("stockQuantity");
+
+		if (stockQuantity != null) {
+			setStockQuantity(stockQuantity);
+		}
+
+		Boolean featured = (Boolean)attributes.get("featured");
+
+		if (featured != null) {
+			setFeatured(featured);
+		}
+
+		Boolean sale = (Boolean)attributes.get("sale");
+
+		if (sale != null) {
+			setSale(sale);
+		}
+
+		Boolean smallImage = (Boolean)attributes.get("smallImage");
+
+		if (smallImage != null) {
+			setSmallImage(smallImage);
+		}
+
+		Long smallImageId = (Long)attributes.get("smallImageId");
+
+		if (smallImageId != null) {
+			setSmallImageId(smallImageId);
+		}
+
+		String smallImageURL = (String)attributes.get("smallImageURL");
+
+		if (smallImageURL != null) {
+			setSmallImageURL(smallImageURL);
+		}
+
+		Boolean mediumImage = (Boolean)attributes.get("mediumImage");
+
+		if (mediumImage != null) {
+			setMediumImage(mediumImage);
+		}
+
+		Long mediumImageId = (Long)attributes.get("mediumImageId");
+
+		if (mediumImageId != null) {
+			setMediumImageId(mediumImageId);
+		}
+
+		String mediumImageURL = (String)attributes.get("mediumImageURL");
+
+		if (mediumImageURL != null) {
+			setMediumImageURL(mediumImageURL);
+		}
+
+		Boolean largeImage = (Boolean)attributes.get("largeImage");
+
+		if (largeImage != null) {
+			setLargeImage(largeImage);
+		}
+
+		Long largeImageId = (Long)attributes.get("largeImageId");
+
+		if (largeImageId != null) {
+			setLargeImageId(largeImageId);
+		}
+
+		String largeImageURL = (String)attributes.get("largeImageURL");
+
+		if (largeImageURL != null) {
+			setLargeImageURL(largeImageURL);
+		}
+	}
+
 	@JSON
 	public long getItemId() {
 		return _itemId;
 	}
 
 	public void setItemId(long itemId) {
+		_columnBitmask = -1L;
+
 		_itemId = itemId;
 	}
 
@@ -221,7 +484,19 @@ public class ShoppingItemModelImpl extends BaseModelImpl<ShoppingItem>
 	}
 
 	public void setGroupId(long groupId) {
+		_columnBitmask |= GROUPID_COLUMN_BITMASK;
+
+		if (!_setOriginalGroupId) {
+			_setOriginalGroupId = true;
+
+			_originalGroupId = _groupId;
+		}
+
 		_groupId = groupId;
+	}
+
+	public long getOriginalGroupId() {
+		return _originalGroupId;
 	}
 
 	@JSON
@@ -230,6 +505,8 @@ public class ShoppingItemModelImpl extends BaseModelImpl<ShoppingItem>
 	}
 
 	public void setCompanyId(long companyId) {
+		_columnBitmask |= COMPANYID_COLUMN_BITMASK;
+
 		if (!_setOriginalCompanyId) {
 			_setOriginalCompanyId = true;
 
@@ -298,7 +575,19 @@ public class ShoppingItemModelImpl extends BaseModelImpl<ShoppingItem>
 	}
 
 	public void setCategoryId(long categoryId) {
+		_columnBitmask |= CATEGORYID_COLUMN_BITMASK;
+
+		if (!_setOriginalCategoryId) {
+			_setOriginalCategoryId = true;
+
+			_originalCategoryId = _categoryId;
+		}
+
 		_categoryId = categoryId;
+	}
+
+	public long getOriginalCategoryId() {
+		return _originalCategoryId;
 	}
 
 	@JSON
@@ -312,6 +601,8 @@ public class ShoppingItemModelImpl extends BaseModelImpl<ShoppingItem>
 	}
 
 	public void setSku(String sku) {
+		_columnBitmask |= SKU_COLUMN_BITMASK;
+
 		if (_originalSku == null) {
 			_originalSku = _sku;
 		}
@@ -530,6 +821,8 @@ public class ShoppingItemModelImpl extends BaseModelImpl<ShoppingItem>
 	}
 
 	public void setSmallImageId(long smallImageId) {
+		_columnBitmask |= SMALLIMAGEID_COLUMN_BITMASK;
+
 		if (!_setOriginalSmallImageId) {
 			_setOriginalSmallImageId = true;
 
@@ -576,6 +869,8 @@ public class ShoppingItemModelImpl extends BaseModelImpl<ShoppingItem>
 	}
 
 	public void setMediumImageId(long mediumImageId) {
+		_columnBitmask |= MEDIUMIMAGEID_COLUMN_BITMASK;
+
 		if (!_setOriginalMediumImageId) {
 			_setOriginalMediumImageId = true;
 
@@ -622,6 +917,8 @@ public class ShoppingItemModelImpl extends BaseModelImpl<ShoppingItem>
 	}
 
 	public void setLargeImageId(long largeImageId) {
+		_columnBitmask |= LARGEIMAGEID_COLUMN_BITMASK;
+
 		if (!_setOriginalLargeImageId) {
 			_setOriginalLargeImageId = true;
 
@@ -649,35 +946,32 @@ public class ShoppingItemModelImpl extends BaseModelImpl<ShoppingItem>
 		_largeImageURL = largeImageURL;
 	}
 
+	public long getColumnBitmask() {
+		return _columnBitmask;
+	}
+
 	@Override
 	public ShoppingItem toEscapedModel() {
-		if (isEscapedModel()) {
-			return (ShoppingItem)this;
+		if (_escapedModelProxy == null) {
+			_escapedModelProxy = (ShoppingItem)ProxyUtil.newProxyInstance(_classLoader,
+					_escapedModelProxyInterfaces,
+					new AutoEscapeBeanHandler(this));
 		}
-		else {
-			if (_escapedModelProxy == null) {
-				_escapedModelProxy = (ShoppingItem)Proxy.newProxyInstance(_classLoader,
-						_escapedModelProxyInterfaces,
-						new AutoEscapeBeanHandler(this));
-			}
 
-			return _escapedModelProxy;
-		}
+		return _escapedModelProxy;
 	}
 
 	@Override
 	public ExpandoBridge getExpandoBridge() {
-		if (_expandoBridge == null) {
-			_expandoBridge = ExpandoBridgeFactoryUtil.getExpandoBridge(getCompanyId(),
-					ShoppingItem.class.getName(), getPrimaryKey());
-		}
-
-		return _expandoBridge;
+		return ExpandoBridgeFactoryUtil.getExpandoBridge(getCompanyId(),
+			ShoppingItem.class.getName(), getPrimaryKey());
 	}
 
 	@Override
 	public void setExpandoBridgeAttributes(ServiceContext serviceContext) {
-		getExpandoBridge().setAttributes(serviceContext);
+		ExpandoBridge expandoBridge = getExpandoBridge();
+
+		expandoBridge.setAttributes(serviceContext);
 	}
 
 	@Override
@@ -778,9 +1072,17 @@ public class ShoppingItemModelImpl extends BaseModelImpl<ShoppingItem>
 	public void resetOriginalValues() {
 		ShoppingItemModelImpl shoppingItemModelImpl = this;
 
+		shoppingItemModelImpl._originalGroupId = shoppingItemModelImpl._groupId;
+
+		shoppingItemModelImpl._setOriginalGroupId = false;
+
 		shoppingItemModelImpl._originalCompanyId = shoppingItemModelImpl._companyId;
 
 		shoppingItemModelImpl._setOriginalCompanyId = false;
+
+		shoppingItemModelImpl._originalCategoryId = shoppingItemModelImpl._categoryId;
+
+		shoppingItemModelImpl._setOriginalCategoryId = false;
 
 		shoppingItemModelImpl._originalSku = shoppingItemModelImpl._sku;
 
@@ -795,6 +1097,8 @@ public class ShoppingItemModelImpl extends BaseModelImpl<ShoppingItem>
 		shoppingItemModelImpl._originalLargeImageId = shoppingItemModelImpl._largeImageId;
 
 		shoppingItemModelImpl._setOriginalLargeImageId = false;
+
+		shoppingItemModelImpl._columnBitmask = 0;
 	}
 
 	@Override
@@ -1172,6 +1476,8 @@ public class ShoppingItemModelImpl extends BaseModelImpl<ShoppingItem>
 		};
 	private long _itemId;
 	private long _groupId;
+	private long _originalGroupId;
+	private boolean _setOriginalGroupId;
 	private long _companyId;
 	private long _originalCompanyId;
 	private boolean _setOriginalCompanyId;
@@ -1181,6 +1487,8 @@ public class ShoppingItemModelImpl extends BaseModelImpl<ShoppingItem>
 	private Date _createDate;
 	private Date _modifiedDate;
 	private long _categoryId;
+	private long _originalCategoryId;
+	private boolean _setOriginalCategoryId;
 	private String _sku;
 	private String _originalSku;
 	private String _name;
@@ -1214,6 +1522,6 @@ public class ShoppingItemModelImpl extends BaseModelImpl<ShoppingItem>
 	private long _originalLargeImageId;
 	private boolean _setOriginalLargeImageId;
 	private String _largeImageURL;
-	private transient ExpandoBridge _expandoBridge;
+	private long _columnBitmask;
 	private ShoppingItem _escapedModelProxy;
 }

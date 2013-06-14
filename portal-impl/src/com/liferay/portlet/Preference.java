@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -80,7 +80,7 @@ public class Preference implements Cloneable, Serializable {
 		for (int i = 0; i < _values.length; i++) {
 			sb.append(_values[i]);
 
-			if (i < _values.length - 1) {
+			if (i < (_values.length - 1)) {
 				sb.append(StringPool.COMMA);
 			}
 		}

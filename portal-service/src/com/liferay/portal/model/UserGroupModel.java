@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -128,34 +128,6 @@ public interface UserGroupModel extends BaseModel<UserGroup> {
 	public void setDescription(String description);
 
 	/**
-	 * Returns the public layout set prototype ID of this user group.
-	 *
-	 * @return the public layout set prototype ID of this user group
-	 */
-	public long getPublicLayoutSetPrototypeId();
-
-	/**
-	 * Sets the public layout set prototype ID of this user group.
-	 *
-	 * @param publicLayoutSetPrototypeId the public layout set prototype ID of this user group
-	 */
-	public void setPublicLayoutSetPrototypeId(long publicLayoutSetPrototypeId);
-
-	/**
-	 * Returns the private layout set prototype ID of this user group.
-	 *
-	 * @return the private layout set prototype ID of this user group
-	 */
-	public long getPrivateLayoutSetPrototypeId();
-
-	/**
-	 * Sets the private layout set prototype ID of this user group.
-	 *
-	 * @param privateLayoutSetPrototypeId the private layout set prototype ID of this user group
-	 */
-	public void setPrivateLayoutSetPrototypeId(long privateLayoutSetPrototypeId);
-
-	/**
 	 * Returns the added by l d a p import of this user group.
 	 *
 	 * @return the added by l d a p import of this user group
@@ -185,8 +157,6 @@ public interface UserGroupModel extends BaseModel<UserGroup> {
 	public void setCachedModel(boolean cachedModel);
 
 	public boolean isEscapedModel();
-
-	public void setEscapedModel(boolean escapedModel);
 
 	public Serializable getPrimaryKeyObj();
 

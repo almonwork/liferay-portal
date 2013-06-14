@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -16,8 +16,8 @@ package com.liferay.portal.kernel.util;
 
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.security.pacl.permission.PortalRuntimePermission;
 
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
@@ -25,77 +25,64 @@ import java.util.TreeMap;
 
 /**
  * @author Brian Wing Shun Chan
+ * @author Raymond Augé
  */
 public class LocaleUtil {
 
 	public static Locale fromLanguageId(String languageId) {
-		return _instance._fromLanguageId(languageId);
+		return getInstance()._fromLanguageId(languageId);
 	}
 
 	public static Locale[] fromLanguageIds(String[] languageIds) {
-		return _instance._fromLanguageIds(languageIds);
+		return getInstance()._fromLanguageIds(languageIds);
 	}
 
 	public static Locale getDefault() {
-		return _instance._getDefault();
+		return getInstance()._getDefault();
 	}
 
 	public static LocaleUtil getInstance() {
+		PortalRuntimePermission.checkGetBeanProperty(LocaleUtil.class);
+
 		return _instance;
 	}
 
 	public static Map<String, String> getISOLanguages(Locale locale) {
-		return _instance._getISOLanguages(locale);
+		return getInstance()._getISOLanguages(locale);
 	}
 
 	public static void setDefault(
 		String userLanguage, String userCountry, String userVariant) {
 
-		_instance._setDefault(userLanguage, userCountry, userVariant);
+		getInstance()._setDefault(userLanguage, userCountry, userVariant);
 	}
 
 	public static String toLanguageId(Locale locale) {
-		return _instance._toLanguageId(locale);
+		return getInstance()._toLanguageId(locale);
 	}
 
 	public static String[] toLanguageIds(Locale[] locales) {
-		return _instance._toLanguageIds(locales);
+		return getInstance()._toLanguageIds(locales);
 	}
 
 	public static String toW3cLanguageId(Locale locale) {
-		return _instance._toW3cLanguageId(locale);
+		return getInstance()._toW3cLanguageId(locale);
 	}
 
 	public static String toW3cLanguageId(String languageId) {
-		return _instance._toW3cLanguageId(languageId);
+		return getInstance()._toW3cLanguageId(languageId);
 	}
 
 	public static String[] toW3cLanguageIds(Locale[] locales) {
-		return _instance._toW3cLanguageIds(locales);
+		return getInstance()._toW3cLanguageIds(locales);
 	}
 
 	public static String[] toW3cLanguageIds(String[] languageIds) {
-		return _instance._toW3cLanguageIds(languageIds);
+		return getInstance()._toW3cLanguageIds(languageIds);
 	}
 
 	private LocaleUtil() {
 		_locale = new Locale("en", "US");
-
-		_isoCountries = Locale.getISOCountries().clone();
-
-		for (int i = 0; i < _isoCountries.length; i++) {
-			_isoCountries[i] = _isoCountries[i].toUpperCase();
-		}
-
-		Arrays.sort(_isoCountries);
-
-		_isoLanguages = Locale.getISOLanguages().clone();
-
-		for (int i = 0; i < _isoLanguages.length; i++) {
-			_isoLanguages[i] = _isoLanguages[i].toLowerCase();
-		}
-
-		Arrays.sort(_isoLanguages);
 	}
 
 	private Locale _fromLanguageId(String languageId) {
@@ -103,50 +90,46 @@ public class LocaleUtil {
 			return _locale;
 		}
 
-		Locale locale = null;
+		Locale locale = _locales.get(languageId);
+
+		if (locale != null) {
+			return locale;
+		}
 
 		try {
-			locale = _locales.get(languageId);
+			int pos = languageId.indexOf(CharPool.UNDERLINE);
 
-			if (locale == null) {
-				int pos = languageId.indexOf(CharPool.UNDERLINE);
+			if (pos == -1) {
+				locale = new Locale(languageId);
+			}
+			else {
+				String[] languageIdParts = StringUtil.split(
+					languageId, CharPool.UNDERLINE);
 
-				if (pos == -1) {
-					if (Arrays.binarySearch(_isoLanguages, languageId) < 0) {
-						return _getDefault();
-					}
+				String languageCode = languageIdParts[0];
+				String countryCode = languageIdParts[1];
 
-					locale = new Locale(languageId);
+				String variant = null;
+
+				if (languageIdParts.length > 2) {
+					variant = languageIdParts[2];
+				}
+
+				if (Validator.isNotNull(variant)) {
+					locale = new Locale(languageCode, countryCode, variant);
 				}
 				else {
-					String[] languageIdParts = StringUtil.split(
-						languageId, CharPool.UNDERLINE);
-
-					String languageCode = languageIdParts[0];
-					String countryCode = languageIdParts[1];
-
-					if ((Arrays.binarySearch(
-							_isoLanguages, languageCode) < 0) ||
-						(Arrays.binarySearch(_isoCountries, countryCode) < 0)) {
-
-						return _getDefault();
-					}
-
-					String variant = null;
-
-					if (languageIdParts.length > 2) {
-						variant = languageIdParts[2];
-					}
-
-					if (Validator.isNotNull(variant)) {
-						locale = new Locale(languageCode, countryCode, variant);
-					}
-					else {
-						locale = new Locale(languageCode, countryCode);
-					}
+					locale = new Locale(languageCode, countryCode);
 				}
+			}
 
+			if (_locales.size() < _MAX_LOCALES) {
 				_locales.put(languageId, locale);
+			}
+			else {
+				if (_log.isWarnEnabled()) {
+					_log.warn("There are too many entries in the locales map");
+				}
 			}
 		}
 		catch (Exception e) {
@@ -173,7 +156,7 @@ public class LocaleUtil {
 	}
 
 	private Locale _getDefault() {
-		Locale locale = LocaleThreadLocal.getLocale();
+		Locale locale = LocaleThreadLocal.getDefaultLocale();
 
 		if (locale != null) {
 			return locale;
@@ -198,6 +181,8 @@ public class LocaleUtil {
 
 	private void _setDefault(
 		String userLanguage, String userCountry, String userVariant) {
+
+		PortalRuntimePermission.checkSetBeanProperty(getClass());
 
 		if (Validator.isNotNull(userLanguage) &&
 			Validator.isNull(userCountry) && Validator.isNull(userVariant)) {
@@ -236,7 +221,7 @@ public class LocaleUtil {
 		boolean hasVariant = false;
 
 		if (variant.length() != 0) {
-			hasCountry = true;
+			hasVariant = true;
 		}
 
 		if (!hasCountry && !hasVariant) {
@@ -299,12 +284,12 @@ public class LocaleUtil {
 		return w3cLanguageIds;
 	}
 
+	private static final int _MAX_LOCALES = 1000;
+
 	private static Log _log = LogFactoryUtil.getLog(LocaleUtil.class);
 
 	private static LocaleUtil _instance = new LocaleUtil();
 
-	private String[] _isoCountries;
-	private String[] _isoLanguages;
 	private Locale _locale;
 	private Map<String, Locale> _locales = new HashMap<String, Locale>();
 

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,6 +14,8 @@
 
 package com.liferay.portlet.messageboards.service;
 
+import com.liferay.portal.service.ServiceWrapper;
+
 /**
  * <p>
  * This class is a wrapper for {@link MBBanService}.
@@ -23,9 +25,28 @@ package com.liferay.portlet.messageboards.service;
  * @see       MBBanService
  * @generated
  */
-public class MBBanServiceWrapper implements MBBanService {
+public class MBBanServiceWrapper implements MBBanService,
+	ServiceWrapper<MBBanService> {
 	public MBBanServiceWrapper(MBBanService mbBanService) {
 		_mbBanService = mbBanService;
+	}
+
+	/**
+	* Returns the Spring bean ID for this bean.
+	*
+	* @return the Spring bean ID for this bean
+	*/
+	public java.lang.String getBeanIdentifier() {
+		return _mbBanService.getBeanIdentifier();
+	}
+
+	/**
+	* Sets the Spring bean ID for this bean.
+	*
+	* @param beanIdentifier the Spring bean ID for this bean
+	*/
+	public void setBeanIdentifier(java.lang.String beanIdentifier) {
+		_mbBanService.setBeanIdentifier(beanIdentifier);
 	}
 
 	public com.liferay.portlet.messageboards.model.MBBan addBan(
@@ -42,11 +63,25 @@ public class MBBanServiceWrapper implements MBBanService {
 		_mbBanService.deleteBan(banUserId, serviceContext);
 	}
 
+	/**
+	 * @deprecated Renamed to {@link #getWrappedService}
+	 */
 	public MBBanService getWrappedMBBanService() {
 		return _mbBanService;
 	}
 
+	/**
+	 * @deprecated Renamed to {@link #setWrappedService}
+	 */
 	public void setWrappedMBBanService(MBBanService mbBanService) {
+		_mbBanService = mbBanService;
+	}
+
+	public MBBanService getWrappedService() {
+		return _mbBanService;
+	}
+
+	public void setWrappedService(MBBanService mbBanService) {
 		_mbBanService = mbBanService;
 	}
 

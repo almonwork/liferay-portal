@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -13,6 +13,8 @@
  */
 
 package com.liferay.portal.kernel.util;
+
+import com.liferay.portal.kernel.security.pacl.permission.PortalRuntimePermission;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -29,36 +31,53 @@ import java.util.Properties;
  */
 public class FileUtil {
 
+	public static void copyDirectory(File source, File destination)
+		throws IOException {
+
+		getFile().copyDirectory(source, destination);
+	}
+
 	public static void copyDirectory(
-		String sourceDirName, String destinationDirName) {
+			String sourceDirName, String destinationDirName)
+		throws IOException {
 
 		getFile().copyDirectory(sourceDirName, destinationDirName);
 	}
 
-	public static void copyDirectory(File source, File destination) {
-		getFile().copyDirectory(source, destination);
-	}
+	public static void copyFile(File source, File destination)
+		throws IOException {
 
-	public static void copyFile(String source, String destination) {
 		getFile().copyFile(source, destination);
 	}
 
-	public static void copyFile(
-		String source, String destination, boolean lazy) {
+	public static void copyFile(File source, File destination, boolean lazy)
+		throws IOException {
 
 		getFile().copyFile(source, destination, lazy);
 	}
 
-	public static void copyFile(File source, File destination) {
+	public static void copyFile(String source, String destination)
+		throws IOException {
+
 		getFile().copyFile(source, destination);
 	}
 
-	public static void copyFile(File source, File destination, boolean lazy) {
+	public static void copyFile(String source, String destination, boolean lazy)
+		throws IOException {
+
 		getFile().copyFile(source, destination, lazy);
 	}
 
 	public static File createTempFile() {
 		return getFile().createTempFile();
+	}
+
+	public static File createTempFile(byte[] bytes) throws IOException {
+		return getFile().createTempFile(bytes);
+	}
+
+	public static File createTempFile(InputStream is) throws IOException {
+		return getFile().createTempFile(is);
 	}
 
 	public static File createTempFile(String extension) {
@@ -77,19 +96,19 @@ public class FileUtil {
 		return getFile().decodeSafeFileName(fileName);
 	}
 
-	public static boolean delete(String file) {
-		return getFile().delete(file);
-	}
-
 	public static boolean delete(File file) {
 		return getFile().delete(file);
 	}
 
-	public static void deltree(String directory) {
-		getFile().deltree(directory);
+	public static boolean delete(String file) {
+		return getFile().delete(file);
 	}
 
 	public static void deltree(File directory) {
+		getFile().deltree(directory);
+	}
+
+	public static void deltree(String directory) {
 		getFile().deltree(directory);
 	}
 
@@ -97,12 +116,12 @@ public class FileUtil {
 		return getFile().encodeSafeFileName(fileName);
 	}
 
-	public static boolean exists(String fileName) {
-		return getFile().exists(fileName);
-	}
-
 	public static boolean exists(File file) {
 		return getFile().exists(file);
+	}
+
+	public static boolean exists(String fileName) {
+		return getFile().exists(fileName);
 	}
 
 	/**
@@ -142,11 +161,20 @@ public class FileUtil {
 		return getFile().getBytes(is);
 	}
 
+	public static byte[] getBytes(
+			InputStream is, int bufferSize, boolean cleanUpStream)
+		throws IOException {
+
+		return getFile().getBytes(is, bufferSize, cleanUpStream);
+	}
+
 	public static String getExtension(String fileName) {
 		return getFile().getExtension(fileName);
 	}
 
 	public static com.liferay.portal.kernel.util.File getFile() {
+		PortalRuntimePermission.checkGetBeanProperty(FileUtil.class);
+
 		return _file;
 	}
 
@@ -170,24 +198,28 @@ public class FileUtil {
 		return getFile().isSameContent(file, s);
 	}
 
-	public static String[] listDirs(String fileName) {
-		return getFile().listDirs(fileName);
-	}
-
 	public static String[] listDirs(File file) {
 		return getFile().listDirs(file);
 	}
 
-	public static String[] listFiles(String fileName) {
-		return getFile().listFiles(fileName);
+	public static String[] listDirs(String fileName) {
+		return getFile().listDirs(fileName);
 	}
 
 	public static String[] listFiles(File file) {
 		return getFile().listFiles(file);
 	}
 
+	public static String[] listFiles(String fileName) {
+		return getFile().listFiles(fileName);
+	}
+
 	public static void mkdirs(String pathName) {
 		getFile().mkdirs(pathName);
+	}
+
+	public static boolean move(File source, File destination) {
+		return getFile().move(source, destination);
 	}
 
 	public static boolean move(
@@ -196,20 +228,16 @@ public class FileUtil {
 		return getFile().move(sourceFileName, destinationFileName);
 	}
 
-	public static boolean move(File source, File destination) {
-		return getFile().move(source, destination);
-	}
-
-	public static String read(String fileName) throws IOException {
-		return getFile().read(fileName);
-	}
-
 	public static String read(File file) throws IOException {
 		return getFile().read(file);
 	}
 
 	public static String read(File file, boolean raw) throws IOException {
 		return getFile().read(file, raw);
+	}
+
+	public static String read(String fileName) throws IOException {
+		return getFile().read(fileName);
 	}
 
 	public static String replaceSeparator(String fileName) {
@@ -232,14 +260,6 @@ public class FileUtil {
 		return getFile().toList(fileName);
 	}
 
-	public static void touch(File file) throws IOException {
-		getFile().touch(file);
-	}
-
-	public static void touch(String fileName) throws IOException {
-		getFile().touch(fileName);
-	}
-
 	public static Properties toProperties(FileInputStream fis) {
 		return getFile().toProperties(fis);
 	}
@@ -248,8 +268,56 @@ public class FileUtil {
 		return getFile().toProperties(fileName);
 	}
 
+	public static void touch(File file) throws IOException {
+		getFile().touch(file);
+	}
+
+	public static void touch(String fileName) throws IOException {
+		getFile().touch(fileName);
+	}
+
 	public static void unzip(File source, File destination) {
 		getFile().unzip(source, destination);
+	}
+
+	public static void write(File file, byte[] bytes) throws IOException {
+		getFile().write(file, bytes);
+	}
+
+	public static void write(File file, byte[] bytes, int offset, int length)
+		throws IOException {
+
+		getFile().write(file, bytes, offset, length);
+	}
+
+	public static void write(File file, InputStream is) throws IOException {
+		getFile().write(file, is);
+	}
+
+	public static void write(File file, String s) throws IOException {
+		getFile().write(file, s);
+	}
+
+	public static void write(File file, String s, boolean lazy)
+		throws IOException {
+
+		getFile().write(file, s, lazy);
+	}
+
+	public static void write(File file, String s, boolean lazy, boolean append)
+		throws IOException {
+
+		getFile().write(file, s, lazy, append);
+	}
+
+	public static void write(String fileName, byte[] bytes) throws IOException {
+		getFile().write(fileName, bytes);
+	}
+
+	public static void write(String fileName, InputStream is)
+		throws IOException {
+
+		getFile().write(fileName, is);
 	}
 
 	public static void write(String fileName, String s) throws IOException {
@@ -290,47 +358,9 @@ public class FileUtil {
 		getFile().write(pathName, fileName, s, lazy, append);
 	}
 
-	public static void write(File file, String s) throws IOException {
-		getFile().write(file, s);
-	}
-
-	public static void write(File file, String s, boolean lazy)
-		throws IOException {
-
-		getFile().write(file, s, lazy);
-	}
-
-	public static void write(File file, String s, boolean lazy, boolean append)
-		throws IOException {
-
-		getFile().write(file, s, lazy, append);
-	}
-
-	public static void write(String fileName, byte[] bytes) throws IOException {
-		getFile().write(fileName, bytes);
-	}
-
-	public static void write(File file, byte[] bytes) throws IOException {
-		getFile().write(file, bytes);
-	}
-
-	public static void write(File file, byte[] bytes, int offset, int length)
-		throws IOException {
-
-		getFile().write(file, bytes, offset, length);
-	}
-
-	public static void write(String fileName, InputStream is)
-		throws IOException {
-
-		getFile().write(fileName, is);
-	}
-
-	public static void write(File file, InputStream is) throws IOException {
-		getFile().write(file, is);
-	}
-
 	public void setFile(com.liferay.portal.kernel.util.File file) {
+		PortalRuntimePermission.checkSetBeanProperty(getClass());
+
 		_file = file;
 	}
 

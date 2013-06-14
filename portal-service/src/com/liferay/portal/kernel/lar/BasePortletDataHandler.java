@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -53,16 +53,16 @@ public abstract class BasePortletDataHandler implements PortletDataHandler {
 		return new PortletDataHandlerControl[0];
 	}
 
+	public PortletDataHandlerControl[] getExportMetadataControls() {
+		return new PortletDataHandlerControl[0];
+	}
+
 	public PortletDataHandlerControl[] getImportControls() {
 		return new PortletDataHandlerControl[0];
 	}
 
-	public boolean isAlwaysExportable() {
-		return _ALWAYS_EXPORTABLE;
-	}
-
-	public boolean isPublishToLiveByDefault() {
-		return _PUBLISH_TO_LIVE_BY_DEFAULT;
+	public PortletDataHandlerControl[] getImportMetadataControls() {
+		return new PortletDataHandlerControl[0];
 	}
 
 	public PortletPreferences importData(
@@ -77,6 +77,18 @@ public abstract class BasePortletDataHandler implements PortletDataHandler {
 		catch (Exception e) {
 			throw new PortletDataException(e);
 		}
+	}
+
+	public boolean isAlwaysExportable() {
+		return _ALWAYS_EXPORTABLE;
+	}
+
+	public boolean isAlwaysStaged() {
+		return _ALWAYS_STAGED;
+	}
+
+	public boolean isPublishToLiveByDefault() {
+		return _PUBLISH_TO_LIVE_BY_DEFAULT;
 	}
 
 	protected PortletPreferences doDeleteData(
@@ -104,6 +116,8 @@ public abstract class BasePortletDataHandler implements PortletDataHandler {
 	}
 
 	private static final boolean _ALWAYS_EXPORTABLE = false;
+
+	private static final boolean _ALWAYS_STAGED = false;
 
 	private static final boolean _PUBLISH_TO_LIVE_BY_DEFAULT = false;
 

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -29,6 +29,7 @@ public class RememberMeLoginTest extends BaseTestCase {
 			case 1:
 				selenium.setTimeout("180000");
 				selenium.open("/web/guest/home/");
+				loadRequiredJavaScriptModules();
 
 				boolean NotSignedOut = selenium.isElementPresent(
 						"link=Sign Out");
@@ -41,18 +42,16 @@ public class RememberMeLoginTest extends BaseTestCase {
 
 				selenium.click(RuntimeVariables.replace("link=Sign Out"));
 				selenium.waitForPageToLoad("30000");
-				selenium.saveScreenShotAndSource();
+				loadRequiredJavaScriptModules();
 
 			case 2:
 				selenium.type("_58_login",
 					RuntimeVariables.replace("test@liferay.com"));
-				selenium.saveScreenShotAndSource();
 				selenium.type("_58_password", RuntimeVariables.replace("test"));
-				selenium.saveScreenShotAndSource();
 				selenium.click("_58_rememberMeCheckbox");
 
 				for (int second = 0;; second++) {
-					if (second >= 60) {
+					if (second >= 90) {
 						fail("timeout");
 					}
 
@@ -68,14 +67,13 @@ public class RememberMeLoginTest extends BaseTestCase {
 					Thread.sleep(1000);
 				}
 
-				selenium.saveScreenShotAndSource();
 				selenium.click(RuntimeVariables.replace(
 						"//input[@value='Sign In']"));
 				selenium.waitForPageToLoad("30000");
-				selenium.saveScreenShotAndSource();
+				loadRequiredJavaScriptModules();
 
 				for (int second = 0;; second++) {
-					if (second >= 60) {
+					if (second >= 90) {
 						fail("timeout");
 					}
 
@@ -91,11 +89,10 @@ public class RememberMeLoginTest extends BaseTestCase {
 					Thread.sleep(1000);
 				}
 
-				selenium.saveScreenShotAndSource();
 				selenium.click(RuntimeVariables.replace(
 						"link=Session Expiration Test Page"));
 				selenium.waitForPageToLoad("30000");
-				selenium.saveScreenShotAndSource();
+				loadRequiredJavaScriptModules();
 
 			case 100:
 				label = -1;

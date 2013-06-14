@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,6 +14,10 @@
 
 package com.liferay.portal.model;
 
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * <p>
  * This class is a wrapper for {@link EmailAddress}.
@@ -23,7 +27,8 @@ package com.liferay.portal.model;
  * @see       EmailAddress
  * @generated
  */
-public class EmailAddressWrapper implements EmailAddress {
+public class EmailAddressWrapper implements EmailAddress,
+	ModelWrapper<EmailAddress> {
 	public EmailAddressWrapper(EmailAddress emailAddress) {
 		_emailAddress = emailAddress;
 	}
@@ -34,6 +39,92 @@ public class EmailAddressWrapper implements EmailAddress {
 
 	public String getModelClassName() {
 		return EmailAddress.class.getName();
+	}
+
+	public Map<String, Object> getModelAttributes() {
+		Map<String, Object> attributes = new HashMap<String, Object>();
+
+		attributes.put("emailAddressId", getEmailAddressId());
+		attributes.put("companyId", getCompanyId());
+		attributes.put("userId", getUserId());
+		attributes.put("userName", getUserName());
+		attributes.put("createDate", getCreateDate());
+		attributes.put("modifiedDate", getModifiedDate());
+		attributes.put("classNameId", getClassNameId());
+		attributes.put("classPK", getClassPK());
+		attributes.put("address", getAddress());
+		attributes.put("typeId", getTypeId());
+		attributes.put("primary", getPrimary());
+
+		return attributes;
+	}
+
+	public void setModelAttributes(Map<String, Object> attributes) {
+		Long emailAddressId = (Long)attributes.get("emailAddressId");
+
+		if (emailAddressId != null) {
+			setEmailAddressId(emailAddressId);
+		}
+
+		Long companyId = (Long)attributes.get("companyId");
+
+		if (companyId != null) {
+			setCompanyId(companyId);
+		}
+
+		Long userId = (Long)attributes.get("userId");
+
+		if (userId != null) {
+			setUserId(userId);
+		}
+
+		String userName = (String)attributes.get("userName");
+
+		if (userName != null) {
+			setUserName(userName);
+		}
+
+		Date createDate = (Date)attributes.get("createDate");
+
+		if (createDate != null) {
+			setCreateDate(createDate);
+		}
+
+		Date modifiedDate = (Date)attributes.get("modifiedDate");
+
+		if (modifiedDate != null) {
+			setModifiedDate(modifiedDate);
+		}
+
+		Long classNameId = (Long)attributes.get("classNameId");
+
+		if (classNameId != null) {
+			setClassNameId(classNameId);
+		}
+
+		Long classPK = (Long)attributes.get("classPK");
+
+		if (classPK != null) {
+			setClassPK(classPK);
+		}
+
+		String address = (String)attributes.get("address");
+
+		if (address != null) {
+			setAddress(address);
+		}
+
+		Integer typeId = (Integer)attributes.get("typeId");
+
+		if (typeId != null) {
+			setTypeId(typeId);
+		}
+
+		Boolean primary = (Boolean)attributes.get("primary");
+
+		if (primary != null) {
+			setPrimary(primary);
+		}
 	}
 
 	/**
@@ -191,6 +282,10 @@ public class EmailAddressWrapper implements EmailAddress {
 		return _emailAddress.getClassName();
 	}
 
+	public void setClassName(java.lang.String className) {
+		_emailAddress.setClassName(className);
+	}
+
 	/**
 	* Returns the class name ID of this email address.
 	*
@@ -310,10 +405,6 @@ public class EmailAddressWrapper implements EmailAddress {
 		return _emailAddress.isEscapedModel();
 	}
 
-	public void setEscapedModel(boolean escapedModel) {
-		_emailAddress.setEscapedModel(escapedModel);
-	}
-
 	public java.io.Serializable getPrimaryKeyObj() {
 		return _emailAddress.getPrimaryKeyObj();
 	}
@@ -373,7 +464,14 @@ public class EmailAddressWrapper implements EmailAddress {
 		return _emailAddress.getType();
 	}
 
+	/**
+	 * @deprecated Renamed to {@link #getWrappedModel}
+	 */
 	public EmailAddress getWrappedEmailAddress() {
+		return _emailAddress;
+	}
+
+	public EmailAddress getWrappedModel() {
 		return _emailAddress;
 	}
 

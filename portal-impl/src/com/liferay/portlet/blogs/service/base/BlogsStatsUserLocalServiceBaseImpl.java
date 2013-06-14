@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -21,26 +21,22 @@ import com.liferay.portal.kernel.bean.IdentifiableBean;
 import com.liferay.portal.kernel.dao.jdbc.SqlUpdate;
 import com.liferay.portal.kernel.dao.jdbc.SqlUpdateFactoryUtil;
 import com.liferay.portal.kernel.dao.orm.DynamicQuery;
+import com.liferay.portal.kernel.dao.orm.DynamicQueryFactoryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
-import com.liferay.portal.kernel.search.Indexer;
-import com.liferay.portal.kernel.search.IndexerRegistryUtil;
-import com.liferay.portal.kernel.search.SearchException;
+import com.liferay.portal.kernel.search.Indexable;
+import com.liferay.portal.kernel.search.IndexableType;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.model.PersistedModel;
+import com.liferay.portal.service.BaseLocalServiceImpl;
 import com.liferay.portal.service.GroupLocalService;
 import com.liferay.portal.service.GroupService;
 import com.liferay.portal.service.PersistedModelLocalServiceRegistry;
 import com.liferay.portal.service.ResourceLocalService;
-import com.liferay.portal.service.ResourceService;
 import com.liferay.portal.service.UserLocalService;
 import com.liferay.portal.service.UserService;
 import com.liferay.portal.service.persistence.GroupFinder;
 import com.liferay.portal.service.persistence.GroupPersistence;
-import com.liferay.portal.service.persistence.ResourceFinder;
-import com.liferay.portal.service.persistence.ResourcePersistence;
 import com.liferay.portal.service.persistence.UserFinder;
 import com.liferay.portal.service.persistence.UserPersistence;
 
@@ -72,7 +68,8 @@ import javax.sql.DataSource;
  * @generated
  */
 public abstract class BlogsStatsUserLocalServiceBaseImpl
-	implements BlogsStatsUserLocalService, IdentifiableBean {
+	extends BaseLocalServiceImpl implements BlogsStatsUserLocalService,
+		IdentifiableBean {
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
@@ -86,26 +83,12 @@ public abstract class BlogsStatsUserLocalServiceBaseImpl
 	 * @return the blogs stats user that was added
 	 * @throws SystemException if a system exception occurred
 	 */
+	@Indexable(type = IndexableType.REINDEX)
 	public BlogsStatsUser addBlogsStatsUser(BlogsStatsUser blogsStatsUser)
 		throws SystemException {
 		blogsStatsUser.setNew(true);
 
-		blogsStatsUser = blogsStatsUserPersistence.update(blogsStatsUser, false);
-
-		Indexer indexer = IndexerRegistryUtil.getIndexer(getModelClassName());
-
-		if (indexer != null) {
-			try {
-				indexer.reindex(blogsStatsUser);
-			}
-			catch (SearchException se) {
-				if (_log.isWarnEnabled()) {
-					_log.warn(se, se);
-				}
-			}
-		}
-
-		return blogsStatsUser;
+		return blogsStatsUserPersistence.update(blogsStatsUser, false);
 	}
 
 	/**
@@ -122,49 +105,34 @@ public abstract class BlogsStatsUserLocalServiceBaseImpl
 	 * Deletes the blogs stats user with the primary key from the database. Also notifies the appropriate model listeners.
 	 *
 	 * @param statsUserId the primary key of the blogs stats user
+	 * @return the blogs stats user that was removed
 	 * @throws PortalException if a blogs stats user with the primary key could not be found
 	 * @throws SystemException if a system exception occurred
 	 */
-	public void deleteBlogsStatsUser(long statsUserId)
+	@Indexable(type = IndexableType.DELETE)
+	public BlogsStatsUser deleteBlogsStatsUser(long statsUserId)
 		throws PortalException, SystemException {
-		BlogsStatsUser blogsStatsUser = blogsStatsUserPersistence.remove(statsUserId);
-
-		Indexer indexer = IndexerRegistryUtil.getIndexer(getModelClassName());
-
-		if (indexer != null) {
-			try {
-				indexer.delete(blogsStatsUser);
-			}
-			catch (SearchException se) {
-				if (_log.isWarnEnabled()) {
-					_log.warn(se, se);
-				}
-			}
-		}
+		return blogsStatsUserPersistence.remove(statsUserId);
 	}
 
 	/**
 	 * Deletes the blogs stats user from the database. Also notifies the appropriate model listeners.
 	 *
 	 * @param blogsStatsUser the blogs stats user
+	 * @return the blogs stats user that was removed
 	 * @throws SystemException if a system exception occurred
 	 */
-	public void deleteBlogsStatsUser(BlogsStatsUser blogsStatsUser)
+	@Indexable(type = IndexableType.DELETE)
+	public BlogsStatsUser deleteBlogsStatsUser(BlogsStatsUser blogsStatsUser)
 		throws SystemException {
-		blogsStatsUserPersistence.remove(blogsStatsUser);
+		return blogsStatsUserPersistence.remove(blogsStatsUser);
+	}
 
-		Indexer indexer = IndexerRegistryUtil.getIndexer(getModelClassName());
+	public DynamicQuery dynamicQuery() {
+		Class<?> clazz = getClass();
 
-		if (indexer != null) {
-			try {
-				indexer.delete(blogsStatsUser);
-			}
-			catch (SearchException se) {
-				if (_log.isWarnEnabled()) {
-					_log.warn(se, se);
-				}
-			}
-		}
+		return DynamicQueryFactoryUtil.forClass(BlogsStatsUser.class,
+			clazz.getClassLoader());
 	}
 
 	/**
@@ -233,6 +201,11 @@ public abstract class BlogsStatsUserLocalServiceBaseImpl
 		return blogsStatsUserPersistence.countWithDynamicQuery(dynamicQuery);
 	}
 
+	public BlogsStatsUser fetchBlogsStatsUser(long statsUserId)
+		throws SystemException {
+		return blogsStatsUserPersistence.fetchByPrimaryKey(statsUserId);
+	}
+
 	/**
 	 * Returns the blogs stats user with the primary key.
 	 *
@@ -285,6 +258,7 @@ public abstract class BlogsStatsUserLocalServiceBaseImpl
 	 * @return the blogs stats user that was updated
 	 * @throws SystemException if a system exception occurred
 	 */
+	@Indexable(type = IndexableType.REINDEX)
 	public BlogsStatsUser updateBlogsStatsUser(BlogsStatsUser blogsStatsUser)
 		throws SystemException {
 		return updateBlogsStatsUser(blogsStatsUser, true);
@@ -298,26 +272,12 @@ public abstract class BlogsStatsUserLocalServiceBaseImpl
 	 * @return the blogs stats user that was updated
 	 * @throws SystemException if a system exception occurred
 	 */
+	@Indexable(type = IndexableType.REINDEX)
 	public BlogsStatsUser updateBlogsStatsUser(BlogsStatsUser blogsStatsUser,
 		boolean merge) throws SystemException {
 		blogsStatsUser.setNew(false);
 
-		blogsStatsUser = blogsStatsUserPersistence.update(blogsStatsUser, merge);
-
-		Indexer indexer = IndexerRegistryUtil.getIndexer(getModelClassName());
-
-		if (indexer != null) {
-			try {
-				indexer.reindex(blogsStatsUser);
-			}
-			catch (SearchException se) {
-				if (_log.isWarnEnabled()) {
-					_log.warn(se, se);
-				}
-			}
-		}
-
-		return blogsStatsUser;
+		return blogsStatsUserPersistence.update(blogsStatsUser, merge);
 	}
 
 	/**
@@ -561,60 +521,6 @@ public abstract class BlogsStatsUserLocalServiceBaseImpl
 	}
 
 	/**
-	 * Returns the resource remote service.
-	 *
-	 * @return the resource remote service
-	 */
-	public ResourceService getResourceService() {
-		return resourceService;
-	}
-
-	/**
-	 * Sets the resource remote service.
-	 *
-	 * @param resourceService the resource remote service
-	 */
-	public void setResourceService(ResourceService resourceService) {
-		this.resourceService = resourceService;
-	}
-
-	/**
-	 * Returns the resource persistence.
-	 *
-	 * @return the resource persistence
-	 */
-	public ResourcePersistence getResourcePersistence() {
-		return resourcePersistence;
-	}
-
-	/**
-	 * Sets the resource persistence.
-	 *
-	 * @param resourcePersistence the resource persistence
-	 */
-	public void setResourcePersistence(ResourcePersistence resourcePersistence) {
-		this.resourcePersistence = resourcePersistence;
-	}
-
-	/**
-	 * Returns the resource finder.
-	 *
-	 * @return the resource finder
-	 */
-	public ResourceFinder getResourceFinder() {
-		return resourceFinder;
-	}
-
-	/**
-	 * Sets the resource finder.
-	 *
-	 * @param resourceFinder the resource finder
-	 */
-	public void setResourceFinder(ResourceFinder resourceFinder) {
-		this.resourceFinder = resourceFinder;
-	}
-
-	/**
 	 * Returns the user local service.
 	 *
 	 * @return the user local service
@@ -767,12 +673,6 @@ public abstract class BlogsStatsUserLocalServiceBaseImpl
 	protected GroupFinder groupFinder;
 	@BeanReference(type = ResourceLocalService.class)
 	protected ResourceLocalService resourceLocalService;
-	@BeanReference(type = ResourceService.class)
-	protected ResourceService resourceService;
-	@BeanReference(type = ResourcePersistence.class)
-	protected ResourcePersistence resourcePersistence;
-	@BeanReference(type = ResourceFinder.class)
-	protected ResourceFinder resourceFinder;
 	@BeanReference(type = UserLocalService.class)
 	protected UserLocalService userLocalService;
 	@BeanReference(type = UserService.class)
@@ -783,6 +683,5 @@ public abstract class BlogsStatsUserLocalServiceBaseImpl
 	protected UserFinder userFinder;
 	@BeanReference(type = PersistedModelLocalServiceRegistry.class)
 	protected PersistedModelLocalServiceRegistry persistedModelLocalServiceRegistry;
-	private static Log _log = LogFactoryUtil.getLog(BlogsStatsUserLocalServiceBaseImpl.class);
 	private String _beanIdentifier;
 }

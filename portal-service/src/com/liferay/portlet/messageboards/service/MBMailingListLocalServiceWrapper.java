@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,6 +14,8 @@
 
 package com.liferay.portlet.messageboards.service;
 
+import com.liferay.portal.service.ServiceWrapper;
+
 /**
  * <p>
  * This class is a wrapper for {@link MBMailingListLocalService}.
@@ -24,7 +26,8 @@ package com.liferay.portlet.messageboards.service;
  * @generated
  */
 public class MBMailingListLocalServiceWrapper
-	implements MBMailingListLocalService {
+	implements MBMailingListLocalService,
+		ServiceWrapper<MBMailingListLocalService> {
 	public MBMailingListLocalServiceWrapper(
 		MBMailingListLocalService mbMailingListLocalService) {
 		_mbMailingListLocalService = mbMailingListLocalService;
@@ -58,25 +61,32 @@ public class MBMailingListLocalServiceWrapper
 	* Deletes the message boards mailing list with the primary key from the database. Also notifies the appropriate model listeners.
 	*
 	* @param mailingListId the primary key of the message boards mailing list
+	* @return the message boards mailing list that was removed
 	* @throws PortalException if a message boards mailing list with the primary key could not be found
 	* @throws SystemException if a system exception occurred
 	*/
-	public void deleteMBMailingList(long mailingListId)
+	public com.liferay.portlet.messageboards.model.MBMailingList deleteMBMailingList(
+		long mailingListId)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException {
-		_mbMailingListLocalService.deleteMBMailingList(mailingListId);
+		return _mbMailingListLocalService.deleteMBMailingList(mailingListId);
 	}
 
 	/**
 	* Deletes the message boards mailing list from the database. Also notifies the appropriate model listeners.
 	*
 	* @param mbMailingList the message boards mailing list
+	* @return the message boards mailing list that was removed
 	* @throws SystemException if a system exception occurred
 	*/
-	public void deleteMBMailingList(
+	public com.liferay.portlet.messageboards.model.MBMailingList deleteMBMailingList(
 		com.liferay.portlet.messageboards.model.MBMailingList mbMailingList)
 		throws com.liferay.portal.kernel.exception.SystemException {
-		_mbMailingListLocalService.deleteMBMailingList(mbMailingList);
+		return _mbMailingListLocalService.deleteMBMailingList(mbMailingList);
+	}
+
+	public com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery() {
+		return _mbMailingListLocalService.dynamicQuery();
 	}
 
 	/**
@@ -148,6 +158,12 @@ public class MBMailingListLocalServiceWrapper
 		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery)
 		throws com.liferay.portal.kernel.exception.SystemException {
 		return _mbMailingListLocalService.dynamicQueryCount(dynamicQuery);
+	}
+
+	public com.liferay.portlet.messageboards.model.MBMailingList fetchMBMailingList(
+		long mailingListId)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return _mbMailingListLocalService.fetchMBMailingList(mailingListId);
 	}
 
 	/**
@@ -330,11 +346,26 @@ public class MBMailingListLocalServiceWrapper
 			allowAnonymous, active, serviceContext);
 	}
 
+	/**
+	 * @deprecated Renamed to {@link #getWrappedService}
+	 */
 	public MBMailingListLocalService getWrappedMBMailingListLocalService() {
 		return _mbMailingListLocalService;
 	}
 
+	/**
+	 * @deprecated Renamed to {@link #setWrappedService}
+	 */
 	public void setWrappedMBMailingListLocalService(
+		MBMailingListLocalService mbMailingListLocalService) {
+		_mbMailingListLocalService = mbMailingListLocalService;
+	}
+
+	public MBMailingListLocalService getWrappedService() {
+		return _mbMailingListLocalService;
+	}
+
+	public void setWrappedService(
 		MBMailingListLocalService mbMailingListLocalService) {
 		_mbMailingListLocalService = mbMailingListLocalService;
 	}

@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -63,7 +63,7 @@ long parentFolderId = BeanParamUtil.getLong(folder, request, "parentFolderId", D
 					parentFolderName = parentFolder.getName();
 				}
 			}
-			catch (NoSuchFolderException nscce) {
+			catch (NoSuchFolderException nsfe) {
 			}
 			%>
 
@@ -74,7 +74,7 @@ long parentFolderId = BeanParamUtil.getLong(folder, request, "parentFolderId", D
 
 			<aui:a href="<%= viewFolderURL %>" id="parentFolderName"><%= parentFolderName %></aui:a>
 
-			<portlet:renderURL windowState="<%= LiferayWindowState.POP_UP.toString() %>" var="selectFolderURL">
+			<portlet:renderURL var="selectFolderURL" windowState="<%= LiferayWindowState.POP_UP.toString() %>">
 				<portlet:param name="struts_action" value="/document_library/select_folder" />
 				<portlet:param name="folderId" value="<%= String.valueOf(parentFolderId) %>" />
 			</portlet:renderURL>
@@ -85,7 +85,11 @@ long parentFolderId = BeanParamUtil.getLong(folder, request, "parentFolderId", D
 
 			<aui:button onClick='<%= taglibOpenFolderWindow %>' value="select" />
 
-			<aui:button name="removeFolderButton" onClick='<%= renderResponse.getNamespace() + "removeFolder();" %>' value="remove" />
+			<%
+			String taglibRemoveFolder = "Liferay.Util.removeFolderSelection('parentFolderId', 'parentFolderName', '" + renderResponse.getNamespace() + "');";
+			%>
+
+			<aui:button name="removeFolderButton" onClick="<%= taglibRemoveFolder %>" value="remove" />
 		</aui:field-wrapper>
 		<aui:button-row>
 			<aui:button type="submit" value="move" />
@@ -96,26 +100,19 @@ long parentFolderId = BeanParamUtil.getLong(folder, request, "parentFolderId", D
 </aui:form>
 
 <aui:script>
-	function <portlet:namespace />removeFolder() {
-		document.<portlet:namespace />fm.<portlet:namespace />parentFolderId.value = "<%= rootFolderId %>";
-
-		var nameEl = document.getElementById("<portlet:namespace />parentFolderName");
-
-		nameEl.href = "";
-		nameEl.innerHTML = "";
-	}
-
 	function <portlet:namespace />saveFolder() {
 		submitForm(document.<portlet:namespace />fm);
 	}
 
 	function <portlet:namespace />selectFolder(parentFolderId, parentFolderName) {
-		document.<portlet:namespace />fm.<portlet:namespace />parentFolderId.value = parentFolderId;
+		var folderData = {
+			idString: 'parentFolderId',
+			idValue: parentFolderId,
+			nameString: 'parentFolderName',
+			nameValue: parentFolderName
+		};
 
-		var nameEl = document.getElementById("<portlet:namespace />parentFolderName");
-
-		nameEl.href = "javascript:location = '<portlet:renderURL><portlet:param name="struts_action" value="/document_library/view" /></portlet:renderURL>&<portlet:namespace />folderId=" + parentFolderId + "'; void('');";
-		nameEl.innerHTML = parentFolderName + "&nbsp;";
+		Liferay.Util.selectFolder(folderData, '<portlet:renderURL><portlet:param name="struts_action" value="/document_library/view" /></portlet:renderURL>', '<portlet:namespace />');
 	}
 
 	<c:if test="<%= windowState.equals(WindowState.MAXIMIZED) %>">

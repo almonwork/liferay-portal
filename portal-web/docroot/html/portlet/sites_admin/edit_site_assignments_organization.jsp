@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -68,8 +68,8 @@ if (group.isOrganization()) {
 					buffer.append(StringPool.COMMA_AND_SPACE);
 				}
 
-				if (buffer.length() > 2) {
-					buffer.delete(buffer.length() - 2, buffer.length());
+				if (!orgUsers.isEmpty()) {
+					buffer.setIndex(buffer.index() - 1);
 				}
 
 				if (orgUsersCount > 5) {
@@ -116,8 +116,9 @@ if (group.isOrganization()) {
 		</liferay-ui:search-container-row>
 
 		<liferay-ui:panel collapsible="<%= true %>" extended="<%= false %>" persistState="<%= true %>" title='<%= LanguageUtil.format(pageContext, "users-that-belong-to-x-x", new String[] {organization.getName(), String.valueOf(organizationUsersCount)}) %>'>
-			<div class="portlet-msg-info">
-				<liferay-ui:message key="this-site-belongs-to-x-which-is-an-organization-of-type-x" arguments="<%= new String[] {organization.getName(), LanguageUtil.get(pageContext, organization.getType())} %>" />
+			<div class="organizations-msg-info portlet-msg">
+				<liferay-ui:message arguments="<%= new String[] {organization.getName(), LanguageUtil.get(pageContext, organization.getType())} %>" key="this-site-belongs-to-x-which-is-an-organization-of-type-x" />
+				<liferay-ui:message arguments="<%= organization.getName() %>" key="all-users-of-x-are-automatically-members-of-the-site" />
 			</div>
 
 			<liferay-ui:search-iterator paginate="<%= false %>" />

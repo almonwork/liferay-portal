@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -16,11 +16,11 @@ package com.liferay.portlet.journalcontent.util;
 
 import com.liferay.portal.kernel.cache.MultiVMPoolUtil;
 import com.liferay.portal.kernel.cache.PortalCache;
+import com.liferay.portal.kernel.lar.ImportExportThreadLocal;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.StringBundler;
-import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.model.Layout;
@@ -45,12 +45,14 @@ import org.apache.commons.lang.time.StopWatch;
 public class JournalContentImpl implements JournalContent {
 
 	public void clearCache() {
+		if (ImportExportThreadLocal.isImportInProcess()) {
+			return;
+		}
+
 		portalCache.removeAll();
 	}
 
-	public void clearCache(
-		long groupId, String articleId, String templateId) {
-
+	public void clearCache(long groupId, String articleId, String templateId) {
 		clearCache();
 	}
 
@@ -60,14 +62,6 @@ public class JournalContentImpl implements JournalContent {
 
 		return getContent(
 			groupId, articleId, null, viewMode, languageId, null, xmlRequest);
-	}
-
-	public String getContent(
-		long groupId, String articleId, String viewMode, String languageId,
-		ThemeDisplay themeDisplay) {
-
-		return getContent(
-			groupId, articleId, null, viewMode, languageId, themeDisplay);
 	}
 
 	public String getContent(
@@ -104,53 +98,17 @@ public class JournalContentImpl implements JournalContent {
 		}
 	}
 
-	public JournalArticleDisplay getDisplay(
-		long groupId, String articleId, String viewMode, String languageId,
-		String xmlRequest) {
-
-		return getDisplay(
-			groupId, articleId, null, viewMode, languageId, null, 1,
-			xmlRequest);
-	}
-
-	public JournalArticleDisplay getDisplay(
+	public String getContent(
 		long groupId, String articleId, String viewMode, String languageId,
 		ThemeDisplay themeDisplay) {
 
-		return getDisplay(
-			groupId, articleId, viewMode, languageId, themeDisplay, 1);
+		return getContent(
+			groupId, articleId, null, viewMode, languageId, themeDisplay);
 	}
 
 	public JournalArticleDisplay getDisplay(
-		long groupId, String articleId, String viewMode, String languageId,
-		ThemeDisplay themeDisplay, int page) {
-
-		return getDisplay(
-			groupId, articleId, null, viewMode, languageId, themeDisplay, page,
-			null);
-	}
-
-	public JournalArticleDisplay getDisplay(
-		long groupId, String articleId, String templateId, String viewMode,
-		String languageId, String xmlRequest) {
-
-		return getDisplay(
-			groupId, articleId, templateId, viewMode, languageId, null, 1,
-			xmlRequest);
-	}
-
-	public JournalArticleDisplay getDisplay(
-		long groupId, String articleId, String templateId, String viewMode,
-		String languageId, ThemeDisplay themeDisplay) {
-
-		return getDisplay(
-			groupId, articleId, templateId, viewMode, languageId, themeDisplay,
-			1, null);
-	}
-
-	public JournalArticleDisplay getDisplay(
-		long groupId, String articleId, String templateId, String viewMode,
-		String languageId, ThemeDisplay themeDisplay, int page,
+		long groupId, String articleId, double version, String templateId,
+		String viewMode, String languageId, ThemeDisplay themeDisplay, int page,
 		String xmlRequest) {
 
 		StopWatch stopWatch = null;
@@ -182,8 +140,8 @@ public class JournalContentImpl implements JournalContent {
 		}
 
 		String key = encodeKey(
-			groupId, articleId, templateId, layoutSetId, viewMode, languageId,
-			page, secure);
+			groupId, articleId, version, templateId, layoutSetId, viewMode,
+			languageId, page, secure);
 
 		JournalArticleDisplay articleDisplay =
 			(JournalArticleDisplay)portalCache.get(key);
@@ -195,15 +153,15 @@ public class JournalContentImpl implements JournalContent {
 				groupId, articleId, templateId, viewMode, languageId, page,
 				xmlRequest, themeDisplay);
 
-			if ((articleDisplay != null) && (articleDisplay.isCacheable()) &&
-				(lifecycleRender)) {
+			if ((articleDisplay != null) && articleDisplay.isCacheable() &&
+				lifecycleRender) {
 
 				portalCache.put(key, articleDisplay);
 			}
 		}
 
 		try {
-			if ((PropsValues.JOURNAL_ARTICLE_VIEW_PERMISSION_CHECK_ENABLED) &&
+			if (PropsValues.JOURNAL_ARTICLE_VIEW_PERMISSION_CHECK_ENABLED &&
 				(articleDisplay != null) && (themeDisplay != null) &&
 				(!JournalArticlePermission.contains(
 					themeDisplay.getPermissionChecker(), groupId, articleId,
@@ -225,17 +183,72 @@ public class JournalContentImpl implements JournalContent {
 		return articleDisplay;
 	}
 
+	public JournalArticleDisplay getDisplay(
+		long groupId, String articleId, String viewMode, String languageId,
+		String xmlRequest) {
+
+		return getDisplay(
+			groupId, articleId, null, viewMode, languageId, null, 1,
+			xmlRequest);
+	}
+
+	public JournalArticleDisplay getDisplay(
+		long groupId, String articleId, String templateId, String viewMode,
+		String languageId, String xmlRequest) {
+
+		return getDisplay(
+			groupId, articleId, templateId, viewMode, languageId, null, 1,
+			xmlRequest);
+	}
+
+	public JournalArticleDisplay getDisplay(
+		long groupId, String articleId, String templateId, String viewMode,
+		String languageId, ThemeDisplay themeDisplay) {
+
+		return getDisplay(
+			groupId, articleId, templateId, viewMode, languageId, themeDisplay,
+			1, null);
+	}
+
+	public JournalArticleDisplay getDisplay(
+		long groupId, String articleId, String templateId, String viewMode,
+		String languageId, ThemeDisplay themeDisplay, int page,
+		String xmlRequest) {
+
+		return getDisplay(
+			groupId, articleId, 0, templateId, viewMode, languageId,
+			themeDisplay, 1, xmlRequest);
+	}
+
+	public JournalArticleDisplay getDisplay(
+		long groupId, String articleId, String viewMode, String languageId,
+		ThemeDisplay themeDisplay) {
+
+		return getDisplay(
+			groupId, articleId, viewMode, languageId, themeDisplay, 1);
+	}
+
+	public JournalArticleDisplay getDisplay(
+		long groupId, String articleId, String viewMode, String languageId,
+		ThemeDisplay themeDisplay, int page) {
+
+		return getDisplay(
+			groupId, articleId, null, viewMode, languageId, themeDisplay, page,
+			null);
+	}
+
 	protected String encodeKey(
-		long groupId, String articleId, String templateId, long layoutSetId,
-		String viewMode, String languageId, int page, boolean secure) {
+		long groupId, String articleId, double version, String templateId,
+		long layoutSetId, String viewMode, String languageId, int page,
+		boolean secure) {
 
 		StringBundler sb = new StringBundler();
 
-		sb.append(CACHE_NAME);
-		sb.append(StringPool.POUND);
 		sb.append(StringUtil.toHexString(groupId));
 		sb.append(ARTICLE_SEPARATOR);
 		sb.append(articleId);
+		sb.append(VERSION_SEPARATOR);
+		sb.append(version);
 		sb.append(TEMPLATE_SEPARATOR);
 		sb.append(templateId);
 
@@ -299,7 +312,7 @@ public class JournalContentImpl implements JournalContent {
 			return themeDisplay.isLifecycleRender();
 		}
 		else if (Validator.isNotNull(xmlRequest)) {
-			Matcher matcher = lifecycleRenderPhasePatern.matcher(xmlRequest);
+			Matcher matcher = lifecycleRenderPhasePattern.matcher(xmlRequest);
 
 			return matcher.find();
 		}
@@ -308,11 +321,13 @@ public class JournalContentImpl implements JournalContent {
 		}
 	}
 
-	protected static Pattern lifecycleRenderPhasePatern = Pattern.compile(
+	protected static final String CACHE_NAME = JournalContent.class.getName();
+
+	protected static Pattern lifecycleRenderPhasePattern = Pattern.compile(
 		"<lifecycle>\\s*RENDER_PHASE\\s*</lifecycle>");
 	protected static PortalCache portalCache = MultiVMPoolUtil.getCache(
 		CACHE_NAME);
 
-	private static Log _log = LogFactoryUtil.getLog(JournalContentUtil.class);
+	private static Log _log = LogFactoryUtil.getLog(JournalContentImpl.class);
 
 }

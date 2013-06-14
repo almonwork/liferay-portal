@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -37,7 +37,7 @@ if (group.isOrganization()) {
 <liferay-ui:header
 	backURL="<%= redirect %>"
 	localizeTitle="<%= false %>"
-	title='<%= group.getDescriptiveName() + ": " + ((team == null) ? LanguageUtil.get(pageContext, "new-team") : team.getName()) %>'
+	title='<%= group.getDescriptiveName(locale) + ": " + ((team == null) ? LanguageUtil.get(pageContext, "new-team") : team.getName()) %>'
 />
 
 <portlet:actionURL var="editTeamURL">
@@ -90,7 +90,7 @@ if (group.isOrganization()) {
 	UsersAdminUtil.addPortletBreadcrumbEntries(organization, request, renderResponse);
 }
 else {
-	PortalUtil.addPortletBreadcrumbEntry(request, group.getDescriptiveName(), null);
+	PortalUtil.addPortletBreadcrumbEntry(request, group.getDescriptiveName(locale), null);
 }
 
 if (team != null) {

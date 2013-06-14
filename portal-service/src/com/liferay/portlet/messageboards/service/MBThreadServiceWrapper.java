@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,6 +14,8 @@
 
 package com.liferay.portlet.messageboards.service;
 
+import com.liferay.portal.service.ServiceWrapper;
+
 /**
  * <p>
  * This class is a wrapper for {@link MBThreadService}.
@@ -23,15 +25,43 @@ package com.liferay.portlet.messageboards.service;
  * @see       MBThreadService
  * @generated
  */
-public class MBThreadServiceWrapper implements MBThreadService {
+public class MBThreadServiceWrapper implements MBThreadService,
+	ServiceWrapper<MBThreadService> {
 	public MBThreadServiceWrapper(MBThreadService mbThreadService) {
 		_mbThreadService = mbThreadService;
+	}
+
+	/**
+	* Returns the Spring bean ID for this bean.
+	*
+	* @return the Spring bean ID for this bean
+	*/
+	public java.lang.String getBeanIdentifier() {
+		return _mbThreadService.getBeanIdentifier();
+	}
+
+	/**
+	* Sets the Spring bean ID for this bean.
+	*
+	* @param beanIdentifier the Spring bean ID for this bean
+	*/
+	public void setBeanIdentifier(java.lang.String beanIdentifier) {
+		_mbThreadService.setBeanIdentifier(beanIdentifier);
 	}
 
 	public void deleteThread(long threadId)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException {
 		_mbThreadService.deleteThread(threadId);
+	}
+
+	public java.util.List<com.liferay.portlet.messageboards.model.MBThread> getGroupThreads(
+		long groupId, long userId, java.util.Date modifiedDate, int status,
+		int start, int end)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException {
+		return _mbThreadService.getGroupThreads(groupId, userId, modifiedDate,
+			status, start, end);
 	}
 
 	public java.util.List<com.liferay.portlet.messageboards.model.MBThread> getGroupThreads(
@@ -58,6 +88,13 @@ public class MBThreadServiceWrapper implements MBThreadService {
 			com.liferay.portal.kernel.exception.SystemException {
 		return _mbThreadService.getGroupThreads(groupId, userId, status, start,
 			end);
+	}
+
+	public int getGroupThreadsCount(long groupId, long userId,
+		java.util.Date modifiedDate, int status)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return _mbThreadService.getGroupThreadsCount(groupId, userId,
+			modifiedDate, status);
 	}
 
 	public int getGroupThreadsCount(long groupId, long userId, int status)
@@ -118,11 +155,25 @@ public class MBThreadServiceWrapper implements MBThreadService {
 		_mbThreadService.unlockThread(threadId);
 	}
 
+	/**
+	 * @deprecated Renamed to {@link #getWrappedService}
+	 */
 	public MBThreadService getWrappedMBThreadService() {
 		return _mbThreadService;
 	}
 
+	/**
+	 * @deprecated Renamed to {@link #setWrappedService}
+	 */
 	public void setWrappedMBThreadService(MBThreadService mbThreadService) {
+		_mbThreadService = mbThreadService;
+	}
+
+	public MBThreadService getWrappedService() {
+		return _mbThreadService;
+	}
+
+	public void setWrappedService(MBThreadService mbThreadService) {
 		_mbThreadService = mbThreadService;
 	}
 

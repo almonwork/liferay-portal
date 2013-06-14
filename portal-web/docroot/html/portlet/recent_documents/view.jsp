@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -22,7 +22,7 @@ List fileRanks = DLAppLocalServiceUtil.getFileRanks(scopeGroupId, user.getUserId
 
 <c:choose>
 	<c:when test="<%= fileRanks.isEmpty() %>">
-		<liferay-ui:message key="there-are-no-recent-documents" />
+		<liferay-ui:message key="there-are-no-recent-downloads" />
 	</c:when>
 	<c:otherwise>
 		<table class="lfr-table">

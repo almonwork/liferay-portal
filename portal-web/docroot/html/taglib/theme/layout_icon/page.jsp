@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -21,5 +21,5 @@ Layout selLayout = (Layout)request.getAttribute("liferay-theme:layout-icon:layou
 %>
 
 <c:if test="<%= (selLayout != null) && selLayout.isIconImage() %>">
-	<img alt="<liferay-ui:message key="page-icon" />" src="<%= themeDisplay.getPathImage() %>/layout_icon?img_id=<%= selLayout.getIconImageId() %>&t=<%= ImageServletTokenUtil.getToken(selLayout.getIconImageId()) %>" />
+	<img alt="<liferay-ui:message key="page-icon" />" src="<%= themeDisplay.getPathImage() %>/layout_icon?img_id=<%= selLayout.getIconImageId() %>&t=<%= WebServerServletTokenUtil.getToken(selLayout.getIconImageId()) %>" />
 </c:if>

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -92,14 +92,6 @@ public class AssetCategoryPropertyUtil {
 		return getPersistence()
 				   .findWithDynamicQuery(dynamicQuery, start, end,
 			orderByComparator);
-	}
-
-	/**
-	 * @see com.liferay.portal.service.persistence.BasePersistence#remove(com.liferay.portal.model.BaseModel)
-	 */
-	public static AssetCategoryProperty remove(
-		AssetCategoryProperty assetCategoryProperty) throws SystemException {
-		return getPersistence().remove(assetCategoryProperty);
 	}
 
 	/**
@@ -706,12 +698,14 @@ public class AssetCategoryPropertyUtil {
 	*
 	* @param categoryId the category ID
 	* @param key the key
+	* @return the asset category property that was removed
 	* @throws SystemException if a system exception occurred
 	*/
-	public static void removeByCA_K(long categoryId, java.lang.String key)
+	public static com.liferay.portlet.asset.model.AssetCategoryProperty removeByCA_K(
+		long categoryId, java.lang.String key)
 		throws com.liferay.portal.kernel.exception.SystemException,
 			com.liferay.portlet.asset.NoSuchCategoryPropertyException {
-		getPersistence().removeByCA_K(categoryId, key);
+		return getPersistence().removeByCA_K(categoryId, key);
 	}
 
 	/**
@@ -796,11 +790,10 @@ public class AssetCategoryPropertyUtil {
 		return _persistence;
 	}
 
+	/**
+	 * @deprecated
+	 */
 	public void setPersistence(AssetCategoryPropertyPersistence persistence) {
-		_persistence = persistence;
-
-		ReferenceRegistry.registerReference(AssetCategoryPropertyUtil.class,
-			"_persistence");
 	}
 
 	private static AssetCategoryPropertyPersistence _persistence;

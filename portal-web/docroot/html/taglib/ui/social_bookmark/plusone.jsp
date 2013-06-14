@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -25,7 +25,7 @@ if (displayStyle.equals("vertical")) {
 %>
 
 <liferay-util:html-bottom outputKey="taglib_ui_social_bookmark_plusone">
-	<script type="text/javascript" src="https://apis.google.com/js/plusone.js">
+	<script src="https://apis.google.com/js/plusone.js" type="text/javascript">
 		{
 			lang: '<%= locale.getDisplayLanguage() %>'
 		}

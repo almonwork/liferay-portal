@@ -52,6 +52,10 @@
 		<finder name="VocabularyId" return-type="Collection">
 			<finder-column name="vocabularyId" />
 		</finder>
+		<finder name="G_V" return-type="Collection">
+			<finder-column name="groupId" />
+			<finder-column name="vocabularyId" />
+		</finder>
 		<finder name="P_N" return-type="Collection">
 			<finder-column name="parentCategoryId" />
 			<finder-column name="name" />
@@ -63,6 +67,11 @@
 		<finder name="N_V" return-type="Collection">
 			<finder-column name="name" />
 			<finder-column name="vocabularyId" />
+		</finder>
+		<finder name="G_P_N" return-type="Collection">
+			<finder-column name="groupId" />
+			<finder-column name="parentCategoryId" />
+			<finder-column name="name" />
 		</finder>
 		<finder name="P_N_V" return-type="AssetCategory" unique="true">
 			<finder-column name="parentCategoryId" />
@@ -136,6 +145,7 @@
 		<column name="classNameId" type="long" />
 		<column name="classPK" type="long" />
 		<column name="classUuid" type="String" />
+		<column name="classTypeId" type="long" />
 		<column name="visible" type="boolean" />
 		<column name="startDate" type="Date" />
 		<column name="endDate" type="Date" />
@@ -143,8 +153,8 @@
 		<column name="expirationDate" type="Date" />
 		<column name="mimeType" type="String" />
 		<column name="title" type="String" localized="true" />
-		<column name="description" type="String" />
-		<column name="summary" type="String" />
+		<column name="description" type="String" localized="true" />
+		<column name="summary" type="String" localized="true" />
 		<column name="url" type="String" />
 		<column name="layoutUuid" type="String" />
 		<column name="height" type="int" />
@@ -161,6 +171,15 @@
 
 		<finder name="CompanyId" return-type="Collection">
 			<finder-column name="companyId" />
+		</finder>
+		<finder name="Visible" return-type="Collection">
+			<finder-column name="visible" />
+		</finder>
+		<finder name="PublishDate" return-type="Collection">
+			<finder-column name="publishDate" />
+		</finder>
+		<finder name="ExpirationDate" return-type="Collection">
+			<finder-column name="expirationDate" />
 		</finder>
 		<finder name="G_CU" return-type="AssetEntry">
 			<finder-column name="groupId" />
@@ -183,7 +202,8 @@
 		<reference package-path="com.liferay.portlet.journal" entity="JournalArticle" />
 		<reference package-path="com.liferay.portlet.journal" entity="JournalArticleResource" />
 		<reference package-path="com.liferay.portlet.messageboards" entity="MBMessage" />
-		<reference package-path="com.liferay.portlet.social" entity="SocialEquityLog" />
+		<reference package-path="com.liferay.portlet.social" entity="SocialActivity" />
+        <reference package-path="com.liferay.portlet.social" entity="SocialActivityCounter" />
 		<reference package-path="com.liferay.portlet.wiki" entity="WikiPage" />
 		<reference package-path="com.liferay.portlet.wiki" entity="WikiPageResource" />
 	</entity>
@@ -277,6 +297,10 @@
 
 		<finder name="GroupId" return-type="Collection">
 			<finder-column name="groupId" />
+		</finder>
+		<finder name="G_N" return-type="AssetTag">
+			<finder-column name="groupId" />
+			<finder-column name="name" />
 		</finder>
 	</entity>
 	<entity name="AssetTagProperty" local-service="true" remote-service="true">

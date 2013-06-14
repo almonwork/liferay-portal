@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,6 +14,9 @@
 
 package com.liferay.portal.model;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * <p>
  * This class is a wrapper for {@link ClassName}.
@@ -23,7 +26,7 @@ package com.liferay.portal.model;
  * @see       ClassName
  * @generated
  */
-public class ClassNameWrapper implements ClassName {
+public class ClassNameWrapper implements ClassName, ModelWrapper<ClassName> {
 	public ClassNameWrapper(ClassName className) {
 		_className = className;
 	}
@@ -34,6 +37,29 @@ public class ClassNameWrapper implements ClassName {
 
 	public String getModelClassName() {
 		return ClassName.class.getName();
+	}
+
+	public Map<String, Object> getModelAttributes() {
+		Map<String, Object> attributes = new HashMap<String, Object>();
+
+		attributes.put("classNameId", getClassNameId());
+		attributes.put("value", getValue());
+
+		return attributes;
+	}
+
+	public void setModelAttributes(Map<String, Object> attributes) {
+		Long classNameId = (Long)attributes.get("classNameId");
+
+		if (classNameId != null) {
+			setClassNameId(classNameId);
+		}
+
+		String value = (String)attributes.get("value");
+
+		if (value != null) {
+			setValue(value);
+		}
 	}
 
 	/**
@@ -61,6 +87,10 @@ public class ClassNameWrapper implements ClassName {
 	*/
 	public java.lang.String getClassName() {
 		return _className.getClassName();
+	}
+
+	public void setClassName(java.lang.String className) {
+		_className.setClassName(className);
 	}
 
 	/**
@@ -119,10 +149,6 @@ public class ClassNameWrapper implements ClassName {
 		return _className.isEscapedModel();
 	}
 
-	public void setEscapedModel(boolean escapedModel) {
-		_className.setEscapedModel(escapedModel);
-	}
-
 	public java.io.Serializable getPrimaryKeyObj() {
 		return _className.getPrimaryKeyObj();
 	}
@@ -176,7 +202,14 @@ public class ClassNameWrapper implements ClassName {
 		_className.persist();
 	}
 
+	/**
+	 * @deprecated Renamed to {@link #getWrappedModel}
+	 */
 	public ClassName getWrappedClassName() {
+		return _className;
+	}
+
+	public ClassName getWrappedModel() {
 		return _className;
 	}
 

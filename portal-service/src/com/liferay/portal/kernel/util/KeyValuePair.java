@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -30,22 +30,6 @@ public class KeyValuePair implements Comparable<KeyValuePair>, Serializable {
 		_value = value;
 	}
 
-	public String getKey() {
-		return _key;
-	}
-
-	public void setKey(String key) {
-		_key = key;
-	}
-
-	public String getValue() {
-		return _value;
-	}
-
-	public void setValue(String value) {
-		_value = value;
-	}
-
 	public int compareTo(KeyValuePair kvp) {
 		return _key.compareTo(kvp.getKey());
 	}
@@ -69,6 +53,14 @@ public class KeyValuePair implements Comparable<KeyValuePair>, Serializable {
 		return false;
 	}
 
+	public String getKey() {
+		return _key;
+	}
+
+	public String getValue() {
+		return _value;
+	}
+
 	@Override
 	public int hashCode() {
 		if (_key != null) {
@@ -77,6 +69,14 @@ public class KeyValuePair implements Comparable<KeyValuePair>, Serializable {
 		else {
 			return 0;
 		}
+	}
+
+	public void setKey(String key) {
+		_key = key;
+	}
+
+	public void setValue(String value) {
+		_value = value;
 	}
 
 	private String _key;

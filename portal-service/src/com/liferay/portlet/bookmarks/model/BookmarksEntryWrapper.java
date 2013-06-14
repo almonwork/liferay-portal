@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,6 +14,12 @@
 
 package com.liferay.portlet.bookmarks.model;
 
+import com.liferay.portal.model.ModelWrapper;
+
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * <p>
  * This class is a wrapper for {@link BookmarksEntry}.
@@ -23,7 +29,8 @@ package com.liferay.portlet.bookmarks.model;
  * @see       BookmarksEntry
  * @generated
  */
-public class BookmarksEntryWrapper implements BookmarksEntry {
+public class BookmarksEntryWrapper implements BookmarksEntry,
+	ModelWrapper<BookmarksEntry> {
 	public BookmarksEntryWrapper(BookmarksEntry bookmarksEntry) {
 		_bookmarksEntry = bookmarksEntry;
 	}
@@ -34,6 +41,120 @@ public class BookmarksEntryWrapper implements BookmarksEntry {
 
 	public String getModelClassName() {
 		return BookmarksEntry.class.getName();
+	}
+
+	public Map<String, Object> getModelAttributes() {
+		Map<String, Object> attributes = new HashMap<String, Object>();
+
+		attributes.put("uuid", getUuid());
+		attributes.put("entryId", getEntryId());
+		attributes.put("groupId", getGroupId());
+		attributes.put("companyId", getCompanyId());
+		attributes.put("userId", getUserId());
+		attributes.put("userName", getUserName());
+		attributes.put("createDate", getCreateDate());
+		attributes.put("modifiedDate", getModifiedDate());
+		attributes.put("resourceBlockId", getResourceBlockId());
+		attributes.put("folderId", getFolderId());
+		attributes.put("name", getName());
+		attributes.put("url", getUrl());
+		attributes.put("description", getDescription());
+		attributes.put("visits", getVisits());
+		attributes.put("priority", getPriority());
+
+		return attributes;
+	}
+
+	public void setModelAttributes(Map<String, Object> attributes) {
+		String uuid = (String)attributes.get("uuid");
+
+		if (uuid != null) {
+			setUuid(uuid);
+		}
+
+		Long entryId = (Long)attributes.get("entryId");
+
+		if (entryId != null) {
+			setEntryId(entryId);
+		}
+
+		Long groupId = (Long)attributes.get("groupId");
+
+		if (groupId != null) {
+			setGroupId(groupId);
+		}
+
+		Long companyId = (Long)attributes.get("companyId");
+
+		if (companyId != null) {
+			setCompanyId(companyId);
+		}
+
+		Long userId = (Long)attributes.get("userId");
+
+		if (userId != null) {
+			setUserId(userId);
+		}
+
+		String userName = (String)attributes.get("userName");
+
+		if (userName != null) {
+			setUserName(userName);
+		}
+
+		Date createDate = (Date)attributes.get("createDate");
+
+		if (createDate != null) {
+			setCreateDate(createDate);
+		}
+
+		Date modifiedDate = (Date)attributes.get("modifiedDate");
+
+		if (modifiedDate != null) {
+			setModifiedDate(modifiedDate);
+		}
+
+		Long resourceBlockId = (Long)attributes.get("resourceBlockId");
+
+		if (resourceBlockId != null) {
+			setResourceBlockId(resourceBlockId);
+		}
+
+		Long folderId = (Long)attributes.get("folderId");
+
+		if (folderId != null) {
+			setFolderId(folderId);
+		}
+
+		String name = (String)attributes.get("name");
+
+		if (name != null) {
+			setName(name);
+		}
+
+		String url = (String)attributes.get("url");
+
+		if (url != null) {
+			setUrl(url);
+		}
+
+		String description = (String)attributes.get("description");
+
+		if (description != null) {
+			setDescription(description);
+		}
+
+		Integer visits = (Integer)attributes.get("visits");
+
+		if (visits != null) {
+			setVisits(visits);
+		}
+
+		Integer priority = (Integer)attributes.get("priority");
+
+		if (priority != null) {
+			setPriority(priority);
+		}
 	}
 
 	/**
@@ -219,6 +340,24 @@ public class BookmarksEntryWrapper implements BookmarksEntry {
 	}
 
 	/**
+	* Returns the resource block ID of this bookmarks entry.
+	*
+	* @return the resource block ID of this bookmarks entry
+	*/
+	public long getResourceBlockId() {
+		return _bookmarksEntry.getResourceBlockId();
+	}
+
+	/**
+	* Sets the resource block ID of this bookmarks entry.
+	*
+	* @param resourceBlockId the resource block ID of this bookmarks entry
+	*/
+	public void setResourceBlockId(long resourceBlockId) {
+		_bookmarksEntry.setResourceBlockId(resourceBlockId);
+	}
+
+	/**
 	* Returns the folder ID of this bookmarks entry.
 	*
 	* @return the folder ID of this bookmarks entry
@@ -346,10 +485,6 @@ public class BookmarksEntryWrapper implements BookmarksEntry {
 		return _bookmarksEntry.isEscapedModel();
 	}
 
-	public void setEscapedModel(boolean escapedModel) {
-		_bookmarksEntry.setEscapedModel(escapedModel);
-	}
-
 	public java.io.Serializable getPrimaryKeyObj() {
 		return _bookmarksEntry.getPrimaryKeyObj();
 	}
@@ -408,7 +543,14 @@ public class BookmarksEntryWrapper implements BookmarksEntry {
 		return _bookmarksEntry.getFolder();
 	}
 
+	/**
+	 * @deprecated Renamed to {@link #getWrappedModel}
+	 */
 	public BookmarksEntry getWrappedBookmarksEntry() {
+		return _bookmarksEntry;
+	}
+
+	public BookmarksEntry getWrappedModel() {
 		return _bookmarksEntry;
 	}
 

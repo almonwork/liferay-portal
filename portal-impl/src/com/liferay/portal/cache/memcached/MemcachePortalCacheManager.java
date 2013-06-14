@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -52,7 +52,7 @@ public class MemcachePortalCacheManager implements PortalCacheManager {
 
 		if (memcachePortalCache == null) {
 			try {
-				MemcachedClientIF memcachedClient  =
+				MemcachedClientIF memcachedClient =
 					_memcachedClientFactory.getMemcachedClient();
 
 				memcachePortalCache = new MemcachePortalCache(

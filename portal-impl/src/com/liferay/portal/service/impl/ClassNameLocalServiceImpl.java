@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,7 +14,8 @@
 
 package com.liferay.portal.service.impl;
 
-import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.cache.CacheRegistryItem;
+import com.liferay.portal.kernel.cache.CacheRegistryUtil;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.spring.aop.Skip;
 import com.liferay.portal.kernel.transaction.Propagation;
@@ -32,7 +33,8 @@ import java.util.concurrent.ConcurrentHashMap;
 /**
  * @author Brian Wing Shun Chan
  */
-public class ClassNameLocalServiceImpl extends ClassNameLocalServiceBaseImpl {
+public class ClassNameLocalServiceImpl
+	extends ClassNameLocalServiceBaseImpl implements CacheRegistryItem {
 
 	public ClassName addClassName(String value) throws SystemException {
 		ClassName className = classNamePersistence.fetchByValue(value);
@@ -50,6 +52,13 @@ public class ClassNameLocalServiceImpl extends ClassNameLocalServiceBaseImpl {
 		return className;
 	}
 
+	@Override
+	public void afterPropertiesSet() {
+		super.afterPropertiesSet();
+
+		CacheRegistryUtil.register(this);
+	}
+
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public void checkClassNames() throws SystemException {
 		List<ClassName> classNames = classNamePersistence.findAll();
@@ -63,13 +72,6 @@ public class ClassNameLocalServiceImpl extends ClassNameLocalServiceBaseImpl {
 		for (String model : models) {
 			getClassName(model);
 		}
-	}
-
-	@Override
-	public ClassName getClassName(long classNameId)
-		throws PortalException, SystemException {
-
-		return classNamePersistence.findByPrimaryKey(classNameId);
 	}
 
 	@Skip
@@ -110,8 +112,16 @@ public class ClassNameLocalServiceImpl extends ClassNameLocalServiceBaseImpl {
 		}
 	}
 
-	private static ClassName _nullClassName = new ClassNameImpl();
+	public String getRegistryName() {
+		return ClassNameLocalServiceImpl.class.getName();
+	}
+
+	public void invalidate() {
+		_classNames.clear();
+	}
+
 	private static Map<String, ClassName> _classNames =
 		new ConcurrentHashMap<String, ClassName>();
+	private static ClassName _nullClassName = new ClassNameImpl();
 
 }

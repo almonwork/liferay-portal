@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -53,17 +53,22 @@ String parentStructureName = StringPool.BLANK;
 
 if (Validator.isNotNull(parentStructureId)) {
 	try {
-		parentStructure = JournalStructureLocalServiceUtil.getStructure(groupId, parentStructureId);
-
-		parentStructureName = parentStructure.getName();
+		parentStructure = JournalStructureLocalServiceUtil.getStructure(groupId, parentStructureId, true);
 	}
 	catch (NoSuchStructureException nsse) {
 	}
 }
 
+if (parentStructure != null) {
+	parentStructureName = parentStructure.getName(locale);
+}
+
 String xsd = ParamUtil.getString(request, "xsd");
 
-if (Validator.isNull(xsd)) {
+try {
+	xsd = JournalUtil.processXMLAttributes(xsd);
+}
+catch (StructureXsdException sxe) {
 	xsd = "<root></root>";
 
 	if (structure != null) {
@@ -74,7 +79,6 @@ if (Validator.isNull(xsd)) {
 // Bug with dom4j requires you to remove "\r\n" and "  " or else root.elements()
 // and root.content() will return different number of objects
 
-xsd = JS.decodeURIComponent(xsd);
 xsd = StringUtil.replace(xsd, StringPool.RETURN_NEW_LINE, StringPool.BLANK);
 xsd = StringUtil.replace(xsd, StringPool.DOUBLE_SPACE, StringPool.BLANK);
 
@@ -103,7 +107,7 @@ int tabIndex = 1;
 	<liferay-ui:header
 		backURL="<%= redirect %>"
 		localizeTitle="<%= (structure == null) %>"
-		title='<%= (structure == null) ? "new-structure" : structure.getName() %>'
+		title='<%= (structure == null) ? "new-structure" : structure.getName(locale) %>'
 	/>
 
 	<liferay-ui:error exception="<%= DuplicateStructureElementException.class %>" message="please-enter-unique-structure-field-names-(including-field-names-inherited-from-the-parent-structure)" />
@@ -152,7 +156,7 @@ int tabIndex = 1;
 						<portlet:param name="parentStructureId" value="<%= parentStructureId %>" />
 					</portlet:renderURL>
 
-					<aui:a href="<%= parentStructureURL %>" label="<%= parentStructureName %>" id="parentStructureName" />
+					<aui:a href="<%= parentStructureURL %>" id="parentStructureName" label="<%= parentStructureName %>" />
 				</c:when>
 				<c:otherwise>
 					<aui:a href="" id="parentStructureName" />
@@ -171,7 +175,7 @@ int tabIndex = 1;
 
 			<c:if test="<%= portletDisplay.isWebDAVEnabled() %>">
 				<aui:field-wrapper label="webdav-url">
-					<liferay-ui:input-resource url='<%= themeDisplay.getPortalURL() + "/tunnel-web/secure/webdav" + group.getFriendlyURL() + "/journal/Structures/" + structureId %>' />
+					<liferay-ui:input-resource url='<%= themeDisplay.getPortalURL() + themeDisplay.getPathContext() + "/api/secure/webdav" + group.getFriendlyURL() + "/journal/Structures/" + structureId %>' />
 				</aui:field-wrapper>
 			</c:if>
 		</c:if>
@@ -188,7 +192,7 @@ int tabIndex = 1;
 			<aui:fieldset>
 				<liferay-ui:error exception="<%= StructureXsdException.class %>" message="please-enter-a-valid-xsd" />
 
-				<aui:input name="xsd" type="hidden" />
+				<aui:input name="xsd" type="hidden" value="<%= JS.encodeURIComponent(xsd) %>" />
 
 				<%
 				String taglibEditElement = renderResponse.getNamespace() + "editElement('add', -1);";
@@ -229,11 +233,27 @@ int tabIndex = 1;
 	</liferay-ui:panel-container>
 
 	<aui:button-row>
-		<aui:button type="submit" />
 
-		<aui:button disabled="<%= structure == null %>" onClick='<%= renderResponse.getNamespace() + "saveAndContinueStructure();" %>' value="save-and-continue" />
+		<%
+		boolean hasSavePermission = false;
 
-		<aui:button disabled="<%= structure == null %>" onClick='<%= renderResponse.getNamespace() + "saveAndEditDefaultValues();" %>' value="save-and-edit-default-values" />
+		if (structure != null) {
+			hasSavePermission = JournalStructurePermission.contains(permissionChecker, structure, ActionKeys.UPDATE);
+		}
+		else {
+			hasSavePermission = JournalPermission.contains(permissionChecker, scopeGroupId, ActionKeys.ADD_STRUCTURE);
+		}
+		%>
+
+		<c:if test="<%= hasSavePermission %>">
+			<aui:button type="submit" />
+
+			<aui:button onClick='<%= renderResponse.getNamespace() + "saveAndContinueStructure();" %>' value="save-and-continue" />
+
+			<c:if test="<%= structure != null %>">
+				<aui:button onClick='<%= renderResponse.getNamespace() + "saveAndEditDefaultValues();" %>' value="save-and-edit-default-values" />
+			</c:if>
+		</c:if>
 
 		<aui:button href="<%= redirect %>" type="cancel" />
 	</aui:button-row>
@@ -255,10 +275,6 @@ int tabIndex = 1;
 		}
 
 		var xsd = "<root>\n";
-
-		if ((cmd == "add") && (elCount == -1)) {
-			xsd += "<dynamic-element name='' type=''></dynamic-element>\n"
-		}
 
 		for (i = 0; i >= 0; i++) {
 			var elDepth = document.getElementById("<portlet:namespace />structure_el" + i + "_depth");
@@ -363,6 +379,10 @@ int tabIndex = 1;
 			}
 		}
 
+		if ((cmd == "add") && (elCount == -1)) {
+			xsd += "<dynamic-element name='' type=''></dynamic-element>\n"
+		}
+
 		xsd += "</root>";
 
 		return xsd;
@@ -386,10 +406,10 @@ int tabIndex = 1;
 		Liferay.Util.openWindow(
 			{
 				dialog: {
-					stack: false,
 					width: 680
 				},
-				title: '<liferay-ui:message key="structure" />',
+				id: '<portlet:namespace />parentStructureSelector',
+				title: '<%= UnicodeLanguageUtil.get(pageContext, "structure") %>',
 				uri: '<portlet:renderURL windowState="<%= LiferayWindowState.POP_UP.toString() %>"><portlet:param name="struts_action" value="/journal/select_structure" /><portlet:param name="groupId" value="<%= String.valueOf(groupId) %>" /></portlet:renderURL>'
 			}
 		);
@@ -457,9 +477,22 @@ int tabIndex = 1;
 	Liferay.Util.inlineEditor(
 		{
 			button: '#<portlet:namespace />editorButton',
+			dialog: {
+				after: {
+					init: function(event) {
+						this.on(
+							'update',
+							function() {
+								submitForm(document.<portlet:namespace />fm1);
+							}
+						);
+					}
+				}
+			},
+			id: '<portlet:namespace />xsdContentIFrame',
 			textarea: '<portlet:namespace />xsdContent',
-			title: '<liferay-ui:message key="editor" />',
-			uri: '<portlet:renderURL windowState="<%= LiferayWindowState.POP_UP.toString() %>"><portlet:param name="struts_action" value="/journal/edit_structure_xsd" /></portlet:renderURL>'
+			title: '<%= UnicodeLanguageUtil.get(pageContext, "editor") %>',
+			uri: '<portlet:renderURL windowState="<%= LiferayWindowState.POP_UP.toString() %>"><portlet:param name="struts_action" value="/journal/edit_template_xsl" /><portlet:param name="langType" value="xsd" /><portlet:param name="editorContentInputElement" value='<%= "#" + renderResponse.getNamespace() + "xsd" %>' /><portlet:param name="editorContentOutputElement" value='<%= "#" + renderResponse.getNamespace() + "xsd" %>' /></portlet:renderURL>'
 		}
 	);
 
@@ -479,7 +512,7 @@ int tabIndex = 1;
 private void _format(Element root, IntegerWrapper count, Integer depth, IntegerWrapper tabIndex, PageContext pageContext, HttpServletRequest request) throws Exception {
 	depth = new Integer(depth.intValue() + 1);
 
-	List children = root.elements();
+	List<Element> children = root.elements();
 
 	Boolean hasSiblings = null;
 
@@ -490,16 +523,12 @@ private void _format(Element root, IntegerWrapper count, Integer depth, IntegerW
 		hasSiblings = Boolean.FALSE;
 	}
 
-	Iterator itr = children.iterator();
-
-	while (itr.hasNext()) {
-		Element el = (Element)itr.next();
-
-		if (el.getName().equals("meta-data")) {
+	for (Element child : children) {
+		if (child.getName().equals("meta-data")) {
 			continue;
 		}
 
-		request.setAttribute(WebKeys.JOURNAL_STRUCTURE_EL, el);
+		request.setAttribute(WebKeys.JOURNAL_STRUCTURE_EL, child);
 		request.setAttribute(WebKeys.JOURNAL_STRUCTURE_EL_COUNT, count);
 		request.setAttribute(WebKeys.JOURNAL_STRUCTURE_EL_DEPTH, depth);
 		request.setAttribute(WebKeys.JOURNAL_STRUCTURE_EL_SIBLINGS, hasSiblings);
@@ -509,17 +538,17 @@ private void _format(Element root, IntegerWrapper count, Integer depth, IntegerW
 
 		count.increment();
 
-		_format(el, count, depth, tabIndex, pageContext, request);
+		_format(child, count, depth, tabIndex, pageContext, request);
 	}
 }
 
 private void _move(Element root, IntegerWrapper count, boolean up, int depth, BooleanWrapper halt) throws Exception {
-	List children = root.elements();
+	List<Element> children = root.elements();
 
 	for (int i = 0; i < children.size(); i++) {
-		Element el = (Element)children.get(i);
+		Element child = children.get(i);
 
-		String nodeName = el.getName();
+		String nodeName = child.getName();
 
 		if (Validator.isNotNull(nodeName) && nodeName.equals("meta-data")) {
 			continue;
@@ -533,21 +562,21 @@ private void _move(Element root, IntegerWrapper count, boolean up, int depth, Bo
 			if (up) {
 				if (i == 0) {
 					children.remove(i);
-					children.add(children.size(), el);
+					children.add(children.size(), child);
 				}
 				else {
 					children.remove(i);
-					children.add(i - 1, el);
+					children.add(i - 1, child);
 				}
 			}
 			else {
 				if ((i + 1) == children.size()) {
 					children.remove(i);
-					children.add(0, el);
+					children.add(0, child);
 				}
 				else {
 					children.remove(i);
-					children.add(i + 1, el);
+					children.add(i + 1, child);
 				}
 			}
 
@@ -558,7 +587,7 @@ private void _move(Element root, IntegerWrapper count, boolean up, int depth, Bo
 
 		count.increment();
 
-		_move(el, count, up, depth, halt);
+		_move(child, count, up, depth, halt);
 	}
 }
 %>

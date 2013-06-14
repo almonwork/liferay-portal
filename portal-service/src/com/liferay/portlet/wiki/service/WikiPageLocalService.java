@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -19,6 +19,7 @@ import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.transaction.Isolation;
 import com.liferay.portal.kernel.transaction.Propagation;
 import com.liferay.portal.kernel.transaction.Transactional;
+import com.liferay.portal.service.BaseLocalService;
 import com.liferay.portal.service.PersistedModelLocalService;
 
 /**
@@ -36,7 +37,8 @@ import com.liferay.portal.service.PersistedModelLocalService;
  */
 @Transactional(isolation = Isolation.PORTAL, rollbackFor =  {
 	PortalException.class, SystemException.class})
-public interface WikiPageLocalService extends PersistedModelLocalService {
+public interface WikiPageLocalService extends BaseLocalService,
+	PersistedModelLocalService {
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
@@ -66,10 +68,11 @@ public interface WikiPageLocalService extends PersistedModelLocalService {
 	* Deletes the wiki page with the primary key from the database. Also notifies the appropriate model listeners.
 	*
 	* @param pageId the primary key of the wiki page
+	* @return the wiki page that was removed
 	* @throws PortalException if a wiki page with the primary key could not be found
 	* @throws SystemException if a system exception occurred
 	*/
-	public void deleteWikiPage(long pageId)
+	public com.liferay.portlet.wiki.model.WikiPage deleteWikiPage(long pageId)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException;
 
@@ -77,10 +80,14 @@ public interface WikiPageLocalService extends PersistedModelLocalService {
 	* Deletes the wiki page from the database. Also notifies the appropriate model listeners.
 	*
 	* @param wikiPage the wiki page
+	* @return the wiki page that was removed
 	* @throws SystemException if a system exception occurred
 	*/
-	public void deleteWikiPage(com.liferay.portlet.wiki.model.WikiPage wikiPage)
+	public com.liferay.portlet.wiki.model.WikiPage deleteWikiPage(
+		com.liferay.portlet.wiki.model.WikiPage wikiPage)
 		throws com.liferay.portal.kernel.exception.SystemException;
+
+	public com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery();
 
 	/**
 	* Performs a dynamic query on the database and returns the matching rows.
@@ -142,6 +149,10 @@ public interface WikiPageLocalService extends PersistedModelLocalService {
 	*/
 	public long dynamicQueryCount(
 		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery)
+		throws com.liferay.portal.kernel.exception.SystemException;
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public com.liferay.portlet.wiki.model.WikiPage fetchWikiPage(long pageId)
 		throws com.liferay.portal.kernel.exception.SystemException;
 
 	/**
@@ -258,20 +269,26 @@ public interface WikiPageLocalService extends PersistedModelLocalService {
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException;
 
+	public void addPageAttachment(long userId, long nodeId,
+		java.lang.String title, java.lang.String fileName, java.io.File file)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException;
+
+	public void addPageAttachment(long userId, long nodeId,
+		java.lang.String title, java.lang.String fileName,
+		java.io.InputStream inputStream)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException;
+
 	public void addPageAttachment(long companyId, java.lang.String dirName,
 		java.util.Date modifiedDate, java.lang.String fileName,
 		java.io.InputStream inputStream)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException;
 
-	public void addPageAttachment(long userId, long nodeId,
-		java.lang.String title, java.lang.String fileName, byte[] bytes)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException;
-
 	public void addPageAttachments(long userId, long nodeId,
 		java.lang.String title,
-		java.util.List<com.liferay.portal.kernel.util.ObjectValuePair<java.lang.String, byte[]>> files)
+		java.util.List<com.liferay.portal.kernel.util.ObjectValuePair<java.lang.String, java.io.InputStream>> inputStreams)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException;
 
@@ -297,7 +314,7 @@ public interface WikiPageLocalService extends PersistedModelLocalService {
 
 	public java.lang.String addTempPageAttachment(long userId,
 		java.lang.String fileName, java.lang.String tempFolderName,
-		java.io.File file)
+		java.io.InputStream inputStream)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException,
 			java.io.IOException;
@@ -330,7 +347,8 @@ public interface WikiPageLocalService extends PersistedModelLocalService {
 			com.liferay.portal.kernel.exception.SystemException;
 
 	public void deleteTempPageAttachment(long userId,
-		java.lang.String fileName, java.lang.String tempFolderName);
+		java.lang.String fileName, java.lang.String tempFolderName)
+		throws com.liferay.portal.kernel.exception.PortalException;
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public java.util.List<com.liferay.portlet.wiki.model.WikiPage> getChildren(

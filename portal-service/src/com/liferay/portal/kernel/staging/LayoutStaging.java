@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -17,6 +17,9 @@ package com.liferay.portal.kernel.staging;
 import com.liferay.portal.model.Group;
 import com.liferay.portal.model.Layout;
 import com.liferay.portal.model.LayoutRevision;
+import com.liferay.portal.model.LayoutSet;
+import com.liferay.portal.model.LayoutSetBranch;
+import com.liferay.portal.model.LayoutSetStagingHandler;
 import com.liferay.portal.model.LayoutStagingHandler;
 
 /**
@@ -25,6 +28,11 @@ import com.liferay.portal.model.LayoutStagingHandler;
 public interface LayoutStaging {
 
 	public LayoutRevision getLayoutRevision(Layout layout);
+
+	public LayoutSetBranch getLayoutSetBranch(LayoutSet layoutSet);
+
+	public LayoutSetStagingHandler getLayoutSetStagingHandler(
+		LayoutSet layoutSet);
 
 	public LayoutStagingHandler getLayoutStagingHandler(Layout layout);
 

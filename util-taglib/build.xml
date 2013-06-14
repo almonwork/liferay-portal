@@ -4,8 +4,12 @@
 	<import file="../build-common-java.xml" />
 
 	<property name="jar.file" value="${ant.project.name}" />
+	<property name="manifest.bundle.name" value="Liferay Util Taglib" />
+	<property name="manifest.bundle.symbolic.name" value="com.liferay.util.taglib;singleton:=true" />
 
 	<target name="build-taglibs">
+		<delete file="${project.dir}/util-taglib/src/META-INF/aui.tld" failonerror="false" />
+
 		<java
 			classname="com.liferay.alloy.tools.tagbuilder.TagBuilder"
 			classpathref="project.classpath"
@@ -13,7 +17,7 @@
 			maxmemory="256m"
 			newenvironment="true"
 		>
-			<jvmarg value="-Dtagbuilder.components.xml=${project.dir}/util-taglib/src/com/liferay/taglib/aui.xml" />
+			<jvmarg value="-Dtagbuilder.components.xml=${project.dir}/util-taglib/src/com/liferay/taglib/aui.xml,${project.dir}/util-taglib/src/com/liferay/taglib/liferay-aui.xml" />
 			<jvmarg value="-Dtagbuilder.docroot.dir=${project.dir}/portal-web/docroot/" />
 			<jvmarg value="-Dtagbuilder.java.dir=${project.dir}/util-taglib/src/com/liferay/taglib/" />
 			<jvmarg value="-Dtagbuilder.java.package=com.liferay.taglib" />
@@ -51,6 +55,12 @@
 		<copy todir="${project.dir}/portal-web/docroot/WEB-INF/tld">
 			<fileset dir="classes/META-INF" includes="*.tld" />
 		</copy>
+
+		<copy file="classes/META-INF/aui.tld" tofile="${project.dir}/portal-web/docroot/WEB-INF/tld/liferay-aui.tld" />
+
+		<replace file="${project.dir}/portal-web/docroot/WEB-INF/tld/liferay-aui.tld">
+			<replacefilter token="http://alloy.liferay.com/tld/aui" value="http://liferay.com/tld/aui" />
+		</replace>
 	</target>
 
 	<target name="taglibdoc">
@@ -66,7 +76,7 @@
 			maxmemory="256m"
 		>
 			<arg line="-d ${doc.taglibs.dir}" />
-			<arg value="${project.dir}/util-taglib/src/META-INF/liferay-aui.tld" />
+			<arg value="${project.dir}/util-taglib/src/META-INF/aui.tld" />
 			<arg value="${project.dir}/util-taglib/src/META-INF/liferay-faces.tld" />
 			<arg value="${project.dir}/util-taglib/src/META-INF/liferay-portlet-ext.tld" />
 			<arg value="${project.dir}/util-taglib/src/META-INF/liferay-portlet.tld" />

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -15,7 +15,6 @@
 package com.liferay.portal.service;
 
 import com.liferay.portal.kernel.bean.PortalBeanLocatorUtil;
-import com.liferay.portal.kernel.util.MethodCache;
 import com.liferay.portal.kernel.util.ReferenceRegistry;
 
 /**
@@ -66,25 +65,32 @@ public class ResourceActionLocalServiceUtil {
 	* Deletes the resource action with the primary key from the database. Also notifies the appropriate model listeners.
 	*
 	* @param resourceActionId the primary key of the resource action
+	* @return the resource action that was removed
 	* @throws PortalException if a resource action with the primary key could not be found
 	* @throws SystemException if a system exception occurred
 	*/
-	public static void deleteResourceAction(long resourceActionId)
+	public static com.liferay.portal.model.ResourceAction deleteResourceAction(
+		long resourceActionId)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException {
-		getService().deleteResourceAction(resourceActionId);
+		return getService().deleteResourceAction(resourceActionId);
 	}
 
 	/**
 	* Deletes the resource action from the database. Also notifies the appropriate model listeners.
 	*
 	* @param resourceAction the resource action
+	* @return the resource action that was removed
 	* @throws SystemException if a system exception occurred
 	*/
-	public static void deleteResourceAction(
+	public static com.liferay.portal.model.ResourceAction deleteResourceAction(
 		com.liferay.portal.model.ResourceAction resourceAction)
 		throws com.liferay.portal.kernel.exception.SystemException {
-		getService().deleteResourceAction(resourceAction);
+		return getService().deleteResourceAction(resourceAction);
+	}
+
+	public static com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery() {
+		return getService().dynamicQuery();
 	}
 
 	/**
@@ -156,6 +162,12 @@ public class ResourceActionLocalServiceUtil {
 		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery)
 		throws com.liferay.portal.kernel.exception.SystemException {
 		return getService().dynamicQueryCount(dynamicQuery);
+	}
+
+	public static com.liferay.portal.model.ResourceAction fetchResourceAction(
+		long resourceActionId)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getService().fetchResourceAction(resourceActionId);
 	}
 
 	/**
@@ -271,6 +283,11 @@ public class ResourceActionLocalServiceUtil {
 		getService().checkResourceActions(name, actionIds, addDefaultActions);
 	}
 
+	public static com.liferay.portal.model.ResourceAction fetchResourceAction(
+		java.lang.String name, java.lang.String actionId) {
+		return getService().fetchResourceAction(name, actionId);
+	}
+
 	public static com.liferay.portal.model.ResourceAction getResourceAction(
 		java.lang.String name, java.lang.String actionId)
 		throws com.liferay.portal.kernel.exception.PortalException {
@@ -289,20 +306,15 @@ public class ResourceActionLocalServiceUtil {
 
 			ReferenceRegistry.registerReference(ResourceActionLocalServiceUtil.class,
 				"_service");
-			MethodCache.remove(ResourceActionLocalService.class);
 		}
 
 		return _service;
 	}
 
+	/**
+	 * @deprecated
+	 */
 	public void setService(ResourceActionLocalService service) {
-		MethodCache.remove(ResourceActionLocalService.class);
-
-		_service = service;
-
-		ReferenceRegistry.registerReference(ResourceActionLocalServiceUtil.class,
-			"_service");
-		MethodCache.remove(ResourceActionLocalService.class);
 	}
 
 	private static ResourceActionLocalService _service;

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -23,9 +23,10 @@ import com.liferay.portalweb.portal.util.RuntimeVariables;
 public class RatePage1BlogsEntry1Test extends BaseTestCase {
 	public void testRatePage1BlogsEntry1() throws Exception {
 		selenium.open("/web/blogs-page-scope-community/");
+		loadRequiredJavaScriptModules();
 
 		for (int second = 0;; second++) {
-			if (second >= 60) {
+			if (second >= 90) {
 				fail("timeout");
 			}
 
@@ -40,26 +41,42 @@ public class RatePage1BlogsEntry1Test extends BaseTestCase {
 			Thread.sleep(1000);
 		}
 
-		selenium.saveScreenShotAndSource();
 		selenium.clickAt("link=Blogs Test Page1",
 			RuntimeVariables.replace("Blogs Test Page1"));
 		selenium.waitForPageToLoad("30000");
-		selenium.saveScreenShotAndSource();
+		loadRequiredJavaScriptModules();
+		Thread.sleep(5000);
+
+		for (int second = 0;; second++) {
+			if (second >= 90) {
+				fail("timeout");
+			}
+
+			try {
+				if (RuntimeVariables.replace("Blogs")
+										.equals(selenium.getText(
+								"//span[@class='portlet-title-text']"))) {
+					break;
+				}
+			}
+			catch (Exception e) {
+			}
+
+			Thread.sleep(1000);
+		}
+
 		assertEquals(RuntimeVariables.replace("Blogs"),
 			selenium.getText("//span[@class='portlet-title-text']"));
 		assertEquals(RuntimeVariables.replace("Blogs Entry1 Title"),
-			selenium.getText("//div[@class='entry-title']/a"));
+			selenium.getText("//div[@class='entry-title']/h2/a"));
 		assertEquals(RuntimeVariables.replace("Blogs Entry1 Content"),
 			selenium.getText("//div[@class='entry-body']/p"));
 		assertTrue(selenium.isPartialText(
 				"//div[@class='taglib-ratings stars']/div[2]/div/div", "0 Votes"));
-		assertEquals(RuntimeVariables.replace("Rate this 4 stars out of 5."),
-			selenium.getText("//a[4]"));
-		selenium.clickAt("//a[4]",
-			RuntimeVariables.replace("Rate this 4 stars out of 5."));
+		selenium.clickAt("//a[4]", RuntimeVariables.replace("4 Star"));
 
 		for (int second = 0;; second++) {
-			if (second >= 60) {
+			if (second >= 90) {
 				fail("timeout");
 			}
 
@@ -76,30 +93,15 @@ public class RatePage1BlogsEntry1Test extends BaseTestCase {
 			Thread.sleep(1000);
 		}
 
-		selenium.saveScreenShotAndSource();
 		assertTrue(selenium.isPartialText(
 				"//div[@class='taglib-ratings stars']/div[2]/div/div", "1 Vote"));
-		selenium.mouseOver(
-			"//div[@class='taglib-ratings stars']/div[2]/div/div");
-
-		for (int second = 0;; second++) {
-			if (second >= 60) {
-				fail("timeout");
-			}
-
-			try {
-				if (selenium.isVisible("//div[@class='aui-widget-bd']")) {
-					break;
-				}
-			}
-			catch (Exception e) {
-			}
-
-			Thread.sleep(1000);
-		}
-
-		selenium.saveScreenShotAndSource();
-		assertEquals(RuntimeVariables.replace("4 Stars"),
-			selenium.getText("//div[@class='aui-widget-bd']"));
+		assertTrue(selenium.isVisible(
+				"xPath=(//img[contains(@class,'aui-rating-element-on')])[4]"));
+		assertTrue(selenium.isVisible(
+				"xPath=(//a[contains(@class,'aui-rating-element-on')])[4]"));
+		assertFalse(selenium.isElementPresent(
+				"xPath=(//img[contains(@class,'aui-rating-element-on')])[5]"));
+		assertFalse(selenium.isElementPresent(
+				"xPath=(//a[contains(@class,'aui-rating-element-on')])[5]"));
 	}
 }

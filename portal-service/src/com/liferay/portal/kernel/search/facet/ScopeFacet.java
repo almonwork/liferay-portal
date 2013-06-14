@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -128,7 +128,7 @@ public class ScopeFacet extends MultiValueFacet {
 
 		searchContext.setGroupIds(groupIds);
 
-		if (!groupIdsQuery.clauses().isEmpty()) {
+		if (groupIdsQuery.hasClauses()) {
 			try {
 				facetQuery.add(groupIdsQuery, BooleanClauseOccur.MUST);
 			}
@@ -137,7 +137,7 @@ public class ScopeFacet extends MultiValueFacet {
 			}
 		}
 
-		if (!scopeGroupIdsQuery.clauses().isEmpty()) {
+		if (scopeGroupIdsQuery.hasClauses()) {
 			try {
 				facetQuery.add(scopeGroupIdsQuery, BooleanClauseOccur.MUST);
 			}
@@ -147,9 +147,9 @@ public class ScopeFacet extends MultiValueFacet {
 		}
 
 		return BooleanClauseFactoryUtil.create(
-			facetQuery, BooleanClauseOccur.MUST.getName());
+			searchContext, facetQuery, BooleanClauseOccur.MUST.getName());
 	}
 
-	private static final Log _log = LogFactoryUtil.getLog(ScopeFacet.class);
+	private static Log _log = LogFactoryUtil.getLog(ScopeFacet.class);
 
 }

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -36,19 +36,12 @@ public abstract class BaseUpgradeColumnImpl implements UpgradeColumn {
 		return _name;
 	}
 
-	public long increment() throws SystemException {
-		DB db = DBFactoryUtil.getDB();
-
-		return db.increment();
+	public Integer getNewColumnType(Integer defaultType) {
+		return defaultType;
 	}
 
-	public boolean isApplicable(String name) {
-		if (_name.equals(name)) {
-			return true;
-		}
-		else {
-			return false;
-		}
+	public Object getNewValue() {
+		return _newValue;
 	}
 
 	public Integer getOldColumnType(Integer defaultType) {
@@ -64,25 +57,32 @@ public abstract class BaseUpgradeColumnImpl implements UpgradeColumn {
 		return _oldValue;
 	}
 
-	public void setOldValue(Object oldValue) {
-		_oldValue = oldValue;
+	public long increment() throws SystemException {
+		DB db = DBFactoryUtil.getDB();
+
+		return db.increment();
 	}
 
-	public Integer getNewColumnType(Integer defaultType) {
-		return defaultType;
-	}
-
-	public Object getNewValue() {
-		return _newValue;
+	public boolean isApplicable(String name) {
+		if (_name.equals(name)) {
+			return true;
+		}
+		else {
+			return false;
+		}
 	}
 
 	public void setNewValue(Object newValue) {
 		_newValue = newValue;
 	}
 
+	public void setOldValue(Object oldValue) {
+		_oldValue = oldValue;
+	}
+
 	private String _name;
+	private Object _newValue;
 	private Integer _oldColumnType;
 	private Object _oldValue;
-	private Object _newValue;
 
 }

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,9 +14,13 @@
 
 package com.liferay.portal.search;
 
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.search.DummyIndexer;
 import com.liferay.portal.kernel.search.Indexer;
 import com.liferay.portal.kernel.search.IndexerRegistry;
 import com.liferay.portal.kernel.util.ListUtil;
+import com.liferay.portal.spring.aop.ServiceBeanAopProxy;
 
 import java.util.List;
 import java.util.Map;
@@ -35,14 +39,33 @@ public class IndexerRegistryImpl implements IndexerRegistry {
 		return ListUtil.fromMapValues(_indexers);
 	}
 
+	public Indexer nullSafeGetIndexer(String className) {
+		Indexer indexer = _indexers.get(className);
+
+		if (indexer != null) {
+			return indexer;
+		}
+
+		if (_log.isWarnEnabled()) {
+			_log.warn("No indexer found for " + className);
+		}
+
+		return _dummyIndexer;
+	}
+
 	public void register(String className, Indexer indexerInstance) {
 		_indexers.put(className, indexerInstance);
+
+		ServiceBeanAopProxy.clearMethodInterceptorCache();
 	}
 
 	public void unregister(String className) {
 		_indexers.remove(className);
 	}
 
+	private static Log _log = LogFactoryUtil.getLog(IndexerRegistryImpl.class);
+
+	private Indexer _dummyIndexer = new DummyIndexer();
 	private Map<String, Indexer> _indexers =
 		new ConcurrentHashMap<String, Indexer>();
 

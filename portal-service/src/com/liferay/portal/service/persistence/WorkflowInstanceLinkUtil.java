@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -91,14 +91,6 @@ public class WorkflowInstanceLinkUtil {
 		return getPersistence()
 				   .findWithDynamicQuery(dynamicQuery, start, end,
 			orderByComparator);
-	}
-
-	/**
-	 * @see com.liferay.portal.service.persistence.BasePersistence#remove(com.liferay.portal.model.BaseModel)
-	 */
-	public static WorkflowInstanceLink remove(
-		WorkflowInstanceLink workflowInstanceLink) throws SystemException {
-		return getPersistence().remove(workflowInstanceLink);
 	}
 
 	/**
@@ -464,11 +456,10 @@ public class WorkflowInstanceLinkUtil {
 		return _persistence;
 	}
 
+	/**
+	 * @deprecated
+	 */
 	public void setPersistence(WorkflowInstanceLinkPersistence persistence) {
-		_persistence = persistence;
-
-		ReferenceRegistry.registerReference(WorkflowInstanceLinkUtil.class,
-			"_persistence");
 	}
 
 	private static WorkflowInstanceLinkPersistence _persistence;

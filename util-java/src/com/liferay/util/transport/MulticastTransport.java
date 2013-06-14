@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -69,8 +69,8 @@ public class MulticastTransport extends Thread implements Transport {
 				_socket.leaveGroup(_address);
 				_address = null;
 			}
-			catch (IOException e) {
-				_log.error("Unable to leave group", e);
+			catch (IOException ioe) {
+				_log.error("Unable to leave group", ioe);
 			}
 		}
 
@@ -79,14 +79,6 @@ public class MulticastTransport extends Thread implements Transport {
 		interrupt();
 
 		_socket.close();
-	}
-
-	public synchronized void sendMessage(String msg) throws IOException {
-		_outboundPacket.setData(msg.getBytes());
-		_outboundPacket.setAddress(_address);
-		_outboundPacket.setPort(_port);
-
-		_socket.send(_outboundPacket);
 	}
 
 	public boolean isConnected() {
@@ -101,30 +93,42 @@ public class MulticastTransport extends Thread implements Transport {
 				_handler.process(_inboundPacket);
 			}
 		}
-		catch (IOException e) {
-			_log.error("Unable to process ", e);
+		catch (IOException ioe) {
+			_log.error("Unable to process ", ioe);
 
 			_socket.disconnect();
 
 			_connected = false;
 
-			_handler.errorReceived(e);
+			_handler.errorReceived(ioe);
 		}
+	}
+
+	public synchronized void sendMessage(byte[] bytes) throws IOException {
+		_outboundPacket.setData(bytes);
+		_outboundPacket.setAddress(_address);
+		_outboundPacket.setPort(_port);
+
+		_socket.send(_outboundPacket);
+	}
+
+	public synchronized void sendMessage(String message) throws IOException {
+		sendMessage(message.getBytes());
 	}
 
 	private static Log _log = LogFactory.getLog(MulticastTransport.class);
 
-	private byte[] _inboundBuffer = new byte[4096];
-	private DatagramPacket _inboundPacket =
-		new DatagramPacket(_inboundBuffer, _inboundBuffer.length);
-	private byte[] _outboundBuffer = new byte[4096];
-	private DatagramPacket _outboundPacket =
-		new DatagramPacket(_outboundBuffer, _outboundBuffer.length);
-	private String _host;
-	private DatagramHandler _handler;
-	private int _port;
-	private boolean _connected;
-	private MulticastSocket _socket;
 	private InetAddress _address;
+	private boolean _connected;
+	private DatagramHandler _handler;
+	private String _host;
+	private byte[] _inboundBuffer = new byte[4096];
+	private DatagramPacket _inboundPacket = new DatagramPacket(
+		_inboundBuffer, _inboundBuffer.length);
+	private byte[] _outboundBuffer = new byte[4096];
+	private DatagramPacket _outboundPacket = new DatagramPacket(
+		_outboundBuffer, _outboundBuffer.length);
+	private int _port;
+	private MulticastSocket _socket;
 
 }

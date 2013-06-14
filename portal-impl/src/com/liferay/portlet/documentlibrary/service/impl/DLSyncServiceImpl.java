@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -48,14 +48,16 @@ public class DLSyncServiceImpl extends DLSyncServiceBaseImpl {
 
 	public DLSyncUpdate getDLSyncUpdate(
 			long companyId, long repositoryId, Date lastAccessDate)
-		throws SystemException {
+		throws PortalException, SystemException {
+
+		repositoryService.checkRepository(repositoryId);
 
 		Date now = new Date();
 
 		List<DLSync> dlSyncs = null;
 
 		if (lastAccessDate != null) {
-			dlSyncs = dlSyncPersistence.findByC_M_R(
+			dlSyncs = dlSyncFinder.filterFindByC_M_R(
 				companyId, lastAccessDate, repositoryId);
 		}
 
@@ -146,8 +148,8 @@ public class DLSyncServiceImpl extends DLSyncServiceBaseImpl {
 				deltaOutputStreamWritableByteChannel);
 
 			DeltaUtil.delta(
-				destinationReadableByteChannel,
-				checksumsByteChannelReader, deltaByteChannelWriter);
+				destinationReadableByteChannel, checksumsByteChannelReader,
+				deltaByteChannelWriter);
 
 			deltaByteChannelWriter.finish();
 

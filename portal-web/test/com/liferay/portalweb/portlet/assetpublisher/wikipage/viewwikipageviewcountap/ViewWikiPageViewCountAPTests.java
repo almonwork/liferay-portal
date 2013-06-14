@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,7 +14,14 @@
 
 package com.liferay.portalweb.portlet.assetpublisher.wikipage.viewwikipageviewcountap;
 
-import com.liferay.portalweb.portal.BaseTests;
+import com.liferay.portalweb.portal.BaseTestSuite;
+import com.liferay.portalweb.portal.util.TearDownPageTest;
+import com.liferay.portalweb.portlet.assetpublisher.portlet.addportletap.AddPageAPTest;
+import com.liferay.portalweb.portlet.assetpublisher.portlet.addportletap.AddPortletAPTest;
+import com.liferay.portalweb.portlet.wiki.portlet.addportletwiki.AddPageWikiTest;
+import com.liferay.portalweb.portlet.wiki.portlet.addportletwiki.AddPortletWikiTest;
+import com.liferay.portalweb.portlet.wiki.wikinode.addwikinode.TearDownWikiNodeTest;
+import com.liferay.portalweb.portlet.wiki.wikipage.addwikifrontpage.AddWikiFrontPageTest;
 
 import junit.framework.Test;
 import junit.framework.TestSuite;
@@ -22,25 +29,20 @@ import junit.framework.TestSuite;
 /**
  * @author Brian Wing Shun Chan
  */
-public class ViewWikiPageViewCountAPTests extends BaseTests {
-
+public class ViewWikiPageViewCountAPTests extends BaseTestSuite {
 	public static Test suite() {
 		TestSuite testSuite = new TestSuite();
-
 		testSuite.addTestSuite(AddPageAPTest.class);
 		testSuite.addTestSuite(AddPortletAPTest.class);
 		testSuite.addTestSuite(AddPageWikiTest.class);
 		testSuite.addTestSuite(AddPortletWikiTest.class);
-		testSuite.addTestSuite(AddWikiPageTest.class);
-		testSuite.addTestSuite(
-			ConfigurePortletDisplayStyleFullContentTest.class);
-		testSuite.addTestSuite(
-			ConfigurePortletShowMetadataViewCountTest.class);
+		testSuite.addTestSuite(AddWikiFrontPageTest.class);
+		testSuite.addTestSuite(ConfigurePortletDisplayStyleFullContentTest.class);
+		testSuite.addTestSuite(ConfigurePortletShowMetadataViewCountTest.class);
 		testSuite.addTestSuite(ViewWikiPageViewCountAPTest.class);
 		testSuite.addTestSuite(TearDownWikiNodeTest.class);
 		testSuite.addTestSuite(TearDownPageTest.class);
 
 		return testSuite;
 	}
-
 }

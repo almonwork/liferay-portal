@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -26,7 +26,7 @@ public class IconPrintTag extends IconTag {
 
 	@Override
 	protected String getPage() {
-		if (FileAvailabilityUtil.isAvailable(getServletContext(), _PAGE)) {
+		if (FileAvailabilityUtil.isAvailable(servletContext, _PAGE)) {
 			return _PAGE;
 		}
 
@@ -40,6 +40,12 @@ public class IconPrintTag extends IconTag {
 		setCssClass("portlet-print portlet-print-icon");
 		setImage("../portlet/print");
 		setMessage("print");
+
+		String onClick = "location.href = '".concat(
+			portletDisplay.getURLPrint()).concat("'; return false;");
+
+		setOnClick(onClick);
+
 		setTarget("_blank");
 		setToolTip(false);
 		setUrl(portletDisplay.getURLPrint());

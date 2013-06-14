@@ -1,4 +1,4 @@
-AUI().add(
+AUI.add(
 	'liferay-form',
 	function(A) {
 		var DEFAULTS_FORM_VALIDATOR = AUI.defaults.FormValidator;
@@ -104,10 +104,9 @@ AUI().add(
 						var formNode = instance.formNode;
 						var formValidator = instance.formValidator;
 
-						formValidator.on('submit', instance._onValidatorSubmit, instance);
+						formValidator.on('submit', A.bind('_onValidatorSubmit', instance));
 
-						formNode.delegate('blur', instance._onFieldFocusChange, 'button,input,select,textarea', instance);
-						formNode.delegate('focus', instance._onFieldFocusChange, 'button,input,select,textarea', instance);
+						formNode.delegate(['blur', 'focus'], A.bind('_onFieldFocusChange', instance), 'button,input,select,textarea');
 					},
 
 					_defaultSubmitFn: function(event) {
@@ -157,7 +156,7 @@ AUI().add(
 						var fieldName = rule.fieldName;
 						var validatorName = rule.validatorName;
 
-						if (rule.body && !rule.isCustom) {
+						if (rule.body && !rule.custom) {
 							value = rule.body;
 						}
 
@@ -171,7 +170,9 @@ AUI().add(
 
 						fieldRules[validatorName] = value;
 
-						if (rule.isCustom) {
+						fieldRules.custom = rule.custom;
+
+						if (rule.custom) {
 							DEFAULTS_FORM_VALIDATOR.RULES[validatorName] = rule.body;
 						}
 
@@ -219,7 +220,6 @@ AUI().add(
 	},
 	'',
 	{
-		requires: ['aui-base', 'aui-form-validator'],
-		use: []
+		requires: ['aui-base', 'aui-form-validator']
 	}
 );

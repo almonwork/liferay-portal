@@ -16,17 +16,17 @@
 <tr>
 	<td>waitForElementPresent</td>
 	<td>link=Control Panel</td>
-	<td></td>
+	<td>Control Panel</td>
 </tr>
 <tr>
 	<td>clickAtAndWait</td>
 	<td>link=Control Panel</td>
-	<td></td>
+	<td>Control Panel</td>
 </tr>
 <tr>
 	<td>clickAtAndWait</td>
 	<td>link=Message Boards</td>
-	<td></td>
+	<td>Message Boards</td>
 </tr>
 <tr>
 	<td>assertTextPresent</td>
@@ -39,9 +39,14 @@
 	<td></td>
 </tr>
 <tr>
+	<td>assertText</td>
+	<td>//tr[4]/td[2]/a[1]/strong</td>
+	<td>Tést Catégory Editéd</td>
+</tr>
+<tr>
 	<td>clickAtAndWait</td>
-	<td>//a/strong</td>
-	<td></td>
+	<td>//tr[4]/td[2]/a[1]/strong</td>
+	<td>Tést Catégory Editéd</td>
 </tr>
 <tr>
 	<td>assertTextPresent</td>
@@ -49,9 +54,14 @@
 	<td></td>
 </tr>
 <tr>
+	<td>assertText</td>
+	<td>//td[2]/a/strong</td>
+	<td>Tést Subcatégory</td>
+</tr>
+<tr>
 	<td>clickAtAndWait</td>
-	<td>//a/strong</td>
-	<td></td>
+	<td>//td[2]/a/strong</td>
+	<td>Tést Subcatégory</td>
 </tr>
 <tr>
 	<td>assertTextPresent</td>
@@ -70,8 +80,8 @@
 </tr>
 <tr>
 	<td>clickAtAndWait</td>
-	<td>link=exact:RE: Tést Méssagé</td>
-	<td></td>
+	<td>link=RE: Tést Méssagé</td>
+	<td>RE: Tést Méssagé</td>
 </tr>
 <tr>
 	<td>assertTextPresent</td>
@@ -89,26 +99,35 @@
 	<td></td>
 </tr>
 <tr>
-	<td>waitForElementPresent</td>
+	<td>waitForVisible</td>
 	<td>link=Message Boards</td>
-	<td></td>
+	<td>Message Boards</td>
 </tr>
 <tr>
 	<td>clickAtAndWait</td>
 	<td>link=Message Boards</td>
-	<td></td>
+	<td>Message Boards</td>
+</tr>
+<tr>
+	<td>waitForText</td>
+	<td>//td[2]/a/strong</td>
+	<td>Sujr</td>
+</tr>
+<tr>
+	<td>assertText</td>
+	<td>//td[2]/a/strong</td>
+	<td>Sujr</td>
 </tr>
 <tr>
 	<td>clickAtAndWait</td>
-	<td>//tr[4]/td[1]/a/strong</td>
-	<td></td>
+	<td>//td[2]/a/strong</td>
+	<td>Sujr</td>
 </tr>
 <tr>
 	<td>assertTextPresent</td>
 	<td>Moved to Sujr</td>
 	<td></td>
 </tr>
-
 </tbody></table>
 </body>
 </html>

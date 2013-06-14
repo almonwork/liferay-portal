@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -36,11 +36,6 @@ public interface PluginSetting extends PluginSettingModel, PersistedModel {
 	public void addRole(java.lang.String role);
 
 	/**
-	* Sets a string of ordered comma delimited plugin IDs.
-	*/
-	public void setRoles(java.lang.String roles);
-
-	/**
 	* Returns an array of required roles of the plugin.
 	*
 	* @return an array of required roles of the plugin
@@ -48,23 +43,30 @@ public interface PluginSetting extends PluginSettingModel, PersistedModel {
 	public java.lang.String[] getRolesArray();
 
 	/**
-	* Sets an array of required roles of the plugin.
+	* Returns <code>true</code> if the user has permission to use this plugin
+	*
+	* @param userId the primary key of the user
+	* @return <code>true</code> if the user has permission to use this plugin
 	*/
-	public void setRolesArray(java.lang.String[] rolesArray);
+	public boolean hasPermission(long userId);
 
 	/**
 	* Returns <code>true</code> if the plugin has a role with the specified
 	* name.
 	*
+	* @param roleName the role name
 	* @return <code>true</code> if the plugin has a role with the specified
 	name
 	*/
 	public boolean hasRoleWithName(java.lang.String roleName);
 
 	/**
-	* Returns <code>true</code> if the user has permission to use this plugin
-	*
-	* @return <code>true</code> if the user has permission to use this plugin
+	* Sets a string of ordered comma delimited plugin IDs.
 	*/
-	public boolean hasPermission(long userId);
+	public void setRoles(java.lang.String roles);
+
+	/**
+	* Sets an array of required roles of the plugin.
+	*/
+	public void setRolesArray(java.lang.String[] rolesArray);
 }

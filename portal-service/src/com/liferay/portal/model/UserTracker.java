@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -29,15 +29,15 @@ public interface UserTracker extends UserTrackerModel, PersistedModel {
 	 *
 	 * Never modify this interface directly. Add methods to {@link com.liferay.portal.model.impl.UserTrackerImpl} and rerun ServiceBuilder to automatically copy the method declarations to this interface.
 	 */
-	public java.lang.String getFullName();
+	public void addPath(com.liferay.portal.model.UserTrackerPath path);
+
+	public int compareTo(com.liferay.portal.model.UserTracker userTracker);
 
 	public java.lang.String getEmailAddress();
 
-	public java.util.List<com.liferay.portal.model.UserTrackerPath> getPaths();
-
-	public void addPath(com.liferay.portal.model.UserTrackerPath path);
+	public java.lang.String getFullName();
 
 	public int getHits();
 
-	public int compareTo(com.liferay.portal.model.UserTracker userTracker);
+	public java.util.List<com.liferay.portal.model.UserTrackerPath> getPaths();
 }

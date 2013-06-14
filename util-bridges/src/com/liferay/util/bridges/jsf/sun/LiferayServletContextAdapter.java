@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -39,25 +39,6 @@ public class LiferayServletContextAdapter extends ExternalContext {
 	}
 
 	@Override
-	public Map<String, Object> getApplicationMap() {
-		if (_applicationMap == null) {
-			_applicationMap = new LiferayApplicationMap(_servletContext);
-		}
-
-		return _applicationMap;
-	}
-
-	@Override
-	public String getAuthType() {
-		return null;
-	}
-
-	@Override
-	public Object getContext() {
-		return null;
-	}
-
-	@Override
 	public void dispatch(String string) {
 	}
 
@@ -77,6 +58,25 @@ public class LiferayServletContextAdapter extends ExternalContext {
 	}
 
 	@Override
+	public Map<String, Object> getApplicationMap() {
+		if (_applicationMap == null) {
+			_applicationMap = new LiferayApplicationMap(_servletContext);
+		}
+
+		return _applicationMap;
+	}
+
+	@Override
+	public String getAuthType() {
+		return null;
+	}
+
+	@Override
+	public Object getContext() {
+		return null;
+	}
+
+	@Override
 	public String getInitParameter(String string) {
 		return null;
 	}
@@ -84,18 +84,6 @@ public class LiferayServletContextAdapter extends ExternalContext {
 	@Override
 	public Map<String, String> getInitParameterMap() {
 		return null;
-	}
-
-	@Override
-	public void log(String string) {
-	}
-
-	@Override
-	public void log(String string, Throwable throwable) {
-	}
-
-	@Override
-	public void redirect(String string) {
 	}
 
 	@Override
@@ -199,16 +187,28 @@ public class LiferayServletContextAdapter extends ExternalContext {
 	}
 
 	@Override
+	public Principal getUserPrincipal() {
+		return null;
+	}
+
+	@Override
 	public boolean isUserInRole(String string) {
 		return false;
 	}
 
 	@Override
-	public Principal getUserPrincipal() {
-		return null;
+	public void log(String string) {
 	}
 
-	private ServletContext _servletContext;
+	@Override
+	public void log(String string, Throwable throwable) {
+	}
+
+	@Override
+	public void redirect(String string) {
+	}
+
 	private LiferayApplicationMap _applicationMap;
+	private ServletContext _servletContext;
 
 }

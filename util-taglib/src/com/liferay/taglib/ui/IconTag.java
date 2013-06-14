@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,9 +14,13 @@
 
 package com.liferay.taglib.ui;
 
+import com.liferay.portal.kernel.util.FriendlyURLNormalizerUtil;
+import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.util.PortalUtil;
 import com.liferay.taglib.util.IncludeTag;
+
+import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -30,8 +34,16 @@ public class IconTag extends IncludeTag {
 		return EVAL_BODY_INCLUDE;
 	}
 
+	public void setAlt(String alt) {
+		_alt = alt;
+	}
+
 	public void setCssClass(String cssClass) {
 		_cssClass = cssClass;
+	}
+
+	public void setData(Map<String, Object> data) {
+		_data = data;
 	}
 
 	public void setId(String id) {
@@ -54,12 +66,20 @@ public class IconTag extends IncludeTag {
 		_lang = lang;
 	}
 
+	public void setLocalizeMessage(boolean localizeMessage) {
+		_localizeMessage = localizeMessage;
+	}
+
 	public void setMessage(String message) {
 		_message = message;
 	}
 
 	public void setMethod(String method) {
 		_method = method;
+	}
+
+	public void setOnClick(String onClick) {
+		_onClick = onClick;
 	}
 
 	public void setSrc(String src) {
@@ -84,14 +104,18 @@ public class IconTag extends IncludeTag {
 
 	@Override
 	protected void cleanUp() {
+		_alt = null;
 		_cssClass = null;
+		_data = null;
 		_id = null;
 		_image = null;
 		_imageHover = null;
 		_label = false;
 		_lang = null;
+		_localizeMessage = true;
 		_message = null;
 		_method = null;
+		_onClick = null;
 		_src = null;
 		_srcHover = null;
 		_target = null;
@@ -122,18 +146,38 @@ public class IconTag extends IncludeTag {
 		String id = _id;
 
 		if (Validator.isNull(id)) {
-			id = PortalUtil.generateRandomKey(
-				request, IconTag.class.getName());
+			id = (String)request.getAttribute("liferay-ui:icon-menu:id");
+
+			String message = _message;
+
+			if (Validator.isNull(message)) {
+				message = _image;
+			}
+
+			if (Validator.isNotNull(id) && Validator.isNotNull(message)) {
+				id = id.concat(StringPool.UNDERLINE).concat(
+					FriendlyURLNormalizerUtil.normalize(message));
+			}
+			else {
+				id = PortalUtil.generateRandomKey(
+					request, IconTag.class.getName());
+			}
 		}
 
+		request.setAttribute("liferay-ui:icon:alt", _alt);
 		request.setAttribute("liferay-ui:icon:cssClass", _cssClass);
+		request.setAttribute("liferay-ui:icon:data", _data);
 		request.setAttribute("liferay-ui:icon:id", id);
 		request.setAttribute("liferay-ui:icon:image", _image);
 		request.setAttribute("liferay-ui:icon:imageHover", _imageHover);
 		request.setAttribute("liferay-ui:icon:label", String.valueOf(_label));
 		request.setAttribute("liferay-ui:icon:lang", _lang);
+		request.setAttribute(
+			"liferay-ui:icon:localizeMessage",
+			String.valueOf(_localizeMessage));
 		request.setAttribute("liferay-ui:icon:message", _message);
 		request.setAttribute("liferay-ui:icon:method", _method);
+		request.setAttribute("liferay-ui:icon:onClick", _onClick);
 		request.setAttribute("liferay-ui:icon:src", _src);
 		request.setAttribute("liferay-ui:icon:srcHover", _srcHover);
 		request.setAttribute("liferay-ui:icon:target", _target);
@@ -146,14 +190,18 @@ public class IconTag extends IncludeTag {
 
 	private static final String _PAGE = "/html/taglib/ui/icon/page.jsp";
 
+	private String _alt;
 	private String _cssClass;
+	private Map<String, Object> _data;
 	private String _id;
 	private String _image;
 	private String _imageHover;
 	private boolean _label;
 	private String _lang;
+	private boolean _localizeMessage = true;
 	private String _message;
 	private String _method;
+	private String _onClick;
 	private String _src;
 	private String _srcHover;
 	private String _target = "_self";

@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -59,6 +59,12 @@ portletURL.setParameter("struts_action", "/dynamic_data_lists/view");
 				<portlet:param name="recordSetId" value="<%= String.valueOf(recordSet.getRecordSetId()) %>" />
 			</liferay-portlet:renderURL>
 
+			<%
+			if (!DDLRecordSetPermission.contains(permissionChecker, recordSet, ActionKeys.VIEW)) {
+				rowURL = null;
+			}
+			%>
+
 			<%@ include file="/html/portlet/dynamic_data_lists/search_columns.jspf" %>
 
 			<liferay-ui:search-container-column-jsp
@@ -100,29 +106,29 @@ portletURL.setParameter("struts_action", "/dynamic_data_lists/view");
 
 			var dialog = new A.Dialog(
 				{
+					align: Liferay.Util.Window.ALIGN_CENTER,
 					bodyContent: form,
 					buttons: [
 						{
 							handler: function() {
 								submitForm(form, url, false);
 							},
-							text: Liferay.Language.get('ok')
+							label: Liferay.Language.get('ok')
 						},
 						{
 							handler: function() {
 								this.close();
 							},
-							text: Liferay.Language.get('cancel')
+							label: Liferay.Language.get('cancel')
 						}
 					],
-					centered: true,
 					modal: true,
-					title: '<liferay-ui:message key="export" />',
+					title: '<%= UnicodeLanguageUtil.get(pageContext, "export") %>',
 					width: 400
 				}
 			).render();
 
 		},
-		['aui-base']
+		['aui-dialog']
 	);
 </aui:script>

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -16,10 +16,11 @@ package com.liferay.portal.servlet;
 
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
-import com.liferay.portal.kernel.servlet.PortletServlet;
+import com.liferay.portal.kernel.servlet.PluginContextListener;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.model.User;
 import com.liferay.portal.security.auth.PrincipalThreadLocal;
+import com.liferay.portal.security.pacl.PACLClassLoaderUtil;
 import com.liferay.portal.security.permission.PermissionChecker;
 import com.liferay.portal.security.permission.PermissionCheckerFactoryUtil;
 import com.liferay.portal.security.permission.PermissionThreadLocal;
@@ -43,25 +44,23 @@ public class AxisServlet extends com.liferay.util.axis.AxisServlet {
 	public void init(ServletConfig servletConfig) throws ServletException {
 		ServletContext servletContext = servletConfig.getServletContext();
 
-		_portletClassLoader = (ClassLoader)servletContext.getAttribute(
-			PortletServlet.PORTLET_CLASS_LOADER);
+		_pluginClassLoader = (ClassLoader)servletContext.getAttribute(
+			PluginContextListener.PLUGIN_CLASS_LOADER);
 
-		if (_portletClassLoader == null) {
+		if (_pluginClassLoader == null) {
 			super.init(servletConfig);
 		}
 		else {
-			Thread currentThread = Thread.currentThread();
-
 			ClassLoader contextClassLoader =
-				currentThread.getContextClassLoader();
+				PACLClassLoaderUtil.getContextClassLoader();
 
 			try {
-				currentThread.setContextClassLoader(_portletClassLoader);
+				PACLClassLoaderUtil.setContextClassLoader(_pluginClassLoader);
 
 				super.init(servletConfig);
 			}
 			finally {
-				currentThread.setContextClassLoader(contextClassLoader);
+				PACLClassLoaderUtil.setContextClassLoader(contextClassLoader);
 			}
 		}
 	}
@@ -88,27 +87,27 @@ public class AxisServlet extends com.liferay.util.axis.AxisServlet {
 				User user = UserLocalServiceUtil.getUserById(userId);
 
 				PermissionChecker permissionChecker =
-					PermissionCheckerFactoryUtil.create(user, true);
+					PermissionCheckerFactoryUtil.create(user);
 
 				PermissionThreadLocal.setPermissionChecker(permissionChecker);
 			}
 
-			if (_portletClassLoader == null) {
+			if (_pluginClassLoader == null) {
 				super.service(request, response);
 			}
 			else {
-				Thread currentThread = Thread.currentThread();
-
 				ClassLoader contextClassLoader =
-					currentThread.getContextClassLoader();
+					PACLClassLoaderUtil.getContextClassLoader();
 
 				try {
-					currentThread.setContextClassLoader(_portletClassLoader);
+					PACLClassLoaderUtil.setContextClassLoader(
+						_pluginClassLoader);
 
 					super.service(request, response);
 				}
 				finally {
-					currentThread.setContextClassLoader(contextClassLoader);
+					PACLClassLoaderUtil.setContextClassLoader(
+						contextClassLoader);
 				}
 			}
 		}
@@ -125,6 +124,6 @@ public class AxisServlet extends com.liferay.util.axis.AxisServlet {
 
 	private static Log _log = LogFactoryUtil.getLog(AxisServlet.class);
 
-	private ClassLoader _portletClassLoader;
+	private ClassLoader _pluginClassLoader;
 
 }

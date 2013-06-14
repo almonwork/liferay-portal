@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -34,9 +34,13 @@ String defaultWapThemeId = PrefsPropsUtil.getString(company.getCompanyId(), Prop
 String defaultControlPanelThemeId = PrefsPropsUtil.getString(company.getCompanyId(), PropsKeys.CONTROL_PANEL_LAYOUT_REGULAR_THEME_ID, PropsValues.CONTROL_PANEL_LAYOUT_REGULAR_THEME_ID);
 %>
 
+<liferay-ui:error-marker key="errorSection" value="displaySettings" />
+
 <h3><liferay-ui:message key="language-and-time-zone" /></h3>
 
 <aui:fieldset>
+	<liferay-ui:error exception="<%= LocaleException.class %>" message="please-enter-a-valid-locale" />
+
 	<aui:select label="default-language" name="languageId">
 
 		<%
@@ -61,9 +65,9 @@ String defaultControlPanelThemeId = PrefsPropsUtil.getString(company.getCompanyI
 <h3><liferay-ui:message key="logo" /></h3>
 
 <aui:fieldset>
-	<aui:input inlineLabel="left" label="allow-site-administrators-to-use-their-own-logo" name='<%= "settings--" + PropsKeys.COMPANY_SECURITY_SITE_LOGO + "--" %>' type="checkbox" value="<%= companySecurityCommunityLogo %>" />
+	<aui:input label="allow-site-administrators-to-use-their-own-logo" name='<%= "settings--" + PropsKeys.COMPANY_SECURITY_SITE_LOGO + "--" %>' type="checkbox" value="<%= companySecurityCommunityLogo %>" />
 
-	<portlet:renderURL windowState="<%= LiferayWindowState.POP_UP.toString() %>" var="editCompanyLogoURL">
+	<portlet:renderURL var="editCompanyLogoURL" windowState="<%= LiferayWindowState.POP_UP.toString() %>">
 		<portlet:param name="struts_action" value="/portal_settings/edit_company_logo" />
 		<portlet:param name="redirect" value="<%= currentURL %>" />
 	</portlet:renderURL>
@@ -107,7 +111,7 @@ boolean deployed = false;
 		</c:if>
 	</aui:select>
 
-	<aui:select label="default-mobile-theme" name='<%= "settings--" + PropsKeys.DEFAULT_REGULAR_THEME_ID + "--" %>'>
+	<aui:select helpMessage="default-mobile-theme-help" label="default-mobile-theme" name='<%= "settings--" + PropsKeys.DEFAULT_REGULAR_THEME_ID + "--" %>'>
 
 		<%
 		themes = ThemeLocalServiceUtil.getThemes(company.getCompanyId(), 0, user.getUserId(), true);

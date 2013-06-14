@@ -9,8 +9,8 @@
 				<equals arg1="${plugins.deployed}" arg2="true" />
 			</not>
 			<then>
-				<delete dir="${liferay.home}/data" />
-				<delete dir="${liferay.home}/deploy" />
+				<delete dir="${user.home}/liferay/data" />
+				<delete dir="${user.home}/liferay/deploy" />
 			</then>
 		</if>
 
@@ -22,29 +22,16 @@
 app.server.lib.global.dir=${simple.server.lib.global.dir}
 app.server.portal.dir=${simple.server.portal.dir}
 
-plugins.includes=${plugins.includes}</echo>
-
-		<ant dir="${lp.plugins.dir}/${plugin.types}" inheritAll="false">
-			<target name="clean" />
-			<target name="deploy" />
-		</ant>
-
-		<delete dir="${lp.plugins.dir}/dist" />
-		<mkdir dir="${lp.plugins.dir}/dist" />
-	</target>
-
-	<target name="deploy-upgrade-simple-server-plugins">
-		<exec dir="${lp.plugins.dir}" executable="cmd.exe">
-			<arg line="/c svn --username ${svn.username} --password ${svn.password} update" />
-		</exec>
-
-		<echo file="${lp.plugins.dir}/build.${user.name}.properties">app.server.dir=${simple.server.dir}
-app.server.lib.global.dir=${simple.server.lib.global.dir}
-app.server.portal.dir=${simple.server.portal.dir}
-
 auto.deploy.dir=$${user.home}/liferay/deploy
 
 plugins.includes=${plugins.includes}</echo>
+
+		<if>
+			<isset property="plugin.portlets.properties" />
+			<then>
+				<echo file="${lp.plugins.dir}/${plugin.types}/${portlet.plugins.includes}/docroot/WEB-INF/src/portlet-ext.properties">${plugin.portlets.properties}</echo>
+			</then>
+		</if>
 
 		<ant dir="${lp.plugins.dir}/${plugin.types}" inheritAll="false">
 			<target name="clean" />
@@ -78,6 +65,189 @@ plugins.includes=${plugins.includes}</echo>
 				</copy>
 			</else>
 		</if>
+	</target>
+
+	<target name="deploy-websphere-6.1-plugins">
+		<exec dir="${lp.plugins.dir}" executable="cmd.exe">
+			<arg line="/c svn --username ${svn.username} --password ${svn.password} update" />
+		</exec>
+
+		<echo file="${lp.plugins.dir}/build.${user.name}.properties">app.server.dir=${app.server.tomcat.dir}
+app.server.lib.global.dir=${app.server.tomcat.lib.global.dir}
+app.server.portal.dir=${app.server.tomcat.portal.dir}
+
+plugins.includes=${plugins.includes}</echo>
+
+		<ant dir="${lp.plugins.dir}/${plugin.types}" inheritAll="false">
+			<target name="clean" />
+			<target name="war" />
+		</ant>
+
+		<exec executable="${plink.executable}">
+			<arg line="-pw ${vm.password} ${vm.username}@${vm.host} cmd.exe /c mkdir C:\WINDOWS\system32\config\systemprofile\liferay\websphere-deploy" />
+		</exec>
+
+		<exec executable="${pscp.executable}">
+			<arg line="-pw ${vm.password} ${lp.plugins.dir}\dist\*.war ${vm.username}@${vm.host}:/WINDOWS/system32/config/systemprofile/liferay/deploy" />
+		</exec>
+
+		<sleep seconds="30" />
+
+		<delete dir="${lp.plugins.dir}/dist" />
+		<mkdir dir="${lp.plugins.dir}/dist" />
+
+		<echo file="wsadmin-plugins.jacl">$AdminApp list</echo>
+
+		<for list="${plugins.includes}" param="plugin.deploy">
+			<sequential>
+				<echo file="wsadmin-plugins.jacl" append="true">
+
+$AdminApp update liferay-portal modulefile {-operation addupdate -contents C:/WINDOWS/system32/config/systemprofile/liferay/websphere-deploy/@{plugin.deploy}.war -contextroot /@{plugin.deploy} -contenturi @{plugin.deploy} -usedefaultbindings}
+
+$AdminConfig save</echo>
+			</sequential>
+		</for>
+
+		<exec executable="${pscp.executable}">
+			<arg line="-pw ${vm.password} wsadmin-plugins.jacl ${vm.username}@${vm.host}:/" />
+		</exec>
+
+		<delete file="wsadmin-plugins.jacl" />
+
+		<exec executable="${plink.executable}">
+			<arg line="-pw ${vm.password} ${vm.username}@${vm.host} cmd.exe /c C:\Progra~1\IBM\WebSphere\AppServer\bin\wsadmin.bat -f C:\wsadmin-plugins.jacl" />
+		</exec>
+	</target>
+
+	<target name="deploy-websphere-7.0-plugins">
+		<exec dir="${lp.plugins.dir}" executable="cmd.exe">
+			<arg line="/c svn --username ${svn.username} --password ${svn.password} update" />
+		</exec>
+
+		<echo file="${lp.plugins.dir}/build.${user.name}.properties">app.server.dir=${app.server.tomcat.dir}
+app.server.lib.global.dir=${app.server.tomcat.lib.global.dir}
+app.server.portal.dir=${app.server.tomcat.portal.dir}
+
+plugins.includes=${plugins.includes}</echo>
+
+		<ant dir="${lp.plugins.dir}/${plugin.types}" inheritAll="false">
+			<target name="clean" />
+			<target name="war" />
+		</ant>
+
+		<exec executable="${plink.executable}">
+			<arg line="-pw ${vm.password} ${vm.username}@${vm.host} cmd.exe /c mkdir C:\WINDOWS\system32\config\systemprofile\liferay\websphere-deploy" />
+		</exec>
+
+		<exec executable="${pscp.executable}">
+			<arg line="-pw ${vm.password} ${lp.plugins.dir}\dist\*.war ${vm.username}@${vm.host}:/WINDOWS/system32/config/systemprofile/liferay/deploy" />
+		</exec>
+
+		<sleep seconds="30" />
+
+		<delete dir="${lp.plugins.dir}/dist" />
+		<mkdir dir="${lp.plugins.dir}/dist" />
+
+		<echo file="wsadmin-plugins.py">print AdminApp.list()</echo>
+
+		<for list="${plugins.includes}" param="plugin.deploy">
+			<sequential>
+				<echo file="wsadmin-plugins.py" append="true">
+
+print AdminApp.update('liferay-portal','modulefile','[-operation addupdate -contents C:/WINDOWS/system32/config/systemprofile/liferay/websphere-deploy/@{plugin.deploy}.war -contextroot /@{plugin.deploy} -contenturi @{plugin.deploy} -usedefaultbindings]')
+
+print AdminConfig.save()</echo>
+			</sequential>
+		</for>
+
+		<exec executable="${pscp.executable}">
+			<arg line="-pw ${vm.password} wsadmin-plugins.py ${vm.username}@${vm.host}:/" />
+		</exec>
+
+		<delete file="wsadmin-plugins.py" />
+
+		<exec executable="${plink.executable}">
+			<arg line="-pw ${vm.password} ${vm.username}@${vm.host} cmd.exe /c C:\Progra~1\IBM\WebSphere\AppServer\bin\wsadmin.bat -f C:\wsadmin-plugins.py" />
+		</exec>
+	</target>
+
+	<target name="deploy-websphere-8.0-plugins">
+		<exec dir="${lp.plugins.dir}" executable="cmd.exe">
+			<arg line="/c svn --username ${svn.username} --password ${svn.password} update" />
+		</exec>
+
+		<echo file="${lp.plugins.dir}/build.${user.name}.properties">app.server.dir=${app.server.tomcat.dir}
+app.server.lib.global.dir=${app.server.tomcat.lib.global.dir}
+app.server.portal.dir=${app.server.tomcat.portal.dir}
+
+plugins.includes=${plugins.includes}</echo>
+
+		<ant dir="${lp.plugins.dir}/${plugin.types}" inheritAll="false">
+			<target name="clean" />
+			<target name="war" />
+		</ant>
+
+		<exec executable="${plink.executable}">
+			<arg line="-pw ${vm.password} ${vm.username}@${vm.host} cmd.exe /c mkdir C:\WINDOWS\system32\config\systemprofile\liferay\websphere-deploy" />
+		</exec>
+
+		<exec executable="${pscp.executable}">
+			<arg line="-pw ${vm.password} ${lp.plugins.dir}\dist\*.war ${vm.username}@${vm.host}:/WINDOWS/system32/config/systemprofile/liferay/deploy" />
+		</exec>
+
+		<sleep seconds="30" />
+
+		<delete dir="${lp.plugins.dir}/dist" />
+		<mkdir dir="${lp.plugins.dir}/dist" />
+
+		<echo file="wsadmin-plugins.py">print AdminApp.list()</echo>
+
+		<for list="${plugins.includes}" param="plugin.deploy">
+			<sequential>
+				<echo file="wsadmin-plugins.py" append="true">
+
+print AdminApp.update('liferay-portal','modulefile','[-operation addupdate -contents C:/WINDOWS/system32/config/systemprofile/liferay/websphere-deploy/@{plugin.deploy}.war -contextroot /@{plugin.deploy} -contenturi @{plugin.deploy} -usedefaultbindings]')
+
+print AdminConfig.save()</echo>
+			</sequential>
+		</for>
+
+		<exec executable="${pscp.executable}">
+			<arg line="-pw ${vm.password} wsadmin-plugins.py ${vm.username}@${vm.host}:/" />
+		</exec>
+
+		<delete file="wsadmin-plugins.py" />
+
+		<exec executable="${plink.executable}">
+			<arg line="-pw ${vm.password} ${vm.username}@${vm.host} cmd.exe /c C:\Progra~1\IBM\WebSphere\AppServer\bin\wsadmin.bat -f C:\wsadmin-plugins.py" />
+		</exec>
+	</target>
+
+	<target name="test-build-plugins-release">
+		<taskdef classname="com.oopsconsultancy.xmltask.ant.XmlTask" classpath="lib/development/xmltask.jar" name="xmltask" />
+
+		<ant dir="${lp.plugins.dir}" target="build-summary" inheritAll="false" />
+
+		<echo file="${lp.plugins.dir}/build.${user.name}.properties">plugins.includes=</echo>
+
+		<xmltask source="${lp.plugins.dir}/summary.xml">
+			<call path="plugins-summary/plugin">
+				<param name="plugins.includes.plugin.marketplace" path="releng/marketplace/text()" />
+				<param name="plugins.includes.plugin.name" path="artifact-id/text()" />
+				<actions>
+					<if>
+						<equals arg1="@{plugins.includes.plugin.marketplace}" arg2="true" />
+						<then>
+							<echo append="true" file="${lp.plugins.dir}/build.${user.name}.properties">@{plugins.includes.plugin.name},</echo>
+						</then>
+					</if>
+				</actions>
+			</call>
+		</xmltask>
+
+		<ant antfile="${lp.plugins.dir}/build.xml" target="all" inheritAll="false" />
+
+		<delete file="${lp.plugins.dir}/build.${user.name}.properties" />
 	</target>
 
 	<target name="test-create">
@@ -135,12 +305,25 @@ plugins.includes=${plugins.includes}</echo>
 		<delete dir="${lp.plugins.dir}/portlets/sample-service-builder-portlet/docroot/WEB-INF/service" />
 		<delete dir="${lp.plugins.dir}/portlets/sample-service-builder-portlet/docroot/WEB-INF/src/META-INF" />
 
-		<exec executable="cmd.exe">
-			<arg line="/c svn --username ${svn.username} --password ${svn.password} update ${lp.plugins.dir}/portlets/sample-service-builder-portlet/docroot/WEB-INF" />
-		</exec>
+		<if>
+			<equals arg1="${scm.tool}" arg2="git" />
+			<then>
+				<exec dir="${lp.plugins.dir}" executable="${shell.executable}">
+					<arg line="-c &quot;git checkout portlets/sample-service-builder-portlet&quot;" />
+				</exec>
+			</then>
+			<elseif>
+				<equals arg1="${scm.tool}" arg2="svn" />
+				<then>
+					<exec executable="${shell.executable}">
+						<arg line="/c svn --username ${svn.username} --password ${svn.password} update ${lp.plugins.dir}/portlets/sample-service-builder-portlet/docroot/WEB-INF" />
+					</exec>
 
-		<exec executable="cmd.exe">
-			<arg line="/c svn revert --recursive ${lp.plugins.dir}/portlets/sample-service-builder-portlet" />
-		</exec>
+					<exec executable="${shell.executable}">
+						<arg line="/c svn revert --recursive ${lp.plugins.dir}/portlets/sample-service-builder-portlet" />
+					</exec>
+				</then>
+			</elseif>
+		</if>
 	</target>
 </project>

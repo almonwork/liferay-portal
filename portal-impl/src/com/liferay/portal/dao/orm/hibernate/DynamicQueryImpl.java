@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -108,9 +108,18 @@ public class DynamicQueryImpl implements DynamicQuery {
 		return this;
 	}
 
-	private DetachedCriteria _detachedCriteria;
+	@Override
+	public String toString() {
+		if (_criteria != null) {
+			return _criteria.toString();
+		}
+
+		return super.toString();
+	}
+
 	private Criteria _criteria;
-	private Integer _start;
+	private DetachedCriteria _detachedCriteria;
 	private Integer _end;
+	private Integer _start;
 
 }

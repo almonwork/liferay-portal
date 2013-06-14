@@ -15,16 +15,6 @@
 		/>
 	</target>
 
-	<target name="copy-optional-jars">
-		<copy
-			todir="${app.server.lib.global.dir}">
-				<fileset
-					dir="${jdbc.drivers.optional.dir}"
-					includes="*.jar"
-			/>
-		</copy>
-	</target>
-
 	<target name="prepare-cluster-tomcat-node">
 		<exec executable="${pscp.executable}">
 			<arg line="-pw ${vm.password} dist/liferay-portal-tomcat-${lp.version}.zip ${vm.username}@${cluster-node.host}:/" />
@@ -36,21 +26,21 @@
 
 		<antcall target="replace-remote-file">
 			<param name="remote.host" value="${cluster-node.host}" />
-			<param name="remote.file" value="/liferay-portal-${lp.version}/tomcat-6.0.32/bin/startup.bat" />
+			<param name="remote.file" value="/liferay-portal-${lp.version}/tomcat-${app.server.tomcat.version}/bin/startup.bat" />
 			<param name="remote.replace.token" value="set &quot;CATALINA_HOME=%cd%&quot;" />
-			<param name="remote.replace.value" value="set CATALINA_HOME=C:\liferay-portal-${lp.version}\tomcat-6.0.32" />
+			<param name="remote.replace.value" value="set CATALINA_HOME=C:\liferay-portal-${lp.version}\tomcat-${app.server.tomcat.version}" />
 		</antcall>
 
 		<antcall target="replace-remote-file">
 			<param name="remote.host" value="${cluster-node.host}" />
-			<param name="remote.file" value="/liferay-portal-${lp.version}/tomcat-6.0.32/bin/shutdown.bat" />
+			<param name="remote.file" value="/liferay-portal-${lp.version}/tomcat-${app.server.tomcat.version}/bin/shutdown.bat" />
 			<param name="remote.replace.token" value="set &quot;CATALINA_HOME=%cd%&quot;" />
-			<param name="remote.replace.value" value="set CATALINA_HOME=C:\liferay-portal-${lp.version}\tomcat-6.0.32" />
+			<param name="remote.replace.value" value="set CATALINA_HOME=C:\liferay-portal-${lp.version}\tomcat-${app.server.tomcat.version}" />
 		</antcall>
 
 		<antcall target="replace-remote-file">
 			<param name="remote.host" value="${cluster-node.host}" />
-			<param name="remote.file" value="/liferay-portal-${lp.version}/tomcat-6.0.32/conf/server.xml" />
+			<param name="remote.file" value="/liferay-portal-${lp.version}/tomcat-${app.server.tomcat.version}/conf/server.xml" />
 			<param name="remote.replace.token" value="&lt;Engine name=&quot;Catalina&quot; defaultHost=&quot;localhost&quot;&gt;" />
 			<param name="remote.replace.value" value="&lt;Engine name=&quot;Catalina&quot; defaultHost=&quot;localhost&quot; jvmRoute=&quot;${cluster-node.value}&quot;&gt;" />
 		</antcall>
@@ -63,12 +53,14 @@ net.sf.ehcache.configurationResourceName=/ehcache/hibernate-clustered.xml
 
 ehcache.multi.vm.config.location=/ehcache/liferay-multi-vm-clustered.xml
 
+redirect.url.ips.allowed=127.0.0.1,SERVER_IP,${vm.cluster-node-1.ip}
+
 cluster.link.enabled=true
 
 web.server.display.node=true</echo>
 
 		<exec executable="${pscp.executable}">
-			<arg line="-pw ${vm.password} portal-impl/src/portal-ext.properties ${vm.username}@${cluster-node.host}:/liferay-portal-${lp.version}/tomcat-6.0.32/webapps/ROOT/WEB-INF/classes" />
+			<arg line="-pw ${vm.password} portal-impl/src/portal-ext.properties ${vm.username}@${cluster-node.host}:/liferay-portal-${lp.version}/tomcat-${app.server.tomcat.version}/webapps/ROOT/WEB-INF/classes" />
 		</exec>
 
 		<delete file="portal-impl/src/portal-ext.properties" />
@@ -87,9 +79,9 @@ web.server.display.node=true</echo>
 
 		<antcall target="replace-remote-file">
 			<param name="remote.host" value="${vm.host}" />
-			<param name="remote.file" value="/liferay-portal-${lp.version}/tomcat-6.0.32/bin/startup.bat" />
+			<param name="remote.file" value="/liferay-portal-${lp.version}/tomcat-${app.server.tomcat.version}/bin/startup.bat" />
 			<param name="remote.replace.token" value='set "CATALINA_HOME=%cd%"' />
-			<param name="remote.replace.value" value="set CATALINA_HOME=C:\liferay-portal-${lp.version}\tomcat-6.0.32" />
+			<param name="remote.replace.value" value="set CATALINA_HOME=C:\liferay-portal-${lp.version}\tomcat-${app.server.tomcat.version}" />
 		</antcall>
 	</target>
 
@@ -177,13 +169,13 @@ web.server.display.node=true</echo>
 						</antcall>
 					</then>
 					<else>
-						<antcall target="prepare-root-xml" inheritAll="false"/>
+						<antcall target="prepare-root-xml" inheritAll="false" />
 					</else>
 				</if>
 			</then>
 		</if>
 
-		<antcall target="deploy-properties" inheritAll="false"/>
+		<antcall target="deploy-properties" inheritAll="false" />
 
 		<delete dir="${user.home}/liferay" />
 
@@ -200,9 +192,12 @@ web.server.display.node=true</echo>
 				/>
 			</then>
 			<elseif>
-				<equals arg1="${lp.version}" arg2="5.2.9" />
-				<equals arg1="${lp.version}" arg2="6.0.10" />
-				<equals arg1="${lp.version}" arg2="6.0.11" />
+				<or>
+					<equals arg1="${lp.version}" arg2="5.2.9" />
+					<equals arg1="${lp.version}" arg2="6.0.10" />
+					<equals arg1="${lp.version}" arg2="6.0.11" />
+					<equals arg1="${lp.version}" arg2="6.0.12" />
+				</or>
 				<then>
 					<copy
 						todir="${user.home}/liferay/deploy">
@@ -225,6 +220,10 @@ web.server.display.node=true</echo>
 	</target>
 
 	<target name="run-tomcat">
+		<antcall target="clean-up-logs" />
+
+		<record action="start" name="log" />
+
 		<antcall target="run-simple-server">
 			<param name="simple.server.dir" value="${app.server.tomcat.dir}" />
 			<param name="simple.server.bin.dir" value="${app.server.tomcat.bin.dir}" />
@@ -235,5 +234,9 @@ web.server.display.node=true</echo>
 			<param name="simple.server.start.executable.arg.line" value="run" />
 			<param name="simple.server.stop.executable" value="shutdown${file.suffix.bat}" />
 		</antcall>
+
+		<record action="stop" name="log" />
+
+		<antcall target="evaluate-logs" />
 	</target>
 </project>

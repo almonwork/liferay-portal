@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,6 +14,8 @@
 
 package com.liferay.portlet.shopping.service;
 
+import com.liferay.portal.service.ServiceWrapper;
+
 /**
  * <p>
  * This class is a wrapper for {@link ShoppingCategoryLocalService}.
@@ -24,7 +26,8 @@ package com.liferay.portlet.shopping.service;
  * @generated
  */
 public class ShoppingCategoryLocalServiceWrapper
-	implements ShoppingCategoryLocalService {
+	implements ShoppingCategoryLocalService,
+		ServiceWrapper<ShoppingCategoryLocalService> {
 	public ShoppingCategoryLocalServiceWrapper(
 		ShoppingCategoryLocalService shoppingCategoryLocalService) {
 		_shoppingCategoryLocalService = shoppingCategoryLocalService;
@@ -58,25 +61,32 @@ public class ShoppingCategoryLocalServiceWrapper
 	* Deletes the shopping category with the primary key from the database. Also notifies the appropriate model listeners.
 	*
 	* @param categoryId the primary key of the shopping category
+	* @return the shopping category that was removed
 	* @throws PortalException if a shopping category with the primary key could not be found
 	* @throws SystemException if a system exception occurred
 	*/
-	public void deleteShoppingCategory(long categoryId)
+	public com.liferay.portlet.shopping.model.ShoppingCategory deleteShoppingCategory(
+		long categoryId)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException {
-		_shoppingCategoryLocalService.deleteShoppingCategory(categoryId);
+		return _shoppingCategoryLocalService.deleteShoppingCategory(categoryId);
 	}
 
 	/**
 	* Deletes the shopping category from the database. Also notifies the appropriate model listeners.
 	*
 	* @param shoppingCategory the shopping category
+	* @return the shopping category that was removed
 	* @throws SystemException if a system exception occurred
 	*/
-	public void deleteShoppingCategory(
+	public com.liferay.portlet.shopping.model.ShoppingCategory deleteShoppingCategory(
 		com.liferay.portlet.shopping.model.ShoppingCategory shoppingCategory)
 		throws com.liferay.portal.kernel.exception.SystemException {
-		_shoppingCategoryLocalService.deleteShoppingCategory(shoppingCategory);
+		return _shoppingCategoryLocalService.deleteShoppingCategory(shoppingCategory);
+	}
+
+	public com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery() {
+		return _shoppingCategoryLocalService.dynamicQuery();
 	}
 
 	/**
@@ -149,6 +159,12 @@ public class ShoppingCategoryLocalServiceWrapper
 		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery)
 		throws com.liferay.portal.kernel.exception.SystemException {
 		return _shoppingCategoryLocalService.dynamicQueryCount(dynamicQuery);
+	}
+
+	public com.liferay.portlet.shopping.model.ShoppingCategory fetchShoppingCategory(
+		long categoryId)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return _shoppingCategoryLocalService.fetchShoppingCategory(categoryId);
 	}
 
 	/**
@@ -377,11 +393,26 @@ public class ShoppingCategoryLocalServiceWrapper
 			serviceContext);
 	}
 
+	/**
+	 * @deprecated Renamed to {@link #getWrappedService}
+	 */
 	public ShoppingCategoryLocalService getWrappedShoppingCategoryLocalService() {
 		return _shoppingCategoryLocalService;
 	}
 
+	/**
+	 * @deprecated Renamed to {@link #setWrappedService}
+	 */
 	public void setWrappedShoppingCategoryLocalService(
+		ShoppingCategoryLocalService shoppingCategoryLocalService) {
+		_shoppingCategoryLocalService = shoppingCategoryLocalService;
+	}
+
+	public ShoppingCategoryLocalService getWrappedService() {
+		return _shoppingCategoryLocalService;
+	}
+
+	public void setWrappedService(
 		ShoppingCategoryLocalService shoppingCategoryLocalService) {
 		_shoppingCategoryLocalService = shoppingCategoryLocalService;
 	}

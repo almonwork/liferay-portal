@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,8 +14,14 @@
  */
 --%>
 
+<%@ page import="com.liferay.portal.events.ServicePreAction" %>
 <%@ page import="com.liferay.portal.kernel.servlet.HttpHeaders" %>
+<%@ page import="com.liferay.portal.kernel.util.InstancePool" %>
+<%@ page import="com.liferay.portal.model.Layout" %>
+<%@ page import="com.liferay.portal.model.LayoutConstants" %>
 <%@ page import="com.liferay.portal.model.LayoutSet" %>
+<%@ page import="com.liferay.portal.service.LayoutLocalServiceUtil" %>
+<%@ page import="com.liferay.portal.theme.ThemeDisplay" %>
 <%@ page import="com.liferay.portal.util.PortalUtil" %>
 <%@ page import="com.liferay.portal.util.WebKeys" %>
 
@@ -32,7 +38,20 @@ String redirect = null;
 LayoutSet layoutSet = (LayoutSet)request.getAttribute(WebKeys.VIRTUAL_HOST_LAYOUT_SET);
 
 if (layoutSet != null) {
-	redirect = PortalUtil.getPathMain();
+	long defaultPlid = LayoutLocalServiceUtil.getDefaultPlid(layoutSet.getGroupId(), layoutSet.isPrivateLayout());
+
+	if (defaultPlid != LayoutConstants.DEFAULT_PLID) {
+		Layout layout = LayoutLocalServiceUtil.getLayout(defaultPlid);
+
+		ServicePreAction servicePreAction = (ServicePreAction)InstancePool.get(ServicePreAction.class.getName());
+
+		ThemeDisplay themeDisplay = servicePreAction.initThemeDisplay(request, response);
+
+		redirect = PortalUtil.getLayoutURL(layout, themeDisplay);
+	}
+	else {
+		redirect = PortalUtil.getPathMain();
+	}
 }
 else {
 	redirect = PortalUtil.getHomeURL(request);

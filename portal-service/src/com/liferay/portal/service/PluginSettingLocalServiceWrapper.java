@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -24,7 +24,8 @@ package com.liferay.portal.service;
  * @generated
  */
 public class PluginSettingLocalServiceWrapper
-	implements PluginSettingLocalService {
+	implements PluginSettingLocalService,
+		ServiceWrapper<PluginSettingLocalService> {
 	public PluginSettingLocalServiceWrapper(
 		PluginSettingLocalService pluginSettingLocalService) {
 		_pluginSettingLocalService = pluginSettingLocalService;
@@ -58,25 +59,32 @@ public class PluginSettingLocalServiceWrapper
 	* Deletes the plugin setting with the primary key from the database. Also notifies the appropriate model listeners.
 	*
 	* @param pluginSettingId the primary key of the plugin setting
+	* @return the plugin setting that was removed
 	* @throws PortalException if a plugin setting with the primary key could not be found
 	* @throws SystemException if a system exception occurred
 	*/
-	public void deletePluginSetting(long pluginSettingId)
+	public com.liferay.portal.model.PluginSetting deletePluginSetting(
+		long pluginSettingId)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException {
-		_pluginSettingLocalService.deletePluginSetting(pluginSettingId);
+		return _pluginSettingLocalService.deletePluginSetting(pluginSettingId);
 	}
 
 	/**
 	* Deletes the plugin setting from the database. Also notifies the appropriate model listeners.
 	*
 	* @param pluginSetting the plugin setting
+	* @return the plugin setting that was removed
 	* @throws SystemException if a system exception occurred
 	*/
-	public void deletePluginSetting(
+	public com.liferay.portal.model.PluginSetting deletePluginSetting(
 		com.liferay.portal.model.PluginSetting pluginSetting)
 		throws com.liferay.portal.kernel.exception.SystemException {
-		_pluginSettingLocalService.deletePluginSetting(pluginSetting);
+		return _pluginSettingLocalService.deletePluginSetting(pluginSetting);
+	}
+
+	public com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery() {
+		return _pluginSettingLocalService.dynamicQuery();
 	}
 
 	/**
@@ -148,6 +156,12 @@ public class PluginSettingLocalServiceWrapper
 		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery)
 		throws com.liferay.portal.kernel.exception.SystemException {
 		return _pluginSettingLocalService.dynamicQueryCount(dynamicQuery);
+	}
+
+	public com.liferay.portal.model.PluginSetting fetchPluginSetting(
+		long pluginSettingId)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return _pluginSettingLocalService.fetchPluginSetting(pluginSettingId);
 	}
 
 	/**
@@ -278,11 +292,26 @@ public class PluginSettingLocalServiceWrapper
 			pluginId, pluginType, roles, active);
 	}
 
+	/**
+	 * @deprecated Renamed to {@link #getWrappedService}
+	 */
 	public PluginSettingLocalService getWrappedPluginSettingLocalService() {
 		return _pluginSettingLocalService;
 	}
 
+	/**
+	 * @deprecated Renamed to {@link #setWrappedService}
+	 */
 	public void setWrappedPluginSettingLocalService(
+		PluginSettingLocalService pluginSettingLocalService) {
+		_pluginSettingLocalService = pluginSettingLocalService;
+	}
+
+	public PluginSettingLocalService getWrappedService() {
+		return _pluginSettingLocalService;
+	}
+
+	public void setWrappedService(
 		PluginSettingLocalService pluginSettingLocalService) {
 		_pluginSettingLocalService = pluginSettingLocalService;
 	}

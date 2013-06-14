@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -50,13 +50,13 @@ PortletURL portletURL = renderResponse.createRenderURL();
 
 		vocabulary = vocabulary.toEscapedModel();
 
-		String vocabularyNavigation = _buildVocabularyNavigation(vocabulary, categoryId, portletURL);
+		String vocabularyNavigation = _buildVocabularyNavigation(vocabulary, categoryId, portletURL, themeDisplay);
 
 		if (Validator.isNotNull(vocabularyNavigation)) {
 			hidePortletWhenEmpty = false;
 	%>
 
-			<liferay-ui:panel collapsible="<%= false %>" extended="<%= true %>" persistState="<%= true %>" title="<%= vocabulary.getName() %>">
+			<liferay-ui:panel collapsible="<%= false %>" extended="<%= true %>" persistState="<%= true %>" title="<%= vocabulary.getTitle(locale) %>">
 				<%= vocabularyNavigation %>
 			</liferay-ui:panel>
 
@@ -95,10 +95,12 @@ if (hidePortletWhenEmpty) {
 				}
 			).render();
 
-			var selected = assetCategoryList.one('.aui-tree-node strong');
+			var selected = assetCategoryList.one('.aui-tree-node .tag-selected');
 
 			if (selected) {
 				var selectedChild = treeView.getNodeByChild(selected);
+
+				selectedChild.expand();
 
 				selectedChild.eachParent(
 					function(node) {
@@ -113,38 +115,38 @@ if (hidePortletWhenEmpty) {
 </aui:script>
 
 <%!
-private void _buildCategoriesNavigation(List<AssetCategory> categories, long curCategoryId, PortletURL portletURL, StringBundler sb) throws Exception {
+private void _buildCategoriesNavigation(List<AssetCategory> categories, long categoryId, PortletURL portletURL, ThemeDisplay themeDisplay, StringBundler sb) throws Exception {
 	for (AssetCategory category : categories) {
 		category = category.toEscapedModel();
 
-		long categoryId = category.getCategoryId();
-		String name = category.getName();
+		String title = category.getTitle(themeDisplay.getLocale());
 
 		List<AssetCategory> categoriesChildren = AssetCategoryServiceUtil.getChildCategories(category.getCategoryId(), QueryUtil.ALL_POS, QueryUtil.ALL_POS, null);
 
 		sb.append("<li><span>");
 
-		if (categoryId == curCategoryId) {
-			sb.append("<strong>");
-			sb.append(name);
-			sb.append("</strong>");
+		if (categoryId == category.getCategoryId()) {
+			portletURL.setParameter("categoryId", StringPool.BLANK);
+
+			sb.append("<a class=\"tag-selected\" href=\"");
 		}
 		else {
-			portletURL.setParameter("categoryId", String.valueOf(categoryId));
+			portletURL.setParameter("resetCur", Boolean.TRUE.toString());
+			portletURL.setParameter("categoryId", String.valueOf(category.getCategoryId()));
 
 			sb.append("<a href=\"");
-			sb.append(portletURL.toString());
-			sb.append("\">");
-			sb.append(name);
-			sb.append("</a>");
 		}
 
+		sb.append(portletURL.toString());
+		sb.append("\">");
+		sb.append(title);
+		sb.append("</a>");
 		sb.append("</span>");
 
 		if (!categoriesChildren.isEmpty()) {
 			sb.append("<ul>");
 
-			_buildCategoriesNavigation(categoriesChildren, curCategoryId, portletURL, sb);
+			_buildCategoriesNavigation(categoriesChildren, categoryId, portletURL, themeDisplay, sb);
 
 			sb.append("</ul>");
 		}
@@ -153,7 +155,7 @@ private void _buildCategoriesNavigation(List<AssetCategory> categories, long cur
 	}
 }
 
-private String _buildVocabularyNavigation(AssetVocabulary vocabulary, long categoryId, PortletURL portletURL) throws Exception {
+private String _buildVocabularyNavigation(AssetVocabulary vocabulary, long categoryId, PortletURL portletURL, ThemeDisplay themeDisplay) throws Exception {
 	List<AssetCategory> categories = AssetCategoryServiceUtil.getVocabularyRootCategories(vocabulary.getVocabularyId(), QueryUtil.ALL_POS, QueryUtil.ALL_POS, null);
 
 	if (categories.isEmpty()) {
@@ -164,7 +166,7 @@ private String _buildVocabularyNavigation(AssetVocabulary vocabulary, long categ
 
 	sb.append("<div class=\"lfr-asset-category-list-container\"><ul class=\"lfr-asset-category-list\">");
 
-	_buildCategoriesNavigation(categories, categoryId, portletURL, sb);
+	_buildCategoriesNavigation(categories, categoryId, portletURL, themeDisplay, sb);
 
 	sb.append("</ul></div>");
 

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,6 +14,8 @@
 
 package com.liferay.portlet.dynamicdatamapping.service;
 
+import com.liferay.portal.service.ServiceWrapper;
+
 /**
  * <p>
  * This class is a wrapper for {@link DDMContentLocalService}.
@@ -23,7 +25,8 @@ package com.liferay.portlet.dynamicdatamapping.service;
  * @see       DDMContentLocalService
  * @generated
  */
-public class DDMContentLocalServiceWrapper implements DDMContentLocalService {
+public class DDMContentLocalServiceWrapper implements DDMContentLocalService,
+	ServiceWrapper<DDMContentLocalService> {
 	public DDMContentLocalServiceWrapper(
 		DDMContentLocalService ddmContentLocalService) {
 		_ddmContentLocalService = ddmContentLocalService;
@@ -57,25 +60,32 @@ public class DDMContentLocalServiceWrapper implements DDMContentLocalService {
 	* Deletes the d d m content with the primary key from the database. Also notifies the appropriate model listeners.
 	*
 	* @param contentId the primary key of the d d m content
+	* @return the d d m content that was removed
 	* @throws PortalException if a d d m content with the primary key could not be found
 	* @throws SystemException if a system exception occurred
 	*/
-	public void deleteDDMContent(long contentId)
+	public com.liferay.portlet.dynamicdatamapping.model.DDMContent deleteDDMContent(
+		long contentId)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException {
-		_ddmContentLocalService.deleteDDMContent(contentId);
+		return _ddmContentLocalService.deleteDDMContent(contentId);
 	}
 
 	/**
 	* Deletes the d d m content from the database. Also notifies the appropriate model listeners.
 	*
 	* @param ddmContent the d d m content
+	* @return the d d m content that was removed
 	* @throws SystemException if a system exception occurred
 	*/
-	public void deleteDDMContent(
+	public com.liferay.portlet.dynamicdatamapping.model.DDMContent deleteDDMContent(
 		com.liferay.portlet.dynamicdatamapping.model.DDMContent ddmContent)
 		throws com.liferay.portal.kernel.exception.SystemException {
-		_ddmContentLocalService.deleteDDMContent(ddmContent);
+		return _ddmContentLocalService.deleteDDMContent(ddmContent);
+	}
+
+	public com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery() {
+		return _ddmContentLocalService.dynamicQuery();
 	}
 
 	/**
@@ -147,6 +157,12 @@ public class DDMContentLocalServiceWrapper implements DDMContentLocalService {
 		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery)
 		throws com.liferay.portal.kernel.exception.SystemException {
 		return _ddmContentLocalService.dynamicQueryCount(dynamicQuery);
+	}
+
+	public com.liferay.portlet.dynamicdatamapping.model.DDMContent fetchDDMContent(
+		long contentId)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return _ddmContentLocalService.fetchDDMContent(contentId);
 	}
 
 	/**
@@ -323,12 +339,26 @@ public class DDMContentLocalServiceWrapper implements DDMContentLocalService {
 			description, xml, serviceContext);
 	}
 
+	/**
+	 * @deprecated Renamed to {@link #getWrappedService}
+	 */
 	public DDMContentLocalService getWrappedDDMContentLocalService() {
 		return _ddmContentLocalService;
 	}
 
+	/**
+	 * @deprecated Renamed to {@link #setWrappedService}
+	 */
 	public void setWrappedDDMContentLocalService(
 		DDMContentLocalService ddmContentLocalService) {
+		_ddmContentLocalService = ddmContentLocalService;
+	}
+
+	public DDMContentLocalService getWrappedService() {
+		return _ddmContentLocalService;
+	}
+
+	public void setWrappedService(DDMContentLocalService ddmContentLocalService) {
 		_ddmContentLocalService = ddmContentLocalService;
 	}
 

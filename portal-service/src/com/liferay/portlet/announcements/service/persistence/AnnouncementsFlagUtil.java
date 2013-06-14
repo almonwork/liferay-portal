@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -92,14 +92,6 @@ public class AnnouncementsFlagUtil {
 		return getPersistence()
 				   .findWithDynamicQuery(dynamicQuery, start, end,
 			orderByComparator);
-	}
-
-	/**
-	 * @see com.liferay.portal.service.persistence.BasePersistence#remove(com.liferay.portal.model.BaseModel)
-	 */
-	public static AnnouncementsFlag remove(AnnouncementsFlag announcementsFlag)
-		throws SystemException {
-		return getPersistence().remove(announcementsFlag);
 	}
 
 	/**
@@ -434,12 +426,14 @@ public class AnnouncementsFlagUtil {
 	* @param userId the user ID
 	* @param entryId the entry ID
 	* @param value the value
+	* @return the announcements flag that was removed
 	* @throws SystemException if a system exception occurred
 	*/
-	public static void removeByU_E_V(long userId, long entryId, int value)
+	public static com.liferay.portlet.announcements.model.AnnouncementsFlag removeByU_E_V(
+		long userId, long entryId, int value)
 		throws com.liferay.portal.kernel.exception.SystemException,
 			com.liferay.portlet.announcements.NoSuchFlagException {
-		getPersistence().removeByU_E_V(userId, entryId, value);
+		return getPersistence().removeByU_E_V(userId, entryId, value);
 	}
 
 	/**
@@ -500,11 +494,10 @@ public class AnnouncementsFlagUtil {
 		return _persistence;
 	}
 
+	/**
+	 * @deprecated
+	 */
 	public void setPersistence(AnnouncementsFlagPersistence persistence) {
-		_persistence = persistence;
-
-		ReferenceRegistry.registerReference(AnnouncementsFlagUtil.class,
-			"_persistence");
 	}
 
 	private static AnnouncementsFlagPersistence _persistence;

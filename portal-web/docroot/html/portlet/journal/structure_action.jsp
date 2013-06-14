@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -58,7 +58,7 @@ JournalStructure structure = (JournalStructure)row.getObject();
 	<c:if test="<%= JournalStructurePermission.contains(permissionChecker, structure, ActionKeys.PERMISSIONS) %>">
 		<liferay-security:permissionsURL
 			modelResource="<%= JournalStructure.class.getName() %>"
-			modelResourceDescription="<%= structure.getName() %>"
+			modelResourceDescription="<%= structure.getName(locale) %>"
 			resourcePrimKey="<%= String.valueOf(structure.getId()) %>"
 			var="permissionsURL"
 		/>
@@ -89,7 +89,6 @@ JournalStructure structure = (JournalStructure)row.getObject();
 			<portlet:param name="redirect" value="<%= currentURL %>" />
 			<portlet:param name="backURL" value="<%= currentURL %>" />
 			<portlet:param name="groupId" value="<%= String.valueOf(structure.getGroupId()) %>" />
-			<portlet:param name="classNameId" value="<%= String.valueOf(PortalUtil.getClassNameId(JournalStructure.class.getName())) %>" />
 			<portlet:param name="classPK" value="<%= String.valueOf(structure.getId()) %>" />
 			<portlet:param name="structureId" value="<%= structure.getStructureId() %>" />
 		</portlet:renderURL>

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -176,13 +176,10 @@ public class InformixDB extends BaseDB {
 		return sb.toString();
 	}
 
-	private static String[] _INFORMIX_TEMPLATE = {
-		"--", "'T'", "'F'",
-		"'1970-01-01'", "CURRENT YEAR TO FRACTION",
-		" blob", " boolean", " datetime YEAR TO FRACTION",
-		" float", " int", " int8",
-		" lvarchar", " text", " varchar",
-		"", "commit"
+	private static final String[] _INFORMIX_TEMPLATE = {
+		"--", "'T'", "'F'", "'1970-01-01'", "CURRENT YEAR TO FRACTION", " blob",
+		" blob", " boolean", " datetime YEAR TO FRACTION", " float", " int",
+		" int8", " lvarchar", " text", " varchar", "", "commit"
 	};
 
 	private static InformixDB _instance = new InformixDB();

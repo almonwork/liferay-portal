@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -23,6 +23,7 @@ import com.liferay.portal.kernel.util.Converter;
 import com.liferay.portal.kernel.util.PropsKeys;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
+import com.liferay.portal.security.pacl.PACLClassLoaderUtil;
 import com.liferay.portal.util.PropsUtil;
 import com.liferay.portal.util.PropsValues;
 
@@ -36,6 +37,7 @@ import javassist.util.proxy.ProxyFactory;
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.cfg.Environment;
+import org.hibernate.dialect.Dialect;
 
 import org.springframework.orm.hibernate3.LocalSessionFactoryBean;
 
@@ -52,10 +54,12 @@ public class PortalHibernateConfiguration extends LocalSessionFactoryBean {
 			new ProxyFactory.ClassLoaderProvider() {
 
 				public ClassLoader get(ProxyFactory proxyFactory) {
-					return Thread.currentThread().getContextClassLoader();
+					return PACLClassLoaderUtil.getContextClassLoader();
 				}
 
 			};
+
+		setBeanClassLoader(getConfigurationClassLoader());
 
 		return super.buildSessionFactory();
 	}
@@ -66,12 +70,14 @@ public class PortalHibernateConfiguration extends LocalSessionFactoryBean {
 		_hibernateConfigurationConverter = hibernateConfigurationConverter;
 	}
 
-	protected String determineDialect() {
-		return DialectDetector.determineDialect(getDataSource());
+	protected Dialect determineDialect() {
+		return DialectDetector.getDialect(getDataSource());
 	}
 
 	protected ClassLoader getConfigurationClassLoader() {
-		return getClass().getClassLoader();
+		Class<?> clazz = getClass();
+
+		return clazz.getClassLoader();
 	}
 
 	protected String[] getConfigurationResources() {
@@ -99,9 +105,13 @@ public class PortalHibernateConfiguration extends LocalSessionFactoryBean {
 			configuration.setProperties(PropsUtil.getProperties());
 
 			if (Validator.isNull(PropsValues.HIBERNATE_DIALECT)) {
-				String dialect = determineDialect();
+				Dialect dialect = determineDialect();
 
-				configuration.setProperty("hibernate.dialect", dialect);
+				setDB(dialect);
+
+				Class<?> clazz = dialect.getClass();
+
+				configuration.setProperty("hibernate.dialect", clazz.getName());
 			}
 
 			DB db = DBFactoryUtil.getDB();
@@ -168,13 +178,16 @@ public class PortalHibernateConfiguration extends LocalSessionFactoryBean {
 			configurationString = _hibernateConfigurationConverter.convert(
 				configurationString);
 
-			is = new UnsyncByteArrayInputStream(
-				configurationString.getBytes());
+			is = new UnsyncByteArrayInputStream(configurationString.getBytes());
 		}
 
 		configuration = configuration.addInputStream(is);
 
 		is.close();
+	}
+
+	protected void setDB(Dialect dialect) {
+		DBFactoryUtil.setDB(dialect);
 	}
 
 	private static Log _log = LogFactoryUtil.getLog(

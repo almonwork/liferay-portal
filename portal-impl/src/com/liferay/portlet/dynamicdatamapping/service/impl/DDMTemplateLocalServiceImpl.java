@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -22,11 +22,13 @@ import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.model.ResourceConstants;
 import com.liferay.portal.model.User;
 import com.liferay.portal.service.ServiceContext;
+import com.liferay.portlet.dynamicdatamapping.TemplateDuplicateTemplateKeyException;
 import com.liferay.portlet.dynamicdatamapping.TemplateNameException;
 import com.liferay.portlet.dynamicdatamapping.TemplateScriptException;
 import com.liferay.portlet.dynamicdatamapping.model.DDMTemplate;
 import com.liferay.portlet.dynamicdatamapping.service.base.DDMTemplateLocalServiceBaseImpl;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
@@ -40,10 +42,10 @@ public class DDMTemplateLocalServiceImpl
 	extends DDMTemplateLocalServiceBaseImpl {
 
 	public DDMTemplate addTemplate(
-			long userId, long groupId, long structureId,
-			Map<Locale, String> nameMap, Map<Locale, String> descriptionMap,
-			String type, String language, String script,
-			ServiceContext serviceContext)
+			long userId, long groupId, long classNameId, long classPK,
+			String templateKey, Map<Locale, String> nameMap,
+			Map<Locale, String> descriptionMap, String type, String mode,
+			String language, String script, ServiceContext serviceContext)
 		throws PortalException, SystemException {
 
 		// Template
@@ -51,7 +53,11 @@ public class DDMTemplateLocalServiceImpl
 		User user = userPersistence.findByPrimaryKey(userId);
 		Date now = new Date();
 
-		validate(nameMap, script);
+		if (Validator.isNull(templateKey)) {
+			templateKey = String.valueOf(counterLocalService.increment());
+		}
+
+		validate(groupId, templateKey, nameMap, script);
 
 		long templateId = counterLocalService.increment();
 
@@ -64,10 +70,13 @@ public class DDMTemplateLocalServiceImpl
 		template.setUserName(user.getFullName());
 		template.setCreateDate(serviceContext.getCreateDate(now));
 		template.setModifiedDate(serviceContext.getModifiedDate(now));
-		template.setStructureId(structureId);
+		template.setClassNameId(classNameId);
+		template.setClassPK(classPK);
+		template.setTemplateKey(templateKey);
 		template.setNameMap(nameMap);
 		template.setDescriptionMap(descriptionMap);
 		template.setType(type);
+		template.setMode(mode);
 		template.setLanguage(language);
 		template.setScript(script);
 
@@ -75,12 +84,12 @@ public class DDMTemplateLocalServiceImpl
 
 		// Resources
 
-		if (serviceContext.getAddGroupPermissions() ||
-			serviceContext.getAddGuestPermissions()) {
+		if (serviceContext.isAddGroupPermissions() ||
+			serviceContext.isAddGuestPermissions()) {
 
 			addTemplateResources(
-				template, serviceContext.getAddGroupPermissions(),
-				serviceContext.getAddGuestPermissions());
+				template, serviceContext.isAddGroupPermissions(),
+				serviceContext.isAddGuestPermissions());
 		}
 		else {
 			addTemplateResources(
@@ -112,6 +121,30 @@ public class DDMTemplateLocalServiceImpl
 			template.getCompanyId(), template.getGroupId(),
 			template.getUserId(), DDMTemplate.class.getName(),
 			template.getTemplateId(), groupPermissions, guestPermissions);
+	}
+
+	public List<DDMTemplate> copyTemplates(
+			long userId, long classNameId, long oldClassPK, long newClassPK,
+			String type, ServiceContext serviceContext)
+		throws PortalException, SystemException {
+
+		List<DDMTemplate> newTemplates = new ArrayList<DDMTemplate>();
+
+		List<DDMTemplate> oldTemplates = getTemplates(
+			classNameId, oldClassPK, type);
+
+		for (DDMTemplate oldTemplate : oldTemplates) {
+			DDMTemplate newTemplate = addTemplate(
+				userId, oldTemplate.getGroupId(), oldTemplate.getClassNameId(),
+				newClassPK, null, oldTemplate.getNameMap(),
+				oldTemplate.getDescriptionMap(), oldTemplate.getType(),
+				oldTemplate.getMode(), oldTemplate.getLanguage(),
+				oldTemplate.getScript(), serviceContext);
+
+			newTemplates.add(newTemplate);
+		}
+
+		return newTemplates;
 	}
 
 	public void deleteTemplate(DDMTemplate template)
@@ -148,69 +181,147 @@ public class DDMTemplateLocalServiceImpl
 		}
 	}
 
+	public DDMTemplate fetchTemplate(long groupId, String templateKey)
+		throws SystemException {
+
+		return ddmTemplatePersistence.fetchByG_T(groupId, templateKey);
+	}
+
 	public DDMTemplate getTemplate(long templateId)
 		throws PortalException, SystemException {
 
 		return ddmTemplatePersistence.findByPrimaryKey(templateId);
 	}
 
-	public List<DDMTemplate> getTemplates(long structureId)
-		throws SystemException {
+	public DDMTemplate getTemplate(long groupId, String templateKey)
+		throws PortalException, SystemException {
 
-		return ddmTemplatePersistence.findByStructureId(structureId);
+		return ddmTemplatePersistence.findByG_T(groupId, templateKey);
 	}
 
-	public List<DDMTemplate> getTemplates(long structureId, String type)
+	public List<DDMTemplate> getTemplates(long classPK) throws SystemException {
+		return ddmTemplatePersistence.findByClassPK(classPK);
+	}
+
+	public List<DDMTemplate> getTemplates(long groupId, long classNameId)
 		throws SystemException {
 
-		return ddmTemplatePersistence.findByS_T(structureId, type);
+		return ddmTemplatePersistence.findByG_C(groupId, classNameId);
+	}
+
+	public List<DDMTemplate> getTemplates(
+			long groupId, long classNameId, long classPK)
+		throws SystemException {
+
+		return ddmTemplatePersistence.findByG_C_C(
+			groupId, classNameId, classPK);
+	}
+
+	public List<DDMTemplate> getTemplates(
+			long classNameId, long classPK, String type)
+		throws SystemException {
+
+		return ddmTemplatePersistence.findByC_C_T(classNameId, classPK, type);
+	}
+
+	public List<DDMTemplate> getTemplates(
+			long classNameId, long classPK, String type, String mode)
+		throws SystemException {
+
+		return ddmTemplatePersistence.findByC_C_T_M(
+			classNameId, classPK, type, mode);
 	}
 
 	public List<DDMTemplate> search(
-			long companyId, long groupId, long structureId, String keywords,
-			int start, int end, OrderByComparator orderByComparator)
-		throws SystemException {
-
-		return ddmTemplateFinder.findByKeywords(
-			companyId, groupId, structureId, keywords, start, end,
-			orderByComparator);
-	}
-
-	public List<DDMTemplate> search(
-			long companyId, long groupId, long structureId, String name,
-			String description, String type, String language,
-			boolean andOperator, int start, int end,
+			long companyId, long groupId, long classNameId, long classPK,
+			String keywords, String type, String mode, int start, int end,
 			OrderByComparator orderByComparator)
 		throws SystemException {
 
-		return ddmTemplateFinder.findByC_G_S_N_D_T_L(
-			companyId, groupId, structureId, name, description, type, language,
-			andOperator, start, end, orderByComparator);
+		return ddmTemplateFinder.findByKeywords(
+			companyId, groupId, classNameId, classPK, keywords, type, mode,
+			start, end, orderByComparator);
+	}
+
+	public List<DDMTemplate> search(
+			long companyId, long groupId, long classNameId, long classPK,
+			String name, String description, String type, String mode,
+			String language, boolean andOperator, int start, int end,
+			OrderByComparator orderByComparator)
+		throws SystemException {
+
+		return ddmTemplateFinder.findByC_G_C_C_N_D_T_M_L(
+			companyId, groupId, classNameId, classPK, name, description, type,
+			mode, language, andOperator, start, end, orderByComparator);
+	}
+
+	public List<DDMTemplate> search(
+			long companyId, long groupId, long[] classNameIds, long classPK,
+			String keywords, String type, String mode, int start, int end,
+			OrderByComparator orderByComparator)
+		throws SystemException {
+
+		return ddmTemplateFinder.findByKeywords(
+			companyId, groupId, classNameIds, classPK, keywords, type, mode,
+			start, end, orderByComparator);
+	}
+
+	public List<DDMTemplate> search(
+			long companyId, long groupId, long[] classNameIds, long classPK,
+			String name, String description, String type, String mode,
+			String language, boolean andOperator, int start, int end,
+			OrderByComparator orderByComparator)
+		throws SystemException {
+
+		return ddmTemplateFinder.findByC_G_C_C_N_D_T_M_L(
+			companyId, groupId, classNameIds, classPK, name, description, type,
+			mode, language, andOperator, start, end, orderByComparator);
 	}
 
 	public int searchCount(
-			long companyId, long groupId, long structureId, String keywords)
+			long companyId, long groupId, long classNameId, long classPK,
+			String keywords, String type, String mode)
 		throws SystemException {
 
 		return ddmTemplateFinder.countByKeywords(
-			companyId, groupId, structureId, keywords);
+			companyId, groupId, classNameId, classPK, keywords, type, mode);
 	}
 
 	public int searchCount(
-			long companyId, long groupId, long structureId, String name,
-			String description, String type, String language,
-			boolean andOperator)
+			long companyId, long groupId, long classNameId, long classPK,
+			String name, String description, String type, String mode,
+			String language, boolean andOperator)
 		throws SystemException {
 
-		return ddmTemplateFinder.countByC_G_S_N_D_T_L(
-			companyId, groupId, structureId, name, description, type, language,
-			andOperator);
+		return ddmTemplateFinder.countByC_G_C_C_N_D_T_M_L(
+			companyId, groupId, classNameId, classPK, name, description, type,
+			mode, language, andOperator);
+	}
+
+	public int searchCount(
+			long companyId, long groupId, long[] classNameIds, long classPK,
+			String keywords, String type, String mode)
+		throws SystemException {
+
+		return ddmTemplateFinder.countByKeywords(
+			companyId, groupId, classNameIds, classPK, keywords, type, mode);
+	}
+
+	public int searchCount(
+			long companyId, long groupId, long[] classNameIds, long classPK,
+			String name, String description, String type, String mode,
+			String language, boolean andOperator)
+		throws SystemException {
+
+		return ddmTemplateFinder.countByC_G_C_C_N_D_T_M_L(
+			companyId, groupId, classNameIds, classPK, name, description, type,
+			mode, language, andOperator);
 	}
 
 	public DDMTemplate updateTemplate(
 			long templateId, Map<Locale, String> nameMap,
-			Map<Locale, String> descriptionMap, String type, String language,
-			String script, ServiceContext serviceContext)
+			Map<Locale, String> descriptionMap, String type, String mode,
+			String language, String script, ServiceContext serviceContext)
 		throws PortalException, SystemException {
 
 		validate(nameMap, script);
@@ -222,12 +333,28 @@ public class DDMTemplateLocalServiceImpl
 		template.setNameMap(nameMap);
 		template.setDescriptionMap(descriptionMap);
 		template.setType(type);
+		template.setMode(mode);
 		template.setLanguage(language);
 		template.setScript(script);
 
 		ddmTemplatePersistence.update(template, false);
 
 		return template;
+	}
+
+	protected void validate(
+			long groupId, String templateKey, Map<Locale, String> nameMap,
+			String script)
+		throws PortalException, SystemException {
+
+		DDMTemplate template = ddmTemplatePersistence.fetchByG_T(
+			groupId, templateKey);
+
+		if (template != null) {
+			throw new TemplateDuplicateTemplateKeyException();
+		}
+
+		validate(nameMap, script);
 	}
 
 	protected void validate(Map<Locale, String> nameMap, String script)

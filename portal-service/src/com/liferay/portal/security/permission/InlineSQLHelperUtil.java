@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,6 +14,8 @@
 
 package com.liferay.portal.security.permission;
 
+import com.liferay.portal.kernel.security.pacl.permission.PortalRuntimePermission;
+
 /**
  * @author Raymond Augé
  * @see    InlineSQLHelper
@@ -21,6 +23,8 @@ package com.liferay.portal.security.permission;
 public class InlineSQLHelperUtil {
 
 	public static InlineSQLHelper getInlineSQLHelper() {
+		PortalRuntimePermission.checkGetBeanProperty(InlineSQLHelperUtil.class);
+
 		return _inlineSQLPermission;
 	}
 
@@ -120,7 +124,18 @@ public class InlineSQLHelperUtil {
 			sql, className, classPKField, userIdField, bridgeJoin);
 	}
 
+	public static String replacePermissionCheck(
+		String sql, String className, String classPKField, String userIdField,
+		String groupIdField, long[] groupIds, String bridgeJoin) {
+
+		return getInlineSQLHelper().replacePermissionCheck(
+			sql, className, classPKField, userIdField, groupIdField, groupIds,
+			bridgeJoin);
+	}
+
 	public void setInlineSQLHelper(InlineSQLHelper inlineSQLPermission) {
+		PortalRuntimePermission.checkSetBeanProperty(getClass());
+
 		_inlineSQLPermission = inlineSQLPermission;
 	}
 

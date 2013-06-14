@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -40,16 +40,16 @@ for (int i = 1; i <= maxDayOfMonth; i++) {
 		<td class="lfr-top" style="padding-right: 10px;" width="1%">
 			<div class="calendar-container float-container">
 				<div class="calendar-day">
-					<h2 class="day-text"><%= DateUtil.getDate(Time.getDate(selCal), "EEEE", locale, timeZone) %></h2>
-					<h3 class="day-number"><%= selDay %></h3>
+					 <div class="day-text"><%= DateUtil.getDate(Time.getDate(selCal), "EEEE", locale, timeZone) %></div>
+					 <div class="day-number"><%= selDay %></div>
 				</div>
 
 				<liferay-ui:calendar
-					month="<%= selMonth %>"
-					day="<%= selDay %>"
-					year="<%= selYear %>"
-					headerFormat="<%= dateFormatDate %>"
 					data="<%= data %>"
+					day="<%= selDay %>"
+					headerFormat="<%= dateFormatDate %>"
+					month="<%= selMonth %>"
+					year="<%= selYear %>"
 				/>
 			</div>
 		</td>

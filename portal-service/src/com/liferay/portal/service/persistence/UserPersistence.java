@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,7 +14,6 @@
 
 package com.liferay.portal.service.persistence;
 
-import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.model.User;
 
 /**
@@ -197,6 +196,117 @@ public interface UserPersistence extends BasePersistence<User> {
 	*/
 	public com.liferay.portal.model.User[] findByUuid_PrevAndNext(long userId,
 		java.lang.String uuid,
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
+		throws com.liferay.portal.NoSuchUserException,
+			com.liferay.portal.kernel.exception.SystemException;
+
+	/**
+	* Returns all the users where uuid = &#63; and companyId = &#63;.
+	*
+	* @param uuid the uuid
+	* @param companyId the company ID
+	* @return the matching users
+	* @throws SystemException if a system exception occurred
+	*/
+	public java.util.List<com.liferay.portal.model.User> findByUuid_C(
+		java.lang.String uuid, long companyId)
+		throws com.liferay.portal.kernel.exception.SystemException;
+
+	/**
+	* Returns a range of all the users where uuid = &#63; and companyId = &#63;.
+	*
+	* <p>
+	* Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set.
+	* </p>
+	*
+	* @param uuid the uuid
+	* @param companyId the company ID
+	* @param start the lower bound of the range of users
+	* @param end the upper bound of the range of users (not inclusive)
+	* @return the range of matching users
+	* @throws SystemException if a system exception occurred
+	*/
+	public java.util.List<com.liferay.portal.model.User> findByUuid_C(
+		java.lang.String uuid, long companyId, int start, int end)
+		throws com.liferay.portal.kernel.exception.SystemException;
+
+	/**
+	* Returns an ordered range of all the users where uuid = &#63; and companyId = &#63;.
+	*
+	* <p>
+	* Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set.
+	* </p>
+	*
+	* @param uuid the uuid
+	* @param companyId the company ID
+	* @param start the lower bound of the range of users
+	* @param end the upper bound of the range of users (not inclusive)
+	* @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
+	* @return the ordered range of matching users
+	* @throws SystemException if a system exception occurred
+	*/
+	public java.util.List<com.liferay.portal.model.User> findByUuid_C(
+		java.lang.String uuid, long companyId, int start, int end,
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
+		throws com.liferay.portal.kernel.exception.SystemException;
+
+	/**
+	* Returns the first user in the ordered set where uuid = &#63; and companyId = &#63;.
+	*
+	* <p>
+	* Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set.
+	* </p>
+	*
+	* @param uuid the uuid
+	* @param companyId the company ID
+	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	* @return the first matching user
+	* @throws com.liferay.portal.NoSuchUserException if a matching user could not be found
+	* @throws SystemException if a system exception occurred
+	*/
+	public com.liferay.portal.model.User findByUuid_C_First(
+		java.lang.String uuid, long companyId,
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
+		throws com.liferay.portal.NoSuchUserException,
+			com.liferay.portal.kernel.exception.SystemException;
+
+	/**
+	* Returns the last user in the ordered set where uuid = &#63; and companyId = &#63;.
+	*
+	* <p>
+	* Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set.
+	* </p>
+	*
+	* @param uuid the uuid
+	* @param companyId the company ID
+	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	* @return the last matching user
+	* @throws com.liferay.portal.NoSuchUserException if a matching user could not be found
+	* @throws SystemException if a system exception occurred
+	*/
+	public com.liferay.portal.model.User findByUuid_C_Last(
+		java.lang.String uuid, long companyId,
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
+		throws com.liferay.portal.NoSuchUserException,
+			com.liferay.portal.kernel.exception.SystemException;
+
+	/**
+	* Returns the users before and after the current user in the ordered set where uuid = &#63; and companyId = &#63;.
+	*
+	* <p>
+	* Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set.
+	* </p>
+	*
+	* @param userId the primary key of the current user
+	* @param uuid the uuid
+	* @param companyId the company ID
+	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	* @return the previous, current, and next user
+	* @throws com.liferay.portal.NoSuchUserException if a user with the primary key could not be found
+	* @throws SystemException if a system exception occurred
+	*/
+	public com.liferay.portal.model.User[] findByUuid_C_PrevAndNext(
+		long userId, java.lang.String uuid, long companyId,
 		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
 		throws com.liferay.portal.NoSuchUserException,
 			com.liferay.portal.kernel.exception.SystemException;
@@ -872,6 +982,16 @@ public interface UserPersistence extends BasePersistence<User> {
 		throws com.liferay.portal.kernel.exception.SystemException;
 
 	/**
+	* Removes all the users where uuid = &#63; and companyId = &#63; from the database.
+	*
+	* @param uuid the uuid
+	* @param companyId the company ID
+	* @throws SystemException if a system exception occurred
+	*/
+	public void removeByUuid_C(java.lang.String uuid, long companyId)
+		throws com.liferay.portal.kernel.exception.SystemException;
+
+	/**
 	* Removes all the users where companyId = &#63; from the database.
 	*
 	* @param companyId the company ID
@@ -884,9 +1004,10 @@ public interface UserPersistence extends BasePersistence<User> {
 	* Removes the user where contactId = &#63; from the database.
 	*
 	* @param contactId the contact ID
+	* @return the user that was removed
 	* @throws SystemException if a system exception occurred
 	*/
-	public void removeByContactId(long contactId)
+	public com.liferay.portal.model.User removeByContactId(long contactId)
 		throws com.liferay.portal.NoSuchUserException,
 			com.liferay.portal.kernel.exception.SystemException;
 
@@ -903,9 +1024,10 @@ public interface UserPersistence extends BasePersistence<User> {
 	* Removes the user where portraitId = &#63; from the database.
 	*
 	* @param portraitId the portrait ID
+	* @return the user that was removed
 	* @throws SystemException if a system exception occurred
 	*/
-	public void removeByPortraitId(long portraitId)
+	public com.liferay.portal.model.User removeByPortraitId(long portraitId)
 		throws com.liferay.portal.NoSuchUserException,
 			com.liferay.portal.kernel.exception.SystemException;
 
@@ -914,9 +1036,10 @@ public interface UserPersistence extends BasePersistence<User> {
 	*
 	* @param companyId the company ID
 	* @param userId the user ID
+	* @return the user that was removed
 	* @throws SystemException if a system exception occurred
 	*/
-	public void removeByC_U(long companyId, long userId)
+	public com.liferay.portal.model.User removeByC_U(long companyId, long userId)
 		throws com.liferay.portal.NoSuchUserException,
 			com.liferay.portal.kernel.exception.SystemException;
 
@@ -925,9 +1048,11 @@ public interface UserPersistence extends BasePersistence<User> {
 	*
 	* @param companyId the company ID
 	* @param defaultUser the default user
+	* @return the user that was removed
 	* @throws SystemException if a system exception occurred
 	*/
-	public void removeByC_DU(long companyId, boolean defaultUser)
+	public com.liferay.portal.model.User removeByC_DU(long companyId,
+		boolean defaultUser)
 		throws com.liferay.portal.NoSuchUserException,
 			com.liferay.portal.kernel.exception.SystemException;
 
@@ -936,9 +1061,11 @@ public interface UserPersistence extends BasePersistence<User> {
 	*
 	* @param companyId the company ID
 	* @param screenName the screen name
+	* @return the user that was removed
 	* @throws SystemException if a system exception occurred
 	*/
-	public void removeByC_SN(long companyId, java.lang.String screenName)
+	public com.liferay.portal.model.User removeByC_SN(long companyId,
+		java.lang.String screenName)
 		throws com.liferay.portal.NoSuchUserException,
 			com.liferay.portal.kernel.exception.SystemException;
 
@@ -947,9 +1074,11 @@ public interface UserPersistence extends BasePersistence<User> {
 	*
 	* @param companyId the company ID
 	* @param emailAddress the email address
+	* @return the user that was removed
 	* @throws SystemException if a system exception occurred
 	*/
-	public void removeByC_EA(long companyId, java.lang.String emailAddress)
+	public com.liferay.portal.model.User removeByC_EA(long companyId,
+		java.lang.String emailAddress)
 		throws com.liferay.portal.NoSuchUserException,
 			com.liferay.portal.kernel.exception.SystemException;
 
@@ -958,9 +1087,11 @@ public interface UserPersistence extends BasePersistence<User> {
 	*
 	* @param companyId the company ID
 	* @param facebookId the facebook ID
+	* @return the user that was removed
 	* @throws SystemException if a system exception occurred
 	*/
-	public void removeByC_FID(long companyId, long facebookId)
+	public com.liferay.portal.model.User removeByC_FID(long companyId,
+		long facebookId)
 		throws com.liferay.portal.NoSuchUserException,
 			com.liferay.portal.kernel.exception.SystemException;
 
@@ -969,9 +1100,11 @@ public interface UserPersistence extends BasePersistence<User> {
 	*
 	* @param companyId the company ID
 	* @param openId the open ID
+	* @return the user that was removed
 	* @throws SystemException if a system exception occurred
 	*/
-	public void removeByC_O(long companyId, java.lang.String openId)
+	public com.liferay.portal.model.User removeByC_O(long companyId,
+		java.lang.String openId)
 		throws com.liferay.portal.NoSuchUserException,
 			com.liferay.portal.kernel.exception.SystemException;
 
@@ -1001,6 +1134,17 @@ public interface UserPersistence extends BasePersistence<User> {
 	* @throws SystemException if a system exception occurred
 	*/
 	public int countByUuid(java.lang.String uuid)
+		throws com.liferay.portal.kernel.exception.SystemException;
+
+	/**
+	* Returns the number of users where uuid = &#63; and companyId = &#63;.
+	*
+	* @param uuid the uuid
+	* @param companyId the company ID
+	* @return the number of matching users
+	* @throws SystemException if a system exception occurred
+	*/
+	public int countByUuid_C(java.lang.String uuid, long companyId)
 		throws com.liferay.portal.kernel.exception.SystemException;
 
 	/**
@@ -1507,197 +1651,6 @@ public interface UserPersistence extends BasePersistence<User> {
 	*/
 	public void setOrganizations(long pk,
 		java.util.List<com.liferay.portal.model.Organization> organizations)
-		throws com.liferay.portal.kernel.exception.SystemException;
-
-	/**
-	* Returns all the permissions associated with the user.
-	*
-	* @param pk the primary key of the user
-	* @return the permissions associated with the user
-	* @throws SystemException if a system exception occurred
-	*/
-	public java.util.List<com.liferay.portal.model.Permission> getPermissions(
-		long pk) throws com.liferay.portal.kernel.exception.SystemException;
-
-	/**
-	* Returns a range of all the permissions associated with the user.
-	*
-	* <p>
-	* Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set.
-	* </p>
-	*
-	* @param pk the primary key of the user
-	* @param start the lower bound of the range of users
-	* @param end the upper bound of the range of users (not inclusive)
-	* @return the range of permissions associated with the user
-	* @throws SystemException if a system exception occurred
-	*/
-	public java.util.List<com.liferay.portal.model.Permission> getPermissions(
-		long pk, int start, int end)
-		throws com.liferay.portal.kernel.exception.SystemException;
-
-	/**
-	* Returns an ordered range of all the permissions associated with the user.
-	*
-	* <p>
-	* Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set.
-	* </p>
-	*
-	* @param pk the primary key of the user
-	* @param start the lower bound of the range of users
-	* @param end the upper bound of the range of users (not inclusive)
-	* @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
-	* @return the ordered range of permissions associated with the user
-	* @throws SystemException if a system exception occurred
-	*/
-	public java.util.List<com.liferay.portal.model.Permission> getPermissions(
-		long pk, int start, int end,
-		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
-		throws com.liferay.portal.kernel.exception.SystemException;
-
-	/**
-	* Returns the number of permissions associated with the user.
-	*
-	* @param pk the primary key of the user
-	* @return the number of permissions associated with the user
-	* @throws SystemException if a system exception occurred
-	*/
-	public int getPermissionsSize(long pk)
-		throws com.liferay.portal.kernel.exception.SystemException;
-
-	/**
-	* Returns <code>true</code> if the permission is associated with the user.
-	*
-	* @param pk the primary key of the user
-	* @param permissionPK the primary key of the permission
-	* @return <code>true</code> if the permission is associated with the user; <code>false</code> otherwise
-	* @throws SystemException if a system exception occurred
-	*/
-	public boolean containsPermission(long pk, long permissionPK)
-		throws com.liferay.portal.kernel.exception.SystemException;
-
-	/**
-	* Returns <code>true</code> if the user has any permissions associated with it.
-	*
-	* @param pk the primary key of the user to check for associations with permissions
-	* @return <code>true</code> if the user has any permissions associated with it; <code>false</code> otherwise
-	* @throws SystemException if a system exception occurred
-	*/
-	public boolean containsPermissions(long pk)
-		throws com.liferay.portal.kernel.exception.SystemException;
-
-	/**
-	* Adds an association between the user and the permission. Also notifies the appropriate model listeners and clears the mapping table finder cache.
-	*
-	* @param pk the primary key of the user
-	* @param permissionPK the primary key of the permission
-	* @throws SystemException if a system exception occurred
-	*/
-	public void addPermission(long pk, long permissionPK)
-		throws com.liferay.portal.kernel.exception.SystemException;
-
-	/**
-	* Adds an association between the user and the permission. Also notifies the appropriate model listeners and clears the mapping table finder cache.
-	*
-	* @param pk the primary key of the user
-	* @param permission the permission
-	* @throws SystemException if a system exception occurred
-	*/
-	public void addPermission(long pk,
-		com.liferay.portal.model.Permission permission)
-		throws com.liferay.portal.kernel.exception.SystemException;
-
-	/**
-	* Adds an association between the user and the permissions. Also notifies the appropriate model listeners and clears the mapping table finder cache.
-	*
-	* @param pk the primary key of the user
-	* @param permissionPKs the primary keys of the permissions
-	* @throws SystemException if a system exception occurred
-	*/
-	public void addPermissions(long pk, long[] permissionPKs)
-		throws com.liferay.portal.kernel.exception.SystemException;
-
-	/**
-	* Adds an association between the user and the permissions. Also notifies the appropriate model listeners and clears the mapping table finder cache.
-	*
-	* @param pk the primary key of the user
-	* @param permissions the permissions
-	* @throws SystemException if a system exception occurred
-	*/
-	public void addPermissions(long pk,
-		java.util.List<com.liferay.portal.model.Permission> permissions)
-		throws com.liferay.portal.kernel.exception.SystemException;
-
-	/**
-	* Clears all associations between the user and its permissions. Also notifies the appropriate model listeners and clears the mapping table finder cache.
-	*
-	* @param pk the primary key of the user to clear the associated permissions from
-	* @throws SystemException if a system exception occurred
-	*/
-	public void clearPermissions(long pk)
-		throws com.liferay.portal.kernel.exception.SystemException;
-
-	/**
-	* Removes the association between the user and the permission. Also notifies the appropriate model listeners and clears the mapping table finder cache.
-	*
-	* @param pk the primary key of the user
-	* @param permissionPK the primary key of the permission
-	* @throws SystemException if a system exception occurred
-	*/
-	public void removePermission(long pk, long permissionPK)
-		throws com.liferay.portal.kernel.exception.SystemException;
-
-	/**
-	* Removes the association between the user and the permission. Also notifies the appropriate model listeners and clears the mapping table finder cache.
-	*
-	* @param pk the primary key of the user
-	* @param permission the permission
-	* @throws SystemException if a system exception occurred
-	*/
-	public void removePermission(long pk,
-		com.liferay.portal.model.Permission permission)
-		throws com.liferay.portal.kernel.exception.SystemException;
-
-	/**
-	* Removes the association between the user and the permissions. Also notifies the appropriate model listeners and clears the mapping table finder cache.
-	*
-	* @param pk the primary key of the user
-	* @param permissionPKs the primary keys of the permissions
-	* @throws SystemException if a system exception occurred
-	*/
-	public void removePermissions(long pk, long[] permissionPKs)
-		throws com.liferay.portal.kernel.exception.SystemException;
-
-	/**
-	* Removes the association between the user and the permissions. Also notifies the appropriate model listeners and clears the mapping table finder cache.
-	*
-	* @param pk the primary key of the user
-	* @param permissions the permissions
-	* @throws SystemException if a system exception occurred
-	*/
-	public void removePermissions(long pk,
-		java.util.List<com.liferay.portal.model.Permission> permissions)
-		throws com.liferay.portal.kernel.exception.SystemException;
-
-	/**
-	* Sets the permissions associated with the user, removing and adding associations as necessary. Also notifies the appropriate model listeners and clears the mapping table finder cache.
-	*
-	* @param pk the primary key of the user
-	* @param permissionPKs the primary keys of the permissions to be associated with the user
-	* @throws SystemException if a system exception occurred
-	*/
-	public void setPermissions(long pk, long[] permissionPKs)
-		throws com.liferay.portal.kernel.exception.SystemException;
-
-	/**
-	* Sets the permissions associated with the user, removing and adding associations as necessary. Also notifies the appropriate model listeners and clears the mapping table finder cache.
-	*
-	* @param pk the primary key of the user
-	* @param permissions the permissions to be associated with the user
-	* @throws SystemException if a system exception occurred
-	*/
-	public void setPermissions(long pk,
-		java.util.List<com.liferay.portal.model.Permission> permissions)
 		throws com.liferay.portal.kernel.exception.SystemException;
 
 	/**
@@ -2268,6 +2221,4 @@ public interface UserPersistence extends BasePersistence<User> {
 	public void setUserGroups(long pk,
 		java.util.List<com.liferay.portal.model.UserGroup> userGroups)
 		throws com.liferay.portal.kernel.exception.SystemException;
-
-	public User remove(User user) throws SystemException;
 }

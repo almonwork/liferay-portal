@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -24,7 +24,7 @@ import org.apache.commons.fileupload.disk.DiskFileItemFactory;
  */
 public class LiferayFileItemFactory extends DiskFileItemFactory {
 
-	public static final int DEFAULT_SIZE = 0;
+	public static final int DEFAULT_SIZE = 1024;
 
 	public LiferayFileItemFactory(File tempDir) {
 		_tempDir = tempDir;

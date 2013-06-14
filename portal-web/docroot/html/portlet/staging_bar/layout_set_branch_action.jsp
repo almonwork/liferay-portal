@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -20,11 +20,13 @@
 ResultRow row = (ResultRow)request.getAttribute(WebKeys.SEARCH_CONTAINER_RESULT_ROW);
 
 LayoutSetBranch layoutSetBranch = (LayoutSetBranch)row.getObject();
+
+long currentLayoutSetBranchId = GetterUtil.getLong((String)request.getAttribute("view_layout_set_branches.jsp-currentLayoutSetBranchId"));
 %>
 
 <liferay-ui:icon-menu>
 	<c:if test="<%= LayoutSetBranchPermissionUtil.contains(permissionChecker, layoutSetBranch, ActionKeys.UPDATE) %>">
-		<portlet:renderURL var="editURL">
+		<portlet:renderURL var="editURL" windowState="<%= LiferayWindowState.EXCLUSIVE.toString() %>">
 			<portlet:param name="struts_action" value="/staging_bar/edit_layout_set_branch" />
 			<portlet:param name="<%= Constants.CMD %>" value="<%= Constants.UPDATE %>" />
 			<portlet:param name="redirect" value="<%= currentURL %>" />
@@ -33,7 +35,7 @@ LayoutSetBranch layoutSetBranch = (LayoutSetBranch)row.getObject();
 		</portlet:renderURL>
 
 		<%
-		String taglibURL = "javascript:Liferay.Staging.Branching.updateBranch({uri: '" + HtmlUtil.escapeJS(editURL) +  "', dialogTitle: '" + UnicodeLanguageUtil.get(pageContext, layoutSetBranch.isPrivateLayout() ? "update-private-pages-variation" : "update-public-pages-variation") + "'});";
+		String taglibURL = "javascript:Liferay.StagingBar.updateBranch({uri: '" + HtmlUtil.escapeJS(editURL) + "', dialogTitle: '" + UnicodeLanguageUtil.get(pageContext, "update-site-pages-variation") + "'});";
 		%>
 
 		<liferay-ui:icon
@@ -63,6 +65,7 @@ LayoutSetBranch layoutSetBranch = (LayoutSetBranch)row.getObject();
 			<portlet:param name="redirect" value="<%= currentURL %>" />
 			<portlet:param name="groupId" value="<%= String.valueOf(layoutSetBranch.getGroupId()) %>" />
 			<portlet:param name="layoutSetBranchId" value="<%= String.valueOf(layoutSetBranch.getLayoutSetBranchId()) %>" />
+			<portlet:param name="currentLayoutSetBranchId" value="<%= String.valueOf(currentLayoutSetBranchId) %>" />
 		</portlet:actionURL>
 
 		<liferay-ui:icon-delete
@@ -79,7 +82,7 @@ LayoutSetBranch layoutSetBranch = (LayoutSetBranch)row.getObject();
 		</portlet:renderURL>
 
 		<%
-		String taglibURL = "javascript:Liferay.Staging.Branching.mergeBranch({uri: '" + HtmlUtil.escapeJS(mergeURL) + "', dialogTitle: '" + UnicodeLanguageUtil.get(pageContext, layoutSetBranch.isPrivateLayout() ? "merge-private-pages-variation" : "merge-public-pages-variation") + "'});";
+		String taglibURL = "javascript:Liferay.StagingBar.mergeBranch({uri: '" + HtmlUtil.escapeJS(mergeURL) + "', dialogTitle: '" + UnicodeLanguageUtil.get(pageContext, "merge-site-pages-variation") + "'});";
 		%>
 
 		<liferay-ui:icon

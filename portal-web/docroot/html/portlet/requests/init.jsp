@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -16,8 +16,10 @@
 
 <%@ include file="/html/portlet/init.jsp" %>
 
-<%@ page import="com.liferay.portlet.social.NoSuchRequestException" %>
-<%@ page import="com.liferay.portlet.social.model.SocialRequest" %>
-<%@ page import="com.liferay.portlet.social.model.SocialRequestConstants" %>
-<%@ page import="com.liferay.portlet.social.model.SocialRequestFeedEntry" %>
-<%@ page import="com.liferay.portlet.social.service.SocialRequestInterpreterLocalServiceUtil" %>
+<%@ page import="com.liferay.portlet.social.NoSuchRequestException" %><%@
+page import="com.liferay.portlet.social.model.SocialRequest" %><%@
+page import="com.liferay.portlet.social.model.SocialRequestConstants" %><%@
+page import="com.liferay.portlet.social.model.SocialRequestFeedEntry" %><%@
+page import="com.liferay.portlet.social.service.SocialRequestInterpreterLocalServiceUtil" %>
+
+<%@ include file="/html/portlet/requests/init-ext.jsp" %>

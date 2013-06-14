@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -17,8 +17,6 @@ package com.liferay.portal.kernel.util;
 import com.liferay.portal.kernel.io.unsync.UnsyncByteArrayInputStream;
 import com.liferay.portal.kernel.io.unsync.UnsyncByteArrayOutputStream;
 import com.liferay.portal.kernel.io.unsync.UnsyncStringReader;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.nio.charset.CharsetDecoderUtil;
 import com.liferay.portal.kernel.nio.charset.CharsetEncoderUtil;
 
@@ -38,7 +36,6 @@ import java.nio.charset.CharsetEncoder;
 
 import java.util.Collections;
 import java.util.Enumeration;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -63,11 +60,7 @@ public class PropertiesUtil {
 	public static Properties fromMap(Map<String, String> map) {
 		Properties properties = new Properties();
 
-		Iterator<Map.Entry<String, String>> itr = map.entrySet().iterator();
-
-		while (itr.hasNext()) {
-			Map.Entry<String, String> entry = itr.next();
-
+		for (Map.Entry<String, String> entry : map.entrySet()) {
 			String key = entry.getKey();
 			String value = entry.getValue();
 
@@ -88,12 +81,7 @@ public class PropertiesUtil {
 
 		map.clear();
 
-		Iterator<Map.Entry<Object, Object>> itr =
-			properties.entrySet().iterator();
-
-		while (itr.hasNext()) {
-			Map.Entry<Object, Object> entry = itr.next();
-
+		for (Map.Entry<Object, Object> entry : properties.entrySet()) {
 			map.put((String)entry.getKey(), (String)entry.getValue());
 		}
 	}
@@ -101,7 +89,7 @@ public class PropertiesUtil {
 	public static Properties getProperties(
 		Properties properties, String prefix, boolean removePrefix) {
 
-		Properties subProperties = new Properties();
+		Properties newProperties = new Properties();
 
 		Enumeration<String> enu =
 			(Enumeration<String>)properties.propertyNames();
@@ -116,11 +104,11 @@ public class PropertiesUtil {
 					key = key.substring(prefix.length());
 				}
 
-				subProperties.setProperty(key, value);
+				newProperties.setProperty(key, value);
 			}
 		}
 
-		return subProperties;
+		return newProperties;
 	}
 
 	public static String list(Map<String, String> map) {
@@ -150,6 +138,17 @@ public class PropertiesUtil {
 		properties.list(printStream);
 
 		return unsyncByteArrayOutputStream.toString();
+	}
+
+	public static Properties load(InputStream is, String charsetName)
+		throws IOException {
+
+		if (JavaDetector.isJDK6()) {
+			return loadJDK6(new InputStreamReader(is, charsetName));
+		}
+		else {
+			return loadJDK5(is, charsetName);
+		}
 	}
 
 	public static void load(Properties properties, String s)
@@ -195,7 +194,7 @@ public class PropertiesUtil {
 	public static Properties load(String s, String charsetName)
 		throws IOException {
 
-		if (JavaProps.isJDK6()) {
+		if (JavaDetector.isJDK6()) {
 			return loadJDK6(new UnsyncStringReader(s));
 		}
 		else {
@@ -205,17 +204,6 @@ public class PropertiesUtil {
 				byteBuffer.array(), byteBuffer.arrayOffset(),
 				byteBuffer.limit());
 
-			return loadJDK5(is, charsetName);
-		}
-	}
-
-	public static Properties load(InputStream is, String charsetName)
-		throws IOException {
-
-		if (JavaProps.isJDK6()) {
-			return loadJDK6(new InputStreamReader(is, charsetName));
-		}
-		else {
 			return loadJDK5(is, charsetName);
 		}
 	}
@@ -253,6 +241,11 @@ public class PropertiesUtil {
 	public static Properties loadJDK6(Reader reader) throws IOException {
 		try {
 			Properties properties = new Properties();
+
+			if (_jdk6LoadMethod == null) {
+				_jdk6LoadMethod = ReflectionUtil.getDeclaredMethod(
+					Properties.class, "load", Reader.class);
+			}
 
 			_jdk6LoadMethod.invoke(properties, reader);
 
@@ -337,20 +330,6 @@ public class PropertiesUtil {
 		}
 	}
 
-	private static Log _log = LogFactoryUtil.getLog(PropertiesUtil.class);
-
 	private static Method _jdk6LoadMethod;
-
-	static {
-		if (JavaProps.isJDK6()) {
-			try {
-				_jdk6LoadMethod = ReflectionUtil.getDeclaredMethod(
-					Properties.class, "load", Reader.class);
-			}
-			catch (Exception e) {
-				_log.error(e, e);
-			}
-		}
-	}
 
 }

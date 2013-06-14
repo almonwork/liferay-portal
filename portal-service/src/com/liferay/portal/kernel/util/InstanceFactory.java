@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -55,8 +55,7 @@ public class InstanceFactory {
 			(parameterTypes.length > 0) && (arguments.length > 0) &&
 			(parameterTypes.length == arguments.length)) {
 
-			Constructor<?> constructor = clazz.getConstructor(
-				parameterTypes);
+			Constructor<?> constructor = clazz.getConstructor(parameterTypes);
 
 			return constructor.newInstance(arguments);
 		}

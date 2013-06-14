@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -20,6 +20,7 @@
 String strutsAction = ParamUtil.getString(request, "struts_action");
 
 long groupId = ParamUtil.getLong(request, "groupId", scopeGroupId);
+String structureId = ParamUtil.getString(request, "structureId");
 
 TemplateSearch searchContainer = (TemplateSearch)request.getAttribute("liferay-ui:search:searchContainer");
 
@@ -27,16 +28,16 @@ TemplateDisplayTerms displayTerms = (TemplateDisplayTerms)searchContainer.getDis
 %>
 
 <liferay-ui:search-toggle
-	id="toggle_id_journal_template_search"
-	displayTerms="<%= displayTerms %>"
 	buttonLabel="search"
+	displayTerms="<%= displayTerms %>"
+	id="toggle_id_journal_template_search"
 >
 	<aui:fieldset>
 		<aui:input label="id" name="<%= displayTerms.TEMPLATE_ID %>" size="20" type="text" value="<%= displayTerms.getTemplateId() %>" />
 
 		<aui:input name="<%= displayTerms.NAME %>" size="20" type="text" value="<%= displayTerms.getName() %>" />
 
-		<aui:input name="<%= displayTerms.DESCRIPTION %>" type="text" size="20" value="<%= displayTerms.getDescription() %>" />
+		<aui:input name="<%= displayTerms.DESCRIPTION %>" size="20" type="text" value="<%= displayTerms.getDescription() %>" />
 
 		<c:if test='<%= strutsAction.equalsIgnoreCase("/journal/select_template") %>'>
 			<aui:select label="my-sites" name="<%= displayTerms.GROUP_IDS %>">
@@ -66,7 +67,7 @@ TemplateDisplayTerms displayTerms = (TemplateDisplayTerms)searchContainer.getDis
 
 <%
 boolean showAddTemplateButton = JournalPermission.contains(permissionChecker, scopeGroupId, ActionKeys.ADD_TEMPLATE);
-boolean showPermissionsButton = GroupPermissionUtil.contains(permissionChecker, scopeGroupId, ActionKeys.PERMISSIONS);
+boolean showPermissionsButton = JournalPermission.contains(permissionChecker, scopeGroupId, ActionKeys.PERMISSIONS);
 %>
 
 <c:if test="<%= showAddTemplateButton || showPermissionsButton %>">
@@ -98,7 +99,7 @@ boolean showPermissionsButton = GroupPermissionUtil.contains(permissionChecker, 
 
 <aui:script>
 	function <portlet:namespace />addTemplate() {
-		var url = '<portlet:renderURL><portlet:param name="struts_action" value="/journal/edit_template" /><portlet:param name="redirect" value="<%= currentURL %>" /><portlet:param name="groupId" value="<%= String.valueOf(groupId) %>" /><portlet:param name="structureId" value="<%= displayTerms.getStructureId() %>" /></portlet:renderURL>';
+		var url = '<portlet:renderURL><portlet:param name="struts_action" value="/journal/edit_template" /><portlet:param name="redirect" value="<%= currentURL %>" /><portlet:param name="groupId" value="<%= String.valueOf(groupId) %>" /><portlet:param name="structureId" value="<%= Validator.isNotNull(structureId) ? structureId : displayTerms.getStructureId() %>" /></portlet:renderURL>';
 
 		if (toggle_id_journal_template_searchcurClickValue == 'basic') {
 			url += '&<portlet:namespace /><%= displayTerms.NAME %>=' + document.<portlet:namespace />fm.<portlet:namespace /><%= displayTerms.KEYWORDS %>.value;

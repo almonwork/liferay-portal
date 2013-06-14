@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -39,7 +39,7 @@ import java.util.List;
 public class BooleanQueryImpl extends BaseBooleanQueryImpl {
 
 	public void add(Query query, BooleanClauseOccur booleanClauseOccur) {
-		_clauses.add(new BooleanClauseImpl(query, booleanClauseOccur));
+		_booleanClauses.add(new BooleanClauseImpl(query, booleanClauseOccur));
 	}
 
 	public void add(Query query, String occur) {
@@ -287,18 +287,7 @@ public class BooleanQueryImpl extends BaseBooleanQueryImpl {
 	}
 
 	public void addTerm(String field, String value, boolean like) {
-		Query query = null;
-
-		if (like) {
-			query = new WildcardQueryImpl(
-				new QueryTermImpl(field, String.valueOf(value)));
-		}
-		else {
-			query = new TermQueryImpl(
-				new QueryTermImpl(field, String.valueOf(value)));
-		}
-
-		add(query , BooleanClauseOccur.SHOULD);
+		addTerm(field, value, like, BooleanClauseOccur.SHOULD);
 	}
 
 	public void addTerm(
@@ -321,8 +310,26 @@ public class BooleanQueryImpl extends BaseBooleanQueryImpl {
 		}
 	}
 
+	public void addTerm(
+		String field, String value, boolean like,
+		BooleanClauseOccur booleanClauseOccur) {
+
+		Query query = null;
+
+		if (like) {
+			query = new WildcardQueryImpl(
+				new QueryTermImpl(field, String.valueOf(value)));
+		}
+		else {
+			query = new TermQueryImpl(
+				new QueryTermImpl(field, String.valueOf(value)));
+		}
+
+		add(query, booleanClauseOccur);
+	}
+
 	public List<BooleanClause> clauses() {
-		return Collections.unmodifiableList(_clauses);
+		return Collections.unmodifiableList(_booleanClauses);
 	}
 
 	@Override
@@ -330,8 +337,13 @@ public class BooleanQueryImpl extends BaseBooleanQueryImpl {
 		return this;
 	}
 
+	public boolean hasClauses() {
+		return !_booleanClauses.isEmpty();
+	}
+
 	private static Log _log = LogFactoryUtil.getLog(BooleanQueryImpl.class);
 
-	private List<BooleanClause> _clauses = new ArrayList<BooleanClause>();
+	private List<BooleanClause> _booleanClauses =
+		new ArrayList<BooleanClause>();
 
 }

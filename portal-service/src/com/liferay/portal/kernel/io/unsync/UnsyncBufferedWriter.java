@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -80,9 +80,7 @@ public class UnsyncBufferedWriter extends Writer {
 	}
 
 	@Override
-	public void write(char[] chars, int offset, int length)
-		throws IOException {
-
+	public void write(char[] chars, int offset, int length) throws IOException {
 		if (writer == null) {
 			throw new IOException("Writer is null");
 		}
@@ -170,7 +168,7 @@ public class UnsyncBufferedWriter extends Writer {
 	protected int size;
 	protected Writer writer;
 
-	private static int _DEFAULT_BUFFER_SIZE = 8192;
+	private static final int _DEFAULT_BUFFER_SIZE = 8192;
 
 	private static final String _LINE_SEPARATOR = System.getProperty(
 		"line.separator");

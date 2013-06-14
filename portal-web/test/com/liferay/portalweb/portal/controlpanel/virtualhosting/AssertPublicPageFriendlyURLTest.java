@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -23,6 +23,7 @@ import com.liferay.portalweb.portal.util.RuntimeVariables;
 public class AssertPublicPageFriendlyURLTest extends BaseTestCase {
 	public void testAssertPublicPageFriendlyURL() throws Exception {
 		selenium.open("/web/alpha/");
+		loadRequiredJavaScriptModules();
 		assertEquals(RuntimeVariables.replace(
 				"http://localhost:8080/web/alpha/"), selenium.getLocation());
 		assertEquals(RuntimeVariables.replace("Virtual Hosting Community"),
@@ -31,7 +32,7 @@ public class AssertPublicPageFriendlyURLTest extends BaseTestCase {
 		selenium.clickAt("link=Public Page",
 			RuntimeVariables.replace("Public Page"));
 		selenium.waitForPageToLoad("30000");
-		selenium.saveScreenShotAndSource();
+		loadRequiredJavaScriptModules();
 		assertEquals(RuntimeVariables.replace(
 				"http://localhost:8080/web/alpha/public-page"),
 			selenium.getLocation());

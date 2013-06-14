@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -17,10 +17,11 @@ package com.liferay.portal.servlet;
 import com.liferay.portal.action.JSONServiceAction;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
-import com.liferay.portal.kernel.servlet.PortletServlet;
+import com.liferay.portal.kernel.servlet.PluginContextListener;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.model.User;
 import com.liferay.portal.security.auth.PrincipalThreadLocal;
+import com.liferay.portal.security.pacl.PACLClassLoaderUtil;
 import com.liferay.portal.security.permission.PermissionChecker;
 import com.liferay.portal.security.permission.PermissionCheckerFactoryUtil;
 import com.liferay.portal.security.permission.PermissionThreadLocal;
@@ -45,8 +46,8 @@ public class JSONServlet extends HttpServlet {
 	public void init(ServletConfig servletConfig) {
 		ServletContext servletContext = servletConfig.getServletContext();
 
-		_portletClassLoader = (ClassLoader)servletContext.getAttribute(
-			PortletServlet.PORTLET_CLASS_LOADER);
+		_pluginClassLoader = (ClassLoader)servletContext.getAttribute(
+			PluginContextListener.PLUGIN_CLASS_LOADER);
 
 		_jsonAction = getJSONAction(servletContext);
 	}
@@ -60,22 +61,22 @@ public class JSONServlet extends HttpServlet {
 		try {
 			resolveRemoteUser(request);
 
-			if (_portletClassLoader == null) {
+			if (_pluginClassLoader == null) {
 				_jsonAction.execute(null, null, request, response);
 			}
 			else {
-				Thread currentThread = Thread.currentThread();
-
 				ClassLoader contextClassLoader =
-					currentThread.getContextClassLoader();
+					PACLClassLoaderUtil.getContextClassLoader();
 
 				try {
-					currentThread.setContextClassLoader(_portletClassLoader);
+					PACLClassLoaderUtil.setContextClassLoader(
+						_pluginClassLoader);
 
 					_jsonAction.execute(null, null, request, response);
 				}
 				finally {
-					currentThread.setContextClassLoader(contextClassLoader);
+					PACLClassLoaderUtil.setContextClassLoader(
+						contextClassLoader);
 				}
 			}
 		}
@@ -109,7 +110,7 @@ public class JSONServlet extends HttpServlet {
 			User user = UserLocalServiceUtil.getUserById(userId);
 
 			PermissionChecker permissionChecker =
-				PermissionCheckerFactoryUtil.create(user, true);
+				PermissionCheckerFactoryUtil.create(user);
 
 			PermissionThreadLocal.setPermissionChecker(permissionChecker);
 		}
@@ -118,6 +119,6 @@ public class JSONServlet extends HttpServlet {
 	private static Log _log = LogFactoryUtil.getLog(JSONServlet.class);
 
 	private JSONAction _jsonAction;
-	private ClassLoader _portletClassLoader;
+	private ClassLoader _pluginClassLoader;
 
 }

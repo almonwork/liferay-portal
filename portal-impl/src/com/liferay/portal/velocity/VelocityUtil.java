@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -19,11 +19,10 @@ import com.liferay.portal.kernel.util.PropsKeys;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.util.PropsUtil;
 
-import java.util.Iterator;
 import java.util.Map;
 
 import org.apache.velocity.VelocityContext;
-import org.apache.velocity.app.Velocity;
+import org.apache.velocity.app.VelocityEngine;
 import org.apache.velocity.runtime.RuntimeConstants;
 
 /**
@@ -38,25 +37,22 @@ public class VelocityUtil {
 	public static String evaluate(String input, Map<String, Object> variables)
 		throws Exception {
 
-		Velocity.setProperty(
+		VelocityEngine velocityEngine = new VelocityEngine();
+
+		velocityEngine.setProperty(
 			RuntimeConstants.RUNTIME_LOG_LOGSYSTEM_CLASS,
 			PropsUtil.get(PropsKeys.VELOCITY_ENGINE_LOGGER));
 
-		Velocity.setProperty(
+		velocityEngine.setProperty(
 			RuntimeConstants.RUNTIME_LOG_LOGSYSTEM + ".log4j.category",
 			PropsUtil.get(PropsKeys.VELOCITY_ENGINE_LOGGER_CATEGORY));
 
-		Velocity.init();
+		velocityEngine.init();
 
 		VelocityContext velocityContext = new VelocityContext();
 
 		if (variables != null) {
-			Iterator<Map.Entry<String, Object>> itr =
-				variables.entrySet().iterator();
-
-			while (itr.hasNext()) {
-				Map.Entry<String, Object> entry = itr.next();
-
+			for (Map.Entry<String, Object> entry : variables.entrySet()) {
 				String key = entry.getKey();
 				Object value = entry.getValue();
 
@@ -68,7 +64,7 @@ public class VelocityUtil {
 
 		UnsyncStringWriter unsyncStringWriter = new UnsyncStringWriter();
 
-		Velocity.evaluate(
+		velocityEngine.evaluate(
 			velocityContext, unsyncStringWriter, VelocityUtil.class.getName(),
 			input);
 

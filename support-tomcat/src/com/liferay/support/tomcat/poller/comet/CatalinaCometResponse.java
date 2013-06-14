@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -23,7 +23,7 @@ import java.io.Writer;
 
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.catalina.CometEvent;
+import org.apache.catalina.comet.CometEvent;
 
 /**
  * @author Edward Han
@@ -63,6 +63,7 @@ public class CatalinaCometResponse implements CometResponse {
 			}
 		}
 	}
+
 	public void writeData(String data) throws CometException {
 		synchronized (this) {
 			if (!_open) {

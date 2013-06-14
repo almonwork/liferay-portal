@@ -9,14 +9,29 @@
 <tr><td rowspan="1" colspan="3">VerifyFunctionalityTest</td></tr>
 </thead><tbody>
 <tr>
+	<td>open</td>
+	<td>/web/guest/home/</td>
+	<td></td>
+</tr>
+<tr>
+	<td>waitForVisible</td>
+	<td>link=Sample PHP Test Page</td>
+	<td>Sample PHP Test Page</td>
+</tr>
+<tr>
+	<td>clickAndWait</td>
+	<td>link=Sample PHP Test Page</td>
+	<td>Sample PHP Test Page</td>
+</tr>
+<tr>
 	<td>waitForElementPresent</td>
 	<td>//input[@value='']</td>
-	<td></td>
+	<td>Foo</td>
 </tr>
 <tr>
 	<td>clickAndWait</td>
 	<td>link=Quercus</td>
-	<td></td>
+	<td>Quercus</td>
 </tr>
 <tr>
 	<td>assertElementPresent</td>
@@ -26,7 +41,7 @@
 <tr>
 	<td>clickAndWait</td>
 	<td>link=PHP Info</td>
-	<td></td>
+	<td>PHP Info</td>
 </tr>
 <tr>
 	<td>assertTextPresent</td>
@@ -36,14 +51,13 @@
 <tr>
 	<td>clickAtAndWait</td>
 	<td>link=Home</td>
-	<td></td>
+	<td>Home</td>
 </tr>
 <tr>
 	<td>assertElementPresent</td>
 	<td>link=Configuration</td>
 	<td></td>
 </tr>
-
 </tbody></table>
 </body>
 </html>

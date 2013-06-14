@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -68,22 +68,28 @@ public class ClassNamePersistenceImpl extends BasePersistenceImpl<ClassName>
 	 * Never modify or reference this class directly. Always use {@link ClassNameUtil} to access the class name persistence. Modify <code>service.xml</code> and rerun ServiceBuilder to regenerate this class.
 	 */
 	public static final String FINDER_CLASS_NAME_ENTITY = ClassNameImpl.class.getName();
-	public static final String FINDER_CLASS_NAME_LIST = FINDER_CLASS_NAME_ENTITY +
-		".List";
+	public static final String FINDER_CLASS_NAME_LIST_WITH_PAGINATION = FINDER_CLASS_NAME_ENTITY +
+		".List1";
+	public static final String FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION = FINDER_CLASS_NAME_ENTITY +
+		".List2";
 	public static final FinderPath FINDER_PATH_FETCH_BY_VALUE = new FinderPath(ClassNameModelImpl.ENTITY_CACHE_ENABLED,
 			ClassNameModelImpl.FINDER_CACHE_ENABLED, ClassNameImpl.class,
 			FINDER_CLASS_NAME_ENTITY, "fetchByValue",
-			new String[] { String.class.getName() });
+			new String[] { String.class.getName() },
+			ClassNameModelImpl.VALUE_COLUMN_BITMASK);
 	public static final FinderPath FINDER_PATH_COUNT_BY_VALUE = new FinderPath(ClassNameModelImpl.ENTITY_CACHE_ENABLED,
 			ClassNameModelImpl.FINDER_CACHE_ENABLED, Long.class,
-			FINDER_CLASS_NAME_LIST, "countByValue",
+			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByValue",
 			new String[] { String.class.getName() });
-	public static final FinderPath FINDER_PATH_FIND_ALL = new FinderPath(ClassNameModelImpl.ENTITY_CACHE_ENABLED,
+	public static final FinderPath FINDER_PATH_WITH_PAGINATION_FIND_ALL = new FinderPath(ClassNameModelImpl.ENTITY_CACHE_ENABLED,
 			ClassNameModelImpl.FINDER_CACHE_ENABLED, ClassNameImpl.class,
-			FINDER_CLASS_NAME_LIST, "findAll", new String[0]);
+			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findAll", new String[0]);
+	public static final FinderPath FINDER_PATH_WITHOUT_PAGINATION_FIND_ALL = new FinderPath(ClassNameModelImpl.ENTITY_CACHE_ENABLED,
+			ClassNameModelImpl.FINDER_CACHE_ENABLED, ClassNameImpl.class,
+			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findAll", new String[0]);
 	public static final FinderPath FINDER_PATH_COUNT_ALL = new FinderPath(ClassNameModelImpl.ENTITY_CACHE_ENABLED,
 			ClassNameModelImpl.FINDER_CACHE_ENABLED, Long.class,
-			FINDER_CLASS_NAME_LIST, "countAll", new String[0]);
+			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countAll", new String[0]);
 
 	/**
 	 * Caches the class name in the entity cache if it is enabled.
@@ -109,8 +115,11 @@ public class ClassNamePersistenceImpl extends BasePersistenceImpl<ClassName>
 		for (ClassName className : classNames) {
 			if (EntityCacheUtil.getResult(
 						ClassNameModelImpl.ENTITY_CACHE_ENABLED,
-						ClassNameImpl.class, className.getPrimaryKey(), this) == null) {
+						ClassNameImpl.class, className.getPrimaryKey()) == null) {
 				cacheResult(className);
+			}
+			else {
+				className.resetOriginalValues();
 			}
 		}
 	}
@@ -129,8 +138,10 @@ public class ClassNamePersistenceImpl extends BasePersistenceImpl<ClassName>
 		}
 
 		EntityCacheUtil.clearCache(ClassNameImpl.class.getName());
+
 		FinderCacheUtil.clearCache(FINDER_CLASS_NAME_ENTITY);
-		FinderCacheUtil.clearCache(FINDER_CLASS_NAME_LIST);
+		FinderCacheUtil.clearCache(FINDER_CLASS_NAME_LIST_WITH_PAGINATION);
+		FinderCacheUtil.clearCache(FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
 	}
 
 	/**
@@ -145,6 +156,26 @@ public class ClassNamePersistenceImpl extends BasePersistenceImpl<ClassName>
 		EntityCacheUtil.removeResult(ClassNameModelImpl.ENTITY_CACHE_ENABLED,
 			ClassNameImpl.class, className.getPrimaryKey());
 
+		FinderCacheUtil.clearCache(FINDER_CLASS_NAME_LIST_WITH_PAGINATION);
+		FinderCacheUtil.clearCache(FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
+
+		clearUniqueFindersCache(className);
+	}
+
+	@Override
+	public void clearCache(List<ClassName> classNames) {
+		FinderCacheUtil.clearCache(FINDER_CLASS_NAME_LIST_WITH_PAGINATION);
+		FinderCacheUtil.clearCache(FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
+
+		for (ClassName className : classNames) {
+			EntityCacheUtil.removeResult(ClassNameModelImpl.ENTITY_CACHE_ENABLED,
+				ClassNameImpl.class, className.getPrimaryKey());
+
+			clearUniqueFindersCache(className);
+		}
+	}
+
+	protected void clearUniqueFindersCache(ClassName className) {
 		FinderCacheUtil.removeResult(FINDER_PATH_FETCH_BY_VALUE,
 			new Object[] { className.getValue() });
 	}
@@ -167,20 +198,6 @@ public class ClassNamePersistenceImpl extends BasePersistenceImpl<ClassName>
 	/**
 	 * Removes the class name with the primary key from the database. Also notifies the appropriate model listeners.
 	 *
-	 * @param primaryKey the primary key of the class name
-	 * @return the class name that was removed
-	 * @throws com.liferay.portal.NoSuchModelException if a class name with the primary key could not be found
-	 * @throws SystemException if a system exception occurred
-	 */
-	@Override
-	public ClassName remove(Serializable primaryKey)
-		throws NoSuchModelException, SystemException {
-		return remove(((Long)primaryKey).longValue());
-	}
-
-	/**
-	 * Removes the class name with the primary key from the database. Also notifies the appropriate model listeners.
-	 *
 	 * @param classNameId the primary key of the class name
 	 * @return the class name that was removed
 	 * @throws com.liferay.portal.NoSuchClassNameException if a class name with the primary key could not be found
@@ -188,24 +205,38 @@ public class ClassNamePersistenceImpl extends BasePersistenceImpl<ClassName>
 	 */
 	public ClassName remove(long classNameId)
 		throws NoSuchClassNameException, SystemException {
+		return remove(Long.valueOf(classNameId));
+	}
+
+	/**
+	 * Removes the class name with the primary key from the database. Also notifies the appropriate model listeners.
+	 *
+	 * @param primaryKey the primary key of the class name
+	 * @return the class name that was removed
+	 * @throws com.liferay.portal.NoSuchClassNameException if a class name with the primary key could not be found
+	 * @throws SystemException if a system exception occurred
+	 */
+	@Override
+	public ClassName remove(Serializable primaryKey)
+		throws NoSuchClassNameException, SystemException {
 		Session session = null;
 
 		try {
 			session = openSession();
 
 			ClassName className = (ClassName)session.get(ClassNameImpl.class,
-					Long.valueOf(classNameId));
+					primaryKey);
 
 			if (className == null) {
 				if (_log.isWarnEnabled()) {
-					_log.warn(_NO_SUCH_ENTITY_WITH_PRIMARY_KEY + classNameId);
+					_log.warn(_NO_SUCH_ENTITY_WITH_PRIMARY_KEY + primaryKey);
 				}
 
 				throw new NoSuchClassNameException(_NO_SUCH_ENTITY_WITH_PRIMARY_KEY +
-					classNameId);
+					primaryKey);
 			}
 
-			return classNamePersistence.remove(className);
+			return remove(className);
 		}
 		catch (NoSuchClassNameException nsee) {
 			throw nsee;
@@ -216,18 +247,6 @@ public class ClassNamePersistenceImpl extends BasePersistenceImpl<ClassName>
 		finally {
 			closeSession(session);
 		}
-	}
-
-	/**
-	 * Removes the class name from the database. Also notifies the appropriate model listeners.
-	 *
-	 * @param className the class name
-	 * @return the class name that was removed
-	 * @throws SystemException if a system exception occurred
-	 */
-	@Override
-	public ClassName remove(ClassName className) throws SystemException {
-		return super.remove(className);
 	}
 
 	@Override
@@ -249,15 +268,7 @@ public class ClassNamePersistenceImpl extends BasePersistenceImpl<ClassName>
 			closeSession(session);
 		}
 
-		FinderCacheUtil.clearCache(FINDER_CLASS_NAME_LIST);
-
-		ClassNameModelImpl classNameModelImpl = (ClassNameModelImpl)className;
-
-		FinderCacheUtil.removeResult(FINDER_PATH_FETCH_BY_VALUE,
-			new Object[] { classNameModelImpl.getValue() });
-
-		EntityCacheUtil.removeResult(ClassNameModelImpl.ENTITY_CACHE_ENABLED,
-			ClassNameImpl.class, className.getPrimaryKey());
+		clearCache(className);
 
 		return className;
 	}
@@ -287,23 +298,33 @@ public class ClassNamePersistenceImpl extends BasePersistenceImpl<ClassName>
 			closeSession(session);
 		}
 
-		FinderCacheUtil.clearCache(FINDER_CLASS_NAME_LIST);
+		FinderCacheUtil.clearCache(FINDER_CLASS_NAME_LIST_WITH_PAGINATION);
+
+		if (isNew || !ClassNameModelImpl.COLUMN_BITMASK_ENABLED) {
+			FinderCacheUtil.clearCache(FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
+		}
 
 		EntityCacheUtil.putResult(ClassNameModelImpl.ENTITY_CACHE_ENABLED,
 			ClassNameImpl.class, className.getPrimaryKey(), className);
 
-		if (!isNew &&
-				(!Validator.equals(className.getValue(),
-					classNameModelImpl.getOriginalValue()))) {
-			FinderCacheUtil.removeResult(FINDER_PATH_FETCH_BY_VALUE,
-				new Object[] { classNameModelImpl.getOriginalValue() });
-		}
-
-		if (isNew ||
-				(!Validator.equals(className.getValue(),
-					classNameModelImpl.getOriginalValue()))) {
+		if (isNew) {
 			FinderCacheUtil.putResult(FINDER_PATH_FETCH_BY_VALUE,
 				new Object[] { className.getValue() }, className);
+		}
+		else {
+			if ((classNameModelImpl.getColumnBitmask() &
+					FINDER_PATH_FETCH_BY_VALUE.getColumnBitmask()) != 0) {
+				Object[] args = new Object[] {
+						classNameModelImpl.getOriginalValue()
+					};
+
+				FinderCacheUtil.removeResult(FINDER_PATH_COUNT_BY_VALUE, args);
+
+				FinderCacheUtil.removeResult(FINDER_PATH_FETCH_BY_VALUE, args);
+
+				FinderCacheUtil.putResult(FINDER_PATH_FETCH_BY_VALUE,
+					new Object[] { className.getValue() }, className);
+			}
 		}
 
 		return className;
@@ -386,7 +407,7 @@ public class ClassNamePersistenceImpl extends BasePersistenceImpl<ClassName>
 	public ClassName fetchByPrimaryKey(long classNameId)
 		throws SystemException {
 		ClassName className = (ClassName)EntityCacheUtil.getResult(ClassNameModelImpl.ENTITY_CACHE_ENABLED,
-				ClassNameImpl.class, classNameId, this);
+				ClassNameImpl.class, classNameId);
 
 		if (className == _nullClassName) {
 			return null;
@@ -484,6 +505,14 @@ public class ClassNamePersistenceImpl extends BasePersistenceImpl<ClassName>
 		if (retrieveFromCache) {
 			result = FinderCacheUtil.getResult(FINDER_PATH_FETCH_BY_VALUE,
 					finderArgs, this);
+		}
+
+		if (result instanceof ClassName) {
+			ClassName className = (ClassName)result;
+
+			if (!Validator.equals(value, className.getValue())) {
+				result = null;
+			}
 		}
 
 		if (result == null) {
@@ -606,12 +635,20 @@ public class ClassNamePersistenceImpl extends BasePersistenceImpl<ClassName>
 	 */
 	public List<ClassName> findAll(int start, int end,
 		OrderByComparator orderByComparator) throws SystemException {
-		Object[] finderArgs = new Object[] {
-				String.valueOf(start), String.valueOf(end),
-				String.valueOf(orderByComparator)
-			};
+		FinderPath finderPath = null;
+		Object[] finderArgs = new Object[] { start, end, orderByComparator };
 
-		List<ClassName> list = (List<ClassName>)FinderCacheUtil.getResult(FINDER_PATH_FIND_ALL,
+		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) &&
+				(orderByComparator == null)) {
+			finderPath = FINDER_PATH_WITHOUT_PAGINATION_FIND_ALL;
+			finderArgs = FINDER_ARGS_EMPTY;
+		}
+		else {
+			finderPath = FINDER_PATH_WITH_PAGINATION_FIND_ALL;
+			finderArgs = new Object[] { start, end, orderByComparator };
+		}
+
+		List<ClassName> list = (List<ClassName>)FinderCacheUtil.getResult(finderPath,
 				finderArgs, this);
 
 		if (list == null) {
@@ -656,14 +693,12 @@ public class ClassNamePersistenceImpl extends BasePersistenceImpl<ClassName>
 			}
 			finally {
 				if (list == null) {
-					FinderCacheUtil.removeResult(FINDER_PATH_FIND_ALL,
-						finderArgs);
+					FinderCacheUtil.removeResult(finderPath, finderArgs);
 				}
 				else {
 					cacheResult(list);
 
-					FinderCacheUtil.putResult(FINDER_PATH_FIND_ALL, finderArgs,
-						list);
+					FinderCacheUtil.putResult(finderPath, finderArgs, list);
 				}
 
 				closeSession(session);
@@ -677,13 +712,14 @@ public class ClassNamePersistenceImpl extends BasePersistenceImpl<ClassName>
 	 * Removes the class name where value = &#63; from the database.
 	 *
 	 * @param value the value
+	 * @return the class name that was removed
 	 * @throws SystemException if a system exception occurred
 	 */
-	public void removeByValue(String value)
+	public ClassName removeByValue(String value)
 		throws NoSuchClassNameException, SystemException {
 		ClassName className = findByValue(value);
 
-		classNamePersistence.remove(className);
+		return remove(className);
 	}
 
 	/**
@@ -693,7 +729,7 @@ public class ClassNamePersistenceImpl extends BasePersistenceImpl<ClassName>
 	 */
 	public void removeAll() throws SystemException {
 		for (ClassName className : findAll()) {
-			classNamePersistence.remove(className);
+			remove(className);
 		}
 	}
 
@@ -769,10 +805,8 @@ public class ClassNamePersistenceImpl extends BasePersistenceImpl<ClassName>
 	 * @throws SystemException if a system exception occurred
 	 */
 	public int countAll() throws SystemException {
-		Object[] finderArgs = new Object[0];
-
 		Long count = (Long)FinderCacheUtil.getResult(FINDER_PATH_COUNT_ALL,
-				finderArgs, this);
+				FINDER_ARGS_EMPTY, this);
 
 		if (count == null) {
 			Session session = null;
@@ -792,8 +826,8 @@ public class ClassNamePersistenceImpl extends BasePersistenceImpl<ClassName>
 					count = Long.valueOf(0);
 				}
 
-				FinderCacheUtil.putResult(FINDER_PATH_COUNT_ALL, finderArgs,
-					count);
+				FinderCacheUtil.putResult(FINDER_PATH_COUNT_ALL,
+					FINDER_ARGS_EMPTY, count);
 
 				closeSession(session);
 			}
@@ -830,7 +864,7 @@ public class ClassNamePersistenceImpl extends BasePersistenceImpl<ClassName>
 	public void destroy() {
 		EntityCacheUtil.removeCache(ClassNameImpl.class.getName());
 		FinderCacheUtil.removeCache(FINDER_CLASS_NAME_ENTITY);
-		FinderCacheUtil.removeCache(FINDER_CLASS_NAME_LIST);
+		FinderCacheUtil.removeCache(FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
 	}
 
 	@BeanReference(type = AccountPersistence.class)
@@ -877,8 +911,6 @@ public class ClassNamePersistenceImpl extends BasePersistenceImpl<ClassName>
 	protected MembershipRequestPersistence membershipRequestPersistence;
 	@BeanReference(type = OrganizationPersistence.class)
 	protected OrganizationPersistence organizationPersistence;
-	@BeanReference(type = OrgGroupPermissionPersistence.class)
-	protected OrgGroupPermissionPersistence orgGroupPermissionPersistence;
 	@BeanReference(type = OrgGroupRolePersistence.class)
 	protected OrgGroupRolePersistence orgGroupRolePersistence;
 	@BeanReference(type = OrgLaborPersistence.class)
@@ -889,8 +921,6 @@ public class ClassNamePersistenceImpl extends BasePersistenceImpl<ClassName>
 	protected PasswordPolicyRelPersistence passwordPolicyRelPersistence;
 	@BeanReference(type = PasswordTrackerPersistence.class)
 	protected PasswordTrackerPersistence passwordTrackerPersistence;
-	@BeanReference(type = PermissionPersistence.class)
-	protected PermissionPersistence permissionPersistence;
 	@BeanReference(type = PhonePersistence.class)
 	protected PhonePersistence phonePersistence;
 	@BeanReference(type = PluginSettingPersistence.class)
@@ -911,14 +941,16 @@ public class ClassNamePersistenceImpl extends BasePersistenceImpl<ClassName>
 	protected RepositoryPersistence repositoryPersistence;
 	@BeanReference(type = RepositoryEntryPersistence.class)
 	protected RepositoryEntryPersistence repositoryEntryPersistence;
-	@BeanReference(type = ResourcePersistence.class)
-	protected ResourcePersistence resourcePersistence;
 	@BeanReference(type = ResourceActionPersistence.class)
 	protected ResourceActionPersistence resourceActionPersistence;
-	@BeanReference(type = ResourceCodePersistence.class)
-	protected ResourceCodePersistence resourceCodePersistence;
+	@BeanReference(type = ResourceBlockPersistence.class)
+	protected ResourceBlockPersistence resourceBlockPersistence;
+	@BeanReference(type = ResourceBlockPermissionPersistence.class)
+	protected ResourceBlockPermissionPersistence resourceBlockPermissionPersistence;
 	@BeanReference(type = ResourcePermissionPersistence.class)
 	protected ResourcePermissionPersistence resourcePermissionPersistence;
+	@BeanReference(type = ResourceTypePermissionPersistence.class)
+	protected ResourceTypePermissionPersistence resourceTypePermissionPersistence;
 	@BeanReference(type = RolePersistence.class)
 	protected RolePersistence rolePersistence;
 	@BeanReference(type = ServiceComponentPersistence.class)
@@ -970,10 +1002,12 @@ public class ClassNamePersistenceImpl extends BasePersistenceImpl<ClassName>
 	private static final boolean _HIBERNATE_CACHE_USE_SECOND_LEVEL_CACHE = com.liferay.portal.util.PropsValues.HIBERNATE_CACHE_USE_SECOND_LEVEL_CACHE;
 	private static Log _log = LogFactoryUtil.getLog(ClassNamePersistenceImpl.class);
 	private static ClassName _nullClassName = new ClassNameImpl() {
+			@Override
 			public Object clone() {
 				return this;
 			}
 
+			@Override
 			public CacheModel<ClassName> toCacheModel() {
 				return _nullClassNameCacheModel;
 			}

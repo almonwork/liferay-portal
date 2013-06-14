@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -38,7 +38,7 @@ public class PortletSandboxDeployListener
 
 		String portalWebDir = PortalUtil.getPortalWebDir();
 
-		auiTaglibDTD = portalWebDir + "/WEB-INF/tld/liferay-aui.tld";
+		auiTaglibDTD = portalWebDir + "/WEB-INF/tld/aui.tld";
 		portletTaglibDTD = portalWebDir + "/WEB-INF/tld/liferay-portlet.tld";
 		portletExtTaglibDTD =
 			portalWebDir + "/WEB-INF/tld/liferay-portlet-ext.tld";

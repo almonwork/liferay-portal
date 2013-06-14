@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -61,7 +61,12 @@ public class FlexjsonObjectJSONTransformer
 		List<PathExpression> pathExpressions, String path, String... names) {
 
 		for (String name : names) {
-			pathExpressions.add(new PathExpression(path + name, false));
+			PathExpression pathExpression = new PathExpression(
+				path.concat(name), false);
+
+			if (!pathExpressions.contains(pathExpression)) {
+				pathExpressions.add(pathExpression);
+			}
 		}
 	}
 
@@ -91,9 +96,11 @@ public class FlexjsonObjectJSONTransformer
 
 		for (String name : names) {
 			PathExpression pathExpression = new PathExpression(
-				path + name, true);
+				path.concat(name), true);
 
-			pathExpressions.add(0, pathExpression);
+			if (!pathExpressions.contains(pathExpression)) {
+				pathExpressions.add(0, pathExpression);
+			}
 		}
 	}
 

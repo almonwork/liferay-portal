@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -21,12 +21,24 @@ import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.portlet.PortletClassLoaderUtil;
 import com.liferay.portal.kernel.util.AggregateClassLoader;
 import com.liferay.portal.kernel.util.ArrayUtil;
-import com.liferay.portal.kernel.util.PortalClassLoaderUtil;
+import com.liferay.portal.kernel.util.PreloadClassLoader;
 import com.liferay.portal.kernel.util.PropsKeys;
+import com.liferay.portal.security.lang.PortalSecurityManagerThreadLocal;
+import com.liferay.portal.security.pacl.PACLClassLoaderUtil;
+import com.liferay.portal.security.pacl.PACLPolicyManager;
 import com.liferay.portal.spring.util.FilterClassLoader;
 
 import java.io.FileNotFoundException;
 
+import java.util.HashMap;
+import java.util.Map;
+
+import org.aopalliance.aop.Advice;
+
+import org.springframework.aop.Advisor;
+import org.springframework.aop.SpringProxy;
+import org.springframework.aop.TargetSource;
+import org.springframework.aop.framework.Advised;
 import org.springframework.beans.factory.xml.XmlBeanDefinitionReader;
 import org.springframework.web.context.support.XmlWebApplicationContext;
 
@@ -44,45 +56,34 @@ import org.springframework.web.context.support.XmlWebApplicationContext;
  */
 public class PortletApplicationContext extends XmlWebApplicationContext {
 
-	@Override
-	protected void initBeanDefinitionReader(XmlBeanDefinitionReader reader) {
+	public static ClassLoader getBeanClassLoader() {
+		if (_isUseRestrictedClassLoader()) {
+			boolean enabled = PortalSecurityManagerThreadLocal.isEnabled();
+
+			try {
+				PortalSecurityManagerThreadLocal.setEnabled(false);
+
+				return new PreloadClassLoader(
+					PortletClassLoaderUtil.getClassLoader(), _classes);
+			}
+			finally {
+				PortalSecurityManagerThreadLocal.setEnabled(enabled);
+			}
+		}
+
 		ClassLoader beanClassLoader =
 			AggregateClassLoader.getAggregateClassLoader(
 				new ClassLoader[] {
 					PortletClassLoaderUtil.getClassLoader(),
-					PortalClassLoaderUtil.getClassLoader()
+					PACLClassLoaderUtil.getPortalClassLoader()
 				});
 
-		beanClassLoader = new FilterClassLoader(beanClassLoader);
-
-		reader.setBeanClassLoader(beanClassLoader);
+		return new FilterClassLoader(beanClassLoader);
 	}
 
 	@Override
-	protected void loadBeanDefinitions(XmlBeanDefinitionReader reader) {
-		String[] configLocations = getPortletConfigLocations();
-
-		if (configLocations == null) {
-			return;
-		}
-
-		for (String configLocation : configLocations) {
-			try {
-				reader.loadBeanDefinitions(configLocation);
-			}
-			catch (Exception e) {
-				Throwable cause = e.getCause();
-
-				if (cause instanceof FileNotFoundException) {
-					if (_log.isWarnEnabled()) {
-						_log.warn(cause.getMessage());
-					}
-				}
-				else {
-					_log.error(e, e);
-				}
-			}
-		}
+	protected String[] getDefaultConfigLocations() {
+		return new String[0];
 	}
 
 	protected String[] getPortletConfigLocations() {
@@ -111,7 +112,67 @@ public class PortletApplicationContext extends XmlWebApplicationContext {
 				PropsKeys.SPRING_CONFIGS));
 	}
 
+	@Override
+	protected void initBeanDefinitionReader(
+		XmlBeanDefinitionReader xmlBeanDefinitionReader) {
+
+		xmlBeanDefinitionReader.setBeanClassLoader(getBeanClassLoader());
+	}
+
+	@Override
+	protected void loadBeanDefinitions(
+		XmlBeanDefinitionReader xmlBeanDefinitionReader) {
+
+		String[] configLocations = getPortletConfigLocations();
+
+		if (configLocations == null) {
+			return;
+		}
+
+		for (String configLocation : configLocations) {
+			boolean checkReadFile =
+				PortalSecurityManagerThreadLocal.isCheckReadFile();
+
+			try {
+				PortalSecurityManagerThreadLocal.setCheckReadFile(false);
+
+				xmlBeanDefinitionReader.loadBeanDefinitions(configLocation);
+			}
+			catch (Exception e) {
+				Throwable cause = e.getCause();
+
+				if (cause instanceof FileNotFoundException) {
+					if (_log.isWarnEnabled()) {
+						_log.warn(cause.getMessage());
+					}
+				}
+				else {
+					_log.error(e, e);
+				}
+			}
+			finally {
+				PortalSecurityManagerThreadLocal.setCheckReadFile(
+					checkReadFile);
+			}
+		}
+	}
+
+	private static boolean _isUseRestrictedClassLoader() {
+		return PACLPolicyManager.isActive();
+	}
+
 	private static Log _log = LogFactoryUtil.getLog(
 		PortletApplicationContext.class);
+
+	private static Map<String, Class<?>> _classes =
+		new HashMap<String, Class<?>>();
+
+	static {
+		_classes.put(Advice.class.getName(), Advice.class);
+		_classes.put(Advised.class.getName(), Advised.class);
+		_classes.put(Advisor.class.getName(), Advisor.class);
+		_classes.put(SpringProxy.class.getName(), SpringProxy.class);
+		_classes.put(TargetSource.class.getName(), TargetSource.class);
+	}
 
 }

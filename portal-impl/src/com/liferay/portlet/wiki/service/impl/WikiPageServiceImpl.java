@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -19,24 +19,25 @@ import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.io.unsync.UnsyncStringReader;
 import com.liferay.portal.kernel.io.unsync.UnsyncStringWriter;
 import com.liferay.portal.kernel.language.LanguageUtil;
+import com.liferay.portal.kernel.template.StringTemplateResource;
+import com.liferay.portal.kernel.template.Template;
+import com.liferay.portal.kernel.template.TemplateContextType;
+import com.liferay.portal.kernel.template.TemplateManager;
+import com.liferay.portal.kernel.template.TemplateManagerUtil;
 import com.liferay.portal.kernel.util.Diff;
 import com.liferay.portal.kernel.util.DiffResult;
 import com.liferay.portal.kernel.util.DiffUtil;
-import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.HtmlUtil;
 import com.liferay.portal.kernel.util.HttpUtil;
 import com.liferay.portal.kernel.util.ObjectValuePair;
-import com.liferay.portal.kernel.util.PropsKeys;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
-import com.liferay.portal.kernel.velocity.VelocityContext;
-import com.liferay.portal.kernel.velocity.VelocityEngineUtil;
 import com.liferay.portal.security.permission.ActionKeys;
 import com.liferay.portal.service.ServiceContext;
 import com.liferay.portal.util.PortalUtil;
 import com.liferay.portal.util.PortletKeys;
-import com.liferay.portal.util.PropsUtil;
+import com.liferay.portal.util.PropsValues;
 import com.liferay.portlet.wiki.model.WikiNode;
 import com.liferay.portlet.wiki.model.WikiPage;
 import com.liferay.portlet.wiki.model.WikiPageConstants;
@@ -58,9 +59,9 @@ import com.sun.syndication.io.FeedException;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 
@@ -94,43 +95,44 @@ public class WikiPageServiceImpl extends WikiPageServiceBaseImpl {
 			getPermissionChecker(), nodeId, ActionKeys.ADD_PAGE);
 
 		return wikiPageLocalService.addPage(
-			getUserId(), nodeId, title, WikiPageConstants.DEFAULT_VERSION,
+			getUserId(), nodeId, title, WikiPageConstants.VERSION_DEFAULT,
 			content, summary, minorEdit, format, true, parentTitle,
 			redirectTitle, serviceContext);
 	}
 
-	public void addPageAttachments(
-			long nodeId, String title,
-			List<ObjectValuePair<String, byte[]>> files)
-		throws PortalException, SystemException {
-
-		WikiNodePermission.check(
-			getPermissionChecker(), nodeId, ActionKeys.ADD_ATTACHMENT);
-
-		wikiPageLocalService.addPageAttachments(
-			getUserId(), nodeId, title, files);
-	}
-
 	public void addPageAttachment(
-			long nodeId, String title, String fileName,	byte[] bytes)
+			long nodeId, String title, String fileName, File file)
 		throws PortalException, SystemException {
 
 		WikiNodePermission.check(
 			getPermissionChecker(), nodeId, ActionKeys.ADD_ATTACHMENT);
 
 		wikiPageLocalService.addPageAttachment(
-			getUserId(), nodeId, title, fileName, bytes);
+			getUserId(), nodeId, title, fileName, file);
+	}
+
+	public void addPageAttachments(
+			long nodeId, String title,
+			List<ObjectValuePair<String, InputStream>> inputStream)
+		throws PortalException, SystemException {
+
+		WikiNodePermission.check(
+			getPermissionChecker(), nodeId, ActionKeys.ADD_ATTACHMENT);
+
+		wikiPageLocalService.addPageAttachments(
+			getUserId(), nodeId, title, inputStream);
 	}
 
 	public String addTempPageAttachment(
-			long nodeId, String fileName, String tempFolderName, File file)
+			long nodeId, String fileName, String tempFolderName,
+			InputStream inputStream)
 		throws IOException, PortalException, SystemException {
 
 		WikiNodePermission.check(
 			getPermissionChecker(), nodeId, ActionKeys.ADD_ATTACHMENT);
 
 		return wikiPageLocalService.addTempPageAttachment(
-			getUserId(), fileName, tempFolderName, file);
+			getUserId(), fileName, tempFolderName, inputStream);
 	}
 
 	public void changeParent(
@@ -207,16 +209,16 @@ public class WikiPageServiceImpl extends WikiPageServiceBaseImpl {
 			List<WikiPage> pageList = wikiPageLocalService.getPages(
 				nodeId, true, lastIntervalStart, lastIntervalStart + max);
 
-			Iterator<WikiPage> itr = pageList.iterator();
-
 			lastIntervalStart += max;
 			listNotExhausted = (pageList.size() == max);
 
-			while (itr.hasNext() && (pages.size() < max)) {
-				WikiPage page = itr.next();
+			for (WikiPage page : pageList) {
+				if (pages.size() >= max) {
+					break;
+				}
 
-				if (WikiPagePermission.contains(getPermissionChecker(), page,
-						ActionKeys.VIEW)) {
+				if (WikiPagePermission.contains(
+						getPermissionChecker(), page, ActionKeys.VIEW)) {
 
 					pages.add(page);
 				}
@@ -244,8 +246,8 @@ public class WikiPageServiceImpl extends WikiPageServiceBaseImpl {
 		Locale locale = null;
 
 		return exportToRSS(
-			companyId, name, description, type, version, displayStyle,
-			feedURL, entryURL, pages, diff, locale);
+			companyId, name, description, type, version, displayStyle, feedURL,
+			entryURL, pages, diff, locale);
 	}
 
 	public WikiPage getPage(long nodeId, String title)
@@ -415,7 +417,7 @@ public class WikiPageServiceImpl extends WikiPageServiceBaseImpl {
 
 			SyndContent syndContent = new SyndContentImpl();
 
-			syndContent.setType(RSSUtil.DEFAULT_ENTRY_TYPE);
+			syndContent.setType(RSSUtil.ENTRY_TYPE_DEFAULT);
 
 			if (diff) {
 				if (latestPage != null) {
@@ -441,7 +443,7 @@ public class WikiPageServiceImpl extends WikiPageServiceBaseImpl {
 				if (displayStyle.equals(RSSUtil.DISPLAY_STYLE_ABSTRACT)) {
 					value = StringUtil.shorten(
 						HtmlUtil.extractText(page.getContent()),
-						_RSS_ABSTRACT_LENGTH, StringPool.BLANK);
+						PropsValues.WIKI_RSS_ABSTRACT_LENGTH, StringPool.BLANK);
 				}
 				else if (displayStyle.equals(RSSUtil.DISPLAY_STYLE_TITLE)) {
 					value = StringPool.BLANK;
@@ -472,41 +474,42 @@ public class WikiPageServiceImpl extends WikiPageServiceBaseImpl {
 	}
 
 	protected String getPageDiff(
-			long companyId, WikiPage latestPage, WikiPage page,
-			Locale locale)
+			long companyId, WikiPage latestPage, WikiPage page, Locale locale)
 		throws SystemException {
 
-		String sourceContent = WikiUtil.processContent(latestPage.getContent());
-		String targetContent = WikiUtil.processContent(page.getContent());
-
-		sourceContent = HtmlUtil.escape(sourceContent);
-		targetContent = HtmlUtil.escape(targetContent);
-
-		List<DiffResult>[] diffResults = DiffUtil.diff(
-			new UnsyncStringReader(sourceContent),
-			new UnsyncStringReader(targetContent));
-
-		String velocityTemplateId =
-			"com/liferay/portlet/wiki/dependencies/rss.vm";
-		String velocityTemplateContent = ContentUtil.get(velocityTemplateId);
-
-		VelocityContext velocityContext =
-			VelocityEngineUtil.getWrappedStandardToolsContext();
-
-		velocityContext.put("companyId", companyId);
-		velocityContext.put("contextLine", Diff.CONTEXT_LINE);
-		velocityContext.put("diffUtil", new DiffUtil());
-		velocityContext.put("languageUtil", LanguageUtil.getLanguage());
-		velocityContext.put("locale", locale);
-		velocityContext.put("sourceResults", diffResults[0]);
-		velocityContext.put("targetResults", diffResults[1]);
-
 		try {
+			String templateId = "com/liferay/portlet/wiki/dependencies/rss.vm";
+
+			String templateContent = ContentUtil.get(templateId);
+
+			Template template = TemplateManagerUtil.getTemplate(
+				TemplateManager.VELOCITY,
+				new StringTemplateResource(templateId, templateContent),
+				TemplateContextType.STANDARD);
+
+			template.put("companyId", companyId);
+			template.put("contextLine", Diff.CONTEXT_LINE);
+			template.put("diffUtil", new DiffUtil());
+			template.put("languageUtil", LanguageUtil.getLanguage());
+			template.put("locale", locale);
+
+			String sourceContent = WikiUtil.processContent(
+				latestPage.getContent());
+			String targetContent = WikiUtil.processContent(page.getContent());
+
+			sourceContent = HtmlUtil.escape(sourceContent);
+			targetContent = HtmlUtil.escape(targetContent);
+
+			List<DiffResult>[] diffResults = DiffUtil.diff(
+				new UnsyncStringReader(sourceContent),
+				new UnsyncStringReader(targetContent));
+
+			template.put("sourceResults", diffResults[0]);
+			template.put("targetResults", diffResults[1]);
+
 			UnsyncStringWriter unsyncStringWriter = new UnsyncStringWriter();
 
-			VelocityEngineUtil.mergeTemplate(
-				velocityTemplateId, velocityTemplateContent, velocityContext,
-				unsyncStringWriter);
+			template.processTemplate(unsyncStringWriter);
 
 			return unsyncStringWriter.toString();
 		}
@@ -514,8 +517,5 @@ public class WikiPageServiceImpl extends WikiPageServiceBaseImpl {
 			throw new SystemException(e);
 		}
 	}
-
-	private static final int _RSS_ABSTRACT_LENGTH = GetterUtil.getInteger(
-		PropsUtil.get(PropsKeys.WIKI_RSS_ABSTRACT_LENGTH));
 
 }

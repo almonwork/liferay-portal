@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -55,78 +55,6 @@ import java.io.Serializable;
 public class Duration implements Cloneable, Serializable {
 
 	/**
-	 * Field weeks
-	 */
-	private int weeks;
-
-	/**
-	 * Field days
-	 */
-	private int days;
-
-	/**
-	 * Field hours
-	 */
-	private int hours;
-
-	/**
-	 * Field minutes
-	 */
-	private int minutes;
-
-	/**
-	 * Field seconds
-	 */
-	private int seconds;
-
-	/**
-	 * Field SECONDS_PER_MINUTE
-	 */
-	private final static int SECONDS_PER_MINUTE = 60;
-
-	/**
-	 * Field MINUTES_PER_HOUR
-	 */
-	private final static int MINUTES_PER_HOUR = 60;
-
-	/**
-	 * Field HOURS_PER_DAY
-	 */
-	private final static int HOURS_PER_DAY = 24;
-
-	/**
-	 * Field DAYS_PER_WEEK
-	 */
-	private final static int DAYS_PER_WEEK = 7;
-
-	/**
-	 * Field MILLIS_PER_SECOND
-	 */
-	private final static int MILLIS_PER_SECOND = 1000;
-
-	/**
-	 * Field MILLIS_PER_MINUTE
-	 */
-	private final static int MILLIS_PER_MINUTE = SECONDS_PER_MINUTE
-												 * MILLIS_PER_SECOND;
-
-	/**
-	 * Field MILLIS_PER_HOUR
-	 */
-	private final static int MILLIS_PER_HOUR = MINUTES_PER_HOUR
-											   * MILLIS_PER_MINUTE;
-
-	/**
-	 * Field MILLIS_PER_DAY
-	 */
-	private final static int MILLIS_PER_DAY = HOURS_PER_DAY * MILLIS_PER_HOUR;
-
-	/**
-	 * Field MILLIS_PER_WEEK
-	 */
-	private final static int MILLIS_PER_WEEK = DAYS_PER_WEEK * MILLIS_PER_DAY;
-
-	/**
 	 * Constructor Duration
 	 */
 	public Duration() {
@@ -139,10 +67,10 @@ public class Duration implements Cloneable, Serializable {
 	 * Constructor Duration
 	 */
 	public Duration(int d, int h, int m, int s) {
-		days = d;
-		hours = h;
-		minutes = m;
-		seconds = s;
+		_days = d;
+		_hours = h;
+		_minutes = m;
+		_seconds = s;
 	}
 
 	/**
@@ -156,197 +84,18 @@ public class Duration implements Cloneable, Serializable {
 	 * Constructor Duration
 	 */
 	public Duration(int w) {
-		weeks = w;
+		_weeks = w;
 	}
 
 	/**
 	 * Method clear
 	 */
 	public void clear() {
-		weeks = 0;
-		days = 0;
-		hours = 0;
-		minutes = 0;
-		seconds = 0;
-	}
-
-	/**
-	 * Method getWeeks
-	 *
-	 * @return int
-	 */
-	public int getWeeks() {
-		return weeks;
-	}
-
-	/**
-	 * Method setWeeks
-	 */
-	public void setWeeks(int w) {
-		if (w < 0) {
-			throw new IllegalArgumentException("Week value out of range");
-		}
-
-		checkWeeksOkay(w);
-
-		weeks = w;
-	}
-
-	/**
-	 * Method getDays
-	 *
-	 * @return int
-	 */
-	public int getDays() {
-		return days;
-	}
-
-	/**
-	 * Method setDays
-	 */
-	public void setDays(int d) {
-		if (d < 0) {
-			throw new IllegalArgumentException("Day value out of range");
-		}
-
-		checkNonWeeksOkay(d);
-
-		days = d;
-
-		normalize();
-	}
-
-	/**
-	 * Method getHours
-	 *
-	 * @return int
-	 */
-	public int getHours() {
-		return hours;
-	}
-
-	/**
-	 * Method setHours
-	 */
-	public void setHours(int h) {
-		if (h < 0) {
-			throw new IllegalArgumentException("Hour value out of range");
-		}
-
-		checkNonWeeksOkay(h);
-
-		hours = h;
-
-		normalize();
-	}
-
-	/**
-	 * Method getMinutes
-	 *
-	 * @return int
-	 */
-	public int getMinutes() {
-		return minutes;
-	}
-
-	/**
-	 * Method setMinutes
-	 */
-	public void setMinutes(int m) {
-		if (m < 0) {
-			throw new IllegalArgumentException("Minute value out of range");
-		}
-
-		checkNonWeeksOkay(m);
-
-		minutes = m;
-
-		normalize();
-	}
-
-	/**
-	 * Method getSeconds
-	 *
-	 * @return int
-	 */
-	public int getSeconds() {
-		return seconds;
-	}
-
-	/**
-	 * Method setSeconds
-	 */
-	public void setSeconds(int s) {
-		if (s < 0) {
-			throw new IllegalArgumentException("Second value out of range");
-		}
-
-		checkNonWeeksOkay(s);
-
-		seconds = s;
-
-		normalize();
-	}
-
-	/**
-	 * Method getInterval
-	 *
-	 * @return long
-	 */
-	public long getInterval() {
-		return seconds * MILLIS_PER_SECOND + minutes * MILLIS_PER_MINUTE
-			   + hours * MILLIS_PER_HOUR + days * MILLIS_PER_DAY
-			   + weeks * MILLIS_PER_WEEK;
-	}
-
-	/**
-	 * Method setInterval
-	 */
-	public void setInterval(long millis) {
-		if (millis < 0) {
-			throw new IllegalArgumentException("Negative-length interval");
-		}
-
-		clear();
-
-		days = (int)(millis / MILLIS_PER_DAY);
-		seconds = (int)((millis % MILLIS_PER_DAY) / MILLIS_PER_SECOND);
-
-		normalize();
-	}
-
-	/**
-	 * Method normalize
-	 */
-	protected void normalize() {
-		minutes += seconds / SECONDS_PER_MINUTE;
-		seconds %= SECONDS_PER_MINUTE;
-		hours += minutes / MINUTES_PER_HOUR;
-		minutes %= MINUTES_PER_HOUR;
-		days += hours / HOURS_PER_DAY;
-		hours %= HOURS_PER_DAY;
-	}
-
-	/**
-	 * Method checkWeeksOkay
-	 */
-	protected void checkWeeksOkay(int f) {
-		if ((f != 0)
-			&& ((days != 0) || (hours != 0) || (minutes != 0)
-				|| (seconds != 0))) {
-			throw new IllegalStateException(
-				"Weeks and non-weeks are incompatible");
-		}
-	}
-
-	/**
-	 * Method checkNonWeeksOkay
-	 */
-	protected void checkNonWeeksOkay(int f) {
-		if ((f != 0) && (weeks != 0)) {
-			throw new IllegalStateException(
-				"Weeks and non-weeks are incompatible");
-		}
+		_weeks = 0;
+		_days = 0;
+		_hours = 0;
+		_minutes = 0;
+		_seconds = 0;
 	}
 
 	/**
@@ -359,17 +108,162 @@ public class Duration implements Cloneable, Serializable {
 		try {
 			Duration other = (Duration)super.clone();
 
-			other.weeks = weeks;
-			other.days = days;
-			other.hours = hours;
-			other.minutes = minutes;
-			other.seconds = seconds;
+			other._weeks = _weeks;
+			other._days = _days;
+			other._hours = _hours;
+			other._minutes = _minutes;
+			other._seconds = _seconds;
 
 			return other;
 		}
-		catch (CloneNotSupportedException e) {
+		catch (CloneNotSupportedException cnse) {
 			throw new InternalError();
 		}
+	}
+
+	/**
+	 * Method getDays
+	 *
+	 * @return int
+	 */
+	public int getDays() {
+		return _days;
+	}
+
+	/**
+	 * Method getHours
+	 *
+	 * @return int
+	 */
+	public int getHours() {
+		return _hours;
+	}
+
+	/**
+	 * Method getInterval
+	 *
+	 * @return long
+	 */
+	public long getInterval() {
+		return _seconds * _MILLIS_PER_SECOND + _minutes * _MILLIS_PER_MINUTE
+			   + _hours * _MILLIS_PER_HOUR + _days * _MILLIS_PER_DAY
+			   + _weeks * _MILLIS_PER_WEEK;
+	}
+
+	/**
+	 * Method getMinutes
+	 *
+	 * @return int
+	 */
+	public int getMinutes() {
+		return _minutes;
+	}
+
+	/**
+	 * Method getSeconds
+	 *
+	 * @return int
+	 */
+	public int getSeconds() {
+		return _seconds;
+	}
+
+	/**
+	 * Method getWeeks
+	 *
+	 * @return int
+	 */
+	public int getWeeks() {
+		return _weeks;
+	}
+
+	/**
+	 * Method setDays
+	 */
+	public void setDays(int d) {
+		if (d < 0) {
+			throw new IllegalArgumentException("Day value out of range");
+		}
+
+		checkNonWeeksOkay(d);
+
+		_days = d;
+
+		normalize();
+	}
+
+	/**
+	 * Method setHours
+	 */
+	public void setHours(int h) {
+		if (h < 0) {
+			throw new IllegalArgumentException("Hour value out of range");
+		}
+
+		checkNonWeeksOkay(h);
+
+		_hours = h;
+
+		normalize();
+	}
+
+	/**
+	 * Method setInterval
+	 */
+	public void setInterval(long millis) {
+		if (millis < 0) {
+			throw new IllegalArgumentException("Negative-length interval");
+		}
+
+		clear();
+
+		_days = (int)(millis / _MILLIS_PER_DAY);
+		_seconds = (int)((millis % _MILLIS_PER_DAY) / _MILLIS_PER_SECOND);
+
+		normalize();
+	}
+
+	/**
+	 * Method setMinutes
+	 */
+	public void setMinutes(int m) {
+		if (m < 0) {
+			throw new IllegalArgumentException("Minute value out of range");
+		}
+
+		checkNonWeeksOkay(m);
+
+		_minutes = m;
+
+		normalize();
+	}
+
+	/**
+	 * Method setSeconds
+	 */
+	public void setSeconds(int s) {
+		if (s < 0) {
+			throw new IllegalArgumentException("Second value out of range");
+		}
+
+		checkNonWeeksOkay(s);
+
+		_seconds = s;
+
+		normalize();
+	}
+
+	/**
+	 * Method setWeeks
+	 */
+	public void setWeeks(int w) {
+		if (w < 0) {
+			throw new IllegalArgumentException("Week value out of range");
+		}
+
+		checkWeeksOkay(w);
+
+		_weeks = w;
 	}
 
 	/**
@@ -383,18 +277,126 @@ public class Duration implements Cloneable, Serializable {
 
 		sb.append(getClass().getName());
 		sb.append("[weeks=");
-		sb.append(weeks);
+		sb.append(_weeks);
 		sb.append(",days=");
-		sb.append(days);
+		sb.append(_days);
 		sb.append(",hours=");
-		sb.append(hours);
+		sb.append(_hours);
 		sb.append(",minutes=");
-		sb.append(minutes);
+		sb.append(_minutes);
 		sb.append(",seconds=");
-		sb.append(seconds);
+		sb.append(_seconds);
 		sb.append("]");
 
 		return sb.toString();
 	}
+
+	/**
+	 * Method checkNonWeeksOkay
+	 */
+	protected void checkNonWeeksOkay(int f) {
+		if ((f != 0) && (_weeks != 0)) {
+			throw new IllegalStateException(
+				"Weeks and non-weeks are incompatible");
+		}
+	}
+
+	/**
+	 * Method checkWeeksOkay
+	 */
+	protected void checkWeeksOkay(int f) {
+		if ((f != 0)
+			&& ((_days != 0) || (_hours != 0) || (_minutes != 0)
+				|| (_seconds != 0))) {
+			throw new IllegalStateException(
+				"Weeks and non-weeks are incompatible");
+		}
+	}
+
+	/**
+	 * Method normalize
+	 */
+	protected void normalize() {
+		_minutes += _seconds / _SECONDS_PER_MINUTE;
+		_seconds %= _SECONDS_PER_MINUTE;
+		_hours += _minutes / _MINUTES_PER_HOUR;
+		_minutes %= _MINUTES_PER_HOUR;
+		_days += _hours / _HOURS_PER_DAY;
+		_hours %= _HOURS_PER_DAY;
+	}
+
+	/**
+	 * Field DAYS_PER_WEEK
+	 */
+	private static final int _DAYS_PER_WEEK = 7;
+
+	/**
+	 * Field HOURS_PER_DAY
+	 */
+	private static final int _HOURS_PER_DAY = 24;
+
+	/**
+	 * Field MILLIS_PER_DAY
+	 */
+	private static final int _MILLIS_PER_DAY =
+		Duration._HOURS_PER_DAY * Duration._MILLIS_PER_HOUR;
+
+	/**
+	 * Field MILLIS_PER_HOUR
+	 */
+	private static final int _MILLIS_PER_HOUR =
+		Duration._MINUTES_PER_HOUR * Duration._MILLIS_PER_MINUTE;
+
+	/**
+	 * Field MILLIS_PER_MINUTE
+	 */
+	private static final int _MILLIS_PER_MINUTE =
+		Duration._SECONDS_PER_MINUTE * Duration._MILLIS_PER_SECOND;
+
+	/**
+	 * Field MILLIS_PER_SECOND
+	 */
+	private static final int _MILLIS_PER_SECOND = 1000;
+
+	/**
+	 * Field MILLIS_PER_WEEK
+	 */
+	private static final int _MILLIS_PER_WEEK =
+		Duration._DAYS_PER_WEEK * Duration._MILLIS_PER_DAY;
+
+	/**
+	 * Field MINUTES_PER_HOUR
+	 */
+	private static final int _MINUTES_PER_HOUR = 60;
+
+	/**
+	 * Field SECONDS_PER_MINUTE
+	 */
+	private static final int _SECONDS_PER_MINUTE = 60;
+
+	/**
+	 * Field days
+	 */
+	private int _days;
+
+	/**
+	 * Field hours
+	 */
+	private int _hours;
+
+	/**
+	 * Field minutes
+	 */
+	private int _minutes;
+
+	/**
+	 * Field seconds
+	 */
+	private int _seconds;
+
+	/**
+	 * Field weeks
+	 */
+	private int _weeks;
 
 }

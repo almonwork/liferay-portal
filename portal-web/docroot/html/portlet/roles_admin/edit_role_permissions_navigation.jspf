@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -87,7 +87,7 @@ portlets = ListUtil.sort(portlets, new PortletTitleComparator(application, local
 							editPermissionsURL.setParameter("showModelResources", "1");
 						%>
 
-							<aui:option label="<%= PortalUtil.getPortletTitle(portlet, application, locale) %>" selected="<%= _isCurrent(editPermissionsURL.toString(), portletResource, showModelResources) %>" value="<%= editPermissionsURL.toString() %>" />
+							<aui:option label="<%= PortalUtil.getPortletLongTitle(portlet, application, locale) %>" selected="<%= _isCurrent(editPermissionsURL.toString(), portletResource, showModelResources) %>" value="<%= editPermissionsURL.toString() %>" />
 
 						<%
 						}
@@ -115,7 +115,7 @@ portlets = ListUtil.sort(portlets, new PortletTitleComparator(application, local
 					editPermissionsURL.setParameter("showModelResources", "1");
 				%>
 
-					<aui:option label="<%= PortalUtil.getPortletTitle(portlet, application, locale) %>" selected="<%= _isCurrent(editPermissionsURL.toString(), portletResource, showModelResources) %>" value="<%= editPermissionsURL.toString() %>" />
+					<aui:option label="<%= PortalUtil.getPortletLongTitle(portlet, application, locale) %>" selected="<%= _isCurrent(editPermissionsURL.toString(), portletResource, showModelResources) %>" value="<%= editPermissionsURL.toString() %>" />
 
 				<%
 				}
@@ -124,9 +124,15 @@ portlets = ListUtil.sort(portlets, new PortletTitleComparator(application, local
 			</optgroup>
 
 			<%
-			PortletCategory portletCategory = (PortletCategory)WebAppPool.get(String.valueOf(company.getCompanyId()), WebKeys.PORTLET_CATEGORY);
+			Set<String> hiddenPortletIds = Collections.emptySet();
 
-			Set<String> hiddenPortletIds = portletCategory.getCategory(PortletCategoryConstants.NAME_HIDDEN).getPortletIds();
+			PortletCategory portletCategory = (PortletCategory)WebAppPool.get(company.getCompanyId(), WebKeys.PORTLET_CATEGORY);
+
+			PortletCategory hiddentPortletCategory = portletCategory.getCategory(PortletCategoryConstants.NAME_HIDDEN);
+
+			if (hiddentPortletCategory != null) {
+				hiddenPortletIds = hiddentPortletCategory.getPortletIds();
+			}
 			%>
 
 			<optgroup label="<liferay-ui:message key="site-applications" />">
@@ -141,7 +147,7 @@ portlets = ListUtil.sort(portlets, new PortletTitleComparator(application, local
 					editPermissionsURL.setParameter("showModelResources", "0");
 				%>
 
-					<aui:option label="<%= PortalUtil.getPortletTitle(portlet, application, locale) %>" selected="<%= _isCurrent(editPermissionsURL.toString(), portletResource, showModelResources) %>" value="<%= editPermissionsURL.toString() %>" />
+					<aui:option label="<%= PortalUtil.getPortletLongTitle(portlet, application, locale) %>" selected="<%= _isCurrent(editPermissionsURL.toString(), portletResource, showModelResources) %>" value="<%= editPermissionsURL.toString() %>" />
 
 				<%
 				}
@@ -169,7 +175,7 @@ portlets = ListUtil.sort(portlets, new PortletTitleComparator(application, local
 				else if (portlet.getControlPanelEntryCategory().equals(PortletCategoryKeys.PORTAL) && (role.getType() == RoleConstants.TYPE_REGULAR)) {
 					portalPortlets.add(portlet);
 				}
-				else if (portlet.getControlPanelEntryCategory().equals(PortletCategoryKeys.SERVER) && (role.getType() == RoleConstants.TYPE_REGULAR)) {
+				else if (portlet.getControlPanelEntryCategory().equals(PortletCategoryKeys.SERVER) && (role.getType() == RoleConstants.TYPE_REGULAR) && !Validator.equals(portlet.getControlPanelEntryClass(), OmniadminControlPanelEntry.class.getName())) {
 					serverPortlets.add(portlet);
 				}
 			}
@@ -184,7 +190,7 @@ portlets = ListUtil.sort(portlets, new PortletTitleComparator(application, local
 						editPermissionsURL.setParameter("showModelResources", "0");
 					%>
 
-						<aui:option label="<%= PortalUtil.getPortletTitle(portlet, application, locale) %>" selected="<%= _isCurrent(editPermissionsURL.toString(), portletResource, showModelResources) %>" value="<%= editPermissionsURL.toString() %>" />
+						<aui:option label="<%= PortalUtil.getPortletLongTitle(portlet, application, locale) %>" selected="<%= _isCurrent(editPermissionsURL.toString(), portletResource, showModelResources) %>" value="<%= editPermissionsURL.toString() %>" />
 
 					<%
 					}
@@ -202,7 +208,7 @@ portlets = ListUtil.sort(portlets, new PortletTitleComparator(application, local
 						editPermissionsURL.setParameter("showModelResources", "0");
 					%>
 
-						<aui:option label="<%= PortalUtil.getPortletTitle(portlet, application, locale) %>" selected="<%= _isCurrent(editPermissionsURL.toString(), portletResource, showModelResources) %>" value="<%= editPermissionsURL.toString() %>" />
+						<aui:option label="<%= PortalUtil.getPortletLongTitle(portlet, application, locale) %>" selected="<%= _isCurrent(editPermissionsURL.toString(), portletResource, showModelResources) %>" value="<%= editPermissionsURL.toString() %>" />
 
 					<%
 					}
@@ -220,7 +226,7 @@ portlets = ListUtil.sort(portlets, new PortletTitleComparator(application, local
 						editPermissionsURL.setParameter("showModelResources", "0");
 					%>
 
-						<aui:option label="<%= PortalUtil.getPortletTitle(portlet, application, locale) %>" selected="<%= _isCurrent(editPermissionsURL.toString(), portletResource, showModelResources) %>" value="<%= editPermissionsURL.toString() %>" />
+						<aui:option label="<%= PortalUtil.getPortletLongTitle(portlet, application, locale) %>" selected="<%= _isCurrent(editPermissionsURL.toString(), portletResource, showModelResources) %>" value="<%= editPermissionsURL.toString() %>" />
 
 					<%
 					}
@@ -238,7 +244,7 @@ portlets = ListUtil.sort(portlets, new PortletTitleComparator(application, local
 						editPermissionsURL.setParameter("showModelResources", "0");
 					%>
 
-						<aui:option label="<%= PortalUtil.getPortletTitle(portlet, application, locale) %>" selected="<%= _isCurrent(editPermissionsURL.toString(), portletResource, showModelResources) %>" value="<%= editPermissionsURL.toString() %>" />
+						<aui:option label="<%= PortalUtil.getPortletLongTitle(portlet, application, locale) %>" selected="<%= _isCurrent(editPermissionsURL.toString(), portletResource, showModelResources) %>" value="<%= editPermissionsURL.toString() %>" />
 
 					<%
 					}

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -22,13 +22,19 @@ import com.liferay.portal.kernel.cluster.Priority;
  */
 public interface SearchEngine {
 
+	public BooleanClauseFactory getBooleanClauseFactory();
+
+	public BooleanQueryFactory getBooleanQueryFactory();
+
 	public Priority getClusteredWritePriority();
 
 	public IndexSearcher getIndexSearcher();
 
 	public IndexWriter getIndexWriter();
 
-	public String getName();
+	public TermQueryFactory getTermQueryFactory();
+
+	public TermRangeQueryFactory getTermRangeQueryFactory();
 
 	public String getVendor();
 

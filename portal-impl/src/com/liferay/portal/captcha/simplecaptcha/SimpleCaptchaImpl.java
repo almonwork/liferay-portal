@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -25,15 +25,15 @@ import com.liferay.portal.kernel.util.InstancePool;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.Randomizer;
 import com.liferay.portal.kernel.util.Validator;
-import com.liferay.portal.util.PortalUtil;
 import com.liferay.portal.util.PropsValues;
 import com.liferay.portal.util.WebKeys;
 
 import java.io.IOException;
 
 import javax.portlet.PortletRequest;
-import javax.portlet.PortletResponse;
 import javax.portlet.PortletSession;
+import javax.portlet.ResourceRequest;
+import javax.portlet.ResourceResponse;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -143,21 +143,19 @@ public class SimpleCaptchaImpl implements Captcha {
 	}
 
 	public void serveImage(
-			PortletRequest portletRequest, PortletResponse portletResponse)
+			ResourceRequest resourceRequest, ResourceResponse resourceResponse)
 		throws IOException {
 
-		PortletSession portletSession = portletRequest.getPortletSession();
+		PortletSession portletSession = resourceRequest.getPortletSession();
 
 		nl.captcha.Captcha simpleCaptcha = getSimpleCaptcha();
 
 		portletSession.setAttribute(
 			WebKeys.CAPTCHA_TEXT, simpleCaptcha.getAnswer());
 
-		HttpServletResponse response = PortalUtil.getHttpServletResponse(
-			portletResponse);
-
 		CaptchaServletUtil.writeImage(
-			response.getOutputStream(), simpleCaptcha.getImage());
+			resourceResponse.getPortletOutputStream(),
+			simpleCaptcha.getImage());
 	}
 
 	protected void checkMaxChallenges(HttpServletRequest request)
@@ -277,15 +275,15 @@ public class SimpleCaptchaImpl implements Captcha {
 
 	protected void incrementCounter(HttpServletRequest request) {
 		if ((PropsValues.CAPTCHA_MAX_CHALLENGES > 0) &&
-			(Validator.isNotNull(request.getRemoteUser()))) {
+			Validator.isNotNull(request.getRemoteUser())) {
 
 			HttpSession session = request.getSession();
 
 			Integer count = (Integer)session.getAttribute(
 				WebKeys.CAPTCHA_COUNT);
 
-			session.setAttribute(WebKeys.CAPTCHA_COUNT,
-				incrementCounter(count));
+			session.setAttribute(
+				WebKeys.CAPTCHA_COUNT, incrementCounter(count));
 		}
 	}
 
@@ -302,15 +300,15 @@ public class SimpleCaptchaImpl implements Captcha {
 
 	protected void incrementCounter(PortletRequest portletRequest) {
 		if ((PropsValues.CAPTCHA_MAX_CHALLENGES > 0) &&
-			(Validator.isNotNull(portletRequest.getRemoteUser()))) {
+			Validator.isNotNull(portletRequest.getRemoteUser())) {
 
 			PortletSession portletSession = portletRequest.getPortletSession();
 
 			Integer count = (Integer)portletSession.getAttribute(
 				WebKeys.CAPTCHA_COUNT);
 
-			portletSession.setAttribute(WebKeys.CAPTCHA_COUNT,
-				incrementCounter(count));
+			portletSession.setAttribute(
+				WebKeys.CAPTCHA_COUNT, incrementCounter(count));
 		}
 	}
 
@@ -338,8 +336,7 @@ public class SimpleCaptchaImpl implements Captcha {
 			gimpyRendererClassNames.length];
 
 		for (int i = 0; i < gimpyRendererClassNames.length; i++) {
-			String gimpyRendererClassName =
-				gimpyRendererClassNames[i];
+			String gimpyRendererClassName = gimpyRendererClassNames[i];
 
 			_gimpyRenderers[i] = (GimpyRenderer)InstancePool.get(
 				gimpyRendererClassName);

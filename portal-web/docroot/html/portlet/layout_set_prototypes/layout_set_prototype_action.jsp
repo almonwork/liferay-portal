@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -42,9 +42,7 @@ Group group = layoutSetPrototype.getGroup();
 			image="edit"
 			url="<%= editURL %>"
 		/>
-	</c:if>
 
-	<c:if test="<%= GroupPermissionUtil.contains(permissionChecker, group.getGroupId(), ActionKeys.MANAGE_LAYOUTS) %>">
 		<portlet:renderURL var="managePagesURL">
 			<portlet:param name="struts_action" value="/layout_set_prototypes/edit_layouts" />
 			<portlet:param name="redirect" value="<%= currentURL %>" />
@@ -56,6 +54,21 @@ Group group = layoutSetPrototype.getGroup();
 			message="manage-pages"
 			url="<%= managePagesURL %>"
 		/>
+
+		<c:if test="<%= group.getPrivateLayoutsPageCount() > 0 %>">
+			<liferay-portlet:actionURL portletName="<%= PortletKeys.SITE_REDIRECTOR %>" var="viewPagesURL">
+				<portlet:param name="struts_action" value="/my_sites/view" />
+				<portlet:param name="groupId" value="<%= String.valueOf(group.getGroupId()) %>" />
+				<portlet:param name="privateLayout" value="<%= Boolean.TRUE.toString() %>" />
+			</liferay-portlet:actionURL>
+
+			<liferay-ui:icon
+				image="view"
+				message="view-pages"
+				target="_blank"
+				url="<%= viewPagesURL %>"
+			/>
+		</c:if>
 	</c:if>
 
 	<c:if test="<%= LayoutSetPrototypePermissionUtil.contains(permissionChecker, layoutSetPrototypeId, ActionKeys.PERMISSIONS) %>">
@@ -82,6 +95,39 @@ Group group = layoutSetPrototype.getGroup();
 
 		<liferay-ui:icon-delete
 			url="<%= deleteURL %>"
+		/>
+	</c:if>
+
+	<c:if test="<%= GroupPermissionUtil.contains(permissionChecker, group.getGroupId(), ActionKeys.EXPORT_IMPORT_LAYOUTS) %>">
+		<portlet:renderURL var="exportPagesURL" windowState="<%= LiferayWindowState.POP_UP.toString() %>">
+			<portlet:param name="struts_action" value="/layouts_admin/export_layouts" />
+			<portlet:param name="<%= Constants.CMD %>" value="<%= Constants.EXPORT %>" />
+			<portlet:param name="groupId" value="<%= String.valueOf(group.getGroupId()) %>" />
+			<portlet:param name="privateLayout" value="<%= String.valueOf(Boolean.TRUE) %>" />
+			<portlet:param name="rootNodeName" value="<%= layoutSetPrototype.getName(locale) %>" />
+		</portlet:renderURL>
+
+		<liferay-ui:icon
+			cssClass="export-layoutset-prototype layoutset-prototype-action"
+			image="export"
+			method="get"
+			url="<%= exportPagesURL %>"
+		/>
+
+		<portlet:renderURL var="importPagesURL" windowState="<%= LiferayWindowState.POP_UP.toString() %>">
+			<portlet:param name="struts_action" value="/layouts_admin/import_layouts" />
+			<portlet:param name="<%= Constants.CMD %>" value="<%= Constants.IMPORT %>" />
+			<portlet:param name="groupId" value="<%= String.valueOf(group.getGroupId()) %>" />
+			<portlet:param name="privateLayout" value="<%= String.valueOf(Boolean.TRUE) %>" />
+			<portlet:param name="rootNodeName" value="<%= layoutSetPrototype.getName(locale) %>" />
+		</portlet:renderURL>
+
+		<liferay-ui:icon
+			cssClass="import-layoutset-prototype layoutset-prototype-action"
+			image="../aui/arrowthick-1-t"
+			message="import"
+			method="get"
+			url="<%= importPagesURL %>"
 		/>
 	</c:if>
 </liferay-ui:icon-menu>

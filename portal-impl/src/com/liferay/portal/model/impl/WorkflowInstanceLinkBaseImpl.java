@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -38,6 +38,11 @@ public abstract class WorkflowInstanceLinkBaseImpl
 	 * Never modify or reference this class directly. All methods that expect a workflow instance link model instance should use the {@link WorkflowInstanceLink} interface instead.
 	 */
 	public void persist() throws SystemException {
-		WorkflowInstanceLinkLocalServiceUtil.updateWorkflowInstanceLink(this);
+		if (this.isNew()) {
+			WorkflowInstanceLinkLocalServiceUtil.addWorkflowInstanceLink(this);
+		}
+		else {
+			WorkflowInstanceLinkLocalServiceUtil.updateWorkflowInstanceLink(this);
+		}
 	}
 }

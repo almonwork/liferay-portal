@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -23,14 +23,15 @@ import com.liferay.portalweb.portal.util.RuntimeVariables;
 public class AddToShoppingCartCategoryItem2Test extends BaseTestCase {
 	public void testAddToShoppingCartCategoryItem2() throws Exception {
 		selenium.open("/web/guest/home/");
+		loadRequiredJavaScriptModules();
 
 		for (int second = 0;; second++) {
-			if (second >= 60) {
+			if (second >= 90) {
 				fail("timeout");
 			}
 
 			try {
-				if (selenium.isElementPresent("link=Shopping Test Page")) {
+				if (selenium.isVisible("link=Shopping Test Page")) {
 					break;
 				}
 			}
@@ -40,35 +41,48 @@ public class AddToShoppingCartCategoryItem2Test extends BaseTestCase {
 			Thread.sleep(1000);
 		}
 
-		selenium.saveScreenShotAndSource();
-		selenium.clickAt("link=Shopping Test Page", RuntimeVariables.replace(""));
+		selenium.clickAt("link=Shopping Test Page",
+			RuntimeVariables.replace("Shopping Test Page"));
 		selenium.waitForPageToLoad("30000");
-		selenium.saveScreenShotAndSource();
-		selenium.clickAt("//td[1]/a", RuntimeVariables.replace(""));
+		loadRequiredJavaScriptModules();
+		assertEquals(RuntimeVariables.replace(
+				"Shopping Category Name\nShopping Category Description"),
+			selenium.getText("//td[1]/a"));
+		selenium.clickAt("//td[1]/a",
+			RuntimeVariables.replace(
+				"Shopping Category Name\nShopping Category Description"));
 		selenium.waitForPageToLoad("30000");
-		selenium.saveScreenShotAndSource();
-		selenium.clickAt("//tr[4]/td[2]/a", RuntimeVariables.replace(""));
+		loadRequiredJavaScriptModules();
+		assertEquals(RuntimeVariables.replace(
+				"Shopping Category Item2 Name\nShopping Category Item2 Description\nShopping: Category Item2 Properties"),
+			selenium.getText("//tr[4]/td[2]/a"));
+		selenium.clickAt("//tr[4]/td[2]/a",
+			RuntimeVariables.replace(
+				"Shopping Category Item2 Name\nShopping Category Item2 Description\nShopping: Category Item2 Properties"));
 		selenium.waitForPageToLoad("30000");
-		selenium.saveScreenShotAndSource();
-		assertTrue(selenium.isTextPresent(
-				"M. Saech - How to Play Guitar - for Dummies."));
-		assertTrue(selenium.isTextPresent(
-				"Noted guitarist and performer (for one) lays down how to thrash with the might battle axe of music."));
+		loadRequiredJavaScriptModules();
+		assertEquals(RuntimeVariables.replace("Shopping Category Item2 Name"),
+			selenium.getText("//span[1]/strong"));
+		assertEquals(RuntimeVariables.replace(
+				"Shopping Category Item2 Name\n \n Shopping Category Item2 Description \n Shopping: Category Item2 Properties \n\n Price for 1 to 1 Items: $9.99\n \n Availability: In Stock"),
+			selenium.getText("//td[3]"));
 		selenium.clickAt("//input[@value='Add to Shopping Cart']",
-			RuntimeVariables.replace(""));
+			RuntimeVariables.replace("Add to Shopping Cart"));
 		selenium.waitForPageToLoad("30000");
-		selenium.saveScreenShotAndSource();
-		assertTrue(selenium.isTextPresent(
-				"Your request completed successfully."));
+		loadRequiredJavaScriptModules();
+		assertEquals(RuntimeVariables.replace(
+				"Your request completed successfully."),
+			selenium.getText("//div[@class='portlet-msg-success']"));
 		selenium.open("/web/guest/home/");
+		loadRequiredJavaScriptModules();
 
 		for (int second = 0;; second++) {
-			if (second >= 60) {
+			if (second >= 90) {
 				fail("timeout");
 			}
 
 			try {
-				if (selenium.isElementPresent("link=Shopping Test Page")) {
+				if (selenium.isVisible("link=Shopping Test Page")) {
 					break;
 				}
 			}
@@ -78,17 +92,18 @@ public class AddToShoppingCartCategoryItem2Test extends BaseTestCase {
 			Thread.sleep(1000);
 		}
 
-		selenium.saveScreenShotAndSource();
-		selenium.clickAt("link=Shopping Test Page", RuntimeVariables.replace(""));
+		selenium.clickAt("link=Shopping Test Page",
+			RuntimeVariables.replace("Shopping Test Page"));
 		selenium.waitForPageToLoad("30000");
-		selenium.saveScreenShotAndSource();
-		selenium.clickAt("link=Cart", RuntimeVariables.replace(""));
+		loadRequiredJavaScriptModules();
+		selenium.clickAt("link=Cart", RuntimeVariables.replace("Cart"));
 		selenium.waitForPageToLoad("30000");
-		selenium.saveScreenShotAndSource();
-		assertTrue(selenium.isTextPresent(
-				"M. Saech - How to Play Guitar - for Dummies."));
-		assertTrue(selenium.isTextPresent(
-				"Noted guitarist and performer (for one) lays down how to thrash with the might battle axe of music."));
-		assertTrue(selenium.isTextPresent("Price: $16.99"));
+		loadRequiredJavaScriptModules();
+		assertEquals(RuntimeVariables.replace(
+				"Shopping Category Item1 Name\nShopping Category Item1 Description\n\nAvailability: In Stock\n\n\nPrice for 1 to 1 Items:$9.99"),
+			selenium.getText("//tr[3]/td[2]/a"));
+		assertEquals(RuntimeVariables.replace(
+				"Shopping Category Item2 Name\nShopping Category Item2 Description\n\nAvailability: In Stock\n\n\nPrice for 1 to 1 Items:$9.99"),
+			selenium.getText("//tr[4]/td[2]/a"));
 	}
 }

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,8 +14,15 @@
 
 package com.liferay.portal.upgrade.v6_1_0;
 
+import com.liferay.portal.kernel.dao.jdbc.DataAccess;
 import com.liferay.portal.kernel.upgrade.UpgradeProcess;
 import com.liferay.portal.kernel.util.PropsKeys;
+import com.liferay.portal.kernel.util.StringBundler;
+import com.liferay.portal.kernel.util.StringUtil;
+
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 
 /**
  * @author Miguel Pastor
@@ -26,31 +33,109 @@ public class UpgradeCommunityProperties extends UpgradeProcess {
 	protected void doUpgrade() throws Exception {
 		for (int i = 0; i < _OLD_PORTLET_PREFERENCES.length; i++) {
 			updatePreferences(
-				"PortletPreferences", _OLD_PORTLET_PREFERENCES[i],
-				_NEW_PORTLET_PREFERENCES[i]);
+				"PortletPreferences", "portletPreferencesId",
+				_OLD_PORTLET_PREFERENCES[i], _NEW_PORTLET_PREFERENCES[i]);
 		}
 
 		for (int i = 0; i < _OLD_PORTAL_PREFERENCES.length; i++) {
 			updatePreferences(
-				"PortalPreferences", _OLD_PORTAL_PREFERENCES[i],
-				_NEW_PORTAL_PREFERENCES[i]);
+				"PortalPreferences", "portalPreferencesId",
+				_OLD_PORTAL_PREFERENCES[i], _NEW_PORTAL_PREFERENCES[i]);
 		}
 	}
 
 	protected void updatePreferences(
-			String tableName, String oldValue, String newValue)
+			String tableName, String primaryKeyColumnName, String oldValue,
+			String newValue)
 		throws Exception {
 
-		runSQL(
-			"update " + tableName + " set preferences = " +
-			   	"replace(preferences, \"" + oldValue + "\", \"" + newValue +
-			   		"\") where preferences like \"%" + oldValue + "%\"");
+		Connection con = null;
+		PreparedStatement ps = null;
+		ResultSet rs = null;
+
+		StringBundler sb = new StringBundler(9);
+
+		sb.append("update ");
+		sb.append(tableName);
+		sb.append(" set preferences = replace(preferences, '");
+		sb.append(oldValue);
+		sb.append("', '");
+		sb.append(newValue);
+		sb.append("') where preferences like '%");
+		sb.append(oldValue);
+		sb.append("%'");
+
+		try {
+			runSQL(sb.toString());
+		}
+		catch (Exception e) {
+			con = DataAccess.getUpgradeOptimizedConnection();
+
+			sb = new StringBundler(7);
+
+			sb.append("select ");
+			sb.append(primaryKeyColumnName);
+			sb.append(", preferences from ");
+			sb.append(tableName);
+			sb.append(" where preferences like '%");
+			sb.append(oldValue);
+			sb.append("%'");
+
+			ps = con.prepareStatement(sb.toString());
+
+			rs = ps.executeQuery();
+
+			while (rs.next()) {
+				long primaryKey = rs.getLong(primaryKeyColumnName);
+				String preferences = rs.getString("preferences");
+
+				updatePreferences(
+					tableName, primaryKeyColumnName, oldValue, newValue,
+					primaryKey, preferences);
+			}
+		}
+		finally {
+			DataAccess.cleanUp(con, ps, rs);
+		}
+	}
+
+	protected void updatePreferences(
+			String tableName, String primaryKeyColumnName, String oldValue,
+			String newValue, long primaryKey, String preferences)
+		throws Exception {
+
+		preferences = StringUtil.replace(preferences, oldValue, newValue);
+
+		Connection con = null;
+		PreparedStatement ps = null;
+		ResultSet rs = null;
+
+		StringBundler sb = new StringBundler(5);
+
+		sb.append("update ");
+		sb.append(tableName);
+		sb.append(" set preferences = ? where ");
+		sb.append(primaryKeyColumnName);
+		sb.append(" = ?");
+
+		try {
+			con = DataAccess.getUpgradeOptimizedConnection();
+
+			ps = con.prepareStatement(sb.toString());
+
+			ps.setString(1, preferences);
+			ps.setLong(2, primaryKey);
+
+			ps.executeUpdate();
+		}
+		finally {
+			DataAccess.cleanUp(con, ps, rs);
+		}
 	}
 
 	private static final String[] _NEW_PORTAL_PREFERENCES = {
 		PropsKeys.COMPANY_SECURITY_SITE_LOGO,
-		PropsKeys.SITES_EMAIL_FROM_ADDRESS,
-		PropsKeys.SITES_EMAIL_FROM_NAME,
+		PropsKeys.SITES_EMAIL_FROM_ADDRESS, PropsKeys.SITES_EMAIL_FROM_NAME,
 		PropsKeys.SITES_EMAIL_MEMBERSHIP_REPLY_BODY,
 		PropsKeys.SITES_EMAIL_MEMBERSHIP_REPLY_SUBJECT,
 		PropsKeys.SITES_EMAIL_MEMBERSHIP_REQUEST_BODY,

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -21,6 +21,7 @@ import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.model.Company;
 import com.liferay.portal.model.Contact;
 import com.liferay.portal.model.ContactConstants;
+import com.liferay.portal.model.GroupConstants;
 import com.liferay.portal.model.User;
 import com.liferay.portal.service.CompanyLocalServiceUtil;
 import com.liferay.portal.service.ContactLocalServiceUtil;
@@ -96,9 +97,9 @@ public class VerifyUser extends VerifyProcess {
 			}
 
 			GroupLocalServiceUtil.addGroup(
-				user.getUserId(), User.class.getName(), user.getUserId(), null,
-				null, 0, StringPool.SLASH + user.getScreenName(), false, true,
-				null);
+				user.getUserId(), GroupConstants.DEFAULT_PARENT_GROUP_ID,
+				User.class.getName(), user.getUserId(), null, null, 0,
+				StringPool.SLASH + user.getScreenName(), false, true, null);
 		}
 
 		if (_log.isDebugEnabled()) {

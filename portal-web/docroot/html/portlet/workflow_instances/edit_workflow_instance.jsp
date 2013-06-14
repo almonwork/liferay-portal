@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -49,13 +49,13 @@ PortletURL viewFullContentURL = renderResponse.createRenderURL();
 
 viewFullContentURL.setParameter("struts_action", "/workflow_tasks/view_content");
 viewFullContentURL.setParameter("redirect", currentURL);
-viewFullContentURL.setParameter("type", assetRendererFactory.getType());
 
 if (assetEntry != null) {
 	viewFullContentURL.setParameter("assetEntryId", String.valueOf(assetEntry.getEntryId()));
 	viewFullContentURL.setParameter("assetEntryVersionId", String.valueOf(classPK));
 }
 
+viewFullContentURL.setParameter("type", assetRendererFactory.getType());
 viewFullContentURL.setParameter("showEditURL", Boolean.FALSE.toString());
 viewFullContentURL.setParameter("workflowAssetPreview", Boolean.TRUE.toString());
 
@@ -92,7 +92,7 @@ request.setAttribute(WebKeys.WORKFLOW_ASSET_PREVIEW, Boolean.TRUE);
 			</aui:column>
 		</aui:layout>
 
-		<liferay-ui:panel-container cssClass="task-panel-container" id="preview" extended="<%= true %>">
+		<liferay-ui:panel-container cssClass="task-panel-container" extended="<%= true %>" id="preview">
 
 			<c:if test="<%= assetRenderer != null %>">
 				<liferay-ui:panel defaultState="open" title='<%= LanguageUtil.format(pageContext, "preview-of-x", ResourceActionsUtil.getModelResource(locale, className)) %>'>
@@ -105,7 +105,7 @@ request.setAttribute(WebKeys.WORKFLOW_ASSET_PREVIEW, Boolean.TRUE);
 					</div>
 
 					<h3 class="task-content-title">
-						<img src="<%= workflowHandler.getIconPath(liferayPortletRequest) %>" alt="" /> <%= workflowHandler.getTitle(classPK, locale) %>
+						<img alt="" src="<%= workflowHandler.getIconPath(liferayPortletRequest) %>" /> <%= HtmlUtil.escape(workflowHandler.getTitle(classPK, locale)) %>
 					</h3>
 
 					<%
@@ -229,87 +229,9 @@ request.setAttribute(WebKeys.WORKFLOW_ASSET_PREVIEW, Boolean.TRUE);
 				logTypes.add(WorkflowLog.TRANSITION);
 
 				List<WorkflowLog> workflowLogs = WorkflowLogManagerUtil.getWorkflowLogsByWorkflowInstance(company.getCompanyId(), workflowInstance.getWorkflowInstanceId(), logTypes, QueryUtil.ALL_POS, QueryUtil.ALL_POS, WorkflowComparatorFactoryUtil.getLogCreateDateComparator(true));
-
-				for (WorkflowLog workflowLog : workflowLogs) {
-					Role curRole = null;
-					User curUser = null;
-					String actorName = null;
-
-					if (workflowLog.getRoleId() != 0) {
-						curRole = RoleLocalServiceUtil.getRole(workflowLog.getRoleId());
-						actorName = curRole.getDescriptiveName();
-					}
-					else if (workflowLog.getUserId() != 0) {
-						curUser = UserLocalServiceUtil.getUser(workflowLog.getUserId());
-						actorName = curUser.getFullName();
-					}
 				%>
 
-					<div class="task-activity task-type-<%= workflowLog.getType() %>">
-						<div class="task-activity-date">
-							<%= dateFormatDateTime.format(workflowLog.getCreateDate()) %>
-						</div>
-
-						<c:choose>
-							<c:when test="<%= workflowLog.getType() == WorkflowLog.TASK_COMPLETION %>">
-								<div>
-									<%= LanguageUtil.format(pageContext, "x-completed-the-task-x", new Object[] {HtmlUtil.escape(actorName), workflowLog.getState()}) %>
-								</div>
-							</c:when>
-							<c:when test="<%= workflowLog.getType() == WorkflowLog.TASK_UPDATE %>">
-								<div>
-									<%= LanguageUtil.format(pageContext, "x-updated-the-due-date", HtmlUtil.escape(actorName)) %>
-								</div>
-							</c:when>
-							<c:when test="<%= workflowLog.getType() == WorkflowLog.TRANSITION %>">
-								<div>
-									<%= LanguageUtil.format(pageContext, "x-changed-the-state-from-x-to-x", new Object[] {HtmlUtil.escape(actorName), workflowLog.getPreviousState(), workflowLog.getState()}) %>
-								</div>
-							</c:when>
-							<c:otherwise>
-								<c:choose>
-									<c:when test="<%= (workflowLog.getPreviousUserId() == 0) && (curUser != null) %>">
-										<div>
-											<%= LanguageUtil.format(pageContext, curUser.isMale() ? "x-assigned-the-task-to-himself" : "x-assigned-the-task-to-herself", HtmlUtil.escape(curUser.getFullName())) %>
-										</div>
-									</c:when>
-									<c:otherwise>
-
-										<%
-										String previousActorName = null;
-
-										if (curRole == null) {
-											previousActorName = PortalUtil.getUserName(workflowLog.getPreviousUserId(), StringPool.BLANK);
-										%>
-
-											<div>
-												<%= LanguageUtil.format(pageContext, "task-assigned-to-x.-previous-assignee-was-x", new Object[] {actorName, HtmlUtil.escape(previousActorName)}) %>
-											</div>
-
-										<%
-										}
-										else {
-											previousActorName = curRole.getDescriptiveName();
-										}
-										%>
-
-										<div>
-											<%= LanguageUtil.format(pageContext, "task-initially-assigned-to-the-x-role", new Object[] {actorName}) %>
-										</div>
-									</c:otherwise>
-								</c:choose>
-							</c:otherwise>
-						</c:choose>
-
-						<div>
-							<%= workflowLog.getComment() %>
-						</div>
-					</div>
-
-				<%
-				}
-				%>
-
+				<%@ include file="/html/portlet/workflow_instances/workflow_logs.jspf" %>
 			</liferay-ui:panel>
 
 			<liferay-ui:panel title="comments">
@@ -335,7 +257,7 @@ request.setAttribute(WebKeys.WORKFLOW_ASSET_PREVIEW, Boolean.TRUE);
 		<div class="lfr-asset-summary">
 			<liferay-ui:icon
 				cssClass="lfr-asset-avatar"
-				image='../file_system/large/task'
+				image="../file_system/large/task"
 				message="download"
 			/>
 

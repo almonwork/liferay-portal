@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -19,18 +19,18 @@
 <%
 JournalArticle article = (JournalArticle)request.getAttribute(WebKeys.JOURNAL_ARTICLE);
 
+long assetEntryId = 0;
 long classPK = 0;
 
 if (article != null) {
 	classPK = article.getResourcePrimKey();
 
-	if (!article.isApproved() && (article.getVersion() != JournalArticleConstants.DEFAULT_VERSION)) {
-		try {
-			AssetEntryLocalServiceUtil.getEntry(JournalArticle.class.getName(), article.getPrimaryKey());
+	if (!article.isApproved() && (article.getVersion() != JournalArticleConstants.VERSION_DEFAULT)) {
+		AssetEntry assetEntry = AssetEntryLocalServiceUtil.fetchEntry(JournalArticle.class.getName(), article.getPrimaryKey());
 
+		if (assetEntry != null) {
+			assetEntryId = assetEntry.getEntryId();
 			classPK = article.getPrimaryKey();
-		}
-		catch (NoSuchEntryException nsee) {
 		}
 	}
 }
@@ -44,6 +44,7 @@ if (article != null) {
 
 <aui:fieldset>
 	<liferay-ui:input-asset-links
+		assetEntryId="<%= assetEntryId %>"
 		className="<%= JournalArticle.class.getName() %>"
 		classPK="<%= classPK %>"
 	/>

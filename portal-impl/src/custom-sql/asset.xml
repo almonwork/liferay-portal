@@ -23,6 +23,18 @@
 				(AssetCategory.name LIKE ? OR ? IS NULL)
 		]]>
 	</sql>
+	<sql id="com.liferay.portlet.asset.service.persistence.AssetCategoryFinder.countByG_N_V">
+		<![CDATA[
+			SELECT
+				COUNT(*) AS COUNT_VALUE
+			FROM
+				AssetCategory
+			WHERE
+				(AssetCategory.groupId = ?) AND
+				(AssetCategory.name LIKE ? OR ? IS NULL) AND
+				(AssetCategory.vocabularyId = ?)
+		]]>
+	</sql>
 	<sql id="com.liferay.portlet.asset.service.persistence.AssetCategoryFinder.countByG_N_P">
 		<![CDATA[
 			SELECT
@@ -69,6 +81,20 @@
 					(AssetEntries_AssetCategories.categoryId = AssetCategory.categoryId)
 			WHERE
 				(AssetEntries_AssetCategories.entryId = ?)
+		]]>
+	</sql>
+	<sql id="com.liferay.portlet.asset.service.persistence.AssetCategoryFinder.findByG_N_V">
+		<![CDATA[
+			SELECT
+				{AssetCategory.*}
+			FROM
+				AssetCategory
+			WHERE
+				(AssetCategory.groupId = ?) AND
+				(AssetCategory.name LIKE ? OR ? IS NULL) AND
+				(AssetCategory.vocabularyId = ?)
+			ORDER BY
+				AssetCategory.name ASC
 		]]>
 	</sql>
 	<sql id="com.liferay.portlet.asset.service.persistence.AssetCategoryFinder.findByG_N_P">
@@ -145,7 +171,57 @@
 			FROM
 				AssetEntries_AssetTags
 			WHERE
-				tagId = ?
+				([$TAG_ID])
+		]]>
+	</sql>
+	<sql id="com.liferay.portlet.asset.service.persistence.AssetLinkFinder.findByE1_V">
+		<![CDATA[
+			SELECT
+				{AssetLink.*}
+			FROM
+				AssetLink
+			INNER JOIN
+				AssetEntry ON
+					(AssetEntry.entryId = AssetLink.entryId2)
+			WHERE
+				(AssetLink.entryId1 = ?) AND
+				(AssetEntry.visible = ?)
+		]]>
+	</sql>
+	<sql id="com.liferay.portlet.asset.service.persistence.AssetLinkFinder.findByE1_T_V">
+		<![CDATA[
+			SELECT
+				{AssetLink.*}
+			FROM
+				AssetLink
+			INNER JOIN
+				AssetEntry ON
+					(AssetEntry.entryId = AssetLink.entryId2)
+			WHERE
+				(AssetLink.entryId1 = ?) AND
+				(AssetLink.type_ = ?) AND
+				(AssetEntry.visible = ?)
+		]]>
+	</sql>
+	<sql id="com.liferay.portlet.asset.service.persistence.AssetTagFinder.countByG_N">
+		<![CDATA[
+			SELECT
+				COUNT(*) AS COUNT_VALUE
+			FROM
+				AssetTag
+			INNER JOIN
+				AssetEntries_AssetTags ON
+					(AssetEntries_AssetTags.tagId = AssetTag.tagId)
+			WHERE
+				(AssetEntries_AssetTags.entryId IN (
+					SELECT
+						entryId
+					FROM
+						AssetEntry
+					WHERE
+						(AssetEntry.groupId = ?)
+				)) AND
+				(AssetTag.name LIKE ?)
 		]]>
 	</sql>
 	<sql id="com.liferay.portlet.asset.service.persistence.AssetTagFinder.countByG_C_N">
@@ -256,6 +332,32 @@
 				AssetTag.name ASC
 		]]>
 	</sql>
+	<sql id="com.liferay.portlet.asset.service.persistence.AssetTagFinder.findByG_N_S_E">
+		<![CDATA[
+			SELECT
+				AssetTag.tagId, AssetTag.name, SUM(SocialActivityCounter.currentValue)
+			FROM
+				AssetTag
+			INNER JOIN
+				AssetEntries_AssetTags ON
+					(AssetEntries_AssetTags.tagId = AssetTag.tagId)
+			INNER JOIN
+				AssetEntry AssetEntry ON
+					(AssetEntry.entryId = AssetEntries_AssetTags.entryId)
+			INNER JOIN
+				SocialActivityCounter ON
+					(SocialActivityCounter.classNameId = AssetEntry.classNameId) AND
+					(SocialActivityCounter.classPK = AssetEntry.classPK)
+			WHERE
+				(SocialActivityCounter.groupId = ?) AND
+				(SocialActivityCounter.name = ?) AND
+				(SocialActivityCounter.startPeriod >= ?) AND
+				(SocialActivityCounter.startPeriod <= ?) AND
+				(SocialActivityCounter.startPeriod + ? <= ?)
+			GROUP BY
+				AssetTag.tagId, AssetTag.name
+   		]]>
+	</sql>
 	<sql id="com.liferay.portlet.asset.service.persistence.AssetTagPropertyFinder.countByG_K">
 		<![CDATA[
 			SELECT
@@ -312,6 +414,30 @@
 				(AssetTag.groupId = ?) AND
 			ORDER BY
 				tagPropertyKey ASC
+		]]>
+	</sql>
+	<sql id="com.liferay.portlet.asset.service.persistence.AssetVocabularyFinder.countByG_N">
+		<![CDATA[
+			SELECT
+				COUNT(*) AS COUNT_VALUE
+			FROM
+				AssetVocabulary
+			WHERE
+				(AssetVocabulary.groupId = ?) AND
+				(AssetVocabulary.name LIKE ? OR ? IS NULL)
+		]]>
+	</sql>
+	<sql id="com.liferay.portlet.asset.service.persistence.AssetVocabularyFinder.findByG_N">
+		<![CDATA[
+			SELECT
+				{AssetVocabulary.*}
+			FROM
+				AssetVocabulary
+			WHERE
+				(AssetVocabulary.groupId = ?) AND
+				(lower(AssetVocabulary.name) LIKE ? OR ? IS NULL)
+			ORDER BY
+				AssetVocabulary.name ASC
 		]]>
 	</sql>
 </custom-sql>

@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -19,42 +19,33 @@
 <%
 String randomNamespace = PortalUtil.generateRandomKey(request, "taglib_ui_input_asset_links_page") + StringPool.UNDERLINE;
 
-String className = GetterUtil.getString((String)request.getAttribute("liferay-ui:input-asset-links:className"));
-long classPK = GetterUtil.getLong((String)request.getAttribute("liferay-ui:input-asset-links:classPK"));
-
-AssetEntry assetEntry = null;
+long assetEntryId = GetterUtil.getLong((String)request.getAttribute("liferay-ui:input-asset-links:assetEntryId"));
 
 List<AssetLink> assetLinks = new ArrayList<AssetLink>();
 
-if (classPK > 0) {
-	assetEntry = AssetEntryLocalServiceUtil.getEntry(className, classPK);
-}
+String assetLinksSearchContainerPrimaryKeys = ParamUtil.getString(request, "assetLinksSearchContainerPrimaryKeys");
 
-String assetLinkSearchContainerPrimaryKeys = ParamUtil.getString(request, "assetLinkSearchContainerPrimaryKeys");
-
-if (Validator.isNull(assetLinkSearchContainerPrimaryKeys) && SessionErrors.isEmpty(portletRequest)) {
-	if (assetEntry != null) {
-		assetLinks = AssetLinkLocalServiceUtil.getDirectLinks(assetEntry.getEntryId());
-	}
+if (Validator.isNull(assetLinksSearchContainerPrimaryKeys) && SessionErrors.isEmpty(portletRequest) && (assetEntryId > 0)) {
+	assetLinks = AssetLinkLocalServiceUtil.getDirectLinks(assetEntryId);
 }
 else {
-	String[] assetEntriesPrimaryKeys = StringUtil.split(assetLinkSearchContainerPrimaryKeys);
+	String[] assetEntriesPrimaryKeys = StringUtil.split(assetLinksSearchContainerPrimaryKeys);
 
-	for (String assetEntryPrimaryKey :  assetEntriesPrimaryKeys) {
-		long assetEntryId = GetterUtil.getLong(assetEntryPrimaryKey);
+	for (String assetEntryPrimaryKey : assetEntriesPrimaryKeys) {
+		long assetEntryPrimaryKeyLong = GetterUtil.getLong(assetEntryPrimaryKey);
 
-		AssetEntry assetEntry2 = AssetEntryServiceUtil.getEntry(assetEntryId);
+		AssetEntry assetEntry = AssetEntryServiceUtil.getEntry(assetEntryPrimaryKeyLong);
 
 		AssetLink assetLink = AssetLinkLocalServiceUtil.createAssetLink(0);
 
-		if (assetEntry != null) {
-			assetLink.setEntryId1(assetEntry.getEntryId());
+		if (assetEntryId > 0) {
+			assetLink.setEntryId1(assetEntryId);
 		}
 		else {
 			assetLink.setEntryId1(0);
 		}
 
-		assetLink.setEntryId2(assetEntry2.getEntryId());
+		assetLink.setEntryId2(assetEntry.getEntryId());
 
 		assetLinks.add(assetLink);
 	}
@@ -75,7 +66,11 @@ assetBrowserURL.setParameter("groupId", scopeGroupId.toString());
 
 	<%
 	for (AssetRendererFactory assetRendererFactory : AssetRendererFactoryRegistryUtil.getAssetRendererFactories()) {
-		if (assetRendererFactory.isSelectable()) {
+		if (assetRendererFactory.isLinkable() && assetRendererFactory.isSelectable()) {
+			if (assetEntryId > 0) {
+				assetBrowserURL.setParameter("refererAssetEntryId", String.valueOf(assetEntryId));
+			}
+
 			assetBrowserURL.setParameter("typeSelection", assetRendererFactory.getClassName());
 			assetBrowserURL.setParameter("callback", randomNamespace + "addAssetLink");
 
@@ -109,7 +104,6 @@ assetBrowserURL.setParameter("groupId", scopeGroupId.toString());
 
 <liferay-ui:search-container
 	headerNames="type,title,null"
-	id='<%= portletResponse.getNamespace() + "assetLinkSearchContainer" %>'
 >
 	<liferay-ui:search-container-results
 		results="<%= assetLinks %>"
@@ -125,20 +119,18 @@ assetBrowserURL.setParameter("groupId", scopeGroupId.toString());
 		<%
 		AssetEntry assetLinkEntry = null;
 
-		if ((assetEntry == null) || (assetLink.getEntryId1() == assetEntry.getEntryId())) {
+		if ((assetEntryId > 0) || (assetLink.getEntryId1() == assetEntryId)) {
 			assetLinkEntry = AssetEntryLocalServiceUtil.getEntry(assetLink.getEntryId2());
 		}
 		else {
 			assetLinkEntry = AssetEntryLocalServiceUtil.getEntry(assetLink.getEntryId1());
 		}
 
-		AssetRendererFactory assetRendererFactory = AssetRendererFactoryRegistryUtil.getAssetRendererFactoryByClassName(PortalUtil.getClassName(assetLinkEntry.getClassNameId()));
-
-		AssetRenderer assetRenderer = assetRendererFactory.getAssetRenderer(assetLinkEntry.getClassPK());
+		assetLinkEntry = assetLinkEntry.toEscapedModel();
 
 		long assetLinkEntryId = assetLinkEntry.getEntryId();
 
-		String assetLinkEntryTitle = assetRenderer.getTitle(locale);
+		String assetLinkEntryTitle = assetLinkEntry.getTitle(locale);
 		String assetLinkEntryType = ResourceActionsUtil.getModelResource(locale, assetLinkEntry.getClassName());
 		%>
 
@@ -170,8 +162,8 @@ assetBrowserURL.setParameter("groupId", scopeGroupId.toString());
 					constrain: true,
 					width: 820
 				},
-				id: 'asset_browser',
-				title: '<liferay-ui:message key="asset-browser" />',
+				id: '<portlet:namespace />assetBrowser',
+				title: '<%= UnicodeLanguageUtil.get(pageContext, "asset-browser") %>',
 				uri: url
 			}
 		);
@@ -183,7 +175,7 @@ assetBrowserURL.setParameter("groupId", scopeGroupId.toString());
 		function(entryId, entryType, entryTitle) {
 			var A = AUI();
 
-			var searchContainerName = '<%= portletResponse.getNamespace() %>assetLinkSearchContainer';
+			var searchContainerName = '<%= portletResponse.getNamespace() %>assetLinksSearchContainer';
 
 			searchContainer = Liferay.SearchContainer.get(searchContainerName);
 
@@ -199,7 +191,7 @@ assetBrowserURL.setParameter("groupId", scopeGroupId.toString());
 </aui:script>
 
 <aui:script use="liferay-search-container">
-	var searchContainer = Liferay.SearchContainer.get('<%= portletResponse.getNamespace() %>assetLinkSearchContainer');
+	var searchContainer = Liferay.SearchContainer.get('<%= portletResponse.getNamespace() %>assetLinksSearchContainer');
 
 	searchContainer.get('contentBox').delegate(
 		'click',

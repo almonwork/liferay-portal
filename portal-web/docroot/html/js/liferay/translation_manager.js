@@ -1,4 +1,4 @@
-AUI().add(
+AUI.add(
 	'liferay-translation-manager',
 	function(A) {
 		var AArray = A.Array;
@@ -530,6 +530,6 @@ AUI().add(
 	},
 	'',
 	{
-		requires: ['aui-base', 'selector-css3']
+		requires: ['aui-base']
 	}
 );

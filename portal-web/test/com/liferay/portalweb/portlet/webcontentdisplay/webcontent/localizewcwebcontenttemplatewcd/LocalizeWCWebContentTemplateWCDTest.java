@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -28,14 +28,15 @@ public class LocalizeWCWebContentTemplateWCDTest extends BaseTestCase {
 			switch (label) {
 			case 1:
 				selenium.open("/web/guest/home/");
+				loadRequiredJavaScriptModules();
 
 				for (int second = 0;; second++) {
-					if (second >= 60) {
+					if (second >= 90) {
 						fail("timeout");
 					}
 
 					try {
-						if (selenium.isElementPresent(
+						if (selenium.isVisible(
 									"link=Web Content Display Test Page")) {
 							break;
 						}
@@ -46,14 +47,13 @@ public class LocalizeWCWebContentTemplateWCDTest extends BaseTestCase {
 					Thread.sleep(1000);
 				}
 
-				selenium.saveScreenShotAndSource();
 				selenium.clickAt("link=Web Content Display Test Page",
 					RuntimeVariables.replace("Web Content Display Test Page"));
 				selenium.waitForPageToLoad("30000");
-				selenium.saveScreenShotAndSource();
+				loadRequiredJavaScriptModules();
 
 				for (int second = 0;; second++) {
-					if (second >= 60) {
+					if (second >= 90) {
 						fail("timeout");
 					}
 
@@ -68,23 +68,26 @@ public class LocalizeWCWebContentTemplateWCDTest extends BaseTestCase {
 					Thread.sleep(1000);
 				}
 
-				selenium.saveScreenShotAndSource();
 				selenium.clickAt("//img[@alt='Edit Web Content']",
 					RuntimeVariables.replace("Edit Web Content"));
 				selenium.waitForPageToLoad("30000");
-				selenium.saveScreenShotAndSource();
-				assertEquals(RuntimeVariables.replace("Web Content Name"),
+				loadRequiredJavaScriptModules();
+				assertEquals(RuntimeVariables.replace(
+						"Hello World Localized Article"),
 					selenium.getText("//h1[@class='header-title']"));
-				assertTrue(selenium.isPartialText(
-						"//fieldset/div/div/div/div/span",
-						"Test Localized Structure"));
+				assertEquals(RuntimeVariables.replace(
+						"Web Content Localized Structure Name"),
+					selenium.getText("//span[@class='structure-name-label']"));
+				assertEquals(RuntimeVariables.replace(
+						"Web Content Localized Template Name"),
+					selenium.getText("//span[@class='template-name-label']"));
 				assertTrue(selenium.isElementPresent(
 						"//span[2]/div/span/span/span/input[2]"));
 
-				boolean localizedPageNameChecked = selenium.isChecked(
+				boolean localizablePageNameChecked = selenium.isChecked(
 						"//span[2]/div/span/span/span/input[2]");
 
-				if (localizedPageNameChecked) {
+				if (localizablePageNameChecked) {
 					label = 2;
 
 					continue;
@@ -97,10 +100,10 @@ public class LocalizeWCWebContentTemplateWCDTest extends BaseTestCase {
 				assertTrue(selenium.isElementPresent(
 						"//li[2]/span[2]/div/span/span/span/input[2]"));
 
-				boolean localizedPageDescriptionChecked = selenium.isChecked(
+				boolean localizablePageDescriptionChecked = selenium.isChecked(
 						"//li[2]/span[2]/div/span/span/span/input[2]");
 
-				if (localizedPageDescriptionChecked) {
+				if (localizablePageDescriptionChecked) {
 					label = 3;
 
 					continue;
@@ -112,30 +115,32 @@ public class LocalizeWCWebContentTemplateWCDTest extends BaseTestCase {
 			case 3:
 				assertTrue(selenium.isChecked(
 						"//span[2]/div/span/span/span/input[2]"));
-				selenium.saveScreenShotAndSource();
 				assertTrue(selenium.isChecked(
 						"//li[2]/span[2]/div/span/span/span/input[2]"));
-				selenium.saveScreenShotAndSource();
+				Thread.sleep(5000);
 				selenium.clickAt("//input[@value='Save as Draft']",
 					RuntimeVariables.replace("Save as Draft"));
 				selenium.waitForPageToLoad("30000");
-				selenium.saveScreenShotAndSource();
-				Thread.sleep(5000);
-				assertEquals(RuntimeVariables.replace("Draft"),
-					selenium.getText("//span[3]/strong"));
-				assertEquals("Web Content Page Name",
+				loadRequiredJavaScriptModules();
+				assertEquals(RuntimeVariables.replace("Status: Draft"),
+					selenium.getText("//span[@class='workflow-status']"));
+				assertEquals("Hello World Page Name",
 					selenium.getValue("//input[@id='page-name']"));
-				assertEquals("Web Content Page Description",
+				assertEquals("Hello World Page Description",
 					selenium.getValue("//input[@id='page-description']"));
+				assertEquals(RuntimeVariables.replace("Add Translation"),
+					selenium.getText("//strong/a/span"));
+				selenium.clickAt("//strong/a/span",
+					RuntimeVariables.replace("Add Translation"));
 
 				for (int second = 0;; second++) {
-					if (second >= 60) {
+					if (second >= 90) {
 						fail("timeout");
 					}
 
 					try {
-						if (selenium.isElementPresent(
-									"//select[@id='_15_languageIdSelect']")) {
+						if (selenium.isVisible(
+									"//div[@class='lfr-component lfr-menu-list']/ul/li[6]/a")) {
 							break;
 						}
 					}
@@ -145,28 +150,70 @@ public class LocalizeWCWebContentTemplateWCDTest extends BaseTestCase {
 					Thread.sleep(1000);
 				}
 
-				selenium.saveScreenShotAndSource();
-				selenium.select("//select[@id='_15_languageIdSelect']",
-					RuntimeVariables.replace("label=Chinese (China)"));
-				Thread.sleep(5000);
+				assertEquals(RuntimeVariables.replace("Chinese (China)"),
+					selenium.getText(
+						"//div[@class='lfr-component lfr-menu-list']/ul/li[6]/a"));
+				selenium.click(
+					"//div[@class='lfr-component lfr-menu-list']/ul/li[6]/a");
+
+				for (int second = 0;; second++) {
+					if (second >= 90) {
+						fail("timeout");
+					}
+
+					try {
+						if (selenium.isVisible("//iframe[@id='_15_zh_CN']")) {
+							break;
+						}
+					}
+					catch (Exception e) {
+					}
+
+					Thread.sleep(1000);
+				}
+
+				selenium.selectFrame("//iframe[@id='_15_zh_CN']");
+
+				for (int second = 0;; second++) {
+					if (second >= 90) {
+						fail("timeout");
+					}
+
+					try {
+						if (selenium.isVisible("//input[@id='page-name']")) {
+							break;
+						}
+					}
+					catch (Exception e) {
+					}
+
+					Thread.sleep(1000);
+				}
+
 				selenium.type("//input[@id='page-name']",
 					RuntimeVariables.replace(
 						"\u4e16\u754c\u60a8\u597d Page Name"));
-				selenium.saveScreenShotAndSource();
 				selenium.type("//input[@id='page-description']",
 					RuntimeVariables.replace(
 						"\u4e16\u754c\u60a8\u597d Page Description"));
-				selenium.saveScreenShotAndSource();
+				selenium.clickAt("//input[@value='Save']",
+					RuntimeVariables.replace("Save"));
+				selenium.waitForPageToLoad("30000");
+				loadRequiredJavaScriptModules();
+				selenium.selectFrame("relative=top");
+				assertEquals(RuntimeVariables.replace("Chinese (China)"),
+					selenium.getText(
+						"//a[@class='lfr-token journal-article-translation-zh_CN']"));
 				Thread.sleep(5000);
 				selenium.clickAt("//input[@value='Publish']",
 					RuntimeVariables.replace("Publish"));
 				selenium.waitForPageToLoad("30000");
-				selenium.saveScreenShotAndSource();
-				assertEquals(RuntimeVariables.replace("Web Content Page Name"),
-					selenium.getText("//td[1]"));
+				loadRequiredJavaScriptModules();
+				assertEquals(RuntimeVariables.replace("Hello World Page Name"),
+					selenium.getText("//td[@class='page-name']"));
 				assertEquals(RuntimeVariables.replace(
-						"Web Content Page Description"),
-					selenium.getText("//td[2]"));
+						"Hello World Page Description"),
+					selenium.getText("//td[@class='page-description']"));
 
 			case 100:
 				label = -1;

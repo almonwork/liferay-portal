@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -23,9 +23,28 @@ package com.liferay.portal.service;
  * @see       PortalService
  * @generated
  */
-public class PortalServiceWrapper implements PortalService {
+public class PortalServiceWrapper implements PortalService,
+	ServiceWrapper<PortalService> {
 	public PortalServiceWrapper(PortalService portalService) {
 		_portalService = portalService;
+	}
+
+	/**
+	* Returns the Spring bean ID for this bean.
+	*
+	* @return the Spring bean ID for this bean
+	*/
+	public java.lang.String getBeanIdentifier() {
+		return _portalService.getBeanIdentifier();
+	}
+
+	/**
+	* Sets the Spring bean ID for this bean.
+	*
+	* @param beanIdentifier the Spring bean ID for this bean
+	*/
+	public void setBeanIdentifier(java.lang.String beanIdentifier) {
+		_portalService.setBeanIdentifier(beanIdentifier);
 	}
 
 	public java.lang.String getAutoDeployDirectory()
@@ -76,6 +95,10 @@ public class PortalServiceWrapper implements PortalService {
 		_portalService.testDeleteClassName();
 	}
 
+	public int testGetBuildNumber() {
+		return _portalService.testGetBuildNumber();
+	}
+
 	public void testGetUserId() {
 		_portalService.testGetUserId();
 	}
@@ -85,11 +108,25 @@ public class PortalServiceWrapper implements PortalService {
 		return _portalService.testHasClassName();
 	}
 
+	/**
+	 * @deprecated Renamed to {@link #getWrappedService}
+	 */
 	public PortalService getWrappedPortalService() {
 		return _portalService;
 	}
 
+	/**
+	 * @deprecated Renamed to {@link #setWrappedService}
+	 */
 	public void setWrappedPortalService(PortalService portalService) {
+		_portalService = portalService;
+	}
+
+	public PortalService getWrappedService() {
+		return _portalService;
+	}
+
+	public void setWrappedService(PortalService portalService) {
 		_portalService = portalService;
 	}
 

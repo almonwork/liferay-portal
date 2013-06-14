@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,6 +14,10 @@
 
 package com.liferay.portal.model;
 
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * <p>
  * This class is a wrapper for {@link LayoutSetPrototype}.
@@ -23,7 +27,8 @@ package com.liferay.portal.model;
  * @see       LayoutSetPrototype
  * @generated
  */
-public class LayoutSetPrototypeWrapper implements LayoutSetPrototype {
+public class LayoutSetPrototypeWrapper implements LayoutSetPrototype,
+	ModelWrapper<LayoutSetPrototype> {
 	public LayoutSetPrototypeWrapper(LayoutSetPrototype layoutSetPrototype) {
 		_layoutSetPrototype = layoutSetPrototype;
 	}
@@ -34,6 +39,78 @@ public class LayoutSetPrototypeWrapper implements LayoutSetPrototype {
 
 	public String getModelClassName() {
 		return LayoutSetPrototype.class.getName();
+	}
+
+	public Map<String, Object> getModelAttributes() {
+		Map<String, Object> attributes = new HashMap<String, Object>();
+
+		attributes.put("uuid", getUuid());
+		attributes.put("layoutSetPrototypeId", getLayoutSetPrototypeId());
+		attributes.put("companyId", getCompanyId());
+		attributes.put("createDate", getCreateDate());
+		attributes.put("modifiedDate", getModifiedDate());
+		attributes.put("name", getName());
+		attributes.put("description", getDescription());
+		attributes.put("settings", getSettings());
+		attributes.put("active", getActive());
+
+		return attributes;
+	}
+
+	public void setModelAttributes(Map<String, Object> attributes) {
+		String uuid = (String)attributes.get("uuid");
+
+		if (uuid != null) {
+			setUuid(uuid);
+		}
+
+		Long layoutSetPrototypeId = (Long)attributes.get("layoutSetPrototypeId");
+
+		if (layoutSetPrototypeId != null) {
+			setLayoutSetPrototypeId(layoutSetPrototypeId);
+		}
+
+		Long companyId = (Long)attributes.get("companyId");
+
+		if (companyId != null) {
+			setCompanyId(companyId);
+		}
+
+		Date createDate = (Date)attributes.get("createDate");
+
+		if (createDate != null) {
+			setCreateDate(createDate);
+		}
+
+		Date modifiedDate = (Date)attributes.get("modifiedDate");
+
+		if (modifiedDate != null) {
+			setModifiedDate(modifiedDate);
+		}
+
+		String name = (String)attributes.get("name");
+
+		if (name != null) {
+			setName(name);
+		}
+
+		String description = (String)attributes.get("description");
+
+		if (description != null) {
+			setDescription(description);
+		}
+
+		String settings = (String)attributes.get("settings");
+
+		if (settings != null) {
+			setSettings(settings);
+		}
+
+		Boolean active = (Boolean)attributes.get("active");
+
+		if (active != null) {
+			setActive(active);
+		}
 	}
 
 	/**
@@ -109,6 +186,42 @@ public class LayoutSetPrototypeWrapper implements LayoutSetPrototype {
 	}
 
 	/**
+	* Returns the create date of this layout set prototype.
+	*
+	* @return the create date of this layout set prototype
+	*/
+	public java.util.Date getCreateDate() {
+		return _layoutSetPrototype.getCreateDate();
+	}
+
+	/**
+	* Sets the create date of this layout set prototype.
+	*
+	* @param createDate the create date of this layout set prototype
+	*/
+	public void setCreateDate(java.util.Date createDate) {
+		_layoutSetPrototype.setCreateDate(createDate);
+	}
+
+	/**
+	* Returns the modified date of this layout set prototype.
+	*
+	* @return the modified date of this layout set prototype
+	*/
+	public java.util.Date getModifiedDate() {
+		return _layoutSetPrototype.getModifiedDate();
+	}
+
+	/**
+	* Sets the modified date of this layout set prototype.
+	*
+	* @param modifiedDate the modified date of this layout set prototype
+	*/
+	public void setModifiedDate(java.util.Date modifiedDate) {
+		_layoutSetPrototype.setModifiedDate(modifiedDate);
+	}
+
+	/**
 	* Returns the name of this layout set prototype.
 	*
 	* @return the name of this layout set prototype
@@ -160,6 +273,14 @@ public class LayoutSetPrototypeWrapper implements LayoutSetPrototype {
 		return _layoutSetPrototype.getName(languageId, useDefault);
 	}
 
+	public java.lang.String getNameCurrentLanguageId() {
+		return _layoutSetPrototype.getNameCurrentLanguageId();
+	}
+
+	public java.lang.String getNameCurrentValue() {
+		return _layoutSetPrototype.getNameCurrentValue();
+	}
+
 	/**
 	* Returns a map of the locales and localized names of this layout set prototype.
 	*
@@ -198,6 +319,10 @@ public class LayoutSetPrototypeWrapper implements LayoutSetPrototype {
 	public void setName(java.lang.String name, java.util.Locale locale,
 		java.util.Locale defaultLocale) {
 		_layoutSetPrototype.setName(name, locale, defaultLocale);
+	}
+
+	public void setNameCurrentLanguageId(java.lang.String languageId) {
+		_layoutSetPrototype.setNameCurrentLanguageId(languageId);
 	}
 
 	/**
@@ -305,10 +430,6 @@ public class LayoutSetPrototypeWrapper implements LayoutSetPrototype {
 		return _layoutSetPrototype.isEscapedModel();
 	}
 
-	public void setEscapedModel(boolean escapedModel) {
-		_layoutSetPrototype.setEscapedModel(escapedModel);
-	}
-
 	public java.io.Serializable getPrimaryKeyObj() {
 		return _layoutSetPrototype.getPrimaryKeyObj();
 	}
@@ -388,7 +509,14 @@ public class LayoutSetPrototypeWrapper implements LayoutSetPrototype {
 		_layoutSetPrototype.setSettingsProperties(settingsProperties);
 	}
 
+	/**
+	 * @deprecated Renamed to {@link #getWrappedModel}
+	 */
 	public LayoutSetPrototype getWrappedLayoutSetPrototype() {
+		return _layoutSetPrototype;
+	}
+
+	public LayoutSetPrototype getWrappedModel() {
 		return _layoutSetPrototype;
 	}
 

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -16,8 +16,10 @@ package com.liferay.portlet.ratings.model.impl;
 
 import com.liferay.portal.kernel.bean.AutoEscapeBeanHandler;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.ProxyUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
+import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.model.CacheModel;
 import com.liferay.portal.model.impl.BaseModelImpl;
 import com.liferay.portal.service.ServiceContext;
@@ -30,9 +32,10 @@ import com.liferay.portlet.ratings.model.RatingsStatsModel;
 
 import java.io.Serializable;
 
-import java.lang.reflect.Proxy;
-
 import java.sql.Types;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * The base model implementation for the RatingsStats service. Represents a row in the &quot;RatingsStats&quot; database table, with each column mapped to a property of this class.
@@ -74,15 +77,11 @@ public class RatingsStatsModelImpl extends BaseModelImpl<RatingsStats>
 	public static final boolean FINDER_CACHE_ENABLED = GetterUtil.getBoolean(com.liferay.portal.util.PropsUtil.get(
 				"value.object.finder.cache.enabled.com.liferay.portlet.ratings.model.RatingsStats"),
 			true);
-
-	public Class<?> getModelClass() {
-		return RatingsStats.class;
-	}
-
-	public String getModelClassName() {
-		return RatingsStats.class.getName();
-	}
-
+	public static final boolean COLUMN_BITMASK_ENABLED = GetterUtil.getBoolean(com.liferay.portal.util.PropsUtil.get(
+				"value.object.column.bitmask.enabled.com.liferay.portlet.ratings.model.RatingsStats"),
+			true);
+	public static long CLASSNAMEID_COLUMN_BITMASK = 1L;
+	public static long CLASSPK_COLUMN_BITMASK = 2L;
 	public static final long LOCK_EXPIRATION_TIME = GetterUtil.getLong(com.liferay.portal.util.PropsUtil.get(
 				"lock.expiration.time.com.liferay.portlet.ratings.model.RatingsStats"));
 
@@ -105,6 +104,67 @@ public class RatingsStatsModelImpl extends BaseModelImpl<RatingsStats>
 		setPrimaryKey(((Long)primaryKeyObj).longValue());
 	}
 
+	public Class<?> getModelClass() {
+		return RatingsStats.class;
+	}
+
+	public String getModelClassName() {
+		return RatingsStats.class.getName();
+	}
+
+	@Override
+	public Map<String, Object> getModelAttributes() {
+		Map<String, Object> attributes = new HashMap<String, Object>();
+
+		attributes.put("statsId", getStatsId());
+		attributes.put("classNameId", getClassNameId());
+		attributes.put("classPK", getClassPK());
+		attributes.put("totalEntries", getTotalEntries());
+		attributes.put("totalScore", getTotalScore());
+		attributes.put("averageScore", getAverageScore());
+
+		return attributes;
+	}
+
+	@Override
+	public void setModelAttributes(Map<String, Object> attributes) {
+		Long statsId = (Long)attributes.get("statsId");
+
+		if (statsId != null) {
+			setStatsId(statsId);
+		}
+
+		Long classNameId = (Long)attributes.get("classNameId");
+
+		if (classNameId != null) {
+			setClassNameId(classNameId);
+		}
+
+		Long classPK = (Long)attributes.get("classPK");
+
+		if (classPK != null) {
+			setClassPK(classPK);
+		}
+
+		Integer totalEntries = (Integer)attributes.get("totalEntries");
+
+		if (totalEntries != null) {
+			setTotalEntries(totalEntries);
+		}
+
+		Double totalScore = (Double)attributes.get("totalScore");
+
+		if (totalScore != null) {
+			setTotalScore(totalScore);
+		}
+
+		Double averageScore = (Double)attributes.get("averageScore");
+
+		if (averageScore != null) {
+			setAverageScore(averageScore);
+		}
+	}
+
 	public long getStatsId() {
 		return _statsId;
 	}
@@ -121,11 +181,23 @@ public class RatingsStatsModelImpl extends BaseModelImpl<RatingsStats>
 		return PortalUtil.getClassName(getClassNameId());
 	}
 
+	public void setClassName(String className) {
+		long classNameId = 0;
+
+		if (Validator.isNotNull(className)) {
+			classNameId = PortalUtil.getClassNameId(className);
+		}
+
+		setClassNameId(classNameId);
+	}
+
 	public long getClassNameId() {
 		return _classNameId;
 	}
 
 	public void setClassNameId(long classNameId) {
+		_columnBitmask |= CLASSNAMEID_COLUMN_BITMASK;
+
 		if (!_setOriginalClassNameId) {
 			_setOriginalClassNameId = true;
 
@@ -144,6 +216,8 @@ public class RatingsStatsModelImpl extends BaseModelImpl<RatingsStats>
 	}
 
 	public void setClassPK(long classPK) {
+		_columnBitmask |= CLASSPK_COLUMN_BITMASK;
+
 		if (!_setOriginalClassPK) {
 			_setOriginalClassPK = true;
 
@@ -181,35 +255,32 @@ public class RatingsStatsModelImpl extends BaseModelImpl<RatingsStats>
 		_averageScore = averageScore;
 	}
 
+	public long getColumnBitmask() {
+		return _columnBitmask;
+	}
+
 	@Override
 	public RatingsStats toEscapedModel() {
-		if (isEscapedModel()) {
-			return (RatingsStats)this;
+		if (_escapedModelProxy == null) {
+			_escapedModelProxy = (RatingsStats)ProxyUtil.newProxyInstance(_classLoader,
+					_escapedModelProxyInterfaces,
+					new AutoEscapeBeanHandler(this));
 		}
-		else {
-			if (_escapedModelProxy == null) {
-				_escapedModelProxy = (RatingsStats)Proxy.newProxyInstance(_classLoader,
-						_escapedModelProxyInterfaces,
-						new AutoEscapeBeanHandler(this));
-			}
 
-			return _escapedModelProxy;
-		}
+		return _escapedModelProxy;
 	}
 
 	@Override
 	public ExpandoBridge getExpandoBridge() {
-		if (_expandoBridge == null) {
-			_expandoBridge = ExpandoBridgeFactoryUtil.getExpandoBridge(0,
-					RatingsStats.class.getName(), getPrimaryKey());
-		}
-
-		return _expandoBridge;
+		return ExpandoBridgeFactoryUtil.getExpandoBridge(0,
+			RatingsStats.class.getName(), getPrimaryKey());
 	}
 
 	@Override
 	public void setExpandoBridgeAttributes(ServiceContext serviceContext) {
-		getExpandoBridge().setAttributes(serviceContext);
+		ExpandoBridge expandoBridge = getExpandoBridge();
+
+		expandoBridge.setAttributes(serviceContext);
 	}
 
 	@Override
@@ -283,6 +354,8 @@ public class RatingsStatsModelImpl extends BaseModelImpl<RatingsStats>
 		ratingsStatsModelImpl._originalClassPK = ratingsStatsModelImpl._classPK;
 
 		ratingsStatsModelImpl._setOriginalClassPK = false;
+
+		ratingsStatsModelImpl._columnBitmask = 0;
 	}
 
 	@Override
@@ -376,6 +449,6 @@ public class RatingsStatsModelImpl extends BaseModelImpl<RatingsStats>
 	private int _totalEntries;
 	private double _totalScore;
 	private double _averageScore;
-	private transient ExpandoBridge _expandoBridge;
+	private long _columnBitmask;
 	private RatingsStats _escapedModelProxy;
 }

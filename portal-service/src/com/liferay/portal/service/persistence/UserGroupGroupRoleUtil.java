@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -91,14 +91,6 @@ public class UserGroupGroupRoleUtil {
 		return getPersistence()
 				   .findWithDynamicQuery(dynamicQuery, start, end,
 			orderByComparator);
-	}
-
-	/**
-	 * @see com.liferay.portal.service.persistence.BasePersistence#remove(com.liferay.portal.model.BaseModel)
-	 */
-	public static UserGroupGroupRole remove(
-		UserGroupGroupRole userGroupGroupRole) throws SystemException {
-		return getPersistence().remove(userGroupGroupRole);
 	}
 
 	/**
@@ -1023,11 +1015,10 @@ public class UserGroupGroupRoleUtil {
 		return _persistence;
 	}
 
+	/**
+	 * @deprecated
+	 */
 	public void setPersistence(UserGroupGroupRolePersistence persistence) {
-		_persistence = persistence;
-
-		ReferenceRegistry.registerReference(UserGroupGroupRoleUtil.class,
-			"_persistence");
 	}
 
 	private static UserGroupGroupRolePersistence _persistence;

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -99,7 +99,20 @@ public class ClusterNodeResponse implements Serializable {
 		sb.append("{clusterMessageType=");
 		sb.append(_clusterMessageType);
 
-		if (hasException()) {
+		boolean clusterMessageTypeNotifyOrUpdate = false;
+
+		if (_clusterMessageType.equals(ClusterMessageType.NOTIFY) ||
+			_clusterMessageType.equals(ClusterMessageType.UPDATE)) {
+
+			clusterMessageTypeNotifyOrUpdate = true;
+		}
+
+		if (clusterMessageTypeNotifyOrUpdate) {
+			sb.append(", clusterNode=");
+			sb.append(_clusterNode);
+		}
+
+		if (!clusterMessageTypeNotifyOrUpdate && hasException()) {
 			sb.append(", exception=");
 			sb.append(_exception);
 		}
@@ -107,7 +120,7 @@ public class ClusterNodeResponse implements Serializable {
 		sb.append(", multicast=");
 		sb.append(_multicast);
 
-		if (!hasException()) {
+		if (!clusterMessageTypeNotifyOrUpdate && !hasException()) {
 			sb.append(", result=");
 			sb.append(_result);
 		}

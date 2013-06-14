@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -23,6 +23,7 @@ import com.liferay.portal.kernel.bean.IdentifiableBean;
 import com.liferay.portal.kernel.dao.jdbc.SqlUpdate;
 import com.liferay.portal.kernel.dao.jdbc.SqlUpdateFactoryUtil;
 import com.liferay.portal.kernel.exception.SystemException;
+import com.liferay.portal.service.BaseServiceImpl;
 import com.liferay.portal.service.CompanyLocalService;
 import com.liferay.portal.service.CompanyService;
 import com.liferay.portal.service.GroupLocalService;
@@ -31,20 +32,17 @@ import com.liferay.portal.service.LockLocalService;
 import com.liferay.portal.service.PortletPreferencesLocalService;
 import com.liferay.portal.service.PortletPreferencesService;
 import com.liferay.portal.service.ResourceLocalService;
-import com.liferay.portal.service.ResourceService;
 import com.liferay.portal.service.SubscriptionLocalService;
 import com.liferay.portal.service.UserLocalService;
 import com.liferay.portal.service.UserService;
 import com.liferay.portal.service.WorkflowInstanceLinkLocalService;
-import com.liferay.portal.service.base.PrincipalBean;
 import com.liferay.portal.service.persistence.CompanyPersistence;
 import com.liferay.portal.service.persistence.GroupFinder;
 import com.liferay.portal.service.persistence.GroupPersistence;
+import com.liferay.portal.service.persistence.LockFinder;
 import com.liferay.portal.service.persistence.LockPersistence;
 import com.liferay.portal.service.persistence.PortletPreferencesFinder;
 import com.liferay.portal.service.persistence.PortletPreferencesPersistence;
-import com.liferay.portal.service.persistence.ResourceFinder;
-import com.liferay.portal.service.persistence.ResourcePersistence;
 import com.liferay.portal.service.persistence.SubscriptionPersistence;
 import com.liferay.portal.service.persistence.UserFinder;
 import com.liferay.portal.service.persistence.UserPersistence;
@@ -57,6 +55,7 @@ import com.liferay.portlet.asset.service.AssetTagLocalService;
 import com.liferay.portlet.asset.service.AssetTagService;
 import com.liferay.portlet.asset.service.persistence.AssetEntryFinder;
 import com.liferay.portlet.asset.service.persistence.AssetEntryPersistence;
+import com.liferay.portlet.asset.service.persistence.AssetLinkFinder;
 import com.liferay.portlet.asset.service.persistence.AssetLinkPersistence;
 import com.liferay.portlet.asset.service.persistence.AssetTagFinder;
 import com.liferay.portlet.asset.service.persistence.AssetTagPersistence;
@@ -74,11 +73,10 @@ import com.liferay.portlet.messageboards.service.MBCategoryLocalService;
 import com.liferay.portlet.messageboards.service.MBCategoryService;
 import com.liferay.portlet.messageboards.service.MBDiscussionLocalService;
 import com.liferay.portlet.messageboards.service.MBMailingListLocalService;
-import com.liferay.portlet.messageboards.service.MBMessageFlagLocalService;
-import com.liferay.portlet.messageboards.service.MBMessageFlagService;
 import com.liferay.portlet.messageboards.service.MBMessageLocalService;
 import com.liferay.portlet.messageboards.service.MBMessageService;
 import com.liferay.portlet.messageboards.service.MBStatsUserLocalService;
+import com.liferay.portlet.messageboards.service.MBThreadFlagLocalService;
 import com.liferay.portlet.messageboards.service.MBThreadLocalService;
 import com.liferay.portlet.messageboards.service.MBThreadService;
 import com.liferay.portlet.messageboards.service.persistence.MBBanPersistence;
@@ -87,19 +85,21 @@ import com.liferay.portlet.messageboards.service.persistence.MBCategoryPersisten
 import com.liferay.portlet.messageboards.service.persistence.MBDiscussionPersistence;
 import com.liferay.portlet.messageboards.service.persistence.MBMailingListPersistence;
 import com.liferay.portlet.messageboards.service.persistence.MBMessageFinder;
-import com.liferay.portlet.messageboards.service.persistence.MBMessageFlagPersistence;
 import com.liferay.portlet.messageboards.service.persistence.MBMessagePersistence;
 import com.liferay.portlet.messageboards.service.persistence.MBStatsUserPersistence;
 import com.liferay.portlet.messageboards.service.persistence.MBThreadFinder;
+import com.liferay.portlet.messageboards.service.persistence.MBThreadFlagPersistence;
 import com.liferay.portlet.messageboards.service.persistence.MBThreadPersistence;
 import com.liferay.portlet.ratings.service.RatingsStatsLocalService;
 import com.liferay.portlet.ratings.service.persistence.RatingsStatsFinder;
 import com.liferay.portlet.ratings.service.persistence.RatingsStatsPersistence;
 import com.liferay.portlet.social.service.SocialActivityLocalService;
-import com.liferay.portlet.social.service.SocialEquityLogLocalService;
 import com.liferay.portlet.social.service.persistence.SocialActivityFinder;
 import com.liferay.portlet.social.service.persistence.SocialActivityPersistence;
-import com.liferay.portlet.social.service.persistence.SocialEquityLogPersistence;
+import com.liferay.portlet.wiki.service.WikiPageLocalService;
+import com.liferay.portlet.wiki.service.WikiPageService;
+import com.liferay.portlet.wiki.service.persistence.WikiPageFinder;
+import com.liferay.portlet.wiki.service.persistence.WikiPagePersistence;
 
 import javax.sql.DataSource;
 
@@ -115,7 +115,7 @@ import javax.sql.DataSource;
  * @see com.liferay.portlet.messageboards.service.MBMessageServiceUtil
  * @generated
  */
-public abstract class MBMessageServiceBaseImpl extends PrincipalBean
+public abstract class MBMessageServiceBaseImpl extends BaseServiceImpl
 	implements MBMessageService, IdentifiableBean {
 	/*
 	 * NOTE FOR DEVELOPERS:
@@ -402,63 +402,6 @@ public abstract class MBMessageServiceBaseImpl extends PrincipalBean
 	}
 
 	/**
-	 * Returns the message boards message flag local service.
-	 *
-	 * @return the message boards message flag local service
-	 */
-	public MBMessageFlagLocalService getMBMessageFlagLocalService() {
-		return mbMessageFlagLocalService;
-	}
-
-	/**
-	 * Sets the message boards message flag local service.
-	 *
-	 * @param mbMessageFlagLocalService the message boards message flag local service
-	 */
-	public void setMBMessageFlagLocalService(
-		MBMessageFlagLocalService mbMessageFlagLocalService) {
-		this.mbMessageFlagLocalService = mbMessageFlagLocalService;
-	}
-
-	/**
-	 * Returns the message boards message flag remote service.
-	 *
-	 * @return the message boards message flag remote service
-	 */
-	public MBMessageFlagService getMBMessageFlagService() {
-		return mbMessageFlagService;
-	}
-
-	/**
-	 * Sets the message boards message flag remote service.
-	 *
-	 * @param mbMessageFlagService the message boards message flag remote service
-	 */
-	public void setMBMessageFlagService(
-		MBMessageFlagService mbMessageFlagService) {
-		this.mbMessageFlagService = mbMessageFlagService;
-	}
-
-	/**
-	 * Returns the message boards message flag persistence.
-	 *
-	 * @return the message boards message flag persistence
-	 */
-	public MBMessageFlagPersistence getMBMessageFlagPersistence() {
-		return mbMessageFlagPersistence;
-	}
-
-	/**
-	 * Sets the message boards message flag persistence.
-	 *
-	 * @param mbMessageFlagPersistence the message boards message flag persistence
-	 */
-	public void setMBMessageFlagPersistence(
-		MBMessageFlagPersistence mbMessageFlagPersistence) {
-		this.mbMessageFlagPersistence = mbMessageFlagPersistence;
-	}
-
-	/**
 	 * Returns the message boards stats user local service.
 	 *
 	 * @return the message boards stats user local service
@@ -567,6 +510,44 @@ public abstract class MBMessageServiceBaseImpl extends PrincipalBean
 	 */
 	public void setMBThreadFinder(MBThreadFinder mbThreadFinder) {
 		this.mbThreadFinder = mbThreadFinder;
+	}
+
+	/**
+	 * Returns the message boards thread flag local service.
+	 *
+	 * @return the message boards thread flag local service
+	 */
+	public MBThreadFlagLocalService getMBThreadFlagLocalService() {
+		return mbThreadFlagLocalService;
+	}
+
+	/**
+	 * Sets the message boards thread flag local service.
+	 *
+	 * @param mbThreadFlagLocalService the message boards thread flag local service
+	 */
+	public void setMBThreadFlagLocalService(
+		MBThreadFlagLocalService mbThreadFlagLocalService) {
+		this.mbThreadFlagLocalService = mbThreadFlagLocalService;
+	}
+
+	/**
+	 * Returns the message boards thread flag persistence.
+	 *
+	 * @return the message boards thread flag persistence
+	 */
+	public MBThreadFlagPersistence getMBThreadFlagPersistence() {
+		return mbThreadFlagPersistence;
+	}
+
+	/**
+	 * Sets the message boards thread flag persistence.
+	 *
+	 * @param mbThreadFlagPersistence the message boards thread flag persistence
+	 */
+	public void setMBThreadFlagPersistence(
+		MBThreadFlagPersistence mbThreadFlagPersistence) {
+		this.mbThreadFlagPersistence = mbThreadFlagPersistence;
 	}
 
 	/**
@@ -768,6 +749,24 @@ public abstract class MBMessageServiceBaseImpl extends PrincipalBean
 	}
 
 	/**
+	 * Returns the lock finder.
+	 *
+	 * @return the lock finder
+	 */
+	public LockFinder getLockFinder() {
+		return lockFinder;
+	}
+
+	/**
+	 * Sets the lock finder.
+	 *
+	 * @param lockFinder the lock finder
+	 */
+	public void setLockFinder(LockFinder lockFinder) {
+		this.lockFinder = lockFinder;
+	}
+
+	/**
 	 * Returns the portlet preferences local service.
 	 *
 	 * @return the portlet preferences local service
@@ -860,60 +859,6 @@ public abstract class MBMessageServiceBaseImpl extends PrincipalBean
 	public void setResourceLocalService(
 		ResourceLocalService resourceLocalService) {
 		this.resourceLocalService = resourceLocalService;
-	}
-
-	/**
-	 * Returns the resource remote service.
-	 *
-	 * @return the resource remote service
-	 */
-	public ResourceService getResourceService() {
-		return resourceService;
-	}
-
-	/**
-	 * Sets the resource remote service.
-	 *
-	 * @param resourceService the resource remote service
-	 */
-	public void setResourceService(ResourceService resourceService) {
-		this.resourceService = resourceService;
-	}
-
-	/**
-	 * Returns the resource persistence.
-	 *
-	 * @return the resource persistence
-	 */
-	public ResourcePersistence getResourcePersistence() {
-		return resourcePersistence;
-	}
-
-	/**
-	 * Sets the resource persistence.
-	 *
-	 * @param resourcePersistence the resource persistence
-	 */
-	public void setResourcePersistence(ResourcePersistence resourcePersistence) {
-		this.resourcePersistence = resourcePersistence;
-	}
-
-	/**
-	 * Returns the resource finder.
-	 *
-	 * @return the resource finder
-	 */
-	public ResourceFinder getResourceFinder() {
-		return resourceFinder;
-	}
-
-	/**
-	 * Sets the resource finder.
-	 *
-	 * @param resourceFinder the resource finder
-	 */
-	public void setResourceFinder(ResourceFinder resourceFinder) {
-		this.resourceFinder = resourceFinder;
 	}
 
 	/**
@@ -1174,6 +1119,24 @@ public abstract class MBMessageServiceBaseImpl extends PrincipalBean
 	public void setAssetLinkPersistence(
 		AssetLinkPersistence assetLinkPersistence) {
 		this.assetLinkPersistence = assetLinkPersistence;
+	}
+
+	/**
+	 * Returns the asset link finder.
+	 *
+	 * @return the asset link finder
+	 */
+	public AssetLinkFinder getAssetLinkFinder() {
+		return assetLinkFinder;
+	}
+
+	/**
+	 * Sets the asset link finder.
+	 *
+	 * @param assetLinkFinder the asset link finder
+	 */
+	public void setAssetLinkFinder(AssetLinkFinder assetLinkFinder) {
+		this.assetLinkFinder = assetLinkFinder;
 	}
 
 	/**
@@ -1493,41 +1456,76 @@ public abstract class MBMessageServiceBaseImpl extends PrincipalBean
 	}
 
 	/**
-	 * Returns the social equity log local service.
+	 * Returns the wiki page local service.
 	 *
-	 * @return the social equity log local service
+	 * @return the wiki page local service
 	 */
-	public SocialEquityLogLocalService getSocialEquityLogLocalService() {
-		return socialEquityLogLocalService;
+	public WikiPageLocalService getWikiPageLocalService() {
+		return wikiPageLocalService;
 	}
 
 	/**
-	 * Sets the social equity log local service.
+	 * Sets the wiki page local service.
 	 *
-	 * @param socialEquityLogLocalService the social equity log local service
+	 * @param wikiPageLocalService the wiki page local service
 	 */
-	public void setSocialEquityLogLocalService(
-		SocialEquityLogLocalService socialEquityLogLocalService) {
-		this.socialEquityLogLocalService = socialEquityLogLocalService;
+	public void setWikiPageLocalService(
+		WikiPageLocalService wikiPageLocalService) {
+		this.wikiPageLocalService = wikiPageLocalService;
 	}
 
 	/**
-	 * Returns the social equity log persistence.
+	 * Returns the wiki page remote service.
 	 *
-	 * @return the social equity log persistence
+	 * @return the wiki page remote service
 	 */
-	public SocialEquityLogPersistence getSocialEquityLogPersistence() {
-		return socialEquityLogPersistence;
+	public WikiPageService getWikiPageService() {
+		return wikiPageService;
 	}
 
 	/**
-	 * Sets the social equity log persistence.
+	 * Sets the wiki page remote service.
 	 *
-	 * @param socialEquityLogPersistence the social equity log persistence
+	 * @param wikiPageService the wiki page remote service
 	 */
-	public void setSocialEquityLogPersistence(
-		SocialEquityLogPersistence socialEquityLogPersistence) {
-		this.socialEquityLogPersistence = socialEquityLogPersistence;
+	public void setWikiPageService(WikiPageService wikiPageService) {
+		this.wikiPageService = wikiPageService;
+	}
+
+	/**
+	 * Returns the wiki page persistence.
+	 *
+	 * @return the wiki page persistence
+	 */
+	public WikiPagePersistence getWikiPagePersistence() {
+		return wikiPagePersistence;
+	}
+
+	/**
+	 * Sets the wiki page persistence.
+	 *
+	 * @param wikiPagePersistence the wiki page persistence
+	 */
+	public void setWikiPagePersistence(WikiPagePersistence wikiPagePersistence) {
+		this.wikiPagePersistence = wikiPagePersistence;
+	}
+
+	/**
+	 * Returns the wiki page finder.
+	 *
+	 * @return the wiki page finder
+	 */
+	public WikiPageFinder getWikiPageFinder() {
+		return wikiPageFinder;
+	}
+
+	/**
+	 * Sets the wiki page finder.
+	 *
+	 * @param wikiPageFinder the wiki page finder
+	 */
+	public void setWikiPageFinder(WikiPageFinder wikiPageFinder) {
+		this.wikiPageFinder = wikiPageFinder;
 	}
 
 	public void afterPropertiesSet() {
@@ -1611,12 +1609,6 @@ public abstract class MBMessageServiceBaseImpl extends PrincipalBean
 	protected MBMessagePersistence mbMessagePersistence;
 	@BeanReference(type = MBMessageFinder.class)
 	protected MBMessageFinder mbMessageFinder;
-	@BeanReference(type = MBMessageFlagLocalService.class)
-	protected MBMessageFlagLocalService mbMessageFlagLocalService;
-	@BeanReference(type = MBMessageFlagService.class)
-	protected MBMessageFlagService mbMessageFlagService;
-	@BeanReference(type = MBMessageFlagPersistence.class)
-	protected MBMessageFlagPersistence mbMessageFlagPersistence;
 	@BeanReference(type = MBStatsUserLocalService.class)
 	protected MBStatsUserLocalService mbStatsUserLocalService;
 	@BeanReference(type = MBStatsUserPersistence.class)
@@ -1629,6 +1621,10 @@ public abstract class MBMessageServiceBaseImpl extends PrincipalBean
 	protected MBThreadPersistence mbThreadPersistence;
 	@BeanReference(type = MBThreadFinder.class)
 	protected MBThreadFinder mbThreadFinder;
+	@BeanReference(type = MBThreadFlagLocalService.class)
+	protected MBThreadFlagLocalService mbThreadFlagLocalService;
+	@BeanReference(type = MBThreadFlagPersistence.class)
+	protected MBThreadFlagPersistence mbThreadFlagPersistence;
 	@BeanReference(type = CounterLocalService.class)
 	protected CounterLocalService counterLocalService;
 	@BeanReference(type = MailService.class)
@@ -1651,6 +1647,8 @@ public abstract class MBMessageServiceBaseImpl extends PrincipalBean
 	protected LockLocalService lockLocalService;
 	@BeanReference(type = LockPersistence.class)
 	protected LockPersistence lockPersistence;
+	@BeanReference(type = LockFinder.class)
+	protected LockFinder lockFinder;
 	@BeanReference(type = PortletPreferencesLocalService.class)
 	protected PortletPreferencesLocalService portletPreferencesLocalService;
 	@BeanReference(type = PortletPreferencesService.class)
@@ -1661,12 +1659,6 @@ public abstract class MBMessageServiceBaseImpl extends PrincipalBean
 	protected PortletPreferencesFinder portletPreferencesFinder;
 	@BeanReference(type = ResourceLocalService.class)
 	protected ResourceLocalService resourceLocalService;
-	@BeanReference(type = ResourceService.class)
-	protected ResourceService resourceService;
-	@BeanReference(type = ResourcePersistence.class)
-	protected ResourcePersistence resourcePersistence;
-	@BeanReference(type = ResourceFinder.class)
-	protected ResourceFinder resourceFinder;
 	@BeanReference(type = SubscriptionLocalService.class)
 	protected SubscriptionLocalService subscriptionLocalService;
 	@BeanReference(type = SubscriptionPersistence.class)
@@ -1695,6 +1687,8 @@ public abstract class MBMessageServiceBaseImpl extends PrincipalBean
 	protected AssetLinkLocalService assetLinkLocalService;
 	@BeanReference(type = AssetLinkPersistence.class)
 	protected AssetLinkPersistence assetLinkPersistence;
+	@BeanReference(type = AssetLinkFinder.class)
+	protected AssetLinkFinder assetLinkFinder;
 	@BeanReference(type = AssetTagLocalService.class)
 	protected AssetTagLocalService assetTagLocalService;
 	@BeanReference(type = AssetTagService.class)
@@ -1729,9 +1723,13 @@ public abstract class MBMessageServiceBaseImpl extends PrincipalBean
 	protected SocialActivityPersistence socialActivityPersistence;
 	@BeanReference(type = SocialActivityFinder.class)
 	protected SocialActivityFinder socialActivityFinder;
-	@BeanReference(type = SocialEquityLogLocalService.class)
-	protected SocialEquityLogLocalService socialEquityLogLocalService;
-	@BeanReference(type = SocialEquityLogPersistence.class)
-	protected SocialEquityLogPersistence socialEquityLogPersistence;
+	@BeanReference(type = WikiPageLocalService.class)
+	protected WikiPageLocalService wikiPageLocalService;
+	@BeanReference(type = WikiPageService.class)
+	protected WikiPageService wikiPageService;
+	@BeanReference(type = WikiPagePersistence.class)
+	protected WikiPagePersistence wikiPagePersistence;
+	@BeanReference(type = WikiPageFinder.class)
+	protected WikiPageFinder wikiPageFinder;
 	private String _beanIdentifier;
 }

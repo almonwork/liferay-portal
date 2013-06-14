@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,9 +14,13 @@
 
 package com.liferay.portlet.journal.action;
 
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.servlet.SessionErrors;
 import com.liferay.portal.kernel.upload.UploadPortletRequest;
 import com.liferay.portal.kernel.util.Constants;
+import com.liferay.portal.kernel.util.FileUtil;
+import com.liferay.portal.kernel.util.LocalizationUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
@@ -27,7 +31,6 @@ import com.liferay.portal.struts.PortletAction;
 import com.liferay.portal.theme.ThemeDisplay;
 import com.liferay.portal.util.PortalUtil;
 import com.liferay.portal.util.WebKeys;
-import com.liferay.portlet.ActionRequestImpl;
 import com.liferay.portlet.PortletURLImpl;
 import com.liferay.portlet.journal.DuplicateTemplateIdException;
 import com.liferay.portlet.journal.NoSuchTemplateException;
@@ -44,6 +47,11 @@ import com.liferay.portlet.journal.util.JournalUtil;
 import com.liferay.util.JS;
 
 import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+
+import java.util.Locale;
+import java.util.Map;
 
 import javax.portlet.ActionRequest;
 import javax.portlet.ActionResponse;
@@ -98,7 +106,7 @@ public class EditTemplateAction extends PortletAction {
 			if (e instanceof NoSuchTemplateException ||
 				e instanceof PrincipalException) {
 
-				SessionErrors.add(actionRequest, e.getClass().getName());
+				SessionErrors.add(actionRequest, e.getClass());
 
 				setForward(actionRequest, "portlet.journal.error");
 			}
@@ -110,7 +118,7 @@ public class EditTemplateAction extends PortletAction {
 					 e instanceof TemplateSmallImageSizeException ||
 					 e instanceof TemplateXslException) {
 
-				SessionErrors.add(actionRequest, e.getClass().getName());
+				SessionErrors.add(actionRequest, e.getClass());
 
 				if (e instanceof RequiredTemplateException) {
 					String redirect = PortalUtil.escapeRedirect(
@@ -140,7 +148,7 @@ public class EditTemplateAction extends PortletAction {
 				ActionUtil.getTemplate(renderRequest);
 			}
 		}
-		catch (NoSuchTemplateException nsse) {
+		catch (NoSuchTemplateException nste) {
 
 			// Let this slide because the user can manually input a template id
 			// for a new template that does not yet exist.
@@ -150,7 +158,7 @@ public class EditTemplateAction extends PortletAction {
 			if (//e instanceof NoSuchTemplateException ||
 				e instanceof PrincipalException) {
 
-				SessionErrors.add(renderRequest, e.getClass().getName());
+				SessionErrors.add(renderRequest, e.getClass());
 
 				return mapping.findForward("portlet.journal.error");
 			}
@@ -192,7 +200,7 @@ public class EditTemplateAction extends PortletAction {
 			actionRequest, "originalRedirect");
 
 		PortletURLImpl portletURL = new PortletURLImpl(
-			(ActionRequestImpl)actionRequest, portletConfig.getPortletName(),
+			actionRequest, portletConfig.getPortletName(),
 			themeDisplay.getPlid(), PortletRequest.RENDER_PHASE);
 
 		portletURL.setWindowState(actionRequest.getWindowState());
@@ -208,42 +216,71 @@ public class EditTemplateAction extends PortletAction {
 		return portletURL.toString();
 	}
 
+	protected String getXsl(UploadPortletRequest uploadPortletRequest) {
+		String xsl = null;
+
+		try {
+			InputStream is = uploadPortletRequest.getFileAsStream("xsl");
+
+			if (is != null) {
+				xsl = new String(FileUtil.getBytes(is));
+
+				is.close();
+			}
+		}
+		catch (IOException ioe) {
+			if (_log.isWarnEnabled()) {
+				_log.warn(ioe, ioe);
+			}
+		}
+
+		return xsl;
+	}
+
 	protected JournalTemplate updateTemplate(ActionRequest actionRequest)
 		throws Exception {
 
-		UploadPortletRequest uploadRequest = PortalUtil.getUploadPortletRequest(
-			actionRequest);
+		UploadPortletRequest uploadPortletRequest =
+			PortalUtil.getUploadPortletRequest(actionRequest);
 
-		String cmd = ParamUtil.getString(uploadRequest, Constants.CMD);
+		String cmd = ParamUtil.getString(uploadPortletRequest, Constants.CMD);
 
-		long groupId = ParamUtil.getLong(uploadRequest, "groupId");
+		long groupId = ParamUtil.getLong(uploadPortletRequest, "groupId");
 
-		String templateId = ParamUtil.getString(uploadRequest, "templateId");
+		String templateId = ParamUtil.getString(
+			uploadPortletRequest, "templateId");
 		boolean autoTemplateId = ParamUtil.getBoolean(
-			uploadRequest, "autoTemplateId");
+			uploadPortletRequest, "autoTemplateId");
 
-		String structureId = ParamUtil.getString(uploadRequest, "structureId");
-		String name = ParamUtil.getString(uploadRequest, "name");
-		String description = ParamUtil.getString(uploadRequest, "description");
+		String structureId = ParamUtil.getString(
+			uploadPortletRequest, "structureId");
+		Map<Locale, String> nameMap = LocalizationUtil.getLocalizationMap(
+			actionRequest, "name");
+		Map<Locale, String> descriptionMap =
+			LocalizationUtil.getLocalizationMap(actionRequest, "description");
 
-		String xsl = ParamUtil.getString(uploadRequest, "xsl");
+		String xsl = getXsl(uploadPortletRequest);
 		String xslContent = JS.decodeURIComponent(
-			ParamUtil.getString(uploadRequest, "xslContent"));
-		boolean formatXsl = ParamUtil.getBoolean(uploadRequest, "formatXsl");
+			ParamUtil.getString(uploadPortletRequest, "xslContent"));
+		boolean formatXsl = ParamUtil.getBoolean(
+			uploadPortletRequest, "formatXsl");
 
 		if (Validator.isNull(xsl)) {
 			xsl = xslContent;
 		}
 
 		String langType = ParamUtil.getString(
-			uploadRequest, "langType", JournalTemplateConstants.LANG_TYPE_XSL);
+			uploadPortletRequest, "langType",
+			JournalTemplateConstants.LANG_TYPE_XSL);
 
-		boolean cacheable = ParamUtil.getBoolean(uploadRequest, "cacheable");
+		boolean cacheable = ParamUtil.getBoolean(
+			uploadPortletRequest, "cacheable");
 
-		boolean smallImage = ParamUtil.getBoolean(uploadRequest, "smallImage");
+		boolean smallImage = ParamUtil.getBoolean(
+			uploadPortletRequest, "smallImage");
 		String smallImageURL = ParamUtil.getString(
-			uploadRequest, "smallImageURL");
-		File smallFile = uploadRequest.getFile("smallFile");
+			uploadPortletRequest, "smallImageURL");
+		File smallFile = uploadPortletRequest.getFile("smallFile");
 
 		ServiceContext serviceContext = ServiceContextFactory.getInstance(
 			JournalTemplate.class.getName(), actionRequest);
@@ -255,8 +292,8 @@ public class EditTemplateAction extends PortletAction {
 			// Add template
 
 			template = JournalTemplateServiceUtil.addTemplate(
-				groupId, templateId, autoTemplateId, structureId, name,
-				description, xsl, formatXsl, langType, cacheable, smallImage,
+				groupId, templateId, autoTemplateId, structureId, nameMap,
+				descriptionMap, xsl, formatXsl, langType, cacheable, smallImage,
 				smallImageURL, smallFile, serviceContext);
 		}
 		else {
@@ -264,7 +301,7 @@ public class EditTemplateAction extends PortletAction {
 			// Update template
 
 			template = JournalTemplateServiceUtil.updateTemplate(
-				groupId, templateId, structureId, name, description, xsl,
+				groupId, templateId, structureId, nameMap, descriptionMap, xsl,
 				formatXsl, langType, cacheable, smallImage, smallImageURL,
 				smallFile, serviceContext);
 		}
@@ -275,5 +312,7 @@ public class EditTemplateAction extends PortletAction {
 
 		return template;
 	}
+
+	private static Log _log = LogFactoryUtil.getLog(JournalTemplate.class);
 
 }

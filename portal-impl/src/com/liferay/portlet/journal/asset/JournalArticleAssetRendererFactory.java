@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -18,6 +18,7 @@ import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.portlet.LiferayPortletRequest;
 import com.liferay.portal.kernel.portlet.LiferayPortletResponse;
+import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.portal.security.permission.ActionKeys;
 import com.liferay.portal.security.permission.PermissionChecker;
@@ -30,11 +31,19 @@ import com.liferay.portlet.asset.model.BaseAssetRendererFactory;
 import com.liferay.portlet.journal.NoSuchArticleException;
 import com.liferay.portlet.journal.model.JournalArticle;
 import com.liferay.portlet.journal.model.JournalArticleResource;
+import com.liferay.portlet.journal.model.JournalStructure;
 import com.liferay.portlet.journal.service.JournalArticleLocalServiceUtil;
 import com.liferay.portlet.journal.service.JournalArticleResourceLocalServiceUtil;
 import com.liferay.portlet.journal.service.JournalArticleServiceUtil;
+import com.liferay.portlet.journal.service.JournalStructureLocalServiceUtil;
 import com.liferay.portlet.journal.service.permission.JournalArticlePermission;
 import com.liferay.portlet.journal.service.permission.JournalPermission;
+import com.liferay.portlet.journal.service.permission.JournalStructurePermission;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 
 import javax.portlet.PortletRequest;
 import javax.portlet.PortletURL;
@@ -67,16 +76,25 @@ public class JournalArticleAssetRendererFactory
 				JournalArticleResourceLocalServiceUtil.getArticleResource(
 					classPK);
 
-			int status = WorkflowConstants.STATUS_ANY;
+			boolean approvedArticleAvailable = true;
 
 			if (type == TYPE_LATEST_APPROVED) {
-				status = WorkflowConstants.STATUS_APPROVED;
+				try {
+					article = JournalArticleLocalServiceUtil.getDisplayArticle(
+						articleResource.getGroupId(),
+						articleResource.getArticleId());
+				}
+				catch (NoSuchArticleException nsae1) {
+					approvedArticleAvailable = false;
+				}
 			}
 
-			article =
-				JournalArticleLocalServiceUtil.getLatestArticle(
+			if ((type != TYPE_LATEST_APPROVED) || !approvedArticleAvailable) {
+				article = JournalArticleLocalServiceUtil.getLatestArticle(
 					articleResource.getGroupId(),
-					articleResource.getArticleId(), status);
+					articleResource.getArticleId(),
+					WorkflowConstants.STATUS_ANY);
+			}
 		}
 
 		return new JournalArticleAssetRenderer(article);
@@ -86,14 +104,33 @@ public class JournalArticleAssetRendererFactory
 	public AssetRenderer getAssetRenderer(long groupId, String urlTitle)
 		throws PortalException, SystemException {
 
-		JournalArticle article = JournalArticleServiceUtil.getArticleByUrlTitle(
-			groupId, urlTitle);
+		JournalArticle article =
+			JournalArticleServiceUtil.getDisplayArticleByUrlTitle(
+				groupId, urlTitle);
 
 		return new JournalArticleAssetRenderer(article);
 	}
 
 	public String getClassName() {
 		return CLASS_NAME;
+	}
+
+	@Override
+	public Map<Long, String> getClassTypes(long[] groupIds, Locale locale)
+		throws Exception {
+
+		Map<Long, String> classTypes = new HashMap<Long, String>();
+
+		for (long groupId : groupIds) {
+			List<JournalStructure> structures =
+				JournalStructureLocalServiceUtil.getStructures(groupId);
+
+			for (JournalStructure structure : structures) {
+				classTypes.put(structure.getId(), structure.getName(locale));
+			}
+		}
+
+		return classTypes;
 	}
 
 	public String getType() {
@@ -119,6 +156,18 @@ public class JournalArticleAssetRendererFactory
 			return null;
 		}
 
+		long classTypeId = GetterUtil.getLong(
+			liferayPortletRequest.getAttribute(
+				WebKeys.ASSET_RENDERER_FACTORY_CLASS_TYPE_ID));
+
+		if ((classTypeId > 0) &&
+			!JournalStructurePermission.contains(
+				themeDisplay.getPermissionChecker(), classTypeId,
+				ActionKeys.VIEW)) {
+
+			return null;
+		}
+
 		PortletURL portletURL = PortletURLFactoryUtil.create(
 			request, PortletKeys.JOURNAL, getControlPanelPlid(themeDisplay),
 			PortletRequest.RENDER_PHASE);
@@ -138,8 +187,15 @@ public class JournalArticleAssetRendererFactory
 	}
 
 	@Override
+	public boolean isLinkable() {
+		return _LINKABLE;
+	}
+
+	@Override
 	protected String getIconPath(ThemeDisplay themeDisplay) {
 		return themeDisplay.getPathThemeImages() + "/common/history.png";
 	}
+
+	private static final boolean _LINKABLE = true;
 
 }

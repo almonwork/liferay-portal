@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -31,27 +31,6 @@ String chooseCallback = (String)request.getAttribute("record_set_action.jsp-choo
 %>
 
 <liferay-ui:icon-menu>
-	<c:if test="<%= ((selRecordSet == null) || (selRecordSet.getRecordSetId() != recordSet.getRecordSetId())) && Validator.isNotNull(chooseCallback) %>">
-
-		<%
-		StringBundler sb = new StringBundler(7);
-
-		sb.append("javascript:");
-		sb.append(chooseCallback);
-		sb.append("('");
-		sb.append(recordSet.getRecordSetId());
-		sb.append("', '");
-		sb.append(HtmlUtil.escapeJS(recordSet.getName(locale)));
-		sb.append("');");
-		%>
-
-		<liferay-ui:icon
-			image="checked"
-			message="choose"
-			url="<%= sb.toString() %>"
-		/>
-	</c:if>
-
 	<c:if test="<%= portletName.equals(PortletKeys.DYNAMIC_DATA_LISTS) && DDLRecordSetPermission.contains(permissionChecker, recordSet, ActionKeys.VIEW) %>">
 		<portlet:renderURL var="viewRecordSetURL">
 			<portlet:param name="struts_action" value="/dynamic_data_lists/view_record_set" />

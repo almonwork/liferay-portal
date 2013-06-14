@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -35,16 +35,16 @@ public class AttributeImpl extends NodeImpl implements Attribute {
 		return visitor.visitAttribute(this);
 	}
 
-	public Object getData() {
-		return _attribute.getData();
-	}
-
 	@Override
 	public boolean equals(Object obj) {
 		org.dom4j.Attribute attribute =
 			((AttributeImpl)obj).getWrappedAttribute();
 
 		return _attribute.equals(attribute);
+	}
+
+	public Object getData() {
+		return _attribute.getData();
 	}
 
 	public Namespace getNamespace() {

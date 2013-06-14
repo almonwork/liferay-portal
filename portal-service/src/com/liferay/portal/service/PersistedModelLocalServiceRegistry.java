@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -18,6 +18,7 @@ import java.util.List;
 
 /**
  * @author Brian Wing Shun Chan
+ * @author Connor McKay
  */
 public interface PersistedModelLocalServiceRegistry {
 
@@ -25,6 +26,8 @@ public interface PersistedModelLocalServiceRegistry {
 		String className);
 
 	public List<PersistedModelLocalService> getPersistedModelLocalServices();
+
+	public boolean isPermissionedModelLocalService(String className);
 
 	public void register(
 		String className,

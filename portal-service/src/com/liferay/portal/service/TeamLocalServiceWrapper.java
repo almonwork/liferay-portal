@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -23,7 +23,8 @@ package com.liferay.portal.service;
  * @see       TeamLocalService
  * @generated
  */
-public class TeamLocalServiceWrapper implements TeamLocalService {
+public class TeamLocalServiceWrapper implements TeamLocalService,
+	ServiceWrapper<TeamLocalService> {
 	public TeamLocalServiceWrapper(TeamLocalService teamLocalService) {
 		_teamLocalService = teamLocalService;
 	}
@@ -55,26 +56,33 @@ public class TeamLocalServiceWrapper implements TeamLocalService {
 	* Deletes the team with the primary key from the database. Also notifies the appropriate model listeners.
 	*
 	* @param teamId the primary key of the team
+	* @return the team that was removed
 	* @throws PortalException if a team with the primary key could not be found
 	* @throws SystemException if a system exception occurred
 	*/
-	public void deleteTeam(long teamId)
+	public com.liferay.portal.model.Team deleteTeam(long teamId)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException {
-		_teamLocalService.deleteTeam(teamId);
+		return _teamLocalService.deleteTeam(teamId);
 	}
 
 	/**
 	* Deletes the team from the database. Also notifies the appropriate model listeners.
 	*
 	* @param team the team
+	* @return the team that was removed
 	* @throws PortalException
 	* @throws SystemException if a system exception occurred
 	*/
-	public void deleteTeam(com.liferay.portal.model.Team team)
+	public com.liferay.portal.model.Team deleteTeam(
+		com.liferay.portal.model.Team team)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException {
-		_teamLocalService.deleteTeam(team);
+		return _teamLocalService.deleteTeam(team);
+	}
+
+	public com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery() {
+		return _teamLocalService.dynamicQuery();
 	}
 
 	/**
@@ -146,6 +154,11 @@ public class TeamLocalServiceWrapper implements TeamLocalService {
 		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery)
 		throws com.liferay.portal.kernel.exception.SystemException {
 		return _teamLocalService.dynamicQueryCount(dynamicQuery);
+	}
+
+	public com.liferay.portal.model.Team fetchTeam(long teamId)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return _teamLocalService.fetchTeam(teamId);
 	}
 
 	/**
@@ -307,11 +320,25 @@ public class TeamLocalServiceWrapper implements TeamLocalService {
 		return _teamLocalService.updateTeam(teamId, name, description);
 	}
 
+	/**
+	 * @deprecated Renamed to {@link #getWrappedService}
+	 */
 	public TeamLocalService getWrappedTeamLocalService() {
 		return _teamLocalService;
 	}
 
+	/**
+	 * @deprecated Renamed to {@link #setWrappedService}
+	 */
 	public void setWrappedTeamLocalService(TeamLocalService teamLocalService) {
+		_teamLocalService = teamLocalService;
+	}
+
+	public TeamLocalService getWrappedService() {
+		return _teamLocalService;
+	}
+
+	public void setWrappedService(TeamLocalService teamLocalService) {
 		_teamLocalService = teamLocalService;
 	}
 

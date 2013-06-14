@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,6 +14,11 @@
 
 package com.liferay.portlet.journal.model;
 
+import com.liferay.portal.model.ModelWrapper;
+
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * <p>
  * This class is a wrapper for {@link JournalContentSearch}.
@@ -23,7 +28,8 @@ package com.liferay.portlet.journal.model;
  * @see       JournalContentSearch
  * @generated
  */
-public class JournalContentSearchWrapper implements JournalContentSearch {
+public class JournalContentSearchWrapper implements JournalContentSearch,
+	ModelWrapper<JournalContentSearch> {
 	public JournalContentSearchWrapper(
 		JournalContentSearch journalContentSearch) {
 		_journalContentSearch = journalContentSearch;
@@ -35,6 +41,64 @@ public class JournalContentSearchWrapper implements JournalContentSearch {
 
 	public String getModelClassName() {
 		return JournalContentSearch.class.getName();
+	}
+
+	public Map<String, Object> getModelAttributes() {
+		Map<String, Object> attributes = new HashMap<String, Object>();
+
+		attributes.put("contentSearchId", getContentSearchId());
+		attributes.put("groupId", getGroupId());
+		attributes.put("companyId", getCompanyId());
+		attributes.put("privateLayout", getPrivateLayout());
+		attributes.put("layoutId", getLayoutId());
+		attributes.put("portletId", getPortletId());
+		attributes.put("articleId", getArticleId());
+
+		return attributes;
+	}
+
+	public void setModelAttributes(Map<String, Object> attributes) {
+		Long contentSearchId = (Long)attributes.get("contentSearchId");
+
+		if (contentSearchId != null) {
+			setContentSearchId(contentSearchId);
+		}
+
+		Long groupId = (Long)attributes.get("groupId");
+
+		if (groupId != null) {
+			setGroupId(groupId);
+		}
+
+		Long companyId = (Long)attributes.get("companyId");
+
+		if (companyId != null) {
+			setCompanyId(companyId);
+		}
+
+		Boolean privateLayout = (Boolean)attributes.get("privateLayout");
+
+		if (privateLayout != null) {
+			setPrivateLayout(privateLayout);
+		}
+
+		Long layoutId = (Long)attributes.get("layoutId");
+
+		if (layoutId != null) {
+			setLayoutId(layoutId);
+		}
+
+		String portletId = (String)attributes.get("portletId");
+
+		if (portletId != null) {
+			setPortletId(portletId);
+		}
+
+		String articleId = (String)attributes.get("articleId");
+
+		if (articleId != null) {
+			setArticleId(articleId);
+		}
 	}
 
 	/**
@@ -210,10 +274,6 @@ public class JournalContentSearchWrapper implements JournalContentSearch {
 		return _journalContentSearch.isEscapedModel();
 	}
 
-	public void setEscapedModel(boolean escapedModel) {
-		_journalContentSearch.setEscapedModel(escapedModel);
-	}
-
 	public java.io.Serializable getPrimaryKeyObj() {
 		return _journalContentSearch.getPrimaryKeyObj();
 	}
@@ -268,7 +328,14 @@ public class JournalContentSearchWrapper implements JournalContentSearch {
 		_journalContentSearch.persist();
 	}
 
+	/**
+	 * @deprecated Renamed to {@link #getWrappedModel}
+	 */
 	public JournalContentSearch getWrappedJournalContentSearch() {
+		return _journalContentSearch;
+	}
+
+	public JournalContentSearch getWrappedModel() {
 		return _journalContentSearch;
 	}
 

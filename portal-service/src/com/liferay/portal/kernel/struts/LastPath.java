@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -43,24 +43,24 @@ public class LastPath implements Serializable {
 		return _contextPath;
 	}
 
-	public void setContextPath(String contextPath) {
-		_contextPath = contextPath;
+	public Map<String, String[]> getParameterMap() {
+		return _parameterMap;
 	}
 
 	public String getPath() {
 		return _path;
 	}
 
-	public void setPath(String path) {
-		_path = path;
-	}
-
-	public Map<String, String[]> getParameterMap() {
-		return _parameterMap;
+	public void setContextPath(String contextPath) {
+		_contextPath = contextPath;
 	}
 
 	public void setParameterMap(Map<String, String[]> parameterMap) {
 		_parameterMap = parameterMap;
+	}
+
+	public void setPath(String path) {
+		_path = path;
 	}
 
 	@Override
@@ -77,7 +77,7 @@ public class LastPath implements Serializable {
 	}
 
 	private String _contextPath;
-	private String _path;
 	private Map<String, String[]> _parameterMap;
+	private String _path;
 
 }

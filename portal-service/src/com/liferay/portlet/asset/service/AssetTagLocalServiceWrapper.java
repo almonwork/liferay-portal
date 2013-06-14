@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,6 +14,8 @@
 
 package com.liferay.portlet.asset.service;
 
+import com.liferay.portal.service.ServiceWrapper;
+
 /**
  * <p>
  * This class is a wrapper for {@link AssetTagLocalService}.
@@ -23,7 +25,8 @@ package com.liferay.portlet.asset.service;
  * @see       AssetTagLocalService
  * @generated
  */
-public class AssetTagLocalServiceWrapper implements AssetTagLocalService {
+public class AssetTagLocalServiceWrapper implements AssetTagLocalService,
+	ServiceWrapper<AssetTagLocalService> {
 	public AssetTagLocalServiceWrapper(
 		AssetTagLocalService assetTagLocalService) {
 		_assetTagLocalService = assetTagLocalService;
@@ -56,25 +59,31 @@ public class AssetTagLocalServiceWrapper implements AssetTagLocalService {
 	* Deletes the asset tag with the primary key from the database. Also notifies the appropriate model listeners.
 	*
 	* @param tagId the primary key of the asset tag
+	* @return the asset tag that was removed
 	* @throws PortalException if a asset tag with the primary key could not be found
 	* @throws SystemException if a system exception occurred
 	*/
-	public void deleteAssetTag(long tagId)
+	public com.liferay.portlet.asset.model.AssetTag deleteAssetTag(long tagId)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException {
-		_assetTagLocalService.deleteAssetTag(tagId);
+		return _assetTagLocalService.deleteAssetTag(tagId);
 	}
 
 	/**
 	* Deletes the asset tag from the database. Also notifies the appropriate model listeners.
 	*
 	* @param assetTag the asset tag
+	* @return the asset tag that was removed
 	* @throws SystemException if a system exception occurred
 	*/
-	public void deleteAssetTag(
+	public com.liferay.portlet.asset.model.AssetTag deleteAssetTag(
 		com.liferay.portlet.asset.model.AssetTag assetTag)
 		throws com.liferay.portal.kernel.exception.SystemException {
-		_assetTagLocalService.deleteAssetTag(assetTag);
+		return _assetTagLocalService.deleteAssetTag(assetTag);
+	}
+
+	public com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery() {
+		return _assetTagLocalService.dynamicQuery();
 	}
 
 	/**
@@ -146,6 +155,11 @@ public class AssetTagLocalServiceWrapper implements AssetTagLocalService {
 		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery)
 		throws com.liferay.portal.kernel.exception.SystemException {
 		return _assetTagLocalService.dynamicQueryCount(dynamicQuery);
+	}
+
+	public com.liferay.portlet.asset.model.AssetTag fetchAssetTag(long tagId)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return _assetTagLocalService.fetchAssetTag(tagId);
 	}
 
 	/**
@@ -322,6 +336,22 @@ public class AssetTagLocalServiceWrapper implements AssetTagLocalService {
 		return _assetTagLocalService.getGroupTagsCount(groupId);
 	}
 
+	public java.util.List<com.liferay.portlet.asset.model.AssetTag> getSocialActivityCounterOffsetTags(
+		long groupId, java.lang.String socialActivityCounterName,
+		int startOffset, int endOffset)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return _assetTagLocalService.getSocialActivityCounterOffsetTags(groupId,
+			socialActivityCounterName, startOffset, endOffset);
+	}
+
+	public java.util.List<com.liferay.portlet.asset.model.AssetTag> getSocialActivityCounterPeriodTags(
+		long groupId, java.lang.String socialActivityCounterName,
+		int startPeriod, int endPeriod)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return _assetTagLocalService.getSocialActivityCounterPeriodTags(groupId,
+			socialActivityCounterName, startPeriod, endPeriod);
+	}
+
 	public com.liferay.portlet.asset.model.AssetTag getTag(long tagId)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException {
@@ -339,6 +369,12 @@ public class AssetTagLocalServiceWrapper implements AssetTagLocalService {
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException {
 		return _assetTagLocalService.getTagIds(groupId, names);
+	}
+
+	public long[] getTagIds(long[] groupIds, java.lang.String name)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException {
+		return _assetTagLocalService.getTagIds(groupIds, name);
 	}
 
 	public long[] getTagIds(long[] groupIds, java.lang.String[] names)
@@ -435,12 +471,26 @@ public class AssetTagLocalServiceWrapper implements AssetTagLocalService {
 			tagProperties, serviceContext);
 	}
 
+	/**
+	 * @deprecated Renamed to {@link #getWrappedService}
+	 */
 	public AssetTagLocalService getWrappedAssetTagLocalService() {
 		return _assetTagLocalService;
 	}
 
+	/**
+	 * @deprecated Renamed to {@link #setWrappedService}
+	 */
 	public void setWrappedAssetTagLocalService(
 		AssetTagLocalService assetTagLocalService) {
+		_assetTagLocalService = assetTagLocalService;
+	}
+
+	public AssetTagLocalService getWrappedService() {
+		return _assetTagLocalService;
+	}
+
+	public void setWrappedService(AssetTagLocalService assetTagLocalService) {
 		_assetTagLocalService = assetTagLocalService;
 	}
 

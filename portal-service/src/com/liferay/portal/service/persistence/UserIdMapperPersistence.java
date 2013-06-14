@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,7 +14,6 @@
 
 package com.liferay.portal.service.persistence;
 
-import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.model.UserIdMapper;
 
 /**
@@ -339,9 +338,11 @@ public interface UserIdMapperPersistence extends BasePersistence<UserIdMapper> {
 	*
 	* @param userId the user ID
 	* @param type the type
+	* @return the user ID mapper that was removed
 	* @throws SystemException if a system exception occurred
 	*/
-	public void removeByU_T(long userId, java.lang.String type)
+	public com.liferay.portal.model.UserIdMapper removeByU_T(long userId,
+		java.lang.String type)
 		throws com.liferay.portal.NoSuchUserIdMapperException,
 			com.liferay.portal.kernel.exception.SystemException;
 
@@ -350,10 +351,11 @@ public interface UserIdMapperPersistence extends BasePersistence<UserIdMapper> {
 	*
 	* @param type the type
 	* @param externalUserId the external user ID
+	* @return the user ID mapper that was removed
 	* @throws SystemException if a system exception occurred
 	*/
-	public void removeByT_E(java.lang.String type,
-		java.lang.String externalUserId)
+	public com.liferay.portal.model.UserIdMapper removeByT_E(
+		java.lang.String type, java.lang.String externalUserId)
 		throws com.liferay.portal.NoSuchUserIdMapperException,
 			com.liferay.portal.kernel.exception.SystemException;
 
@@ -405,7 +407,4 @@ public interface UserIdMapperPersistence extends BasePersistence<UserIdMapper> {
 	*/
 	public int countAll()
 		throws com.liferay.portal.kernel.exception.SystemException;
-
-	public UserIdMapper remove(UserIdMapper userIdMapper)
-		throws SystemException;
 }

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -25,7 +25,13 @@ import org.jamwiki.model.Topic;
  */
 public class LiferaySearchEngine implements SearchEngine {
 
+	public void addToIndex(Topic arg0) {
+	}
+
 	public void addToIndex(Topic topic, List<String> links) {
+	}
+
+	public void commit(String arg0) {
 	}
 
 	public void deleteFromIndex(Topic topic) {
@@ -44,6 +50,15 @@ public class LiferaySearchEngine implements SearchEngine {
 	}
 
 	public void refreshIndex() {
+	}
+
+	public void setAutoCommit(boolean autoCommit) {
+	}
+
+	public void shutdown() {
+	}
+
+	public void updateInIndex(Topic topic) {
 	}
 
 	public void updateInIndex(Topic topic, List<String> links) {

@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -40,6 +40,8 @@ if (!host.equals(privateLayoutSet.getVirtualHostname())) {
 	privateSitemapUrl += "?groupId=" + liveGroup.getGroupId() + "&privateLayout=" + true;
 }
 %>
+
+<liferay-ui:error-marker key="errorSection" value="siteMap" />
 
 <liferay-util:buffer var="linkContent">
 	<aui:a href="http://www.sitemaps.org" target="_blank">http://www.sitemaps.org</aui:a>

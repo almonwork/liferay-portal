@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -83,7 +83,7 @@ public class BeanPropertiesImpl implements BeanProperties {
 			try {
 				Object value = BeanUtil.getProperty(bean, param);
 
-				beanValue = Convert.toBoolean(value, defaultValue);
+				beanValue = Convert.toBooleanValue(value, defaultValue);
 			}
 			catch (Exception e) {
 				_log.error(e, e);
@@ -106,7 +106,7 @@ public class BeanPropertiesImpl implements BeanProperties {
 			try {
 				Object value = BeanUtil.getProperty(bean, param);
 
-				beanValue = Convert.toBoolean(value, defaultValue);
+				beanValue = Convert.toBooleanValue(value, defaultValue);
 			}
 			catch (Exception e) {
 			}
@@ -126,7 +126,7 @@ public class BeanPropertiesImpl implements BeanProperties {
 			try {
 				Object value = BeanUtil.getProperty(bean, param);
 
-				beanValue = Convert.toByte(value, defaultValue);
+				beanValue = Convert.toByteValue(value, defaultValue);
 			}
 			catch (Exception e) {
 				_log.error(e, e);
@@ -147,7 +147,7 @@ public class BeanPropertiesImpl implements BeanProperties {
 			try {
 				Object value = BeanUtil.getProperty(bean, param);
 
-				beanValue = Convert.toByte(value, defaultValue);
+				beanValue = Convert.toByteValue(value, defaultValue);
 			}
 			catch (Exception e) {
 			}
@@ -167,7 +167,7 @@ public class BeanPropertiesImpl implements BeanProperties {
 			try {
 				Object value = BeanUtil.getProperty(bean, param);
 
-				beanValue = Convert.toDouble(value, defaultValue);
+				beanValue = Convert.toDoubleValue(value, defaultValue);
 			}
 			catch (Exception e) {
 				_log.error(e, e);
@@ -190,7 +190,7 @@ public class BeanPropertiesImpl implements BeanProperties {
 			try {
 				Object value = BeanUtil.getProperty(bean, param);
 
-				beanValue = Convert.toDouble(value, defaultValue);
+				beanValue = Convert.toDoubleValue(value, defaultValue);
 			}
 			catch (Exception e) {
 			}
@@ -210,7 +210,7 @@ public class BeanPropertiesImpl implements BeanProperties {
 			try {
 				Object value = BeanUtil.getProperty(bean, param);
 
-				beanValue = Convert.toFloat(value, defaultValue);
+				beanValue = Convert.toFloatValue(value, defaultValue);
 			}
 			catch (Exception e) {
 				_log.error(e, e);
@@ -231,7 +231,7 @@ public class BeanPropertiesImpl implements BeanProperties {
 			try {
 				Object value = BeanUtil.getProperty(bean, param);
 
-				beanValue = Convert.toFloat(value, defaultValue);
+				beanValue = Convert.toFloatValue(value, defaultValue);
 			}
 			catch (Exception e) {
 			}
@@ -251,7 +251,7 @@ public class BeanPropertiesImpl implements BeanProperties {
 			try {
 				Object value = BeanUtil.getProperty(bean, param);
 
-				beanValue = Convert.toInteger(value, defaultValue);
+				beanValue = Convert.toIntValue(value, defaultValue);
 			}
 			catch (Exception e) {
 				_log.error(e, e);
@@ -272,7 +272,7 @@ public class BeanPropertiesImpl implements BeanProperties {
 			try {
 				Object value = BeanUtil.getProperty(bean, param);
 
-				beanValue = Convert.toInteger(value, defaultValue);
+				beanValue = Convert.toIntValue(value, defaultValue);
 			}
 			catch (Exception e) {
 			}
@@ -292,7 +292,7 @@ public class BeanPropertiesImpl implements BeanProperties {
 			try {
 				Object value = BeanUtil.getProperty(bean, param);
 
-				beanValue = Convert.toLong(value, defaultValue);
+				beanValue = Convert.toLongValue(value, defaultValue);
 			}
 			catch (Exception e) {
 				_log.error(e, e);
@@ -313,7 +313,7 @@ public class BeanPropertiesImpl implements BeanProperties {
 			try {
 				Object value = BeanUtil.getProperty(bean, param);
 
-				beanValue = Convert.toLong(value, defaultValue);
+				beanValue = Convert.toLongValue(value, defaultValue);
 			}
 			catch (Exception e) {
 			}
@@ -371,6 +371,57 @@ public class BeanPropertiesImpl implements BeanProperties {
 		}
 	}
 
+	public Class<?> getObjectType(Object bean, String param) {
+		return getObjectType(bean, param, null);
+	}
+
+	public Class<?> getObjectType(
+		Object bean, String param, Class<?> defaultValue) {
+
+		Class<?> beanType = null;
+
+		if (bean != null) {
+			try {
+				beanType = BeanUtil.getPropertyType(bean, param);
+			}
+			catch (Exception e) {
+				_log.error(e, e);
+			}
+		}
+
+		if (beanType == null) {
+			return defaultValue;
+		}
+		else {
+			return beanType;
+		}
+	}
+
+	public Class<?> getObjectTypeSilent(Object bean, String param) {
+		return getObjectTypeSilent(bean, param, null);
+	}
+
+	public Class<?> getObjectTypeSilent(
+		Object bean, String param, Class<?> defaultValue) {
+
+		Class<?> beanType = null;
+
+		if (bean != null) {
+			try {
+				beanType = BeanUtil.getPropertyType(bean, param);
+			}
+			catch (Exception e) {
+			}
+		}
+
+		if (beanType == null) {
+			return defaultValue;
+		}
+		else {
+			return beanType;
+		}
+	}
+
 	public short getShort(Object bean, String param) {
 		return getShort(bean, param, GetterUtil.DEFAULT_SHORT);
 	}
@@ -382,7 +433,7 @@ public class BeanPropertiesImpl implements BeanProperties {
 			try {
 				Object value = BeanUtil.getProperty(bean, param);
 
-				beanValue = Convert.toShort(value, defaultValue);
+				beanValue = Convert.toShortValue(value, defaultValue);
 			}
 			catch (Exception e) {
 				_log.error(e, e);
@@ -403,7 +454,7 @@ public class BeanPropertiesImpl implements BeanProperties {
 			try {
 				Object value = BeanUtil.getProperty(bean, param);
 
-				beanValue = Convert.toShort(value, defaultValue);
+				beanValue = Convert.toShortValue(value, defaultValue);
 			}
 			catch (Exception e) {
 			}
@@ -475,7 +526,9 @@ public class BeanPropertiesImpl implements BeanProperties {
 				Class<?> propertyTypeClass = BeanUtil.getPropertyType(
 					bean, dateParam);
 
-				if (!propertyTypeClass.equals(Date.class)) {
+				if ((propertyTypeClass == null) ||
+					!propertyTypeClass.equals(Date.class)) {
+
 					continue;
 				}
 

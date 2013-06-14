@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,6 +14,9 @@
 
 package com.liferay.portal.model;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * <p>
  * This class is a wrapper for {@link Group}.
@@ -23,7 +26,7 @@ package com.liferay.portal.model;
  * @see       Group
  * @generated
  */
-public class GroupWrapper implements Group {
+public class GroupWrapper implements Group, ModelWrapper<Group> {
 	public GroupWrapper(Group group) {
 		_group = group;
 	}
@@ -34,6 +37,113 @@ public class GroupWrapper implements Group {
 
 	public String getModelClassName() {
 		return Group.class.getName();
+	}
+
+	public Map<String, Object> getModelAttributes() {
+		Map<String, Object> attributes = new HashMap<String, Object>();
+
+		attributes.put("groupId", getGroupId());
+		attributes.put("companyId", getCompanyId());
+		attributes.put("creatorUserId", getCreatorUserId());
+		attributes.put("classNameId", getClassNameId());
+		attributes.put("classPK", getClassPK());
+		attributes.put("parentGroupId", getParentGroupId());
+		attributes.put("liveGroupId", getLiveGroupId());
+		attributes.put("name", getName());
+		attributes.put("description", getDescription());
+		attributes.put("type", getType());
+		attributes.put("typeSettings", getTypeSettings());
+		attributes.put("friendlyURL", getFriendlyURL());
+		attributes.put("site", getSite());
+		attributes.put("active", getActive());
+
+		return attributes;
+	}
+
+	public void setModelAttributes(Map<String, Object> attributes) {
+		Long groupId = (Long)attributes.get("groupId");
+
+		if (groupId != null) {
+			setGroupId(groupId);
+		}
+
+		Long companyId = (Long)attributes.get("companyId");
+
+		if (companyId != null) {
+			setCompanyId(companyId);
+		}
+
+		Long creatorUserId = (Long)attributes.get("creatorUserId");
+
+		if (creatorUserId != null) {
+			setCreatorUserId(creatorUserId);
+		}
+
+		Long classNameId = (Long)attributes.get("classNameId");
+
+		if (classNameId != null) {
+			setClassNameId(classNameId);
+		}
+
+		Long classPK = (Long)attributes.get("classPK");
+
+		if (classPK != null) {
+			setClassPK(classPK);
+		}
+
+		Long parentGroupId = (Long)attributes.get("parentGroupId");
+
+		if (parentGroupId != null) {
+			setParentGroupId(parentGroupId);
+		}
+
+		Long liveGroupId = (Long)attributes.get("liveGroupId");
+
+		if (liveGroupId != null) {
+			setLiveGroupId(liveGroupId);
+		}
+
+		String name = (String)attributes.get("name");
+
+		if (name != null) {
+			setName(name);
+		}
+
+		String description = (String)attributes.get("description");
+
+		if (description != null) {
+			setDescription(description);
+		}
+
+		Integer type = (Integer)attributes.get("type");
+
+		if (type != null) {
+			setType(type);
+		}
+
+		String typeSettings = (String)attributes.get("typeSettings");
+
+		if (typeSettings != null) {
+			setTypeSettings(typeSettings);
+		}
+
+		String friendlyURL = (String)attributes.get("friendlyURL");
+
+		if (friendlyURL != null) {
+			setFriendlyURL(friendlyURL);
+		}
+
+		Boolean site = (Boolean)attributes.get("site");
+
+		if (site != null) {
+			setSite(site);
+		}
+
+		Boolean active = (Boolean)attributes.get("active");
+
+		if (active != null) {
+			setActive(active);
+		}
 	}
 
 	/**
@@ -135,6 +245,10 @@ public class GroupWrapper implements Group {
 	*/
 	public java.lang.String getClassName() {
 		return _group.getClassName();
+	}
+
+	public void setClassName(java.lang.String className) {
+		_group.setClassName(className);
 	}
 
 	/**
@@ -373,10 +487,6 @@ public class GroupWrapper implements Group {
 		return _group.isEscapedModel();
 	}
 
-	public void setEscapedModel(boolean escapedModel) {
-		_group.setEscapedModel(escapedModel);
-	}
-
 	public java.io.Serializable getPrimaryKeyObj() {
 		return _group.getPrimaryKeyObj();
 	}
@@ -444,12 +554,24 @@ public class GroupWrapper implements Group {
 		return _group.getDescriptiveName();
 	}
 
+	public java.lang.String getDescriptiveName(java.util.Locale locale)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException {
+		return _group.getDescriptiveName(locale);
+	}
+
 	public com.liferay.portal.model.Group getLiveGroup() {
 		return _group.getLiveGroup();
 	}
 
 	public long getOrganizationId() {
 		return _group.getOrganizationId();
+	}
+
+	public com.liferay.portal.model.Group getParentGroup()
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException {
+		return _group.getParentGroup();
 	}
 
 	public java.lang.String getPathFriendlyURL(boolean privateLayout,
@@ -540,6 +662,10 @@ public class GroupWrapper implements Group {
 		return _group.isRegularSite();
 	}
 
+	public boolean isRoot() {
+		return _group.isRoot();
+	}
+
 	public boolean isStaged() {
 		return _group.isStaged();
 	}
@@ -564,12 +690,23 @@ public class GroupWrapper implements Group {
 		return _group.isUserGroup();
 	}
 
+	public boolean isUserPersonalSite() {
+		return _group.isUserPersonalSite();
+	}
+
 	public void setTypeSettingsProperties(
 		com.liferay.portal.kernel.util.UnicodeProperties typeSettingsProperties) {
 		_group.setTypeSettingsProperties(typeSettingsProperties);
 	}
 
+	/**
+	 * @deprecated Renamed to {@link #getWrappedModel}
+	 */
 	public Group getWrappedGroup() {
+		return _group;
+	}
+
+	public Group getWrappedModel() {
 		return _group;
 	}
 

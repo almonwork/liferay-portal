@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -28,9 +28,10 @@ public class AdvancedSearchTemplateIDTest extends BaseTestCase {
 			switch (label) {
 			case 1:
 				selenium.open("/web/guest/home/");
+				loadRequiredJavaScriptModules();
 
 				for (int second = 0;; second++) {
-					if (second >= 60) {
+					if (second >= 90) {
 						fail("timeout");
 					}
 
@@ -45,20 +46,21 @@ public class AdvancedSearchTemplateIDTest extends BaseTestCase {
 					Thread.sleep(1000);
 				}
 
-				selenium.saveScreenShotAndSource();
 				selenium.clickAt("link=Control Panel",
-					RuntimeVariables.replace(""));
+					RuntimeVariables.replace("Control Panel"));
 				selenium.waitForPageToLoad("30000");
-				selenium.saveScreenShotAndSource();
-				assertEquals(RuntimeVariables.replace("Web Content"),
-					selenium.getText("//div[2]/div[2]/div[2]/ul/li[3]/a"));
-				selenium.clickAt("//div[2]/div[2]/div[2]/ul/li[3]/a",
+				loadRequiredJavaScriptModules();
+				selenium.clickAt("link=Web Content",
 					RuntimeVariables.replace("Web Content"));
 				selenium.waitForPageToLoad("30000");
-				selenium.saveScreenShotAndSource();
-				selenium.clickAt("link=Templates", RuntimeVariables.replace(""));
+				loadRequiredJavaScriptModules();
+				selenium.clickAt("link=Templates",
+					RuntimeVariables.replace("Templates"));
 				selenium.waitForPageToLoad("30000");
-				selenium.saveScreenShotAndSource();
+				loadRequiredJavaScriptModules();
+
+				String templateID = selenium.getText("//td[2]/a");
+				RuntimeVariables.setValue("templateID", templateID);
 
 				boolean advancedVisible = selenium.isVisible(
 						"link=Advanced \u00bb");
@@ -70,17 +72,18 @@ public class AdvancedSearchTemplateIDTest extends BaseTestCase {
 				}
 
 				selenium.clickAt("link=Advanced \u00bb",
-					RuntimeVariables.replace(""));
+					RuntimeVariables.replace("Advanced \u00bb"));
 
 			case 2:
 
 				for (int second = 0;; second++) {
-					if (second >= 60) {
+					if (second >= 90) {
 						fail("timeout");
 					}
 
 					try {
-						if (selenium.isVisible("_15_searchTemplateId")) {
+						if (selenium.isVisible(
+									"//input[@id='_15_searchTemplateId']")) {
 							break;
 						}
 					}
@@ -90,30 +93,34 @@ public class AdvancedSearchTemplateIDTest extends BaseTestCase {
 					Thread.sleep(1000);
 				}
 
-				selenium.saveScreenShotAndSource();
-				selenium.type("_15_searchTemplateId",
-					RuntimeVariables.replace("templateid"));
-				selenium.saveScreenShotAndSource();
-				selenium.clickAt("//div[2]/span[2]/span/input",
+				selenium.type("//input[@id='_15_searchTemplateId']",
+					RuntimeVariables.replace(RuntimeVariables.getValue(
+							"templateID")));
+				selenium.clickAt("//input[@value='Search']",
 					RuntimeVariables.replace("Search"));
 				selenium.waitForPageToLoad("30000");
-				selenium.saveScreenShotAndSource();
-				selenium.type("_15_searchTemplateId",
+				loadRequiredJavaScriptModules();
+				selenium.type("//input[@id='_15_searchTemplateId']",
 					RuntimeVariables.replace(""));
-				selenium.saveScreenShotAndSource();
-				selenium.type("_15_searchTemplateId",
-					RuntimeVariables.replace("templateid1"));
-				selenium.saveScreenShotAndSource();
-				selenium.clickAt("//div[2]/span[2]/span/input",
+				assertEquals(RuntimeVariables.replace(
+						"Web Content Template Name"),
+					selenium.getText("//td[3]/a"));
+				assertEquals(RuntimeVariables.replace(
+						"Web Content Template Description"),
+					selenium.getText("//td[4]/a"));
+				selenium.type("//input[@id='_15_searchTemplateId']",
+					RuntimeVariables.replace("test"));
+				selenium.clickAt("//input[@value='Search']",
 					RuntimeVariables.replace("Search"));
 				selenium.waitForPageToLoad("30000");
-				selenium.saveScreenShotAndSource();
-				selenium.type("_15_searchTemplateId",
+				loadRequiredJavaScriptModules();
+				selenium.type("//input[@id='_15_searchTemplateId']",
 					RuntimeVariables.replace(""));
-				selenium.saveScreenShotAndSource();
-				assertFalse(selenium.isElementPresent("link=TEMPLATEID"));
+				assertFalse(selenium.isTextPresent("Web Content Template Name"));
+				assertFalse(selenium.isTextPresent(
+						"Web Content Template Description"));
 				selenium.clickAt("link=\u00ab Basic",
-					RuntimeVariables.replace(""));
+					RuntimeVariables.replace("\u00ab Basic"));
 
 			case 100:
 				label = -1;

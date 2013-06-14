@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -41,13 +41,9 @@ decimalFormat.setMinimumFractionDigits(2);
 <select name="<portlet:namespace />from">
 
 	<%
-	Iterator itr = allSymbols.entrySet().iterator();
-
-	while (itr.hasNext()) {
-		Map.Entry entry = (Map.Entry)itr.next();
-
-		String symbol = (String)entry.getValue();
-		String currencyValue = (String)entry.getKey();
+	for (Map.Entry<String, String> entry : allSymbols.entrySet()) {
+		String symbol = entry.getValue();
+		String currencyValue = entry.getKey();
 	%>
 
 		<option <%= symbol.equals(from) ? "selected" : "" %> value="<%= symbol %>"><%= currencyValue %></option value>
@@ -63,13 +59,9 @@ decimalFormat.setMinimumFractionDigits(2);
 <select name="<portlet:namespace />to">
 
 	<%
-	itr = allSymbols.entrySet().iterator();
-
-	while (itr.hasNext()) {
-		Map.Entry entry = (Map.Entry)itr.next();
-
-		String symbol = (String)entry.getValue();
-		String currencyValue = (String)entry.getKey();
+	for (Map.Entry<String, String> entry : allSymbols.entrySet()) {
+		String symbol = entry.getValue();
+		String currencyValue = entry.getKey();
 	%>
 
 		<option <%= symbol.equals(to) ? "selected" : "" %> value="<%= symbol %>"><%= currencyValue %></option value>
@@ -189,7 +181,7 @@ decimalFormat.setMinimumFractionDigits(2);
 		<table border="1" cellpadding="2" cellspacing="0">
 		<tr>
 			<td>
-				<img height="288" src="http://ichart.yahoo.com/z?s=<%= currency.getSymbol() %>=X&t=<%= chartId %>?" width="512" />
+				<img height="288" src="http://ichart.yahoo.com/z?s=<%= currency.getSymbol() %>=X&t=<%= HtmlUtil.escape(chartId) %>?" width="512" />
 			</td>
 		</tr>
 		</table>

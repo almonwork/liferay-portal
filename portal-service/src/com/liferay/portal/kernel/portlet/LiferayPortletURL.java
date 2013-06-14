@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -56,11 +56,22 @@ public interface LiferayPortletURL
 	public String getParameter(String name);
 
 	/**
+	 * Returns the parameters that are included in the friendly URL path and do
+	 * not need to appear in the query string.
+	 *
+	 * @return the names of the parameters that are included in the friendly URL
+	 *         path and do not need to appear in the query string
+	 */
+	public Set<String> getParametersIncludedInPath();
+
+	/**
 	 * Returns the ID of this URL's target portlet.
 	 *
 	 * @return the ID of this URL's target portlet
 	 */
 	public String getPortletId();
+
+	public Set<String> getRemovedParameterNames();
 
 	/**
 	 * Returns the map of reserved parameters for this URL.
@@ -139,62 +150,6 @@ public interface LiferayPortletURL
 	public boolean isSecure();
 
 	/**
-	 * Sets the portlet lifecycle of this URL's target portlet.
-	 *
-	 * <p>
-	 * Valid lifecycles are:
-	 * </p>
-	 *
-	 * <ul>
-	 * <li>
-	 * {@link javax.portlet.PortletRequest#ACTION_PHASE}
-	 * </li>
-	 * <li>
-	 * {@link javax.portlet.PortletRequest#RENDER_PHASE}
-	 * </li>
-	 * <li>
-	 * {@link javax.portlet.PortletRequest#RESOURCE_PHASE}
-	 * </li>
-	 * </ul>
-	 *
-	 * @param lifecycle the portlet lifecycle
-	 */
-	public void setLifecycle(String lifecycle);
-
-	/**
-	 * Sets the URL parameter to the value.
-	 *
-	 * @param name the name of the URL parameter
-	 * @param value the value of the URL parameter
-	 * @param append whether the new value should be appended to any existing
-	 *        values for the parameter. If <code>append</code> is
-	 *        <code>false</code> any existing values will be overwritten with
-	 *        the new value.
-	 */
-	public void setParameter(String name, String value, boolean append);
-
-	/**
-	 * Sets the URL parameter the values.
-	 *
-	 * @param name the name of the URL parameter
-	 * @param values the values of the URL parameter
-	 * @param append whether the new values should be appended to any existing
-	 *        values for the parameter. If <code>append</code> is
-	 *        <code>false</code> any existing values will be overwritten with
-	 *        the new values.
-	 */
-	public void setParameter(String name, String[] values, boolean append);
-
-	/**
-	 * Returns the parameters that are included in the friendly URL path and do
-	 * not need to appear in the query string.
-	 *
-	 * @return the names of the parameters that are included in the friendly URL
-	 *         path and do not need to appear in the query string
-	 */
-	public Set<String> getParametersIncludedInPath();
-
-	/**
 	 * Sets whether this URL is an anchor pointing to the specified portlet on
 	 * the page.
 	 *
@@ -207,6 +162,8 @@ public interface LiferayPortletURL
 	 *        portlet on the page
 	 */
 	public void setAnchor(boolean anchor);
+
+	public void setControlPanelCategory(String controlPanelCategory);
 
 	/**
 	 * Sets whether the render parameters in the current request should be
@@ -282,6 +239,53 @@ public interface LiferayPortletURL
 	public void setEscapeXml(boolean escapeXml);
 
 	/**
+	 * Sets the portlet lifecycle of this URL's target portlet.
+	 *
+	 * <p>
+	 * Valid lifecycles are:
+	 * </p>
+	 *
+	 * <ul>
+	 * <li>
+	 * {@link javax.portlet.PortletRequest#ACTION_PHASE}
+	 * </li>
+	 * <li>
+	 * {@link javax.portlet.PortletRequest#RENDER_PHASE}
+	 * </li>
+	 * <li>
+	 * {@link javax.portlet.PortletRequest#RESOURCE_PHASE}
+	 * </li>
+	 * </ul>
+	 *
+	 * @param lifecycle the portlet lifecycle
+	 */
+	public void setLifecycle(String lifecycle);
+
+	/**
+	 * Sets the URL parameter to the value.
+	 *
+	 * @param name the name of the URL parameter
+	 * @param value the value of the URL parameter
+	 * @param append whether the new value should be appended to any existing
+	 *        values for the parameter. If <code>append</code> is
+	 *        <code>false</code> any existing values will be overwritten with
+	 *        the new value.
+	 */
+	public void setParameter(String name, String value, boolean append);
+
+	/**
+	 * Sets the URL parameter the values.
+	 *
+	 * @param name the name of the URL parameter
+	 * @param values the values of the URL parameter
+	 * @param append whether the new values should be appended to any existing
+	 *        values for the parameter. If <code>append</code> is
+	 *        <code>false</code> any existing values will be overwritten with
+	 *        the new values.
+	 */
+	public void setParameter(String name, String[] values, boolean append);
+
+	/**
 	 * Sets the portlet layout ID.
 	 *
 	 * @param plid the portlet layout ID
@@ -292,5 +296,14 @@ public interface LiferayPortletURL
 	 * Sets the ID of the target portlet.
 	 */
 	public void setPortletId(String portletId);
+
+	/**
+	 * Sets the referer layout ID.
+	 *
+	 * @param refererPlid the referer layout ID
+	 */
+	public void setRefererPlid(long refererPlid);
+
+	public void setRemovedParameterNames(Set<String> removedParamNames);
 
 }

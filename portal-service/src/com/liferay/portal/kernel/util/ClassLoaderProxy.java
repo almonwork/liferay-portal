@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -135,7 +135,8 @@ public class ClassLoaderProxy {
 						methods[i].getParameterTypes();
 
 					if (methods[i].getName().equals(methodName) &&
-						methodParameterTypes.length == parameterTypes.size()) {
+						(methodParameterTypes.length ==
+							parameterTypes.size())) {
 
 						boolean correctParams = true;
 
@@ -179,33 +180,37 @@ public class ClassLoaderProxy {
 	}
 
 	protected Throwable translateThrowable(
-		Throwable t1, ClassLoader contextClassLoader) {
+		Throwable throwable, ClassLoader contextClassLoader) {
 
 		try {
-			UnsyncByteArrayOutputStream ubaos =
+			UnsyncByteArrayOutputStream unsyncByteArrayOutputStream =
 				new UnsyncByteArrayOutputStream();
-			ObjectOutputStream oos = new ObjectOutputStream(ubaos);
+			ObjectOutputStream objectOutputStream = new ObjectOutputStream(
+				unsyncByteArrayOutputStream);
 
-			oos.writeObject(t1);
+			objectOutputStream.writeObject(throwable);
 
-			oos.flush();
-			oos.close();
+			objectOutputStream.flush();
+			objectOutputStream.close();
 
-			UnsyncByteArrayInputStream bais = new UnsyncByteArrayInputStream(
-				ubaos.unsafeGetByteArray(), 0, ubaos.size());
-			ObjectInputStream ois = new ClassLoaderObjectInputStream(
-				bais, contextClassLoader);
+			UnsyncByteArrayInputStream unsyncByteArrayInputStream =
+				new UnsyncByteArrayInputStream(
+					unsyncByteArrayOutputStream.unsafeGetByteArray(), 0,
+					unsyncByteArrayOutputStream.size());
+			ObjectInputStream objectInputStream =
+				new ClassLoaderObjectInputStream(
+					unsyncByteArrayInputStream, contextClassLoader);
 
-			t1 = (Throwable)ois.readObject();
+			throwable = (Throwable)objectInputStream.readObject();
 
-			ois.close();
+			objectInputStream.close();
 
-			return t1;
+			return throwable;
 		}
-		catch (Throwable t2) {
-			_log.error(t2, t2);
+		catch (Throwable throwable2) {
+			_log.error(throwable2, throwable2);
 
-			return t2;
+			return throwable2;
 		}
 	}
 
@@ -253,8 +258,8 @@ public class ClassLoaderProxy {
 
 	private static Log _log = LogFactoryUtil.getLog(ClassLoaderProxy.class);
 
-	private Object _obj;
 	private ClassLoader _classLoader;
 	private String _className;
+	private Object _obj;
 
 }

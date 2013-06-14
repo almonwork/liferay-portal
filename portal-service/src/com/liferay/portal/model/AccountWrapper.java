@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,6 +14,10 @@
 
 package com.liferay.portal.model;
 
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * <p>
  * This class is a wrapper for {@link Account}.
@@ -23,7 +27,7 @@ package com.liferay.portal.model;
  * @see       Account
  * @generated
  */
-public class AccountWrapper implements Account {
+public class AccountWrapper implements Account, ModelWrapper<Account> {
 	public AccountWrapper(Account account) {
 		_account = account;
 	}
@@ -34,6 +38,127 @@ public class AccountWrapper implements Account {
 
 	public String getModelClassName() {
 		return Account.class.getName();
+	}
+
+	public Map<String, Object> getModelAttributes() {
+		Map<String, Object> attributes = new HashMap<String, Object>();
+
+		attributes.put("accountId", getAccountId());
+		attributes.put("companyId", getCompanyId());
+		attributes.put("userId", getUserId());
+		attributes.put("userName", getUserName());
+		attributes.put("createDate", getCreateDate());
+		attributes.put("modifiedDate", getModifiedDate());
+		attributes.put("parentAccountId", getParentAccountId());
+		attributes.put("name", getName());
+		attributes.put("legalName", getLegalName());
+		attributes.put("legalId", getLegalId());
+		attributes.put("legalType", getLegalType());
+		attributes.put("sicCode", getSicCode());
+		attributes.put("tickerSymbol", getTickerSymbol());
+		attributes.put("industry", getIndustry());
+		attributes.put("type", getType());
+		attributes.put("size", getSize());
+
+		return attributes;
+	}
+
+	public void setModelAttributes(Map<String, Object> attributes) {
+		Long accountId = (Long)attributes.get("accountId");
+
+		if (accountId != null) {
+			setAccountId(accountId);
+		}
+
+		Long companyId = (Long)attributes.get("companyId");
+
+		if (companyId != null) {
+			setCompanyId(companyId);
+		}
+
+		Long userId = (Long)attributes.get("userId");
+
+		if (userId != null) {
+			setUserId(userId);
+		}
+
+		String userName = (String)attributes.get("userName");
+
+		if (userName != null) {
+			setUserName(userName);
+		}
+
+		Date createDate = (Date)attributes.get("createDate");
+
+		if (createDate != null) {
+			setCreateDate(createDate);
+		}
+
+		Date modifiedDate = (Date)attributes.get("modifiedDate");
+
+		if (modifiedDate != null) {
+			setModifiedDate(modifiedDate);
+		}
+
+		Long parentAccountId = (Long)attributes.get("parentAccountId");
+
+		if (parentAccountId != null) {
+			setParentAccountId(parentAccountId);
+		}
+
+		String name = (String)attributes.get("name");
+
+		if (name != null) {
+			setName(name);
+		}
+
+		String legalName = (String)attributes.get("legalName");
+
+		if (legalName != null) {
+			setLegalName(legalName);
+		}
+
+		String legalId = (String)attributes.get("legalId");
+
+		if (legalId != null) {
+			setLegalId(legalId);
+		}
+
+		String legalType = (String)attributes.get("legalType");
+
+		if (legalType != null) {
+			setLegalType(legalType);
+		}
+
+		String sicCode = (String)attributes.get("sicCode");
+
+		if (sicCode != null) {
+			setSicCode(sicCode);
+		}
+
+		String tickerSymbol = (String)attributes.get("tickerSymbol");
+
+		if (tickerSymbol != null) {
+			setTickerSymbol(tickerSymbol);
+		}
+
+		String industry = (String)attributes.get("industry");
+
+		if (industry != null) {
+			setIndustry(industry);
+		}
+
+		String type = (String)attributes.get("type");
+
+		if (type != null) {
+			setType(type);
+		}
+
+		String size = (String)attributes.get("size");
+
+		if (size != null) {
+			setSize(size);
+		}
 	}
 
 	/**
@@ -382,10 +507,6 @@ public class AccountWrapper implements Account {
 		return _account.isEscapedModel();
 	}
 
-	public void setEscapedModel(boolean escapedModel) {
-		_account.setEscapedModel(escapedModel);
-	}
-
 	public java.io.Serializable getPrimaryKeyObj() {
 		return _account.getPrimaryKeyObj();
 	}
@@ -439,7 +560,14 @@ public class AccountWrapper implements Account {
 		_account.persist();
 	}
 
+	/**
+	 * @deprecated Renamed to {@link #getWrappedModel}
+	 */
 	public Account getWrappedAccount() {
+		return _account;
+	}
+
+	public Account getWrappedModel() {
 		return _account;
 	}
 

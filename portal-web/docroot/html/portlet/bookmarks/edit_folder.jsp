@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -24,6 +24,8 @@ BookmarksFolder folder = (BookmarksFolder)request.getAttribute(WebKeys.BOOKMARKS
 long folderId = BeanParamUtil.getLong(folder, request, "folderId");
 
 long parentFolderId = BeanParamUtil.getLong(folder, request, "parentFolderId", BookmarksFolderConstants.DEFAULT_PARENT_FOLDER_ID);
+
+boolean mergeWithParentFolderDisabled = ParamUtil.getBoolean(request, "mergeWithParentFolderDisabled");
 %>
 
 <liferay-util:include page="/html/portlet/bookmarks/top_links.jsp" />
@@ -60,7 +62,7 @@ long parentFolderId = BeanParamUtil.getLong(folder, request, "parentFolderId", B
 
 					parentFolderName = parentFolder.getName();
 				}
-				catch (NoSuchFolderException nscce) {
+				catch (NoSuchFolderException nsfe) {
 				}
 				%>
 
@@ -71,7 +73,7 @@ long parentFolderId = BeanParamUtil.getLong(folder, request, "parentFolderId", B
 
 				<aui:a href="<%= viewFolderURL %>" id="parentFolderName"><%= parentFolderName %></aui:a>
 
-				<portlet:renderURL windowState="<%= LiferayWindowState.POP_UP.toString() %>" var="selectFolderURL">
+				<portlet:renderURL var="selectFolderURL" windowState="<%= LiferayWindowState.POP_UP.toString() %>">
 					<portlet:param name="struts_action" value="/bookmarks/select_folder" />
 					<portlet:param name="folderId" value="<%= String.valueOf(parentFolderId) %>" />
 				</portlet:renderURL>
@@ -82,9 +84,13 @@ long parentFolderId = BeanParamUtil.getLong(folder, request, "parentFolderId", B
 
 				<aui:button onClick="<%= taglibOpenFolderWindow %>" value="select" />
 
-				<aui:button name="removeFolderButton" onClick='<%= renderResponse.getNamespace() + "removeFolder();" %>' value="remove" />
+				<%
+				String taglibRemoveFolder = "Liferay.Util.removeFolderSelection('parentFolderId', 'parentFolderName', '" + renderResponse.getNamespace() + "');";
+				%>
 
-				<aui:input inlineLabel="left" label="merge-with-parent-folder" name="mergeWithParentFolder" type="checkbox" />
+				<aui:button name="removeFolderButton" onClick="<%= taglibRemoveFolder %>" value="remove" />
+
+				<aui:input disabled="<%= mergeWithParentFolderDisabled %>" label="merge-with-parent-folder" name="mergeWithParentFolder" type="checkbox" />
 			</aui:field-wrapper>
 		</c:if>
 
@@ -118,27 +124,20 @@ long parentFolderId = BeanParamUtil.getLong(folder, request, "parentFolderId", B
 </aui:form>
 
 <aui:script>
-	function <portlet:namespace />removeFolder() {
-		document.<portlet:namespace />fm.<portlet:namespace />parentFolderId.value = "<%= rootFolderId %>";
-
-		var nameEl = document.getElementById("<portlet:namespace />parentFolderName");
-
-		nameEl.href = "";
-		nameEl.innerHTML = "";
-	}
-
 	function <portlet:namespace />saveFolder() {
 		document.<portlet:namespace />fm.<portlet:namespace /><%= Constants.CMD %>.value = "<%= (folder == null) ? Constants.ADD : Constants.UPDATE %>";
 		submitForm(document.<portlet:namespace />fm);
 	}
 
 	function <portlet:namespace />selectFolder(parentFolderId, parentFolderName) {
-		document.<portlet:namespace />fm.<portlet:namespace />parentFolderId.value = parentFolderId;
+		var folderData = {
+			idString: 'parentFolderId',
+			idValue: parentFolderId,
+			nameString: 'parentFolderName',
+			nameValue: parentFolderName
+		};
 
-		var nameEl = document.getElementById("<portlet:namespace />parentFolderName");
-
-		nameEl.href = "<portlet:renderURL><portlet:param name="struts_action" value="/bookmarks/view" /></portlet:renderURL>&<portlet:namespace />folderId=" + parentFolderId;
-		nameEl.innerHTML = parentFolderName + "&nbsp;";
+		Liferay.Util.selectFolder(folderData, '<portlet:renderURL><portlet:param name="struts_action" value="/bookmarks/view" /></portlet:renderURL>', '<portlet:namespace />');
 	}
 
 	<c:if test="<%= windowState.equals(WindowState.MAXIMIZED) || windowState.equals(LiferayWindowState.POP_UP) %>">

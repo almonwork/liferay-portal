@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -32,9 +32,9 @@ import java.net.Socket;
  */
 public class WhoisWebCacheItem implements WebCacheItem {
 
-	public static String WHOIS_SERVER = "whois.geektools.com";
+	public static final String WHOIS_SERVER = "whois.geektools.com";
 
-	public static int WHOIS_SERVER_PORT = 43;
+	public static final int WHOIS_SERVER_PORT = 43;
 
 	public WhoisWebCacheItem(String domain) {
 		_domain = domain;

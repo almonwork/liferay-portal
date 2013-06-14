@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -24,7 +24,8 @@ package com.liferay.portal.service;
  * @generated
  */
 public class LayoutRevisionLocalServiceWrapper
-	implements LayoutRevisionLocalService {
+	implements LayoutRevisionLocalService,
+		ServiceWrapper<LayoutRevisionLocalService> {
 	public LayoutRevisionLocalServiceWrapper(
 		LayoutRevisionLocalService layoutRevisionLocalService) {
 		_layoutRevisionLocalService = layoutRevisionLocalService;
@@ -58,27 +59,34 @@ public class LayoutRevisionLocalServiceWrapper
 	* Deletes the layout revision with the primary key from the database. Also notifies the appropriate model listeners.
 	*
 	* @param layoutRevisionId the primary key of the layout revision
+	* @return the layout revision that was removed
 	* @throws PortalException if a layout revision with the primary key could not be found
 	* @throws SystemException if a system exception occurred
 	*/
-	public void deleteLayoutRevision(long layoutRevisionId)
+	public com.liferay.portal.model.LayoutRevision deleteLayoutRevision(
+		long layoutRevisionId)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException {
-		_layoutRevisionLocalService.deleteLayoutRevision(layoutRevisionId);
+		return _layoutRevisionLocalService.deleteLayoutRevision(layoutRevisionId);
 	}
 
 	/**
 	* Deletes the layout revision from the database. Also notifies the appropriate model listeners.
 	*
 	* @param layoutRevision the layout revision
+	* @return the layout revision that was removed
 	* @throws PortalException
 	* @throws SystemException if a system exception occurred
 	*/
-	public void deleteLayoutRevision(
+	public com.liferay.portal.model.LayoutRevision deleteLayoutRevision(
 		com.liferay.portal.model.LayoutRevision layoutRevision)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException {
-		_layoutRevisionLocalService.deleteLayoutRevision(layoutRevision);
+		return _layoutRevisionLocalService.deleteLayoutRevision(layoutRevision);
+	}
+
+	public com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery() {
+		return _layoutRevisionLocalService.dynamicQuery();
 	}
 
 	/**
@@ -150,6 +158,12 @@ public class LayoutRevisionLocalServiceWrapper
 		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery)
 		throws com.liferay.portal.kernel.exception.SystemException {
 		return _layoutRevisionLocalService.dynamicQueryCount(dynamicQuery);
+	}
+
+	public com.liferay.portal.model.LayoutRevision fetchLayoutRevision(
+		long layoutRevisionId)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return _layoutRevisionLocalService.fetchLayoutRevision(layoutRevisionId);
 	}
 
 	/**
@@ -252,7 +266,8 @@ public class LayoutRevisionLocalServiceWrapper
 	public com.liferay.portal.model.LayoutRevision addLayoutRevision(
 		long userId, long layoutSetBranchId, long layoutBranchId,
 		long parentLayoutRevisionId, boolean head, long plid,
-		boolean privateLayout, java.lang.String name, java.lang.String title,
+		long portletPreferencesPlid, boolean privateLayout,
+		java.lang.String name, java.lang.String title,
 		java.lang.String description, java.lang.String keywords,
 		java.lang.String robots, java.lang.String typeSettings,
 		boolean iconImage, long iconImageId, java.lang.String themeId,
@@ -263,9 +278,10 @@ public class LayoutRevisionLocalServiceWrapper
 			com.liferay.portal.kernel.exception.SystemException {
 		return _layoutRevisionLocalService.addLayoutRevision(userId,
 			layoutSetBranchId, layoutBranchId, parentLayoutRevisionId, head,
-			plid, privateLayout, name, title, description, keywords, robots,
-			typeSettings, iconImage, iconImageId, themeId, colorSchemeId,
-			wapThemeId, wapColorSchemeId, css, serviceContext);
+			plid, portletPreferencesPlid, privateLayout, name, title,
+			description, keywords, robots, typeSettings, iconImage,
+			iconImageId, themeId, colorSchemeId, wapThemeId, wapColorSchemeId,
+			css, serviceContext);
 	}
 
 	public void deleteLayoutLayoutRevisions(long plid)
@@ -293,6 +309,12 @@ public class LayoutRevisionLocalServiceWrapper
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException {
 		_layoutRevisionLocalService.deleteLayoutSetBranchLayoutRevisions(layoutSetBranchId);
+	}
+
+	public com.liferay.portal.model.LayoutRevision fetchLastLayoutRevision(
+		long plid, boolean head)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return _layoutRevisionLocalService.fetchLastLayoutRevision(plid, head);
 	}
 
 	public java.util.List<com.liferay.portal.model.LayoutRevision> getChildLayoutRevisions(
@@ -409,11 +431,26 @@ public class LayoutRevisionLocalServiceWrapper
 			layoutRevisionId, status, serviceContext);
 	}
 
+	/**
+	 * @deprecated Renamed to {@link #getWrappedService}
+	 */
 	public LayoutRevisionLocalService getWrappedLayoutRevisionLocalService() {
 		return _layoutRevisionLocalService;
 	}
 
+	/**
+	 * @deprecated Renamed to {@link #setWrappedService}
+	 */
 	public void setWrappedLayoutRevisionLocalService(
+		LayoutRevisionLocalService layoutRevisionLocalService) {
+		_layoutRevisionLocalService = layoutRevisionLocalService;
+	}
+
+	public LayoutRevisionLocalService getWrappedService() {
+		return _layoutRevisionLocalService;
+	}
+
+	public void setWrappedService(
 		LayoutRevisionLocalService layoutRevisionLocalService) {
 		_layoutRevisionLocalService = layoutRevisionLocalService;
 	}

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -35,7 +35,8 @@ import com.liferay.portal.kernel.transaction.Transactional;
  */
 @Transactional(isolation = Isolation.PORTAL, rollbackFor =  {
 	PortalException.class, SystemException.class})
-public interface UserLocalService extends PersistedModelLocalService {
+public interface UserLocalService extends BaseLocalService,
+	PersistedModelLocalService {
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
@@ -65,10 +66,11 @@ public interface UserLocalService extends PersistedModelLocalService {
 	* Deletes the user with the primary key from the database. Also notifies the appropriate model listeners.
 	*
 	* @param userId the primary key of the user
+	* @return the user that was removed
 	* @throws PortalException if a user with the primary key could not be found
 	* @throws SystemException if a system exception occurred
 	*/
-	public void deleteUser(long userId)
+	public com.liferay.portal.model.User deleteUser(long userId)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException;
 
@@ -76,12 +78,16 @@ public interface UserLocalService extends PersistedModelLocalService {
 	* Deletes the user from the database. Also notifies the appropriate model listeners.
 	*
 	* @param user the user
+	* @return the user that was removed
 	* @throws PortalException
 	* @throws SystemException if a system exception occurred
 	*/
-	public void deleteUser(com.liferay.portal.model.User user)
+	public com.liferay.portal.model.User deleteUser(
+		com.liferay.portal.model.User user)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException;
+
+	public com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery();
 
 	/**
 	* Performs a dynamic query on the database and returns the matching rows.
@@ -143,6 +149,10 @@ public interface UserLocalService extends PersistedModelLocalService {
 	*/
 	public long dynamicQueryCount(
 		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery)
+		throws com.liferay.portal.kernel.exception.SystemException;
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public com.liferay.portal.model.User fetchUser(long userId)
 		throws com.liferay.portal.kernel.exception.SystemException;
 
 	/**
@@ -226,6 +236,27 @@ public interface UserLocalService extends PersistedModelLocalService {
 	* @param beanIdentifier the Spring bean ID for this bean
 	*/
 	public void setBeanIdentifier(java.lang.String beanIdentifier);
+
+	/**
+	* Adds a default admin user for the company.
+	*
+	* @param companyId the primary key of the user's company
+	* @param screenName the user's screen name
+	* @param emailAddress the user's email address
+	* @param locale the user's locale
+	* @param firstName the user's first name
+	* @param middleName the user's middle name
+	* @param lastName the user's last name
+	* @return the new default admin user
+	* @throws PortalException n if a portal exception occurred
+	* @throws SystemException if a system exception occurred
+	*/
+	public com.liferay.portal.model.User addDefaultAdminUser(long companyId,
+		java.lang.String screenName, java.lang.String emailAddress,
+		java.util.Locale locale, java.lang.String firstName,
+		java.lang.String middleName, java.lang.String lastName)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException;
 
 	/**
 	* Adds the user to the default groups, unless the user is already in these
@@ -373,9 +404,9 @@ public interface UserLocalService extends PersistedModelLocalService {
 	* @param sendEmail whether to send the user an email notification about
 	their new account
 	* @param serviceContext the user's service context (optionally
-	<code>null</code>). Can specify the user's universally unique
-	identifier (with the <code>uuid</code> attribute), asset category
-	IDs, asset tag names, and expando bridge attributes.
+	<code>null</code>). Can set the universally unique identifier
+	(with the <code>uuid</code> attribute), asset category IDs, asset
+	tag names, and expando bridge attributes for the user.
 	* @return the new user
 	* @throws PortalException if the user's information was invalid
 	* @throws SystemException if a system exception occurred
@@ -448,9 +479,9 @@ public interface UserLocalService extends PersistedModelLocalService {
 	* @param sendEmail whether to send the user an email notification about
 	their new account
 	* @param serviceContext the user's service context (optionally
-	<code>null</code>). Can specify the user's universally unique
-	identifier (with the <code>uuid</code> attribute), asset category
-	IDs, asset tag names, and expando bridge attributes.
+	<code>null</code>). Can set the universally unique identifier
+	(with the <code>uuid</code> attribute), asset category IDs, asset
+	tag names, and expando bridge attributes for the user.
 	* @return the new user
 	* @throws PortalException if the user's information was invalid
 	* @throws SystemException if a system exception occurred
@@ -641,6 +672,7 @@ public interface UserLocalService extends PersistedModelLocalService {
 	* the AuthPipeline.
 	*
 	* @param userId the primary key of the user
+	* @param encPassword the encrypted password
 	* @return <code>true</code> if authentication is successful;
 	<code>false</code> otherwise
 	*/
@@ -746,10 +778,10 @@ public interface UserLocalService extends PersistedModelLocalService {
 	* the confirmation email.
 	*
 	* @param user the user
-	* @param serviceContext the user's service context. Can specify whether a
+	* @param serviceContext the user's service context. Can set whether a
 	password should be generated (with the <code>autoPassword</code>
 	attribute) and whether the confirmation email should be sent
-	(with the <code>sendEmail</code> attribute).
+	(with the <code>sendEmail</code> attribute) for the user.
 	* @throws PortalException if a portal exception occurred
 	* @throws SystemException if a system exception occurred
 	*/
@@ -779,6 +811,7 @@ public interface UserLocalService extends PersistedModelLocalService {
 	/**
 	* Deletes the user's portrait image.
 	*
+	* @param userId the primary key of the user
 	* @throws PortalException if a user with the primary key could not be found
 	or if the user's portrait could not be found
 	* @throws SystemException if a system exception occurred
@@ -800,6 +833,14 @@ public interface UserLocalService extends PersistedModelLocalService {
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException;
 
+	/**
+	* Removes the user from the user group.
+	*
+	* @param userGroupId the primary key of the user group
+	* @param userId the primary key of the user
+	* @throws PortalException if a portal exception occurred
+	* @throws SystemException if a system exception occurred
+	*/
 	public void deleteUserGroupUser(long userGroupId, long userId)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException;
@@ -818,12 +859,25 @@ public interface UserLocalService extends PersistedModelLocalService {
 			com.liferay.portal.kernel.exception.SystemException;
 
 	/**
+	* Returns the user with the primary key.
+	*
+	* @param userId the primary key of the user
+	* @return the user with the primary key, or <code>null</code> if a user
+	with the primary key could not be found
+	* @throws SystemException if a system exception occurred
+	*/
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public com.liferay.portal.model.User fetchUserById(long userId)
+		throws com.liferay.portal.kernel.exception.SystemException;
+
+	/**
 	* Returns the user with the screen name.
 	*
 	* @param companyId the primary key of the user's company
 	* @param screenName the user's screen name
 	* @return the user with the screen name, or <code>null</code> if a user
 	with the screen name could not be found
+	* @throws SystemException if a system exception occurred
 	*/
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public com.liferay.portal.model.User fetchUserByScreenName(long companyId,
@@ -1164,7 +1218,7 @@ public interface UserLocalService extends PersistedModelLocalService {
 
 	/**
 	* Returns an ordered range of all the users with a mutual social relation
-	* of the type with the user.
+	* of the type with both of the given users.
 	*
 	* <p>
 	* Useful when paginating results. Returns a maximum of <code>end -
@@ -1176,6 +1230,8 @@ public interface UserLocalService extends PersistedModelLocalService {
 	* result set.
 	* </p>
 	*
+	* @param userId1 the primary key of the first user
+	* @param userId2 the primary key of the second user
 	* @param type the type of social relation. The possible types can be found
 	in {@link
 	com.liferay.portlet.social.model.SocialRelationConstants}.
@@ -1197,7 +1253,7 @@ public interface UserLocalService extends PersistedModelLocalService {
 
 	/**
 	* Returns an ordered range of all the users with a mutual social relation
-	* with the user.
+	* with both of the given users.
 	*
 	* <p>
 	* Useful when paginating results. Returns a maximum of <code>end -
@@ -1209,6 +1265,8 @@ public interface UserLocalService extends PersistedModelLocalService {
 	* result set.
 	* </p>
 	*
+	* @param userId1 the primary key of the first user
+	* @param userId2 the primary key of the second user
 	* @param start the lower bound of the range of users
 	* @param end the upper bound of the range of users (not inclusive)
 	* @param obc the comparator to order the users by (optionally
@@ -1257,8 +1315,11 @@ public interface UserLocalService extends PersistedModelLocalService {
 			com.liferay.portal.kernel.exception.SystemException;
 
 	/**
-	* Returns the number of users with a mutual social relation with the user.
+	* Returns the number of users with a mutual social relation with both of
+	* the given users.
 	*
+	* @param userId1 the primary key of the first user
+	* @param userId2 the primary key of the second user
 	* @return the number of users with a mutual social relation with the user
 	* @throws PortalException if a user with the primary key could not be found
 	* @throws SystemException if a system exception occurred
@@ -1270,8 +1331,10 @@ public interface UserLocalService extends PersistedModelLocalService {
 
 	/**
 	* Returns the number of users with a mutual social relation of the type
-	* with the user.
+	* with both of the given users.
 	*
+	* @param userId1 the primary key of the first user
+	* @param userId2 the primary key of the second user
 	* @param type the type of social relation. The possible types can be found
 	in {@link
 	com.liferay.portlet.social.model.SocialRelationConstants}.
@@ -1392,6 +1455,7 @@ public interface UserLocalService extends PersistedModelLocalService {
 	* @param screenName the user's screen name
 	* @return the user with the screen name
 	* @throws PortalException if a user with the screen name could not be found
+	* @throws SystemException if a system exception occurred
 	*/
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public com.liferay.portal.model.User getUserByScreenName(long companyId,
@@ -1404,12 +1468,29 @@ public interface UserLocalService extends PersistedModelLocalService {
 	*
 	* @param uuid the user's universally unique identifier
 	* @return the user with the universally unique identifier
+	* @throws PortalException if a user with the universally unique
+	identifier could not be found
+	* @throws SystemException if a system exception occurred
+	* @deprecated {@link #getUserByUuidAndCompanyId(String, long)}
+	*/
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public com.liferay.portal.model.User getUserByUuid(java.lang.String uuid)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException;
+
+	/**
+	* Returns the user with the universally unique identifier.
+	*
+	* @param uuid the user's universally unique identifier
+	* @param companyId the primary key of the user's company
+	* @return the user with the universally unique identifier
 	* @throws PortalException if a user with the universally unique identifier
 	could not be found
 	* @throws SystemException if a system exception occurred
 	*/
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public com.liferay.portal.model.User getUserByUuid(java.lang.String uuid)
+	public com.liferay.portal.model.User getUserByUuidAndCompanyId(
+		java.lang.String uuid, long companyId)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException;
 
@@ -1499,6 +1580,7 @@ public interface UserLocalService extends PersistedModelLocalService {
 	* Returns <code>true</code> if the user is a member of the organization.
 	*
 	* @param organizationId the primary key of the organization
+	* @param userId the primary key of the user
 	* @return <code>true</code> if the user is a member of the organization;
 	<code>false</code> otherwise
 	* @throws SystemException if a system exception occurred
@@ -1612,56 +1694,15 @@ public interface UserLocalService extends PersistedModelLocalService {
 			com.liferay.portal.kernel.exception.SystemException;
 
 	/**
-	* Updates a user account that was automatically created when a guest user
-	* participated in an action (e.g. posting a comment) and only provided his
-	* name and email address.
+	* Returns the default user for the company.
 	*
-	* @param creatorUserId the primary key of the creator
-	* @param companyId the primary key of the user's company
-	* @param autoPassword whether a password should be automatically generated
-	for the user
-	* @param password1 the user's password
-	* @param password2 the user's password confirmation
-	* @param autoScreenName whether a screen name should be automatically
-	generated for the user
-	* @param screenName the user's screen name
-	* @param emailAddress the user's email address
-	* @param facebookId the user's facebook ID
-	* @param openId the user's OpenID
-	* @param locale the user's locale
-	* @param firstName the user's first name
-	* @param middleName the user's middle name
-	* @param lastName the user's last name
-	* @param prefixId the user's name prefix ID
-	* @param suffixId the user's name suffix ID
-	* @param male whether the user is male
-	* @param birthdayMonth the user's birthday month (0-based, meaning 0 for
-	January)
-	* @param birthdayDay the user's birthday day
-	* @param birthdayYear the user's birthday year
-	* @param jobTitle the user's job title
-	* @param updateUserInformation whether to update the user's information
-	* @param sendEmail whether to send the user an email notification about
-	their new account
-	* @param serviceContext the user's service context (optionally
-	<code>null</code>). Can specify the user's expando bridge
-	attributes.
-	* @return the user
-	* @throws PortalException if the user's information was invalid
+	* @param companyId the primary key of the company
+	* @return the default user for the company
+	* @throws PortalException if the user could not be found
 	* @throws SystemException if a system exception occurred
 	*/
-	public com.liferay.portal.model.User updateIncompleteUser(
-		long creatorUserId, long companyId, boolean autoPassword,
-		java.lang.String password1, java.lang.String password2,
-		boolean autoScreenName, java.lang.String screenName,
-		java.lang.String emailAddress, long facebookId,
-		java.lang.String openId, java.util.Locale locale,
-		java.lang.String firstName, java.lang.String middleName,
-		java.lang.String lastName, int prefixId, int suffixId, boolean male,
-		int birthdayMonth, int birthdayDay, int birthdayYear,
-		java.lang.String jobTitle, boolean updateUserInformation,
-		boolean sendEmail,
-		com.liferay.portal.service.ServiceContext serviceContext)
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public com.liferay.portal.model.User loadGetDefaultUser(long companyId)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException;
 
@@ -1891,6 +1932,17 @@ public interface UserLocalService extends PersistedModelLocalService {
 		boolean andSearch)
 		throws com.liferay.portal.kernel.exception.SystemException;
 
+	/**
+	* Sends an email address verification to the user.
+	*
+	* @param user the verification email recipient
+	* @param emailAddress the recipient's email address
+	* @param serviceContext the service context. Must set the portal URL, main
+	path, primary key of the layout, remote address, remote host, and
+	agent for the user.
+	* @throws PortalException if a portal exception occurred
+	* @throws SystemException if a system exception occurred
+	*/
 	public void sendEmailAddressVerification(
 		com.liferay.portal.model.User user, java.lang.String emailAddress,
 		com.liferay.portal.service.ServiceContext serviceContext)
@@ -1954,10 +2006,12 @@ public interface UserLocalService extends PersistedModelLocalService {
 	*
 	* @param groupId the primary key of the group
 	* @param userIds the primary keys of the users
+	* @param serviceContext the service context (optionally <code>null</code>)
 	* @throws PortalException if a portal exception occurred
 	* @throws SystemException if a system exception occurred
 	*/
-	public void unsetGroupUsers(long groupId, long[] userIds)
+	public void unsetGroupUsers(long groupId, long[] userIds,
+		com.liferay.portal.service.ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException;
 
@@ -2095,6 +2149,27 @@ public interface UserLocalService extends PersistedModelLocalService {
 			com.liferay.portal.kernel.exception.SystemException;
 
 	/**
+	* Updates the user's email address or sends verification email.
+	*
+	* @param userId the primary key of the user
+	* @param password the user's password
+	* @param emailAddress1 the user's new email address
+	* @param emailAddress2 the user's new email address confirmation
+	* @param serviceContext the service context. Must set the portal URL, main
+	path, primary key of the layout, remote address, remote host, and
+	agent for the user.
+	* @return the user
+	* @throws PortalException if a user with the primary key could not be found
+	* @throws SystemException if a system exception occurred
+	*/
+	public com.liferay.portal.model.User updateEmailAddress(long userId,
+		java.lang.String password, java.lang.String emailAddress1,
+		java.lang.String emailAddress2,
+		com.liferay.portal.service.ServiceContext serviceContext)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException;
+
+	/**
 	* Updates whether the user has verified email address.
 	*
 	* @param userId the primary key of the user
@@ -2127,18 +2202,78 @@ public interface UserLocalService extends PersistedModelLocalService {
 	*
 	* @param userId the primary key of the user
 	* @param newGroupIds the primary keys of the groups
+	* @param serviceContext the service context (optionally <code>null</code>)
 	* @throws PortalException if a portal exception occurred
 	* @throws SystemException if a system exception occurred
 	*/
-	public void updateGroups(long userId, long[] newGroupIds)
+	public void updateGroups(long userId, long[] newGroupIds,
+		com.liferay.portal.service.ServiceContext serviceContext)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException;
+
+	/**
+	* Updates a user account that was automatically created when a guest user
+	* participated in an action (e.g. posting a comment) and only provided his
+	* name and email address.
+	*
+	* @param creatorUserId the primary key of the creator
+	* @param companyId the primary key of the user's company
+	* @param autoPassword whether a password should be automatically generated
+	for the user
+	* @param password1 the user's password
+	* @param password2 the user's password confirmation
+	* @param autoScreenName whether a screen name should be automatically
+	generated for the user
+	* @param screenName the user's screen name
+	* @param emailAddress the user's email address
+	* @param facebookId the user's facebook ID
+	* @param openId the user's OpenID
+	* @param locale the user's locale
+	* @param firstName the user's first name
+	* @param middleName the user's middle name
+	* @param lastName the user's last name
+	* @param prefixId the user's name prefix ID
+	* @param suffixId the user's name suffix ID
+	* @param male whether the user is male
+	* @param birthdayMonth the user's birthday month (0-based, meaning 0 for
+	January)
+	* @param birthdayDay the user's birthday day
+	* @param birthdayYear the user's birthday year
+	* @param jobTitle the user's job title
+	* @param updateUserInformation whether to update the user's information
+	* @param sendEmail whether to send the user an email notification about
+	their new account
+	* @param serviceContext the user's service context (optionally
+	<code>null</code>). Can set expando bridge attributes for the
+	user.
+	* @return the user
+	* @throws PortalException if the user's information was invalid
+	* @throws SystemException if a system exception occurred
+	*/
+	public com.liferay.portal.model.User updateIncompleteUser(
+		long creatorUserId, long companyId, boolean autoPassword,
+		java.lang.String password1, java.lang.String password2,
+		boolean autoScreenName, java.lang.String screenName,
+		java.lang.String emailAddress, long facebookId,
+		java.lang.String openId, java.util.Locale locale,
+		java.lang.String firstName, java.lang.String middleName,
+		java.lang.String lastName, int prefixId, int suffixId, boolean male,
+		int birthdayMonth, int birthdayDay, int birthdayYear,
+		java.lang.String jobTitle, boolean updateUserInformation,
+		boolean sendEmail,
+		com.liferay.portal.service.ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException;
 
 	/**
 	* Updates the user's job title.
 	*
+	* @param userId the primary key of the user
 	* @param jobTitle the user's job title
 	* @return the user
+	* @throws PortalException if a user with the primary key could not be found
+	or if a contact could not be found matching the user's contact ID
+	* @throws SystemException if a system exception occurred
 	*/
 	public com.liferay.portal.model.User updateJobTitle(long userId,
 		java.lang.String jobTitle)
@@ -2252,9 +2387,13 @@ public interface UserLocalService extends PersistedModelLocalService {
 	*
 	* @param userId the primary key of the user
 	* @param newOrganizationIds the primary keys of the organizations
+	* @param serviceContext the service context. Must set whether user
+	indexing is enabled.
 	* @throws PortalException if a user with the primary key could not be found
+	* @throws SystemException if a system exception occurred
 	*/
-	public void updateOrganizations(long userId, long[] newOrganizationIds)
+	public void updateOrganizations(long userId, long[] newOrganizationIds,
+		com.liferay.portal.service.ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException;
 
@@ -2323,7 +2462,7 @@ public interface UserLocalService extends PersistedModelLocalService {
 	*
 	* @param userId the primary key of the user
 	* @param passwordReset whether the user should be asked to reset their
-	password the next time they login.
+	password the next time they login
 	* @return the user
 	* @throws PortalException if a user with the primary key could not be found
 	* @throws SystemException if a system exception occurred
@@ -2440,10 +2579,9 @@ public interface UserLocalService extends PersistedModelLocalService {
 	* @param userGroupRoles the user user's group roles
 	* @param userGroupIds the primary keys of the user's user groups
 	* @param serviceContext the user's service context (optionally
-	<code>null</code>). Can specify the user's universally unique
-	identifier (with the <code>uuid</code> attribute), replacement
-	asset category IDs, replacement asset tag names, and new expando
-	bridge attributes.
+	<code>null</code>). Can set the universally unique identifier
+	(with the <code>uuid</code> attribute), asset category IDs, asset
+	tag names, and expando bridge attributes for the user.
 	* @return the user
 	* @throws PortalException if a user with the primary key could not be found
 	or if the new information was invalid
@@ -2473,6 +2611,15 @@ public interface UserLocalService extends PersistedModelLocalService {
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException;
 
+	/**
+	* Verifies the email address of the ticket.
+	*
+	* @param ticketKey the ticket key
+	* @throws PortalException if a ticket matching the ticket key could not be
+	found, if the ticket has expired, if the ticket is an email
+	address ticket, or if the email address is invalid
+	* @throws SystemException if a system exception occurred
+	*/
 	public void verifyEmailAddress(java.lang.String ticketKey)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException;

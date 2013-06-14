@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -19,6 +19,7 @@ import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.transaction.Isolation;
 import com.liferay.portal.kernel.transaction.Propagation;
 import com.liferay.portal.kernel.transaction.Transactional;
+import com.liferay.portal.service.BaseLocalService;
 import com.liferay.portal.service.PersistedModelLocalService;
 
 /**
@@ -36,7 +37,8 @@ import com.liferay.portal.service.PersistedModelLocalService;
  */
 @Transactional(isolation = Isolation.PORTAL, rollbackFor =  {
 	PortalException.class, SystemException.class})
-public interface PollsChoiceLocalService extends PersistedModelLocalService {
+public interface PollsChoiceLocalService extends BaseLocalService,
+	PersistedModelLocalService {
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
@@ -67,10 +69,12 @@ public interface PollsChoiceLocalService extends PersistedModelLocalService {
 	* Deletes the polls choice with the primary key from the database. Also notifies the appropriate model listeners.
 	*
 	* @param choiceId the primary key of the polls choice
+	* @return the polls choice that was removed
 	* @throws PortalException if a polls choice with the primary key could not be found
 	* @throws SystemException if a system exception occurred
 	*/
-	public void deletePollsChoice(long choiceId)
+	public com.liferay.portlet.polls.model.PollsChoice deletePollsChoice(
+		long choiceId)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException;
 
@@ -78,11 +82,14 @@ public interface PollsChoiceLocalService extends PersistedModelLocalService {
 	* Deletes the polls choice from the database. Also notifies the appropriate model listeners.
 	*
 	* @param pollsChoice the polls choice
+	* @return the polls choice that was removed
 	* @throws SystemException if a system exception occurred
 	*/
-	public void deletePollsChoice(
+	public com.liferay.portlet.polls.model.PollsChoice deletePollsChoice(
 		com.liferay.portlet.polls.model.PollsChoice pollsChoice)
 		throws com.liferay.portal.kernel.exception.SystemException;
+
+	public com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery();
 
 	/**
 	* Performs a dynamic query on the database and returns the matching rows.
@@ -144,6 +151,11 @@ public interface PollsChoiceLocalService extends PersistedModelLocalService {
 	*/
 	public long dynamicQueryCount(
 		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery)
+		throws com.liferay.portal.kernel.exception.SystemException;
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public com.liferay.portlet.polls.model.PollsChoice fetchPollsChoice(
+		long choiceId)
 		throws com.liferay.portal.kernel.exception.SystemException;
 
 	/**

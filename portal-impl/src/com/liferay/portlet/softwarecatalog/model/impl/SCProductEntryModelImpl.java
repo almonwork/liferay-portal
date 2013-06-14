@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -19,6 +19,7 @@ import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.json.JSON;
 import com.liferay.portal.kernel.util.DateUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.ProxyUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.model.CacheModel;
@@ -34,13 +35,13 @@ import com.liferay.portlet.softwarecatalog.model.SCProductEntrySoap;
 
 import java.io.Serializable;
 
-import java.lang.reflect.Proxy;
-
 import java.sql.Types;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * The base model implementation for the SCProductEntry service. Represents a row in the &quot;SCProductEntry&quot; database table, with each column mapped to a property of this class.
@@ -95,6 +96,14 @@ public class SCProductEntryModelImpl extends BaseModelImpl<SCProductEntry>
 	public static final boolean FINDER_CACHE_ENABLED = GetterUtil.getBoolean(com.liferay.portal.util.PropsUtil.get(
 				"value.object.finder.cache.enabled.com.liferay.portlet.softwarecatalog.model.SCProductEntry"),
 			true);
+	public static final boolean COLUMN_BITMASK_ENABLED = GetterUtil.getBoolean(com.liferay.portal.util.PropsUtil.get(
+				"value.object.column.bitmask.enabled.com.liferay.portlet.softwarecatalog.model.SCProductEntry"),
+			true);
+	public static long COMPANYID_COLUMN_BITMASK = 1L;
+	public static long GROUPID_COLUMN_BITMASK = 2L;
+	public static long REPOARTIFACTID_COLUMN_BITMASK = 4L;
+	public static long REPOGROUPID_COLUMN_BITMASK = 8L;
+	public static long USERID_COLUMN_BITMASK = 16L;
 
 	/**
 	 * Converts the soap model instance into a normal model instance.
@@ -141,17 +150,18 @@ public class SCProductEntryModelImpl extends BaseModelImpl<SCProductEntry>
 		return models;
 	}
 
-	public Class<?> getModelClass() {
-		return SCProductEntry.class;
-	}
-
-	public String getModelClassName() {
-		return SCProductEntry.class.getName();
-	}
-
-	public static final String MAPPING_TABLE_SCLICENSES_SCPRODUCTENTRIES_NAME = com.liferay.portlet.softwarecatalog.model.impl.SCLicenseModelImpl.MAPPING_TABLE_SCLICENSES_SCPRODUCTENTRIES_NAME;
+	public static final String MAPPING_TABLE_SCLICENSES_SCPRODUCTENTRIES_NAME = "SCLicenses_SCProductEntries";
+	public static final Object[][] MAPPING_TABLE_SCLICENSES_SCPRODUCTENTRIES_COLUMNS =
+		{
+			{ "licenseId", Types.BIGINT },
+			{ "productEntryId", Types.BIGINT }
+		};
+	public static final String MAPPING_TABLE_SCLICENSES_SCPRODUCTENTRIES_SQL_CREATE =
+		"create table SCLicenses_SCProductEntries (licenseId LONG not null,productEntryId LONG not null,primary key (licenseId, productEntryId))";
 	public static final boolean FINDER_CACHE_ENABLED_SCLICENSES_SCPRODUCTENTRIES =
-		com.liferay.portlet.softwarecatalog.model.impl.SCLicenseModelImpl.FINDER_CACHE_ENABLED_SCLICENSES_SCPRODUCTENTRIES;
+		GetterUtil.getBoolean(com.liferay.portal.util.PropsUtil.get(
+				"value.object.finder.cache.enabled.SCLicenses_SCProductEntries"),
+			true);
 	public static final long LOCK_EXPIRATION_TIME = GetterUtil.getLong(com.liferay.portal.util.PropsUtil.get(
 				"lock.expiration.time.com.liferay.portlet.softwarecatalog.model.SCProductEntry"));
 
@@ -174,6 +184,137 @@ public class SCProductEntryModelImpl extends BaseModelImpl<SCProductEntry>
 		setPrimaryKey(((Long)primaryKeyObj).longValue());
 	}
 
+	public Class<?> getModelClass() {
+		return SCProductEntry.class;
+	}
+
+	public String getModelClassName() {
+		return SCProductEntry.class.getName();
+	}
+
+	@Override
+	public Map<String, Object> getModelAttributes() {
+		Map<String, Object> attributes = new HashMap<String, Object>();
+
+		attributes.put("productEntryId", getProductEntryId());
+		attributes.put("groupId", getGroupId());
+		attributes.put("companyId", getCompanyId());
+		attributes.put("userId", getUserId());
+		attributes.put("userName", getUserName());
+		attributes.put("createDate", getCreateDate());
+		attributes.put("modifiedDate", getModifiedDate());
+		attributes.put("name", getName());
+		attributes.put("type", getType());
+		attributes.put("tags", getTags());
+		attributes.put("shortDescription", getShortDescription());
+		attributes.put("longDescription", getLongDescription());
+		attributes.put("pageURL", getPageURL());
+		attributes.put("author", getAuthor());
+		attributes.put("repoGroupId", getRepoGroupId());
+		attributes.put("repoArtifactId", getRepoArtifactId());
+
+		return attributes;
+	}
+
+	@Override
+	public void setModelAttributes(Map<String, Object> attributes) {
+		Long productEntryId = (Long)attributes.get("productEntryId");
+
+		if (productEntryId != null) {
+			setProductEntryId(productEntryId);
+		}
+
+		Long groupId = (Long)attributes.get("groupId");
+
+		if (groupId != null) {
+			setGroupId(groupId);
+		}
+
+		Long companyId = (Long)attributes.get("companyId");
+
+		if (companyId != null) {
+			setCompanyId(companyId);
+		}
+
+		Long userId = (Long)attributes.get("userId");
+
+		if (userId != null) {
+			setUserId(userId);
+		}
+
+		String userName = (String)attributes.get("userName");
+
+		if (userName != null) {
+			setUserName(userName);
+		}
+
+		Date createDate = (Date)attributes.get("createDate");
+
+		if (createDate != null) {
+			setCreateDate(createDate);
+		}
+
+		Date modifiedDate = (Date)attributes.get("modifiedDate");
+
+		if (modifiedDate != null) {
+			setModifiedDate(modifiedDate);
+		}
+
+		String name = (String)attributes.get("name");
+
+		if (name != null) {
+			setName(name);
+		}
+
+		String type = (String)attributes.get("type");
+
+		if (type != null) {
+			setType(type);
+		}
+
+		String tags = (String)attributes.get("tags");
+
+		if (tags != null) {
+			setTags(tags);
+		}
+
+		String shortDescription = (String)attributes.get("shortDescription");
+
+		if (shortDescription != null) {
+			setShortDescription(shortDescription);
+		}
+
+		String longDescription = (String)attributes.get("longDescription");
+
+		if (longDescription != null) {
+			setLongDescription(longDescription);
+		}
+
+		String pageURL = (String)attributes.get("pageURL");
+
+		if (pageURL != null) {
+			setPageURL(pageURL);
+		}
+
+		String author = (String)attributes.get("author");
+
+		if (author != null) {
+			setAuthor(author);
+		}
+
+		String repoGroupId = (String)attributes.get("repoGroupId");
+
+		if (repoGroupId != null) {
+			setRepoGroupId(repoGroupId);
+		}
+
+		String repoArtifactId = (String)attributes.get("repoArtifactId");
+
+		if (repoArtifactId != null) {
+			setRepoArtifactId(repoArtifactId);
+		}
+	}
+
 	@JSON
 	public long getProductEntryId() {
 		return _productEntryId;
@@ -189,7 +330,19 @@ public class SCProductEntryModelImpl extends BaseModelImpl<SCProductEntry>
 	}
 
 	public void setGroupId(long groupId) {
+		_columnBitmask |= GROUPID_COLUMN_BITMASK;
+
+		if (!_setOriginalGroupId) {
+			_setOriginalGroupId = true;
+
+			_originalGroupId = _groupId;
+		}
+
 		_groupId = groupId;
+	}
+
+	public long getOriginalGroupId() {
+		return _originalGroupId;
 	}
 
 	@JSON
@@ -198,7 +351,19 @@ public class SCProductEntryModelImpl extends BaseModelImpl<SCProductEntry>
 	}
 
 	public void setCompanyId(long companyId) {
+		_columnBitmask |= COMPANYID_COLUMN_BITMASK;
+
+		if (!_setOriginalCompanyId) {
+			_setOriginalCompanyId = true;
+
+			_originalCompanyId = _companyId;
+		}
+
 		_companyId = companyId;
+	}
+
+	public long getOriginalCompanyId() {
+		return _originalCompanyId;
 	}
 
 	@JSON
@@ -207,6 +372,14 @@ public class SCProductEntryModelImpl extends BaseModelImpl<SCProductEntry>
 	}
 
 	public void setUserId(long userId) {
+		_columnBitmask |= USERID_COLUMN_BITMASK;
+
+		if (!_setOriginalUserId) {
+			_setOriginalUserId = true;
+
+			_originalUserId = _userId;
+		}
+
 		_userId = userId;
 	}
 
@@ -216,6 +389,10 @@ public class SCProductEntryModelImpl extends BaseModelImpl<SCProductEntry>
 
 	public void setUserUuid(String userUuid) {
 		_userUuid = userUuid;
+	}
+
+	public long getOriginalUserId() {
+		return _originalUserId;
 	}
 
 	@JSON
@@ -247,6 +424,8 @@ public class SCProductEntryModelImpl extends BaseModelImpl<SCProductEntry>
 	}
 
 	public void setModifiedDate(Date modifiedDate) {
+		_columnBitmask = -1L;
+
 		_modifiedDate = modifiedDate;
 	}
 
@@ -261,6 +440,8 @@ public class SCProductEntryModelImpl extends BaseModelImpl<SCProductEntry>
 	}
 
 	public void setName(String name) {
+		_columnBitmask = -1L;
+
 		_name = name;
 	}
 
@@ -359,6 +540,8 @@ public class SCProductEntryModelImpl extends BaseModelImpl<SCProductEntry>
 	}
 
 	public void setRepoGroupId(String repoGroupId) {
+		_columnBitmask |= REPOGROUPID_COLUMN_BITMASK;
+
 		if (_originalRepoGroupId == null) {
 			_originalRepoGroupId = _repoGroupId;
 		}
@@ -381,6 +564,8 @@ public class SCProductEntryModelImpl extends BaseModelImpl<SCProductEntry>
 	}
 
 	public void setRepoArtifactId(String repoArtifactId) {
+		_columnBitmask |= REPOARTIFACTID_COLUMN_BITMASK;
+
 		if (_originalRepoArtifactId == null) {
 			_originalRepoArtifactId = _repoArtifactId;
 		}
@@ -392,35 +577,32 @@ public class SCProductEntryModelImpl extends BaseModelImpl<SCProductEntry>
 		return GetterUtil.getString(_originalRepoArtifactId);
 	}
 
+	public long getColumnBitmask() {
+		return _columnBitmask;
+	}
+
 	@Override
 	public SCProductEntry toEscapedModel() {
-		if (isEscapedModel()) {
-			return (SCProductEntry)this;
+		if (_escapedModelProxy == null) {
+			_escapedModelProxy = (SCProductEntry)ProxyUtil.newProxyInstance(_classLoader,
+					_escapedModelProxyInterfaces,
+					new AutoEscapeBeanHandler(this));
 		}
-		else {
-			if (_escapedModelProxy == null) {
-				_escapedModelProxy = (SCProductEntry)Proxy.newProxyInstance(_classLoader,
-						_escapedModelProxyInterfaces,
-						new AutoEscapeBeanHandler(this));
-			}
 
-			return _escapedModelProxy;
-		}
+		return _escapedModelProxy;
 	}
 
 	@Override
 	public ExpandoBridge getExpandoBridge() {
-		if (_expandoBridge == null) {
-			_expandoBridge = ExpandoBridgeFactoryUtil.getExpandoBridge(getCompanyId(),
-					SCProductEntry.class.getName(), getPrimaryKey());
-		}
-
-		return _expandoBridge;
+		return ExpandoBridgeFactoryUtil.getExpandoBridge(getCompanyId(),
+			SCProductEntry.class.getName(), getPrimaryKey());
 	}
 
 	@Override
 	public void setExpandoBridgeAttributes(ServiceContext serviceContext) {
-		getExpandoBridge().setAttributes(serviceContext);
+		ExpandoBridge expandoBridge = getExpandoBridge();
+
+		expandoBridge.setAttributes(serviceContext);
 	}
 
 	@Override
@@ -506,9 +688,23 @@ public class SCProductEntryModelImpl extends BaseModelImpl<SCProductEntry>
 	public void resetOriginalValues() {
 		SCProductEntryModelImpl scProductEntryModelImpl = this;
 
+		scProductEntryModelImpl._originalGroupId = scProductEntryModelImpl._groupId;
+
+		scProductEntryModelImpl._setOriginalGroupId = false;
+
+		scProductEntryModelImpl._originalCompanyId = scProductEntryModelImpl._companyId;
+
+		scProductEntryModelImpl._setOriginalCompanyId = false;
+
+		scProductEntryModelImpl._originalUserId = scProductEntryModelImpl._userId;
+
+		scProductEntryModelImpl._setOriginalUserId = false;
+
 		scProductEntryModelImpl._originalRepoGroupId = scProductEntryModelImpl._repoGroupId;
 
 		scProductEntryModelImpl._originalRepoArtifactId = scProductEntryModelImpl._repoArtifactId;
+
+		scProductEntryModelImpl._columnBitmask = 0;
 	}
 
 	@Override
@@ -748,9 +944,15 @@ public class SCProductEntryModelImpl extends BaseModelImpl<SCProductEntry>
 		};
 	private long _productEntryId;
 	private long _groupId;
+	private long _originalGroupId;
+	private boolean _setOriginalGroupId;
 	private long _companyId;
+	private long _originalCompanyId;
+	private boolean _setOriginalCompanyId;
 	private long _userId;
 	private String _userUuid;
+	private long _originalUserId;
+	private boolean _setOriginalUserId;
 	private String _userName;
 	private Date _createDate;
 	private Date _modifiedDate;
@@ -765,6 +967,6 @@ public class SCProductEntryModelImpl extends BaseModelImpl<SCProductEntry>
 	private String _originalRepoGroupId;
 	private String _repoArtifactId;
 	private String _originalRepoArtifactId;
-	private transient ExpandoBridge _expandoBridge;
+	private long _columnBitmask;
 	private SCProductEntry _escapedModelProxy;
 }

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -17,12 +17,9 @@ package com.liferay.portal.image;
 import com.liferay.portal.NoSuchImageException;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
-import com.liferay.portal.kernel.io.unsync.UnsyncByteArrayInputStream;
 import com.liferay.portal.kernel.util.FileUtil;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.model.Image;
-import com.liferay.portal.service.ServiceContext;
-import com.liferay.portal.util.PortletKeys;
 import com.liferay.portlet.documentlibrary.NoSuchFileException;
 import com.liferay.portlet.documentlibrary.store.DLStoreUtil;
 
@@ -40,8 +37,7 @@ public class DLHook extends BaseHook {
 		String fileName = getFileName(image.getImageId(), image.getType());
 
 		try {
-			DLStoreUtil.deleteFile(
-				_COMPANY_ID, _PORTLET_ID, _REPOSITORY_ID, fileName);
+			DLStoreUtil.deleteFile(_COMPANY_ID, _REPOSITORY_ID, fileName);
 		}
 		catch (NoSuchFileException nsfe) {
 			throw new NoSuchImageException(nsfe);
@@ -81,18 +77,12 @@ public class DLHook extends BaseHook {
 		throws PortalException, SystemException {
 
 		String fileName = getFileName(image.getImageId(), image.getType());
-		InputStream is = new UnsyncByteArrayInputStream(bytes);
 
-		if (DLStoreUtil.hasFile(
-			_COMPANY_ID, _REPOSITORY_ID, fileName, _VERSION_NUMBER)) {
-
-			DLStoreUtil.deleteFile(
-				_COMPANY_ID, _PORTLET_ID, _REPOSITORY_ID, fileName);
+		if (DLStoreUtil.hasFile(_COMPANY_ID, _REPOSITORY_ID, fileName)) {
+			DLStoreUtil.deleteFile(_COMPANY_ID, _REPOSITORY_ID, fileName);
 		}
 
-		DLStoreUtil.addFile(
-			_COMPANY_ID, _PORTLET_ID, _GROUP_ID, _REPOSITORY_ID, fileName, true,
-			new ServiceContext(), is);
+		DLStoreUtil.addFile(_COMPANY_ID, _REPOSITORY_ID, fileName, true, bytes);
 	}
 
 	protected String getFileName(long imageId, String type) {
@@ -101,12 +91,6 @@ public class DLHook extends BaseHook {
 
 	private static final long _COMPANY_ID = 0;
 
-	private static final long _GROUP_ID = 0;
-
-	private static final String _PORTLET_ID = PortletKeys.PORTAL;
-
 	private static final long _REPOSITORY_ID = 0;
-
-	private static final String _VERSION_NUMBER = "1.0";
 
 }

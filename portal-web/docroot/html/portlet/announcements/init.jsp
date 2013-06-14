@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -16,27 +16,34 @@
 
 <%@ include file="/html/portlet/init.jsp" %>
 
-<%@ page import="com.liferay.portal.service.permission.OrganizationPermissionUtil" %>
-<%@ page import="com.liferay.portal.service.permission.RolePermissionUtil" %>
-<%@ page import="com.liferay.portal.service.permission.UserGroupPermissionUtil" %>
-<%@ page import="com.liferay.portlet.PortletURLUtil" %>
-<%@ page import="com.liferay.portlet.announcements.EntryContentException" %>
-<%@ page import="com.liferay.portlet.announcements.EntryDisplayDateException" %>
-<%@ page import="com.liferay.portlet.announcements.EntryExpirationDateException" %>
-<%@ page import="com.liferay.portlet.announcements.EntryTitleException" %>
-<%@ page import="com.liferay.portlet.announcements.EntryURLException" %>
-<%@ page import="com.liferay.portlet.announcements.NoSuchEntryException" %>
-<%@ page import="com.liferay.portlet.announcements.NoSuchFlagException" %>
-<%@ page import="com.liferay.portlet.announcements.model.AnnouncementsEntry" %>
-<%@ page import="com.liferay.portlet.announcements.model.AnnouncementsEntryConstants" %>
-<%@ page import="com.liferay.portlet.announcements.model.AnnouncementsFlagConstants" %>
-<%@ page import="com.liferay.portlet.announcements.service.AnnouncementsEntryLocalServiceUtil" %>
-<%@ page import="com.liferay.portlet.announcements.service.AnnouncementsFlagLocalServiceUtil" %>
-<%@ page import="com.liferay.portlet.announcements.service.permission.AnnouncementsEntryPermission" %>
-<%@ page import="com.liferay.portlet.announcements.util.AnnouncementsUtil" %>
+<%@ page import="com.liferay.portal.service.permission.OrganizationPermissionUtil" %><%@
+page import="com.liferay.portal.service.permission.RolePermissionUtil" %><%@
+page import="com.liferay.portal.service.permission.UserGroupPermissionUtil" %><%@
+page import="com.liferay.portlet.announcements.EntryContentException" %><%@
+page import="com.liferay.portlet.announcements.EntryDisplayDateException" %><%@
+page import="com.liferay.portlet.announcements.EntryExpirationDateException" %><%@
+page import="com.liferay.portlet.announcements.EntryTitleException" %><%@
+page import="com.liferay.portlet.announcements.EntryURLException" %><%@
+page import="com.liferay.portlet.announcements.NoSuchEntryException" %><%@
+page import="com.liferay.portlet.announcements.NoSuchFlagException" %><%@
+page import="com.liferay.portlet.announcements.model.AnnouncementsEntry" %><%@
+page import="com.liferay.portlet.announcements.model.AnnouncementsEntryConstants" %><%@
+page import="com.liferay.portlet.announcements.model.AnnouncementsFlagConstants" %><%@
+page import="com.liferay.portlet.announcements.service.AnnouncementsEntryLocalServiceUtil" %><%@
+page import="com.liferay.portlet.announcements.service.AnnouncementsFlagLocalServiceUtil" %><%@
+page import="com.liferay.portlet.announcements.service.permission.AnnouncementsEntryPermission" %><%@
+page import="com.liferay.portlet.announcements.util.AnnouncementsUtil" %>
 
 <%
-int delta = 3;
+PortletPreferences preferences = renderRequest.getPreferences();
+
+String portletResource = ParamUtil.getString(request, "portletResource");
+
+if (Validator.isNotNull(portletResource)) {
+	preferences = PortletPreferencesFactoryUtil.getPortletSetup(request, portletResource);
+}
+
+int pageDelta = GetterUtil.getInteger(preferences.getValue("pageDelta", String.valueOf(SearchContainer.DEFAULT_DELTA)));
 
 Format dateFormatDate = FastDateFormatFactoryUtil.getDate(locale, timeZone);
 %>

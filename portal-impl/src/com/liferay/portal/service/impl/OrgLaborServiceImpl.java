@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -91,7 +91,7 @@ public class OrgLaborServiceImpl extends OrgLaborServiceBaseImpl {
 			ActionKeys.UPDATE);
 
 		return orgLaborLocalService.updateOrgLabor(
-			orgLaborId, typeId ,sunOpen, sunClose, monOpen, monClose, tueOpen,
+			orgLaborId, typeId, sunOpen, sunClose, monOpen, monClose, tueOpen,
 			tueClose, wedOpen, wedClose, thuOpen, thuClose, friOpen, friClose,
 			satOpen, satClose);
 	}

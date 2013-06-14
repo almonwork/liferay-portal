@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -28,6 +28,7 @@ import com.liferay.portal.kernel.staging.StagingUtil;
 import com.liferay.portal.kernel.upload.UploadPortletRequest;
 import com.liferay.portal.kernel.util.Constants;
 import com.liferay.portal.kernel.util.ContentTypes;
+import com.liferay.portal.kernel.util.FileUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.StringPool;
@@ -94,10 +95,12 @@ public class ExportImportAction extends EditConfigurationAction {
 
 				sendRedirect(actionRequest, actionResponse);
 			}
-			else if (cmd.equals("export")) {
+			else if (cmd.equals(Constants.EXPORT)) {
 				exportData(actionRequest, actionResponse, portlet);
+
+				sendRedirect(actionRequest, actionResponse);
 			}
-			else if (cmd.equals("import")) {
+			else if (cmd.equals(Constants.IMPORT)) {
 				importData(actionRequest, actionResponse, portlet);
 
 				sendRedirect(actionRequest, actionResponse);
@@ -112,7 +115,7 @@ public class ExportImportAction extends EditConfigurationAction {
 			if (e instanceof NoSuchLayoutException ||
 				e instanceof PrincipalException) {
 
-				SessionErrors.add(actionRequest, e.getClass().getName());
+				SessionErrors.add(actionRequest, e.getClass());
 
 				setForward(
 					actionRequest, "portlet.portlet_configuration.error");
@@ -151,6 +154,8 @@ public class ExportImportAction extends EditConfigurationAction {
 			ActionRequest actionRequest, ActionResponse actionResponse,
 			Portlet portlet)
 		throws Exception {
+
+		File file = null;
 
 		try {
 			ThemeDisplay themeDisplay =
@@ -233,7 +238,7 @@ public class ExportImportAction extends EditConfigurationAction {
 				}
 			}
 
-			File file = LayoutServiceUtil.exportPortletInfoAsFile(
+			file = LayoutServiceUtil.exportPortletInfoAsFile(
 				plid, groupId, portlet.getPortletId(),
 				actionRequest.getParameterMap(), startDate, endDate);
 
@@ -249,7 +254,14 @@ public class ExportImportAction extends EditConfigurationAction {
 			setForward(actionRequest, ActionConstants.COMMON_NULL);
 		}
 		catch (Exception e) {
-			_log.error(e, e);
+			if (_log.isDebugEnabled()) {
+				_log.debug(e, e);
+			}
+
+			SessionErrors.add(actionRequest, e.getClass(), e);
+		}
+		finally {
+			FileUtil.delete(file);
 		}
 	}
 
@@ -259,12 +271,12 @@ public class ExportImportAction extends EditConfigurationAction {
 		throws Exception {
 
 		try {
-			UploadPortletRequest uploadRequest =
+			UploadPortletRequest uploadPortletRequest =
 				PortalUtil.getUploadPortletRequest(actionRequest);
 
-			long plid = ParamUtil.getLong(uploadRequest, "plid");
-			long groupId = ParamUtil.getLong(uploadRequest, "groupId");
-			File file = uploadRequest.getFile("importFileName");
+			long plid = ParamUtil.getLong(uploadPortletRequest, "plid");
+			long groupId = ParamUtil.getLong(uploadPortletRequest, "groupId");
+			File file = uploadPortletRequest.getFile("importFileName");
 
 			if (!file.exists()) {
 				throw new LARFileException("Import file does not exist");
@@ -281,7 +293,7 @@ public class ExportImportAction extends EditConfigurationAction {
 				(e instanceof LARTypeException) ||
 				(e instanceof PortletIdException)) {
 
-				SessionErrors.add(actionRequest, e.getClass().getName());
+				SessionErrors.add(actionRequest, e.getClass());
 			}
 			else {
 				_log.error(e, e);

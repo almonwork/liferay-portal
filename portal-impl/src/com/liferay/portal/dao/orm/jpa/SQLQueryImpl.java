@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -119,23 +119,27 @@ public class SQLQueryImpl extends QueryImpl implements SQLQuery {
 	}
 
 	@Override
-	public List<?> list(boolean unmodifiable) throws ORMException {
+	public List<?> list(boolean copy, boolean unmodifiable)
+		throws ORMException {
+
 		try {
 			List<?> list = sessionImpl.list(
 				queryString, positionalParameterMap, namedParameterMap,
-				strictName, firstResult, maxResults, flushModeType, sqlQuery,
-				entityClass);
+				strictName, firstResult, maxResults, flushModeType,
+				lockModeType, sqlQuery, entityClass);
 
 			if ((entityClass == null) && !list.isEmpty()) {
 				list = _transformList(list);
 			}
 
 			if (unmodifiable) {
-				return new UnmodifiableList<Object>(list);
+				list = new UnmodifiableList<Object>(list);
 			}
-			else {
-				return ListUtil.copy(list);
+			else if (copy) {
+				list = ListUtil.copy(list);
 			}
+
+			return list;
 		}
 		catch (Exception e) {
 			throw ExceptionTranslator.translate(e);
@@ -145,10 +149,10 @@ public class SQLQueryImpl extends QueryImpl implements SQLQuery {
 	@Override
 	public Object uniqueResult() throws ORMException {
 		try {
-			Object object =  sessionImpl.uniqueResult(
+			Object object = sessionImpl.uniqueResult(
 				queryString, positionalParameterMap, namedParameterMap,
-				strictName, firstResult, maxResults, flushModeType, sqlQuery,
-				entityClass);
+				strictName, firstResult, maxResults, flushModeType,
+				lockModeType, sqlQuery, entityClass);
 
 			if (object instanceof Collection<?>) {
 				Collection<Object> collection = (Collection<Object>)object;
@@ -243,7 +247,7 @@ public class SQLQueryImpl extends QueryImpl implements SQLQuery {
 
 				list = newList;
 			}
-			else if ((_scalars.size() == 1)) {
+			else if (_scalars.size() == 1) {
 				List<Object> newList = new ArrayList<Object>();
 
 				for (Object value : list) {

@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -34,39 +34,35 @@ String redirect = ParamUtil.getString(request, "redirect");
 
 		String layoutTemplateId = preferences.getValue("layoutTemplateId", PropsValues.NESTED_PORTLETS_LAYOUT_TEMPLATE_DEFAULT);
 
-		List layoutTemplates = LayoutTemplateLocalServiceUtil.getLayoutTemplates(theme.getThemeId());
+		List<LayoutTemplate> layoutTemplates = LayoutTemplateLocalServiceUtil.getLayoutTemplates(theme.getThemeId());
 
 		layoutTemplates = PluginUtil.restrictPlugins(layoutTemplates, user);
 
-		List unsupportedLayoutTemplates = ListUtil.fromArray(PropsUtil.getArray(PropsKeys.NESTED_PORTLETS_LAYOUT_TEMPLATE_UNSUPPORTED));
+		List<String> unsupportedLayoutTemplates = ListUtil.fromArray(PropsUtil.getArray(PropsKeys.NESTED_PORTLETS_LAYOUT_TEMPLATE_UNSUPPORTED));
 
-		for (int i = 0; i < layoutTemplates.size(); i++) {
-			LayoutTemplate curLayoutTemplate = (LayoutTemplate)layoutTemplates.get(i);
+		int i = 0;
 
-			if (unsupportedLayoutTemplates.contains(curLayoutTemplate.getLayoutTemplateId())) {
-				layoutTemplates.remove(i);
-			}
-		}
-
-		for (int i = 0; i < layoutTemplates.size(); i++) {
-			LayoutTemplate curLayoutTemplate = (LayoutTemplate)layoutTemplates.get(i);
+		for (LayoutTemplate layoutTemplate : layoutTemplates) {
+			if (!unsupportedLayoutTemplates.contains(layoutTemplate.getLayoutTemplateId())) {
 		%>
 
-			<c:if test="<%= (i % CELLS_PER_ROW) == 0 %>">
-				<tr>
-			</c:if>
+				<c:if test="<%= (i % CELLS_PER_ROW) == 0 %>">
+					<tr>
+				</c:if>
 
-			<td align="center" width="<%= 100 / CELLS_PER_ROW %>%">
-				<img onclick="document.getElementById('<portlet:namespace />layoutTemplateId<%= i %>').checked = true;" src="<%= curLayoutTemplate.getStaticResourcePath() %><%= curLayoutTemplate.getThumbnailPath() %>" /><br />
+				<td align="center" width="<%= 100 / CELLS_PER_ROW %>%">
+					<img onclick="document.getElementById('<portlet:namespace />layoutTemplateId<%= i %>').checked = true;" src="<%= layoutTemplate.getStaticResourcePath() %><%= layoutTemplate.getThumbnailPath() %>" /><br />
 
-				<aui:input checked="<%= layoutTemplateId.equals(curLayoutTemplate.getLayoutTemplateId()) %>" id='<%= "layoutTemplateId" + i %>' label="<%= curLayoutTemplate.getName() %>" name="preferences--layoutTemplateId--" type="radio" value="<%= curLayoutTemplate.getLayoutTemplateId() %>" />
-			</td>
+					<aui:input checked="<%= layoutTemplateId.equals(layoutTemplate.getLayoutTemplateId()) %>" id='<%= "layoutTemplateId" + i %>' label="<%= layoutTemplate.getName() %>" name="preferences--layoutTemplateId--" type="radio" value="<%= layoutTemplate.getLayoutTemplateId() %>" />
+				</td>
 
-			<c:if test="<%= (i % CELLS_PER_ROW) == (CELLS_PER_ROW - 1) %>">
-				</tr>
-			</c:if>
+				<c:if test="<%= (i % CELLS_PER_ROW) == (CELLS_PER_ROW - 1) %>">
+					</tr>
+				</c:if>
 
 		<%
+				i++;
+			}
 		}
 		%>
 
@@ -76,7 +72,7 @@ String redirect = ParamUtil.getString(request, "redirect");
 	<%
 	boolean portletDecorateDefault = GetterUtil.getBoolean(themeDisplay.getThemeSetting("portlet-setup-show-borders-default"), true);
 
-	boolean portletSetupShowBorders = GetterUtil.getBoolean(preferences.getValue("portlet-setup-show-borders", String.valueOf(portletDecorateDefault)));
+	boolean portletSetupShowBorders = GetterUtil.getBoolean(preferences.getValue("portletSetupShowBorders", String.valueOf(portletDecorateDefault)));
 	%>
 
 	<aui:fieldset label="display-settings">

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -39,10 +39,10 @@ import java.util.List;
 public class JournalFeedFinderImpl
 	extends BasePersistenceImpl<JournalFeed> implements JournalFeedFinder {
 
-	public static String COUNT_BY_C_G_F_N_D =
+	public static final String COUNT_BY_C_G_F_N_D =
 		JournalFeedFinder.class.getName() + ".countByC_G_F_N_D";
 
-	public static String FIND_BY_C_G_F_N_D =
+	public static final String FIND_BY_C_G_F_N_D =
 		JournalFeedFinder.class.getName() + ".findByC_G_F_N_D";
 
 	public int countByKeywords(long companyId, long groupId, String keywords)
@@ -96,7 +96,8 @@ public class JournalFeedFinderImpl
 			String sql = CustomSQLUtil.get(COUNT_BY_C_G_F_N_D);
 
 			if (groupId <= 0) {
-				sql = StringUtil.replace(sql, "(groupId = ?) AND", "");
+				sql = StringUtil.replace(
+					sql, "(groupId = ?) AND", StringPool.BLANK);
 			}
 
 			sql = CustomSQLUtil.replaceKeywords(
@@ -124,7 +125,7 @@ public class JournalFeedFinderImpl
 			qPos.add(names, 2);
 			qPos.add(descriptions, 2);
 
-			Iterator<Long> itr = q.list().iterator();
+			Iterator<Long> itr = q.iterate();
 
 			if (itr.hasNext()) {
 				Long count = itr.next();
@@ -201,7 +202,8 @@ public class JournalFeedFinderImpl
 			String sql = CustomSQLUtil.get(FIND_BY_C_G_F_N_D);
 
 			if (groupId <= 0) {
-				sql = StringUtil.replace(sql, "(groupId = ?) AND", "");
+				sql = StringUtil.replace(
+					sql, "(groupId = ?) AND", StringPool.BLANK);
 			}
 
 			sql = CustomSQLUtil.replaceKeywords(

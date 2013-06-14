@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,6 +14,9 @@
 
 package com.liferay.portal.model;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * <p>
  * This class is a wrapper for {@link OrgLabor}.
@@ -23,7 +26,7 @@ package com.liferay.portal.model;
  * @see       OrgLabor
  * @generated
  */
-public class OrgLaborWrapper implements OrgLabor {
+public class OrgLaborWrapper implements OrgLabor, ModelWrapper<OrgLabor> {
 	public OrgLaborWrapper(OrgLabor orgLabor) {
 		_orgLabor = orgLabor;
 	}
@@ -34,6 +37,134 @@ public class OrgLaborWrapper implements OrgLabor {
 
 	public String getModelClassName() {
 		return OrgLabor.class.getName();
+	}
+
+	public Map<String, Object> getModelAttributes() {
+		Map<String, Object> attributes = new HashMap<String, Object>();
+
+		attributes.put("orgLaborId", getOrgLaborId());
+		attributes.put("organizationId", getOrganizationId());
+		attributes.put("typeId", getTypeId());
+		attributes.put("sunOpen", getSunOpen());
+		attributes.put("sunClose", getSunClose());
+		attributes.put("monOpen", getMonOpen());
+		attributes.put("monClose", getMonClose());
+		attributes.put("tueOpen", getTueOpen());
+		attributes.put("tueClose", getTueClose());
+		attributes.put("wedOpen", getWedOpen());
+		attributes.put("wedClose", getWedClose());
+		attributes.put("thuOpen", getThuOpen());
+		attributes.put("thuClose", getThuClose());
+		attributes.put("friOpen", getFriOpen());
+		attributes.put("friClose", getFriClose());
+		attributes.put("satOpen", getSatOpen());
+		attributes.put("satClose", getSatClose());
+
+		return attributes;
+	}
+
+	public void setModelAttributes(Map<String, Object> attributes) {
+		Long orgLaborId = (Long)attributes.get("orgLaborId");
+
+		if (orgLaborId != null) {
+			setOrgLaborId(orgLaborId);
+		}
+
+		Long organizationId = (Long)attributes.get("organizationId");
+
+		if (organizationId != null) {
+			setOrganizationId(organizationId);
+		}
+
+		Integer typeId = (Integer)attributes.get("typeId");
+
+		if (typeId != null) {
+			setTypeId(typeId);
+		}
+
+		Integer sunOpen = (Integer)attributes.get("sunOpen");
+
+		if (sunOpen != null) {
+			setSunOpen(sunOpen);
+		}
+
+		Integer sunClose = (Integer)attributes.get("sunClose");
+
+		if (sunClose != null) {
+			setSunClose(sunClose);
+		}
+
+		Integer monOpen = (Integer)attributes.get("monOpen");
+
+		if (monOpen != null) {
+			setMonOpen(monOpen);
+		}
+
+		Integer monClose = (Integer)attributes.get("monClose");
+
+		if (monClose != null) {
+			setMonClose(monClose);
+		}
+
+		Integer tueOpen = (Integer)attributes.get("tueOpen");
+
+		if (tueOpen != null) {
+			setTueOpen(tueOpen);
+		}
+
+		Integer tueClose = (Integer)attributes.get("tueClose");
+
+		if (tueClose != null) {
+			setTueClose(tueClose);
+		}
+
+		Integer wedOpen = (Integer)attributes.get("wedOpen");
+
+		if (wedOpen != null) {
+			setWedOpen(wedOpen);
+		}
+
+		Integer wedClose = (Integer)attributes.get("wedClose");
+
+		if (wedClose != null) {
+			setWedClose(wedClose);
+		}
+
+		Integer thuOpen = (Integer)attributes.get("thuOpen");
+
+		if (thuOpen != null) {
+			setThuOpen(thuOpen);
+		}
+
+		Integer thuClose = (Integer)attributes.get("thuClose");
+
+		if (thuClose != null) {
+			setThuClose(thuClose);
+		}
+
+		Integer friOpen = (Integer)attributes.get("friOpen");
+
+		if (friOpen != null) {
+			setFriOpen(friOpen);
+		}
+
+		Integer friClose = (Integer)attributes.get("friClose");
+
+		if (friClose != null) {
+			setFriClose(friClose);
+		}
+
+		Integer satOpen = (Integer)attributes.get("satOpen");
+
+		if (satOpen != null) {
+			setSatOpen(satOpen);
+		}
+
+		Integer satClose = (Integer)attributes.get("satClose");
+
+		if (satClose != null) {
+			setSatClose(satClose);
+		}
 	}
 
 	/**
@@ -380,10 +511,6 @@ public class OrgLaborWrapper implements OrgLabor {
 		return _orgLabor.isEscapedModel();
 	}
 
-	public void setEscapedModel(boolean escapedModel) {
-		_orgLabor.setEscapedModel(escapedModel);
-	}
-
 	public java.io.Serializable getPrimaryKeyObj() {
 		return _orgLabor.getPrimaryKeyObj();
 	}
@@ -443,7 +570,14 @@ public class OrgLaborWrapper implements OrgLabor {
 		return _orgLabor.getType();
 	}
 
+	/**
+	 * @deprecated Renamed to {@link #getWrappedModel}
+	 */
 	public OrgLabor getWrappedOrgLabor() {
+		return _orgLabor;
+	}
+
+	public OrgLabor getWrappedModel() {
 		return _orgLabor;
 	}
 

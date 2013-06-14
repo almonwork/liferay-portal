@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -17,13 +17,25 @@
 <%
 TemplateSearchTerms searchTerms = (TemplateSearchTerms)searchContainer.getSearchTerms();
 
-if (searchTerms.isAdvancedSearch()){
-	results = DDMTemplateLocalServiceUtil.search(company.getCompanyId(), scopeGroupId, structure.getStructureId(), searchTerms.getName(), searchTerms.getDescription(), null, null, searchTerms.isAndOperator(), searchContainer.getStart(), searchContainer.getEnd(), searchContainer.getOrderByComparator());
-	total = DDMTemplateLocalServiceUtil.searchCount(company.getCompanyId(), scopeGroupId, structure.getStructureId(), searchTerms.getName(), searchTerms.getDescription(), null, null, searchTerms.isAndOperator());
+long[] searchClassNameIds = null;
+long searchClassPK = 0;
+
+if (portletName.equals(PortletKeys.APPLICATION_DISPLAY_STYLES)) {
+	searchClassNameIds = PortletDisplayTemplateHandlerRegistryUtil.getClassNameIds();
+	searchClassPK = -1;
 }
 else {
-	results = DDMTemplateLocalServiceUtil.search(company.getCompanyId(), scopeGroupId, structure.getStructureId(), searchTerms.getKeywords(), searchContainer.getStart(), searchContainer.getEnd(), searchContainer.getOrderByComparator());
-	total = DDMTemplateLocalServiceUtil.searchCount(company.getCompanyId(), scopeGroupId, structure.getStructureId(), searchTerms.getKeywords());
+	searchClassNameIds = new long[] {classNameId};
+	searchClassPK = classPK;
+}
+
+if (searchTerms.isAdvancedSearch()) {
+	results = DDMTemplateServiceUtil.search(company.getCompanyId(), scopeGroupId, searchClassNameIds, searchClassPK, searchTerms.getName(), searchTerms.getDescription(), templateTypeValue, scopeTemplateMode, null, searchTerms.isAndOperator(), searchContainer.getStart(), searchContainer.getEnd(), searchContainer.getOrderByComparator());
+	total = DDMTemplateServiceUtil.searchCount(company.getCompanyId(), scopeGroupId, searchClassNameIds, searchClassPK, searchTerms.getName(), searchTerms.getDescription(), templateTypeValue, null, null, searchTerms.isAndOperator());
+}
+else {
+	results = DDMTemplateServiceUtil.search(company.getCompanyId(), scopeGroupId, searchClassNameIds, searchClassPK, searchTerms.getKeywords(), templateTypeValue, scopeTemplateMode, searchContainer.getStart(), searchContainer.getEnd(), searchContainer.getOrderByComparator());
+	total = DDMTemplateServiceUtil.searchCount(company.getCompanyId(), scopeGroupId, searchClassNameIds, searchClassPK, searchTerms.getKeywords(), templateTypeValue, scopeTemplateMode);
 }
 
 pageContext.setAttribute("results", results);

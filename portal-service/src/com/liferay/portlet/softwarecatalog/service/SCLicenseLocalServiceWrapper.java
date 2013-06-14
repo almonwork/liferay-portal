@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,6 +14,8 @@
 
 package com.liferay.portlet.softwarecatalog.service;
 
+import com.liferay.portal.service.ServiceWrapper;
+
 /**
  * <p>
  * This class is a wrapper for {@link SCLicenseLocalService}.
@@ -23,7 +25,8 @@ package com.liferay.portlet.softwarecatalog.service;
  * @see       SCLicenseLocalService
  * @generated
  */
-public class SCLicenseLocalServiceWrapper implements SCLicenseLocalService {
+public class SCLicenseLocalServiceWrapper implements SCLicenseLocalService,
+	ServiceWrapper<SCLicenseLocalService> {
 	public SCLicenseLocalServiceWrapper(
 		SCLicenseLocalService scLicenseLocalService) {
 		_scLicenseLocalService = scLicenseLocalService;
@@ -57,25 +60,32 @@ public class SCLicenseLocalServiceWrapper implements SCLicenseLocalService {
 	* Deletes the s c license with the primary key from the database. Also notifies the appropriate model listeners.
 	*
 	* @param licenseId the primary key of the s c license
+	* @return the s c license that was removed
 	* @throws PortalException if a s c license with the primary key could not be found
 	* @throws SystemException if a system exception occurred
 	*/
-	public void deleteSCLicense(long licenseId)
+	public com.liferay.portlet.softwarecatalog.model.SCLicense deleteSCLicense(
+		long licenseId)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException {
-		_scLicenseLocalService.deleteSCLicense(licenseId);
+		return _scLicenseLocalService.deleteSCLicense(licenseId);
 	}
 
 	/**
 	* Deletes the s c license from the database. Also notifies the appropriate model listeners.
 	*
 	* @param scLicense the s c license
+	* @return the s c license that was removed
 	* @throws SystemException if a system exception occurred
 	*/
-	public void deleteSCLicense(
+	public com.liferay.portlet.softwarecatalog.model.SCLicense deleteSCLicense(
 		com.liferay.portlet.softwarecatalog.model.SCLicense scLicense)
 		throws com.liferay.portal.kernel.exception.SystemException {
-		_scLicenseLocalService.deleteSCLicense(scLicense);
+		return _scLicenseLocalService.deleteSCLicense(scLicense);
+	}
+
+	public com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery() {
+		return _scLicenseLocalService.dynamicQuery();
 	}
 
 	/**
@@ -147,6 +157,12 @@ public class SCLicenseLocalServiceWrapper implements SCLicenseLocalService {
 		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery)
 		throws com.liferay.portal.kernel.exception.SystemException {
 		return _scLicenseLocalService.dynamicQueryCount(dynamicQuery);
+	}
+
+	public com.liferay.portlet.softwarecatalog.model.SCLicense fetchSCLicense(
+		long licenseId)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return _scLicenseLocalService.fetchSCLicense(licenseId);
 	}
 
 	/**
@@ -323,12 +339,26 @@ public class SCLicenseLocalServiceWrapper implements SCLicenseLocalService {
 			openSource, active, recommended);
 	}
 
+	/**
+	 * @deprecated Renamed to {@link #getWrappedService}
+	 */
 	public SCLicenseLocalService getWrappedSCLicenseLocalService() {
 		return _scLicenseLocalService;
 	}
 
+	/**
+	 * @deprecated Renamed to {@link #setWrappedService}
+	 */
 	public void setWrappedSCLicenseLocalService(
 		SCLicenseLocalService scLicenseLocalService) {
+		_scLicenseLocalService = scLicenseLocalService;
+	}
+
+	public SCLicenseLocalService getWrappedService() {
+		return _scLicenseLocalService;
+	}
+
+	public void setWrappedService(SCLicenseLocalService scLicenseLocalService) {
 		_scLicenseLocalService = scLicenseLocalService;
 	}
 

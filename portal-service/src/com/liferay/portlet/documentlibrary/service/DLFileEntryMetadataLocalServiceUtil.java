@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -15,7 +15,6 @@
 package com.liferay.portlet.documentlibrary.service;
 
 import com.liferay.portal.kernel.bean.PortalBeanLocatorUtil;
-import com.liferay.portal.kernel.util.MethodCache;
 import com.liferay.portal.kernel.util.ReferenceRegistry;
 
 /**
@@ -66,25 +65,32 @@ public class DLFileEntryMetadataLocalServiceUtil {
 	* Deletes the document library file entry metadata with the primary key from the database. Also notifies the appropriate model listeners.
 	*
 	* @param fileEntryMetadataId the primary key of the document library file entry metadata
+	* @return the document library file entry metadata that was removed
 	* @throws PortalException if a document library file entry metadata with the primary key could not be found
 	* @throws SystemException if a system exception occurred
 	*/
-	public static void deleteDLFileEntryMetadata(long fileEntryMetadataId)
+	public static com.liferay.portlet.documentlibrary.model.DLFileEntryMetadata deleteDLFileEntryMetadata(
+		long fileEntryMetadataId)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException {
-		getService().deleteDLFileEntryMetadata(fileEntryMetadataId);
+		return getService().deleteDLFileEntryMetadata(fileEntryMetadataId);
 	}
 
 	/**
 	* Deletes the document library file entry metadata from the database. Also notifies the appropriate model listeners.
 	*
 	* @param dlFileEntryMetadata the document library file entry metadata
+	* @return the document library file entry metadata that was removed
 	* @throws SystemException if a system exception occurred
 	*/
-	public static void deleteDLFileEntryMetadata(
+	public static com.liferay.portlet.documentlibrary.model.DLFileEntryMetadata deleteDLFileEntryMetadata(
 		com.liferay.portlet.documentlibrary.model.DLFileEntryMetadata dlFileEntryMetadata)
 		throws com.liferay.portal.kernel.exception.SystemException {
-		getService().deleteDLFileEntryMetadata(dlFileEntryMetadata);
+		return getService().deleteDLFileEntryMetadata(dlFileEntryMetadata);
+	}
+
+	public static com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery() {
+		return getService().dynamicQuery();
 	}
 
 	/**
@@ -156,6 +162,12 @@ public class DLFileEntryMetadataLocalServiceUtil {
 		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery)
 		throws com.liferay.portal.kernel.exception.SystemException {
 		return getService().dynamicQueryCount(dynamicQuery);
+	}
+
+	public static com.liferay.portlet.documentlibrary.model.DLFileEntryMetadata fetchDLFileEntryMetadata(
+		long fileEntryMetadataId)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getService().fetchDLFileEntryMetadata(fileEntryMetadataId);
 	}
 
 	/**
@@ -310,20 +322,15 @@ public class DLFileEntryMetadataLocalServiceUtil {
 
 			ReferenceRegistry.registerReference(DLFileEntryMetadataLocalServiceUtil.class,
 				"_service");
-			MethodCache.remove(DLFileEntryMetadataLocalService.class);
 		}
 
 		return _service;
 	}
 
+	/**
+	 * @deprecated
+	 */
 	public void setService(DLFileEntryMetadataLocalService service) {
-		MethodCache.remove(DLFileEntryMetadataLocalService.class);
-
-		_service = service;
-
-		ReferenceRegistry.registerReference(DLFileEntryMetadataLocalServiceUtil.class,
-			"_service");
-		MethodCache.remove(DLFileEntryMetadataLocalService.class);
 	}
 
 	private static DLFileEntryMetadataLocalService _service;

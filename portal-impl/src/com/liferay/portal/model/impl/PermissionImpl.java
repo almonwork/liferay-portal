@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,15 +14,18 @@
 
 package com.liferay.portal.model.impl;
 
+import com.liferay.portal.model.Permission;
+
 /**
- * Represents a permission to perform an action on a resource in permissions
- * versions &lt; 6.
- *
  * @author Brian Wing Shun Chan
  */
-public class PermissionImpl extends PermissionBaseImpl {
+public class PermissionImpl implements Permission {
 
 	public PermissionImpl() {
+	}
+
+	public String getActionId() {
+		return _actionId;
 	}
 
 	public String getName() {
@@ -37,6 +40,10 @@ public class PermissionImpl extends PermissionBaseImpl {
 		return _scope;
 	}
 
+	public void setActionId(String actionId) {
+		_actionId = actionId;
+	}
+
 	public void setName(String name) {
 		_name = name;
 	}
@@ -49,6 +56,7 @@ public class PermissionImpl extends PermissionBaseImpl {
 		_scope = scope;
 	}
 
+	private String _actionId;
 	private String _name;
 	private String _primKey;
 	private int _scope;

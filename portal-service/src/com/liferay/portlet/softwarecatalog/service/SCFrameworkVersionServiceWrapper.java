@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,6 +14,8 @@
 
 package com.liferay.portlet.softwarecatalog.service;
 
+import com.liferay.portal.service.ServiceWrapper;
+
 /**
  * <p>
  * This class is a wrapper for {@link SCFrameworkVersionService}.
@@ -24,10 +26,29 @@ package com.liferay.portlet.softwarecatalog.service;
  * @generated
  */
 public class SCFrameworkVersionServiceWrapper
-	implements SCFrameworkVersionService {
+	implements SCFrameworkVersionService,
+		ServiceWrapper<SCFrameworkVersionService> {
 	public SCFrameworkVersionServiceWrapper(
 		SCFrameworkVersionService scFrameworkVersionService) {
 		_scFrameworkVersionService = scFrameworkVersionService;
+	}
+
+	/**
+	* Returns the Spring bean ID for this bean.
+	*
+	* @return the Spring bean ID for this bean
+	*/
+	public java.lang.String getBeanIdentifier() {
+		return _scFrameworkVersionService.getBeanIdentifier();
+	}
+
+	/**
+	* Sets the Spring bean ID for this bean.
+	*
+	* @param beanIdentifier the Spring bean ID for this bean
+	*/
+	public void setBeanIdentifier(java.lang.String beanIdentifier) {
+		_scFrameworkVersionService.setBeanIdentifier(beanIdentifier);
 	}
 
 	public com.liferay.portlet.softwarecatalog.model.SCFrameworkVersion addFrameworkVersion(
@@ -74,11 +95,26 @@ public class SCFrameworkVersionServiceWrapper
 			name, url, active, priority);
 	}
 
+	/**
+	 * @deprecated Renamed to {@link #getWrappedService}
+	 */
 	public SCFrameworkVersionService getWrappedSCFrameworkVersionService() {
 		return _scFrameworkVersionService;
 	}
 
+	/**
+	 * @deprecated Renamed to {@link #setWrappedService}
+	 */
 	public void setWrappedSCFrameworkVersionService(
+		SCFrameworkVersionService scFrameworkVersionService) {
+		_scFrameworkVersionService = scFrameworkVersionService;
+	}
+
+	public SCFrameworkVersionService getWrappedService() {
+		return _scFrameworkVersionService;
+	}
+
+	public void setWrappedService(
 		SCFrameworkVersionService scFrameworkVersionService) {
 		_scFrameworkVersionService = scFrameworkVersionService;
 	}

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -19,7 +19,6 @@ import com.liferay.portal.kernel.log.LogFactoryUtil;
 
 import java.lang.reflect.Constructor;
 
-import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -170,22 +169,22 @@ public class MapUtil {
 					map.put(kvp[0], new Boolean(kvp[1]));
 				}
 				else if (type.equalsIgnoreCase("double") ||
-					type.equals(Double.class.getName())) {
+						 type.equals(Double.class.getName())) {
 
 					map.put(kvp[0], new Double(kvp[1]));
 				}
 				else if (type.equalsIgnoreCase("int") ||
-					type.equals(Integer.class.getName())) {
+						 type.equals(Integer.class.getName())) {
 
 					map.put(kvp[0], new Integer(kvp[1]));
 				}
 				else if (type.equalsIgnoreCase("long") ||
-					type.equals(Long.class.getName())) {
+						 type.equals(Long.class.getName())) {
 
 					map.put(kvp[0], new Long(kvp[1]));
 				}
 				else if (type.equalsIgnoreCase("short") ||
-					type.equals(Short.class.getName())) {
+						 type.equals(Short.class.getName())) {
 
 					map.put(kvp[0], new Short(kvp[1]));
 				}
@@ -212,16 +211,15 @@ public class MapUtil {
 	}
 
 	public static String toString(Map<?, ?> map) {
+		if (map.isEmpty()) {
+			return StringPool.OPEN_CURLY_BRACE + StringPool.CLOSE_CURLY_BRACE;
+		}
+
 		StringBundler sb = new StringBundler(map.size() * 4 + 1);
 
 		sb.append(StringPool.OPEN_CURLY_BRACE);
 
-		Iterator<?> itr = map.entrySet().iterator();
-
-		while (itr.hasNext()) {
-			Map.Entry<Object, Object> entry =
-				(Map.Entry<Object, Object>)itr.next();
-
+		for (Map.Entry<?, ?> entry : map.entrySet()) {
 			Object key = entry.getKey();
 			Object value = entry.getValue();
 
@@ -243,12 +241,10 @@ public class MapUtil {
 				sb.append(value);
 			}
 
-			if (itr.hasNext()) {
-				sb.append(StringPool.COMMA_AND_SPACE);
-			}
+			sb.append(StringPool.COMMA_AND_SPACE);
 		}
 
-		sb.append(StringPool.CLOSE_CURLY_BRACE);
+		sb.setStringAt(StringPool.CLOSE_CURLY_BRACE, sb.index());
 
 		return sb.toString();
 	}

@@ -26,6 +26,12 @@ body.portlet {
 	cursor: pointer;
 }
 
+.panel-page-content, .panel-page-body {
+	.portlet-title-text {
+		cursor: auto;
+	}
+}
+
 .portlet-topper-toolbar {
 	margin: 0;
 	padding: 2px;
@@ -98,6 +104,7 @@ body.portlet {
 	}
 
 	.portlet-title-default, .portlet-actions {
+		min-height: 20px;
 		vertical-align: top;
 	}
 
@@ -195,21 +202,26 @@ body.portlet {
 
 /* ---------- Help messages, general additional information, etc. ---------- */
 
-
-.portlet-msg-info {
+.portlet-msg-info, .lfr-message-info {
 	@extend .portlet-msg;
 	background-color: #DFF4FF;
 	background-image: url(../images/messages/info.png);
 	border-color: #A7CEDF;
+}
 
-	&.pending {
-		background-image: url(../images/common/time.png);
-	}
+.portlet-msg-help, .lfr-message-help {
+	@extend .portlet-msg-info;
+	background-image: url(../images/portlet/help.png);
+}
+
+.portlet-msg-progress, .lfr-message-progress {
+	@extend .portlet-msg-info;
+	background-image: url(../images/aui/loading_indicator.gif);
 }
 
 /* ---------- Error messages ---------- */
 
-.portlet-msg-error {
+.portlet-msg-error, .lfr-message-error {
 	@extend .portlet-msg;
 	background-color: #FDD;
 	background-image: url(../images/messages/error.png);
@@ -218,7 +230,7 @@ body.portlet {
 
 /* ---------- Warning messages ---------- */
 
-.portlet-msg-alert {
+.portlet-msg-alert, .lfr-message-alert {
 	@extend .portlet-msg;
 	background-color: #FFC;
 	background-image: url(../images/messages/alert.png);
@@ -228,7 +240,7 @@ body.portlet {
 
 /* ---------- Success messages ---------- */
 
-.portlet-msg-success {
+.portlet-msg-success, .lfr-message-success {
 	@extend .portlet-msg;
 	background-color: #F4FDEF;
 	background-image: url(../images/messages/success.png);
@@ -238,20 +250,10 @@ body.portlet {
 
 /* ---------- Message labels ---------- */
 
-.portlet-msg-info-label, .portlet-msg-error-label, .portlet-msg-alert-label, .portlet-msg-success-label {
+.portlet-msg-alert-label, .portlet-msg-error-label, .portlet-msg-info-label, .portlet-msg-progress-label, .portlet-msg-success-label {
 	background: none no-repeat 0 50%;
 	padding: 3px 3px 3px 20px;
 	font-weight: bold;
-}
-
-.portlet-msg-info-label {
-	background-image: url(../images/messages/info.png);
-	color: #34404F;
-}
-
-.portlet-msg-error-label {
-	background-image: url(../images/messages/error.png);
-	color: #900;
 }
 
 .portlet-msg-alert-label {
@@ -259,9 +261,94 @@ body.portlet {
 	color: #663;
 }
 
+.portlet-msg-error-label {
+	background-image: url(../images/messages/error.png);
+	color: #900;
+}
+
+.portlet-msg-info-label, .portlet-msg-help-label, .portlet-msg-progress-label {
+	background-image: url(../images/messages/info.png);
+	color: #34404F;
+}
+
+.portlet-msg-help-label {
+	background-image: url(../images/portlet/help.png);
+}
+
+.portlet-msg-progress-label {
+	background-image: url(../images/aui/loading_indicator.gif);
+}
+
 .portlet-msg-success-label {
 	background-image: url(../images/messages/success.png);
 	color: #384F34;
+}
+
+/* ---------- Liferay Messages ---------- */
+
+.lfr-message-content, .lfr-message-info, .lfr-message-help, .lfr-message-error, .lfr-message-alert, .lfr-message-success {
+	border-left-width: 0;
+	border-right-width: 0;
+}
+
+.lfr-message {
+	position: relative;
+
+	.lfr-message-control {
+		background-color: #333;
+		display: inline-block;
+	}
+
+	.lfr-message-controls {
+		display: none;
+		left: 3px;
+		margin: -8px 8px 0 3px;
+		position: absolute;
+		top: 50%;
+		z-index: 10;
+	}
+
+	.lfr-message-close {
+		background-image: url(../images/portlet/close_borderless.png);
+		background-position: 0 0;
+		background-repeat: no-repeat;
+	}
+
+	.lfr-message-close-all {
+		color: #FFF;
+		display: none;
+		font-size: 0.8em;
+		margin-left: 10px;
+		padding: 1px 10px;
+		text-shadow: 1px 1px 0 #000;
+		vertical-align: top;
+
+		a {
+			color: #FFF;
+		}
+	}
+
+	.lfr-message-controls-hover .lfr-message-close-all {
+		display: inline-block;
+	}
+
+	&.pending {
+		background-image: url(../images/common/time.png);
+	}
+}
+
+.lfr-message-dismissible.lfr-message-hover {
+	.lfr-message-content {
+		background-image: none;
+	}
+
+	.lfr-message-controls {
+		display: block;
+	}
+}
+
+.lfr-message-trigger, .lfr-message-close {
+	cursor: pointer;
 }
 
 /* ---------- Sections ---------- */
@@ -663,6 +750,10 @@ body.portlet {
 	.breadcrumbs-vertical, .breadcrumbs-horizontal li {
 		display: inline;
 		zoom: 1;
+	}
+
+	.lfr-message .lfr-message-close {
+		float: left;
 	}
 }
 

@@ -16,15 +16,25 @@
 <tr>
 	<td>waitForVisible</td>
 	<td>link=Web Form Test Page</td>
-	<td></td>
+	<td>Web Form Test Page</td>
 </tr>
 <tr>
 	<td>clickAtAndWait</td>
 	<td>link=Web Form Test Page</td>
+	<td>Web Form Test Page</td>
+</tr>
+<tr>
+	<td>pause</td>
+	<td>5000</td>
 	<td></td>
 </tr>
 <tr>
-	<td>click</td>
+	<td>assertText</td>
+	<td>//strong/a</td>
+	<td>Options</td>
+</tr>
+<tr>
+	<td>clickAt</td>
 	<td>//strong/a</td>
 	<td>Options</td>
 </tr>
@@ -34,43 +44,43 @@
 	<td>Configuration</td>
 </tr>
 <tr>
-	<td>click</td>
+	<td>assertText</td>
+	<td>//div[@class='lfr-component lfr-menu-list']/ul/li[2]/a</td>
+	<td>Configuration</td>
+</tr>
+<tr>
+	<td>clickAt</td>
 	<td>//div[@class='lfr-component lfr-menu-list']/ul/li[2]/a</td>
 	<td>Configuration</td>
 </tr>
 <tr>
 	<td>waitForVisible</td>
-	<td>//span[@class='taglib-text']</td>
+	<td>//div[@class='archived-setups']/span/a/img</td>
 	<td>Archive/Restore Setup</td>
 </tr>
 <tr>
 	<td>clickAndWait</td>
-	<td>//span[@class='taglib-text']</td>
+	<td>//div[@class='archived-setups']/span/a/img</td>
 	<td>Archive/Restore Setup</td>
 </tr>
 <tr>
 	<td>type</td>
-	<td>_86_name</td>
+	<td>//input[@id='_86_name']</td>
 	<td>test archive</td>
 </tr>
 <tr>
 	<td>clickAtAndWait</td>
 	<td>//input[@value='Save']</td>
-	<td></td>
+	<td>Save</td>
 </tr>
 <tr>
 	<td>assertText</td>
-	<td>//div[@id='p_p_id_86_']/div/div</td>
-	<td>Your request completed successfully.</td>
-</tr>
-<tr>
-	<td>waitForText</td>
-	<td>//form[@id='_86_fm']/div[1]/div[1]/table/tbody/tr[3]/td[1]</td>
-	<td>test archive</td>
+	<td>//div[@class='portlet-msg-success']</td>
+	<td>You have successfully updated the setup.</td>
 </tr>
 <tr>
 	<td>assertText</td>
-	<td>//form[@id='_86_fm']/div[1]/div[1]/table/tbody/tr[3]/td[1]</td>
+	<td>//tr[3]/td[1]</td>
 	<td>test archive</td>
 </tr>
 

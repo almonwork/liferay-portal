@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -23,15 +23,16 @@ import com.liferay.portalweb.portal.util.RuntimeVariables;
 public class ViewSchedulerEventStagingCommunityQuartzTest extends BaseTestCase {
 	public void testViewSchedulerEventStagingCommunityQuartz()
 		throws Exception {
-		selenium.open("/web/guest/home/");
+		selenium.open("/web/community-staging-community-quartz-staging/");
+		loadRequiredJavaScriptModules();
 
 		for (int second = 0;; second++) {
-			if (second >= 60) {
+			if (second >= 90) {
 				fail("timeout");
 			}
 
 			try {
-				if (selenium.isElementPresent("link=Control Panel")) {
+				if (selenium.isVisible("link=Page Staging Community Quartz")) {
 					break;
 				}
 			}
@@ -41,30 +42,16 @@ public class ViewSchedulerEventStagingCommunityQuartzTest extends BaseTestCase {
 			Thread.sleep(1000);
 		}
 
-		selenium.saveScreenShotAndSource();
-		selenium.clickAt("link=Control Panel",
-			RuntimeVariables.replace("Control Panel"));
+		selenium.clickAt("link=Page Staging Community Quartz",
+			RuntimeVariables.replace("Page Staging Community Quartz"));
 		selenium.waitForPageToLoad("30000");
-		selenium.saveScreenShotAndSource();
-		selenium.clickAt("link=Communities",
-			RuntimeVariables.replace("Communities"));
-		selenium.waitForPageToLoad("30000");
-		selenium.saveScreenShotAndSource();
-		selenium.type("//input[@id='_134_name']",
-			RuntimeVariables.replace("Community Staging Community Quartz"));
-		selenium.saveScreenShotAndSource();
-		selenium.clickAt("//input[@value='Search']",
-			RuntimeVariables.replace("Search"));
-		selenium.waitForPageToLoad("30000");
-		selenium.saveScreenShotAndSource();
-		assertTrue(selenium.isPartialText("//tr[3]/td[1]",
-				"Community Staging Community Quartz"));
-		assertEquals(RuntimeVariables.replace("Actions"),
-			selenium.getText("//strong/a"));
-		selenium.clickAt("//strong/a", RuntimeVariables.replace("Actions"));
+		loadRequiredJavaScriptModules();
+		Thread.sleep(5000);
+		selenium.clickAt("//strong/a",
+			RuntimeVariables.replace("Staging Drop Down"));
 
 		for (int second = 0;; second++) {
-			if (second >= 60) {
+			if (second >= 90) {
 				fail("timeout");
 			}
 
@@ -80,25 +67,37 @@ public class ViewSchedulerEventStagingCommunityQuartzTest extends BaseTestCase {
 			Thread.sleep(1000);
 		}
 
-		selenium.saveScreenShotAndSource();
-		assertEquals(RuntimeVariables.replace("Manage Pages"),
+		assertEquals(RuntimeVariables.replace("Schedule Publication to Live"),
 			selenium.getText(
 				"//div[@class='lfr-component lfr-menu-list']/ul/li[2]/a"));
-		selenium.click(RuntimeVariables.replace(
-				"//div[@class='lfr-component lfr-menu-list']/ul/li[2]/a"));
-		selenium.waitForPageToLoad("30000");
-		selenium.saveScreenShotAndSource();
-		selenium.clickAt("//input[@value='Schedule Publication to Live']",
-			RuntimeVariables.replace("Schedule Publication to Live"));
+		selenium.click("//div[@class='lfr-component lfr-menu-list']/ul/li[2]/a");
+
+		for (int second = 0;; second++) {
+			if (second >= 90) {
+				fail("timeout");
+			}
+
+			try {
+				if (selenium.isVisible("link=View All")) {
+					break;
+				}
+			}
+			catch (Exception e) {
+			}
+
+			Thread.sleep(1000);
+		}
+
 		Thread.sleep(5000);
+		selenium.click("link=View All");
 
 		for (int second = 0;; second++) {
-			if (second >= 60) {
+			if (second >= 90) {
 				fail("timeout");
 			}
 
 			try {
-				if (selenium.isVisible("//span[1]/a")) {
+				if (selenium.isVisible("//div[@class='portlet-msg-info']")) {
 					break;
 				}
 			}
@@ -108,32 +107,7 @@ public class ViewSchedulerEventStagingCommunityQuartzTest extends BaseTestCase {
 			Thread.sleep(1000);
 		}
 
-		selenium.saveScreenShotAndSource();
-		assertEquals(RuntimeVariables.replace("View All"),
-			selenium.getText("//span[1]/a"));
-		selenium.clickAt("//span[1]/a", RuntimeVariables.replace("View All"));
-
-		for (int second = 0;; second++) {
-			if (second >= 60) {
-				fail("timeout");
-			}
-
-			try {
-				if (RuntimeVariables.replace("Quartz Scheduler Event")
-										.equals(selenium.getText(
-								"//div[@id='_134_scheduledPublishEventsDiv']/div/div/table/tbody/tr[3]/td"))) {
-					break;
-				}
-			}
-			catch (Exception e) {
-			}
-
-			Thread.sleep(1000);
-		}
-
-		selenium.saveScreenShotAndSource();
-		assertEquals(RuntimeVariables.replace("Quartz Scheduler Event"),
-			selenium.getText(
-				"//div[@id='_134_scheduledPublishEventsDiv']/div/div/table/tbody/tr[3]/td"));
+		assertEquals(RuntimeVariables.replace("There are no scheduled events."),
+			selenium.getText("//div[@class='portlet-msg-info']"));
 	}
 }

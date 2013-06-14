@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -32,9 +32,11 @@ public interface PortalLDAPExporter {
 		throws Exception;
 
 	public void exportToLDAP(
-			User user, Map<String, Serializable> userExpandoAttributes)
+			long userId, long userGroupId, LDAPOperation ldapOperation)
 		throws Exception;
 
-	public void exportToLDAP(long userId, long userGroupId) throws Exception;
+	public void exportToLDAP(
+			User user, Map<String, Serializable> userExpandoAttributes)
+		throws Exception;
 
 }

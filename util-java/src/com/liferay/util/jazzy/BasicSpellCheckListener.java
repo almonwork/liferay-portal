@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -19,7 +19,6 @@ import com.swabunga.spell.event.SpellCheckEvent;
 import com.swabunga.spell.event.SpellCheckListener;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -33,14 +32,14 @@ public class BasicSpellCheckListener implements SpellCheckListener {
 		_invalidWords = new ArrayList<InvalidWord>();
 	}
 
+	public List<InvalidWord> getInvalidWords() {
+		return _invalidWords;
+	}
+
 	public void spellingError(SpellCheckEvent event) {
 		List<String> suggestions = new ArrayList<String>();
 
-		Iterator<Word> itr = event.getSuggestions().iterator();
-
-		while (itr.hasNext()) {
-			Word word = itr.next();
-
+		for (Word word : (List<Word>)event.getSuggestions()) {
 			suggestions.add(word.getWord());
 		}
 
@@ -60,10 +59,6 @@ public class BasicSpellCheckListener implements SpellCheckListener {
 						event.getWordContext(), pos));
 			}
 		}
-	}
-
-	public List<InvalidWord> getInvalidWords() {
-		return _invalidWords;
 	}
 
 	private boolean _isInsideHtmlTag(int pos) {
@@ -96,8 +91,8 @@ public class BasicSpellCheckListener implements SpellCheckListener {
 		return insideHtmlTag;
 	}
 
+	private List<InvalidWord> _invalidWords;
 	private String _text;
 	private char[] _textCharArray;
-	private List<InvalidWord> _invalidWords;
 
 }

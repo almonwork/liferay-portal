@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -21,6 +21,8 @@ public interface ThemeSetting {
 
 	public String[] getOptions();
 
+	public String getScript();
+
 	public String getType();
 
 	public String getValue();
@@ -30,6 +32,8 @@ public interface ThemeSetting {
 	public void setConfigurable(boolean configurable);
 
 	public void setOptions(String[] options);
+
+	public void setScript(String script);
 
 	public void setType(String type);
 

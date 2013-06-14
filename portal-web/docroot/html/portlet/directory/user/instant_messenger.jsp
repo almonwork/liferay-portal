@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -60,15 +60,6 @@ String ym = selContact.getYmSn();
 			</dd>
 		</c:if>
 
-		<c:if test="<%= Validator.isNotNull(msn) %>">
-			<dt>
-				<liferay-ui:message key="msn" />
-			</dt>
-			<dd>
-				<%= HtmlUtil.escape(msn) %>
-			</dd>
-		</c:if>
-
 		<c:if test="<%= Validator.isNotNull(skype) %>">
 			<dt>
 				<liferay-ui:message key="skype" />
@@ -79,9 +70,18 @@ String ym = selContact.getYmSn();
 			</dd>
 		</c:if>
 
+		<c:if test="<%= Validator.isNotNull(msn) %>">
+			<dt>
+				<liferay-ui:message key="windows-live-messenger" />
+			</dt>
+			<dd>
+				<%= HtmlUtil.escape(msn) %>
+			</dd>
+		</c:if>
+
 		<c:if test="<%= Validator.isNotNull(ym) %>">
 			<dt>
-				<liferay-ui:message key="ym" />
+				<liferay-ui:message key="yim" />
 			</dt>
 			<dd>
 				<%= HtmlUtil.escape(ym) %>

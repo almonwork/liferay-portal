@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -20,6 +20,8 @@ import com.liferay.portal.kernel.dao.jdbc.DataAccess;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.upgrade.util.UpgradeTable;
+import com.liferay.portal.kernel.upgrade.util.UpgradeTableFactoryUtil;
 
 import java.io.IOException;
 
@@ -56,7 +58,7 @@ public abstract class UpgradeProcess {
 		ResultSet rs = null;
 
 		try {
-			con = DataAccess.getConnection();
+			con = DataAccess.getUpgradeOptimizedConnection();
 
 			DatabaseMetaData metadata = con.getMetaData();
 
@@ -77,6 +79,12 @@ public abstract class UpgradeProcess {
 		DB db = DBFactoryUtil.getDB();
 
 		return db.increment();
+	}
+
+	public long increment(String name) throws SystemException {
+		DB db = DBFactoryUtil.getDB();
+
+		return db.increment(name);
 	}
 
 	public boolean isSupportsAlterColumnName() {
@@ -139,7 +147,7 @@ public abstract class UpgradeProcess {
 		ResultSet rs = null;
 
 		try {
-			con = DataAccess.getConnection();
+			con = DataAccess.getUpgradeOptimizedConnection();
 
 			ps = con.prepareStatement("select * from " + tableName);
 
@@ -170,7 +178,7 @@ public abstract class UpgradeProcess {
 		ResultSet rs = null;
 
 		try {
-			con = DataAccess.getConnection();
+			con = DataAccess.getUpgradeOptimizedConnection();
 
 			ps = con.prepareStatement("select count(*) from " + tableName);
 
@@ -206,9 +214,7 @@ public abstract class UpgradeProcess {
 		}
 	}
 
-	public void upgrade(Class<?> upgradeProcessClass)
-		throws UpgradeException {
-
+	public void upgrade(Class<?> upgradeProcessClass) throws UpgradeException {
 		UpgradeProcess upgradeProcess = null;
 
 		try {
@@ -221,13 +227,34 @@ public abstract class UpgradeProcess {
 		upgradeProcess.upgrade();
 	}
 
-	public void upgrade(UpgradeProcess upgradeProcess)
-		throws UpgradeException {
-
+	public void upgrade(UpgradeProcess upgradeProcess) throws UpgradeException {
 		upgradeProcess.upgrade();
 	}
 
 	protected void doUpgrade() throws Exception {
+	}
+
+	protected void upgradeTable(String tableName, Object[][] tableColumns)
+		throws Exception {
+
+		UpgradeTable upgradeTable = UpgradeTableFactoryUtil.getUpgradeTable(
+			tableName, tableColumns);
+
+		upgradeTable.updateTable();
+	}
+
+	protected void upgradeTable(
+			String tableName, Object[][] tableColumns, String sqlCreate,
+			String[] sqlAddIndexes)
+		throws Exception {
+
+		UpgradeTable upgradeTable = UpgradeTableFactoryUtil.getUpgradeTable(
+			tableName, tableColumns);
+
+		upgradeTable.setCreateSQL(sqlCreate);
+		upgradeTable.setIndexesSQL(sqlAddIndexes);
+
+		upgradeTable.updateTable();
 	}
 
 	private static Log _log = LogFactoryUtil.getLog(UpgradeProcess.class);

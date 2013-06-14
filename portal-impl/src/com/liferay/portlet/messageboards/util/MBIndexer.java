@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,9 +14,17 @@
 
 package com.liferay.portlet.messageboards.util;
 
+import com.liferay.portal.kernel.dao.orm.DynamicQuery;
+import com.liferay.portal.kernel.dao.orm.DynamicQueryFactoryUtil;
+import com.liferay.portal.kernel.dao.orm.Projection;
+import com.liferay.portal.kernel.dao.orm.ProjectionFactoryUtil;
+import com.liferay.portal.kernel.dao.orm.ProjectionList;
+import com.liferay.portal.kernel.dao.orm.Property;
+import com.liferay.portal.kernel.dao.orm.PropertyFactoryUtil;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.parsers.bbcode.BBCodeTranslatorUtil;
 import com.liferay.portal.kernel.search.BaseIndexer;
 import com.liferay.portal.kernel.search.BooleanClauseOccur;
 import com.liferay.portal.kernel.search.BooleanQuery;
@@ -25,7 +33,6 @@ import com.liferay.portal.kernel.search.Document;
 import com.liferay.portal.kernel.search.DocumentImpl;
 import com.liferay.portal.kernel.search.Field;
 import com.liferay.portal.kernel.search.Hits;
-import com.liferay.portal.kernel.search.Indexer;
 import com.liferay.portal.kernel.search.SearchContext;
 import com.liferay.portal.kernel.search.SearchEngineUtil;
 import com.liferay.portal.kernel.search.Summary;
@@ -35,6 +42,7 @@ import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.portal.model.Group;
+import com.liferay.portal.security.pacl.PACLClassLoaderUtil;
 import com.liferay.portal.security.permission.ActionKeys;
 import com.liferay.portal.security.permission.PermissionChecker;
 import com.liferay.portal.service.GroupLocalServiceUtil;
@@ -69,23 +77,27 @@ public class MBIndexer extends BaseIndexer {
 
 	public static final String PORTLET_ID = PortletKeys.MESSAGE_BOARDS;
 
+	public MBIndexer() {
+		setFilterSearch(true);
+		setPermissionAware(true);
+	}
+
 	public String[] getClassNames() {
 		return CLASS_NAMES;
 	}
 
+	public String getPortletId() {
+		return PORTLET_ID;
+	}
+
 	@Override
 	public boolean hasPermission(
-			PermissionChecker permissionChecker, long entryClassPK,
-			String actionId)
+			PermissionChecker permissionChecker, String entryClassName,
+			long entryClassPK, String actionId)
 		throws Exception {
 
 		return MBMessagePermission.contains(
 			permissionChecker, entryClassPK, ActionKeys.VIEW);
-	}
-
-	@Override
-	public boolean isFilterSearch() {
-		return _FILTER_SEARCH;
 	}
 
 	@Override
@@ -140,11 +152,35 @@ public class MBIndexer extends BaseIndexer {
 		}
 	}
 
+	protected void addReindexCriteria(
+		DynamicQuery dynamicQuery, long companyId) {
+
+		Property property = PropertyFactoryUtil.forName("companyId");
+
+		dynamicQuery.add(property.eq(companyId));
+	}
+
+	protected void addReindexCriteria(
+		DynamicQuery dynamicQuery, long groupId, long categoryId) {
+
+		Property groupIdProperty = PropertyFactoryUtil.forName("groupId");
+
+		dynamicQuery.add(groupIdProperty.eq(groupId));
+
+		Property categoryIdProperty = PropertyFactoryUtil.forName("categoryId");
+
+		dynamicQuery.add(categoryIdProperty.eq(categoryId));
+
+		Property statusProperty = PropertyFactoryUtil.forName("status");
+
+		dynamicQuery.add(statusProperty.eq(WorkflowConstants.STATUS_APPROVED));
+	}
+
 	@Override
 	protected void doDelete(Object obj) throws Exception {
 		SearchContext searchContext = new SearchContext();
 
-		searchContext.setSearchEngineId(SearchEngineUtil.SYSTEM_ENGINE_ID);
+		searchContext.setSearchEngineId(getSearchEngineId());
 
 		if (obj instanceof MBCategory) {
 			MBCategory category = (MBCategory)obj;
@@ -158,14 +194,15 @@ public class MBIndexer extends BaseIndexer {
 				"categoryId", category.getCategoryId());
 
 			Hits hits = SearchEngineUtil.search(
-				category.getCompanyId(), booleanQuery, QueryUtil.ALL_POS,
-				QueryUtil.ALL_POS);
+				getSearchEngineId(), category.getCompanyId(), booleanQuery,
+				QueryUtil.ALL_POS, QueryUtil.ALL_POS);
 
 			for (int i = 0; i < hits.getLength(); i++) {
 				Document document = hits.doc(i);
 
 				SearchEngineUtil.deleteDocument(
-					category.getCompanyId(), document.get(Field.UID));
+					getSearchEngineId(), category.getCompanyId(),
+					document.get(Field.UID));
 			}
 		}
 		else if (obj instanceof MBMessage) {
@@ -176,7 +213,8 @@ public class MBIndexer extends BaseIndexer {
 			document.addUID(PORTLET_ID, message.getMessageId());
 
 			SearchEngineUtil.deleteDocument(
-				message.getCompanyId(), document.get(Field.UID));
+				getSearchEngineId(), message.getCompanyId(),
+				document.get(Field.UID));
 		}
 		else if (obj instanceof MBThread) {
 			MBThread thread = (MBThread)obj;
@@ -192,14 +230,15 @@ public class MBIndexer extends BaseIndexer {
 			booleanQuery.addRequiredTerm("threadId", thread.getThreadId());
 
 			Hits hits = SearchEngineUtil.search(
-				message.getCompanyId(), booleanQuery, QueryUtil.ALL_POS,
-				QueryUtil.ALL_POS);
+				getSearchEngineId(), message.getCompanyId(), booleanQuery,
+				QueryUtil.ALL_POS, QueryUtil.ALL_POS);
 
 			for (int i = 0; i < hits.getLength(); i++) {
 				Document document = hits.doc(i);
 
 				SearchEngineUtil.deleteDocument(
-					message.getCompanyId(), document.get(Field.UID));
+					getSearchEngineId(), message.getCompanyId(),
+					document.get(Field.UID));
 			}
 		}
 	}
@@ -269,7 +308,8 @@ public class MBIndexer extends BaseIndexer {
 
 		Document document = getDocument(message);
 
-		SearchEngineUtil.updateDocument(message.getCompanyId(), document);
+		SearchEngineUtil.updateDocument(
+			getSearchEngineId(), message.getCompanyId(), document);
 	}
 
 	@Override
@@ -309,7 +349,7 @@ public class MBIndexer extends BaseIndexer {
 		String content = message.getBody();
 
 		try {
-			content = BBCodeUtil.getHTML(content);
+			content = BBCodeTranslatorUtil.getHTML(content);
 		}
 		catch (Exception e) {
 			_log.error(
@@ -323,62 +363,144 @@ public class MBIndexer extends BaseIndexer {
 	}
 
 	protected void reindexCategories(long companyId) throws Exception {
-		int categoryCount =
-			MBCategoryLocalServiceUtil.getCompanyCategoriesCount(companyId);
+		DynamicQuery dynamicQuery = DynamicQueryFactoryUtil.forClass(
+			MBCategory.class, PACLClassLoaderUtil.getPortalClassLoader());
 
-		int categoryPages = categoryCount / Indexer.DEFAULT_INTERVAL;
+		Projection minCategoryIdProjection = ProjectionFactoryUtil.min(
+			"categoryId");
+		Projection maxCategoryIdProjection = ProjectionFactoryUtil.max(
+			"categoryId");
 
-		for (int i = 0; i <= categoryPages; i++) {
-			int categoryStart = (i * Indexer.DEFAULT_INTERVAL);
-			int categoryEnd = categoryStart + Indexer.DEFAULT_INTERVAL;
+		ProjectionList projectionList = ProjectionFactoryUtil.projectionList();
 
-			reindexCategories(companyId, categoryStart, categoryEnd);
+		projectionList.add(minCategoryIdProjection);
+		projectionList.add(maxCategoryIdProjection);
+
+		dynamicQuery.setProjection(projectionList);
+
+		addReindexCriteria(dynamicQuery, companyId);
+
+		List<Object[]> results = MBCategoryLocalServiceUtil.dynamicQuery(
+			dynamicQuery);
+
+		Object[] minAndMaxCategoryIds = results.get(0);
+
+		if ((minAndMaxCategoryIds[0] == null) ||
+			(minAndMaxCategoryIds[1] == null)) {
+
+			return;
+		}
+
+		long minCategoryId = (Long)minAndMaxCategoryIds[0];
+		long maxCategoryId = (Long)minAndMaxCategoryIds[1];
+
+		long startCategoryId = minCategoryId;
+		long endCategoryId = startCategoryId + DEFAULT_INTERVAL;
+
+		while (startCategoryId <= maxCategoryId) {
+			reindexCategories(companyId, startCategoryId, endCategoryId);
+
+			startCategoryId = endCategoryId;
+			endCategoryId += DEFAULT_INTERVAL;
 		}
 	}
 
 	protected void reindexCategories(
-			long companyId, int categoryStart, int categoryEnd)
+			long companyId, long startCategoryId, long endCategoryId)
 		throws Exception {
 
-		List<MBCategory> categories =
-			MBCategoryLocalServiceUtil.getCompanyCategories(
-				companyId, categoryStart, categoryEnd);
+		DynamicQuery dynamicQuery = DynamicQueryFactoryUtil.forClass(
+			MBCategory.class, PACLClassLoaderUtil.getPortalClassLoader());
+
+		Property property = PropertyFactoryUtil.forName("categoryId");
+
+		dynamicQuery.add(property.ge(startCategoryId));
+		dynamicQuery.add(property.lt(endCategoryId));
+
+		addReindexCriteria(dynamicQuery, companyId);
+
+		List<MBCategory> categories = MBCategoryLocalServiceUtil.dynamicQuery(
+			dynamicQuery);
 
 		for (MBCategory category : categories) {
 			long groupId = category.getGroupId();
 			long categoryId = category.getCategoryId();
 
-			int messageCount =
-				MBMessageLocalServiceUtil.getCategoryMessagesCount(
-					groupId, categoryId, WorkflowConstants.STATUS_APPROVED);
-
-			int messagePages = messageCount / Indexer.DEFAULT_INTERVAL;
-
-			for (int i = 0; i <= messagePages; i++) {
-				int messageStart = (i * Indexer.DEFAULT_INTERVAL);
-				int messageEnd = messageStart + Indexer.DEFAULT_INTERVAL;
-
-				reindexMessages(
-					companyId, groupId, categoryId, messageStart, messageEnd);
-			}
+			reindexMessages(companyId, groupId, categoryId);
 		}
 	}
 
 	protected void reindexMessages(
-			long companyId, long groupId, long categoryId, int messageStart,
-			int messageEnd)
+			long companyId, long groupId, long categoryId)
 		throws Exception {
 
-		List<MBMessage> messages =
-			MBMessageLocalServiceUtil.getCategoryMessages(
-				groupId, categoryId, WorkflowConstants.STATUS_APPROVED,
-				messageStart, messageEnd);
+		DynamicQuery dynamicQuery = DynamicQueryFactoryUtil.forClass(
+			MBMessage.class, PACLClassLoaderUtil.getPortalClassLoader());
+
+		Projection minMessageIdProjection = ProjectionFactoryUtil.min(
+			"messageId");
+		Projection maxMessageIdProjection = ProjectionFactoryUtil.max(
+			"messageId");
+
+		ProjectionList projectionList = ProjectionFactoryUtil.projectionList();
+
+		projectionList.add(minMessageIdProjection);
+		projectionList.add(maxMessageIdProjection);
+
+		dynamicQuery.setProjection(projectionList);
+
+		addReindexCriteria(dynamicQuery, groupId, categoryId);
+
+		List<Object[]> results = MBMessageLocalServiceUtil.dynamicQuery(
+			dynamicQuery);
+
+		Object[] minAndMaxMessageIds = results.get(0);
+
+		if ((minAndMaxMessageIds[0] == null) ||
+			(minAndMaxMessageIds[1] == null)) {
+
+			return;
+		}
+
+		long minMessageId = (Long)minAndMaxMessageIds[0];
+		long maxMessageId = (Long)minAndMaxMessageIds[1];
+
+		long startMessageId = minMessageId;
+		long endMessageId = startMessageId + DEFAULT_INTERVAL;
+
+		while (startMessageId <= maxMessageId) {
+			reindexMessages(
+				companyId, groupId, categoryId, startMessageId, endMessageId);
+
+			startMessageId = endMessageId;
+			endMessageId += DEFAULT_INTERVAL;
+		}
+	}
+
+	protected void reindexMessages(
+			long companyId, long groupId, long categoryId, long startMessageId,
+			long endMessageId)
+		throws Exception {
+
+		DynamicQuery dynamicQuery = DynamicQueryFactoryUtil.forClass(
+			MBMessage.class, PACLClassLoaderUtil.getPortalClassLoader());
+
+		Property property = PropertyFactoryUtil.forName("messageId");
+
+		dynamicQuery.add(property.ge(startMessageId));
+		dynamicQuery.add(property.lt(endMessageId));
+
+		addReindexCriteria(dynamicQuery, groupId, categoryId);
+
+		List<MBMessage> messages = MBMessageLocalServiceUtil.dynamicQuery(
+			dynamicQuery);
 
 		if (messages.isEmpty()) {
 			return;
 		}
 
-		Collection<Document> documents = new ArrayList<Document>();
+		Collection<Document> documents = new ArrayList<Document>(
+			messages.size());
 
 		for (MBMessage message : messages) {
 			Document document = getDocument(message);
@@ -386,48 +508,72 @@ public class MBIndexer extends BaseIndexer {
 			documents.add(document);
 		}
 
-		SearchEngineUtil.updateDocuments(companyId, documents);
+		SearchEngineUtil.updateDocuments(
+			getSearchEngineId(), companyId, documents);
 	}
 
 	protected void reindexRoot(long companyId) throws Exception {
-		int groupCount = GroupLocalServiceUtil.getCompanyGroupsCount(companyId);
+		DynamicQuery dynamicQuery = DynamicQueryFactoryUtil.forClass(
+			Group.class, PACLClassLoaderUtil.getPortalClassLoader());
 
-		int groupPages = groupCount / Indexer.DEFAULT_INTERVAL;
+		Projection minGroupIdProjection = ProjectionFactoryUtil.min("groupId");
+		Projection maxGroupIdProjection = ProjectionFactoryUtil.max("groupId");
 
-		for (int i = 0; i <= groupPages; i++) {
-			int groupStart = (i * Indexer.DEFAULT_INTERVAL);
-			int groupEnd = groupStart + Indexer.DEFAULT_INTERVAL;
+		ProjectionList projectionList = ProjectionFactoryUtil.projectionList();
 
-			reindexRoot(companyId, groupStart, groupEnd);
+		projectionList.add(minGroupIdProjection);
+		projectionList.add(maxGroupIdProjection);
+
+		dynamicQuery.setProjection(projectionList);
+
+		addReindexCriteria(dynamicQuery, companyId);
+
+		List<Object[]> results = GroupLocalServiceUtil.dynamicQuery(
+			dynamicQuery);
+
+		Object[] minAndMaxGroupIds = results.get(0);
+
+		if ((minAndMaxGroupIds[0] == null) || (minAndMaxGroupIds[1] == null)) {
+			return;
+		}
+
+		long minGroupId = (Long)minAndMaxGroupIds[0];
+		long maxGroupId = (Long)minAndMaxGroupIds[1];
+
+		long startGroupId = minGroupId;
+		long endGroupId = startGroupId + DEFAULT_INTERVAL;
+
+		while (startGroupId <= maxGroupId) {
+			reindexRoot(companyId, startGroupId, endGroupId);
+
+			startGroupId = endGroupId;
+			endGroupId += DEFAULT_INTERVAL;
 		}
 	}
 
-	protected void reindexRoot(long companyId, int groupStart, int groupEnd)
+	protected void reindexRoot(
+			long companyId, long startGroupId, long endGroupId)
 		throws Exception {
 
-		List<Group> groups = GroupLocalServiceUtil.getCompanyGroups(
-			companyId, groupStart, groupEnd);
+		DynamicQuery dynamicQuery = DynamicQueryFactoryUtil.forClass(
+			Group.class, PACLClassLoaderUtil.getPortalClassLoader());
+
+		Property property = PropertyFactoryUtil.forName("groupId");
+
+		dynamicQuery.add(property.ge(startGroupId));
+		dynamicQuery.add(property.lt(endGroupId));
+
+		addReindexCriteria(dynamicQuery, companyId);
+
+		List<Group> groups = GroupLocalServiceUtil.dynamicQuery(dynamicQuery);
 
 		for (Group group : groups) {
 			long groupId = group.getGroupId();
 			long categoryId = MBCategoryConstants.DEFAULT_PARENT_CATEGORY_ID;
 
-			int entryCount = MBMessageLocalServiceUtil.getCategoryMessagesCount(
-				groupId, categoryId, WorkflowConstants.STATUS_APPROVED);
-
-			int entryPages = entryCount / Indexer.DEFAULT_INTERVAL;
-
-			for (int i = 0; i <= entryPages; i++) {
-				int entryStart = (i * Indexer.DEFAULT_INTERVAL);
-				int entryEnd = entryStart + Indexer.DEFAULT_INTERVAL;
-
-				reindexMessages(
-					companyId, groupId, categoryId, entryStart, entryEnd);
-			}
+			reindexMessages(companyId, groupId, categoryId);
 		}
 	}
-
-	private static final boolean _FILTER_SEARCH = true;
 
 	private static Log _log = LogFactoryUtil.getLog(MBIndexer.class);
 

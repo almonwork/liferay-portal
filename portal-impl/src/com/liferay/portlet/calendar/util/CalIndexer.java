@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,11 +14,16 @@
 
 package com.liferay.portlet.calendar.util;
 
+import com.liferay.portal.kernel.dao.orm.DynamicQuery;
+import com.liferay.portal.kernel.dao.orm.DynamicQueryFactoryUtil;
+import com.liferay.portal.kernel.dao.orm.Projection;
+import com.liferay.portal.kernel.dao.orm.ProjectionFactoryUtil;
+import com.liferay.portal.kernel.dao.orm.ProjectionList;
+import com.liferay.portal.kernel.dao.orm.Property;
+import com.liferay.portal.kernel.dao.orm.PropertyFactoryUtil;
 import com.liferay.portal.kernel.search.BaseIndexer;
 import com.liferay.portal.kernel.search.Document;
-import com.liferay.portal.kernel.search.DocumentImpl;
 import com.liferay.portal.kernel.search.Field;
-import com.liferay.portal.kernel.search.Indexer;
 import com.liferay.portal.kernel.search.SearchContext;
 import com.liferay.portal.kernel.search.SearchEngineUtil;
 import com.liferay.portal.kernel.search.Summary;
@@ -26,6 +31,7 @@ import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.HtmlUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
+import com.liferay.portal.security.pacl.PACLClassLoaderUtil;
 import com.liferay.portal.util.PortletKeys;
 import com.liferay.portlet.calendar.model.CalEvent;
 import com.liferay.portlet.calendar.service.CalEventLocalServiceUtil;
@@ -46,20 +52,31 @@ public class CalIndexer extends BaseIndexer {
 
 	public static final String PORTLET_ID = PortletKeys.CALENDAR;
 
+	public CalIndexer() {
+		setPermissionAware(true);
+	}
+
 	public String[] getClassNames() {
 		return CLASS_NAMES;
+	}
+
+	public String getPortletId() {
+		return PORTLET_ID;
+	}
+
+	protected void addReindexCriteria(
+		DynamicQuery dynamicQuery, long companyId) {
+
+		Property property = PropertyFactoryUtil.forName("companyId");
+
+		dynamicQuery.add(property.eq(companyId));
 	}
 
 	@Override
 	protected void doDelete(Object obj) throws Exception {
 		CalEvent event = (CalEvent)obj;
 
-		Document document = new DocumentImpl();
-
-		document.addUID(PORTLET_ID, event.getEventId());
-
-		SearchEngineUtil.deleteDocument(
-			event.getCompanyId(), document.get(Field.UID));
+		deleteDocument(event.getCompanyId(), event.getEventId());
 	}
 
 	@Override
@@ -103,7 +120,8 @@ public class CalIndexer extends BaseIndexer {
 
 		Document document = getDocument(event);
 
-		SearchEngineUtil.updateDocument(event.getCompanyId(), document);
+		SearchEngineUtil.updateDocument(
+			getSearchEngineId(), event.getCompanyId(), document);
 	}
 
 	@Override
@@ -126,29 +144,66 @@ public class CalIndexer extends BaseIndexer {
 	}
 
 	protected void reindexEvents(long companyId) throws Exception {
-		int count = CalEventLocalServiceUtil.getCompanyEventsCount(companyId);
+		DynamicQuery dynamicQuery = DynamicQueryFactoryUtil.forClass(
+			CalEvent.class, PACLClassLoaderUtil.getPortalClassLoader());
 
-		int pages = count / Indexer.DEFAULT_INTERVAL;
+		Projection minEventIdProjection = ProjectionFactoryUtil.min("eventId");
+		Projection maxEventIdProjection = ProjectionFactoryUtil.max("eventId");
 
-		for (int i = 0; i <= pages; i++) {
-			int start = (i * Indexer.DEFAULT_INTERVAL);
-			int end = start + Indexer.DEFAULT_INTERVAL;
+		ProjectionList projectionList = ProjectionFactoryUtil.projectionList();
 
-			reindexEvents(companyId, start, end);
+		projectionList.add(minEventIdProjection);
+		projectionList.add(maxEventIdProjection);
+
+		dynamicQuery.setProjection(projectionList);
+
+		addReindexCriteria(dynamicQuery, companyId);
+
+		List<Object[]> results = CalEventLocalServiceUtil.dynamicQuery(
+			dynamicQuery);
+
+		Object[] minAndMaxEventIds = results.get(0);
+
+		if ((minAndMaxEventIds[0] == null) || (minAndMaxEventIds[1] == null)) {
+			return;
+		}
+
+		long minEventId = (Long)minAndMaxEventIds[0];
+		long maxEventId = (Long)minAndMaxEventIds[1];
+
+		long startEventId = minEventId;
+		long endEventId = startEventId + DEFAULT_INTERVAL;
+
+		while (startEventId <= maxEventId) {
+			reindexEvents(companyId, startEventId, endEventId);
+
+			startEventId = endEventId;
+			endEventId += DEFAULT_INTERVAL;
 		}
 	}
 
-	protected void reindexEvents(long companyId, int start, int end)
+	protected void reindexEvents(
+			long companyId, long startEventId, long endEventId)
 		throws Exception {
 
-		List<CalEvent> events = CalEventLocalServiceUtil.getCompanyEvents(
-			companyId, start, end);
+		DynamicQuery dynamicQuery = DynamicQueryFactoryUtil.forClass(
+			CalEvent.class, PACLClassLoaderUtil.getPortalClassLoader());
+
+		Property property = PropertyFactoryUtil.forName("eventId");
+
+		dynamicQuery.add(property.ge(startEventId));
+		dynamicQuery.add(property.lt(endEventId));
+
+		addReindexCriteria(dynamicQuery, companyId);
+
+		List<CalEvent> events = CalEventLocalServiceUtil.dynamicQuery(
+			dynamicQuery);
 
 		if (events.isEmpty()) {
 			return;
 		}
 
-		Collection<Document> documents = new ArrayList<Document>();
+		Collection<Document> documents = new ArrayList<Document>(events.size());
 
 		for (CalEvent event : events) {
 			Document document = getDocument(event);
@@ -156,7 +211,8 @@ public class CalIndexer extends BaseIndexer {
 			documents.add(document);
 		}
 
-		SearchEngineUtil.updateDocuments(companyId, documents);
+		SearchEngineUtil.updateDocuments(
+			getSearchEngineId(), companyId, documents);
 	}
 
 }

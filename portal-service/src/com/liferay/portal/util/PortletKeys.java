@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -33,6 +33,8 @@ public class PortletKeys {
 
 	public static final String ANNOUNCEMENTS = "84";
 
+	public static final String APPLICATION_DISPLAY_STYLES = "183";
+
 	public static final String ASSET_BROWSER = "172";
 
 	public static final String ASSET_PUBLISHER = "101";
@@ -48,8 +50,6 @@ public class PortletKeys {
 	public static final String CALENDAR = "8";
 
 	public static final String CHAT = "1_WAR_chatportlet";
-
-	public static final String COMMUNITIES = "29";
 
 	public static final String CONTROL_PANEL_MENU = "160";
 
@@ -79,9 +79,9 @@ public class PortletKeys {
 
 	public static final String GROUP_PAGES = "156";
 
-	public static final String IFRAME = "48";
+	public static final String GROUP_STATISTICS = "181";
 
-	public static final String IMAGE_GALLERY = "31";
+	public static final String IFRAME = "48";
 
 	public static final String INVITATION = "100";
 
@@ -108,11 +108,19 @@ public class PortletKeys {
 
 	public static final String MAIL = "1_WAR_mailportlet";
 
-	public static final String MESSAGE_BOARDS_ADMIN = "162";
+	public static final String MARKETPLACE_STORE = "1_WAR_marketplaceportlet";
+
+	public static final String MEDIA_GALLERY_DISPLAY = "31";
 
 	public static final String MESSAGE_BOARDS = "19";
 
+	public static final String MESSAGE_BOARDS_ADMIN = "162";
+
 	public static final String METADATA_SET_ADMIN = "171";
+
+	public static final String MOBILE_DEVICE_GLOBAL_ADMIN = "177";
+
+	public static final String MOBILE_DEVICE_SITE_ADMIN = "178";
 
 	public static final String MONITORING = "131";
 
@@ -120,7 +128,7 @@ public class PortletKeys {
 
 	public static final String MY_PAGES = "140";
 
-	public static final String MY_SITES = "49";
+	public static final String MY_SITES = "29";
 
 	public static final String MY_WORKFLOW_INSTANCES = "158";
 
@@ -162,7 +170,7 @@ public class PortletKeys {
 
 	public static final int PREFS_OWNER_TYPE_LAYOUT = 3;
 
-	public static final int PREFS_OWNER_TYPE_ORGANIZATION  = 6;
+	public static final int PREFS_OWNER_TYPE_ORGANIZATION = 6;
 
 	public static final int PREFS_OWNER_TYPE_USER = 4;
 
@@ -188,9 +196,11 @@ public class PortletKeys {
 
 	public static final String SITE_MEMBERSHIPS_ADMIN = "174";
 
-	public static final String SITES_ADMIN = "134";
+	public static final String SITE_REDIRECTOR = "49";
 
 	public static final String SITE_SETTINGS = "165";
+
+	public static final String SITES_ADMIN = "134";
 
 	public static final String SOFTWARE_CATALOG = "98";
 
@@ -210,9 +220,15 @@ public class PortletKeys {
 
 	public static final String TRANSLATOR = "26";
 
+	public static final String TRASH = "182";
+
 	public static final String UNIT_CONVERTER = "27";
 
 	public static final String UPDATE_MANAGER = "104";
+
+	public static final String USER_GROUPS_ADMIN = "127";
+
+	public static final String USER_STATISTICS = "180";
 
 	public static final String USERS_ADMIN = "125";
 

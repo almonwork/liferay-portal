@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -21,9 +21,12 @@ import com.liferay.portal.kernel.portlet.LiferayPortletRequest;
 import com.liferay.portal.kernel.portlet.LiferayPortletSession;
 import com.liferay.portal.kernel.portlet.LiferayWindowState;
 import com.liferay.portal.kernel.servlet.BrowserSnifferUtil;
+import com.liferay.portal.kernel.servlet.DynamicServletRequest;
 import com.liferay.portal.kernel.servlet.ProtectedPrincipal;
+import com.liferay.portal.kernel.servlet.ServletContextPool;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.ContentTypes;
+import com.liferay.portal.kernel.util.ContextPathUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.JavaConstants;
 import com.liferay.portal.kernel.util.LocaleUtil;
@@ -43,9 +46,6 @@ import com.liferay.portal.theme.ThemeDisplay;
 import com.liferay.portal.util.PortalUtil;
 import com.liferay.portal.util.WebKeys;
 import com.liferay.portlet.portletconfiguration.util.PublicRenderParameterConfiguration;
-import com.liferay.util.servlet.DynamicServletRequest;
-
-import java.lang.reflect.Method;
 
 import java.security.Principal;
 
@@ -69,9 +69,12 @@ import javax.portlet.PortletRequest;
 import javax.portlet.PortletResponse;
 import javax.portlet.PortletSession;
 import javax.portlet.WindowState;
+import javax.portlet.filter.PortletRequestWrapper;
 
+import javax.servlet.ServletContext;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 
 /**
  * @author Brian Wing Shun Chan
@@ -83,31 +86,21 @@ public abstract class PortletRequestImpl implements LiferayPortletRequest {
 	public static PortletRequestImpl getPortletRequestImpl(
 		PortletRequest portletRequest) {
 
-		PortletRequestImpl portletRequestImpl = null;
+		while (!(portletRequest instanceof PortletRequestImpl)) {
+			if (portletRequest instanceof PortletRequestWrapper) {
+				PortletRequestWrapper portletRequestWrapper =
+					(PortletRequestWrapper)portletRequest;
 
-		if (portletRequest instanceof PortletRequestImpl) {
-			portletRequestImpl = (PortletRequestImpl)portletRequest;
-		}
-		else {
-
-			// LPS-3311
-
-			try {
-				Method method = portletRequest.getClass().getMethod(
-					"getRequest");
-
-				Object obj = method.invoke(portletRequest, (Object[])null);
-
-				portletRequestImpl = getPortletRequestImpl((PortletRequest)obj);
+				portletRequest = portletRequestWrapper.getRequest();
 			}
-			catch (Exception e) {
+			else {
 				throw new RuntimeException(
-					"Unable to get the portlet request from " +
-						portletRequest.getClass().getName());
+					"Unable to unwrap the portlet request from " +
+						portletRequest.getClass());
 			}
 		}
 
-		return portletRequestImpl;
+		return (PortletRequestImpl)portletRequest;
 	}
 
 	public void cleanUp() {
@@ -115,6 +108,8 @@ public abstract class PortletRequestImpl implements LiferayPortletRequest {
 		_request.removeAttribute(JavaConstants.JAVAX_PORTLET_REQUEST);
 		_request.removeAttribute(JavaConstants.JAVAX_PORTLET_RESPONSE);
 		_request.removeAttribute(PortletRequest.LIFECYCLE_PHASE);
+		_request.removeAttribute(WebKeys.PORTLET_ID);
+		_request.removeAttribute(WebKeys.PORTLET_CONTENT);
 	}
 
 	public void defineObjects(
@@ -177,8 +172,20 @@ public abstract class PortletRequestImpl implements LiferayPortletRequest {
 	}
 
 	public String getContextPath() {
-		//return StringPool.SLASH + _req.getContextPath();
-		return StringPool.SLASH + _portletContext.getPortletContextName();
+		PortletContextImpl portletContextImpl =
+			(PortletContextImpl)_portletContext;
+
+		ServletContext servletContext = portletContextImpl.getServletContext();
+
+		String servletContextName = servletContext.getServletContextName();
+
+		if (ServletContextPool.containsKey(servletContextName)) {
+			servletContext = ServletContextPool.get(servletContextName);
+
+			return ContextPathUtil.getContextPath(servletContext);
+		}
+
+		return StringPool.SLASH.concat(_portletContext.getPortletContextName());
 	}
 
 	public Cookie[] getCookies() {
@@ -295,8 +302,7 @@ public abstract class PortletRequestImpl implements LiferayPortletRequest {
 		else {
 			if (create) {
 				_session = new PortletSessionImpl(
-					_req, _portletName, _portletContext, _portalSessionId,
-					_plid);
+					_req.getSession(), _portletContext, _portletName, _plid);
 			}
 
 			return _ses;
@@ -306,7 +312,7 @@ public abstract class PortletRequestImpl implements LiferayPortletRequest {
 			_req.getSession(create);
 
 			_session = new PortletSessionImpl(
-				_req, _portletName, _portletContext, _portalSessionId, _plid);
+				_req.getSession(), _portletContext, _portletName, _plid);
 		}*/
 
 		if (!create && _invalidSession) {
@@ -326,19 +332,37 @@ public abstract class PortletRequestImpl implements LiferayPortletRequest {
 	}
 
 	public Map<String, String[]> getPrivateParameterMap() {
-		Map<String, String[]> parameterMap = new HashMap<String, String[]>();
+		Map<String, String[]> parameterMap = null;
 
-		Enumeration<String> enu = getParameterNames();
-
-		while (enu.hasMoreElements()) {
-			String name = enu.nextElement();
-
-			if (_portlet.getPublicRenderParameter(name) == null) {
-				parameterMap.put(name, getParameterValues(name));
-			}
+		if (_portletRequestDispatcherRequest != null) {
+			parameterMap = _portletRequestDispatcherRequest.getParameterMap();
+		}
+		else {
+			parameterMap = _request.getParameterMap();
 		}
 
-		return parameterMap;
+		Map<String, String[]> privateParameterMap = null;
+
+		for (Map.Entry<String, String[]> entry : parameterMap.entrySet()) {
+			String name = entry.getKey();
+
+			if (_portlet.getPublicRenderParameter(name) != null) {
+				continue;
+			}
+
+			if (privateParameterMap == null) {
+				privateParameterMap = new HashMap<String, String[]>(
+					parameterMap.size(), 1);
+			}
+
+			privateParameterMap.put(name, entry.getValue());
+		}
+
+		if (privateParameterMap == null) {
+			return Collections.emptyMap();
+		}
+
+		return Collections.unmodifiableMap(privateParameterMap);
 	}
 
 	public Enumeration<String> getProperties(String name) {
@@ -362,19 +386,37 @@ public abstract class PortletRequestImpl implements LiferayPortletRequest {
 	}
 
 	public Map<String, String[]> getPublicParameterMap() {
-		Map<String, String[]> parameterMap = new HashMap<String, String[]>();
+		Map<String, String[]> parameterMap = null;
 
-		Enumeration<String> enu = getParameterNames();
+		if (_portletRequestDispatcherRequest != null) {
+			parameterMap = _portletRequestDispatcherRequest.getParameterMap();
+		}
+		else {
+			parameterMap = _request.getParameterMap();
+		}
 
-		while (enu.hasMoreElements()) {
-			String name = enu.nextElement();
+		Map<String, String[]> publicParameterMap = null;
+
+		for (Map.Entry<String, String[]> entry : parameterMap.entrySet()) {
+			String name = entry.getKey();
 
 			if (_portlet.getPublicRenderParameter(name) != null) {
-				parameterMap.put(name, getParameterValues(name));
+
+				if (publicParameterMap == null) {
+					publicParameterMap = new HashMap<String, String[]>(
+						parameterMap.size(), 1);
+				}
+
+				publicParameterMap.put(name, entry.getValue());
 			}
 		}
 
-		return parameterMap;
+		if (publicParameterMap == null) {
+			return Collections.emptyMap();
+		}
+		else {
+			return Collections.unmodifiableMap(publicParameterMap);
+		}
 	}
 
 	public String getRemoteUser() {
@@ -386,7 +428,19 @@ public abstract class PortletRequestImpl implements LiferayPortletRequest {
 	}
 
 	public String getRequestedSessionId() {
-		return _request.getSession().getId();
+		if (_session != null) {
+			return _session.getId();
+		}
+		else {
+			HttpSession session = _request.getSession(false);
+
+			if (session == null) {
+				return StringPool.BLANK;
+			}
+			else {
+				return session.getId();
+			}
+		}
 	}
 
 	public String getResponseContentType() {
@@ -469,16 +523,15 @@ public abstract class PortletRequestImpl implements LiferayPortletRequest {
 	}
 
 	public boolean isRequestedSessionIdValid() {
-		if (_session != null) {
-			return _session.isValid();
-		}
-		else {
-			return _request.isRequestedSessionIdValid();
-		}
+		return _request.isRequestedSessionIdValid();
 	}
 
 	public boolean isSecure() {
 		return _request.isSecure();
+	}
+
+	public boolean isTriggeredByActionURL() {
+		return _triggeredByActionURL;
 	}
 
 	public boolean isUserInRole(String role) {
@@ -545,10 +598,6 @@ public abstract class PortletRequestImpl implements LiferayPortletRequest {
 		_windowState = windowState;
 	}
 
-	public boolean isTriggeredByActionURL() {
-		return _triggeredByActionURL;
-	}
-
 	protected void init(
 		HttpServletRequest request, Portlet portlet,
 		InvokerPortlet invokerPortlet, PortletContext portletContext,
@@ -588,7 +637,7 @@ public abstract class PortletRequestImpl implements LiferayPortletRequest {
 
 		String ppid = ParamUtil.getString(request, "p_p_id");
 
-		boolean windowStateRestoreCurrentView =  ParamUtil.getBoolean(
+		boolean windowStateRestoreCurrentView = ParamUtil.getBoolean(
 			request, "p_p_state_rcv");
 
 		if (_portletName.equals(ppid) &&
@@ -617,11 +666,9 @@ public abstract class PortletRequestImpl implements LiferayPortletRequest {
 			}
 		}
 
-		Map<String, String[]> renderParameters = RenderParametersPool.get(
-			request, plid, _portletName);
-
 		if (portletFocus) {
-			renderParameters = new HashMap<String, String[]>();
+			Map<String, String[]> renderParameters =
+				new HashMap<String, String[]>();
 
 			if (getLifecycle().equals(PortletRequest.RENDER_PHASE) &&
 				!LiferayWindowState.isExclusive(request) &&
@@ -657,6 +704,9 @@ public abstract class PortletRequestImpl implements LiferayPortletRequest {
 			}
 		}
 		else {
+			Map<String, String[]> renderParameters = RenderParametersPool.get(
+				request, plid, _portletName);
+
 			for (Map.Entry<String, String[]> entry :
 					renderParameters.entrySet()) {
 
@@ -681,9 +731,8 @@ public abstract class PortletRequestImpl implements LiferayPortletRequest {
 		_windowState = windowState;
 		_portletMode = portletMode;
 		_preferences = preferences;
-		_portalSessionId = _request.getRequestedSessionId();
 		_session = new PortletSessionImpl(
-			_request, _portletName, _portletContext, _portalSessionId, plid);
+			_request.getSession(), _portletContext, _portletName, plid);
 
 		String remoteUser = request.getRemoteUser();
 
@@ -769,8 +818,8 @@ public abstract class PortletRequestImpl implements LiferayPortletRequest {
 				String[] values = _publicRenderParameters.get(
 					PortletQNameUtil.getPublicRenderParameterName(qName));
 
-				if ((values) == null || (values.length == 0) ||
-					(Validator.isNull(values[0]))) {
+				if ((values == null) || (values.length == 0) ||
+					Validator.isNull(values[0])) {
 
 					continue;
 				}
@@ -789,7 +838,7 @@ public abstract class PortletRequestImpl implements LiferayPortletRequest {
 		InvokerPortlet invokerPortlet, String portletNamespace, String name) {
 
 		if (name.startsWith(portletNamespace) &&
-			!invokerPortlet.isFacesPortlet()) {
+			((invokerPortlet == null) || !invokerPortlet.isFacesPortlet())) {
 
 			name = name.substring(portletNamespace.length());
 		}
@@ -799,27 +848,26 @@ public abstract class PortletRequestImpl implements LiferayPortletRequest {
 
 	private static Log _log = LogFactoryUtil.getLog(PortletRequestImpl.class);
 
-	private HttpServletRequest _request;
-	private HttpServletRequest _originalRequest;
-	private HttpServletRequest _portletRequestDispatcherRequest;
-	private boolean _wapTheme;
-	private Portlet _portlet;
-	private String _portletName;
-	private PortalContext _portalContext;
-	private PortletContext _portletContext;
-	private WindowState _windowState;
-	private PortletMode _portletMode;
-	private PortletPreferences _preferences;
-	private PortletSessionImpl _session;
-	private String _portalSessionId;
 	private boolean _invalidSession;
+	private Locale _locale;
+	private HttpServletRequest _originalRequest;
+	private long _plid;
+	private PortalContext _portalContext;
+	private Portlet _portlet;
+	private PortletContext _portletContext;
+	private PortletMode _portletMode;
+	private String _portletName;
+	private HttpServletRequest _portletRequestDispatcherRequest;
+	private PortletPreferences _preferences;
+	private Profile _profile;
+	private Map<String, String[]> _publicRenderParameters;
 	private String _remoteUser;
 	private long _remoteUserId;
-	private Principal _userPrincipal;
-	private Profile _profile;
-	private Locale _locale;
-	private long _plid;
-	private Map<String, String[]> _publicRenderParameters;
+	private HttpServletRequest _request;
+	private PortletSessionImpl _session;
 	private boolean _triggeredByActionURL;
+	private Principal _userPrincipal;
+	private boolean _wapTheme;
+	private WindowState _windowState;
 
 }

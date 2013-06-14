@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -19,6 +19,8 @@ import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.model.CacheModel;
 import com.liferay.portal.model.Country;
 
+import java.io.Serializable;
+
 /**
  * The cache model class for representing Country in entity cache.
  *
@@ -26,10 +28,10 @@ import com.liferay.portal.model.Country;
  * @see Country
  * @generated
  */
-public class CountryCacheModel implements CacheModel<Country> {
+public class CountryCacheModel implements CacheModel<Country>, Serializable {
 	@Override
 	public String toString() {
-		StringBundler sb = new StringBundler(15);
+		StringBundler sb = new StringBundler(17);
 
 		sb.append("{countryId=");
 		sb.append(countryId);
@@ -43,6 +45,8 @@ public class CountryCacheModel implements CacheModel<Country> {
 		sb.append(number);
 		sb.append(", idd=");
 		sb.append(idd);
+		sb.append(", zipRequired=");
+		sb.append(zipRequired);
 		sb.append(", active=");
 		sb.append(active);
 		sb.append("}");
@@ -90,6 +94,7 @@ public class CountryCacheModel implements CacheModel<Country> {
 			countryImpl.setIdd(idd);
 		}
 
+		countryImpl.setZipRequired(zipRequired);
 		countryImpl.setActive(active);
 
 		countryImpl.resetOriginalValues();
@@ -103,5 +108,6 @@ public class CountryCacheModel implements CacheModel<Country> {
 	public String a3;
 	public String number;
 	public String idd;
+	public boolean zipRequired;
 	public boolean active;
 }

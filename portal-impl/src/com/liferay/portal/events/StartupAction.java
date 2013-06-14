@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -19,7 +19,6 @@ import com.liferay.portal.kernel.bean.PortalBeanLocatorUtil;
 import com.liferay.portal.kernel.cluster.ClusterExecutorUtil;
 import com.liferay.portal.kernel.events.ActionException;
 import com.liferay.portal.kernel.events.SimpleAction;
-import com.liferay.portal.kernel.freemarker.FreeMarkerEngineUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.messaging.MessageBus;
@@ -29,8 +28,9 @@ import com.liferay.portal.kernel.messaging.sender.SynchronousMessageSender;
 import com.liferay.portal.kernel.scheduler.SchedulerEngineUtil;
 import com.liferay.portal.kernel.search.IndexerRegistryUtil;
 import com.liferay.portal.kernel.servlet.JspFactorySwapper;
+import com.liferay.portal.kernel.template.TemplateManagerUtil;
 import com.liferay.portal.kernel.util.ReleaseInfo;
-import com.liferay.portal.kernel.velocity.VelocityEngineUtil;
+import com.liferay.portal.kernel.util.ServerDetector;
 import com.liferay.portal.plugin.PluginPackageIndexer;
 import com.liferay.portal.security.lang.PortalSecurityManager;
 import com.liferay.portal.service.LockLocalServiceUtil;
@@ -86,31 +86,40 @@ public class StartupAction extends SimpleAction {
 			_log.debug("Add shutdown hook");
 		}
 
-		Runtime.getRuntime().addShutdownHook(new Thread(new ShutdownHook()));
+		Runtime runtime = Runtime.getRuntime();
+
+		runtime.addShutdownHook(new Thread(new ShutdownHook()));
 
 		// Security manager
 
-		if ((System.getSecurityManager() == null) &&
-			(PropsValues.PORTAL_SECURITY_MANAGER_ENABLE)) {
+		String portalSecurityManagerStrategy =
+			PropsValues.PORTAL_SECURITY_MANAGER_STRATEGY;
 
-			System.setSecurityManager(new PortalSecurityManager());
+		if (portalSecurityManagerStrategy.equals("smart")) {
+			if (ServerDetector.isWebSphere()) {
+				portalSecurityManagerStrategy = "none";
+			}
+			else {
+				portalSecurityManagerStrategy = "default";
+			}
 		}
 
-		// FreeMarker
+		if (portalSecurityManagerStrategy.equals("liferay")) {
+			if (System.getSecurityManager() == null) {
+				System.setSecurityManager(new PortalSecurityManager());
+			}
+		}
+		else if (portalSecurityManagerStrategy.equals("none")) {
+			System.setSecurityManager(null);
+		}
+
+		// Template manager
 
 		if (_log.isDebugEnabled()) {
-			_log.debug("Initialize FreeMarker engine");
+			_log.debug("Initialize template manager");
 		}
 
-		FreeMarkerEngineUtil.init();
-
-		// Velocity
-
-		if (_log.isDebugEnabled()) {
-			_log.debug("Initialize Velocity engine");
-		}
-
-		VelocityEngineUtil.init();
+		TemplateManagerUtil.init();
 
 		// Indexers
 
@@ -150,10 +159,10 @@ public class StartupAction extends SimpleAction {
 		// Scheduler
 
 		if (_log.isDebugEnabled()) {
-			_log.debug("Initialize scheduler engine");
+			_log.debug("Initialize scheduler engine lifecycle");
 		}
 
-		SchedulerEngineUtil.start();
+		SchedulerEngineUtil.initialize();
 
 		// Verify
 

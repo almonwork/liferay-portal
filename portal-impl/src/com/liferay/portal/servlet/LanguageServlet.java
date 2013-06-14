@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -51,7 +51,7 @@ public class LanguageServlet extends HttpServlet {
 		}
 
 		if (Validator.isNotNull(path) && path.startsWith(StringPool.SLASH)) {
-			path = path.substring(1, path.length());
+			path = path.substring(1);
 		}
 
 		String[] pathArray = StringUtil.split(path, CharPool.SLASH);

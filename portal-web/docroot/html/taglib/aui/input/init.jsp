@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -21,7 +21,6 @@
 <%
 Map<String, Object> dynamicAttributes = (Map<String, Object>)request.getAttribute("aui:input:dynamicAttributes");
 Map<String, Object> scopedAttributes = (Map<String, Object>)request.getAttribute("aui:input:scopedAttributes");
-CustomAttributes customAttributes = (CustomAttributes)request.getAttribute("aui:input:customAttributes");
 
 Map<String, Object> _options = new HashMap<String, Object>();
 
@@ -39,6 +38,7 @@ boolean checked = GetterUtil.getBoolean(String.valueOf(request.getAttribute("aui
 long classPK = GetterUtil.getLong(String.valueOf(request.getAttribute("aui:input:classPK")));
 java.lang.String cssClass = GetterUtil.getString((java.lang.String)request.getAttribute("aui:input:cssClass"));
 java.util.Map data = (java.util.Map)request.getAttribute("aui:input:data");
+java.lang.String defaultLanguageId = GetterUtil.getString((java.lang.String)request.getAttribute("aui:input:defaultLanguageId"));
 boolean disabled = GetterUtil.getBoolean(String.valueOf(request.getAttribute("aui:input:disabled")));
 java.lang.String field = GetterUtil.getString((java.lang.String)request.getAttribute("aui:input:field"));
 java.lang.String fieldParam = GetterUtil.getString((java.lang.String)request.getAttribute("aui:input:fieldParam"));
@@ -58,7 +58,9 @@ boolean multiple = GetterUtil.getBoolean(String.valueOf(request.getAttribute("au
 java.lang.String name = GetterUtil.getString((java.lang.String)request.getAttribute("aui:input:name"));
 java.lang.String onChange = GetterUtil.getString((java.lang.String)request.getAttribute("aui:input:onChange"));
 java.lang.String onClick = GetterUtil.getString((java.lang.String)request.getAttribute("aui:input:onClick"));
+java.lang.String placeholder = GetterUtil.getString((java.lang.String)request.getAttribute("aui:input:placeholder"));
 java.lang.String prefix = GetterUtil.getString((java.lang.String)request.getAttribute("aui:input:prefix"));
+boolean showRequiredLabel = GetterUtil.getBoolean(String.valueOf(request.getAttribute("aui:input:showRequiredLabel")), true);
 java.lang.String suffix = GetterUtil.getString((java.lang.String)request.getAttribute("aui:input:suffix"));
 java.lang.String title = GetterUtil.getString((java.lang.String)request.getAttribute("aui:input:title"));
 java.lang.String type = GetterUtil.getString((java.lang.String)request.getAttribute("aui:input:type"));
@@ -71,6 +73,7 @@ _updateOptions(_options, "checked", checked);
 _updateOptions(_options, "classPK", classPK);
 _updateOptions(_options, "cssClass", cssClass);
 _updateOptions(_options, "data", data);
+_updateOptions(_options, "defaultLanguageId", defaultLanguageId);
 _updateOptions(_options, "disabled", disabled);
 _updateOptions(_options, "field", field);
 _updateOptions(_options, "fieldParam", fieldParam);
@@ -90,7 +93,9 @@ _updateOptions(_options, "multiple", multiple);
 _updateOptions(_options, "name", name);
 _updateOptions(_options, "onChange", onChange);
 _updateOptions(_options, "onClick", onClick);
+_updateOptions(_options, "placeholder", placeholder);
 _updateOptions(_options, "prefix", prefix);
+_updateOptions(_options, "showRequiredLabel", showRequiredLabel);
 _updateOptions(_options, "suffix", suffix);
 _updateOptions(_options, "title", title);
 _updateOptions(_options, "type", type);
@@ -98,7 +103,7 @@ _updateOptions(_options, "useNamespace", useNamespace);
 _updateOptions(_options, "value", value);
 %>
 
-<%@ include file="init-ext.jspf" %>
+<%@ include file="/html/taglib/aui/input/init-ext.jspf" %>
 
 <%!
 private static final String _NAMESPACE = "aui:input:";

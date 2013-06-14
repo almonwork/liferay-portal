@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -19,19 +19,25 @@ import com.liferay.portal.kernel.configuration.Configuration;
 import com.liferay.portal.kernel.configuration.Filter;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.servlet.WebDirDetector;
 import com.liferay.portal.kernel.util.CharPool;
+import com.liferay.portal.kernel.util.ClassUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.PropsKeys;
+import com.liferay.portal.kernel.util.ReleaseInfo;
 import com.liferay.portal.kernel.util.ServerDetector;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.SystemProperties;
+import com.liferay.portal.kernel.util.UnicodeProperties;
 import com.liferay.portal.model.CompanyConstants;
 import com.liferay.portal.security.auth.CompanyThreadLocal;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
+
+import javax.servlet.Servlet;
 
 /**
  * @author Brian Wing Shun Chan
@@ -40,6 +46,10 @@ public class PropsUtil {
 
 	public static void addProperties(Properties properties) {
 		_instance._addProperties(properties);
+	}
+
+	public static void addProperties(UnicodeProperties unicodeProperties) {
+		_instance._addProperties(unicodeProperties);
 	}
 
 	public static boolean contains(String key) {
@@ -86,8 +96,72 @@ public class PropsUtil {
 
 	private PropsUtil() {
 		try {
+
+			// Default liferay home directory
+
 			SystemProperties.set(
 				PropsKeys.DEFAULT_LIFERAY_HOME, _getDefaultLiferayHome());
+
+			// Global shared lib directory
+
+			String globalSharedLibDir = _getLibDir(Servlet.class);
+
+			if (_log.isInfoEnabled()) {
+				_log.info("Global shared lib directory " + globalSharedLibDir);
+			}
+
+			SystemProperties.set(
+				PropsKeys.LIFERAY_LIB_GLOBAL_SHARED_DIR, globalSharedLibDir);
+
+			// Global lib directory
+
+			String globalLibDir = _getLibDir(ReleaseInfo.class);
+
+			if (_log.isInfoEnabled()) {
+				_log.info("Global lib directory " + globalLibDir);
+			}
+
+			SystemProperties.set(
+				PropsKeys.LIFERAY_LIB_GLOBAL_DIR, globalLibDir);
+
+			// Portal lib directory
+
+			Class<?> clazz = getClass();
+
+			ClassLoader classLoader = clazz.getClassLoader();
+
+			String portalLibDir = WebDirDetector.getLibDir(classLoader);
+
+			String portalLibDirProperty = System.getProperty(
+				PropsKeys.LIFERAY_LIB_PORTAL_DIR);
+
+			if (portalLibDirProperty != null) {
+				if (!portalLibDirProperty.endsWith(StringPool.SLASH)) {
+					portalLibDirProperty += StringPool.SLASH;
+				}
+
+				portalLibDir = portalLibDirProperty;
+			}
+
+			if (_log.isInfoEnabled()) {
+				_log.info("Portal lib directory " + portalLibDir);
+			}
+
+			SystemProperties.set(
+				PropsKeys.LIFERAY_LIB_PORTAL_DIR, portalLibDir);
+
+			// Portal web directory
+
+			String portalWebDir = WebDirDetector.getRootDir(portalLibDir);
+
+			if (_log.isDebugEnabled()) {
+				_log.debug("Portal web directory " + portalWebDir);
+			}
+
+			SystemProperties.set(
+				PropsKeys.LIFERAY_WEB_PORTAL_DIR, portalWebDir);
+
+			// Liferay home directory
 
 			_configuration = new ConfigurationImpl(
 				PropsUtil.class.getClassLoader(), PropsFiles.PORTAL);
@@ -99,6 +173,8 @@ public class PropsUtil {
 			}
 
 			SystemProperties.set(PropsKeys.LIFERAY_HOME, liferayHome);
+
+			// Ehcache disk directory
 
 			SystemProperties.set(
 				"ehcache.disk.store.dir", liferayHome + "/data/ehcache");
@@ -118,6 +194,14 @@ public class PropsUtil {
 
 	private void _addProperties(Properties properties) {
 		_getConfiguration().addProperties(properties);
+	}
+
+	private void _addProperties(UnicodeProperties unicodeProperties) {
+		Properties properties = new Properties();
+
+		properties.putAll(unicodeProperties);
+
+		_addProperties(properties);
 	}
 
 	private boolean _contains(String key) {
@@ -219,6 +303,23 @@ public class PropsUtil {
 		}
 
 		return defaultLiferayHome;
+	}
+
+	private String _getLibDir(Class<?> clazz) {
+		String path = ClassUtil.getParentPath(
+			clazz.getClassLoader(), clazz.getName());
+
+		int pos = path.lastIndexOf(".jar!");
+
+		if (pos == -1) {
+			pos = path.lastIndexOf(".jar/");
+		}
+
+		pos = path.lastIndexOf(CharPool.SLASH, pos);
+
+		path = path.substring(0, pos + 1);
+
+		return path;
 	}
 
 	private Properties _getProperties() {

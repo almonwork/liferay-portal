@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -17,11 +17,10 @@ package com.liferay.portlet.dynamicdatamapping.model.impl;
 import com.liferay.portal.kernel.bean.AutoEscapeBeanHandler;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.json.JSON;
-import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
-import com.liferay.portal.kernel.util.HtmlUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.LocalizationUtil;
+import com.liferay.portal.kernel.util.ProxyUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.Validator;
@@ -38,12 +37,11 @@ import com.liferay.portlet.expando.util.ExpandoBridgeFactoryUtil;
 
 import java.io.Serializable;
 
-import java.lang.reflect.Proxy;
-
 import java.sql.Types;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -79,14 +77,17 @@ public class DDMTemplateModelImpl extends BaseModelImpl<DDMTemplate>
 			{ "userName", Types.VARCHAR },
 			{ "createDate", Types.TIMESTAMP },
 			{ "modifiedDate", Types.TIMESTAMP },
-			{ "structureId", Types.BIGINT },
+			{ "classNameId", Types.BIGINT },
+			{ "classPK", Types.BIGINT },
+			{ "templateKey", Types.VARCHAR },
 			{ "name", Types.VARCHAR },
 			{ "description", Types.VARCHAR },
 			{ "type_", Types.VARCHAR },
+			{ "mode_", Types.VARCHAR },
 			{ "language", Types.VARCHAR },
 			{ "script", Types.CLOB }
 		};
-	public static final String TABLE_SQL_CREATE = "create table DDMTemplate (uuid_ VARCHAR(75) null,templateId LONG not null primary key,groupId LONG,companyId LONG,userId LONG,userName VARCHAR(75) null,createDate DATE null,modifiedDate DATE null,structureId LONG,name STRING null,description STRING null,type_ VARCHAR(75) null,language VARCHAR(75) null,script TEXT null)";
+	public static final String TABLE_SQL_CREATE = "create table DDMTemplate (uuid_ VARCHAR(75) null,templateId LONG not null primary key,groupId LONG,companyId LONG,userId LONG,userName VARCHAR(75) null,createDate DATE null,modifiedDate DATE null,classNameId LONG,classPK LONG,templateKey VARCHAR(75) null,name STRING null,description STRING null,type_ VARCHAR(75) null,mode_ VARCHAR(75) null,language VARCHAR(75) null,script TEXT null)";
 	public static final String TABLE_SQL_DROP = "drop table DDMTemplate";
 	public static final String DATA_SOURCE = "liferayDataSource";
 	public static final String SESSION_FACTORY = "liferaySessionFactory";
@@ -97,6 +98,18 @@ public class DDMTemplateModelImpl extends BaseModelImpl<DDMTemplate>
 	public static final boolean FINDER_CACHE_ENABLED = GetterUtil.getBoolean(com.liferay.portal.util.PropsUtil.get(
 				"value.object.finder.cache.enabled.com.liferay.portlet.dynamicdatamapping.model.DDMTemplate"),
 			true);
+	public static final boolean COLUMN_BITMASK_ENABLED = GetterUtil.getBoolean(com.liferay.portal.util.PropsUtil.get(
+				"value.object.column.bitmask.enabled.com.liferay.portlet.dynamicdatamapping.model.DDMTemplate"),
+			true);
+	public static long CLASSNAMEID_COLUMN_BITMASK = 1L;
+	public static long CLASSPK_COLUMN_BITMASK = 2L;
+	public static long COMPANYID_COLUMN_BITMASK = 4L;
+	public static long GROUPID_COLUMN_BITMASK = 8L;
+	public static long LANGUAGE_COLUMN_BITMASK = 16L;
+	public static long MODE_COLUMN_BITMASK = 32L;
+	public static long TEMPLATEKEY_COLUMN_BITMASK = 64L;
+	public static long TYPE_COLUMN_BITMASK = 128L;
+	public static long UUID_COLUMN_BITMASK = 256L;
 
 	/**
 	 * Converts the soap model instance into a normal model instance.
@@ -115,10 +128,13 @@ public class DDMTemplateModelImpl extends BaseModelImpl<DDMTemplate>
 		model.setUserName(soapModel.getUserName());
 		model.setCreateDate(soapModel.getCreateDate());
 		model.setModifiedDate(soapModel.getModifiedDate());
-		model.setStructureId(soapModel.getStructureId());
+		model.setClassNameId(soapModel.getClassNameId());
+		model.setClassPK(soapModel.getClassPK());
+		model.setTemplateKey(soapModel.getTemplateKey());
 		model.setName(soapModel.getName());
 		model.setDescription(soapModel.getDescription());
 		model.setType(soapModel.getType());
+		model.setMode(soapModel.getMode());
 		model.setLanguage(soapModel.getLanguage());
 		model.setScript(soapModel.getScript());
 
@@ -141,14 +157,6 @@ public class DDMTemplateModelImpl extends BaseModelImpl<DDMTemplate>
 		return models;
 	}
 
-	public Class<?> getModelClass() {
-		return DDMTemplate.class;
-	}
-
-	public String getModelClassName() {
-		return DDMTemplate.class.getName();
-	}
-
 	public static final long LOCK_EXPIRATION_TIME = GetterUtil.getLong(com.liferay.portal.util.PropsUtil.get(
 				"lock.expiration.time.com.liferay.portlet.dynamicdatamapping.model.DDMTemplate"));
 
@@ -169,6 +177,144 @@ public class DDMTemplateModelImpl extends BaseModelImpl<DDMTemplate>
 
 	public void setPrimaryKeyObj(Serializable primaryKeyObj) {
 		setPrimaryKey(((Long)primaryKeyObj).longValue());
+	}
+
+	public Class<?> getModelClass() {
+		return DDMTemplate.class;
+	}
+
+	public String getModelClassName() {
+		return DDMTemplate.class.getName();
+	}
+
+	@Override
+	public Map<String, Object> getModelAttributes() {
+		Map<String, Object> attributes = new HashMap<String, Object>();
+
+		attributes.put("uuid", getUuid());
+		attributes.put("templateId", getTemplateId());
+		attributes.put("groupId", getGroupId());
+		attributes.put("companyId", getCompanyId());
+		attributes.put("userId", getUserId());
+		attributes.put("userName", getUserName());
+		attributes.put("createDate", getCreateDate());
+		attributes.put("modifiedDate", getModifiedDate());
+		attributes.put("classNameId", getClassNameId());
+		attributes.put("classPK", getClassPK());
+		attributes.put("templateKey", getTemplateKey());
+		attributes.put("name", getName());
+		attributes.put("description", getDescription());
+		attributes.put("type", getType());
+		attributes.put("mode", getMode());
+		attributes.put("language", getLanguage());
+		attributes.put("script", getScript());
+
+		return attributes;
+	}
+
+	@Override
+	public void setModelAttributes(Map<String, Object> attributes) {
+		String uuid = (String)attributes.get("uuid");
+
+		if (uuid != null) {
+			setUuid(uuid);
+		}
+
+		Long templateId = (Long)attributes.get("templateId");
+
+		if (templateId != null) {
+			setTemplateId(templateId);
+		}
+
+		Long groupId = (Long)attributes.get("groupId");
+
+		if (groupId != null) {
+			setGroupId(groupId);
+		}
+
+		Long companyId = (Long)attributes.get("companyId");
+
+		if (companyId != null) {
+			setCompanyId(companyId);
+		}
+
+		Long userId = (Long)attributes.get("userId");
+
+		if (userId != null) {
+			setUserId(userId);
+		}
+
+		String userName = (String)attributes.get("userName");
+
+		if (userName != null) {
+			setUserName(userName);
+		}
+
+		Date createDate = (Date)attributes.get("createDate");
+
+		if (createDate != null) {
+			setCreateDate(createDate);
+		}
+
+		Date modifiedDate = (Date)attributes.get("modifiedDate");
+
+		if (modifiedDate != null) {
+			setModifiedDate(modifiedDate);
+		}
+
+		Long classNameId = (Long)attributes.get("classNameId");
+
+		if (classNameId != null) {
+			setClassNameId(classNameId);
+		}
+
+		Long classPK = (Long)attributes.get("classPK");
+
+		if (classPK != null) {
+			setClassPK(classPK);
+		}
+
+		String templateKey = (String)attributes.get("templateKey");
+
+		if (templateKey != null) {
+			setTemplateKey(templateKey);
+		}
+
+		String name = (String)attributes.get("name");
+
+		if (name != null) {
+			setName(name);
+		}
+
+		String description = (String)attributes.get("description");
+
+		if (description != null) {
+			setDescription(description);
+		}
+
+		String type = (String)attributes.get("type");
+
+		if (type != null) {
+			setType(type);
+		}
+
+		String mode = (String)attributes.get("mode");
+
+		if (mode != null) {
+			setMode(mode);
+		}
+
+		String language = (String)attributes.get("language");
+
+		if (language != null) {
+			setLanguage(language);
+		}
+
+		String script = (String)attributes.get("script");
+
+		if (script != null) {
+			setScript(script);
+		}
 	}
 
 	@JSON
@@ -208,6 +354,8 @@ public class DDMTemplateModelImpl extends BaseModelImpl<DDMTemplate>
 	}
 
 	public void setGroupId(long groupId) {
+		_columnBitmask |= GROUPID_COLUMN_BITMASK;
+
 		if (!_setOriginalGroupId) {
 			_setOriginalGroupId = true;
 
@@ -227,7 +375,19 @@ public class DDMTemplateModelImpl extends BaseModelImpl<DDMTemplate>
 	}
 
 	public void setCompanyId(long companyId) {
+		_columnBitmask |= COMPANYID_COLUMN_BITMASK;
+
+		if (!_setOriginalCompanyId) {
+			_setOriginalCompanyId = true;
+
+			_originalCompanyId = _companyId;
+		}
+
 		_companyId = companyId;
+	}
+
+	public long getOriginalCompanyId() {
+		return _originalCompanyId;
 	}
 
 	@JSON
@@ -279,13 +439,88 @@ public class DDMTemplateModelImpl extends BaseModelImpl<DDMTemplate>
 		_modifiedDate = modifiedDate;
 	}
 
-	@JSON
-	public long getStructureId() {
-		return _structureId;
+	public String getClassName() {
+		if (getClassNameId() <= 0) {
+			return StringPool.BLANK;
+		}
+
+		return PortalUtil.getClassName(getClassNameId());
 	}
 
-	public void setStructureId(long structureId) {
-		_structureId = structureId;
+	public void setClassName(String className) {
+		long classNameId = 0;
+
+		if (Validator.isNotNull(className)) {
+			classNameId = PortalUtil.getClassNameId(className);
+		}
+
+		setClassNameId(classNameId);
+	}
+
+	@JSON
+	public long getClassNameId() {
+		return _classNameId;
+	}
+
+	public void setClassNameId(long classNameId) {
+		_columnBitmask |= CLASSNAMEID_COLUMN_BITMASK;
+
+		if (!_setOriginalClassNameId) {
+			_setOriginalClassNameId = true;
+
+			_originalClassNameId = _classNameId;
+		}
+
+		_classNameId = classNameId;
+	}
+
+	public long getOriginalClassNameId() {
+		return _originalClassNameId;
+	}
+
+	@JSON
+	public long getClassPK() {
+		return _classPK;
+	}
+
+	public void setClassPK(long classPK) {
+		_columnBitmask |= CLASSPK_COLUMN_BITMASK;
+
+		if (!_setOriginalClassPK) {
+			_setOriginalClassPK = true;
+
+			_originalClassPK = _classPK;
+		}
+
+		_classPK = classPK;
+	}
+
+	public long getOriginalClassPK() {
+		return _originalClassPK;
+	}
+
+	@JSON
+	public String getTemplateKey() {
+		if (_templateKey == null) {
+			return StringPool.BLANK;
+		}
+		else {
+			return _templateKey;
+		}
+	}
+
+	public void setTemplateKey(String templateKey) {
+		_columnBitmask |= TEMPLATEKEY_COLUMN_BITMASK;
+
+		if (_originalTemplateKey == null) {
+			_originalTemplateKey = _templateKey;
+		}
+
+		_templateKey = templateKey;
+	}
+
+	public String getOriginalTemplateKey() {
+		return GetterUtil.getString(_originalTemplateKey);
 	}
 
 	@JSON
@@ -311,26 +546,23 @@ public class DDMTemplateModelImpl extends BaseModelImpl<DDMTemplate>
 	}
 
 	public String getName(String languageId) {
-		String value = LocalizationUtil.getLocalization(getName(), languageId);
-
-		if (isEscapedModel()) {
-			return HtmlUtil.escape(value);
-		}
-		else {
-			return value;
-		}
+		return LocalizationUtil.getLocalization(getName(), languageId);
 	}
 
 	public String getName(String languageId, boolean useDefault) {
-		String value = LocalizationUtil.getLocalization(getName(), languageId,
-				useDefault);
+		return LocalizationUtil.getLocalization(getName(), languageId,
+			useDefault);
+	}
 
-		if (isEscapedModel()) {
-			return HtmlUtil.escape(value);
-		}
-		else {
-			return value;
-		}
+	public String getNameCurrentLanguageId() {
+		return _nameCurrentLanguageId;
+	}
+
+	@JSON
+	public String getNameCurrentValue() {
+		Locale locale = getLocale(_nameCurrentLanguageId);
+
+		return getName(locale);
 	}
 
 	public Map<Locale, String> getNameMap() {
@@ -359,6 +591,10 @@ public class DDMTemplateModelImpl extends BaseModelImpl<DDMTemplate>
 		}
 	}
 
+	public void setNameCurrentLanguageId(String languageId) {
+		_nameCurrentLanguageId = languageId;
+	}
+
 	public void setNameMap(Map<Locale, String> nameMap) {
 		setNameMap(nameMap, LocaleUtil.getDefault());
 	}
@@ -368,13 +604,8 @@ public class DDMTemplateModelImpl extends BaseModelImpl<DDMTemplate>
 			return;
 		}
 
-		Locale[] locales = LanguageUtil.getAvailableLocales();
-
-		for (Locale locale : locales) {
-			String name = nameMap.get(locale);
-
-			setName(name, locale, defaultLocale);
-		}
+		setName(LocalizationUtil.updateLocalization(nameMap, getName(), "Name",
+				LocaleUtil.toLanguageId(defaultLocale)));
 	}
 
 	@JSON
@@ -400,27 +631,23 @@ public class DDMTemplateModelImpl extends BaseModelImpl<DDMTemplate>
 	}
 
 	public String getDescription(String languageId) {
-		String value = LocalizationUtil.getLocalization(getDescription(),
-				languageId);
-
-		if (isEscapedModel()) {
-			return HtmlUtil.escape(value);
-		}
-		else {
-			return value;
-		}
+		return LocalizationUtil.getLocalization(getDescription(), languageId);
 	}
 
 	public String getDescription(String languageId, boolean useDefault) {
-		String value = LocalizationUtil.getLocalization(getDescription(),
-				languageId, useDefault);
+		return LocalizationUtil.getLocalization(getDescription(), languageId,
+			useDefault);
+	}
 
-		if (isEscapedModel()) {
-			return HtmlUtil.escape(value);
-		}
-		else {
-			return value;
-		}
+	public String getDescriptionCurrentLanguageId() {
+		return _descriptionCurrentLanguageId;
+	}
+
+	@JSON
+	public String getDescriptionCurrentValue() {
+		Locale locale = getLocale(_descriptionCurrentLanguageId);
+
+		return getDescription(locale);
 	}
 
 	public Map<Locale, String> getDescriptionMap() {
@@ -451,6 +678,10 @@ public class DDMTemplateModelImpl extends BaseModelImpl<DDMTemplate>
 		}
 	}
 
+	public void setDescriptionCurrentLanguageId(String languageId) {
+		_descriptionCurrentLanguageId = languageId;
+	}
+
 	public void setDescriptionMap(Map<Locale, String> descriptionMap) {
 		setDescriptionMap(descriptionMap, LocaleUtil.getDefault());
 	}
@@ -461,13 +692,9 @@ public class DDMTemplateModelImpl extends BaseModelImpl<DDMTemplate>
 			return;
 		}
 
-		Locale[] locales = LanguageUtil.getAvailableLocales();
-
-		for (Locale locale : locales) {
-			String description = descriptionMap.get(locale);
-
-			setDescription(description, locale, defaultLocale);
-		}
+		setDescription(LocalizationUtil.updateLocalization(descriptionMap,
+				getDescription(), "Description",
+				LocaleUtil.toLanguageId(defaultLocale)));
 	}
 
 	@JSON
@@ -481,7 +708,41 @@ public class DDMTemplateModelImpl extends BaseModelImpl<DDMTemplate>
 	}
 
 	public void setType(String type) {
+		_columnBitmask |= TYPE_COLUMN_BITMASK;
+
+		if (_originalType == null) {
+			_originalType = _type;
+		}
+
 		_type = type;
+	}
+
+	public String getOriginalType() {
+		return GetterUtil.getString(_originalType);
+	}
+
+	@JSON
+	public String getMode() {
+		if (_mode == null) {
+			return StringPool.BLANK;
+		}
+		else {
+			return _mode;
+		}
+	}
+
+	public void setMode(String mode) {
+		_columnBitmask |= MODE_COLUMN_BITMASK;
+
+		if (_originalMode == null) {
+			_originalMode = _mode;
+		}
+
+		_mode = mode;
+	}
+
+	public String getOriginalMode() {
+		return GetterUtil.getString(_originalMode);
 	}
 
 	@JSON
@@ -495,7 +756,17 @@ public class DDMTemplateModelImpl extends BaseModelImpl<DDMTemplate>
 	}
 
 	public void setLanguage(String language) {
+		_columnBitmask |= LANGUAGE_COLUMN_BITMASK;
+
+		if (_originalLanguage == null) {
+			_originalLanguage = _language;
+		}
+
 		_language = language;
+	}
+
+	public String getOriginalLanguage() {
+		return GetterUtil.getString(_originalLanguage);
 	}
 
 	@JSON
@@ -512,35 +783,32 @@ public class DDMTemplateModelImpl extends BaseModelImpl<DDMTemplate>
 		_script = script;
 	}
 
+	public long getColumnBitmask() {
+		return _columnBitmask;
+	}
+
 	@Override
 	public DDMTemplate toEscapedModel() {
-		if (isEscapedModel()) {
-			return (DDMTemplate)this;
+		if (_escapedModelProxy == null) {
+			_escapedModelProxy = (DDMTemplate)ProxyUtil.newProxyInstance(_classLoader,
+					_escapedModelProxyInterfaces,
+					new AutoEscapeBeanHandler(this));
 		}
-		else {
-			if (_escapedModelProxy == null) {
-				_escapedModelProxy = (DDMTemplate)Proxy.newProxyInstance(_classLoader,
-						_escapedModelProxyInterfaces,
-						new AutoEscapeBeanHandler(this));
-			}
 
-			return _escapedModelProxy;
-		}
+		return _escapedModelProxy;
 	}
 
 	@Override
 	public ExpandoBridge getExpandoBridge() {
-		if (_expandoBridge == null) {
-			_expandoBridge = ExpandoBridgeFactoryUtil.getExpandoBridge(getCompanyId(),
-					DDMTemplate.class.getName(), getPrimaryKey());
-		}
-
-		return _expandoBridge;
+		return ExpandoBridgeFactoryUtil.getExpandoBridge(getCompanyId(),
+			DDMTemplate.class.getName(), getPrimaryKey());
 	}
 
 	@Override
 	public void setExpandoBridgeAttributes(ServiceContext serviceContext) {
-		getExpandoBridge().setAttributes(serviceContext);
+		ExpandoBridge expandoBridge = getExpandoBridge();
+
+		expandoBridge.setAttributes(serviceContext);
 	}
 
 	@Override
@@ -555,10 +823,13 @@ public class DDMTemplateModelImpl extends BaseModelImpl<DDMTemplate>
 		ddmTemplateImpl.setUserName(getUserName());
 		ddmTemplateImpl.setCreateDate(getCreateDate());
 		ddmTemplateImpl.setModifiedDate(getModifiedDate());
-		ddmTemplateImpl.setStructureId(getStructureId());
+		ddmTemplateImpl.setClassNameId(getClassNameId());
+		ddmTemplateImpl.setClassPK(getClassPK());
+		ddmTemplateImpl.setTemplateKey(getTemplateKey());
 		ddmTemplateImpl.setName(getName());
 		ddmTemplateImpl.setDescription(getDescription());
 		ddmTemplateImpl.setType(getType());
+		ddmTemplateImpl.setMode(getMode());
 		ddmTemplateImpl.setLanguage(getLanguage());
 		ddmTemplateImpl.setScript(getScript());
 
@@ -620,6 +891,28 @@ public class DDMTemplateModelImpl extends BaseModelImpl<DDMTemplate>
 		ddmTemplateModelImpl._originalGroupId = ddmTemplateModelImpl._groupId;
 
 		ddmTemplateModelImpl._setOriginalGroupId = false;
+
+		ddmTemplateModelImpl._originalCompanyId = ddmTemplateModelImpl._companyId;
+
+		ddmTemplateModelImpl._setOriginalCompanyId = false;
+
+		ddmTemplateModelImpl._originalClassNameId = ddmTemplateModelImpl._classNameId;
+
+		ddmTemplateModelImpl._setOriginalClassNameId = false;
+
+		ddmTemplateModelImpl._originalClassPK = ddmTemplateModelImpl._classPK;
+
+		ddmTemplateModelImpl._setOriginalClassPK = false;
+
+		ddmTemplateModelImpl._originalTemplateKey = ddmTemplateModelImpl._templateKey;
+
+		ddmTemplateModelImpl._originalType = ddmTemplateModelImpl._type;
+
+		ddmTemplateModelImpl._originalMode = ddmTemplateModelImpl._mode;
+
+		ddmTemplateModelImpl._originalLanguage = ddmTemplateModelImpl._language;
+
+		ddmTemplateModelImpl._columnBitmask = 0;
 	}
 
 	@Override
@@ -668,7 +961,17 @@ public class DDMTemplateModelImpl extends BaseModelImpl<DDMTemplate>
 			ddmTemplateCacheModel.modifiedDate = Long.MIN_VALUE;
 		}
 
-		ddmTemplateCacheModel.structureId = getStructureId();
+		ddmTemplateCacheModel.classNameId = getClassNameId();
+
+		ddmTemplateCacheModel.classPK = getClassPK();
+
+		ddmTemplateCacheModel.templateKey = getTemplateKey();
+
+		String templateKey = ddmTemplateCacheModel.templateKey;
+
+		if ((templateKey != null) && (templateKey.length() == 0)) {
+			ddmTemplateCacheModel.templateKey = null;
+		}
 
 		ddmTemplateCacheModel.name = getName();
 
@@ -694,6 +997,14 @@ public class DDMTemplateModelImpl extends BaseModelImpl<DDMTemplate>
 			ddmTemplateCacheModel.type = null;
 		}
 
+		ddmTemplateCacheModel.mode = getMode();
+
+		String mode = ddmTemplateCacheModel.mode;
+
+		if ((mode != null) && (mode.length() == 0)) {
+			ddmTemplateCacheModel.mode = null;
+		}
+
 		ddmTemplateCacheModel.language = getLanguage();
 
 		String language = ddmTemplateCacheModel.language;
@@ -715,7 +1026,7 @@ public class DDMTemplateModelImpl extends BaseModelImpl<DDMTemplate>
 
 	@Override
 	public String toString() {
-		StringBundler sb = new StringBundler(29);
+		StringBundler sb = new StringBundler(35);
 
 		sb.append("{uuid=");
 		sb.append(getUuid());
@@ -733,14 +1044,20 @@ public class DDMTemplateModelImpl extends BaseModelImpl<DDMTemplate>
 		sb.append(getCreateDate());
 		sb.append(", modifiedDate=");
 		sb.append(getModifiedDate());
-		sb.append(", structureId=");
-		sb.append(getStructureId());
+		sb.append(", classNameId=");
+		sb.append(getClassNameId());
+		sb.append(", classPK=");
+		sb.append(getClassPK());
+		sb.append(", templateKey=");
+		sb.append(getTemplateKey());
 		sb.append(", name=");
 		sb.append(getName());
 		sb.append(", description=");
 		sb.append(getDescription());
 		sb.append(", type=");
 		sb.append(getType());
+		sb.append(", mode=");
+		sb.append(getMode());
 		sb.append(", language=");
 		sb.append(getLanguage());
 		sb.append(", script=");
@@ -751,7 +1068,7 @@ public class DDMTemplateModelImpl extends BaseModelImpl<DDMTemplate>
 	}
 
 	public String toXmlString() {
-		StringBundler sb = new StringBundler(46);
+		StringBundler sb = new StringBundler(55);
 
 		sb.append("<model><model-name>");
 		sb.append("com.liferay.portlet.dynamicdatamapping.model.DDMTemplate");
@@ -790,8 +1107,16 @@ public class DDMTemplateModelImpl extends BaseModelImpl<DDMTemplate>
 		sb.append(getModifiedDate());
 		sb.append("]]></column-value></column>");
 		sb.append(
-			"<column><column-name>structureId</column-name><column-value><![CDATA[");
-		sb.append(getStructureId());
+			"<column><column-name>classNameId</column-name><column-value><![CDATA[");
+		sb.append(getClassNameId());
+		sb.append("]]></column-value></column>");
+		sb.append(
+			"<column><column-name>classPK</column-name><column-value><![CDATA[");
+		sb.append(getClassPK());
+		sb.append("]]></column-value></column>");
+		sb.append(
+			"<column><column-name>templateKey</column-name><column-value><![CDATA[");
+		sb.append(getTemplateKey());
 		sb.append("]]></column-value></column>");
 		sb.append(
 			"<column><column-name>name</column-name><column-value><![CDATA[");
@@ -804,6 +1129,10 @@ public class DDMTemplateModelImpl extends BaseModelImpl<DDMTemplate>
 		sb.append(
 			"<column><column-name>type</column-name><column-value><![CDATA[");
 		sb.append(getType());
+		sb.append("]]></column-value></column>");
+		sb.append(
+			"<column><column-name>mode</column-name><column-value><![CDATA[");
+		sb.append(getMode());
 		sb.append("]]></column-value></column>");
 		sb.append(
 			"<column><column-name>language</column-name><column-value><![CDATA[");
@@ -830,17 +1159,32 @@ public class DDMTemplateModelImpl extends BaseModelImpl<DDMTemplate>
 	private long _originalGroupId;
 	private boolean _setOriginalGroupId;
 	private long _companyId;
+	private long _originalCompanyId;
+	private boolean _setOriginalCompanyId;
 	private long _userId;
 	private String _userUuid;
 	private String _userName;
 	private Date _createDate;
 	private Date _modifiedDate;
-	private long _structureId;
+	private long _classNameId;
+	private long _originalClassNameId;
+	private boolean _setOriginalClassNameId;
+	private long _classPK;
+	private long _originalClassPK;
+	private boolean _setOriginalClassPK;
+	private String _templateKey;
+	private String _originalTemplateKey;
 	private String _name;
+	private String _nameCurrentLanguageId;
 	private String _description;
+	private String _descriptionCurrentLanguageId;
 	private String _type;
+	private String _originalType;
+	private String _mode;
+	private String _originalMode;
 	private String _language;
+	private String _originalLanguage;
 	private String _script;
-	private transient ExpandoBridge _expandoBridge;
+	private long _columnBitmask;
 	private DDMTemplate _escapedModelProxy;
 }

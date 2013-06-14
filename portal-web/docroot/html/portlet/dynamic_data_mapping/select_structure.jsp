@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -16,16 +16,24 @@
 
 <%@ include file="/html/portlet/dynamic_data_mapping/init.jsp" %>
 
+<c:if test="<%= showToolbar %>">
+	<liferay-util:include page="/html/portlet/dynamic_data_mapping/structure_toolbar.jsp">
+		<liferay-util:param name="toolbarItem" value="view-all" />
+	</liferay-util:include>
+</c:if>
+
 <liferay-portlet:renderURL varImpl="portletURL">
 	<portlet:param name="struts_action" value="/dynamic_data_mapping/select_structure" />
 </liferay-portlet:renderURL>
 
 <aui:form action="<%= portletURL.toString() %>" method="post" name="fm">
 
-	<liferay-ui:header
-		localizeTitle="<%= false %>"
-		title="<%= scopeStructureName %>"
-	/>
+	<c:if test="<%= !showToolbar %>">
+		<liferay-ui:header
+			localizeTitle="<%= false %>"
+			title="<%= scopeStructureName %>"
+		/>
+	</c:if>
 
 	<liferay-ui:search-form
 		page="/html/portlet/dynamic_data_mapping/structure_search.jsp"

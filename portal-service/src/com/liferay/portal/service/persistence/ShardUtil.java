@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -90,13 +90,6 @@ public class ShardUtil {
 		return getPersistence()
 				   .findWithDynamicQuery(dynamicQuery, start, end,
 			orderByComparator);
-	}
-
-	/**
-	 * @see com.liferay.portal.service.persistence.BasePersistence#remove(com.liferay.portal.model.BaseModel)
-	 */
-	public static Shard remove(Shard shard) throws SystemException {
-		return getPersistence().remove(shard);
 	}
 
 	/**
@@ -331,12 +324,14 @@ public class ShardUtil {
 	* Removes the shard where name = &#63; from the database.
 	*
 	* @param name the name
+	* @return the shard that was removed
 	* @throws SystemException if a system exception occurred
 	*/
-	public static void removeByName(java.lang.String name)
+	public static com.liferay.portal.model.Shard removeByName(
+		java.lang.String name)
 		throws com.liferay.portal.NoSuchShardException,
 			com.liferay.portal.kernel.exception.SystemException {
-		getPersistence().removeByName(name);
+		return getPersistence().removeByName(name);
 	}
 
 	/**
@@ -344,12 +339,14 @@ public class ShardUtil {
 	*
 	* @param classNameId the class name ID
 	* @param classPK the class p k
+	* @return the shard that was removed
 	* @throws SystemException if a system exception occurred
 	*/
-	public static void removeByC_C(long classNameId, long classPK)
+	public static com.liferay.portal.model.Shard removeByC_C(long classNameId,
+		long classPK)
 		throws com.liferay.portal.NoSuchShardException,
 			com.liferay.portal.kernel.exception.SystemException {
-		getPersistence().removeByC_C(classNameId, classPK);
+		return getPersistence().removeByC_C(classNameId, classPK);
 	}
 
 	/**
@@ -408,10 +405,10 @@ public class ShardUtil {
 		return _persistence;
 	}
 
+	/**
+	 * @deprecated
+	 */
 	public void setPersistence(ShardPersistence persistence) {
-		_persistence = persistence;
-
-		ReferenceRegistry.registerReference(ShardUtil.class, "_persistence");
 	}
 
 	private static ShardPersistence _persistence;

@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -16,11 +16,11 @@
 
 <%@ include file="/html/portlet/init.jsp" %>
 
-<%@ page import="com.liferay.portlet.blogs.model.BlogsEntry" %>
-<%@ page import="com.liferay.portlet.blogs.model.BlogsStatsUser" %>
-<%@ page import="com.liferay.portlet.blogs.service.BlogsEntryLocalServiceUtil" %>
-<%@ page import="com.liferay.portlet.blogs.service.BlogsStatsUserLocalServiceUtil" %>
-<%@ page import="com.liferay.portlet.blogs.util.comparator.StatsUserLastPostDateComparator" %>
+<%@ page import="com.liferay.portlet.blogs.model.BlogsEntry" %><%@
+page import="com.liferay.portlet.blogs.model.BlogsStatsUser" %><%@
+page import="com.liferay.portlet.blogs.service.BlogsEntryLocalServiceUtil" %><%@
+page import="com.liferay.portlet.blogs.service.BlogsStatsUserLocalServiceUtil" %><%@
+page import="com.liferay.portlet.blogs.util.comparator.StatsUserLastPostDateComparator" %>
 
 <%
 PortletPreferences preferences = renderRequest.getPreferences();
@@ -46,3 +46,5 @@ if (organizationId == 0) {
 
 Format dateFormatDate = FastDateFormatFactoryUtil.getDate(locale, timeZone);
 %>
+
+<%@ include file="/html/portlet/recent_bloggers/init-ext.jsp" %>

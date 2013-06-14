@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -16,8 +16,13 @@
 
 <%@ include file="/html/portlet/document_library/init.jsp" %>
 
+<liferay-util:include page="/html/portlet/document_library/file_entry_type_toolbar.jsp">
+	<liferay-util:param name="strutsAction" value="/document_library/select_file_entry_type" />
+</liferay-util:include>
+
 <liferay-portlet:renderURL varImpl="portletURL">
 	<portlet:param name="struts_action" value="/document_library/select_file_entry_type" />
+	<portlet:param name="includeBasicFileEntryType" value="1" />
 </liferay-portlet:renderURL>
 
 <aui:form action="<%= portletURL.toString() %>" method="post" name="fm">
@@ -57,12 +62,6 @@
 
 			String rowHREF = sb.toString();
 			%>
-
-			<liferay-ui:search-container-column-text
-				href="<%= rowHREF %>"
-				name="id"
-				value="<%= String.valueOf(fileEntryType.getFileEntryTypeId()) %>"
-			/>
 
 			<liferay-ui:search-container-column-text
 				href="<%= rowHREF %>"

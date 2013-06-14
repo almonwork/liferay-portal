@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -26,6 +26,7 @@ import com.liferay.portal.service.AccountLocalService;
 import com.liferay.portal.service.AccountService;
 import com.liferay.portal.service.AddressLocalService;
 import com.liferay.portal.service.AddressService;
+import com.liferay.portal.service.BaseServiceImpl;
 import com.liferay.portal.service.BrowserTrackerLocalService;
 import com.liferay.portal.service.CMISRepositoryLocalService;
 import com.liferay.portal.service.ClassNameLocalService;
@@ -69,7 +70,6 @@ import com.liferay.portal.service.PasswordPolicyLocalService;
 import com.liferay.portal.service.PasswordPolicyRelLocalService;
 import com.liferay.portal.service.PasswordPolicyService;
 import com.liferay.portal.service.PasswordTrackerLocalService;
-import com.liferay.portal.service.PermissionLocalService;
 import com.liferay.portal.service.PermissionService;
 import com.liferay.portal.service.PhoneLocalService;
 import com.liferay.portal.service.PhoneService;
@@ -86,13 +86,17 @@ import com.liferay.portal.service.PortletService;
 import com.liferay.portal.service.QuartzLocalService;
 import com.liferay.portal.service.RegionService;
 import com.liferay.portal.service.ReleaseLocalService;
+import com.liferay.portal.service.RepositoryEntryLocalService;
+import com.liferay.portal.service.RepositoryLocalService;
 import com.liferay.portal.service.RepositoryService;
 import com.liferay.portal.service.ResourceActionLocalService;
-import com.liferay.portal.service.ResourceCodeLocalService;
+import com.liferay.portal.service.ResourceBlockLocalService;
+import com.liferay.portal.service.ResourceBlockPermissionLocalService;
+import com.liferay.portal.service.ResourceBlockService;
 import com.liferay.portal.service.ResourceLocalService;
 import com.liferay.portal.service.ResourcePermissionLocalService;
 import com.liferay.portal.service.ResourcePermissionService;
-import com.liferay.portal.service.ResourceService;
+import com.liferay.portal.service.ResourceTypePermissionLocalService;
 import com.liferay.portal.service.RoleLocalService;
 import com.liferay.portal.service.RoleService;
 import com.liferay.portal.service.ServiceComponentLocalService;
@@ -143,10 +147,9 @@ import com.liferay.portal.service.persistence.LayoutSetBranchPersistence;
 import com.liferay.portal.service.persistence.LayoutSetPersistence;
 import com.liferay.portal.service.persistence.LayoutSetPrototypePersistence;
 import com.liferay.portal.service.persistence.ListTypePersistence;
+import com.liferay.portal.service.persistence.LockFinder;
 import com.liferay.portal.service.persistence.LockPersistence;
 import com.liferay.portal.service.persistence.MembershipRequestPersistence;
-import com.liferay.portal.service.persistence.OrgGroupPermissionFinder;
-import com.liferay.portal.service.persistence.OrgGroupPermissionPersistence;
 import com.liferay.portal.service.persistence.OrgGroupRolePersistence;
 import com.liferay.portal.service.persistence.OrgLaborPersistence;
 import com.liferay.portal.service.persistence.OrganizationFinder;
@@ -155,8 +158,6 @@ import com.liferay.portal.service.persistence.PasswordPolicyFinder;
 import com.liferay.portal.service.persistence.PasswordPolicyPersistence;
 import com.liferay.portal.service.persistence.PasswordPolicyRelPersistence;
 import com.liferay.portal.service.persistence.PasswordTrackerPersistence;
-import com.liferay.portal.service.persistence.PermissionFinder;
-import com.liferay.portal.service.persistence.PermissionPersistence;
 import com.liferay.portal.service.persistence.PhonePersistence;
 import com.liferay.portal.service.persistence.PluginSettingPersistence;
 import com.liferay.portal.service.persistence.PortalPreferencesPersistence;
@@ -169,11 +170,13 @@ import com.liferay.portal.service.persistence.ReleasePersistence;
 import com.liferay.portal.service.persistence.RepositoryEntryPersistence;
 import com.liferay.portal.service.persistence.RepositoryPersistence;
 import com.liferay.portal.service.persistence.ResourceActionPersistence;
-import com.liferay.portal.service.persistence.ResourceCodePersistence;
-import com.liferay.portal.service.persistence.ResourceFinder;
+import com.liferay.portal.service.persistence.ResourceBlockFinder;
+import com.liferay.portal.service.persistence.ResourceBlockPermissionPersistence;
+import com.liferay.portal.service.persistence.ResourceBlockPersistence;
 import com.liferay.portal.service.persistence.ResourcePermissionFinder;
 import com.liferay.portal.service.persistence.ResourcePermissionPersistence;
-import com.liferay.portal.service.persistence.ResourcePersistence;
+import com.liferay.portal.service.persistence.ResourceTypePermissionFinder;
+import com.liferay.portal.service.persistence.ResourceTypePermissionPersistence;
 import com.liferay.portal.service.persistence.RoleFinder;
 import com.liferay.portal.service.persistence.RolePersistence;
 import com.liferay.portal.service.persistence.ServiceComponentPersistence;
@@ -213,7 +216,7 @@ import javax.sql.DataSource;
  * @see com.liferay.portal.service.ThemeServiceUtil
  * @generated
  */
-public abstract class ThemeServiceBaseImpl extends PrincipalBean
+public abstract class ThemeServiceBaseImpl extends BaseServiceImpl
 	implements ThemeService, IdentifiableBean {
 	/*
 	 * NOTE FOR DEVELOPERS:
@@ -1329,6 +1332,24 @@ public abstract class ThemeServiceBaseImpl extends PrincipalBean
 	}
 
 	/**
+	 * Returns the lock finder.
+	 *
+	 * @return the lock finder
+	 */
+	public LockFinder getLockFinder() {
+		return lockFinder;
+	}
+
+	/**
+	 * Sets the lock finder.
+	 *
+	 * @param lockFinder the lock finder
+	 */
+	public void setLockFinder(LockFinder lockFinder) {
+		this.lockFinder = lockFinder;
+	}
+
+	/**
 	 * Returns the membership request local service.
 	 *
 	 * @return the membership request local service
@@ -1457,44 +1478,6 @@ public abstract class ThemeServiceBaseImpl extends PrincipalBean
 	 */
 	public void setOrganizationFinder(OrganizationFinder organizationFinder) {
 		this.organizationFinder = organizationFinder;
-	}
-
-	/**
-	 * Returns the org group permission persistence.
-	 *
-	 * @return the org group permission persistence
-	 */
-	public OrgGroupPermissionPersistence getOrgGroupPermissionPersistence() {
-		return orgGroupPermissionPersistence;
-	}
-
-	/**
-	 * Sets the org group permission persistence.
-	 *
-	 * @param orgGroupPermissionPersistence the org group permission persistence
-	 */
-	public void setOrgGroupPermissionPersistence(
-		OrgGroupPermissionPersistence orgGroupPermissionPersistence) {
-		this.orgGroupPermissionPersistence = orgGroupPermissionPersistence;
-	}
-
-	/**
-	 * Returns the org group permission finder.
-	 *
-	 * @return the org group permission finder
-	 */
-	public OrgGroupPermissionFinder getOrgGroupPermissionFinder() {
-		return orgGroupPermissionFinder;
-	}
-
-	/**
-	 * Sets the org group permission finder.
-	 *
-	 * @param orgGroupPermissionFinder the org group permission finder
-	 */
-	public void setOrgGroupPermissionFinder(
-		OrgGroupPermissionFinder orgGroupPermissionFinder) {
-		this.orgGroupPermissionFinder = orgGroupPermissionFinder;
 	}
 
 	/**
@@ -1724,25 +1707,6 @@ public abstract class ThemeServiceBaseImpl extends PrincipalBean
 	}
 
 	/**
-	 * Returns the permission local service.
-	 *
-	 * @return the permission local service
-	 */
-	public PermissionLocalService getPermissionLocalService() {
-		return permissionLocalService;
-	}
-
-	/**
-	 * Sets the permission local service.
-	 *
-	 * @param permissionLocalService the permission local service
-	 */
-	public void setPermissionLocalService(
-		PermissionLocalService permissionLocalService) {
-		this.permissionLocalService = permissionLocalService;
-	}
-
-	/**
 	 * Returns the permission remote service.
 	 *
 	 * @return the permission remote service
@@ -1758,43 +1722,6 @@ public abstract class ThemeServiceBaseImpl extends PrincipalBean
 	 */
 	public void setPermissionService(PermissionService permissionService) {
 		this.permissionService = permissionService;
-	}
-
-	/**
-	 * Returns the permission persistence.
-	 *
-	 * @return the permission persistence
-	 */
-	public PermissionPersistence getPermissionPersistence() {
-		return permissionPersistence;
-	}
-
-	/**
-	 * Sets the permission persistence.
-	 *
-	 * @param permissionPersistence the permission persistence
-	 */
-	public void setPermissionPersistence(
-		PermissionPersistence permissionPersistence) {
-		this.permissionPersistence = permissionPersistence;
-	}
-
-	/**
-	 * Returns the permission finder.
-	 *
-	 * @return the permission finder
-	 */
-	public PermissionFinder getPermissionFinder() {
-		return permissionFinder;
-	}
-
-	/**
-	 * Sets the permission finder.
-	 *
-	 * @param permissionFinder the permission finder
-	 */
-	public void setPermissionFinder(PermissionFinder permissionFinder) {
-		this.permissionFinder = permissionFinder;
 	}
 
 	/**
@@ -2241,6 +2168,25 @@ public abstract class ThemeServiceBaseImpl extends PrincipalBean
 	}
 
 	/**
+	 * Returns the repository local service.
+	 *
+	 * @return the repository local service
+	 */
+	public RepositoryLocalService getRepositoryLocalService() {
+		return repositoryLocalService;
+	}
+
+	/**
+	 * Sets the repository local service.
+	 *
+	 * @param repositoryLocalService the repository local service
+	 */
+	public void setRepositoryLocalService(
+		RepositoryLocalService repositoryLocalService) {
+		this.repositoryLocalService = repositoryLocalService;
+	}
+
+	/**
 	 * Returns the repository remote service.
 	 *
 	 * @return the repository remote service
@@ -2275,6 +2221,25 @@ public abstract class ThemeServiceBaseImpl extends PrincipalBean
 	public void setRepositoryPersistence(
 		RepositoryPersistence repositoryPersistence) {
 		this.repositoryPersistence = repositoryPersistence;
+	}
+
+	/**
+	 * Returns the repository entry local service.
+	 *
+	 * @return the repository entry local service
+	 */
+	public RepositoryEntryLocalService getRepositoryEntryLocalService() {
+		return repositoryEntryLocalService;
+	}
+
+	/**
+	 * Sets the repository entry local service.
+	 *
+	 * @param repositoryEntryLocalService the repository entry local service
+	 */
+	public void setRepositoryEntryLocalService(
+		RepositoryEntryLocalService repositoryEntryLocalService) {
+		this.repositoryEntryLocalService = repositoryEntryLocalService;
 	}
 
 	/**
@@ -2316,60 +2281,6 @@ public abstract class ThemeServiceBaseImpl extends PrincipalBean
 	}
 
 	/**
-	 * Returns the resource remote service.
-	 *
-	 * @return the resource remote service
-	 */
-	public ResourceService getResourceService() {
-		return resourceService;
-	}
-
-	/**
-	 * Sets the resource remote service.
-	 *
-	 * @param resourceService the resource remote service
-	 */
-	public void setResourceService(ResourceService resourceService) {
-		this.resourceService = resourceService;
-	}
-
-	/**
-	 * Returns the resource persistence.
-	 *
-	 * @return the resource persistence
-	 */
-	public ResourcePersistence getResourcePersistence() {
-		return resourcePersistence;
-	}
-
-	/**
-	 * Sets the resource persistence.
-	 *
-	 * @param resourcePersistence the resource persistence
-	 */
-	public void setResourcePersistence(ResourcePersistence resourcePersistence) {
-		this.resourcePersistence = resourcePersistence;
-	}
-
-	/**
-	 * Returns the resource finder.
-	 *
-	 * @return the resource finder
-	 */
-	public ResourceFinder getResourceFinder() {
-		return resourceFinder;
-	}
-
-	/**
-	 * Sets the resource finder.
-	 *
-	 * @param resourceFinder the resource finder
-	 */
-	public void setResourceFinder(ResourceFinder resourceFinder) {
-		this.resourceFinder = resourceFinder;
-	}
-
-	/**
 	 * Returns the resource action local service.
 	 *
 	 * @return the resource action local service
@@ -2408,41 +2319,116 @@ public abstract class ThemeServiceBaseImpl extends PrincipalBean
 	}
 
 	/**
-	 * Returns the resource code local service.
+	 * Returns the resource block local service.
 	 *
-	 * @return the resource code local service
+	 * @return the resource block local service
 	 */
-	public ResourceCodeLocalService getResourceCodeLocalService() {
-		return resourceCodeLocalService;
+	public ResourceBlockLocalService getResourceBlockLocalService() {
+		return resourceBlockLocalService;
 	}
 
 	/**
-	 * Sets the resource code local service.
+	 * Sets the resource block local service.
 	 *
-	 * @param resourceCodeLocalService the resource code local service
+	 * @param resourceBlockLocalService the resource block local service
 	 */
-	public void setResourceCodeLocalService(
-		ResourceCodeLocalService resourceCodeLocalService) {
-		this.resourceCodeLocalService = resourceCodeLocalService;
+	public void setResourceBlockLocalService(
+		ResourceBlockLocalService resourceBlockLocalService) {
+		this.resourceBlockLocalService = resourceBlockLocalService;
 	}
 
 	/**
-	 * Returns the resource code persistence.
+	 * Returns the resource block remote service.
 	 *
-	 * @return the resource code persistence
+	 * @return the resource block remote service
 	 */
-	public ResourceCodePersistence getResourceCodePersistence() {
-		return resourceCodePersistence;
+	public ResourceBlockService getResourceBlockService() {
+		return resourceBlockService;
 	}
 
 	/**
-	 * Sets the resource code persistence.
+	 * Sets the resource block remote service.
 	 *
-	 * @param resourceCodePersistence the resource code persistence
+	 * @param resourceBlockService the resource block remote service
 	 */
-	public void setResourceCodePersistence(
-		ResourceCodePersistence resourceCodePersistence) {
-		this.resourceCodePersistence = resourceCodePersistence;
+	public void setResourceBlockService(
+		ResourceBlockService resourceBlockService) {
+		this.resourceBlockService = resourceBlockService;
+	}
+
+	/**
+	 * Returns the resource block persistence.
+	 *
+	 * @return the resource block persistence
+	 */
+	public ResourceBlockPersistence getResourceBlockPersistence() {
+		return resourceBlockPersistence;
+	}
+
+	/**
+	 * Sets the resource block persistence.
+	 *
+	 * @param resourceBlockPersistence the resource block persistence
+	 */
+	public void setResourceBlockPersistence(
+		ResourceBlockPersistence resourceBlockPersistence) {
+		this.resourceBlockPersistence = resourceBlockPersistence;
+	}
+
+	/**
+	 * Returns the resource block finder.
+	 *
+	 * @return the resource block finder
+	 */
+	public ResourceBlockFinder getResourceBlockFinder() {
+		return resourceBlockFinder;
+	}
+
+	/**
+	 * Sets the resource block finder.
+	 *
+	 * @param resourceBlockFinder the resource block finder
+	 */
+	public void setResourceBlockFinder(ResourceBlockFinder resourceBlockFinder) {
+		this.resourceBlockFinder = resourceBlockFinder;
+	}
+
+	/**
+	 * Returns the resource block permission local service.
+	 *
+	 * @return the resource block permission local service
+	 */
+	public ResourceBlockPermissionLocalService getResourceBlockPermissionLocalService() {
+		return resourceBlockPermissionLocalService;
+	}
+
+	/**
+	 * Sets the resource block permission local service.
+	 *
+	 * @param resourceBlockPermissionLocalService the resource block permission local service
+	 */
+	public void setResourceBlockPermissionLocalService(
+		ResourceBlockPermissionLocalService resourceBlockPermissionLocalService) {
+		this.resourceBlockPermissionLocalService = resourceBlockPermissionLocalService;
+	}
+
+	/**
+	 * Returns the resource block permission persistence.
+	 *
+	 * @return the resource block permission persistence
+	 */
+	public ResourceBlockPermissionPersistence getResourceBlockPermissionPersistence() {
+		return resourceBlockPermissionPersistence;
+	}
+
+	/**
+	 * Sets the resource block permission persistence.
+	 *
+	 * @param resourceBlockPermissionPersistence the resource block permission persistence
+	 */
+	public void setResourceBlockPermissionPersistence(
+		ResourceBlockPermissionPersistence resourceBlockPermissionPersistence) {
+		this.resourceBlockPermissionPersistence = resourceBlockPermissionPersistence;
 	}
 
 	/**
@@ -2519,6 +2505,63 @@ public abstract class ThemeServiceBaseImpl extends PrincipalBean
 	public void setResourcePermissionFinder(
 		ResourcePermissionFinder resourcePermissionFinder) {
 		this.resourcePermissionFinder = resourcePermissionFinder;
+	}
+
+	/**
+	 * Returns the resource type permission local service.
+	 *
+	 * @return the resource type permission local service
+	 */
+	public ResourceTypePermissionLocalService getResourceTypePermissionLocalService() {
+		return resourceTypePermissionLocalService;
+	}
+
+	/**
+	 * Sets the resource type permission local service.
+	 *
+	 * @param resourceTypePermissionLocalService the resource type permission local service
+	 */
+	public void setResourceTypePermissionLocalService(
+		ResourceTypePermissionLocalService resourceTypePermissionLocalService) {
+		this.resourceTypePermissionLocalService = resourceTypePermissionLocalService;
+	}
+
+	/**
+	 * Returns the resource type permission persistence.
+	 *
+	 * @return the resource type permission persistence
+	 */
+	public ResourceTypePermissionPersistence getResourceTypePermissionPersistence() {
+		return resourceTypePermissionPersistence;
+	}
+
+	/**
+	 * Sets the resource type permission persistence.
+	 *
+	 * @param resourceTypePermissionPersistence the resource type permission persistence
+	 */
+	public void setResourceTypePermissionPersistence(
+		ResourceTypePermissionPersistence resourceTypePermissionPersistence) {
+		this.resourceTypePermissionPersistence = resourceTypePermissionPersistence;
+	}
+
+	/**
+	 * Returns the resource type permission finder.
+	 *
+	 * @return the resource type permission finder
+	 */
+	public ResourceTypePermissionFinder getResourceTypePermissionFinder() {
+		return resourceTypePermissionFinder;
+	}
+
+	/**
+	 * Sets the resource type permission finder.
+	 *
+	 * @param resourceTypePermissionFinder the resource type permission finder
+	 */
+	public void setResourceTypePermissionFinder(
+		ResourceTypePermissionFinder resourceTypePermissionFinder) {
+		this.resourceTypePermissionFinder = resourceTypePermissionFinder;
 	}
 
 	/**
@@ -3666,6 +3709,8 @@ public abstract class ThemeServiceBaseImpl extends PrincipalBean
 	protected LockLocalService lockLocalService;
 	@BeanReference(type = LockPersistence.class)
 	protected LockPersistence lockPersistence;
+	@BeanReference(type = LockFinder.class)
+	protected LockFinder lockFinder;
 	@BeanReference(type = MembershipRequestLocalService.class)
 	protected MembershipRequestLocalService membershipRequestLocalService;
 	@BeanReference(type = MembershipRequestService.class)
@@ -3680,10 +3725,6 @@ public abstract class ThemeServiceBaseImpl extends PrincipalBean
 	protected OrganizationPersistence organizationPersistence;
 	@BeanReference(type = OrganizationFinder.class)
 	protected OrganizationFinder organizationFinder;
-	@BeanReference(type = OrgGroupPermissionPersistence.class)
-	protected OrgGroupPermissionPersistence orgGroupPermissionPersistence;
-	@BeanReference(type = OrgGroupPermissionFinder.class)
-	protected OrgGroupPermissionFinder orgGroupPermissionFinder;
 	@BeanReference(type = OrgGroupRolePersistence.class)
 	protected OrgGroupRolePersistence orgGroupRolePersistence;
 	@BeanReference(type = OrgLaborLocalService.class)
@@ -3708,14 +3749,8 @@ public abstract class ThemeServiceBaseImpl extends PrincipalBean
 	protected PasswordTrackerLocalService passwordTrackerLocalService;
 	@BeanReference(type = PasswordTrackerPersistence.class)
 	protected PasswordTrackerPersistence passwordTrackerPersistence;
-	@BeanReference(type = PermissionLocalService.class)
-	protected PermissionLocalService permissionLocalService;
 	@BeanReference(type = PermissionService.class)
 	protected PermissionService permissionService;
-	@BeanReference(type = PermissionPersistence.class)
-	protected PermissionPersistence permissionPersistence;
-	@BeanReference(type = PermissionFinder.class)
-	protected PermissionFinder permissionFinder;
 	@BeanReference(type = PhoneLocalService.class)
 	protected PhoneLocalService phoneLocalService;
 	@BeanReference(type = PhoneService.class)
@@ -3764,28 +3799,34 @@ public abstract class ThemeServiceBaseImpl extends PrincipalBean
 	protected ReleaseLocalService releaseLocalService;
 	@BeanReference(type = ReleasePersistence.class)
 	protected ReleasePersistence releasePersistence;
+	@BeanReference(type = RepositoryLocalService.class)
+	protected RepositoryLocalService repositoryLocalService;
 	@BeanReference(type = RepositoryService.class)
 	protected RepositoryService repositoryService;
 	@BeanReference(type = RepositoryPersistence.class)
 	protected RepositoryPersistence repositoryPersistence;
+	@BeanReference(type = RepositoryEntryLocalService.class)
+	protected RepositoryEntryLocalService repositoryEntryLocalService;
 	@BeanReference(type = RepositoryEntryPersistence.class)
 	protected RepositoryEntryPersistence repositoryEntryPersistence;
 	@BeanReference(type = ResourceLocalService.class)
 	protected ResourceLocalService resourceLocalService;
-	@BeanReference(type = ResourceService.class)
-	protected ResourceService resourceService;
-	@BeanReference(type = ResourcePersistence.class)
-	protected ResourcePersistence resourcePersistence;
-	@BeanReference(type = ResourceFinder.class)
-	protected ResourceFinder resourceFinder;
 	@BeanReference(type = ResourceActionLocalService.class)
 	protected ResourceActionLocalService resourceActionLocalService;
 	@BeanReference(type = ResourceActionPersistence.class)
 	protected ResourceActionPersistence resourceActionPersistence;
-	@BeanReference(type = ResourceCodeLocalService.class)
-	protected ResourceCodeLocalService resourceCodeLocalService;
-	@BeanReference(type = ResourceCodePersistence.class)
-	protected ResourceCodePersistence resourceCodePersistence;
+	@BeanReference(type = ResourceBlockLocalService.class)
+	protected ResourceBlockLocalService resourceBlockLocalService;
+	@BeanReference(type = ResourceBlockService.class)
+	protected ResourceBlockService resourceBlockService;
+	@BeanReference(type = ResourceBlockPersistence.class)
+	protected ResourceBlockPersistence resourceBlockPersistence;
+	@BeanReference(type = ResourceBlockFinder.class)
+	protected ResourceBlockFinder resourceBlockFinder;
+	@BeanReference(type = ResourceBlockPermissionLocalService.class)
+	protected ResourceBlockPermissionLocalService resourceBlockPermissionLocalService;
+	@BeanReference(type = ResourceBlockPermissionPersistence.class)
+	protected ResourceBlockPermissionPersistence resourceBlockPermissionPersistence;
 	@BeanReference(type = ResourcePermissionLocalService.class)
 	protected ResourcePermissionLocalService resourcePermissionLocalService;
 	@BeanReference(type = ResourcePermissionService.class)
@@ -3794,6 +3835,12 @@ public abstract class ThemeServiceBaseImpl extends PrincipalBean
 	protected ResourcePermissionPersistence resourcePermissionPersistence;
 	@BeanReference(type = ResourcePermissionFinder.class)
 	protected ResourcePermissionFinder resourcePermissionFinder;
+	@BeanReference(type = ResourceTypePermissionLocalService.class)
+	protected ResourceTypePermissionLocalService resourceTypePermissionLocalService;
+	@BeanReference(type = ResourceTypePermissionPersistence.class)
+	protected ResourceTypePermissionPersistence resourceTypePermissionPersistence;
+	@BeanReference(type = ResourceTypePermissionFinder.class)
+	protected ResourceTypePermissionFinder resourceTypePermissionFinder;
 	@BeanReference(type = RoleLocalService.class)
 	protected RoleLocalService roleLocalService;
 	@BeanReference(type = RoleService.class)

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -27,6 +27,7 @@ import java.util.Map;
  * @author Micha Kiener
  * @author Shuyang Zhou
  * @author Brian Wing Shun Chan
+ * @author Marcellus Tavares
  */
 @MessagingProxy(mode = ProxyMode.SYNC)
 public interface WorkflowInstanceManager {
@@ -48,14 +49,25 @@ public interface WorkflowInstanceManager {
 		throws WorkflowException;
 
 	public int getWorkflowInstanceCount(
+			long companyId, Long userId, String[] assetClassNames,
+			Boolean completed)
+		throws WorkflowException;
+
+	public int getWorkflowInstanceCount(
 			long companyId, String workflowDefinitionName,
 			Integer workflowDefinitionVersion, Boolean completed)
 		throws WorkflowException;
 
 	public List<WorkflowInstance> getWorkflowInstances(
 			long companyId, Long userId, String assetClassName,
-			Long assetClassPK, Boolean completed, int start,
-			int end, OrderByComparator orderByComparator)
+			Long assetClassPK, Boolean completed, int start, int end,
+			OrderByComparator orderByComparator)
+		throws WorkflowException;
+
+	public List<WorkflowInstance> getWorkflowInstances(
+			long companyId, Long userId, String[] assetClassNames,
+			Boolean completed, int start, int end,
+			OrderByComparator orderByComparator)
 		throws WorkflowException;
 
 	public List<WorkflowInstance> getWorkflowInstances(

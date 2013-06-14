@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -47,58 +47,58 @@ import java.util.Map;
 public class RoleFinderImpl
 	extends BasePersistenceImpl<Role> implements RoleFinder {
 
-	public static String COUNT_BY_ORGANIZATION =
+	public static final String COUNT_BY_ORGANIZATION =
 		RoleFinder.class.getName() + ".countByOrganization";
 
-	public static String COUNT_BY_ORGANIZATION_SITE =
+	public static final String COUNT_BY_ORGANIZATION_SITE =
 		RoleFinder.class.getName() + ".countByOrganizationSite";
 
-	public static String COUNT_BY_SITE =
+	public static final String COUNT_BY_SITE =
 		RoleFinder.class.getName() + ".countBySite";
 
-	public static String COUNT_BY_USER =
+	public static final String COUNT_BY_USER =
 		RoleFinder.class.getName() + ".countByUser";
 
-	public static String COUNT_BY_USER_GROUP =
+	public static final String COUNT_BY_USER_GROUP =
 		RoleFinder.class.getName() + ".countByUserGroup";
 
-	public static String COUNT_BY_USER_GROUP_SITE =
+	public static final String COUNT_BY_USER_GROUP_SITE =
 		RoleFinder.class.getName() + ".countByUserGroupSite";
 
-	public static String COUNT_BY_U_G_R =
+	public static final String COUNT_BY_U_G_R =
 		RoleFinder.class.getName() + ".countByU_G_R";
 
-	public static String COUNT_BY_C_N_D_T =
+	public static final String COUNT_BY_C_N_D_T =
 		RoleFinder.class.getName() + ".countByC_N_D_T";
 
-	public static String FIND_BY_SYSTEM =
+	public static final String FIND_BY_SYSTEM =
 		RoleFinder.class.getName() + ".findBySystem";
 
-	public static String FIND_BY_USER_GROUP_GROUP_ROLE =
+	public static final String FIND_BY_USER_GROUP_GROUP_ROLE =
 		RoleFinder.class.getName() + ".findByUserGroupGroupRole";
 
-	public static String FIND_BY_USER_GROUP_ROLE =
+	public static final String FIND_BY_USER_GROUP_ROLE =
 		RoleFinder.class.getName() + ".findByUserGroupRole";
 
-	public static String FIND_BY_C_N =
+	public static final String FIND_BY_C_N =
 		RoleFinder.class.getName() + ".findByC_N";
 
-	public static String FIND_BY_U_G =
+	public static final String FIND_BY_U_G =
 		RoleFinder.class.getName() + ".findByU_G";
 
-	public static String FIND_BY_C_N_D_T =
+	public static final String FIND_BY_R_N_A =
+		RoleFinder.class.getName() + ".findByR_N_A";
+
+	public static final String FIND_BY_C_N_D_T =
 		RoleFinder.class.getName() + ".findByC_N_D_T";
 
-	public static String FIND_BY_C_N_S_P =
+	public static final String FIND_BY_C_N_S_P =
 		RoleFinder.class.getName() + ".findByC_N_S_P";
 
-	public static String FIND_BY_C_N_S_P_A =
+	public static final String FIND_BY_C_N_S_P_A =
 		RoleFinder.class.getName() + ".findByC_N_S_P_A";
 
-	public static String JOIN_BY_ROLES_PERMISSIONS =
-		RoleFinder.class.getName() + ".joinByRolesPermissions";
-
-	public static String JOIN_BY_USERS_ROLES =
+	public static final String JOIN_BY_USERS_ROLES =
 		RoleFinder.class.getName() + ".joinByUsersRoles";
 
 	public int countByR_U(long roleId, long userId) throws SystemException {
@@ -146,7 +146,7 @@ public class RoleFinderImpl
 			qPos.add(groupId);
 			qPos.add(userId);
 
-			Iterator<Long> itr = q.list().iterator();
+			Iterator<Long> itr = q.iterate();
 
 			if (itr.hasNext()) {
 				Long count = itr.next();
@@ -215,12 +215,13 @@ public class RoleFinderImpl
 			QueryPos qPos = QueryPos.getInstance(q);
 
 			setJoin(qPos, params);
+
 			qPos.add(companyId);
 			qPos.add(names, 2);
 			qPos.add(descriptions, 2);
 			qPos.add(types);
 
-			Iterator<Long> itr = q.list().iterator();
+			Iterator<Long> itr = q.iterate();
 
 			if (itr.hasNext()) {
 				Long count = itr.next();
@@ -240,8 +241,7 @@ public class RoleFinderImpl
 		}
 	}
 
-	public int countByKeywords(
-			long companyId, String keywords, Integer[] types)
+	public int countByKeywords(long companyId, String keywords, Integer[] types)
 		throws SystemException {
 
 		return countByKeywords(
@@ -285,7 +285,7 @@ public class RoleFinderImpl
 
 			qPos.add(companyId);
 
-			return q.list();
+			return q.list(true);
 		}
 		catch (Exception e) {
 			throw new SystemException(e);
@@ -314,7 +314,7 @@ public class RoleFinderImpl
 			qPos.add(userId);
 			qPos.add(groupId);
 
-			return q.list();
+			return q.list(true);
 		}
 		catch (Exception e) {
 			throw new SystemException(e);
@@ -343,7 +343,7 @@ public class RoleFinderImpl
 			qPos.add(userId);
 			qPos.add(groupId);
 
-			return q.list();
+			return q.list(true);
 		}
 		catch (Exception e) {
 			throw new SystemException(e);
@@ -374,10 +374,10 @@ public class RoleFinderImpl
 			qPos.add(companyId);
 			qPos.add(name);
 
-			List<Role> list = q.list();
+			List<Role> roles = q.list();
 
-			if (!list.isEmpty()) {
-				return list.get(0);
+			if (!roles.isEmpty()) {
+				return roles.get(0);
 			}
 		}
 		catch (Exception e) {
@@ -396,6 +396,20 @@ public class RoleFinderImpl
 		sb.append("}");
 
 		throw new NoSuchRoleException(sb.toString());
+	}
+
+	public List<Role> findByU_G(long userId, List<Group> groups)
+		throws SystemException {
+
+		long[] groupIds = new long[groups.size()];
+
+		for (int i = 0; i < groups.size(); i++) {
+			Group group = groups.get(i);
+
+			groupIds[i] = group.getGroupId();
+		}
+
+		return findByU_G(userId, groupIds);
 	}
 
 	public List<Role> findByU_G(long userId, long groupId)
@@ -426,7 +440,7 @@ public class RoleFinderImpl
 			qPos.add(userId);
 			qPos.add(groupIds);
 
-			return q.list();
+			return q.list(true);
 		}
 		catch (Exception e) {
 			throw new SystemException(e);
@@ -436,18 +450,35 @@ public class RoleFinderImpl
 		}
 	}
 
-	public List<Role> findByU_G(long userId, List<Group> groups)
+	public List<Role> findByR_N_A(
+			long resourceBlockId, String className, String actionId)
 		throws SystemException {
 
-		long[] groupIds = new long[groups.size()];
+		Session session = null;
 
-		for (int i = 0; i < groups.size(); i++) {
-			Group group = groups.get(i);
+		try {
+			session = openSession();
 
-			groupIds[i] = group.getGroupId();
+			String sql = CustomSQLUtil.get(FIND_BY_R_N_A);
+
+			SQLQuery q = session.createSQLQuery(sql);
+
+			q.addEntity("Role_", RoleImpl.class);
+
+			QueryPos qPos = QueryPos.getInstance(q);
+
+			qPos.add(resourceBlockId);
+			qPos.add(className);
+			qPos.add(actionId);
+
+			return q.list(true);
 		}
-
-		return findByU_G(userId, groupIds);
+		catch (Exception e) {
+			throw new SystemException(e);
+		}
+		finally {
+			closeSession(session);
+		}
 	}
 
 	public List<Role> findByC_N_D_T(
@@ -502,6 +533,7 @@ public class RoleFinderImpl
 			QueryPos qPos = QueryPos.getInstance(q);
 
 			setJoin(qPos, params);
+
 			qPos.add(companyId);
 			qPos.add(names, 2);
 			qPos.add(descriptions, 2);
@@ -543,7 +575,7 @@ public class RoleFinderImpl
 			Map<String, List<String>> roleMap =
 				new HashMap<String, List<String>>();
 
-			Iterator<Object[]> itr = q.list().iterator();
+			Iterator<Object[]> itr = q.iterate();
 
 			while (itr.hasNext()) {
 				Object[] array = itr.next();
@@ -596,7 +628,7 @@ public class RoleFinderImpl
 			qPos.add(primKey);
 			qPos.add(actionId);
 
-			return q.list();
+			return q.list(true);
 		}
 		catch (Exception e) {
 			throw new SystemException(e);
@@ -689,11 +721,7 @@ public class RoleFinderImpl
 
 		StringBundler sb = new StringBundler(params.size());
 
-		Iterator<Map.Entry<String, Object>> itr = params.entrySet().iterator();
-
-		while (itr.hasNext()) {
-			Map.Entry<String, Object> entry = itr.next();
-
+		for (Map.Entry<String, Object> entry : params.entrySet()) {
 			String key = entry.getKey();
 			Object value = entry.getValue();
 
@@ -708,10 +736,7 @@ public class RoleFinderImpl
 	protected String getJoin(String key) {
 		String join = StringPool.BLANK;
 
-		if (key.equals("permissionsResourceId")) {
-			join = CustomSQLUtil.get(JOIN_BY_ROLES_PERMISSIONS);
-		}
-		else if (key.equals("usersRoles")) {
+		if (key.equals("usersRoles")) {
 			join = CustomSQLUtil.get(JOIN_BY_USERS_ROLES);
 		}
 
@@ -755,11 +780,7 @@ public class RoleFinderImpl
 
 		StringBundler sb = new StringBundler(params.size());
 
-		Iterator<Map.Entry<String, Object>> itr = params.entrySet().iterator();
-
-		while (itr.hasNext()) {
-			Map.Entry<String, Object> entry = itr.next();
-
+		for (Map.Entry<String, Object> entry : params.entrySet()) {
 			String key = entry.getKey();
 			Object value = entry.getValue();
 
@@ -774,10 +795,7 @@ public class RoleFinderImpl
 	protected String getWhere(String key) {
 		String join = StringPool.BLANK;
 
-		if (key.equals("permissionsResourceId")) {
-			join = CustomSQLUtil.get(JOIN_BY_ROLES_PERMISSIONS);
-		}
-		else if (key.equals("usersRoles")) {
+		if (key.equals("usersRoles")) {
 			join = CustomSQLUtil.get(JOIN_BY_USERS_ROLES);
 		}
 
@@ -798,28 +816,25 @@ public class RoleFinderImpl
 	protected void setJoin(
 		QueryPos qPos, LinkedHashMap<String, Object> params) {
 
-		if (params != null) {
-			Iterator<Map.Entry<String, Object>> itr =
-				params.entrySet().iterator();
+		if (params == null) {
+			return;
+		}
 
-			while (itr.hasNext()) {
-				Map.Entry<String, Object> entry = itr.next();
+		for (Map.Entry<String, Object> entry : params.entrySet()) {
+			Object value = entry.getValue();
 
-				Object value = entry.getValue();
+			if (value instanceof Long) {
+				Long valueLong = (Long)value;
 
-				if (value instanceof Long) {
-					Long valueLong = (Long)value;
-
-					if (Validator.isNotNull(valueLong)) {
-						qPos.add(valueLong);
-					}
+				if (Validator.isNotNull(valueLong)) {
+					qPos.add(valueLong);
 				}
-				else if (value instanceof String) {
-					String valueString = (String)value;
+			}
+			else if (value instanceof String) {
+				String valueString = (String)value;
 
-					if (Validator.isNotNull(valueString)) {
-						qPos.add(valueString);
-					}
+				if (Validator.isNotNull(valueString)) {
+					qPos.add(valueString);
 				}
 			}
 		}

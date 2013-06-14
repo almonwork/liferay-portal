@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -27,6 +27,7 @@ import com.liferay.portlet.messageboards.service.MBCategoryLocalServiceUtil;
 
 /**
  * @author Brian Wing Shun Chan
+ * @author Mate Thurzo
  */
 public class MBCategoryPermission {
 
@@ -36,6 +37,16 @@ public class MBCategoryPermission {
 		throws PortalException, SystemException {
 
 		if (!contains(permissionChecker, groupId, categoryId, actionId)) {
+			throw new PrincipalException();
+		}
+	}
+
+	public static void check(
+			PermissionChecker permissionChecker, long categoryId,
+			String actionId)
+		throws PortalException, SystemException {
+
+		if (!contains(permissionChecker, categoryId, actionId)) {
 			throw new PrincipalException();
 		}
 	}
@@ -66,6 +77,17 @@ public class MBCategoryPermission {
 
 			return contains(permissionChecker, category, actionId);
 		}
+	}
+
+	public static boolean contains(
+			PermissionChecker permissionChecker, long categoryId,
+			String actionId)
+		throws PortalException, SystemException {
+
+		MBCategory category = MBCategoryLocalServiceUtil.getCategory(
+			categoryId);
+
+		return contains(permissionChecker, category, actionId);
 	}
 
 	public static boolean contains(

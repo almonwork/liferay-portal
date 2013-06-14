@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -16,18 +16,14 @@ package com.liferay.portlet.messageboards.util;
 
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.mail.Account;
-import com.liferay.portal.kernel.mail.MailMessage;
 import com.liferay.portal.kernel.mail.SMTPAccount;
+import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.util.SubscriptionSender;
 import com.liferay.portlet.messageboards.NoSuchMailingListException;
 import com.liferay.portlet.messageboards.model.MBMailingList;
 import com.liferay.portlet.messageboards.service.MBMailingListLocalServiceUtil;
-
-import java.util.Locale;
 
 /**
  * @author Brian Wing Shun Chan
@@ -84,30 +80,11 @@ public class MBSubscriptionSender extends SubscriptionSender {
 	}
 
 	protected String getMailingListSubject(String subject, String mailId) {
+		subject = GetterUtil.getString(subject);
+		mailId = GetterUtil.getString(mailId);
+
 		return subject.concat(StringPool.SPACE).concat(mailId);
 	}
-
-	@Override
-	protected void processMailMessage(MailMessage mailMessage, Locale locale)
-		throws Exception {
-
-		super.processMailMessage(mailMessage, locale);
-
-		if (htmlFormat) {
-			try {
-				String processedBody = BBCodeUtil.getHTML(
-					mailMessage.getBody());
-
-				mailMessage.setBody(processedBody);
-			}
-			catch (Exception e) {
-				_log.error(
-					"Could not parse message " + mailId + " " + e.getMessage());
-			}
-		}
-	}
-
-	private static Log _log = LogFactoryUtil.getLog(MBSubscriptionSender.class);
 
 	private boolean _calledAddMailingListSubscriber;
 

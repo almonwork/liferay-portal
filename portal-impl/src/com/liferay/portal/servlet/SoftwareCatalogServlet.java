@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -185,13 +185,12 @@ public class SoftwareCatalogServlet extends HttpServlet {
 			String name = enu.nextElement();
 
 			if (name.startsWith(prefix)) {
-				String settingName = name.substring(
-					prefix.length(), name.length());
+				String settingName = name.substring(prefix.length());
 
 				String value = ParamUtil.getString(request, name);
 
 				if (Validator.isNotNull(value)) {
-					repoSettings.setProperty(settingName , value);
+					repoSettings.setProperty(settingName, value);
 				}
 			}
 		}

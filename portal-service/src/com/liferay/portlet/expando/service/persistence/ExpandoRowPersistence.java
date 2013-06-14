@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,7 +14,6 @@
 
 package com.liferay.portlet.expando.service.persistence;
 
-import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.service.persistence.BasePersistence;
 
 import com.liferay.portlet.expando.model.ExpandoRow;
@@ -302,9 +301,11 @@ public interface ExpandoRowPersistence extends BasePersistence<ExpandoRow> {
 	*
 	* @param tableId the table ID
 	* @param classPK the class p k
+	* @return the expando row that was removed
 	* @throws SystemException if a system exception occurred
 	*/
-	public void removeByT_C(long tableId, long classPK)
+	public com.liferay.portlet.expando.model.ExpandoRow removeByT_C(
+		long tableId, long classPK)
 		throws com.liferay.portal.kernel.exception.SystemException,
 			com.liferay.portlet.expando.NoSuchRowException;
 
@@ -345,6 +346,4 @@ public interface ExpandoRowPersistence extends BasePersistence<ExpandoRow> {
 	*/
 	public int countAll()
 		throws com.liferay.portal.kernel.exception.SystemException;
-
-	public ExpandoRow remove(ExpandoRow expandoRow) throws SystemException;
 }

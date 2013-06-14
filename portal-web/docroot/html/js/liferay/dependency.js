@@ -1,11 +1,11 @@
-(function(){
+(function() {
 	var A = AUI().use('oop');
 
 	var usedModules = {};
-	var emptyFn = function(){};
+	var emptyFn = function() {};
 
 	var Dependency = {
-		provide: function(obj, methodName, methodFn, modules) {
+		provide: function(obj, methodName, methodFn, modules, proto) {
 			if (!A.Lang.isArray(modules)) {
 				modules = [modules];
 			}
@@ -24,6 +24,10 @@
 				}
 			}
 
+			if (proto && A.Lang.isFunction(obj)) {
+				obj = obj.prototype;
+			}
+
 			var AOP = Dependency._getAOP(obj, methodName);
 
 			if (AOP) {
@@ -33,11 +37,17 @@
 			var proxy = function() {
 				var args = arguments;
 
+				var context = obj;
+
+				if (proto) {
+					context = this;
+				}
+
 				if (modules.length == 1) {
 					if (modules[0] in usedModules) {
-						Dependency._replaceMethod(obj, methodName, methodFn);
+						Dependency._replaceMethod(obj, methodName, methodFn, context);
 
-						methodFn.apply(obj, args);
+						methodFn.apply(context, args);
 
 						return;
 					}
@@ -56,7 +66,7 @@
 				queue.add(args);
 
 				if (firstLoad) {
-					modules.push(A.bind(Dependency._proxy, Liferay, obj, methodName, methodFn, guid, modules));
+					modules.push(A.bind(Dependency._proxy, Liferay, obj, methodName, methodFn, context, guid, modules));
 
 					A.use.apply(A, modules);
 				}
@@ -75,32 +85,38 @@
 			return obj._yuid && A.Do.objs[obj._yuid] && A.Do.objs[obj._yuid][methodName];
 		},
 
-		_proxy: function(obj, methodName, methodFn, guid, modules, A) {
+		_proxy: function(obj, methodName, methodFn, context, guid, modules, A) {
 			var queue = Dependency._proxyLoaders[guid];
 			var args;
 
-			Dependency._replaceMethod(obj, methodName, methodFn);
+			Dependency._replaceMethod(obj, methodName, methodFn, context);
 
 			while ((args = queue.next())) {
-		        methodFn.apply(obj, args);
-		    }
+				methodFn.apply(context, args);
+			}
 
 			for (var i = modules.length - 1; i >= 0; i--) {
 				usedModules[modules[i]] = true;
 			}
 		},
 
-		_replaceMethod: function(obj, methodName, methodFn) {
+		_replaceMethod: function(obj, methodName, methodFn, context) {
 			var instance = this;
 
 			var AOP = Dependency._getAOP(obj, methodName);
 
+			var proxy = obj[methodName];
+
 			if (AOP) {
+				proxy = AOP.method;
+
 				AOP.method = methodFn;
 			}
 			else {
 				obj[methodName] = methodFn;
 			}
+
+			A.mix(methodFn, proxy);
 		},
 
 		_proxyLoaders: {}

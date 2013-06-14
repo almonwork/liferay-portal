@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -92,14 +92,6 @@ public class RatingsStatsUtil {
 		return getPersistence()
 				   .findWithDynamicQuery(dynamicQuery, start, end,
 			orderByComparator);
-	}
-
-	/**
-	 * @see com.liferay.portal.service.persistence.BasePersistence#remove(com.liferay.portal.model.BaseModel)
-	 */
-	public static RatingsStats remove(RatingsStats ratingsStats)
-		throws SystemException {
-		return getPersistence().remove(ratingsStats);
 	}
 
 	/**
@@ -299,12 +291,14 @@ public class RatingsStatsUtil {
 	*
 	* @param classNameId the class name ID
 	* @param classPK the class p k
+	* @return the ratings stats that was removed
 	* @throws SystemException if a system exception occurred
 	*/
-	public static void removeByC_C(long classNameId, long classPK)
+	public static com.liferay.portlet.ratings.model.RatingsStats removeByC_C(
+		long classNameId, long classPK)
 		throws com.liferay.portal.kernel.exception.SystemException,
 			com.liferay.portlet.ratings.NoSuchStatsException {
-		getPersistence().removeByC_C(classNameId, classPK);
+		return getPersistence().removeByC_C(classNameId, classPK);
 	}
 
 	/**
@@ -352,11 +346,10 @@ public class RatingsStatsUtil {
 		return _persistence;
 	}
 
+	/**
+	 * @deprecated
+	 */
 	public void setPersistence(RatingsStatsPersistence persistence) {
-		_persistence = persistence;
-
-		ReferenceRegistry.registerReference(RatingsStatsUtil.class,
-			"_persistence");
 	}
 
 	private static RatingsStatsPersistence _persistence;

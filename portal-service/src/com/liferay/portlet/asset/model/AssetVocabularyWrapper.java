@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,6 +14,12 @@
 
 package com.liferay.portlet.asset.model;
 
+import com.liferay.portal.model.ModelWrapper;
+
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * <p>
  * This class is a wrapper for {@link AssetVocabulary}.
@@ -23,7 +29,8 @@ package com.liferay.portlet.asset.model;
  * @see       AssetVocabulary
  * @generated
  */
-public class AssetVocabularyWrapper implements AssetVocabulary {
+public class AssetVocabularyWrapper implements AssetVocabulary,
+	ModelWrapper<AssetVocabulary> {
 	public AssetVocabularyWrapper(AssetVocabulary assetVocabulary) {
 		_assetVocabulary = assetVocabulary;
 	}
@@ -34,6 +41,99 @@ public class AssetVocabularyWrapper implements AssetVocabulary {
 
 	public String getModelClassName() {
 		return AssetVocabulary.class.getName();
+	}
+
+	public Map<String, Object> getModelAttributes() {
+		Map<String, Object> attributes = new HashMap<String, Object>();
+
+		attributes.put("uuid", getUuid());
+		attributes.put("vocabularyId", getVocabularyId());
+		attributes.put("groupId", getGroupId());
+		attributes.put("companyId", getCompanyId());
+		attributes.put("userId", getUserId());
+		attributes.put("userName", getUserName());
+		attributes.put("createDate", getCreateDate());
+		attributes.put("modifiedDate", getModifiedDate());
+		attributes.put("name", getName());
+		attributes.put("title", getTitle());
+		attributes.put("description", getDescription());
+		attributes.put("settings", getSettings());
+
+		return attributes;
+	}
+
+	public void setModelAttributes(Map<String, Object> attributes) {
+		String uuid = (String)attributes.get("uuid");
+
+		if (uuid != null) {
+			setUuid(uuid);
+		}
+
+		Long vocabularyId = (Long)attributes.get("vocabularyId");
+
+		if (vocabularyId != null) {
+			setVocabularyId(vocabularyId);
+		}
+
+		Long groupId = (Long)attributes.get("groupId");
+
+		if (groupId != null) {
+			setGroupId(groupId);
+		}
+
+		Long companyId = (Long)attributes.get("companyId");
+
+		if (companyId != null) {
+			setCompanyId(companyId);
+		}
+
+		Long userId = (Long)attributes.get("userId");
+
+		if (userId != null) {
+			setUserId(userId);
+		}
+
+		String userName = (String)attributes.get("userName");
+
+		if (userName != null) {
+			setUserName(userName);
+		}
+
+		Date createDate = (Date)attributes.get("createDate");
+
+		if (createDate != null) {
+			setCreateDate(createDate);
+		}
+
+		Date modifiedDate = (Date)attributes.get("modifiedDate");
+
+		if (modifiedDate != null) {
+			setModifiedDate(modifiedDate);
+		}
+
+		String name = (String)attributes.get("name");
+
+		if (name != null) {
+			setName(name);
+		}
+
+		String title = (String)attributes.get("title");
+
+		if (title != null) {
+			setTitle(title);
+		}
+
+		String description = (String)attributes.get("description");
+
+		if (description != null) {
+			setDescription(description);
+		}
+
+		String settings = (String)attributes.get("settings");
+
+		if (settings != null) {
+			setSettings(settings);
+		}
 	}
 
 	/**
@@ -288,6 +388,14 @@ public class AssetVocabularyWrapper implements AssetVocabulary {
 		return _assetVocabulary.getTitle(languageId, useDefault);
 	}
 
+	public java.lang.String getTitleCurrentLanguageId() {
+		return _assetVocabulary.getTitleCurrentLanguageId();
+	}
+
+	public java.lang.String getTitleCurrentValue() {
+		return _assetVocabulary.getTitleCurrentValue();
+	}
+
 	/**
 	* Returns a map of the locales and localized titles of this asset vocabulary.
 	*
@@ -326,6 +434,10 @@ public class AssetVocabularyWrapper implements AssetVocabulary {
 	public void setTitle(java.lang.String title, java.util.Locale locale,
 		java.util.Locale defaultLocale) {
 		_assetVocabulary.setTitle(title, locale, defaultLocale);
+	}
+
+	public void setTitleCurrentLanguageId(java.lang.String languageId) {
+		_assetVocabulary.setTitleCurrentLanguageId(languageId);
 	}
 
 	/**
@@ -403,6 +515,14 @@ public class AssetVocabularyWrapper implements AssetVocabulary {
 		return _assetVocabulary.getDescription(languageId, useDefault);
 	}
 
+	public java.lang.String getDescriptionCurrentLanguageId() {
+		return _assetVocabulary.getDescriptionCurrentLanguageId();
+	}
+
+	public java.lang.String getDescriptionCurrentValue() {
+		return _assetVocabulary.getDescriptionCurrentValue();
+	}
+
 	/**
 	* Returns a map of the locales and localized descriptions of this asset vocabulary.
 	*
@@ -442,6 +562,10 @@ public class AssetVocabularyWrapper implements AssetVocabulary {
 	public void setDescription(java.lang.String description,
 		java.util.Locale locale, java.util.Locale defaultLocale) {
 		_assetVocabulary.setDescription(description, locale, defaultLocale);
+	}
+
+	public void setDescriptionCurrentLanguageId(java.lang.String languageId) {
+		_assetVocabulary.setDescriptionCurrentLanguageId(languageId);
 	}
 
 	/**
@@ -502,10 +626,6 @@ public class AssetVocabularyWrapper implements AssetVocabulary {
 
 	public boolean isEscapedModel() {
 		return _assetVocabulary.isEscapedModel();
-	}
-
-	public void setEscapedModel(boolean escapedModel) {
-		_assetVocabulary.setEscapedModel(escapedModel);
 	}
 
 	public java.io.Serializable getPrimaryKeyObj() {
@@ -579,7 +699,14 @@ public class AssetVocabularyWrapper implements AssetVocabulary {
 		_assetVocabulary.setSettingsProperties(settingsProperties);
 	}
 
+	/**
+	 * @deprecated Renamed to {@link #getWrappedModel}
+	 */
 	public AssetVocabulary getWrappedAssetVocabulary() {
+		return _assetVocabulary;
+	}
+
+	public AssetVocabulary getWrappedModel() {
 		return _assetVocabulary;
 	}
 

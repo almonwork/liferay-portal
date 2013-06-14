@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -15,6 +15,7 @@
 package com.liferay.taglib.portletext;
 
 import com.liferay.portal.kernel.servlet.taglib.FileAvailabilityUtil;
+import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.model.Portlet;
 import com.liferay.portal.theme.PortletDisplay;
 import com.liferay.portal.theme.ThemeDisplay;
@@ -29,6 +30,10 @@ import javax.servlet.http.HttpServletRequest;
  */
 public class IconPortletTag extends IconTag {
 
+	public void setPortlet(Portlet portlet) {
+		_portlet = portlet;
+	}
+
 	@Override
 	protected void cleanUp() {
 		super.cleanUp();
@@ -37,19 +42,8 @@ public class IconPortletTag extends IconTag {
 	}
 
 	@Override
-	protected void setAttributes(HttpServletRequest request) {
-		super.setAttributes(request);
-
-		request.setAttribute("liferay-portlet:icon_portlet:portlet", _portlet);
-	}
-
-	public void setPortlet(Portlet portlet) {
-		_portlet = portlet;
-	}
-
-	@Override
 	protected String getPage() {
-		if (FileAvailabilityUtil.isAvailable(getServletContext(), _PAGE)) {
+		if (FileAvailabilityUtil.isAvailable(servletContext, _PAGE)) {
 			return _PAGE;
 		}
 
@@ -76,10 +70,18 @@ public class IconPortletTag extends IconTag {
 			src = portletDisplay.getURLPortlet();
 		}
 
+		setAlt(StringPool.BLANK);
 		setMessage(message);
 		setSrc(src);
 
 		return super.getPage();
+	}
+
+	@Override
+	protected void setAttributes(HttpServletRequest request) {
+		super.setAttributes(request);
+
+		request.setAttribute("liferay-portlet:icon_portlet:portlet", _portlet);
 	}
 
 	private static final String _PAGE =

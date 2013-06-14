@@ -1,4 +1,4 @@
-AUI().add(
+AUI.add(
 	'liferay-form-navigator',
 	function(A) {
 		var CSS_HIDDEN = 'aui-helper-hidden-accessible';
@@ -10,6 +10,10 @@ AUI().add(
 		var SELECTOR_FORM_SECTION = '.form-section';
 
 		var SELECTOR_LIST_ITEM_SELECTED = 'li.selected';
+
+		var SELECTOR_SECTION_ERROR = '.' + CSS_SECTION_ERROR;
+
+		var STR_HREF = 'href';
 
 		var FormNavigator = function(options) {
 			var instance = this;
@@ -26,11 +30,11 @@ AUI().add(
 			instance._sections = instance._container.all(SELECTOR_FORM_SECTION);
 
 			if (instance._navigation) {
-				instance._navigation.delegate('click', instance._onClick, 'li a', instance)
+				instance._navigation.delegate('click', instance._onClick, 'li a', instance);
 			}
 
 			if (options.modifiedSections) {
-				instance._modifiedSections = A.all('[name=' + options.modifiedSections+ ']');
+				instance._modifiedSections = A.all('[name=' + options.modifiedSections + ']');
 
 				if (!instance._modifiedSections) {
 					instance._modifiedSections = A.Node.create('<input name="' + options.modifiedSections + '" type="hidden" />');
@@ -78,7 +82,7 @@ AUI().add(
 			_addModifiedSection: function (section) {
 				var instance = this;
 
-				if (A.Array.indexOf(section, instance._modifiedSectionsArray) == -1) {
+				if (A.Array.indexOf(instance._modifiedSectionsArray, section) == -1) {
 					instance._modifiedSectionsArray.push(section);
 				}
 			},
@@ -91,8 +95,9 @@ AUI().add(
 
 					instance._formValidator = formValidator;
 
-					formValidator.on('errorField', instance._updateSectionStatus, instance);
-					formValidator.on('validField', instance._updateSectionStatus, instance);
+					formValidator.on(['errorField', 'validField'], instance._updateSectionStatus, instance);
+
+					formValidator.on('submitError', instance._revealSectionError, instance);
 				}
 			},
 
@@ -133,7 +138,7 @@ AUI().add(
 				var li = target.get('parentNode');
 
 				if (li && !li.test('.selected')) {
-					var href = target.attr('href');
+					var href = target.attr(STR_HREF);
 
 					instance._revealSection(href, li);
 
@@ -155,13 +160,19 @@ AUI().add(
 				if (id) {
 					id = id.charAt(0) != '#' ? '#' + id : id;
 
-					var li = currentNavItem || instance._navigation.one('[href$=' + id + ']').get('parentNode');
+					if (!currentNavItem) {
+						var link = instance._navigation.one('[href$=' + id + ']');
+
+						if (link) {
+							currentNavItem = link.get('parentNode');
+						}
+					}
 
 					id = id.split('#');
 
 					var namespacedId = id[1];
 
-					if (namespacedId) {
+					if (currentNavItem && namespacedId) {
 						Liferay.fire('formNavigator:reveal' + namespacedId);
 
 						var section = A.one('#' + namespacedId);
@@ -171,7 +182,7 @@ AUI().add(
 							selected.removeClass(CSS_SELECTED);
 						}
 
-						li.addClass(CSS_SELECTED);
+						currentNavItem.addClass(CSS_SELECTED);
 
 						instance._sections.removeClass(CSS_SELECTED).addClass(CSS_HIDDEN);
 
@@ -180,6 +191,16 @@ AUI().add(
 						}
 					}
 				}
+			},
+
+			_revealSectionError: function() {
+				var instance = this;
+
+				var sectionError = instance._navigation.one(SELECTOR_SECTION_ERROR);
+
+				var sectionErrorLink = sectionError.one('a').attr(STR_HREF);
+
+				instance._revealSection(sectionErrorLink, sectionError);
 			},
 
 			_trackChanges: function(el) {
@@ -205,28 +226,30 @@ AUI().add(
 			_updateSectionStatus: function() {
 				var instance = this;
 
-				var selectedSectionNode = instance._navigation.one(SELECTOR_LIST_ITEM_SELECTED);
+				var navigation = instance._navigation;
 
-				if (selectedSectionNode) {
-					if (instance._formValidator.hasErrors()) {
-						var hasOwnProperty = Object.prototype.hasOwnProperty;
+				var lis = navigation.all('li');
 
-						var errors = instance._formValidator.errors;
+				lis.removeClass(CSS_SECTION_ERROR);
 
-						for (var item in errors) {
-							if (hasOwnProperty.call(errors, item)) {
-								var section = A.one('#' + item).ancestor(SELECTOR_FORM_SECTION);
+				var formValidator = instance._formValidator;
 
-								if (section && section.hasClass(CSS_SELECTED)) {
-									selectedSectionNode.addClass(CSS_SECTION_ERROR);
+				if (formValidator.hasErrors()) {
+					var selectors = A.Object.keys(formValidator.errors);
 
-									return;
+					A.all('#' + selectors.join(', #')).each(
+						function(item, index, collection) {
+							var section = item.ancestor(SELECTOR_FORM_SECTION);
+
+							if (section) {
+								var navItem = navigation.one('a[href="#' + section.attr('id') + '"]');
+
+								if (navItem) {
+									navItem.ancestor().addClass(CSS_SECTION_ERROR);
 								}
 							}
 						}
-					}
-
-					selectedSectionNode.removeClass(CSS_SECTION_ERROR);
+					);
 				}
 			},
 

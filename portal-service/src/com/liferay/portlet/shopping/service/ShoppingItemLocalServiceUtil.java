@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -15,7 +15,6 @@
 package com.liferay.portlet.shopping.service;
 
 import com.liferay.portal.kernel.bean.PortalBeanLocatorUtil;
-import com.liferay.portal.kernel.util.MethodCache;
 import com.liferay.portal.kernel.util.ReferenceRegistry;
 
 /**
@@ -66,25 +65,32 @@ public class ShoppingItemLocalServiceUtil {
 	* Deletes the shopping item with the primary key from the database. Also notifies the appropriate model listeners.
 	*
 	* @param itemId the primary key of the shopping item
+	* @return the shopping item that was removed
 	* @throws PortalException if a shopping item with the primary key could not be found
 	* @throws SystemException if a system exception occurred
 	*/
-	public static void deleteShoppingItem(long itemId)
+	public static com.liferay.portlet.shopping.model.ShoppingItem deleteShoppingItem(
+		long itemId)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException {
-		getService().deleteShoppingItem(itemId);
+		return getService().deleteShoppingItem(itemId);
 	}
 
 	/**
 	* Deletes the shopping item from the database. Also notifies the appropriate model listeners.
 	*
 	* @param shoppingItem the shopping item
+	* @return the shopping item that was removed
 	* @throws SystemException if a system exception occurred
 	*/
-	public static void deleteShoppingItem(
+	public static com.liferay.portlet.shopping.model.ShoppingItem deleteShoppingItem(
 		com.liferay.portlet.shopping.model.ShoppingItem shoppingItem)
 		throws com.liferay.portal.kernel.exception.SystemException {
-		getService().deleteShoppingItem(shoppingItem);
+		return getService().deleteShoppingItem(shoppingItem);
+	}
+
+	public static com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery() {
+		return getService().dynamicQuery();
 	}
 
 	/**
@@ -156,6 +162,11 @@ public class ShoppingItemLocalServiceUtil {
 		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery)
 		throws com.liferay.portal.kernel.exception.SystemException {
 		return getService().dynamicQueryCount(dynamicQuery);
+	}
+
+	public static com.liferay.portlet.shopping.model.ShoppingItem fetchShoppingItem(
+		long itemId) throws com.liferay.portal.kernel.exception.SystemException {
+		return getService().fetchShoppingItem(itemId);
 	}
 
 	/**
@@ -268,10 +279,10 @@ public class ShoppingItemLocalServiceUtil {
 		java.lang.String properties, java.lang.String fieldsQuantities,
 		boolean requiresShipping, int stockQuantity, boolean featured,
 		java.lang.Boolean sale, boolean smallImage,
-		java.lang.String smallImageURL, java.io.File smallFile,
+		java.lang.String smallImageURL, java.io.File smallImageFile,
 		boolean mediumImage, java.lang.String mediumImageURL,
-		java.io.File mediumFile, boolean largeImage,
-		java.lang.String largeImageURL, java.io.File largeFile,
+		java.io.File mediumImageFile, boolean largeImage,
+		java.lang.String largeImageURL, java.io.File largeImageFile,
 		java.util.List<com.liferay.portlet.shopping.model.ShoppingItemField> itemFields,
 		java.util.List<com.liferay.portlet.shopping.model.ShoppingItemPrice> itemPrices,
 		com.liferay.portal.service.ServiceContext serviceContext)
@@ -281,8 +292,9 @@ public class ShoppingItemLocalServiceUtil {
 				   .addItem(userId, groupId, categoryId, sku, name,
 			description, properties, fieldsQuantities, requiresShipping,
 			stockQuantity, featured, sale, smallImage, smallImageURL,
-			smallFile, mediumImage, mediumImageURL, mediumFile, largeImage,
-			largeImageURL, largeFile, itemFields, itemPrices, serviceContext);
+			smallImageFile, mediumImage, mediumImageURL, mediumImageFile,
+			largeImage, largeImageURL, largeImageFile, itemFields, itemPrices,
+			serviceContext);
 	}
 
 	public static void addItemResources(long itemId,
@@ -433,10 +445,10 @@ public class ShoppingItemLocalServiceUtil {
 		java.lang.String fieldsQuantities, boolean requiresShipping,
 		int stockQuantity, boolean featured, java.lang.Boolean sale,
 		boolean smallImage, java.lang.String smallImageURL,
-		java.io.File smallFile, boolean mediumImage,
-		java.lang.String mediumImageURL, java.io.File mediumFile,
+		java.io.File smallImageFile, boolean mediumImage,
+		java.lang.String mediumImageURL, java.io.File mediumImageFile,
 		boolean largeImage, java.lang.String largeImageURL,
-		java.io.File largeFile,
+		java.io.File largeImageFile,
 		java.util.List<com.liferay.portlet.shopping.model.ShoppingItemField> itemFields,
 		java.util.List<com.liferay.portlet.shopping.model.ShoppingItemPrice> itemPrices,
 		com.liferay.portal.service.ServiceContext serviceContext)
@@ -446,8 +458,9 @@ public class ShoppingItemLocalServiceUtil {
 				   .updateItem(userId, itemId, groupId, categoryId, sku, name,
 			description, properties, fieldsQuantities, requiresShipping,
 			stockQuantity, featured, sale, smallImage, smallImageURL,
-			smallFile, mediumImage, mediumImageURL, mediumFile, largeImage,
-			largeImageURL, largeFile, itemFields, itemPrices, serviceContext);
+			smallImageFile, mediumImage, mediumImageURL, mediumImageFile,
+			largeImage, largeImageURL, largeImageFile, itemFields, itemPrices,
+			serviceContext);
 	}
 
 	public static ShoppingItemLocalService getService() {
@@ -456,20 +469,15 @@ public class ShoppingItemLocalServiceUtil {
 
 			ReferenceRegistry.registerReference(ShoppingItemLocalServiceUtil.class,
 				"_service");
-			MethodCache.remove(ShoppingItemLocalService.class);
 		}
 
 		return _service;
 	}
 
+	/**
+	 * @deprecated
+	 */
 	public void setService(ShoppingItemLocalService service) {
-		MethodCache.remove(ShoppingItemLocalService.class);
-
-		_service = service;
-
-		ReferenceRegistry.registerReference(ShoppingItemLocalServiceUtil.class,
-			"_service");
-		MethodCache.remove(ShoppingItemLocalService.class);
 	}
 
 	private static ShoppingItemLocalService _service;

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -20,8 +20,12 @@ import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.mobile.device.Device;
+import com.liferay.portal.kernel.staging.StagingUtil;
 import com.liferay.portal.kernel.util.Http;
+import com.liferay.portal.kernel.util.LocaleThreadLocal;
+import com.liferay.portal.kernel.util.Mergeable;
 import com.liferay.portal.kernel.util.StringPool;
+import com.liferay.portal.kernel.util.TimeZoneThreadLocal;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.model.Account;
 import com.liferay.portal.model.ColorScheme;
@@ -37,6 +41,8 @@ import com.liferay.portal.model.User;
 import com.liferay.portal.security.permission.PermissionChecker;
 import com.liferay.portal.service.GroupLocalServiceUtil;
 import com.liferay.portal.service.LayoutLocalServiceUtil;
+import com.liferay.portal.util.PortalUtil;
+import com.liferay.portlet.mobiledevicerules.model.MDRRuleGroupInstance;
 
 import java.io.Serializable;
 
@@ -51,7 +57,8 @@ import javax.portlet.PortletURL;
 /**
  * @author Brian Wing Shun Chan
  */
-public class ThemeDisplay implements Serializable {
+public class ThemeDisplay
+	implements Cloneable, Mergeable<ThemeDisplay>, Serializable {
 
 	public ThemeDisplay() {
 		if (_log.isDebugEnabled()) {
@@ -61,8 +68,54 @@ public class ThemeDisplay implements Serializable {
 		_portletDisplay.setThemeDisplay(this);
 	}
 
+	@Override
+	public Object clone() throws CloneNotSupportedException {
+		ThemeDisplay themeDisplay = (ThemeDisplay)super.clone();
+
+		PortletDisplay portletDisplay = new PortletDisplay();
+
+		_portletDisplay.copyTo(portletDisplay);
+
+		themeDisplay._portletDisplay = portletDisplay;
+
+		portletDisplay.setThemeDisplay(themeDisplay);
+
+		return themeDisplay;
+	}
+
 	public Account getAccount() {
 		return _account;
+	}
+
+	public String getCDNBaseURL() {
+		if (_cdnBaseURL != null) {
+			return _cdnBaseURL;
+		}
+
+		String host = getCDNHost();
+
+		String portalURL = getPortalURL();
+
+		if (getServerName() != null) {
+			try {
+				portalURL = PortalUtil.getPortalURL(getLayout(), this);
+			}
+			catch (Exception e) {
+				_log.error(e, e);
+			}
+		}
+
+		if (Validator.isNull(host)) {
+			host = portalURL;
+		}
+
+		_cdnBaseURL = host;
+
+		return _cdnBaseURL;
+	}
+
+	public String getCDNDynamicResourcesHost() {
+		return _cdnDynamicResourcesHost;
 	}
 
 	public String getCDNHost() {
@@ -179,6 +232,14 @@ public class ThemeDisplay implements Serializable {
 
 	public Locale getLocale() {
 		return _locale;
+	}
+
+	public MDRRuleGroupInstance getMDRRuleGroupInstance() {
+		return _mdrRuleGroupInstance;
+	}
+
+	public Group getParentGroup() {
+		return _parentGroup;
 	}
 
 	public long getParentGroupId() {
@@ -324,29 +385,18 @@ public class ThemeDisplay implements Serializable {
 		return _scopeGroupId;
 	}
 
+	public long getScopeGroupIdOrLiveGroupId()
+		throws PortalException, SystemException {
+
+		return StagingUtil.getLiveGroupId(_scopeGroupId);
+	}
+
 	public String getScopeGroupName() throws PortalException, SystemException {
 		if (_scopeGroup == null) {
 			return StringPool.BLANK;
 		}
 		else {
 			return _scopeGroup.getDescriptiveName();
-		}
-	}
-
-	public long getScopeGroupIdOrLiveGroupId()
-		throws PortalException, SystemException {
-
-		if (_scopeGroupId == 0) {
-			return _scopeGroupId;
-		}
-
-		Group group = GroupLocalServiceUtil.getGroup(_scopeGroupId);
-
-		if (group.isStagingGroup()) {
-			return group.getLiveGroupId();
-		}
-		else {
-			return _scopeGroupId;
 		}
 	}
 
@@ -511,6 +561,10 @@ public class ThemeDisplay implements Serializable {
 		return _addSessionIdToURL;
 	}
 
+	public boolean isAjax() {
+		return _ajax;
+	}
+
 	public boolean isFacebook() {
 		return _facebook;
 	}
@@ -540,11 +594,6 @@ public class ThemeDisplay implements Serializable {
 
 			return true;
 		}
-		else if (isIncludeServiceJs() &&
-				 js.startsWith(path + "/liferay/service.js")) {
-
-			return true;
-		}
 		else {
 			return false;
 		}
@@ -552,10 +601,6 @@ public class ThemeDisplay implements Serializable {
 
 	public boolean isIncludePortletCssJs() {
 		return _includePortletCssJs;
-	}
-
-	public boolean isIncludeServiceJs() {
-		return _includeServiceJs;
 	}
 
 	public boolean isIsolated() {
@@ -686,12 +731,34 @@ public class ThemeDisplay implements Serializable {
 		return _widget;
 	}
 
+	public ThemeDisplay merge(ThemeDisplay themeDisplay) {
+		if ((themeDisplay == null) || (themeDisplay == this)) {
+			return this;
+		}
+
+		_includePortletCssJs = themeDisplay._includePortletCssJs;
+
+		return this;
+	}
+
 	public void setAccount(Account account) {
 		_account = account;
 	}
 
 	public void setAddSessionIdToURL(boolean addSessionIdToURL) {
 		_addSessionIdToURL = addSessionIdToURL;
+	}
+
+	public void setAjax(boolean ajax) {
+		_ajax = ajax;
+	}
+
+	public void setCDNBaseURL(String cdnBase) {
+		_cdnBaseURL = cdnBase;
+	}
+
+	public void setCDNDynamicResourcesHost(String cdnDynamicResourcesHost) {
+		_cdnDynamicResourcesHost = cdnDynamicResourcesHost;
 	}
 
 	public void setCDNHost(String cdnHost) {
@@ -781,10 +848,6 @@ public class ThemeDisplay implements Serializable {
 		_includePortletCssJs = includePortletCssJs;
 	}
 
-	public void setIncludeServiceJs(boolean includeServiceJs) {
-		_includeServiceJs = includeServiceJs;
-	}
-
 	public void setIsolated(boolean isolated) {
 		_isolated = isolated;
 	}
@@ -831,41 +894,60 @@ public class ThemeDisplay implements Serializable {
 
 	public void setLocale(Locale locale) {
 		_locale = locale;
+
+		LocaleThreadLocal.setThemeDisplayLocale(locale);
 	}
 
-	public void setLookAndFeel(
-		String contextPath, Theme theme, ColorScheme colorScheme) {
-
+	public void setLookAndFeel(Theme theme, ColorScheme colorScheme) {
 		_theme = theme;
 		_colorScheme = colorScheme;
 
 		if ((theme != null) && (colorScheme != null)) {
 			String themeStaticResourcePath = theme.getStaticResourcePath();
 
-			String host = getCDNHost();
-
-			if (Validator.isNull(host) && isFacebook()) {
-				host = getPortalURL();
-			}
+			String cdnBaseURL = getCDNBaseURL();
 
 			setPathColorSchemeImages(
-				host + themeStaticResourcePath +
+				cdnBaseURL + themeStaticResourcePath +
 					colorScheme.getColorSchemeImagesPath());
 
+			String dynamicResourcesHost = getCDNDynamicResourcesHost();
+
+			if (Validator.isNull(dynamicResourcesHost)) {
+				String portalURL = getPortalURL();
+
+				if (getServerName() != null) {
+					try {
+						portalURL = PortalUtil.getPortalURL(getLayout(), this);
+					}
+					catch (Exception e) {
+						_log.error(e, e);
+					}
+				}
+
+				dynamicResourcesHost = portalURL;
+			}
+
 			setPathThemeCss(
-				host + themeStaticResourcePath + theme.getCssPath());
+				dynamicResourcesHost + themeStaticResourcePath +
+					theme.getCssPath());
+
 			setPathThemeImages(
-				host + themeStaticResourcePath + theme.getImagesPath());
+				cdnBaseURL + themeStaticResourcePath + theme.getImagesPath());
 			setPathThemeJavaScript(
-				host + themeStaticResourcePath + theme.getJavaScriptPath());
+				cdnBaseURL + themeStaticResourcePath +
+					theme.getJavaScriptPath());
 			setPathThemeRoot(themeStaticResourcePath + theme.getRootPath());
 			setPathThemeTemplates(
-				host + themeStaticResourcePath + theme.getTemplatesPath());
+				cdnBaseURL + themeStaticResourcePath +
+					theme.getTemplatesPath());
 		}
 	}
 
-	public void setLookAndFeel(Theme theme, ColorScheme colorScheme) {
-		setLookAndFeel(getPathContext(), theme, colorScheme);
+	public void setMDRRuleGroupInstance(
+		MDRRuleGroupInstance mdrRuleGroupInstance) {
+
+		_mdrRuleGroupInstance = mdrRuleGroupInstance;
 	}
 
 	public void setParentGroupId(long parentGroupId) {
@@ -1137,6 +1219,8 @@ public class ThemeDisplay implements Serializable {
 
 	public void setTimeZone(TimeZone timeZone) {
 		_timeZone = timeZone;
+
+		TimeZoneThreadLocal.setThemeDisplayTimeZone(timeZone);
 	}
 
 	public void setUnfilteredLayouts(List<Layout> unfilteredLayouts) {
@@ -1235,6 +1319,9 @@ public class ThemeDisplay implements Serializable {
 
 	private Account _account;
 	private boolean _addSessionIdToURL;
+	private boolean _ajax;
+	private String _cdnBaseURL;
+	private String _cdnDynamicResourcesHost = StringPool.BLANK;
 	private String _cdnHost = StringPool.BLANK;
 	private ColorScheme _colorScheme;
 	private Company _company;
@@ -1256,19 +1343,19 @@ public class ThemeDisplay implements Serializable {
 	private String _i18nLanguageId;
 	private String _i18nPath;
 	private boolean _includePortletCssJs;
-	private boolean _includeServiceJs;
 	private boolean _isolated;
 	private String _languageId;
 	private Layout _layout;
 	private List<Layout> _layouts;
-	private String _layoutSetLogo = StringPool.BLANK;
 	private LayoutSet _layoutSet;
+	private String _layoutSetLogo = StringPool.BLANK;
 	private LayoutTypePortlet _layoutTypePortlet;
 	private String _lifecycle;
 	private boolean _lifecycleAction;
 	private boolean _lifecycleRender;
 	private boolean _lifecycleResource;
 	private Locale _locale;
+	private MDRRuleGroupInstance _mdrRuleGroupInstance;
 	private Group _parentGroup;
 	private long _parentGroupId;
 	private String _pathApplet = StringPool.BLANK;

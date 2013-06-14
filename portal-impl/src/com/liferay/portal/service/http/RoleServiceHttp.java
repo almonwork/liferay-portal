@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -55,7 +55,8 @@ public class RoleServiceHttp {
 	public static com.liferay.portal.model.Role addRole(
 		HttpPrincipal httpPrincipal, java.lang.String name,
 		java.util.Map<java.util.Locale, java.lang.String> titleMap,
-		java.lang.String description, int type)
+		java.util.Map<java.util.Locale, java.lang.String> descriptionMap,
+		int type)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException {
 		try {
@@ -63,7 +64,7 @@ public class RoleServiceHttp {
 					"addRole", _addRoleParameterTypes0);
 
 			MethodHandler methodHandler = new MethodHandler(methodKey, name,
-					titleMap, description, type);
+					titleMap, descriptionMap, type);
 
 			Object returnObj = null;
 
@@ -157,7 +158,8 @@ public class RoleServiceHttp {
 
 	public static java.util.List<com.liferay.portal.model.Role> getGroupRoles(
 		HttpPrincipal httpPrincipal, long groupId)
-		throws com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException {
 		try {
 			MethodKey methodKey = new MethodKey(RoleServiceUtil.class.getName(),
 					"getGroupRoles", _getGroupRolesParameterTypes3);
@@ -170,6 +172,10 @@ public class RoleServiceHttp {
 				returnObj = TunnelUtil.invoke(httpPrincipal, methodHandler);
 			}
 			catch (Exception e) {
+				if (e instanceof com.liferay.portal.kernel.exception.PortalException) {
+					throw (com.liferay.portal.kernel.exception.PortalException)e;
+				}
+
 				if (e instanceof com.liferay.portal.kernel.exception.SystemException) {
 					throw (com.liferay.portal.kernel.exception.SystemException)e;
 				}
@@ -261,7 +267,8 @@ public class RoleServiceHttp {
 
 	public static java.util.List<com.liferay.portal.model.Role> getUserGroupGroupRoles(
 		HttpPrincipal httpPrincipal, long userId, long groupId)
-		throws com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException {
 		try {
 			MethodKey methodKey = new MethodKey(RoleServiceUtil.class.getName(),
 					"getUserGroupGroupRoles",
@@ -276,6 +283,10 @@ public class RoleServiceHttp {
 				returnObj = TunnelUtil.invoke(httpPrincipal, methodHandler);
 			}
 			catch (Exception e) {
+				if (e instanceof com.liferay.portal.kernel.exception.PortalException) {
+					throw (com.liferay.portal.kernel.exception.PortalException)e;
+				}
+
 				if (e instanceof com.liferay.portal.kernel.exception.SystemException) {
 					throw (com.liferay.portal.kernel.exception.SystemException)e;
 				}
@@ -294,7 +305,8 @@ public class RoleServiceHttp {
 
 	public static java.util.List<com.liferay.portal.model.Role> getUserGroupRoles(
 		HttpPrincipal httpPrincipal, long userId, long groupId)
-		throws com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException {
 		try {
 			MethodKey methodKey = new MethodKey(RoleServiceUtil.class.getName(),
 					"getUserGroupRoles", _getUserGroupRolesParameterTypes7);
@@ -308,6 +320,10 @@ public class RoleServiceHttp {
 				returnObj = TunnelUtil.invoke(httpPrincipal, methodHandler);
 			}
 			catch (Exception e) {
+				if (e instanceof com.liferay.portal.kernel.exception.PortalException) {
+					throw (com.liferay.portal.kernel.exception.PortalException)e;
+				}
+
 				if (e instanceof com.liferay.portal.kernel.exception.SystemException) {
 					throw (com.liferay.portal.kernel.exception.SystemException)e;
 				}
@@ -327,7 +343,8 @@ public class RoleServiceHttp {
 	public static java.util.List<com.liferay.portal.model.Role> getUserRelatedRoles(
 		HttpPrincipal httpPrincipal, long userId,
 		java.util.List<com.liferay.portal.model.Group> groups)
-		throws com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException {
 		try {
 			MethodKey methodKey = new MethodKey(RoleServiceUtil.class.getName(),
 					"getUserRelatedRoles", _getUserRelatedRolesParameterTypes8);
@@ -341,6 +358,10 @@ public class RoleServiceHttp {
 				returnObj = TunnelUtil.invoke(httpPrincipal, methodHandler);
 			}
 			catch (Exception e) {
+				if (e instanceof com.liferay.portal.kernel.exception.PortalException) {
+					throw (com.liferay.portal.kernel.exception.PortalException)e;
+				}
+
 				if (e instanceof com.liferay.portal.kernel.exception.SystemException) {
 					throw (com.liferay.portal.kernel.exception.SystemException)e;
 				}
@@ -359,7 +380,8 @@ public class RoleServiceHttp {
 
 	public static java.util.List<com.liferay.portal.model.Role> getUserRoles(
 		HttpPrincipal httpPrincipal, long userId)
-		throws com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException {
 		try {
 			MethodKey methodKey = new MethodKey(RoleServiceUtil.class.getName(),
 					"getUserRoles", _getUserRolesParameterTypes9);
@@ -372,6 +394,10 @@ public class RoleServiceHttp {
 				returnObj = TunnelUtil.invoke(httpPrincipal, methodHandler);
 			}
 			catch (Exception e) {
+				if (e instanceof com.liferay.portal.kernel.exception.PortalException) {
+					throw (com.liferay.portal.kernel.exception.PortalException)e;
+				}
+
 				if (e instanceof com.liferay.portal.kernel.exception.SystemException) {
 					throw (com.liferay.portal.kernel.exception.SystemException)e;
 				}
@@ -498,7 +524,8 @@ public class RoleServiceHttp {
 	public static com.liferay.portal.model.Role updateRole(
 		HttpPrincipal httpPrincipal, long roleId, java.lang.String name,
 		java.util.Map<java.util.Locale, java.lang.String> titleMap,
-		java.lang.String description, java.lang.String subtype)
+		java.util.Map<java.util.Locale, java.lang.String> descriptionMap,
+		java.lang.String subtype)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException {
 		try {
@@ -506,7 +533,7 @@ public class RoleServiceHttp {
 					"updateRole", _updateRoleParameterTypes13);
 
 			MethodHandler methodHandler = new MethodHandler(methodKey, roleId,
-					name, titleMap, description, subtype);
+					name, titleMap, descriptionMap, subtype);
 
 			Object returnObj = null;
 
@@ -536,7 +563,7 @@ public class RoleServiceHttp {
 
 	private static Log _log = LogFactoryUtil.getLog(RoleServiceHttp.class);
 	private static final Class<?>[] _addRoleParameterTypes0 = new Class[] {
-			java.lang.String.class, java.util.Map.class, java.lang.String.class,
+			java.lang.String.class, java.util.Map.class, java.util.Map.class,
 			int.class
 		};
 	private static final Class<?>[] _addUserRolesParameterTypes1 = new Class[] {
@@ -577,6 +604,6 @@ public class RoleServiceHttp {
 		};
 	private static final Class<?>[] _updateRoleParameterTypes13 = new Class[] {
 			long.class, java.lang.String.class, java.util.Map.class,
-			java.lang.String.class, java.lang.String.class
+			java.util.Map.class, java.lang.String.class
 		};
 }

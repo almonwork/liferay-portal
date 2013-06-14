@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -16,30 +16,28 @@ package com.liferay.portal.scheduler.job;
 
 import com.liferay.portal.kernel.cluster.ClusterExecutorUtil;
 import com.liferay.portal.kernel.cluster.ClusterRequest;
-import com.liferay.portal.kernel.concurrent.LockRegistry;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.messaging.Message;
 import com.liferay.portal.kernel.messaging.MessageBusUtil;
 import com.liferay.portal.kernel.scheduler.JobState;
+import com.liferay.portal.kernel.scheduler.JobStateSerializeUtil;
 import com.liferay.portal.kernel.scheduler.SchedulerEngine;
 import com.liferay.portal.kernel.scheduler.SchedulerEngineUtil;
 import com.liferay.portal.kernel.scheduler.StorageType;
-import com.liferay.portal.kernel.scheduler.TriggerState;
 import com.liferay.portal.kernel.util.MethodHandler;
 import com.liferay.portal.kernel.util.MethodKey;
-import com.liferay.portal.spring.context.PortletContextLoaderListener;
 import com.liferay.portal.util.PropsValues;
 
-import java.util.concurrent.locks.ReentrantLock;
+import java.util.Map;
 
 import org.quartz.Job;
 import org.quartz.JobDataMap;
 import org.quartz.JobDetail;
 import org.quartz.JobExecutionContext;
+import org.quartz.JobKey;
 import org.quartz.Scheduler;
-import org.quartz.Trigger;
 
 /**
  * @author Michael C. Han
@@ -77,103 +75,52 @@ public class MessageSenderJob implements Job {
 			message = (Message)JSONFactoryUtil.deserialize(messageJSON);
 		}
 
-		String contextPath = message.getString(SchedulerEngine.CONTEXT_PATH);
+		message.put(SchedulerEngine.DESTINATION_NAME, destinationName);
 
-		String lockKey = PortletContextLoaderListener.getLockKey(
-			contextPath);
+		Map<String, Object> jobStateMap =
+			(Map<String, Object>)jobDataMap.get(SchedulerEngine.JOB_STATE);
 
-		ReentrantLock executionLock = null;
+		JobState jobState = JobStateSerializeUtil.deserialize(jobStateMap);
 
-		if (lockKey != null) {
-			executionLock = LockRegistry.getLock(lockKey, lockKey);
+		JobKey jobKey = jobDetail.getKey();
 
-			if (executionLock != null) {
-				if (executionLock.hasQueuedThreads()) {
-					return;
-				}
+		if (jobExecutionContext.getNextFireTime() == null) {
+			message.put(SchedulerEngine.DISABLE, true);
 
-				executionLock.lock();
+			StorageType storageType = StorageType.valueOf(
+				jobDataMap.getString(SchedulerEngine.STORAGE_TYPE));
+
+			if (PropsValues.CLUSTER_LINK_ENABLED &&
+				storageType.equals(StorageType.MEMORY_CLUSTERED)) {
+
+				notifyClusterMember(jobKey, storageType);
+			}
+
+			if (storageType.equals(StorageType.PERSISTED)) {
+				Scheduler scheduler = jobExecutionContext.getScheduler();
+
+				scheduler.deleteJob(jobKey);
 			}
 		}
 
-		try {
-			message.put(SchedulerEngine.DESTINATION_NAME, destinationName);
+		message.put(SchedulerEngine.JOB_NAME, jobKey.getName());
+		message.put(SchedulerEngine.JOB_STATE, jobState);
+		message.put(SchedulerEngine.GROUP_NAME, jobKey.getGroup());
 
-			Scheduler scheduler = jobExecutionContext.getScheduler();
-
-			JobState jobState = (JobState)jobDataMap.get(
-				SchedulerEngine.JOB_STATE);
-
-			if (jobExecutionContext.getNextFireTime() == null) {
-				Trigger trigger = jobExecutionContext.getTrigger();
-
-				StorageType storageType = StorageType.valueOf(
-					jobDataMap.getString(SchedulerEngine.STORAGE_TYPE));
-
-				if (storageType.equals(StorageType.PERSISTED)) {
-					JobState jobStateClone = updatePersistedJobState(
-						jobState, trigger);
-
-					jobDataMap.put(SchedulerEngine.JOB_STATE, jobStateClone);
-
-					scheduler.addJob(jobDetail, true);
-				}
-				else {
-					message.put(SchedulerEngine.DISABLE, true);
-
-					if (PropsValues.CLUSTER_LINK_ENABLED &&
-						storageType.equals(StorageType.MEMORY_CLUSTERED)) {
-
-						notifyClusterMember(
-							trigger.getJobName(), trigger.getGroup(),
-							storageType);
-					}
-				}
-			}
-
-			message.put(SchedulerEngine.JOB_STATE, jobState);
-
-			MessageBusUtil.sendMessage(destinationName, message);
-		}
-		finally {
-			if (executionLock != null) {
-				executionLock.unlock();
-			}
-		}
+		MessageBusUtil.sendMessage(destinationName, message);
 	}
 
-	protected void notifyClusterMember(
-			String jobName, String groupName, StorageType storageType)
+	protected void notifyClusterMember(JobKey jobKey, StorageType storageType)
 		throws Exception {
 
 		MethodHandler methodHandler = new MethodHandler(
-			_deleteJobMethodKey, jobName, groupName, storageType);
+			_deleteJobMethodKey, jobKey.getName(), jobKey.getGroup(),
+			storageType);
 
-		ClusterRequest clusterRequest =
-			ClusterRequest.createMulticastRequest(methodHandler, true);
+		ClusterRequest clusterRequest = ClusterRequest.createMulticastRequest(
+			methodHandler, true);
 
 		ClusterExecutorUtil.execute(clusterRequest);
-	}
-
-	protected JobState updatePersistedJobState(
-		JobState jobState, Trigger trigger) {
-
-		jobState.setTriggerState(TriggerState.COMPLETE);
-		jobState.setTriggerTimeInfomation(
-			SchedulerEngine.END_TIME, trigger.getEndTime());
-		jobState.setTriggerTimeInfomation(
-			SchedulerEngine.FINAL_FIRE_TIME, trigger.getFinalFireTime());
-		jobState.setTriggerTimeInfomation(SchedulerEngine.NEXT_FIRE_TIME, null);
-		jobState.setTriggerTimeInfomation(
-			SchedulerEngine.PREVIOUS_FIRE_TIME, trigger.getPreviousFireTime());
-		jobState.setTriggerTimeInfomation(
-			SchedulerEngine.START_TIME, trigger.getStartTime());
-
-		JobState jobStateClone = (JobState)jobState.clone();
-
-		jobStateClone.clearExceptions();
-
-		return jobStateClone;
 	}
 
 	private static Log _log = LogFactoryUtil.getLog(MessageSenderJob.class);

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -25,7 +25,9 @@ public class PortalLifecycleUtil {
 	public static void flushDestroys() {
 		_inFlushDestroys = true;
 
-		for (PortalLifecycle portalLifecycle : _portalLifecyclesDestroy) {
+		for (int i = _portalLifecyclesDestroy.size() - 1; i >= 0; i--) {
+			PortalLifecycle portalLifecycle = _portalLifecyclesDestroy.get(i);
+
 			portalLifecycle.portalDestroy();
 		}
 

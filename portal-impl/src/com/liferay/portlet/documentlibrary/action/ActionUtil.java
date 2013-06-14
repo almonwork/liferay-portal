@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -27,12 +27,12 @@ import com.liferay.portal.theme.ThemeDisplay;
 import com.liferay.portal.util.PortalUtil;
 import com.liferay.portal.util.WebKeys;
 import com.liferay.portlet.documentlibrary.NoSuchFileEntryException;
+import com.liferay.portlet.documentlibrary.NoSuchFolderException;
 import com.liferay.portlet.documentlibrary.model.DLFileShortcut;
 import com.liferay.portlet.documentlibrary.model.DLFolderConstants;
 import com.liferay.portlet.documentlibrary.service.DLAppServiceUtil;
 import com.liferay.portlet.documentlibrary.service.permission.DLPermission;
-import com.liferay.portlet.documentlibrary.util.RawMetadataProcessor;
-import com.liferay.portlet.imagegallery.NoSuchFolderException;
+import com.liferay.portlet.documentlibrary.util.RawMetadataProcessorUtil;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -55,10 +55,10 @@ public class ActionUtil {
 		long[] fileEntryIds = StringUtil.split(
 			ParamUtil.getString(request, "fileEntryIds"), 0L);
 
-		for (int i = 0; i < fileEntryIds.length; i++) {
+		for (long fileEntryId : fileEntryIds) {
 			try {
 				FileEntry fileEntry = DLAppServiceUtil.getFileEntry(
-					fileEntryIds[i]);
+					fileEntryId);
 
 				fileEntries.add(fileEntry);
 			}
@@ -82,43 +82,31 @@ public class ActionUtil {
 	public static void getFileEntry(HttpServletRequest request)
 		throws Exception {
 
-		ThemeDisplay themeDisplay = (ThemeDisplay)request.getAttribute(
-			WebKeys.THEME_DISPLAY);
-
 		long fileEntryId = ParamUtil.getLong(request, "fileEntryId");
-
-		long groupId = themeDisplay.getScopeGroupId();
-		long folderId = ParamUtil.getLong(request, "folderId");
-		String title = ParamUtil.getString(request, "title");
 
 		FileEntry fileEntry = null;
 
-		try {
-			if (fileEntryId > 0) {
-				fileEntry = DLAppServiceUtil.getFileEntry(fileEntryId);
-			}
-			else if (Validator.isNotNull(title)) {
-				fileEntry = DLAppServiceUtil.getFileEntry(
-					groupId, folderId, title);
-			}
+		if (fileEntryId > 0) {
+			fileEntry = DLAppServiceUtil.getFileEntry(fileEntryId);
+		}
 
-			request.setAttribute(
-				WebKeys.DOCUMENT_LIBRARY_FILE_ENTRY, fileEntry);
-		}
-		catch (NoSuchFileEntryException nsfee) {
-		}
+		request.setAttribute(WebKeys.DOCUMENT_LIBRARY_FILE_ENTRY, fileEntry);
 
 		String version = ParamUtil.getString(request, "version");
 
-		if ((fileEntry != null) && Validator.isNotNull(version)) {
-			FileVersion fileVersion = fileEntry.getFileVersion(version);
-
-			request.setAttribute(
-				WebKeys.DOCUMENT_LIBRARY_FILE_VERSION, fileVersion);
-		}
-
 		if (fileEntry != null) {
-			RawMetadataProcessor.generateMetadata(fileEntry);
+			if (Validator.isNotNull(version)) {
+				FileVersion fileVersion = fileEntry.getFileVersion(version);
+
+				request.setAttribute(
+					WebKeys.DOCUMENT_LIBRARY_FILE_VERSION, fileVersion);
+
+				RawMetadataProcessorUtil.generateMetadata(fileVersion);
+			}
+			else {
+				RawMetadataProcessorUtil.generateMetadata(
+					fileEntry.getFileVersion());
+			}
 		}
 	}
 
@@ -153,6 +141,34 @@ public class ActionUtil {
 			portletRequest);
 
 		getFileShortcut(request);
+	}
+
+	public static void getFileShortcuts(HttpServletRequest request)
+		throws Exception {
+
+		long[] fileShortcutIds = StringUtil.split(
+			ParamUtil.getString(request, "fileShortcutIds"), 0L);
+
+		List<DLFileShortcut> fileShortcuts = new ArrayList<DLFileShortcut>();
+
+		for (long fileShortcutId : fileShortcutIds) {
+			if (fileShortcutId > 0) {
+				fileShortcuts.add(
+					DLAppServiceUtil.getFileShortcut(fileShortcutId));
+			}
+		}
+
+		request.setAttribute(
+			WebKeys.DOCUMENT_LIBRARY_FILE_SHORTCUTS, fileShortcuts);
+	}
+
+	public static void getFileShortcuts(PortletRequest portletRequest)
+		throws Exception {
+
+		HttpServletRequest request = PortalUtil.getHttpServletRequest(
+			portletRequest);
+
+		getFileShortcuts(request);
 	}
 
 	public static void getFolder(HttpServletRequest request) throws Exception {
@@ -192,9 +208,9 @@ public class ActionUtil {
 
 		List<Folder> folders = new ArrayList<Folder>();
 
-		for (int i = 0; i < folderIds.length; i++) {
+		for (long folderId : folderIds) {
 			try {
-				Folder folder = DLAppServiceUtil.getFolder(folderIds[i]);
+				Folder folder = DLAppServiceUtil.getFolder(folderId);
 
 				folders.add(folder);
 			}

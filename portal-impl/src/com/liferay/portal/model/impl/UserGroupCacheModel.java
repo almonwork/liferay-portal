@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -19,6 +19,8 @@ import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.model.CacheModel;
 import com.liferay.portal.model.UserGroup;
 
+import java.io.Serializable;
+
 /**
  * The cache model class for representing UserGroup in entity cache.
  *
@@ -26,10 +28,10 @@ import com.liferay.portal.model.UserGroup;
  * @see UserGroup
  * @generated
  */
-public class UserGroupCacheModel implements CacheModel<UserGroup> {
+public class UserGroupCacheModel implements CacheModel<UserGroup>, Serializable {
 	@Override
 	public String toString() {
-		StringBundler sb = new StringBundler(17);
+		StringBundler sb = new StringBundler(13);
 
 		sb.append("{userGroupId=");
 		sb.append(userGroupId);
@@ -41,10 +43,6 @@ public class UserGroupCacheModel implements CacheModel<UserGroup> {
 		sb.append(name);
 		sb.append(", description=");
 		sb.append(description);
-		sb.append(", publicLayoutSetPrototypeId=");
-		sb.append(publicLayoutSetPrototypeId);
-		sb.append(", privateLayoutSetPrototypeId=");
-		sb.append(privateLayoutSetPrototypeId);
 		sb.append(", addedByLDAPImport=");
 		sb.append(addedByLDAPImport);
 		sb.append("}");
@@ -73,8 +71,6 @@ public class UserGroupCacheModel implements CacheModel<UserGroup> {
 			userGroupImpl.setDescription(description);
 		}
 
-		userGroupImpl.setPublicLayoutSetPrototypeId(publicLayoutSetPrototypeId);
-		userGroupImpl.setPrivateLayoutSetPrototypeId(privateLayoutSetPrototypeId);
 		userGroupImpl.setAddedByLDAPImport(addedByLDAPImport);
 
 		userGroupImpl.resetOriginalValues();
@@ -87,7 +83,5 @@ public class UserGroupCacheModel implements CacheModel<UserGroup> {
 	public long parentUserGroupId;
 	public String name;
 	public String description;
-	public long publicLayoutSetPrototypeId;
-	public long privateLayoutSetPrototypeId;
 	public boolean addedByLDAPImport;
 }

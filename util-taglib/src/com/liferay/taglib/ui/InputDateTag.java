@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -82,6 +82,10 @@ public class InputDateTag extends IncludeTag {
 		_monthValue = monthValue;
 	}
 
+	public void setName(String name) {
+		_name = name;
+	}
+
 	public void setYearNullable(boolean yearNullable) {
 		_yearNullable = yearNullable;
 	}
@@ -160,6 +164,7 @@ public class InputDateTag extends IncludeTag {
 		request.setAttribute("liferay-ui:input-date:monthParam", _monthParam);
 		request.setAttribute(
 			"liferay-ui:input-date:monthValue", String.valueOf(_monthValue));
+		request.setAttribute("liferay-ui:input-date:name", _name);
 		request.setAttribute(
 			"liferay-ui:input-date:yearNullable",
 			String.valueOf(_yearNullable));
@@ -190,6 +195,7 @@ public class InputDateTag extends IncludeTag {
 	private boolean _monthNullable;
 	private String _monthParam;
 	private int _monthValue = -1;
+	private String _name;
 	private boolean _yearNullable;
 	private String _yearParam;
 	private int _yearRangeEnd;

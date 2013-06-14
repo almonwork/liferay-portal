@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -27,7 +27,20 @@ for (int assetEntryIndex = 0; assetEntryIndex < results.size(); assetEntryIndex+
 		continue;
 	}
 
-	AssetRenderer assetRenderer = assetRendererFactory.getAssetRenderer(classPK);
+	AssetRenderer assetRenderer = null;
+
+	try {
+		assetRenderer = assetRendererFactory.getAssetRenderer(classPK);
+	}
+	catch (Exception e) {
+		if (_log.isWarnEnabled()) {
+			_log.warn(e, e);
+		}
+	}
+
+	if ((assetRenderer == null) || !assetRenderer.isDisplayable()) {
+		continue;
+	}
 
 	String title = assetRenderer.getTitle(locale);
 

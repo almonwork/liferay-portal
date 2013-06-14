@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -15,6 +15,7 @@
 package com.liferay.portal.repository.util;
 
 import com.liferay.portal.kernel.repository.BaseRepository;
+import com.liferay.portal.kernel.repository.RepositoryException;
 import com.liferay.portal.util.PropsValues;
 
 import java.util.concurrent.ConcurrentHashMap;
@@ -30,11 +31,18 @@ public class RepositoryFactoryUtil {
 		RepositoryFactory repositoryFactory = _repositoryFactories.get(
 			className);
 
+		BaseRepository baseRepository = null;
+
 		if (repositoryFactory != null) {
-			return repositoryFactory.getInstance();
+			baseRepository = repositoryFactory.getInstance();
 		}
 
-		return null;
+		if (baseRepository != null) {
+			return baseRepository;
+		}
+
+		throw new RepositoryException(
+			"Repository with class name " + className + " is unavailable");
 	}
 
 	public static String[] getRepositoryClassNames() {

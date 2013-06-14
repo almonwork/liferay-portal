@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -23,6 +23,7 @@ import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.servlet.SessionErrors;
 import com.liferay.portal.kernel.servlet.SessionMessages;
+import com.liferay.portal.kernel.upload.UploadException;
 import com.liferay.portal.kernel.upload.UploadPortletRequest;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.CharPool;
@@ -51,7 +52,6 @@ import com.liferay.portal.util.PrefsPropsUtil;
 import com.liferay.portal.util.PropsUtil;
 import com.liferay.portal.util.PropsValues;
 import com.liferay.portal.util.WebKeys;
-import com.liferay.util.servlet.UploadException;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -253,8 +253,8 @@ public class InstallPluginAction extends PortletAction {
 	}
 
 	protected void localDeploy(ActionRequest actionRequest) throws Exception {
-		UploadPortletRequest uploadRequest = PortalUtil.getUploadPortletRequest(
-			actionRequest);
+		UploadPortletRequest uploadPortletRequest =
+			PortalUtil.getUploadPortletRequest(actionRequest);
 
 		String fileName = null;
 
@@ -266,7 +266,8 @@ public class InstallPluginAction extends PortletAction {
 				BaseDeployer.DEPLOY_TO_PREFIX + deploymentContext + ".war";
 		}
 		else {
-			fileName = GetterUtil.getString(uploadRequest.getFileName("file"));
+			fileName = GetterUtil.getString(uploadPortletRequest.getFileName(
+				"file"));
 
 			int pos = fileName.lastIndexOf(CharPool.PERIOD);
 
@@ -275,7 +276,7 @@ public class InstallPluginAction extends PortletAction {
 			}
 		}
 
-		File file = uploadRequest.getFile("file");
+		File file = uploadPortletRequest.getFile("file");
 
 		byte[] bytes = FileUtil.getBytes(file);
 
@@ -543,7 +544,9 @@ public class InstallPluginAction extends PortletAction {
 		String deploymentContext = ParamUtil.getString(
 			actionRequest, "deploymentContext");
 
-		if (appServerType.startsWith(ServerDetector.JBOSS_ID)) {
+		if (appServerType.startsWith(ServerDetector.JBOSS_ID) ||
+			appServerType.equals(ServerDetector.WEBLOGIC_ID)) {
+
 			deploymentContext += ".war";
 		}
 
@@ -551,6 +554,8 @@ public class InstallPluginAction extends PortletAction {
 			DeployUtil.getAutoDeployDestDir() + "/" + deploymentContext);
 
 		DeployUtil.undeploy(appServerType, deployDir);
+
+		SessionMessages.add(actionRequest, "triggeredPortletUndeploy");
 	}
 
 	private static final String _DOWNLOAD_DIR = "download";

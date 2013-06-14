@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -17,6 +17,7 @@ package com.liferay.mail.util;
 import com.liferay.portal.kernel.jndi.JNDIUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.util.PropsKeys;
 import com.liferay.portal.kernel.util.SortedProperties;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.util.PropsUtil;
@@ -25,6 +26,7 @@ import java.util.Properties;
 
 import javax.mail.Session;
 
+import javax.naming.Context;
 import javax.naming.InitialContext;
 
 import org.springframework.beans.factory.config.AbstractFactoryBean;
@@ -45,14 +47,18 @@ public class MailSessionFactoryBean extends AbstractFactoryBean<Session> {
 
 	@Override
 	protected Session createInstance() throws Exception {
-		Properties properties = PropsUtil.getProperties(
-			_propertyPrefix, true);
+		Properties properties = PropsUtil.getProperties(_propertyPrefix, true);
 
 		String jndiName = properties.getProperty("jndi.name");
 
 		if (Validator.isNotNull(jndiName)) {
 			try {
-				return (Session)JNDIUtil.lookup(new InitialContext(), jndiName);
+				Properties jndiEnvironmentProperties = PropsUtil.getProperties(
+					PropsKeys.JNDI_ENVIRONMENT, true);
+
+				Context context = new InitialContext(jndiEnvironmentProperties);
+
+				return (Session)JNDIUtil.lookup(context, jndiName);
 			}
 			catch (Exception e) {
 				_log.error("Unable to lookup " + jndiName, e);

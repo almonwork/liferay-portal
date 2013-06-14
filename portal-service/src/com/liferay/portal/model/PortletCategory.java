@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -41,7 +41,7 @@ public class PortletCategory implements Serializable {
 	}
 
 	public PortletCategory(String name, Set<String> portletIds) {
-		_categories = new HashMap<String, PortletCategory>();
+		_portletCategories = new HashMap<String, PortletCategory>();
 		_portletIds = portletIds;
 
 		if (name.contains(_DELIMITER)) {
@@ -71,15 +71,15 @@ public class PortletCategory implements Serializable {
 
 		portletCategory.setPath(path);
 
-		_categories.put(portletCategory.getName(), portletCategory);
+		_portletCategories.put(portletCategory.getName(), portletCategory);
 	}
 
 	public Collection<PortletCategory> getCategories() {
-		return Collections.unmodifiableCollection(_categories.values());
+		return Collections.unmodifiableCollection(_portletCategories.values());
 	}
 
 	public PortletCategory getCategory(String name) {
-		return _categories.get(name);
+		return _portletCategories.get(name);
 	}
 
 	public String getName() {
@@ -116,7 +116,23 @@ public class PortletCategory implements Serializable {
 	}
 
 	public void merge(PortletCategory newPortletCategory) {
-		_merge(this, newPortletCategory);
+		merge(this, newPortletCategory);
+	}
+
+	public void separate(Set<String> portletIds) {
+		for (PortletCategory portletCategory : _portletCategories.values()) {
+			portletCategory.separate(portletIds);
+		}
+
+		Iterator<String>itr = _portletIds.iterator();
+
+		while (itr.hasNext()) {
+			String portletId = itr.next();
+
+			if (portletIds.contains(portletId)) {
+				itr.remove();
+			}
+		}
 	}
 
 	public void separate(String portletId) {
@@ -127,29 +143,32 @@ public class PortletCategory implements Serializable {
 		separate(portletIds);
 	}
 
-	public void separate(Set<String> portletIds) {
-		Iterator<PortletCategory> categoriesItr =
-			_categories.values().iterator();
-
-		while (categoriesItr.hasNext()) {
-			PortletCategory category = categoriesItr.next();
-
-			category.separate(portletIds);
-		}
-
-		Iterator<String>portletIdsItr = _portletIds.iterator();
-
-		while (portletIdsItr.hasNext()) {
-			String portletId = portletIdsItr.next();
-
-			if (portletIds.contains(portletId)) {
-				portletIdsItr.remove();
-			}
-		}
-	}
-
 	public void setPortletIds(Set<String> portletIds) {
 		_portletIds = portletIds;
+	}
+
+	protected void merge(
+		PortletCategory portletCategory1, PortletCategory portletCategory2) {
+
+		Collection<PortletCategory> portletCategories =
+			portletCategory2.getCategories();
+
+		for (PortletCategory curPortletCategory2 : portletCategories) {
+			PortletCategory curPortletCategory1 = portletCategory1.getCategory(
+				curPortletCategory2.getName());
+
+			if (curPortletCategory1 != null) {
+				merge(curPortletCategory1, curPortletCategory2);
+			}
+			else {
+				portletCategory1.addCategory(curPortletCategory2);
+			}
+		}
+
+		Set<String> portletIds1 = portletCategory1.getPortletIds();
+		Set<String> portletIds2 = portletCategory2.getPortletIds();
+
+		portletIds1.addAll(portletIds2);
 	}
 
 	protected void setParentCategory(PortletCategory portletCategory) {
@@ -160,38 +179,12 @@ public class PortletCategory implements Serializable {
 		_path = path;
 	}
 
-	private void _merge(
-		PortletCategory portletCategory1, PortletCategory portletCategory2) {
-
-		Iterator<PortletCategory> itr =
-			portletCategory2.getCategories().iterator();
-
-		while (itr.hasNext()) {
-			PortletCategory curCategory2 = itr.next();
-
-			PortletCategory curCategory1 =
-				portletCategory1.getCategory(curCategory2.getName());
-
-			if (curCategory1 != null) {
-				_merge(curCategory1, curCategory2);
-			}
-			else {
-				portletCategory1.addCategory(curCategory2);
-			}
-		}
-
-		Set<String> portletIds1 = portletCategory1.getPortletIds();
-		Set<String> portletIds2 = portletCategory2.getPortletIds();
-
-		portletIds1.addAll(portletIds2);
-	}
-
 	private static final String _DELIMITER = StringPool.DOUBLE_SLASH;
 
-	private Map<String, PortletCategory> _categories;
 	private String _name;
 	private PortletCategory _parentPortletCategory;
 	private String _path;
+	private Map<String, PortletCategory> _portletCategories;
 	private Set<String> _portletIds;
 
 }

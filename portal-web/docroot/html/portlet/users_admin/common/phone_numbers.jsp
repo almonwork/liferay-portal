@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -59,12 +59,15 @@ else {
 		phonesIndexes = new int[0];
 	}
 }
-
 %>
 
 <liferay-ui:error-marker key="errorSection" value="phoneNumbers" />
 
 <h3><liferay-ui:message key="phone-numbers" /></h3>
+
+<div class="portlet-msg-info">
+	<liferay-ui:message key="phone-number-and-type-are-required-fields.-extension-must-be-numeric" />
+</div>
 
 <liferay-ui:error key="<%= NoSuchListTypeException.class.getName() + className + ListTypeConstants.PHONE %>" message="please-select-a-type" />
 <liferay-ui:error exception="<%= PhoneNumberException.class %>" message="please-enter-a-valid-phone-number" />
@@ -84,13 +87,13 @@ else {
 			<div class="row-fields">
 				<aui:input name='<%= "phoneId" + phonesIndex %>' type="hidden" value="<%= phone.getPhoneId() %>" />
 
-				<aui:input fieldParam='<%= "phoneNumber" + phonesIndex %>' name="number" />
+				<aui:input fieldParam='<%= "phoneNumber" + phonesIndex %>' id='<%= "phoneNumber" + phonesIndex %>' name="number" />
 
-				<aui:input fieldParam='<%= "phoneExtension" + phonesIndex %>' name="extension" />
+				<aui:input fieldParam='<%= "phoneExtension" + phonesIndex %>' id='<%= "phoneExtension" + phonesIndex %>' name="extension" />
 
-				<aui:select label="type" name='<%= "phoneTypeId" + phonesIndex %>' listType="<%= className + ListTypeConstants.PHONE %>" />
+				<aui:select label="type" listType="<%= className + ListTypeConstants.PHONE %>" name='<%= "phoneTypeId" + phonesIndex %>' />
 
-				<aui:input checked="<%= phone.isPrimary() %>" cssClass="primary-ctrl" id='<%= "phonePrimary" + phonesIndex %>' inlineLabel="left" label="primary" name="phonePrimary" type="radio" value="<%= phonesIndex %>" />
+				<aui:input checked="<%= phone.isPrimary() %>" cssClass="primary-ctrl" id='<%= "phonePrimary" + phonesIndex %>' label="primary" name="phonePrimary" type="radio" value="<%= phonesIndex %>" />
 			</div>
 		</div>
 

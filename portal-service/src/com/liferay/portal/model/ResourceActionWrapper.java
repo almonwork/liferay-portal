@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,6 +14,9 @@
 
 package com.liferay.portal.model;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * <p>
  * This class is a wrapper for {@link ResourceAction}.
@@ -23,7 +26,8 @@ package com.liferay.portal.model;
  * @see       ResourceAction
  * @generated
  */
-public class ResourceActionWrapper implements ResourceAction {
+public class ResourceActionWrapper implements ResourceAction,
+	ModelWrapper<ResourceAction> {
 	public ResourceActionWrapper(ResourceAction resourceAction) {
 		_resourceAction = resourceAction;
 	}
@@ -34,6 +38,43 @@ public class ResourceActionWrapper implements ResourceAction {
 
 	public String getModelClassName() {
 		return ResourceAction.class.getName();
+	}
+
+	public Map<String, Object> getModelAttributes() {
+		Map<String, Object> attributes = new HashMap<String, Object>();
+
+		attributes.put("resourceActionId", getResourceActionId());
+		attributes.put("name", getName());
+		attributes.put("actionId", getActionId());
+		attributes.put("bitwiseValue", getBitwiseValue());
+
+		return attributes;
+	}
+
+	public void setModelAttributes(Map<String, Object> attributes) {
+		Long resourceActionId = (Long)attributes.get("resourceActionId");
+
+		if (resourceActionId != null) {
+			setResourceActionId(resourceActionId);
+		}
+
+		String name = (String)attributes.get("name");
+
+		if (name != null) {
+			setName(name);
+		}
+
+		String actionId = (String)attributes.get("actionId");
+
+		if (actionId != null) {
+			setActionId(actionId);
+		}
+
+		Long bitwiseValue = (Long)attributes.get("bitwiseValue");
+
+		if (bitwiseValue != null) {
+			setBitwiseValue(bitwiseValue);
+		}
 	}
 
 	/**
@@ -146,10 +187,6 @@ public class ResourceActionWrapper implements ResourceAction {
 		return _resourceAction.isEscapedModel();
 	}
 
-	public void setEscapedModel(boolean escapedModel) {
-		_resourceAction.setEscapedModel(escapedModel);
-	}
-
 	public java.io.Serializable getPrimaryKeyObj() {
 		return _resourceAction.getPrimaryKeyObj();
 	}
@@ -203,7 +240,14 @@ public class ResourceActionWrapper implements ResourceAction {
 		_resourceAction.persist();
 	}
 
+	/**
+	 * @deprecated Renamed to {@link #getWrappedModel}
+	 */
 	public ResourceAction getWrappedResourceAction() {
+		return _resourceAction;
+	}
+
+	public ResourceAction getWrappedModel() {
 		return _resourceAction;
 	}
 

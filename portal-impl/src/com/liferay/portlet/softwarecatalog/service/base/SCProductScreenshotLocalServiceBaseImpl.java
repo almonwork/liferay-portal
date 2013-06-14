@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -21,25 +21,21 @@ import com.liferay.portal.kernel.bean.IdentifiableBean;
 import com.liferay.portal.kernel.dao.jdbc.SqlUpdate;
 import com.liferay.portal.kernel.dao.jdbc.SqlUpdateFactoryUtil;
 import com.liferay.portal.kernel.dao.orm.DynamicQuery;
+import com.liferay.portal.kernel.dao.orm.DynamicQueryFactoryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
-import com.liferay.portal.kernel.search.Indexer;
-import com.liferay.portal.kernel.search.IndexerRegistryUtil;
-import com.liferay.portal.kernel.search.SearchException;
+import com.liferay.portal.kernel.search.Indexable;
+import com.liferay.portal.kernel.search.IndexableType;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.model.PersistedModel;
+import com.liferay.portal.service.BaseLocalServiceImpl;
 import com.liferay.portal.service.ImageLocalService;
 import com.liferay.portal.service.ImageService;
 import com.liferay.portal.service.PersistedModelLocalServiceRegistry;
 import com.liferay.portal.service.ResourceLocalService;
-import com.liferay.portal.service.ResourceService;
 import com.liferay.portal.service.UserLocalService;
 import com.liferay.portal.service.UserService;
 import com.liferay.portal.service.persistence.ImagePersistence;
-import com.liferay.portal.service.persistence.ResourceFinder;
-import com.liferay.portal.service.persistence.ResourcePersistence;
 import com.liferay.portal.service.persistence.UserFinder;
 import com.liferay.portal.service.persistence.UserPersistence;
 
@@ -78,7 +74,8 @@ import javax.sql.DataSource;
  * @generated
  */
 public abstract class SCProductScreenshotLocalServiceBaseImpl
-	implements SCProductScreenshotLocalService, IdentifiableBean {
+	extends BaseLocalServiceImpl implements SCProductScreenshotLocalService,
+		IdentifiableBean {
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
@@ -92,27 +89,12 @@ public abstract class SCProductScreenshotLocalServiceBaseImpl
 	 * @return the s c product screenshot that was added
 	 * @throws SystemException if a system exception occurred
 	 */
+	@Indexable(type = IndexableType.REINDEX)
 	public SCProductScreenshot addSCProductScreenshot(
 		SCProductScreenshot scProductScreenshot) throws SystemException {
 		scProductScreenshot.setNew(true);
 
-		scProductScreenshot = scProductScreenshotPersistence.update(scProductScreenshot,
-				false);
-
-		Indexer indexer = IndexerRegistryUtil.getIndexer(getModelClassName());
-
-		if (indexer != null) {
-			try {
-				indexer.reindex(scProductScreenshot);
-			}
-			catch (SearchException se) {
-				if (_log.isWarnEnabled()) {
-					_log.warn(se, se);
-				}
-			}
-		}
-
-		return scProductScreenshot;
+		return scProductScreenshotPersistence.update(scProductScreenshot, false);
 	}
 
 	/**
@@ -130,49 +112,34 @@ public abstract class SCProductScreenshotLocalServiceBaseImpl
 	 * Deletes the s c product screenshot with the primary key from the database. Also notifies the appropriate model listeners.
 	 *
 	 * @param productScreenshotId the primary key of the s c product screenshot
+	 * @return the s c product screenshot that was removed
 	 * @throws PortalException if a s c product screenshot with the primary key could not be found
 	 * @throws SystemException if a system exception occurred
 	 */
-	public void deleteSCProductScreenshot(long productScreenshotId)
-		throws PortalException, SystemException {
-		SCProductScreenshot scProductScreenshot = scProductScreenshotPersistence.remove(productScreenshotId);
-
-		Indexer indexer = IndexerRegistryUtil.getIndexer(getModelClassName());
-
-		if (indexer != null) {
-			try {
-				indexer.delete(scProductScreenshot);
-			}
-			catch (SearchException se) {
-				if (_log.isWarnEnabled()) {
-					_log.warn(se, se);
-				}
-			}
-		}
+	@Indexable(type = IndexableType.DELETE)
+	public SCProductScreenshot deleteSCProductScreenshot(
+		long productScreenshotId) throws PortalException, SystemException {
+		return scProductScreenshotPersistence.remove(productScreenshotId);
 	}
 
 	/**
 	 * Deletes the s c product screenshot from the database. Also notifies the appropriate model listeners.
 	 *
 	 * @param scProductScreenshot the s c product screenshot
+	 * @return the s c product screenshot that was removed
 	 * @throws SystemException if a system exception occurred
 	 */
-	public void deleteSCProductScreenshot(
+	@Indexable(type = IndexableType.DELETE)
+	public SCProductScreenshot deleteSCProductScreenshot(
 		SCProductScreenshot scProductScreenshot) throws SystemException {
-		scProductScreenshotPersistence.remove(scProductScreenshot);
+		return scProductScreenshotPersistence.remove(scProductScreenshot);
+	}
 
-		Indexer indexer = IndexerRegistryUtil.getIndexer(getModelClassName());
+	public DynamicQuery dynamicQuery() {
+		Class<?> clazz = getClass();
 
-		if (indexer != null) {
-			try {
-				indexer.delete(scProductScreenshot);
-			}
-			catch (SearchException se) {
-				if (_log.isWarnEnabled()) {
-					_log.warn(se, se);
-				}
-			}
-		}
+		return DynamicQueryFactoryUtil.forClass(SCProductScreenshot.class,
+			clazz.getClassLoader());
 	}
 
 	/**
@@ -241,6 +208,11 @@ public abstract class SCProductScreenshotLocalServiceBaseImpl
 		return scProductScreenshotPersistence.countWithDynamicQuery(dynamicQuery);
 	}
 
+	public SCProductScreenshot fetchSCProductScreenshot(
+		long productScreenshotId) throws SystemException {
+		return scProductScreenshotPersistence.fetchByPrimaryKey(productScreenshotId);
+	}
+
 	/**
 	 * Returns the s c product screenshot with the primary key.
 	 *
@@ -293,6 +265,7 @@ public abstract class SCProductScreenshotLocalServiceBaseImpl
 	 * @return the s c product screenshot that was updated
 	 * @throws SystemException if a system exception occurred
 	 */
+	@Indexable(type = IndexableType.REINDEX)
 	public SCProductScreenshot updateSCProductScreenshot(
 		SCProductScreenshot scProductScreenshot) throws SystemException {
 		return updateSCProductScreenshot(scProductScreenshot, true);
@@ -306,28 +279,13 @@ public abstract class SCProductScreenshotLocalServiceBaseImpl
 	 * @return the s c product screenshot that was updated
 	 * @throws SystemException if a system exception occurred
 	 */
+	@Indexable(type = IndexableType.REINDEX)
 	public SCProductScreenshot updateSCProductScreenshot(
 		SCProductScreenshot scProductScreenshot, boolean merge)
 		throws SystemException {
 		scProductScreenshot.setNew(false);
 
-		scProductScreenshot = scProductScreenshotPersistence.update(scProductScreenshot,
-				merge);
-
-		Indexer indexer = IndexerRegistryUtil.getIndexer(getModelClassName());
-
-		if (indexer != null) {
-			try {
-				indexer.reindex(scProductScreenshot);
-			}
-			catch (SearchException se) {
-				if (_log.isWarnEnabled()) {
-					_log.warn(se, se);
-				}
-			}
-		}
-
-		return scProductScreenshot;
+		return scProductScreenshotPersistence.update(scProductScreenshot, merge);
 	}
 
 	/**
@@ -687,60 +645,6 @@ public abstract class SCProductScreenshotLocalServiceBaseImpl
 	}
 
 	/**
-	 * Returns the resource remote service.
-	 *
-	 * @return the resource remote service
-	 */
-	public ResourceService getResourceService() {
-		return resourceService;
-	}
-
-	/**
-	 * Sets the resource remote service.
-	 *
-	 * @param resourceService the resource remote service
-	 */
-	public void setResourceService(ResourceService resourceService) {
-		this.resourceService = resourceService;
-	}
-
-	/**
-	 * Returns the resource persistence.
-	 *
-	 * @return the resource persistence
-	 */
-	public ResourcePersistence getResourcePersistence() {
-		return resourcePersistence;
-	}
-
-	/**
-	 * Sets the resource persistence.
-	 *
-	 * @param resourcePersistence the resource persistence
-	 */
-	public void setResourcePersistence(ResourcePersistence resourcePersistence) {
-		this.resourcePersistence = resourcePersistence;
-	}
-
-	/**
-	 * Returns the resource finder.
-	 *
-	 * @return the resource finder
-	 */
-	public ResourceFinder getResourceFinder() {
-		return resourceFinder;
-	}
-
-	/**
-	 * Sets the resource finder.
-	 *
-	 * @param resourceFinder the resource finder
-	 */
-	public void setResourceFinder(ResourceFinder resourceFinder) {
-		this.resourceFinder = resourceFinder;
-	}
-
-	/**
 	 * Returns the user local service.
 	 *
 	 * @return the user local service
@@ -905,12 +809,6 @@ public abstract class SCProductScreenshotLocalServiceBaseImpl
 	protected ImagePersistence imagePersistence;
 	@BeanReference(type = ResourceLocalService.class)
 	protected ResourceLocalService resourceLocalService;
-	@BeanReference(type = ResourceService.class)
-	protected ResourceService resourceService;
-	@BeanReference(type = ResourcePersistence.class)
-	protected ResourcePersistence resourcePersistence;
-	@BeanReference(type = ResourceFinder.class)
-	protected ResourceFinder resourceFinder;
 	@BeanReference(type = UserLocalService.class)
 	protected UserLocalService userLocalService;
 	@BeanReference(type = UserService.class)
@@ -921,6 +819,5 @@ public abstract class SCProductScreenshotLocalServiceBaseImpl
 	protected UserFinder userFinder;
 	@BeanReference(type = PersistedModelLocalServiceRegistry.class)
 	protected PersistedModelLocalServiceRegistry persistedModelLocalServiceRegistry;
-	private static Log _log = LogFactoryUtil.getLog(SCProductScreenshotLocalServiceBaseImpl.class);
 	private String _beanIdentifier;
 }

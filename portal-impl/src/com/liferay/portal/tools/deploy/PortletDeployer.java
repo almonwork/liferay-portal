@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -21,7 +21,6 @@ import com.liferay.portal.kernel.util.PropsKeys;
 import com.liferay.portal.kernel.util.ServerDetector;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringUtil;
-import com.liferay.portal.kernel.util.TextFormatter;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.xml.Document;
 import com.liferay.portal.kernel.xml.Element;
@@ -40,11 +39,7 @@ import com.liferay.util.xml.descriptor.FacesXMLDescriptor;
 import java.io.File;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
-import java.util.Properties;
 
 /**
  * @author Brian Wing Shun Chan
@@ -58,8 +53,7 @@ public class PortletDeployer extends BaseDeployer {
 	public static final String JSF_STANDARD =
 		"javax.portlet.faces.GenericFacesPortlet";
 
-	public static final String JSF_SUN =
-		"com.sun.faces.portlet.FacesPortlet";
+	public static final String JSF_SUN = "com.sun.faces.portlet.FacesPortlet";
 
 	public static final String LIFERAY_RENDER_KIT_FACTORY =
 		"com.liferay.util.jsf.sun.faces.renderkit.LiferayRenderKitFactoryImpl";
@@ -124,11 +118,6 @@ public class PortletDeployer extends BaseDeployer {
 
 		StringBundler sb = new StringBundler();
 
-		String extraContent = super.getExtraContent(
-			webXmlVersion, srcFile, displayName);
-
-		sb.append(extraContent);
-
 		if (ServerDetector.isWebSphere()) {
 			sb.append("<context-param>");
 			sb.append("<param-name>");
@@ -162,13 +151,24 @@ public class PortletDeployer extends BaseDeployer {
 			sb.append("</listener>");
 		}
 
-		// PortletContextListener
+		String extraContent = super.getExtraContent(
+			webXmlVersion, srcFile, displayName);
 
-		sb.append("<listener>");
-		sb.append("<listener-class>");
-		sb.append("com.liferay.portal.kernel.servlet.PortletContextListener");
-		sb.append("</listener-class>");
-		sb.append("</listener>");
+		sb.append(extraContent);
+
+		return sb.toString();
+	}
+
+	@Override
+	public String getExtraFiltersContent(double webXmlVersion, File srcFile)
+		throws Exception {
+
+		StringBundler sb = new StringBundler(4);
+
+		String extraFiltersContent = super.getExtraFiltersContent(
+			webXmlVersion, srcFile);
+
+		sb.append(extraFiltersContent);
 
 		// Ignore filters
 
@@ -186,25 +186,26 @@ public class PortletDeployer extends BaseDeployer {
 		return sb.toString();
 	}
 
+	@Override
+	public String getPluginType() {
+		return Plugin.TYPE_PORTLET;
+	}
+
 	public String getServletContent(File portletXML, File webXML)
 		throws Exception {
 
 		StringBundler sb = new StringBundler();
 
-		// Add wrappers for portlets
+		Document document = SAXReaderUtil.read(portletXML);
 
-		Document doc = SAXReaderUtil.read(portletXML);
+		Element rootElement = document.getRootElement();
 
-		Element root = doc.getRootElement();
+		List<Element> portletElements = rootElement.elements("portlet");
 
-		Iterator<Element> itr1 = root.elements("portlet").iterator();
-
-		while (itr1.hasNext()) {
-			Element portlet = itr1.next();
-
+		for (Element portletElement : portletElements) {
 			String portletName = PortalUtil.getJsSafePortletId(
-				portlet.elementText("portlet-name"));
-			String portletClass = portlet.elementText("portlet-class");
+				portletElement.elementText("portlet-name"));
+			String portletClass = portletElement.elementText("portlet-class");
 
 			String servletName = portletName + " Servlet";
 
@@ -221,7 +222,7 @@ public class PortletDeployer extends BaseDeployer {
 			sb.append(portletClass);
 			sb.append("</param-value>");
 			sb.append("</init-param>");
-			sb.append("<load-on-startup>0</load-on-startup>");
+			sb.append("<load-on-startup>1</load-on-startup>");
 			sb.append("</servlet>");
 
 			sb.append("<servlet-mapping>");
@@ -234,222 +235,7 @@ public class PortletDeployer extends BaseDeployer {
 			sb.append("</servlet-mapping>");
 		}
 
-		// Make sure there is a company id specified
-
-		doc = SAXReaderUtil.read(webXML);
-
-		root = doc.getRootElement();
-
-		// Remove deprecated references to SharedServletWrapper
-
-		itr1 = root.elements("servlet").iterator();
-
-		while (itr1.hasNext()) {
-			Element servlet = itr1.next();
-
-			String icon = servlet.elementText("icon");
-			String servletName = servlet.elementText("servlet-name");
-			String displayName = servlet.elementText("display-name");
-			String description = servlet.elementText("description");
-			String servletClass = servlet.elementText("servlet-class");
-			List<Element> initParams = servlet.elements("init-param");
-			String loadOnStartup = servlet.elementText("load-on-startup");
-			String runAs = servlet.elementText("run-as");
-			List<Element> securityRoleRefs = servlet.elements(
-				"security-role-ref");
-
-			if ((servletClass != null) &&
-				(servletClass.equals(
-					"com.liferay.portal.servlet.SharedServletWrapper"))) {
-
-				sb.append("<servlet>");
-
-				if (icon != null) {
-					sb.append("<icon>");
-					sb.append(icon);
-					sb.append("</icon>");
-				}
-
-				if (servletName != null) {
-					sb.append("<servlet-name>");
-					sb.append(servletName);
-					sb.append("</servlet-name>");
-				}
-
-				if (displayName != null) {
-					sb.append("<display-name>");
-					sb.append(displayName);
-					sb.append("</display-name>");
-				}
-
-				if (description != null) {
-					sb.append("<description>");
-					sb.append(description);
-					sb.append("</description>");
-				}
-
-				Iterator<Element> itr2 = initParams.iterator();
-
-				while (itr2.hasNext()) {
-					Element initParam = itr2.next();
-
-					String paramName = initParam.elementText("param-name");
-					String paramValue = initParam.elementText("param-value");
-
-					if ((paramName != null) &&
-						(paramName.equals("servlet-class"))) {
-
-						sb.append("<servlet-class>");
-						sb.append(paramValue);
-						sb.append("</servlet-class>");
-					}
-				}
-
-				itr2 = initParams.iterator();
-
-				while (itr2.hasNext()) {
-					Element initParam = itr2.next();
-
-					String paramName = initParam.elementText("param-name");
-					String paramValue = initParam.elementText("param-value");
-					String paramDesc = initParam.elementText("description");
-
-					if ((paramName != null) &&
-						(!paramName.equals("servlet-class"))) {
-
-						sb.append("<init-param>");
-						sb.append("<param-name>");
-						sb.append(paramName);
-						sb.append("</param-name>");
-
-						if (paramValue != null) {
-							sb.append("<param-value>");
-							sb.append(paramValue);
-							sb.append("</param-value>");
-						}
-
-						if (paramDesc != null) {
-							sb.append("<description>");
-							sb.append(paramDesc);
-							sb.append("</description>");
-						}
-
-						sb.append("</init-param>");
-					}
-				}
-
-				if (loadOnStartup != null) {
-					sb.append("<load-on-startup>");
-					sb.append(loadOnStartup);
-					sb.append("</load-on-startup>");
-				}
-
-				if (runAs != null) {
-					sb.append("<run-as>");
-					sb.append(runAs);
-					sb.append("</run-as>");
-				}
-
-				itr2 = securityRoleRefs.iterator();
-
-				while (itr2.hasNext()) {
-					Element roleRef = itr2.next();
-
-					String roleDesc = roleRef.elementText("description");
-					String roleName = roleRef.elementText("role-name");
-					String roleLink = roleRef.elementText("role-link");
-
-					sb.append("<security-role-ref>");
-
-					if (roleDesc != null) {
-						sb.append("<description>");
-						sb.append(roleDesc);
-						sb.append("</description>");
-					}
-
-					if (roleName != null) {
-						sb.append("<role-name>");
-						sb.append(roleName);
-						sb.append("</role-name>");
-					}
-
-					if (roleLink != null) {
-						sb.append("<role-link>");
-						sb.append(roleLink);
-						sb.append("</role-link>");
-					}
-
-					sb.append("</security-role-ref>");
-				}
-
-				sb.append("</servlet>");
-			}
-		}
-
 		return sb.toString();
-	}
-
-	@Override
-	public void processPluginPackageProperties(
-			File srcFile, String displayName, PluginPackage pluginPackage)
-		throws Exception {
-
-		if (pluginPackage == null) {
-			return;
-		}
-
-		Properties properties = getPluginPackageProperties(srcFile);
-
-		if ((properties == null) || (properties.size() == 0)) {
-			return;
-		}
-
-		String moduleGroupId = pluginPackage.getGroupId();
-		String moduleArtifactId = pluginPackage.getArtifactId();
-		String moduleVersion = pluginPackage.getVersion();
-
-		String pluginName = pluginPackage.getName();
-		String pluginType = pluginPackage.getTypes().get(0);
-		String pluginTypeName = TextFormatter.format(
-			pluginType, TextFormatter.J);
-
-		if (!pluginType.equals(Plugin.TYPE_PORTLET)) {
-			return;
-		}
-
-		String tags = getPluginPackageTagsXml(pluginPackage.getTags());
-		String shortDescription = pluginPackage.getShortDescription();
-		String longDescription = pluginPackage.getLongDescription();
-		String changeLog = pluginPackage.getChangeLog();
-		String pageURL = pluginPackage.getPageURL();
-		String author = pluginPackage.getAuthor();
-		String licenses = getPluginPackageLicensesXml(
-			pluginPackage.getLicenses());
-		String liferayVersions = getPluginPackageLiferayVersionsXml(
-			pluginPackage.getLiferayVersions());
-
-		Map<String, String> filterMap = new HashMap<String, String>();
-
-		filterMap.put("module_group_id", moduleGroupId);
-		filterMap.put("module_artifact_id", moduleArtifactId);
-		filterMap.put("module_version", moduleVersion);
-
-		filterMap.put("plugin_name", pluginName);
-		filterMap.put("plugin_type", pluginType);
-		filterMap.put("plugin_type_name", pluginTypeName);
-
-		filterMap.put("tags", tags);
-		filterMap.put("short_description", shortDescription);
-		filterMap.put("long_description", longDescription);
-		filterMap.put("change_log", changeLog);
-		filterMap.put("page_url", pageURL);
-		filterMap.put("author", author);
-		filterMap.put("licenses", licenses);
-		filterMap.put("liferay_versions", liferayVersions);
-
-		copyDependencyXml(
-			"liferay-plugin-package.xml", srcFile + "/WEB-INF", filterMap,
-			true);
 	}
 
 	public void setupJSF(File facesXML, File portletXML) throws Exception {
@@ -462,18 +248,14 @@ public class PortletDeployer extends BaseDeployer {
 
 		// portlet.xml
 
-		Document doc = SAXReaderUtil.read(portletXML, true);
+		Document document = SAXReaderUtil.read(portletXML, true);
 
-		Element root = doc.getRootElement();
+		Element rootElement = document.getRootElement();
 
-		List<Element> elements = root.elements("portlet");
+		List<Element> portletElements = rootElement.elements("portlet");
 
-		Iterator<Element> itr = elements.iterator();
-
-		while (itr.hasNext()) {
-			Element portlet = itr.next();
-
-			String portletClass = portlet.elementText("portlet-class");
+		for (Element portletElement : portletElements) {
+			String portletClass = portletElement.elementText("portlet-class");
 
 			if (portletClass.equals(JSF_MYFACES)) {
 				_myFacesPortlet = true;
@@ -489,47 +271,49 @@ public class PortletDeployer extends BaseDeployer {
 
 		// faces-config.xml
 
-		doc = SAXReaderUtil.read(facesXML, true);
+		document = SAXReaderUtil.read(facesXML, true);
 
-		root = doc.getRootElement();
+		rootElement = document.getRootElement();
 
-		Element factoryEl = root.element("factory");
+		Element factoryElement = rootElement.element("factory");
 
-		Element renderKitFactoryEl = null;
-		Element facesContextFactoryEl = null;
+		Element renderKitFactoryElement = null;
+		Element facesContextFactoryElement = null;
 
-		if (factoryEl == null) {
-			factoryEl = root.addElement("factory");
+		if (factoryElement == null) {
+			factoryElement = rootElement.addElement("factory");
 		}
 
-		renderKitFactoryEl = factoryEl.element("render-kit-factory");
-		facesContextFactoryEl = factoryEl.element("faces-context-factory");
+		renderKitFactoryElement = factoryElement.element("render-kit-factory");
+		facesContextFactoryElement = factoryElement.element(
+			"faces-context-factory");
 
-		if ((appServerType.equals("orion") && (_sunFacesPortlet) &&
-			(renderKitFactoryEl == null))) {
+		if (appServerType.equals("orion") && _sunFacesPortlet &&
+			(renderKitFactoryElement == null)) {
 
-			renderKitFactoryEl = factoryEl.addElement("render-kit-factory");
+			renderKitFactoryElement = factoryElement.addElement(
+				"render-kit-factory");
 
-			renderKitFactoryEl.addText(LIFERAY_RENDER_KIT_FACTORY);
+			renderKitFactoryElement.addText(LIFERAY_RENDER_KIT_FACTORY);
 		}
-		else if (_myFacesPortlet && (facesContextFactoryEl == null)) {
-			facesContextFactoryEl = factoryEl.addElement(
+		else if (_myFacesPortlet && (facesContextFactoryElement == null)) {
+			facesContextFactoryElement = factoryElement.addElement(
 				"faces-context-factory");
 
-			facesContextFactoryEl.addText(MYFACES_CONTEXT_FACTORY);
+			facesContextFactoryElement.addText(MYFACES_CONTEXT_FACTORY);
 		}
 
-		if (!appServerType.equals("orion") && (_sunFacesPortlet)) {
-			factoryEl.detach();
+		if (!appServerType.equals("orion") && _sunFacesPortlet) {
+			factoryElement.detach();
 		}
 
-		XMLMerger merger = new XMLMerger(new FacesXMLDescriptor());
+		XMLMerger xmlMerger = new XMLMerger(new FacesXMLDescriptor());
 
-		DocumentImpl docImpl = (DocumentImpl)doc;
+		DocumentImpl documentImpl = (DocumentImpl)document;
 
-		merger.organizeXML(docImpl.getWrappedDocument());
+		xmlMerger.organizeXML(documentImpl.getWrappedDocument());
 
-		FileUtil.write(facesXML, doc.formattedString(), true);
+		FileUtil.write(facesXML, document.formattedString(), true);
 	}
 
 	@Override

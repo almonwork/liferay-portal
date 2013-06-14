@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -91,13 +91,6 @@ public class DLSyncUtil {
 		return getPersistence()
 				   .findWithDynamicQuery(dynamicQuery, start, end,
 			orderByComparator);
-	}
-
-	/**
-	 * @see com.liferay.portal.service.persistence.BasePersistence#remove(com.liferay.portal.model.BaseModel)
-	 */
-	public static DLSync remove(DLSync dlSync) throws SystemException {
-		return getPersistence().remove(dlSync);
 	}
 
 	/**
@@ -204,7 +197,7 @@ public class DLSyncUtil {
 	* @throws SystemException if a system exception occurred
 	*/
 	public static com.liferay.portlet.documentlibrary.model.DLSync findByFileId(
-		java.lang.String fileId)
+		long fileId)
 		throws com.liferay.portal.kernel.exception.SystemException,
 			com.liferay.portlet.documentlibrary.NoSuchSyncException {
 		return getPersistence().findByFileId(fileId);
@@ -218,8 +211,7 @@ public class DLSyncUtil {
 	* @throws SystemException if a system exception occurred
 	*/
 	public static com.liferay.portlet.documentlibrary.model.DLSync fetchByFileId(
-		java.lang.String fileId)
-		throws com.liferay.portal.kernel.exception.SystemException {
+		long fileId) throws com.liferay.portal.kernel.exception.SystemException {
 		return getPersistence().fetchByFileId(fileId);
 	}
 
@@ -232,7 +224,7 @@ public class DLSyncUtil {
 	* @throws SystemException if a system exception occurred
 	*/
 	public static com.liferay.portlet.documentlibrary.model.DLSync fetchByFileId(
-		java.lang.String fileId, boolean retrieveFromCache)
+		long fileId, boolean retrieveFromCache)
 		throws com.liferay.portal.kernel.exception.SystemException {
 		return getPersistence().fetchByFileId(fileId, retrieveFromCache);
 	}
@@ -433,12 +425,14 @@ public class DLSyncUtil {
 	* Removes the d l sync where fileId = &#63; from the database.
 	*
 	* @param fileId the file ID
+	* @return the d l sync that was removed
 	* @throws SystemException if a system exception occurred
 	*/
-	public static void removeByFileId(java.lang.String fileId)
+	public static com.liferay.portlet.documentlibrary.model.DLSync removeByFileId(
+		long fileId)
 		throws com.liferay.portal.kernel.exception.SystemException,
 			com.liferay.portlet.documentlibrary.NoSuchSyncException {
-		getPersistence().removeByFileId(fileId);
+		return getPersistence().removeByFileId(fileId);
 	}
 
 	/**
@@ -472,7 +466,7 @@ public class DLSyncUtil {
 	* @return the number of matching d l syncs
 	* @throws SystemException if a system exception occurred
 	*/
-	public static int countByFileId(java.lang.String fileId)
+	public static int countByFileId(long fileId)
 		throws com.liferay.portal.kernel.exception.SystemException {
 		return getPersistence().countByFileId(fileId);
 	}
@@ -514,10 +508,10 @@ public class DLSyncUtil {
 		return _persistence;
 	}
 
+	/**
+	 * @deprecated
+	 */
 	public void setPersistence(DLSyncPersistence persistence) {
-		_persistence = persistence;
-
-		ReferenceRegistry.registerReference(DLSyncUtil.class, "_persistence");
 	}
 
 	private static DLSyncPersistence _persistence;

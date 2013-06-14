@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,6 +14,9 @@
 
 package com.liferay.portal.model;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * <p>
  * This class is a wrapper for {@link UserGroup}.
@@ -23,7 +26,7 @@ package com.liferay.portal.model;
  * @see       UserGroup
  * @generated
  */
-public class UserGroupWrapper implements UserGroup {
+public class UserGroupWrapper implements UserGroup, ModelWrapper<UserGroup> {
 	public UserGroupWrapper(UserGroup userGroup) {
 		_userGroup = userGroup;
 	}
@@ -34,6 +37,57 @@ public class UserGroupWrapper implements UserGroup {
 
 	public String getModelClassName() {
 		return UserGroup.class.getName();
+	}
+
+	public Map<String, Object> getModelAttributes() {
+		Map<String, Object> attributes = new HashMap<String, Object>();
+
+		attributes.put("userGroupId", getUserGroupId());
+		attributes.put("companyId", getCompanyId());
+		attributes.put("parentUserGroupId", getParentUserGroupId());
+		attributes.put("name", getName());
+		attributes.put("description", getDescription());
+		attributes.put("addedByLDAPImport", getAddedByLDAPImport());
+
+		return attributes;
+	}
+
+	public void setModelAttributes(Map<String, Object> attributes) {
+		Long userGroupId = (Long)attributes.get("userGroupId");
+
+		if (userGroupId != null) {
+			setUserGroupId(userGroupId);
+		}
+
+		Long companyId = (Long)attributes.get("companyId");
+
+		if (companyId != null) {
+			setCompanyId(companyId);
+		}
+
+		Long parentUserGroupId = (Long)attributes.get("parentUserGroupId");
+
+		if (parentUserGroupId != null) {
+			setParentUserGroupId(parentUserGroupId);
+		}
+
+		String name = (String)attributes.get("name");
+
+		if (name != null) {
+			setName(name);
+		}
+
+		String description = (String)attributes.get("description");
+
+		if (description != null) {
+			setDescription(description);
+		}
+
+		Boolean addedByLDAPImport = (Boolean)attributes.get("addedByLDAPImport");
+
+		if (addedByLDAPImport != null) {
+			setAddedByLDAPImport(addedByLDAPImport);
+		}
 	}
 
 	/**
@@ -145,42 +199,6 @@ public class UserGroupWrapper implements UserGroup {
 	}
 
 	/**
-	* Returns the public layout set prototype ID of this user group.
-	*
-	* @return the public layout set prototype ID of this user group
-	*/
-	public long getPublicLayoutSetPrototypeId() {
-		return _userGroup.getPublicLayoutSetPrototypeId();
-	}
-
-	/**
-	* Sets the public layout set prototype ID of this user group.
-	*
-	* @param publicLayoutSetPrototypeId the public layout set prototype ID of this user group
-	*/
-	public void setPublicLayoutSetPrototypeId(long publicLayoutSetPrototypeId) {
-		_userGroup.setPublicLayoutSetPrototypeId(publicLayoutSetPrototypeId);
-	}
-
-	/**
-	* Returns the private layout set prototype ID of this user group.
-	*
-	* @return the private layout set prototype ID of this user group
-	*/
-	public long getPrivateLayoutSetPrototypeId() {
-		return _userGroup.getPrivateLayoutSetPrototypeId();
-	}
-
-	/**
-	* Sets the private layout set prototype ID of this user group.
-	*
-	* @param privateLayoutSetPrototypeId the private layout set prototype ID of this user group
-	*/
-	public void setPrivateLayoutSetPrototypeId(long privateLayoutSetPrototypeId) {
-		_userGroup.setPrivateLayoutSetPrototypeId(privateLayoutSetPrototypeId);
-	}
-
-	/**
 	* Returns the added by l d a p import of this user group.
 	*
 	* @return the added by l d a p import of this user group
@@ -225,10 +243,6 @@ public class UserGroupWrapper implements UserGroup {
 
 	public boolean isEscapedModel() {
 		return _userGroup.isEscapedModel();
-	}
-
-	public void setEscapedModel(boolean escapedModel) {
-		_userGroup.setEscapedModel(escapedModel);
 	}
 
 	public java.io.Serializable getPrimaryKeyObj() {
@@ -296,16 +310,16 @@ public class UserGroupWrapper implements UserGroup {
 		return _userGroup.getPrivateLayoutsPageCount();
 	}
 
-	public boolean hasPrivateLayouts()
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
-		return _userGroup.hasPrivateLayouts();
-	}
-
 	public int getPublicLayoutsPageCount()
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException {
 		return _userGroup.getPublicLayoutsPageCount();
+	}
+
+	public boolean hasPrivateLayouts()
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException {
+		return _userGroup.hasPrivateLayouts();
 	}
 
 	public boolean hasPublicLayouts()
@@ -314,7 +328,14 @@ public class UserGroupWrapper implements UserGroup {
 		return _userGroup.hasPublicLayouts();
 	}
 
+	/**
+	 * @deprecated Renamed to {@link #getWrappedModel}
+	 */
 	public UserGroup getWrappedUserGroup() {
+		return _userGroup;
+	}
+
+	public UserGroup getWrappedModel() {
 		return _userGroup;
 	}
 

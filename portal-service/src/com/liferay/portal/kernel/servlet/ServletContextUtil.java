@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -38,12 +38,12 @@ import javax.servlet.ServletContext;
  */
 public class ServletContextUtil {
 
+	public static final String LOG_INFO_LAST_MODIFIED =
+		ServletContextUtil.LOG_INFO_PREFIX + "retrieval of the most recent " +
+			"last modified date of a WAR for best performance";
+
 	public static final String LOG_INFO_PREFIX =
 		"Please configure Tomcat to unpack WARs to enable ";
-
-	public static final String LOG_INFO_LAST_MODIFIED =
-		LOG_INFO_PREFIX + "retrieval of the most recent last modified date " +
-			"of a WAR for best performance";
 
 	public static final String LOG_INFO_SPRITES =
 		LOG_INFO_PREFIX + "enable sprites for best performance";
@@ -165,7 +165,7 @@ public class ServletContextUtil {
 
 		if (rootDir == null) {
 			ClassLoader classLoader = (ClassLoader)servletContext.getAttribute(
-				PortletServlet.PORTLET_CLASS_LOADER);
+				PluginContextListener.PLUGIN_CLASS_LOADER);
 
 			if (classLoader == null) {
 				classLoader = PortalClassLoaderUtil.getClassLoader();
@@ -242,6 +242,8 @@ public class ServletContextUtil {
 						classNames.add(className);
 					}
 				}
+
+				jarFile.close();
 
 			}
 			else if (resourcePath.endsWith(StringPool.SLASH)) {

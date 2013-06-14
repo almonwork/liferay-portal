@@ -24,63 +24,78 @@
 	<td>Control Panel</td>
 </tr>
 <tr>
+	<td>waitForVisible</td>
+	<td>link=Blogs</td>
+	<td>Blogs</td>
+</tr>
+<tr>
 	<td>clickAtAndWait</td>
 	<td>link=Blogs</td>
 	<td>Blogs</td>
 </tr>
 <tr>
 	<td>assertText</td>
-	<td>//div[2]/span/a</td>
-	<td>Default</td>
+	<td>//div/span/ul/li/strong/a/span</td>
+	<td>Scope: Default</td>
 </tr>
 <tr>
 	<td>clickAt</td>
-	<td>//div[2]/span/a</td>
-	<td>Default</td>
+	<td>//div/span/ul/li/strong/a/span</td>
+	<td>Scope: Default</td>
 </tr>
 <tr>
 	<td>waitForVisible</td>
-	<td>//li[2]/a</td>
+	<td>//div[@class='lfr-component lfr-menu-list']/ul/li[2]/a</td>
 	<td>Blogs Test Page2</td>
 </tr>
 <tr>
 	<td>assertText</td>
-	<td>//li[2]/a</td>
+	<td>//div[@class='lfr-component lfr-menu-list']/ul/li[2]/a</td>
 	<td>Blogs Test Page2</td>
 </tr>
 <tr>
 	<td>clickAtAndWait</td>
-	<td>//li[2]/a</td>
+	<td>//div[@class='lfr-component lfr-menu-list']/ul/li[2]/a</td>
 	<td>Blogs Test Page2</td>
 </tr>
 <tr>
-	<td>assertText</td>
-	<td>//div[2]/span/a</td>
-	<td>Blogs Test Page2</td>
+	<td>pause</td>
+	<td>5000</td>
+	<td></td>
+</tr>
+<tr>
+	<td>waitForText</td>
+	<td>//div/span/ul/li/strong/a/span</td>
+	<td>Scope: Blogs Test Page2</td>
 </tr>
 <tr>
 	<td>assertText</td>
-	<td>//strong/a</td>
+	<td>//div/span/ul/li/strong/a/span</td>
+	<td>Scope: Blogs Test Page2</td>
+</tr>
+<tr>
+	<td>assertText</td>
+	<td>//menu/span/ul/li/strong/a</td>
 	<td>Options</td>
 </tr>
 <tr>
 	<td>clickAt</td>
-	<td>//strong/a</td>
+	<td>//menu/span/ul/li/strong/a</td>
 	<td>Options</td>
 </tr>
 <tr>
 	<td>waitForVisible</td>
-	<td>//div[@class='lfr-component lfr-menu-list']/ul/li[2]/a</td>
+	<td>//div[@class='lfr-component lfr-menu-list']/ul/li[1]/a</td>
 	<td>Export / Import</td>
 </tr>
 <tr>
 	<td>assertText</td>
-	<td>//div[@class='lfr-component lfr-menu-list']/ul/li[2]/a</td>
+	<td>//div[@class='lfr-component lfr-menu-list']/ul/li[1]/a</td>
 	<td>Export / Import</td>
 </tr>
 <tr>
 	<td>clickAndWait</td>
-	<td>//div[@class='lfr-component lfr-menu-list']/ul/li[2]/a</td>
+	<td>//div[@class='lfr-component lfr-menu-list']/ul/li[1]/a</td>
 	<td>Export / Import</td>
 </tr>
 <tr>
@@ -90,17 +105,17 @@
 </tr>
 <tr>
 	<td>assertNotChecked</td>
-	<td>//input[@id='_86_PORTLET_DATA_33Checkbox']</td>
+	<td>//input[@id='_86_PORTLET_DATA_161Checkbox']</td>
 	<td>Data</td>
 </tr>
 <tr>
 	<td>clickAt</td>
-	<td>//input[@id='_86_PORTLET_DATA_33Checkbox']</td>
+	<td>//input[@id='_86_PORTLET_DATA_161Checkbox']</td>
 	<td>Data</td>
 </tr>
 <tr>
 	<td>assertChecked</td>
-	<td>//input[@id='_86_PORTLET_DATA_33Checkbox']</td>
+	<td>//input[@id='_86_PORTLET_DATA_161Checkbox']</td>
 	<td>Data</td>
 </tr>
 <tr>
@@ -132,6 +147,11 @@
 	<td>assertChecked</td>
 	<td>//input[@id='_86_CATEGORIESCheckbox']</td>
 	<td>Categories</td>
+</tr>
+<tr>
+	<td>pause</td>
+	<td>5000</td>
+	<td></td>
 </tr>
 <tr>
 	<td>clickAt</td>
@@ -139,11 +159,10 @@
 	<td>Export</td>
 </tr>
 <tr>
-	<td>downloadFile</td>
+	<td>downloadTempFile</td>
 	<td>Blogs_Page_Scope.Page2.CP.lar</td>
 	<td></td>
 </tr>
-
 </tbody></table>
 </body>
 </html>

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -19,6 +19,7 @@ import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.json.JSON;
 import com.liferay.portal.kernel.util.DateUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.ProxyUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.model.CacheModel;
@@ -33,13 +34,13 @@ import com.liferay.portlet.expando.util.ExpandoBridgeFactoryUtil;
 
 import java.io.Serializable;
 
-import java.lang.reflect.Proxy;
-
 import java.sql.Types;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * The base model implementation for the MembershipRequest service. Represents a row in the &quot;MembershipRequest&quot; database table, with each column mapped to a property of this class.
@@ -88,6 +89,12 @@ public class MembershipRequestModelImpl extends BaseModelImpl<MembershipRequest>
 	public static final boolean FINDER_CACHE_ENABLED = GetterUtil.getBoolean(com.liferay.portal.util.PropsUtil.get(
 				"value.object.finder.cache.enabled.com.liferay.portal.model.MembershipRequest"),
 			true);
+	public static final boolean COLUMN_BITMASK_ENABLED = GetterUtil.getBoolean(com.liferay.portal.util.PropsUtil.get(
+				"value.object.column.bitmask.enabled.com.liferay.portal.model.MembershipRequest"),
+			true);
+	public static long GROUPID_COLUMN_BITMASK = 1L;
+	public static long STATUSID_COLUMN_BITMASK = 2L;
+	public static long USERID_COLUMN_BITMASK = 4L;
 
 	/**
 	 * Converts the soap model instance into a normal model instance.
@@ -129,14 +136,6 @@ public class MembershipRequestModelImpl extends BaseModelImpl<MembershipRequest>
 		return models;
 	}
 
-	public Class<?> getModelClass() {
-		return MembershipRequest.class;
-	}
-
-	public String getModelClassName() {
-		return MembershipRequest.class.getName();
-	}
-
 	public static final long LOCK_EXPIRATION_TIME = GetterUtil.getLong(com.liferay.portal.util.PropsUtil.get(
 				"lock.expiration.time.com.liferay.portal.model.MembershipRequest"));
 
@@ -159,6 +158,95 @@ public class MembershipRequestModelImpl extends BaseModelImpl<MembershipRequest>
 		setPrimaryKey(((Long)primaryKeyObj).longValue());
 	}
 
+	public Class<?> getModelClass() {
+		return MembershipRequest.class;
+	}
+
+	public String getModelClassName() {
+		return MembershipRequest.class.getName();
+	}
+
+	@Override
+	public Map<String, Object> getModelAttributes() {
+		Map<String, Object> attributes = new HashMap<String, Object>();
+
+		attributes.put("membershipRequestId", getMembershipRequestId());
+		attributes.put("groupId", getGroupId());
+		attributes.put("companyId", getCompanyId());
+		attributes.put("userId", getUserId());
+		attributes.put("createDate", getCreateDate());
+		attributes.put("comments", getComments());
+		attributes.put("replyComments", getReplyComments());
+		attributes.put("replyDate", getReplyDate());
+		attributes.put("replierUserId", getReplierUserId());
+		attributes.put("statusId", getStatusId());
+
+		return attributes;
+	}
+
+	@Override
+	public void setModelAttributes(Map<String, Object> attributes) {
+		Long membershipRequestId = (Long)attributes.get("membershipRequestId");
+
+		if (membershipRequestId != null) {
+			setMembershipRequestId(membershipRequestId);
+		}
+
+		Long groupId = (Long)attributes.get("groupId");
+
+		if (groupId != null) {
+			setGroupId(groupId);
+		}
+
+		Long companyId = (Long)attributes.get("companyId");
+
+		if (companyId != null) {
+			setCompanyId(companyId);
+		}
+
+		Long userId = (Long)attributes.get("userId");
+
+		if (userId != null) {
+			setUserId(userId);
+		}
+
+		Date createDate = (Date)attributes.get("createDate");
+
+		if (createDate != null) {
+			setCreateDate(createDate);
+		}
+
+		String comments = (String)attributes.get("comments");
+
+		if (comments != null) {
+			setComments(comments);
+		}
+
+		String replyComments = (String)attributes.get("replyComments");
+
+		if (replyComments != null) {
+			setReplyComments(replyComments);
+		}
+
+		Date replyDate = (Date)attributes.get("replyDate");
+
+		if (replyDate != null) {
+			setReplyDate(replyDate);
+		}
+
+		Long replierUserId = (Long)attributes.get("replierUserId");
+
+		if (replierUserId != null) {
+			setReplierUserId(replierUserId);
+		}
+
+		Integer statusId = (Integer)attributes.get("statusId");
+
+		if (statusId != null) {
+			setStatusId(statusId);
+		}
+	}
+
 	@JSON
 	public long getMembershipRequestId() {
 		return _membershipRequestId;
@@ -174,7 +262,19 @@ public class MembershipRequestModelImpl extends BaseModelImpl<MembershipRequest>
 	}
 
 	public void setGroupId(long groupId) {
+		_columnBitmask |= GROUPID_COLUMN_BITMASK;
+
+		if (!_setOriginalGroupId) {
+			_setOriginalGroupId = true;
+
+			_originalGroupId = _groupId;
+		}
+
 		_groupId = groupId;
+	}
+
+	public long getOriginalGroupId() {
+		return _originalGroupId;
 	}
 
 	@JSON
@@ -192,6 +292,14 @@ public class MembershipRequestModelImpl extends BaseModelImpl<MembershipRequest>
 	}
 
 	public void setUserId(long userId) {
+		_columnBitmask |= USERID_COLUMN_BITMASK;
+
+		if (!_setOriginalUserId) {
+			_setOriginalUserId = true;
+
+			_originalUserId = _userId;
+		}
+
 		_userId = userId;
 	}
 
@@ -203,12 +311,18 @@ public class MembershipRequestModelImpl extends BaseModelImpl<MembershipRequest>
 		_userUuid = userUuid;
 	}
 
+	public long getOriginalUserId() {
+		return _originalUserId;
+	}
+
 	@JSON
 	public Date getCreateDate() {
 		return _createDate;
 	}
 
 	public void setCreateDate(Date createDate) {
+		_columnBitmask = -1L;
+
 		_createDate = createDate;
 	}
 
@@ -273,38 +387,47 @@ public class MembershipRequestModelImpl extends BaseModelImpl<MembershipRequest>
 	}
 
 	public void setStatusId(int statusId) {
+		_columnBitmask |= STATUSID_COLUMN_BITMASK;
+
+		if (!_setOriginalStatusId) {
+			_setOriginalStatusId = true;
+
+			_originalStatusId = _statusId;
+		}
+
 		_statusId = statusId;
+	}
+
+	public int getOriginalStatusId() {
+		return _originalStatusId;
+	}
+
+	public long getColumnBitmask() {
+		return _columnBitmask;
 	}
 
 	@Override
 	public MembershipRequest toEscapedModel() {
-		if (isEscapedModel()) {
-			return (MembershipRequest)this;
+		if (_escapedModelProxy == null) {
+			_escapedModelProxy = (MembershipRequest)ProxyUtil.newProxyInstance(_classLoader,
+					_escapedModelProxyInterfaces,
+					new AutoEscapeBeanHandler(this));
 		}
-		else {
-			if (_escapedModelProxy == null) {
-				_escapedModelProxy = (MembershipRequest)Proxy.newProxyInstance(_classLoader,
-						_escapedModelProxyInterfaces,
-						new AutoEscapeBeanHandler(this));
-			}
 
-			return _escapedModelProxy;
-		}
+		return _escapedModelProxy;
 	}
 
 	@Override
 	public ExpandoBridge getExpandoBridge() {
-		if (_expandoBridge == null) {
-			_expandoBridge = ExpandoBridgeFactoryUtil.getExpandoBridge(getCompanyId(),
-					MembershipRequest.class.getName(), getPrimaryKey());
-		}
-
-		return _expandoBridge;
+		return ExpandoBridgeFactoryUtil.getExpandoBridge(getCompanyId(),
+			MembershipRequest.class.getName(), getPrimaryKey());
 	}
 
 	@Override
 	public void setExpandoBridgeAttributes(ServiceContext serviceContext) {
-		getExpandoBridge().setAttributes(serviceContext);
+		ExpandoBridge expandoBridge = getExpandoBridge();
+
+		expandoBridge.setAttributes(serviceContext);
 	}
 
 	@Override
@@ -374,6 +497,21 @@ public class MembershipRequestModelImpl extends BaseModelImpl<MembershipRequest>
 
 	@Override
 	public void resetOriginalValues() {
+		MembershipRequestModelImpl membershipRequestModelImpl = this;
+
+		membershipRequestModelImpl._originalGroupId = membershipRequestModelImpl._groupId;
+
+		membershipRequestModelImpl._setOriginalGroupId = false;
+
+		membershipRequestModelImpl._originalUserId = membershipRequestModelImpl._userId;
+
+		membershipRequestModelImpl._setOriginalUserId = false;
+
+		membershipRequestModelImpl._originalStatusId = membershipRequestModelImpl._statusId;
+
+		membershipRequestModelImpl._setOriginalStatusId = false;
+
+		membershipRequestModelImpl._columnBitmask = 0;
 	}
 
 	@Override
@@ -517,9 +655,13 @@ public class MembershipRequestModelImpl extends BaseModelImpl<MembershipRequest>
 		};
 	private long _membershipRequestId;
 	private long _groupId;
+	private long _originalGroupId;
+	private boolean _setOriginalGroupId;
 	private long _companyId;
 	private long _userId;
 	private String _userUuid;
+	private long _originalUserId;
+	private boolean _setOriginalUserId;
 	private Date _createDate;
 	private String _comments;
 	private String _replyComments;
@@ -527,6 +669,8 @@ public class MembershipRequestModelImpl extends BaseModelImpl<MembershipRequest>
 	private long _replierUserId;
 	private String _replierUserUuid;
 	private int _statusId;
-	private transient ExpandoBridge _expandoBridge;
+	private int _originalStatusId;
+	private boolean _setOriginalStatusId;
+	private long _columnBitmask;
 	private MembershipRequest _escapedModelProxy;
 }

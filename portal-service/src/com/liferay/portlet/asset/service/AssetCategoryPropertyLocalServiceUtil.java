@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -15,7 +15,6 @@
 package com.liferay.portlet.asset.service;
 
 import com.liferay.portal.kernel.bean.PortalBeanLocatorUtil;
-import com.liferay.portal.kernel.util.MethodCache;
 import com.liferay.portal.kernel.util.ReferenceRegistry;
 
 /**
@@ -66,25 +65,32 @@ public class AssetCategoryPropertyLocalServiceUtil {
 	* Deletes the asset category property with the primary key from the database. Also notifies the appropriate model listeners.
 	*
 	* @param categoryPropertyId the primary key of the asset category property
+	* @return the asset category property that was removed
 	* @throws PortalException if a asset category property with the primary key could not be found
 	* @throws SystemException if a system exception occurred
 	*/
-	public static void deleteAssetCategoryProperty(long categoryPropertyId)
+	public static com.liferay.portlet.asset.model.AssetCategoryProperty deleteAssetCategoryProperty(
+		long categoryPropertyId)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException {
-		getService().deleteAssetCategoryProperty(categoryPropertyId);
+		return getService().deleteAssetCategoryProperty(categoryPropertyId);
 	}
 
 	/**
 	* Deletes the asset category property from the database. Also notifies the appropriate model listeners.
 	*
 	* @param assetCategoryProperty the asset category property
+	* @return the asset category property that was removed
 	* @throws SystemException if a system exception occurred
 	*/
-	public static void deleteAssetCategoryProperty(
+	public static com.liferay.portlet.asset.model.AssetCategoryProperty deleteAssetCategoryProperty(
 		com.liferay.portlet.asset.model.AssetCategoryProperty assetCategoryProperty)
 		throws com.liferay.portal.kernel.exception.SystemException {
-		getService().deleteAssetCategoryProperty(assetCategoryProperty);
+		return getService().deleteAssetCategoryProperty(assetCategoryProperty);
+	}
+
+	public static com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery() {
+		return getService().dynamicQuery();
 	}
 
 	/**
@@ -156,6 +162,12 @@ public class AssetCategoryPropertyLocalServiceUtil {
 		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery)
 		throws com.liferay.portal.kernel.exception.SystemException {
 		return getService().dynamicQueryCount(dynamicQuery);
+	}
+
+	public static com.liferay.portlet.asset.model.AssetCategoryProperty fetchAssetCategoryProperty(
+		long categoryPropertyId)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getService().fetchAssetCategoryProperty(categoryPropertyId);
 	}
 
 	/**
@@ -326,20 +338,15 @@ public class AssetCategoryPropertyLocalServiceUtil {
 
 			ReferenceRegistry.registerReference(AssetCategoryPropertyLocalServiceUtil.class,
 				"_service");
-			MethodCache.remove(AssetCategoryPropertyLocalService.class);
 		}
 
 		return _service;
 	}
 
+	/**
+	 * @deprecated
+	 */
 	public void setService(AssetCategoryPropertyLocalService service) {
-		MethodCache.remove(AssetCategoryPropertyLocalService.class);
-
-		_service = service;
-
-		ReferenceRegistry.registerReference(AssetCategoryPropertyLocalServiceUtil.class,
-			"_service");
-		MethodCache.remove(AssetCategoryPropertyLocalService.class);
 	}
 
 	private static AssetCategoryPropertyLocalService _service;

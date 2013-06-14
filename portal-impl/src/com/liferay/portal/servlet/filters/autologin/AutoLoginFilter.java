@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -23,9 +23,11 @@ import com.liferay.portal.kernel.util.InstancePool;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.model.User;
+import com.liferay.portal.model.UserTracker;
 import com.liferay.portal.security.auth.AutoLogin;
 import com.liferay.portal.security.pwd.PwdEncryptor;
 import com.liferay.portal.service.UserLocalServiceUtil;
+import com.liferay.portal.service.UserTrackerLocalServiceUtil;
 import com.liferay.portal.servlet.filters.BasePortalFilter;
 import com.liferay.portal.util.PortalInstances;
 import com.liferay.portal.util.PortalUtil;
@@ -51,15 +53,7 @@ public class AutoLoginFilter extends BasePortalFilter {
 	}
 
 	public static void unregisterAutoLogin(AutoLogin autoLogin) {
-		for (int i = 0; i < _autoLogins.size(); i++) {
-			AutoLogin curAutoLogin = _autoLogins.get(i);
-
-			if (autoLogin == curAutoLogin) {
-				_autoLogins.remove(i);
-
-				break;
-			}
-		}
+		_autoLogins.remove(autoLogin);
 	}
 
 	public AutoLoginFilter() {
@@ -96,6 +90,18 @@ public class AutoLoginFilter extends BasePortalFilter {
 
 				if (user.isLockout()) {
 					return null;
+				}
+				else if (PropsValues.LIVE_USERS_ENABLED) {
+					UserTracker userTracker =
+						UserTrackerLocalServiceUtil.fetchUserTracker(userId);
+
+					if ((userTracker == null) &&
+						(session.getAttribute(WebKeys.USER) == null)) {
+
+						session.invalidate();
+
+						return null;
+					}
 				}
 			}
 			else {
@@ -157,10 +163,10 @@ public class AutoLoginFilter extends BasePortalFilter {
 
 		String path = request.getRequestURI().toLowerCase();
 
-		if ((!contextPath.equals(StringPool.SLASH)) &&
+		if (!contextPath.equals(StringPool.SLASH) &&
 			(path.indexOf(contextPath) != -1)) {
 
-			path = path.substring(contextPath.length(), path.length());
+			path = path.substring(contextPath.length());
 		}
 
 		if (PortalInstances.isAutoLoginIgnorePath(path)) {

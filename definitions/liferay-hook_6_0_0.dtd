@@ -1,6 +1,4 @@
 <!--
-This is the DTD for the Hook parameters for Liferay Portal.
-
 <!DOCTYPE hook PUBLIC
 	"-//Liferay//DTD Hook 6.0.0//EN"
 	"http://www.liferay.com/dtd/liferay-hook_6_0_0.dtd">
@@ -73,11 +71,14 @@ my.places.show.user.public.sites.with.no.layouts
 passwords.passwordpolicytoolkit.generator
 passwords.passwordpolicytoolkit.static
 portlet.add.default.resource.check.enabled
+portlet.add.default.resource.check.whitelist
+portlet.add.default.resource.check.whitelist.actions
 sanitizer.impl
 servlet.session.create.events
 servlet.session.destroy.events
 servlet.service.events.post
 servlet.service.events.pre
+session.max.allowed
 session.phishing.protected.attributes
 session.store.password
 terms.of.use.required

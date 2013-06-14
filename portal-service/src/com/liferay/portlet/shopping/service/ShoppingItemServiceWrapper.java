@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,6 +14,8 @@
 
 package com.liferay.portlet.shopping.service;
 
+import com.liferay.portal.service.ServiceWrapper;
+
 /**
  * <p>
  * This class is a wrapper for {@link ShoppingItemService}.
@@ -23,9 +25,28 @@ package com.liferay.portlet.shopping.service;
  * @see       ShoppingItemService
  * @generated
  */
-public class ShoppingItemServiceWrapper implements ShoppingItemService {
+public class ShoppingItemServiceWrapper implements ShoppingItemService,
+	ServiceWrapper<ShoppingItemService> {
 	public ShoppingItemServiceWrapper(ShoppingItemService shoppingItemService) {
 		_shoppingItemService = shoppingItemService;
+	}
+
+	/**
+	* Returns the Spring bean ID for this bean.
+	*
+	* @return the Spring bean ID for this bean
+	*/
+	public java.lang.String getBeanIdentifier() {
+		return _shoppingItemService.getBeanIdentifier();
+	}
+
+	/**
+	* Sets the Spring bean ID for this bean.
+	*
+	* @param beanIdentifier the Spring bean ID for this bean
+	*/
+	public void setBeanIdentifier(java.lang.String beanIdentifier) {
+		_shoppingItemService.setBeanIdentifier(beanIdentifier);
 	}
 
 	public void addBookItems(long groupId, long categoryId,
@@ -124,12 +145,26 @@ public class ShoppingItemServiceWrapper implements ShoppingItemService {
 			serviceContext);
 	}
 
+	/**
+	 * @deprecated Renamed to {@link #getWrappedService}
+	 */
 	public ShoppingItemService getWrappedShoppingItemService() {
 		return _shoppingItemService;
 	}
 
+	/**
+	 * @deprecated Renamed to {@link #setWrappedService}
+	 */
 	public void setWrappedShoppingItemService(
 		ShoppingItemService shoppingItemService) {
+		_shoppingItemService = shoppingItemService;
+	}
+
+	public ShoppingItemService getWrappedService() {
+		return _shoppingItemService;
+	}
+
+	public void setWrappedService(ShoppingItemService shoppingItemService) {
 		_shoppingItemService = shoppingItemService;
 	}
 

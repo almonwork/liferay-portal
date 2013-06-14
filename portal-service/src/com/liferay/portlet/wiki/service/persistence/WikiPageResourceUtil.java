@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -92,14 +92,6 @@ public class WikiPageResourceUtil {
 		return getPersistence()
 				   .findWithDynamicQuery(dynamicQuery, start, end,
 			orderByComparator);
-	}
-
-	/**
-	 * @see com.liferay.portal.service.persistence.BasePersistence#remove(com.liferay.portal.model.BaseModel)
-	 */
-	public static WikiPageResource remove(WikiPageResource wikiPageResource)
-		throws SystemException {
-		return getPersistence().remove(wikiPageResource);
 	}
 
 	/**
@@ -428,12 +420,14 @@ public class WikiPageResourceUtil {
 	*
 	* @param nodeId the node ID
 	* @param title the title
+	* @return the wiki page resource that was removed
 	* @throws SystemException if a system exception occurred
 	*/
-	public static void removeByN_T(long nodeId, java.lang.String title)
+	public static com.liferay.portlet.wiki.model.WikiPageResource removeByN_T(
+		long nodeId, java.lang.String title)
 		throws com.liferay.portal.kernel.exception.SystemException,
 			com.liferay.portlet.wiki.NoSuchPageResourceException {
-		getPersistence().removeByN_T(nodeId, title);
+		return getPersistence().removeByN_T(nodeId, title);
 	}
 
 	/**
@@ -493,11 +487,10 @@ public class WikiPageResourceUtil {
 		return _persistence;
 	}
 
+	/**
+	 * @deprecated
+	 */
 	public void setPersistence(WikiPageResourcePersistence persistence) {
-		_persistence = persistence;
-
-		ReferenceRegistry.registerReference(WikiPageResourceUtil.class,
-			"_persistence");
 	}
 
 	private static WikiPageResourcePersistence _persistence;
