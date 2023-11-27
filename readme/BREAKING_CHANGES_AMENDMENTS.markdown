@@ -28,6 +28,20 @@ so the correct message on **What** section should be
 
 modules/apps/frontend-taglib/frontend-taglib-clay/src/main/java/com/liferay/frontend/taglib/clay/servlet/taglib/base/BaseClayTag.java
 
+```
+LPS-198462 Removes unused BaseClayTag
+    
+# breaking
+    
+## What modules/apps/frontend-taglib/frontend-taglib-clay/src/main/java/com/liferay/frontend/taglib/clay/servlet/taglib/base/BaseClayTag.java
+    
+We are deleting BaseClayTag.java
+    
+## Why
+    
+It is an internal class and it doesn't have any usage in portal
+
+```
 ----
 
 # 678e4379fb055804a2100169b6310319d8f0d07e
