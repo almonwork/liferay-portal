@@ -501,16 +501,40 @@ export default function _JournalPortlet({
 		eventHandlers.push(
 			attachFormChangeListener({
 				acceptMutationRecord: (mutationRecord) => {
-					return [
-						mutationRecord.target,
-						...mutationRecord.addedNodes,
-						...mutationRecord.removedNodes,
-					].some(
-						(node) =>
-							node.name &&
-							node.name.startsWith(namespace) &&
-							node.name !== `${namespace}languageId`
-					);
+					const isRelevantNode = (node) =>
+						node.name &&
+						node.name.startsWith(namespace) &&
+						node.name !== `${namespace}languageId`;
+
+					if (mutationRecord.type === 'childList') {
+						const addedNodes = [
+							...mutationRecord.addedNodes,
+						].filter(isRelevantNode);
+						const removedNodes = [
+							...mutationRecord.removedNodes,
+						].filter(isRelevantNode);
+
+						if (!addedNodes.length && !removedNodes.length) {
+							return false;
+						}
+
+						if (!addedNodes.length || !removedNodes.length) {
+							return true;
+						}
+
+						return addedNodes.some((addedNode) => {
+							const removedNode = removedNodes.find(
+								(node) => node.name === addedNode.name
+							);
+
+							return (
+								!removedNode ||
+								addedNode.value !== removedNode.value
+							);
+						});
+					}
+
+					return isRelevantNode(mutationRecord.target);
 				},
 				callback: () => {
 					if (lockHolder.lock?.isLocked()) {
