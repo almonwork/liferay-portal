@@ -6,9 +6,11 @@
 package com.liferay.site.cms.site.initializer.internal.display.context;
 
 import com.liferay.depot.constants.DepotConstants;
+import com.liferay.depot.model.DepotEntry;
 import com.liferay.depot.service.DepotEntryLocalService;
 import com.liferay.depot.service.DepotEntryServiceUtil;
 import com.liferay.frontend.data.set.model.FDSActionDropdownItem;
+import com.liferay.frontend.taglib.clay.servlet.taglib.util.DropdownItem;
 import com.liferay.headless.asset.library.resource.v1_0.AssetLibraryResource;
 import com.liferay.object.model.ObjectEntryFolder;
 import com.liferay.object.service.ObjectDefinitionService;
@@ -22,6 +24,8 @@ import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.language.Language;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.model.Group;
+import com.liferay.portal.kernel.security.permission.ActionKeys;
+import com.liferay.portal.kernel.security.permission.PermissionChecker;
 import com.liferay.portal.kernel.security.permission.resource.ModelResourcePermission;
 import com.liferay.portal.kernel.service.GroupLocalService;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
@@ -38,6 +42,7 @@ import com.liferay.trash.TrashHelper;
 
 import jakarta.servlet.http.HttpServletRequest;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -88,6 +93,8 @@ public class ViewRecycleBinSectionDisplayContext
 
 			return HashMapBuilder.<String, Object>put(
 				"breadcrumbItems", jsonArray
+			).put(
+				"hasDeletePermission", _hasDeletePermission()
 			).put(
 				"hideSpace", true
 			).build();
@@ -145,6 +152,15 @@ public class ViewRecycleBinSectionDisplayContext
 		).put(
 			"size", "md"
 		).build();
+	}
+
+	@Override
+	public List<DropdownItem> getBulkActionDropdownItems() {
+		if (!_hasDeletePermission()) {
+			return Collections.emptyList();
+		}
+
+		return super.getBulkActionDropdownItems();
 	}
 
 	public Map<String, Object> getEmptyState() {
@@ -209,6 +225,29 @@ public class ViewRecycleBinSectionDisplayContext
 			filterString, " and groupIds/any(g:g in (",
 			StringUtil.merge(groupIds, ","), ")) and status eq ",
 			WorkflowConstants.STATUS_IN_TRASH);
+	}
+
+	private boolean _hasDeletePermission() {
+		PermissionChecker permissionChecker =
+			themeDisplay.getPermissionChecker();
+
+		for (long groupId :
+				DepotEntryServiceUtil.getDepotEntryGroupIds(
+					themeDisplay.getCompanyId(), themeDisplay.getUserId(),
+					DepotConstants.TYPE_SPACE)) {
+
+			Group group = groupLocalService.fetchGroup(groupId);
+
+			if ((group != null) &&
+				permissionChecker.hasPermission(
+					group, DepotEntry.class.getName(), group.getClassPK(),
+					ActionKeys.DELETE)) {
+
+				return true;
+			}
+		}
+
+		return false;
 	}
 
 	private final AssetLibraryResource.Factory _assetLibraryResourceFactory;
