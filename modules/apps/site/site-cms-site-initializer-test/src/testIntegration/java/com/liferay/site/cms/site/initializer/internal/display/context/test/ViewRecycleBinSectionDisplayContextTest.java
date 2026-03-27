@@ -11,6 +11,7 @@ import com.liferay.depot.service.DepotEntryLocalService;
 import com.liferay.fragment.renderer.FragmentRenderer;
 import com.liferay.frontend.data.set.model.FDSActionDropdownItem;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.CreationMenu;
+import com.liferay.frontend.taglib.clay.servlet.taglib.util.DropdownItem;
 import com.liferay.object.constants.ObjectFolderConstants;
 import com.liferay.object.model.ObjectEntryFolder;
 import com.liferay.petra.string.StringBundler;
@@ -89,9 +90,79 @@ public class ViewRecycleBinSectionDisplayContextTest
 						language.get(LocaleUtil.getDefault(), "recycle-bin")
 					))
 			).put(
+				"hasDeletePermission", true
+			).put(
 				"hideSpace", true
 			).build(),
 			_getBreadcrumbProps(displayContext));
+	}
+
+	@Test
+	public void testGetBreadcrumbPropsWithSpaceMember() throws Exception {
+		DepotEntry depotEntry = _addDepotEntry(
+			true, TestPropsValues.getUserId());
+
+		User spaceMember = UserTestUtil.addUser();
+
+		_groupLocalService.addUserGroup(
+			spaceMember.getUserId(), depotEntry.getGroupId());
+
+		setUser(spaceMember);
+
+		Object displayContext = getSectionDisplayContext(
+			getMockHttpServletRequest(spaceMember));
+
+		Map<String, Object> breadcrumbProps = _getBreadcrumbProps(
+			displayContext);
+
+		Assert.assertEquals(false, breadcrumbProps.get("hasDeletePermission"));
+
+		_depotEntryLocalService.deleteDepotEntry(depotEntry);
+		_userLocalService.deleteUser(spaceMember);
+	}
+
+	@Test
+	public void testGetBulkActionDropdownItemsWithAdminUser()
+		throws Exception {
+
+		HttpServletRequest httpServletRequest = getMockHttpServletRequest();
+
+		Object displayContext = getSectionDisplayContext(httpServletRequest);
+
+		List<DropdownItem> bulkActionDropdownItems =
+			_getBulkActionDropdownItems(displayContext);
+
+		Assert.assertFalse(
+			bulkActionDropdownItems.toString(),
+			bulkActionDropdownItems.isEmpty());
+	}
+
+	@Test
+	public void testGetBulkActionDropdownItemsWithSpaceMember()
+		throws Exception {
+
+		DepotEntry depotEntry = _addDepotEntry(
+			true, TestPropsValues.getUserId());
+
+		User spaceMember = UserTestUtil.addUser();
+
+		_groupLocalService.addUserGroup(
+			spaceMember.getUserId(), depotEntry.getGroupId());
+
+		setUser(spaceMember);
+
+		Object displayContext = getSectionDisplayContext(
+			getMockHttpServletRequest(spaceMember));
+
+		List<DropdownItem> bulkActionDropdownItems =
+			_getBulkActionDropdownItems(displayContext);
+
+		Assert.assertTrue(
+			bulkActionDropdownItems.toString(),
+			bulkActionDropdownItems.isEmpty());
+
+		_depotEntryLocalService.deleteDepotEntry(depotEntry);
+		_userLocalService.deleteUser(spaceMember);
 	}
 
 	@Override
@@ -273,6 +344,13 @@ public class ViewRecycleBinSectionDisplayContextTest
 	private HashMap<String, Object> _getBreadcrumbProps(Object displayContext) {
 		return ReflectionTestUtil.invoke(
 			displayContext, "getBreadcrumbProps", new Class<?>[0]);
+	}
+
+	private List<DropdownItem> _getBulkActionDropdownItems(
+		Object displayContext) {
+
+		return ReflectionTestUtil.invoke(
+			displayContext, "getBulkActionDropdownItems", new Class<?>[0]);
 	}
 
 	private String _getExpectedFilterString(long... groupIds) {
