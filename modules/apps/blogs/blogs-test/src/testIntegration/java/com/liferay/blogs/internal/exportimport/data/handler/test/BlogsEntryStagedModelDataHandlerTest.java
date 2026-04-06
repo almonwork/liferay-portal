@@ -72,6 +72,60 @@ public class BlogsEntryStagedModelDataHandlerTest
 			PermissionCheckerMethodTestRule.INSTANCE);
 
 	@Test
+	public void testImportEntryWithExistingERC() throws Exception {
+		initExport();
+
+		ServiceContext serviceContext =
+			ServiceContextTestUtil.getServiceContext(
+				stagingGroup.getGroupId(), TestPropsValues.getUserId());
+
+		BlogsEntry entry = BlogsEntryLocalServiceUtil.addEntry(
+			"test-erc-lpd-85081", TestPropsValues.getUserId(),
+			RandomTestUtil.randomString(), RandomTestUtil.randomString(),
+			RandomTestUtil.randomString(), RandomTestUtil.randomString(),
+			RandomTestUtil.randomString(), new Date(), true, true,
+			new String[0], StringPool.BLANK, null, null, serviceContext);
+
+		StagedModelDataHandlerUtil.exportStagedModel(portletDataContext, entry);
+
+		// Create a blog entry in the live group with the same ERC but a
+		// different UUID, simulating a lazy reference created by batch
+		// import
+
+		ServiceContext liveServiceContext =
+			ServiceContextTestUtil.getServiceContext(
+				liveGroup.getGroupId(), TestPropsValues.getUserId());
+
+		BlogsEntry conflictingEntry = BlogsEntryLocalServiceUtil.addEntry(
+			"test-erc-lpd-85081", TestPropsValues.getUserId(),
+			RandomTestUtil.randomString(), RandomTestUtil.randomString(),
+			RandomTestUtil.randomString(), RandomTestUtil.randomString(),
+			RandomTestUtil.randomString(), new Date(), true, true,
+			new String[0], StringPool.BLANK, null, null, liveServiceContext);
+
+		Assert.assertNotEquals(entry.getUuid(), conflictingEntry.getUuid());
+		Assert.assertEquals(
+			entry.getExternalReferenceCode(),
+			conflictingEntry.getExternalReferenceCode());
+
+		try (SafeCloseable safeCloseable = initImportWithSafeCloseable()) {
+			BlogsEntry exportedEntry = (BlogsEntry)readExportedStagedModel(
+				entry);
+
+			StagedModelDataHandlerUtil.importStagedModel(
+				portletDataContext, exportedEntry);
+
+			BlogsEntry importedEntry =
+				BlogsEntryLocalServiceUtil.
+					fetchBlogsEntryByExternalReferenceCode(
+						"test-erc-lpd-85081", liveGroup.getGroupId());
+
+			Assert.assertNotNull(importedEntry);
+			Assert.assertEquals(entry.getTitle(), importedEntry.getTitle());
+		}
+	}
+
+	@Test
 	public void testImportedCoverImage() throws Exception {
 		initExport();
 
